@@ -48,18 +48,6 @@ class BottomNavBarState extends State<BottomNavBar> {
           title: Text('Wallet'),
         ),
         new BottomNavigationBarItem(
-          icon: Icon(
-            Icons.supervised_user_circle,
-            color: Colors.grey.shade700,
-          ),
-          title: Text(
-            'Circles',
-            style: new TextStyle(
-              color: Colors.grey.shade700,
-            ),
-          ),
-        ),
-        new BottomNavigationBarItem(
             icon: Icon(Icons.people), title: Text('Social')),
         new BottomNavigationBarItem(
             icon: Icon(Icons.chat_bubble), title: Text('ChatBot'))
