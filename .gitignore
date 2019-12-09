@@ -311,7 +311,6 @@ example/*.njsproj
 example/*.sln
 example/*.sw*
 example/public/config.js
-example/package.json
 
 openkyc/*
 Makefile
