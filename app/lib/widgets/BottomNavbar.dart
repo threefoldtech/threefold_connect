@@ -45,7 +45,7 @@ class BottomNavBarState extends State<BottomNavBar> {
         ),
         new BottomNavigationBarItem(
           icon: Icon(Icons.account_balance_wallet),
-          title: Text('Pay'),
+          title: Text('Wallet'),
         ),
         new BottomNavigationBarItem(
           icon: Icon(
