@@ -1,0 +1,33 @@
+#app:before {
+    content: '';
+    transform: scale(1.1);
+    width: 100%;
+    height: 100%;
+    position: fixed;
+    background: url(./assets/bg.jpg);
+    background-position: center top;
+}
+.overlay {
+    width: 100%;
+    height: 100%;
+    position: fixed;
+    opacity: 0.75;
+}
+.fw {
+    width: 100%;
+}
+.notAlone {
+    textarea {
+        filter: blur(5px);
+    }
+}
+.qr {
+    img {
+        width: 200px;
+    }
+}
+
+// Vuetify extension
+.v-card {
+    border-radius: 10px;
+}

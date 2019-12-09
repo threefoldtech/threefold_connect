@@ -1,0 +1,25 @@
+<section class="login">
+    <v-card style="min-width: 300px;">
+        <v-toolbar class="primary">
+            <h1 class="headline white--text text-xs-center fw">
+                Verifing auth for {{username}}
+            </h1>
+        </v-toolbar>
+        <v-form>
+            <v-card-text>
+                <v-layout column align-center v-if="!verified && !error">
+                    <v-progress-circular :size="100" :width="15" color="accent" indeterminate>
+                    </v-progress-circular>
+                </v-layout>
+                <v-layout class="text-xs-center" align-center v-if="error">
+                    <v-icon left color="orange">info</v-icon>
+                    <span v-if="error">{{error}}</span>
+                </v-layout>
+                <v-layout column align-center v-if="verified">
+                    <v-icon>check</v-icon>
+                    <p>Ok</p>
+                </v-layout>
+            </v-card-text>
+        </v-form>
+    </v-card>
+</section>

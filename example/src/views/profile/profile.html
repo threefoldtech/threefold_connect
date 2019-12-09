@@ -1,0 +1,18 @@
+<section class="profile">
+  <v-card style="min-width: 300px;">
+    <v-toolbar class="primary">
+      <h1 class="headline white--text text-xs-center fw">
+        You are logged in
+      </h1>
+    </v-toolbar>
+    <v-form>
+      <v-card-text>
+        <v-layout column>
+          <p>Hi {{user.name}}</p>
+          <p>{{user.email}}</p>
+          <p>{{user}}</p>
+        </v-layout>
+      </v-card-text>
+    </v-form>
+  </v-card>
+</section>

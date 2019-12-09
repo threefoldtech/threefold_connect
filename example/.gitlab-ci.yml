@@ -1,0 +1,10 @@
+before_script:
+  - docker info
+
+build_image:
+  script: 
+    - mv public/config.staging.js public/config.js
+    - npm install
+    - npm run build
+    - docker build -t jimber/login_example:staging .
+    - docker push jimber/login_example:staging
