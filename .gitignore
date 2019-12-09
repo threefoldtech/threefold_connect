@@ -1,0 +1,317 @@
+# Miscellaneous
+app/*.class
+app/*.log
+app/*.pyc
+app/*.swp
+app/.DS_Store
+app/.atom/
+app/.buildlog/
+app/.history
+app/.svn/
+
+# IntelliJ related
+app/*.iml
+app/*.ipr
+app/*.iws
+app/.idea/
+
+# Visual Studio Code related
+app/.vscode/
+
+# Flutter/Dart/Pub related
+app/**/doc/api/
+app/.dart_tool/
+app/.flutter-plugins
+app/.packages
+app/.pub-cache/
+app/.pub/
+app/build/
+
+# Android related
+app/**/android/**/gradle-wrapper.jar
+app/**/android/.gradle
+app/**/android/captures/
+app/**/android/gradlew
+app/**/android/gradlew.bat
+app/**/android/local.properties
+app/**/android/**/GeneratedPluginRegistrant.java
+
+# iOS/XCode related
+app/**/ios/**/*.mode1v3
+app/**/ios/**/*.mode2v3
+app/**/ios/**/*.moved-aside
+app/**/ios/**/*.pbxuser
+app/**/ios/**/*.perspectivev3
+app/**/ios/**/*sync/
+app/**/ios/**/.sconsign.dblite
+app/**/ios/**/.tags*
+app/**/ios/**/.vagrant/
+app/**/ios/**/DerivedData/
+app/**/ios/**/Icon?
+app/**/ios/**/Pods/
+app/**/ios/**/.symlinks/
+app/**/ios/**/profile
+app/**/ios/**/xcuserdata
+app/**/ios/.generated/
+app/**/ios/Flutter/App.framework
+app/**/ios/Flutter/Flutter.framework
+app/**/ios/Flutter/Generated.xcconfig
+app/**/ios/Flutter/app.flx
+app/**/ios/Flutter/app.zip
+app/**/ios/Flutter/flutter_assets/
+app/**/ios/ServiceDefinitions.json
+app/**/ios/Runner/GeneratedPluginRegistrant.*
+
+# Exceptions to above rules.
+app/!**/ios/**/default.mode1v3
+app/!**/ios/**/default.mode2v3
+app/!**/ios/**/default.pbxuser
+app/!**/ios/**/default.perspectivev3
+app/!/packages/flutter_tools/test/data/dart_dependencies_test/**/.packages
+
+app/android/app-key\.keystore
+app/android/app/app-key.keystore
+
+app/android/key\.properties
+app/android/app/google-services-prod.json
+app/android/app/google-services-staging.json
+app/android/app/google-services-local.json
+app/android/app/google-services.json
+
+app/android/app/app-key.keystore
+
+
+# Created by https://www.gitignore.io/api/macos,linux,python,visualstudiocode
+# Edit at https://www.gitignore.io/?templates=macos,linux,python,visualstudiocode
+
+### Linux ###
+backend/*~
+
+# temporary files which can be created if a process still has a handle open of a deleted file
+backend/.fuse_hidden*
+
+# KDE directory preferences
+backend/.directory
+
+# Linux trash folder which might appear on any partition or disk
+backend/.Trash-*
+
+# .nfs files are created when an open file is removed but is still being accessed
+backend/.nfs*
+
+### macOS ###
+# General
+backend/.DS_Store
+backend/.AppleDouble
+backend/.LSOverride
+
+# Icon must end with two \r
+backend/Icon
+
+# Thumbnails
+backend/._*
+
+# Files that might appear in the root of a volume
+backend/.DocumentRevisions-V100
+backend/.fseventsd
+backend/.Spotlight-V100
+backend/.TemporaryItems
+backend/.Trashes
+backend/.VolumeIcon.icns
+backend/.com.apple.timemachine.donotpresent
+
+# Directories potentially created on remote AFP share
+backend/.AppleDB
+backend/.AppleDesktop
+backend/Network Trash Folder
+backend/Temporary Items
+backend/.apdisk
+
+### Python ###
+# Byte-compiled / optimized / DLL files
+backend/__pycache__/
+backend/*.py[cod]
+backend/*$py.class
+
+# C extensions
+backend/*.so
+
+# Distribution / packaging
+backend/.Python
+backend/build/
+backend/develop-eggs/
+backend/dist/
+backend/downloads/
+backend/eggs/
+backend/.eggs/
+backend/lib/
+backend/lib64/
+backend/parts/
+backend/sdist/
+backend/var/
+backend/wheels/
+backend/pip-wheel-metadata/
+backend/share/python-wheels/
+backend/*.egg-info/
+backend/.installed.cfg
+backend/*.egg
+backend/MANIFEST
+backend/myenv/
+# PyInstaller
+#  Usually these files are written by a python script from a template
+#  before PyInstaller builds the exe, so as to inject date/other infos into it.
+backend/*.manifest
+backend/*.spec
+
+# Installer logs
+backend/pip-log.txt
+backend/pip-delete-this-directory.txt
+
+# Unit test / coverage reports
+backend/htmlcov/
+backend/.tox/
+backend/.nox/
+backend/.coverage
+backend/.coverage.*
+backend/.cache
+backend/nosetests.xml
+backend/coverage.xml
+backend/*.cover
+backend/.hypothesis/
+backend/.pytest_cache/
+
+# Translations
+backend/*.mo
+backend/*.pot
+
+# Django stuff:
+backend/*.log
+backend/local_settings.py
+backend/db.sqlite3
+
+# Flask stuff:
+backend/instance/
+backend/.webassets-cache
+
+# Scrapy stuff:
+backend/.scrapy
+
+# Sphinx documentation
+backend/docs/_build/
+
+# PyBuilder
+backend/target/
+
+# Jupyter Notebook
+backend/.ipynb_checkpoints
+
+# IPython
+backend/profile_default/
+backend/ipython_config.py
+
+# pyenv
+backend/.python-version
+
+# celery beat schedule file
+backend/celerybeat-schedule
+
+# SageMath parsed files
+backend/*.sage.py
+
+# Environments
+backend/.env
+backend/.venv
+backend/env/
+backend/venv/
+backend/ENV/
+backend/env.bak/
+backend/venv.bak/
+
+# Spyder project settings
+backend/.spyderproject
+backend/.spyproject
+
+# Rope project settings
+backend/.ropeproject
+
+# mkdocs documentation
+backend/site
+
+# mypy
+backend/.mypy_cache/
+backend/.dmypy.json
+backend/dmypy.json
+
+# Pyre type checker
+backend/.pyre/
+
+### Python Patch ###
+backend/.venv/
+
+### VisualStudioCode ###
+backend/.vscode/*
+backend/!.vscode/settings.json
+backend/!.vscode/tasks.json
+backend/!.vscode/launch.json
+backend/!.vscode/extensions.json
+
+### VisualStudioCode Patch ###
+# Ignore all local history of files
+backend/.history
+
+# End of https://www.gitignore.io/api/macos,linux,python,visualstudiocode
+
+backend/config.ini
+backend/pythonsqlite.db
+backend/.vscode/settings.json
+backend/backend_venv
+
+frontend/.DS_Store
+frontend/node_modules
+frontend/dist
+
+# local env files
+frontend/.env.local
+frontend/.env.*.local
+
+# Log files
+frontend/npm-debug.log*
+frontend/yarn-debug.log*
+frontend/yarn-error.log*
+
+# Editor directories and files
+frontend/.idea
+frontend/.vscode
+frontend/*.suo
+frontend/*.ntvs*
+frontend/*.njsproj
+frontend/*.sln
+frontend/*.sw*
+frontend/public/config.js
+
+example/.DS_Store
+example/node_modules
+example/dist
+
+# local env files
+example/.env.local
+example/.env.*.local
+
+# Log files
+example/npm-debug.log*
+example/yarn-debug.log*
+example/yarn-error.log*
+
+# Editor directories and files
+example/.idea
+example/.vscode
+example/*.suo
+example/*.ntvs*
+example/*.njsproj
+example/*.sln
+example/*.sw*
+example/public/config.js
+example/package.json
+
+openkyc/*
+Makefile
