@@ -10,8 +10,9 @@ import 'package:threebotlogin/widgets/ReuseableTextFieldStep.dart';
 
 class MobileRegistrationScreen extends StatefulWidget {
   final String doubleName;
+  final Uri link;
 
-  MobileRegistrationScreen({this.doubleName});
+  MobileRegistrationScreen({this.doubleName, this.link});
 
   _MobileRegistrationScreenState createState() =>
       _MobileRegistrationScreenState();
@@ -148,7 +149,8 @@ class _MobileRegistrationScreenState extends State<MobileRegistrationScreen> {
         MaterialPageRoute(
             builder: (context) => RegistrationWithoutScanScreen(
                 registrationData,
-                resetPin: true)));
+                resetPin: true,
+                link: widget.link)));
   }
 
   loadingDialog() {

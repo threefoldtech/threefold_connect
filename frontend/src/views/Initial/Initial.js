@@ -120,17 +120,11 @@ export default {
       return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
     },
     lostFocus () {
-      console.log(`Lost focus, set flag`)
       this.didLeavePage = true
     },
     gotFocus () {
-      console.log(`--- Got focus again, flag is ${this.didLeavePage}`)
-      // this.forceRefetchStatus()
       if (this.didLeavePage) {
-        if (!this.rechecked) {
-          this.forceRefetchStatus()
-        }
-        this.rechecked = true
+        this.forceRefetchStatus()
       }
     },
     promptLoginToMobileUser () {
@@ -212,10 +206,6 @@ export default {
     signed (val) {
       try {
         if (val) {
-          debugger
-          console.log('Val: ', JSON.stringify(val))
-          console.log(val)
-
           window.localStorage.setItem('username', val.doubleName)
           var signedHash = encodeURIComponent(val.signedHash)
           var data
@@ -243,8 +233,6 @@ export default {
             } else {
               safeRedirectUri = '/' + this.redirectUrl
             }
-
-            debugger
 
             var url = `//${this.appId}${safeRedirectUri}${union}username=${val.doubleName}&signedhash=${signedHash}&data=${data}`
             if (!this.isRedirecting) {

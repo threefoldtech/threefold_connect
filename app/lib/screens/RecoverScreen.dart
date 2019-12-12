@@ -79,7 +79,8 @@ class _RecoverScreenState extends State<RecoverScreen> {
         MaterialPageRoute(
             builder: (context) => RegistrationWithoutScanScreen(
                 registrationData,
-                resetPin: true)));
+                resetPin: true,
+                link: null)));
   }
 
   checkSeedLength(seedPhrase) {

@@ -87,15 +87,37 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     if (link.host == 'login') {
       var state = link.queryParameters['state'];
       var doubleName = await getDoubleName();
-      Map<String, dynamic> data = { 'doubleName': doubleName, 'mobile': true, 'firstTime': false, 'sid': 'random', 'state': state };
+      if (doubleName != null) {
+        Map<String, dynamic> data = {
+          'doubleName': doubleName,
+          'mobile': true,
+          'firstTime': false,
+          'sid': 'random',
+          'state': state
+        };
 
-      await loginMobile(data);
-      return openPage(LoginScreen(link.queryParameters));
+        await loginMobile(data);
+        return openPage(LoginScreen(link.queryParameters));
+      } else {
+        if (doubleName == null) {
+          Navigator.popUntil(context, ModalRoute.withName('/'));
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => MobileRegistrationScreen(
+                  doubleName: '',
+                  link: link
+              ),
+            ),
+          );
+        }
+      }
     }
     if (link.host == 'register') {
       openPage(RegistrationWithoutScanScreen(
         link.queryParameters,
         resetPin: false,
+        link: null
       ));
     } else if (link.host == "registeraccount") {
       // Check if we already have an account registered before showing this screen.
@@ -108,7 +130,8 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
           context,
           MaterialPageRoute(
             builder: (context) => MobileRegistrationScreen(
-                doubleName: link.queryParameters['doubleName']),
+                doubleName: link.queryParameters['doubleName'],
+                link: null),
           ),
         );
       } else {

@@ -10,12 +10,15 @@ import 'package:threebotlogin/services/cryptoService.dart';
 import 'package:threebotlogin/services/3botService.dart';
 import 'package:threebotlogin/main.dart';
 
+import 'LoginScreen.dart';
+
 class RegistrationWithoutScanScreen extends StatefulWidget {
   final Widget registrationWithoutScanScreen;
   final initialData;
   final bool resetPin;
+  final Uri link;
   RegistrationWithoutScanScreen(this.initialData,
-      {Key key, this.registrationWithoutScanScreen, this.resetPin})
+      {Key key, this.registrationWithoutScanScreen, this.resetPin, this.link})
       : super(key: key);
 
   _RegistrationWithoutScanScreen createState() =>
@@ -147,7 +150,25 @@ class _RegistrationWithoutScanScreen
     await sendVerificationEmail();
 
     Navigator.popUntil(context, ModalRoute.withName('/'));
+
+    if (widget.link != null) {
+       Map<String, dynamic> data = {
+          'doubleName': doubleName,
+          'mobile': true,
+          'firstTime': false,
+          'sid': 'random',
+          'state': widget.link.queryParameters['state']
+        };
+        await loginMobile(data);
+        return openPage(LoginScreen(widget.link.queryParameters));
+    }
+
     Navigator.of(context).pushNamed('/registered');
+  }
+
+  openPage(page) {
+    Navigator.popUntil(context, ModalRoute.withName('/'));
+    Navigator.push(context, MaterialPageRoute(builder: (context) => page));
   }
 
   loadingDialog() {

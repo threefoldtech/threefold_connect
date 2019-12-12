@@ -138,14 +138,14 @@ class _LoginScreenState extends State<LoginScreen> {
 
     String scopePermissions = await getScopePermissions();
     if (scopePermissions == null) {
-      saveScopePermissions(jsonEncode(HashMap()));
+      saveScopePermissions(jsonEncode(scope));
+      scopePermissions = jsonEncode(scope);
     }
 
     var initialPermissions = jsonDecode(scopePermissions);
 
     if (!initialPermissions.containsKey(widget.message['appId'])) {
       var newHashMap = new HashMap();
-      var appId = widget.message['appId'];
       initialPermissions[widget.message['appId']] = newHashMap;
 
       if (scope != null) {
