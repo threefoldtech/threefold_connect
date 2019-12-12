@@ -32,8 +32,7 @@ export default {
   },
   methods: {
     ...mapActions([
-      'resendNotification',
-      'forceRefetchStatus'
+      'resendNotification'
     ]),
     openApp () {
       if (this.isMobile) {
@@ -47,19 +46,6 @@ export default {
         } else if (/Android|webOS|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
           window.open(url)
         }
-      }
-    },
-    lostFocus () {
-      console.log(`Lost focus, set flag`)
-      this.didLeavePage = true
-    },
-    gotFocus () {
-      console.log(`--- Got focus again, flag is ${this.didLeavePage}`)
-      if (this.didLeavePage) {
-        if (!this.rechecked) {
-          this.forceRefetchStatus()
-        }
-        this.rechecked = true
       }
     }
   },
@@ -99,6 +85,7 @@ export default {
             }
 
             var url = `//${this.appId}${safeRedirectUri}${union}username=${this.doubleName}&signedhash=${signedHash}&data=${data}`
+            debugger
             if (!this.isRedirecting) {
               this.isRedirecting = true
               console.log('Changing href: ', url)

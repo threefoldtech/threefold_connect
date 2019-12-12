@@ -4,6 +4,7 @@ import 'package:http/http.dart' as http;
 import 'package:http/http.dart';
 import 'package:threebotlogin/main.dart';
 import 'dart:convert';
+import 'package:socket_io_client/socket_io_client.dart' as IO;
 
 import 'package:threebotlogin/screens/ErrorScreen.dart';
 import 'package:threebotlogin/services/cryptoService.dart';
@@ -15,12 +16,18 @@ Map<String, String> requestHeaders = {'Content-type': 'application/json'};
 sendScannedFlag(String hash, String deviceId, String doubleName) async {
   http.post(
     '$threeBotApiUrl/flag',
-    body: json.encode({'hash': hash, 'deviceId': deviceId, 'isSigned': true, 'doubleName': doubleName}),
+    body: json.encode({
+      'hash': hash,
+      'deviceId': deviceId,
+      'isSigned': true,
+      'doubleName': doubleName
+    }),
     headers: requestHeaders,
   );
 }
 
-Future updateDeviceId(String deviceId, String doubleName, String privateKey) async {
+Future updateDeviceId(
+    String deviceId, String doubleName, String privateKey) async {
   String signedDeviceId = await signData(deviceId, privateKey);
 
   return http.put('$threeBotApiUrl/users/$doubleName/deviceid',
@@ -95,11 +102,10 @@ Future<Response> removeDeviceId(String doubleName) async {
 
   try {
     return await http.delete('$threeBotApiUrl/users/$doubleName/deviceid',
-      headers: loginRequestHeaders);
+        headers: loginRequestHeaders);
   } catch (e) {
     return null;
   }
-
 }
 
 Future<int> checkVersionNumber(BuildContext context, String version) async {
@@ -143,18 +149,19 @@ Future cancelLogin(doubleName) {
 }
 
 Future getUserInfo(doubleName) {
-  return http.get('$threeBotApiUrl/users/$doubleName',
-     headers: requestHeaders);
+  return http.get('$threeBotApiUrl/users/$doubleName', headers: requestHeaders);
 }
 
-Future<http.Response> finishRegistration(String doubleName, String email, String sid, String publicKey) async {
-  return http.post('$threeBotApiUrl/mobileregistration', body: json.encode({
-    'doubleName' : doubleName+'.3bot',
-    'sid' : sid,
-    'email' : email,
-    'public_key' : publicKey,
-  }),
-  headers: requestHeaders);
+Future<http.Response> finishRegistration(
+    String doubleName, String email, String sid, String publicKey) async {
+  return http.post('$threeBotApiUrl/mobileregistration',
+      body: json.encode({
+        'doubleName': doubleName + '.3bot',
+        'sid': sid,
+        'email': email,
+        'public_key': publicKey,
+      }),
+      headers: requestHeaders);
 }
 
 Future sendRegisterSign(String doubleName) {
@@ -166,5 +173,31 @@ Future sendRegisterSign(String doubleName) {
 }
 
 Future<http.Response> getShowApps() async {
-    return http.get('$threeBotApiUrl/showapps', headers: requestHeaders);
+  return http.get('$threeBotApiUrl/showapps', headers: requestHeaders);
+}
+
+void connectSocket(Map<String, dynamic> data) {
+  var jsonData = jsonEncode(data);
+  var apiUrl = threeBotApiUrl.split('/api')[0];
+  IO.Socket socket = IO.io(apiUrl, <String, dynamic>{
+    'transports': ['websocket'],
+    'extraHeaders': {'foo': 'bar'} // optional
+  });
+  socket.on('connect', (_) {
+    print('connect');
+    logger.log('------------------socket-connected--------------------');
+    socket.emit('login', jsonData);
+    return;
+  });
+  socket.on('event', (data) => print(data));
+  socket.on('error', (err) => print(err));
+  socket.on('disconnect', (_) => print('disconnect'));
+  socket.on('fromServer', (_) => print(_));
+}
+
+Future<http.Response> loginMobile(Map<String, dynamic> data) {
+  var jsonData = jsonEncode(data);
+  return http.post('$threeBotApiUrl/loginmobile',
+      body: jsonData,
+      headers: requestHeaders);
 }

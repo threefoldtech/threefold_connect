@@ -49,7 +49,6 @@ def connect_handler():
 @sio.on('checkname')
 def checkname_handler(data):
     logger.debug("Checking name %s", data)
-    sid = request.sid
     user = db.getUserByName(conn, data.get('doubleName').lower())
 
     if user:
@@ -82,7 +81,6 @@ def registration_handler(data):
 def login_handler(data):
     logger.debug("Login %s", data)
     data['type'] = 'login'
-
     sid = request.sid
     user = db.getUserByName(conn, data.get('doubleName').lower())
     if user:
@@ -129,7 +127,7 @@ def force_refetch_handler():
     loggin_attempt = db.getAuthByStateHash(conn, data['hash'])
     logger.debug("Login attempt %s", loggin_attempt)
     if (loggin_attempt != None):
-        data = {"scanned": loggin_attempt[3], "signed": {'signedHash': loggin_attempt[4], 'data': loggin_attempt[5]}}
+        data = {"scanned": loggin_attempt[3], "signed": {'signedHash': loggin_attempt[4], 'data': loggin_attempt[5], 'doubleName': loggin_attempt[0]}}
         response = app.response_class(
             response=json.dumps(data),
             mimetype='application/json'
@@ -201,6 +199,7 @@ def signRegisterHandler():
     if user:
         sio.emit('signed', {
             'data': body.get('data'),
+            'doubleName': body.get('doubleName')
         }, room=user[1])
         return Response('Ok')
     else:
@@ -210,7 +209,7 @@ def signRegisterHandler():
 @app.route('/api/sign', methods=['POST'])
 def sign_handler():
     body = request.get_json()
-    logger.debug("Sign: %s", body)
+    # logger.debug("Sign: %s", body)
     login_attempt = db.getAuthByStateHash(conn, body.get('hash'))
     if login_attempt != None:
         user = db.getUserByName(conn, login_attempt[0])
@@ -222,10 +221,33 @@ def sign_handler():
             'data': body.get('data'),
             'selectedImageId': body.get('selectedImageId')
         }, room=user[1])
+        logger.debug('signed emitted')
         return Response("Ok")
     else:
         return Response("Something went wrong", status=500)
 
+@app.route('/api/loginmobile', methods=['POST'])
+def login_handler1():
+    data = request.get_json()
+    logger.debug("Login %s", data)
+    data['type'] = 'login'
+
+    sid = data.get('sid')
+    user = db.getUserByName(conn, data.get('doubleName').lower())
+    if user:
+        logger.debug("User found %s", user[0])
+        update_sql = "UPDATE users SET sid=?  WHERE double_name=?;"
+        db.update_user(conn, update_sql, sid, user[0])
+
+    if data.get('firstTime') == False and data.get('mobile') == False:
+        user = db.getUserByName(conn, data.get('doubleName').lower())
+        push_service.notify_single_device(registration_id=user[4], message_title='Finish login',
+                                          message_body='Tap to finish login', data_message=data, click_action='FLUTTER_NOTIFICATION_CLICK', tag='testLogin', collapse_key='testLogin')
+
+    insert_auth_sql = "INSERT INTO auth (double_name,state_hash,timestamp,scanned,data) VALUES (?,?,?,?,?);"
+    db.insert_auth(conn, insert_auth_sql, data.get('doubleName').lower(
+    ), data.get('state'), datetime.now(), 0, json.dumps(data))
+    return Response("Ok")
 
 @app.route('/api/attempts/<doublename>', methods=['GET'])
 def get_attempts_handler(doublename):

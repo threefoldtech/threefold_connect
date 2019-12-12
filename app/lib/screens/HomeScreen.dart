@@ -84,6 +84,14 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   }
 
   checkWhatPageToOpen(Uri link) async {
+    if (link.host == 'login') {
+      var state = link.queryParameters['state'];
+      var doubleName = await getDoubleName();
+      Map<String, dynamic> data = { 'doubleName': doubleName, 'mobile': true, 'firstTime': false, 'sid': 'random', 'state': state };
+
+      await loginMobile(data);
+      return openPage(LoginScreen(link.queryParameters));
+    }
     if (link.host == 'register') {
       openPage(RegistrationWithoutScanScreen(
         link.queryParameters,

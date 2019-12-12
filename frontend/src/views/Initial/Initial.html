@@ -34,7 +34,7 @@
               Hi! What is your 3bot name?
             </p>
             <v-text-field @input="checkNameAvailability" :disabled="nameCheckStatus.checking" :rules="nameRules"
-              autofocus v-model="doubleName" box label="Name"
+              v-model="doubleName" box label="Name"
               :hint="doubleName ? `Your 3bot address: ${doubleName}.3bot` : `Whats your 3bot address?`" required
               counter=50></v-text-field>
             <br>

@@ -175,6 +175,12 @@ export default new Vuex.Store({
         logintoken: (data.logintoken || null)
       })
     },
+    loginUserMobile (context, data) {
+      context.commit('setSigned', null)
+      context.commit('setFirstTime', data.firstTime)
+      context.commit('setRandomImageId')
+      context.commit('setIsMobile', data.mobile)
+    },
     resendNotification (context) {
       context.commit('setRandomImageId')
       socketService.emit('resend', {
@@ -187,9 +193,9 @@ export default new Vuex.Store({
       })
     },
     forceRefetchStatus (context) {
-      if (context.getters.hash && context.getters.doubleName) {
-        console.log(`Forcerefetching for ${context.getters.doubleName}`)
-        axios.get(`${config.apiurl}api/forcerefetch?hash=${context.getters.hash}&doublename=${context.getters.doubleName}`).then(response => {
+      if (context.getters.hash) {
+        // console.log(`Forcerefetching for ${context.getters.doubleName}`)
+        axios.get(`${config.apiurl}api/forcerefetch?hash=${context.getters.hash}`).then(response => {
           if (response.data.scanned) context.commit('setScannedFlagUp', response.data.scanned)
           if (response.data.signed) context.commit('setSigned', response.data.signed)
         }).catch(e => {

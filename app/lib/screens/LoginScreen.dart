@@ -145,6 +145,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
     if (!initialPermissions.containsKey(widget.message['appId'])) {
       var newHashMap = new HashMap();
+      var appId = widget.message['appId'];
       initialPermissions[widget.message['appId']] = newHashMap;
 
       if (scope != null) {
