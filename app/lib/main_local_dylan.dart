@@ -6,9 +6,9 @@ import 'main.dart';
 void main() async {
   var config = Config(
       name: '3bot local',
-      threeBotApiUrl: 'http://192.168.0.225:5000/api',
-      openKycApiUrl: 'http://192.168.0.225:5005',
-      threeBotFrontEndUrl: 'http://192.168.0.225:8081/',
+      threeBotApiUrl: 'http://192.168.8.66:5000/api',
+      openKycApiUrl: 'http://192.168.8.66:5005',
+      threeBotFrontEndUrl: 'http://192.168.8.66:8081/',
       child: new MyApp());
 
   init();
@@ -25,13 +25,13 @@ void main() async {
         textAlign: TextAlign.center,
       ),
       "subheading": '',
-      "url": 'http://192.168.0.225:8082',
+      "url": 'http://192.168.8.66:8082',
       "bg": 'nbh.png',
       "disabled": false,
-      "initialUrl": 'http://192.168.0.225:8082',
+      "initialUrl": 'http://192.168.8.66:8082',
       "visible": false,
       "id": 1,
-      "appid": '192.168.0.225:8082',
+      "appid": '192.168.8.66:8082',
       "redirecturl": '/login',
       'cookieUrl': '',
       'localStorageKeys': true,

@@ -4,7 +4,6 @@ import 'package:http/http.dart' as http;
 import 'package:http/http.dart';
 import 'package:threebotlogin/main.dart';
 import 'dart:convert';
-import 'package:socket_io_client/socket_io_client.dart' as IO;
 
 import 'package:threebotlogin/screens/ErrorScreen.dart';
 import 'package:threebotlogin/services/cryptoService.dart';
@@ -174,25 +173,6 @@ Future sendRegisterSign(String doubleName) {
 
 Future<http.Response> getShowApps() async {
   return http.get('$threeBotApiUrl/showapps', headers: requestHeaders);
-}
-
-void connectSocket(Map<String, dynamic> data) {
-  var jsonData = jsonEncode(data);
-  var apiUrl = threeBotApiUrl.split('/api')[0];
-  IO.Socket socket = IO.io(apiUrl, <String, dynamic>{
-    'transports': ['websocket'],
-    'extraHeaders': {'foo': 'bar'} // optional
-  });
-  socket.on('connect', (_) {
-    print('connect');
-    logger.log('------------------socket-connected--------------------');
-    socket.emit('login', jsonData);
-    return;
-  });
-  socket.on('event', (data) => print(data));
-  socket.on('error', (err) => print(err));
-  socket.on('disconnect', (_) => print('disconnect'));
-  socket.on('fromServer', (_) => print(_));
 }
 
 Future<http.Response> loginMobile(Map<String, dynamic> data) {

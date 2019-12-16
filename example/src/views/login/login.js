@@ -52,10 +52,7 @@ export default {
       window.location.href = `${config.botFrontEnd}?state=${state}&appid=${appid}&scope=${scope}&publickey=${encodeURIComponent(CryptoService.getEdPkInCurve(keys.publicKey))}&doublename=${this.$route.query.doublename}&logintoken=${this.$route.query.logintoken}&redirecturl=${encodeURIComponent(`${config.redirect_url}`)}`
     },
     async redirect(state, scope, appid, publicKey, redirectUrl) {
-      
       window.location.href = `${config.botFrontEnd}?state=${state}&scope=${scope}&appid=${appid}&publickey=${encodeURIComponent(CryptoService.getEdPkInCurve(publicKey))}&redirecturl=${encodeURIComponent(redirectUrl)}`
-    
-
     }
     // generateKey () {
     //   CryptoService.generateKeys().then(keys => {

@@ -85,6 +85,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
 
   checkWhatPageToOpen(Uri link) async {
     if (link.host == 'login') {
+
       var state = link.queryParameters['state'];
       var doubleName = await getDoubleName();
       if (doubleName != null) {
@@ -96,8 +97,18 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
           'state': state
         };
 
+        bool autoLogin = false;
+        var scope = jsonDecode(link.queryParameters['scope']);
+        if (scope['trustedDevice'] != null) {
+          var trustedDevice = scope['trustedDevice'];
+          if (await isTrustedDevice(link.queryParameters['appId'], trustedDevice)) {
+            print('you are logged in');
+            autoLogin = true;
+          }
+        }
+
         await loginMobile(data);
-        return openPage(LoginScreen(link.queryParameters));
+        return openPage(LoginScreen(link.queryParameters, autoLogin: autoLogin));
       } else {
         if (doubleName == null) {
           Navigator.popUntil(context, ModalRoute.withName('/'));

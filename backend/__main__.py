@@ -209,7 +209,7 @@ def signRegisterHandler():
 @app.route('/api/sign', methods=['POST'])
 def sign_handler():
     body = request.get_json()
-    # logger.debug("Sign: %s", body)
+    logger.debug("Sign: %s", body)
     login_attempt = db.getAuthByStateHash(conn, body.get('hash'))
     if login_attempt != None:
         user = db.getUserByName(conn, login_attempt[0])

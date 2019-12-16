@@ -2,7 +2,7 @@ import {
   mapActions,
   mapGetters
 } from 'vuex'
-var cookies = require('vue-cookies')
+const cookies = require('vue-cookies')
 
 export default {
   name: 'initial',
@@ -214,6 +214,11 @@ export default {
             data = encodeURIComponent(JSON.stringify(val.data))
           } else {
             data = encodeURIComponent(val.data)
+          }
+
+          const trustedDevice = JSON.parse(val.data).trustedDevice
+          if (trustedDevice) {
+            cookies.set(`td-${this.appId}`, JSON.stringify(trustedDevice))
           }
 
           console.log('signedHash: ', signedHash)

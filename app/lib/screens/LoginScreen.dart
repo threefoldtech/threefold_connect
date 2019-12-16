@@ -18,12 +18,14 @@ class LoginScreen extends StatefulWidget {
   final Widget scopeList;
   final message;
   final bool closeWhenLoggedIn;
+  final bool autoLogin;
 
   LoginScreen(this.message,
       {Key key,
       this.loginScreen,
       this.closeWhenLoggedIn = false,
-      this.scopeList})
+      this.scopeList,
+      this.autoLogin = false})
       : super(key: key);
 
   _LoginScreenState createState() => _LoginScreenState();
@@ -61,6 +63,10 @@ class _LoginScreenState extends State<LoginScreen> {
     isMobileCheck = checkMobile();
 
     makePermissionPrefs();
+
+    if (widget.autoLogin) {
+      return this.sendIt();
+    }
 
     // Generate EmojiList
     generateEmojiImageList();
@@ -121,8 +127,12 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   bool isRequired(value, givenScope) {
-    return jsonDecode(givenScope)[value] != null &&
-        jsonDecode(givenScope)[value];
+    var decodedValue = jsonDecode(givenScope)[value];
+    if (decodedValue == null) return false;
+    if (decodedValue is String) {
+      return true;
+    }
+    else return decodedValue && decodedValue != null;
   }
 
   makePermissionPrefs() async {
@@ -133,6 +143,12 @@ class _LoginScreenState extends State<LoginScreen> {
 
       if (jsonDecode(widget.message['scope']).containsKey('derivedSeed')) {
         scope['derivedSeed'] = await getDerivedSeed(widget.message['appId']);
+      }
+
+      if (jsonDecode(widget.message['scope']).containsKey('trustedDevice')) {
+        var trustedDevice = {};
+        trustedDevice['trustedDevice'] = json.decode(widget.message['scope'])['trustedDevice'];
+        scope['trustedDevice'] = trustedDevice;
       }
     }
 
@@ -158,11 +174,10 @@ class _LoginScreenState extends State<LoginScreen> {
       }
       saveScopePermissions(jsonEncode(initialPermissions));
     } else {
-      List<String> permissions = ['doubleName', 'email', 'derivedSeed'];
+      List<String> permissions = ['doubleName', 'email', 'derivedSeed', 'trustedDevice'];
 
       permissions.forEach((var permission) {
-        if (!initialPermissions[widget.message['appId']]
-            .containsKey(permission)) {
+        if (!initialPermissions[widget.message['appId']].containsKey(permission)) {
           initialPermissions[widget.message['appId']][permission] = {
             'enabled': true,
             'required': isRequired(permission, widget.message['scope'])
@@ -393,9 +408,18 @@ class _LoginScreenState extends State<LoginScreen> {
       print(exception);
     }
 
-    var data = encrypt(jsonEncode(tmpScope), publicKey, await getPrivateKey());
+    var data = await encrypt(jsonEncode(tmpScope), publicKey, await getPrivateKey());
 
-    await sendData(state, await signedHash, await data, selectedImageId);
+    if (tmpScope['trustedDevice'] != null) {
+      data.addAll({ 'trustedDevice': tmpScope['trustedDevice']['trustedDevice'] });
+    }
+
+    await sendData(state, await signedHash, data, selectedImageId);
+
+    if (scope['trustedDevice'] != null) {
+      // Save the trusted deviceid
+      saveTrustedDevice(widget.message['appId'], scope['trustedDevice']['trustedDevice']);
+    }
 
     if (selectedImageId == correctImage || isMobileCheck) {
       if (widget.closeWhenLoggedIn && isMobileCheck) {

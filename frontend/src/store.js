@@ -5,6 +5,8 @@ import cryptoService from './services/cryptoService'
 import axios from 'axios'
 import config from '../public/config'
 import createPersistedState from 'vuex-persistedstate'
+import { uuid } from 'vue-uuid'
+const cookies = require('vue-cookies')
 
 Vue.use(Vuex)
 
@@ -67,7 +69,19 @@ export default new Vuex.Store({
       state.emailVerificationStatus = status
     },
     setScope (state, scope) {
-      state.scope = scope
+      let parsedScope = JSON.parse(scope)
+      debugger
+      // if the trustedDevice scope is present get it out of the cookies and put the id on the scope to pass it to the app
+      if (parsedScope.trustedDevice) {
+        // get the cookie specific for this app id
+        const trustedAppDevice = JSON.parse(cookies.get(`td-${state.appId}`))
+        if (trustedAppDevice) {
+          parsedScope.trustedDevice = trustedAppDevice
+        } else {
+          parsedScope.trustedDevice = uuid.v4()
+        }
+      }
+      state.scope = JSON.stringify(parsedScope)
     },
     setAppId (state, appId) {
       state.appId = appId
