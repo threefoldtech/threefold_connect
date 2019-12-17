@@ -64,12 +64,13 @@ class _LoginScreenState extends State<LoginScreen> {
 
     makePermissionPrefs();
 
-    if (widget.autoLogin) {
-      return this.sendIt();
-    }
-
     // Generate EmojiList
     generateEmojiImageList();
+
+    if (widget.autoLogin) {
+      sendIt();
+      return;
+    }
 
     if (Platform.isIOS) {
       goToPinfield();
@@ -409,10 +410,6 @@ class _LoginScreenState extends State<LoginScreen> {
     }
 
     var data = await encrypt(jsonEncode(tmpScope), publicKey, await getPrivateKey());
-
-    if (tmpScope['trustedDevice'] != null) {
-      data.addAll({ 'trustedDevice': tmpScope['trustedDevice']['trustedDevice'] });
-    }
 
     await sendData(state, await signedHash, data, selectedImageId);
 

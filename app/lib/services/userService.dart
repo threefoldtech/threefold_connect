@@ -176,20 +176,16 @@ Future<String> getScopePermissions() async {
 
 Future<bool> isTrustedDevice(String appId, String trustedDevice) async {
   final prefs = await SharedPreferences.getInstance();
-  var trustedDeviceJsonString = prefs.getString('trustedDevice');
-  if (trustedDeviceJsonString == null) return false;
-  Map<String, dynamic> trustedAppDeviceMap = json.decode(trustedDeviceJsonString);
-  return trustedDevice == trustedAppDeviceMap['deviceId'];
+  var trustedDeviceApp = prefs.getString('$appId-trusted');
+  if (trustedDeviceApp == null) return false;
+
+  return trustedDeviceApp == trustedDevice;
 }
 
 Future<void> saveTrustedDevice(String appId, String trustedDeviceId) async {
   final prefs = await SharedPreferences.getInstance();
-  prefs.remove('trustedDevice');
-  Map<String, String> trustedAppDevice = {
-    'appId': appId,
-    'deviceId': trustedDeviceId,
-  };
-  prefs.setString('trustedDevice', json.encode(trustedAppDevice));
+  prefs.remove('$appId-trusted');
+  prefs.setString('$appId-trusted', trustedDeviceId);
 }
 
 Future<bool> clearData() async {

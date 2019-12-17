@@ -6,7 +6,6 @@ import axios from 'axios'
 import config from '../public/config'
 import createPersistedState from 'vuex-persistedstate'
 import { uuid } from 'vue-uuid'
-const cookies = require('vue-cookies')
 
 Vue.use(Vuex)
 
@@ -74,11 +73,12 @@ export default new Vuex.Store({
       // if the trustedDevice scope is present get it out of the cookies and put the id on the scope to pass it to the app
       if (parsedScope.trustedDevice) {
         // get the cookie specific for this app id
-        const trustedAppDevice = JSON.parse(cookies.get(`td-${state.appId}`))
+        const trustedAppDevice = localStorage.getItem(`td-${state.appId}`)
         if (trustedAppDevice) {
           parsedScope.trustedDevice = trustedAppDevice
         } else {
           parsedScope.trustedDevice = uuid.v4()
+          localStorage.setItem(`td-${state.appId}`, parsedScope.trustedDevice)
         }
       }
       state.scope = JSON.stringify(parsedScope)

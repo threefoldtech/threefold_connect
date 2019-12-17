@@ -216,11 +216,6 @@ export default {
             data = encodeURIComponent(val.data)
           }
 
-          const trustedDevice = JSON.parse(val.data).trustedDevice
-          if (trustedDevice) {
-            cookies.set(`td-${this.appId}`, JSON.stringify(trustedDevice))
-          }
-
           console.log('signedHash: ', signedHash)
           console.log('data', data)
 
