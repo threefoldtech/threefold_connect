@@ -1,7 +1,11 @@
-FROM node:9 as builder
+FROM node:12 as builder
 
-COPY 3botlogin_frontend /3botlogin_frontend
-WORKDIR /3botlogin_frontend
+COPY frontend /frontend
+WORKDIR /frontend
+RUN npm i && npm run build
+
+COPY example /example
+WORKDIR /example
 RUN npm i && npm run build
 
 
@@ -12,8 +16,9 @@ RUN apt update && apt install -y python3 python3-pip
 # RUN pip3 install flask flask_socketio flask_cors pyfcm pynacl
 RUN pip3 install -r requirements.txt
 
-COPY --from=builder /3botlogin_frontend/dist /usr/share/nginx/frontend
-COPY 3botlogin_backend/ /usr/share/nginx/backend
+COPY --from=builder /frontend/dist /var/www/html/frontend
+COPY --from=builder /example/dist /var/www/html/example
+COPY backend/ /usr/share/nginx/backend
 
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 COPY services.sh /services.sh
