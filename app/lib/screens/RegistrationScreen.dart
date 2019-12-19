@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:threebotlogin/services/socketService.dart';
 import 'package:threebotlogin/widgets/CustomDialog.dart';
 import 'package:threebotlogin/widgets/PinField.dart';
 import 'package:threebotlogin/services/userService.dart';
@@ -221,6 +222,7 @@ class _ScanScreenState extends State<RegistrationScreen>
     savePublicKey(keys['publicKey']);
 
     saveEmail(email, false);
+    joinRoom(doubleName);
     saveDoubleName(doubleName);
     savePhrase(phrase);
     saveFingerprint(false);

@@ -10,10 +10,9 @@ import database as db
 import logging
 
 from flask import Flask, Response, request, json
-from flask_socketio import SocketIO, emit
+from flask_socketio import SocketIO, emit, join_room, leave_room, send
 from flask_cors import CORS
 from datetime import datetime, timedelta
-from pyfcm import FCMNotification
 
 epoch = datetime.utcfromtimestamp(0)
 conn = db.create_connection("pythonsqlite.db")  # connection
@@ -21,7 +20,6 @@ db.create_db(conn)  # create tables
 
 config = configparser.ConfigParser()
 config.read('config.ini')
-push_service = FCMNotification(api_key=config['DEFAULT']['API_KEY'])
 
 app = Flask(__name__)
 sio = SocketIO(app)
@@ -45,6 +43,13 @@ logger.addHandler(handler)
 def connect_handler():
     logger.debug("Connected.")
 
+@sio.on('join')
+def on_join(data):
+    join_room(data['room'])
+
+@sio.on('leave')
+def on_leave(data):
+    leave_room(data['room'])
 
 @sio.on('checkname')
 def checkname_handler(data):
@@ -90,8 +95,7 @@ def login_handler(data):
 
     if data.get('firstTime') == False and data.get('mobile') == False:
         user = db.getUserByName(conn, data.get('doubleName').lower())
-        push_service.notify_single_device(registration_id=user[4], message_title='Finish login',
-                                          message_body='Tap to finish login', data_message=data, click_action='FLUTTER_NOTIFICATION_CLICK', tag='testLogin', collapse_key='testLogin')
+        emit('login', data, room=user[0])
 
     insert_auth_sql = "INSERT INTO auth (double_name,state_hash,timestamp,scanned,data) VALUES (?,?,?,?,?);"
     db.insert_auth(conn, insert_auth_sql, data.get('doubleName').lower(
@@ -112,9 +116,7 @@ def resend_handler(data):
 
     user = db.getUserByName(conn, data.get('doubleName').lower())
     data['type'] = 'login'
-    push_service.notify_single_device(registration_id=user[4], message_title='Finish login',
-                                      message_body='Tap to finish login', data_message=data, click_action='FLUTTER_NOTIFICATION_CLICK', collapse_key='testLogin')
-    print('')
+    emit('login', data, room=user[0])
 
 
 @app.route('/api/forcerefetch', methods=['GET'])
@@ -164,7 +166,7 @@ def flag_handler():
                 update_sql = "UPDATE users SET device_id=?  WHERE device_id=?;"
                 db.update_user(conn, update_sql, '', verified_device_id)
 
-                sio.emit('scannedFlag', {'scanned': True}, room=user[1])
+                sio.emit('scannedFlag', {'scanned': True}, room=user[0])
             return Response("Ok")
         except Exception as e:
             logger.debug("Exception: %s", e)
@@ -200,7 +202,7 @@ def signRegisterHandler():
         sio.emit('signed', {
             'data': body.get('data'),
             'doubleName': body.get('doubleName')
-        }, room=user[1])
+        }, room=user[0])
         return Response('Ok')
     else:
         return Response('User not found', status=404)
@@ -219,8 +221,8 @@ def sign_handler():
         sio.emit('signed', {
             'signedHash': body.get('signedHash'),
             'data': body.get('data'),
-            'selectedImageId': body.get('selectedImageId')
-        }, room=user[1])
+            'selectedImageId': body.get('selectedImageId'),
+        }, room=user[0])
         logger.debug('signed emitted')
         return Response("Ok")
     else:
@@ -241,8 +243,7 @@ def login_handler1():
 
     if data.get('firstTime') == False and data.get('mobile') == False:
         user = db.getUserByName(conn, data.get('doubleName').lower())
-        push_service.notify_single_device(registration_id=user[4], message_title='Finish login',
-                                          message_body='Tap to finish login', data_message=data, click_action='FLUTTER_NOTIFICATION_CLICK', tag='testLogin', collapse_key='testLogin')
+        emit('login', data, room=user[0])
 
     insert_auth_sql = "INSERT INTO auth (double_name,state_hash,timestamp,scanned,data) VALUES (?,?,?,?,?);"
     db.insert_auth(conn, insert_auth_sql, data.get('doubleName').lower(
@@ -451,7 +452,7 @@ def cancel_login_attempt(doublename):
     user = db.getUserByName(conn, doublename.lower())
     db.delete_auth_for_user(conn, doublename.lower())
 
-    sio.emit('cancelLogin', {'scanned': True}, room=user[1])
+    sio.emit('cancelLogin', {'scanned': True}, room=user[0])
     return Response('Canceled by User')
 
 
@@ -461,8 +462,8 @@ def set_email_verified_handler(doublename):
     user = db.getUserByName(conn, doublename.lower())
     logger.debug(user)
     logger.debug(user[4])
-    push_service.notify_single_device(registration_id=user[4], message_title='Email verified', message_body='Thanks for verifying your email', data_message={
-                                      'type': 'email_verification'}, click_action='EMAIL_VERIFIED')
+    data = {'type': 'email_verification'}
+    sio.emit('login', data, room=user[0])
     return Response('Ok')
 
 
@@ -559,4 +560,7 @@ def verify_signed_data(double_name, data):
     return verified_signed_data
 
 
-app.run(host='0.0.0.0', port=5000)
+# app.run(host='0.0.0.0', port=5000)
+
+if __name__ == '__main__':
+    sio.run(app, host='0.0.0.0', port=5000)

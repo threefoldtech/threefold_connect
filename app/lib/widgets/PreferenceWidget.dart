@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:threebotlogin/main.dart';
 import 'package:threebotlogin/services/fingerprintService.dart';
 import 'package:threebotlogin/services/openKYCService.dart';
+import 'package:threebotlogin/services/socketService.dart';
 import 'package:threebotlogin/services/userService.dart';
 import 'package:threebotlogin/widgets/CustomDialog.dart';
 import 'package:threebotlogin/widgets/PinField.dart';
@@ -296,6 +297,7 @@ class _PreferenceWidgetState extends State<PreferenceWidget> {
                     ModalRoute.withName('/'),
                 );
 
+                closeSocketConnection(this.doubleName);
                 await Navigator.pushNamed(preferenceContext, '/');
                 widget.routeToHome();
               } else {

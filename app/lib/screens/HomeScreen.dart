@@ -10,8 +10,8 @@ import 'package:threebotlogin/screens/RegisteredScreen.dart';
 import 'package:threebotlogin/screens/UnregisteredScreen.dart';
 import 'package:threebotlogin/services/3botService.dart';
 import 'package:threebotlogin/services/WebviewService.dart';
+import 'package:threebotlogin/services/socketService.dart';
 import 'package:threebotlogin/services/userService.dart';
-import 'package:threebotlogin/services/firebaseService.dart';
 import 'package:package_info/package_info.dart';
 import 'package:threebotlogin/main.dart';
 import 'package:threebotlogin/widgets/CustomDialog.dart';
@@ -208,17 +208,17 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     }
   }
 
-  Future onActivate(bool initFirebase) async {
+  Future onActivate(bool initSocket) async {
     var buildNr = (await PackageInfo.fromPlatform()).buildNumber;
 
     int response = await checkVersionNumber(context, buildNr);
 
     if (response == 1) {
-      if (initFirebase) {
-        initFirebaseMessagingListener(context);
+      String tmpDoubleName = await getDoubleName();
+      if (initSocket) {
+        await createSocketConnection(context, tmpDoubleName);
       }
 
-      String tmpDoubleName = await getDoubleName();
 
       checkIfThereAreLoginAttempts(tmpDoubleName);
       await initUniLinks();

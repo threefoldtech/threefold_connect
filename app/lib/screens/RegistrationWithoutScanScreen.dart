@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:threebotlogin/services/openKYCService.dart';
+import 'package:threebotlogin/services/socketService.dart';
 import 'package:threebotlogin/widgets/CustomDialog.dart';
 import 'package:threebotlogin/widgets/PinField.dart';
 import 'package:threebotlogin/services/userService.dart';
@@ -132,6 +133,7 @@ class _RegistrationWithoutScanScreen
       saveEmail(email, widget.initialData['emailVerified']);
     }
 
+    joinRoom(doubleName);
     saveDoubleName(doubleName);
     savePhrase(phrase);
 

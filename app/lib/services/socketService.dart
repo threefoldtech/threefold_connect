@@ -1,49 +1,80 @@
+import 'package:flutter/material.dart';
+import 'package:socket_io_client/socket_io_client.dart' as IO;
+import 'package:threebotlogin/services/userService.dart';
 import 'dart:convert';
 import 'dart:io';
-import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:flutter/material.dart';
 import 'package:threebotlogin/screens/LoginScreen.dart';
 import 'package:threebotlogin/services/3botService.dart';
 import 'package:threebotlogin/services/WebviewService.dart';
 import 'package:threebotlogin/services/cryptoService.dart';
 import 'package:threebotlogin/services/openKYCService.dart';
-import 'package:threebotlogin/services/userService.dart';
 import 'package:threebotlogin/main.dart';
 import 'package:threebotlogin/widgets/CustomDialog.dart';
 
-FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
+IO.Socket socket;
+BuildContext ctx;
+bool conntected = false;
 
-void initFirebaseMessagingListener(context) async {
-  _firebaseMessaging.configure(
-    onMessage: (Map<String, dynamic> message) async {
-      logger.log('On message $message');
-      openLogin(context, message);
-    },
-    onLaunch: (Map<String, dynamic> message) async {
-      logger.log('On launch $message');
-      openLogin(context, message);
-    },
-    onResume: (Map<String, dynamic> message) async {
-      logger.log('On resume $message');
-      openLogin(context, message);
-    },
-  );
+createSocketConnection(BuildContext context, String doubleName) async {
+  if (conntected) return;
+  ctx = context;
 
-  _firebaseMessaging.requestNotificationPermissions(
-      const IosNotificationSettings(sound: true, badge: true, alert: true));
+  if (doubleName == null) {
+    doubleName = await getDoubleName();
+  }
 
-  _firebaseMessaging.onIosSettingsRegistered
-      .listen((IosNotificationSettings settings) {
-    logger.log("Settings registered: $settings");
+  print('creating socket conncetion....');
+  socket = IO.io('ws://192.168.8.66:5000/', <String, dynamic>{
+    'transports': ['websocket']
   });
+
+  socket.on('connect', (res) {
+    print('connected');
+    // If a doubleName already exists/provided join room with this doublename
+    if (doubleName != null) {
+      print('joining room....');
+      // once a client has connected, we let him join a room
+      socket.emit('join', { 'room': doubleName });
+    }
+  });
+
+  socket.on('signed', (data) {
+    print('---------signed-----------');
+    print(data);
+  });
+
+  socket.on('login', (data) {
+    print('---------login-----------');
+    print(data);
+    openLogin(context, data);
+  });
+
+  socket.on('disconnect', (_) {
+    print('disconnect');
+    conntected = false;
+  });
+
+  socket.on('fromServer', (_) => print(_));
+  socket.on('connect_error', (err) => print(err));
 }
 
-Future openLogin(context, message) async {
-  var data = message['data'];
+void closeSocketConnection(String doubleName) {
+  print('closing socket connection....');
+  socket.emit('leave', { 'room': doubleName });
+  socket.close();
+}
 
+void joinRoom(String doubleName) {
+  print('joining room....');
+  socket.emit('join', { 'room': doubleName });
+}
+
+Future openLogin(context, data) async {
   if (Platform.isIOS) {
-    data = message;
+    data = data;
   }
+
+  logger.log(data);
 
   if (data['logintoken'] != null) {
     if (data['logintoken'] == await getLoginToken()) {
