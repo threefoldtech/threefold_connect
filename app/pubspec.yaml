@@ -41,6 +41,7 @@ dependencies:
   crypto: ^2.0.6
   bip39: ^1.0.3
   uuid: 2.0.4
+  socket_io_client: ^0.9.7+1
   keyboard_visibility: 0.5.0
   community_material_icon:
   local_auth: 0.6.0
