@@ -9,6 +9,7 @@ void main() async {
       name: '3bot local',
       threeBotApiUrl: 'http://dev.jimber.org:5000/api',
       openKycApiUrl: 'https://openkyc.staging.jimber.org/',
+      threeBotSocketUrl: 'ws://192.168.8.66:5000/',
       threeBotFrontEndUrl: 'http://dev.jimber.org:8080/',
       child: new MyApp());
 

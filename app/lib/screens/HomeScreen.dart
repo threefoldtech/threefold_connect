@@ -107,7 +107,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
           }
         }
 
-        await loginMobile(data);
+        socketLoginMobile(data);
         return openPage(LoginScreen(link.queryParameters, autoLogin: autoLogin));
       } else {
         if (doubleName == null) {

@@ -5,6 +5,7 @@ class Config extends InheritedWidget {
   Config({
     @required this.name,
     @required this.threeBotApiUrl,
+    @required this.threeBotSocketUrl,
     @required this.openKycApiUrl,
     @required this.threeBotFrontEndUrl,
     @required Widget child
@@ -12,6 +13,7 @@ class Config extends InheritedWidget {
 
   final String name;
   final String threeBotApiUrl;
+  final String threeBotSocketUrl;
   final String openKycApiUrl;
   final String threeBotFrontEndUrl;
 

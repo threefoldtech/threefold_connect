@@ -15,6 +15,8 @@ IO.Socket socket;
 BuildContext ctx;
 bool conntected = false;
 
+String threeBotSocketUrl = config.threeBotSocketUrl;
+
 createSocketConnection(BuildContext context, String doubleName) async {
   if (conntected) return;
   ctx = context;
@@ -24,7 +26,7 @@ createSocketConnection(BuildContext context, String doubleName) async {
   }
 
   print('creating socket conncetion....');
-  socket = IO.io('ws://192.168.8.66:5000/', <String, dynamic>{
+  socket = IO.io(threeBotSocketUrl, <String, dynamic>{
     'transports': ['websocket']
   });
 
@@ -67,6 +69,11 @@ void closeSocketConnection(String doubleName) {
 void joinRoom(String doubleName) {
   print('joining room....');
   socket.emit('join', { 'room': doubleName });
+}
+
+void socketLoginMobile(Map<String, dynamic> data) {
+  print('loging in');
+  return socket.emit('login', data);
 }
 
 Future openLogin(context, data) async {

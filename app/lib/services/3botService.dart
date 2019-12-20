@@ -174,10 +174,3 @@ Future sendRegisterSign(String doubleName) {
 Future<http.Response> getShowApps() async {
   return http.get('$threeBotApiUrl/showapps', headers: requestHeaders);
 }
-
-Future<http.Response> loginMobile(Map<String, dynamic> data) {
-  var jsonData = jsonEncode(data);
-  return http.post('$threeBotApiUrl/loginmobile',
-      body: jsonData,
-      headers: requestHeaders);
-}

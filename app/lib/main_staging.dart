@@ -8,6 +8,7 @@ void main() async {
   var config = Config(
       name: '3bot staging',
       threeBotApiUrl: 'https://login.staging.jimber.org/api',
+      threeBotSocketUrl: 'ws://login.staging.jimber.org',
       openKycApiUrl: 'https://openkyc.staging.jimber.org',
       threeBotFrontEndUrl: 'https://login.staging.jimber.org/',
       child: new MyApp());

@@ -8,6 +8,7 @@ void main() {
   var config = Config(
       name: '3Bot connect',
       threeBotApiUrl: 'https://login.threefold.me/api',
+      threeBotSocketUrl: 'ws://login.jimber.org',
       openKycApiUrl: 'https://openkyc.live/',
       threeBotFrontEndUrl: 'https://login.threefold.me/',
       child: new MyApp());

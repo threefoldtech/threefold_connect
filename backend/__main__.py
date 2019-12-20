@@ -23,6 +23,7 @@ config.read('config.ini')
 
 app = Flask(__name__)
 sio = SocketIO(app)
+
 CORS(app, resources={r"*": {"origins": ["*"]}})
 
 # Disables the default spamm logging that's caused by flask.
@@ -227,28 +228,6 @@ def sign_handler():
         return Response("Ok")
     else:
         return Response("Something went wrong", status=500)
-
-@app.route('/api/loginmobile', methods=['POST'])
-def login_handler1():
-    data = request.get_json()
-    logger.debug("Login %s", data)
-    data['type'] = 'login'
-
-    sid = data.get('sid')
-    user = db.getUserByName(conn, data.get('doubleName').lower())
-    if user:
-        logger.debug("User found %s", user[0])
-        update_sql = "UPDATE users SET sid=?  WHERE double_name=?;"
-        db.update_user(conn, update_sql, sid, user[0])
-
-    if data.get('firstTime') == False and data.get('mobile') == False:
-        user = db.getUserByName(conn, data.get('doubleName').lower())
-        emit('login', data, room=user[0])
-
-    insert_auth_sql = "INSERT INTO auth (double_name,state_hash,timestamp,scanned,data) VALUES (?,?,?,?,?);"
-    db.insert_auth(conn, insert_auth_sql, data.get('doubleName').lower(
-    ), data.get('state'), datetime.now(), 0, json.dumps(data))
-    return Response("Ok")
 
 @app.route('/api/attempts/<doublename>', methods=['GET'])
 def get_attempts_handler(doublename):

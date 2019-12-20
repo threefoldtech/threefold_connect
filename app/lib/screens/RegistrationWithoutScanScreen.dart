@@ -161,7 +161,7 @@ class _RegistrationWithoutScanScreen
           'sid': 'random',
           'state': widget.link.queryParameters['state']
         };
-        await loginMobile(data);
+        socketLoginMobile(data);
         return openPage(LoginScreen(widget.link.queryParameters));
     }
 

@@ -7,6 +7,7 @@ void main() async {
   var config = Config(
       name: '3bot local',
       threeBotApiUrl: 'http://192.168.8.66:5000/api',
+      threeBotSocketUrl: 'ws://192.168.8.66:5000/',
       openKycApiUrl: 'http://192.168.8.66:5005',
       threeBotFrontEndUrl: 'http://192.168.8.66:8081/',
       child: new MyApp());
