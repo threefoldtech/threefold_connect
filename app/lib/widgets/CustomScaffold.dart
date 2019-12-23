@@ -14,7 +14,6 @@ class CustomScaffold extends StatefulWidget {
 }
 
 class _CustomScaffoldState extends State<CustomScaffold> {
-  var selectedApp = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -23,17 +22,13 @@ class _CustomScaffoldState extends State<CustomScaffold> {
       body: SafeArea(
         child: widget.body,
       ),
-      bottomNavigationBar: BottomNavBar(
-        selectedIndex: selectedApp,
-        onItemTapped: changeView,
-      ),
+      // bottomNavigationBar: BottomNavBar(
+      //   onItemTapped: changeView,
+      // ),
     );
   }
 
   void changeView(int newId, BuildContext context) {
     Navigator.pushNamed(context, apps[newId]);
-    setState(() {
-      selectedApp = newId;
-    });
   }
 }

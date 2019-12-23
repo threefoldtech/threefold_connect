@@ -1,0 +1,3 @@
+export ANDROID_HOME=/home/delruej/Android/Sdk/ 
+export PATH=${PATH}:/home/delruej/Sdk/tools/ 
+export ANDROID_AVD_HOME=/home/delruej/.android/avd/

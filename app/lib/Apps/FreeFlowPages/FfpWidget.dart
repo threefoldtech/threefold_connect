@@ -8,6 +8,43 @@ import 'package:threebotlogin/services/cryptoService.dart';
 import 'package:threebotlogin/services/userService.dart';
 import 'package:threebotlogin/widgets/CustomScaffold.dart';
 
+
+
+
+
+/**************** */
+
+
+class MyInAppBrowser extends InAppBrowser {
+
+  @override
+  void onLoadStart(String url) {
+    super.onLoadStart(url);
+    print("\n\nStarted $url\n\n");
+  }
+
+  @override
+  void onLoadStop(String url) {
+    super.onLoadStop(url);
+    print("\n\nStopped $url\n\n");
+  }
+
+  // @override
+  // void onLoadError(String url, String code, String message) {
+  //   super.onLoadStop(url);
+  //   print("\n\nCan't load $url.. Error: $message\n\n");
+  // }
+
+  @override
+  void onExit() {
+    super.onExit();
+    print("\n\nBrowser closed!\n\n");
+  }
+
+}
+
+MyInAppBrowser inAppBrowser = new MyInAppBrowser();
+
 /*
 Future main() async {
   runApp(new FfpWidget());
@@ -18,11 +55,7 @@ class FfpWidget extends StatefulWidget {
   _FfpState createState() => new _FfpState();
 }
 
-class _FfpState extends State<FfpWidget>  with AutomaticKeepAliveClientMixin{
-
-  @override
-  bool get wantKeepAlive => true;
-  
+class _FfpState extends State<FfpWidget> with AutomaticKeepAliveClientMixin {
   InAppWebViewController webView;
   String url = "";
   double progress = 0;
@@ -30,27 +63,37 @@ class _FfpState extends State<FfpWidget>  with AutomaticKeepAliveClientMixin{
 
   InAppWebView iaWebview;
   _FfpState() {
+
     iaWebview = InAppWebView(
       initialUrl: config.cookieUrl(),
       initialHeaders: {},
-     initialOptions: InAppWebViewWidgetOptions(
-        android: AndroidInAppWebViewOptions(
-                              supportMultipleWindows: true
-                            )
-      ),
+      initialOptions: InAppWebViewWidgetOptions(
+          android: AndroidInAppWebViewOptions(supportMultipleWindows: true)),
       onWebViewCreated: (InAppWebViewController controller) {
         webView = controller;
+
         initKeys();
+      },
+      onCreateWindow:
+          (InAppWebViewController controller, OnCreateWindowRequest req) {
+        print("Create window");
+        
+        inAppBrowser.open(url: req.url, options: InAppBrowserClassOptions());
+
       },
       onLoadStart: (InAppWebViewController controller, String url) {
         if (url.contains('state=')) {
           controller.injectCSSCode(source: '* { display: none; }');
         }
+        controller.injectCSSCode(
+            source: ".crisp-client {display: none !important;}");
         setState(() {
           this.url = url;
         });
       },
       onLoadStop: (InAppWebViewController controller, String url) async {
+        controller.injectCSSCode(
+            source: ".crisp-client {display: none !important;}");
         setState(() {
           this.url = url;
         });
@@ -117,4 +160,8 @@ class _FfpState extends State<FfpWidget>  with AutomaticKeepAliveClientMixin{
       ),
     );
   }
+
+  @override
+  // TODO: implement wantKeepAlive
+  bool get wantKeepAlive => true;
 }

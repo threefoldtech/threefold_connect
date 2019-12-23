@@ -18,11 +18,7 @@ class WalletWidget extends StatefulWidget {
 
 }
 
-class _WalletState extends State<WalletWidget>  with AutomaticKeepAliveClientMixin{
-
-  @override
-  bool get wantKeepAlive => true;
-
+class _WalletState extends State<WalletWidget> with AutomaticKeepAliveClientMixin{
   InAppWebViewController webView;
   String url = "";
   double progress = 0;
@@ -31,7 +27,7 @@ class _WalletState extends State<WalletWidget>  with AutomaticKeepAliveClientMix
 
   _WalletState() {
     iaWebView = InAppWebView(
-      initialUrl: 'http://192.168.2.90:8080/handlertest.html?cache=5',
+      initialUrl: 'https://${config.appId}',
       initialHeaders: {},
       initialOptions: InAppWebViewWidgetOptions(
         android: AndroidInAppWebViewOptions(
@@ -125,4 +121,8 @@ class _WalletState extends State<WalletWidget>  with AutomaticKeepAliveClientMix
       ),
     );
   }
+
+  @override
+  // TODO: implement wantKeepAlive
+  bool get wantKeepAlive => true;
 }
