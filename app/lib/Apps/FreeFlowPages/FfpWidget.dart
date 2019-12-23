@@ -1,27 +1,25 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
-import 'package:threebotlogin/Apps/Wallet/walletUserData.dart';
-
+import 'package:http/http.dart' as http;
 import 'package:threebotlogin/services/cryptoService.dart';
-import 'package:threebotlogin/services/toolsService.dart';
 import 'package:threebotlogin/services/userService.dart';
 import 'config.dart';
 /*
 Future main() async {
-  runApp(new WalletWidget());
+  runApp(new FfpWidget());
 }*/
 
-class WalletWidget extends StatefulWidget {
+class FfpWidget extends StatefulWidget {
   @override
   _WalletState createState() => new _WalletState();
 }
 
-class _WalletState extends State<WalletWidget> {
+class _WalletState extends State<FfpWidget> {
   InAppWebViewController webView;
   String url = "";
   double progress = 0;
-  var config = WalletConfig().config();
+  FfpConfig config = FfpConfig();
 
   @override
   void initState() {
@@ -33,43 +31,33 @@ class _WalletState extends State<WalletWidget> {
     super.dispose();
   }
 
-
-
   initKeys() async {
+    var url = await webView.getUrl(); // get url after login redir
+
+    final state = Uri.decodeFull(url.split("&state=")[1]);
     final union = '?';
-
-    var keys = await generateKeyPair();
-
-    final state = randomString(15);
-
     final privateKey = await getPrivateKey();
-    final signedHash = await signData(state, privateKey);
+    final signedHash = signData(state, privateKey);
 
-    var jsToExecute =
-        "(function() { try {window.localStorage.setItem('tempKeys', \'{\"privateKey\": \"${keys["privateKey"]}\", \"publicKey\": \"${keys["publicKey"]}\"}\');  window.localStorage.setItem('state', '$state'); } catch (err) { return err; } })();";
+    final redirecturl =
+        Uri.decodeFull(url.split("&redirecturl=")[1].split("&")[0]);
+    final scope = Uri.decodeFull(url.split("&scope=")[1].split("&")[0]);
+    final publickey = Uri.decodeFull(url.split("&publickey=")[1].split("&")[0]);
 
-    webView.evaluateJavascript(source: jsToExecute);
+    final scopeData = {};
 
-    var scope = {};
-    scope['doubleName'] = await getDoubleName();
-    scope['derivedSeed'] = await getDerivedSeed(config['appId']);
-    var encrypted =
-        await encrypt(jsonEncode(scope), keys["publicKey"], privateKey);
-    var jsonData = jsonEncode(encrypted);
+    if (scope != null && scope.contains("\"email\":")) {
+      scopeData['email'] = await getEmail();
+      print("adding scope");
+    }
+
+    var jsonData = jsonEncode(
+        (await encrypt(jsonEncode(scopeData), publickey, privateKey)));
     var data = Uri.encodeQueryComponent(jsonData); //Uri.encodeFull();
-
     var loadUrl =
-        'https://${config.appId}${config.redirectUrl}${union}username=${await getDoubleName()}&signedhash=${Uri.encodeQueryComponent(signedHash)}&data=$data';
-
+        'https://${config.appId()}${redirecturl}${union}username=${await getDoubleName()}&signedhash=${Uri.encodeComponent(await signedHash)}&data=$data';
 
     webView.loadUrl(url: loadUrl);
-  }
-
-
-
-  addHandler() {
-    webView.addJavaScriptHandler(handlerName: "ADD_IMPORT_WALLET", callback: saveImportedWallet);
-    webView.addJavaScriptHandler(handlerName: "ADD_APP_WALLET", callback: saveAppWallet);
   }
 
   @override
@@ -81,13 +69,12 @@ class _WalletState extends State<WalletWidget> {
             Expanded(
               child: Container(
                 child: InAppWebView(
-                  initialUrl: "http://192.168.2.90:8080/handlertest.html?test=3",
+                  initialUrl: config.cookieUrl(),
                   initialHeaders: {},
                   initialOptions: InAppWebViewWidgetOptions(),
                   onWebViewCreated: (InAppWebViewController controller) {
                     webView = controller;
-                    this.addHandler();
-                    //initKeys();
+                    initKeys();
                   },
                   onLoadStart: (InAppWebViewController controller, String url) {
                     setState(() {
