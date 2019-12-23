@@ -6,6 +6,7 @@ import 'package:threebotlogin/Apps/Wallet/walletUserData.dart';
 import 'package:threebotlogin/services/cryptoService.dart';
 import 'package:threebotlogin/services/toolsService.dart';
 import 'package:threebotlogin/services/userService.dart';
+import 'package:threebotlogin/widgets/CustomScaffold.dart';
 import 'config.dart';
 /*
 Future main() async {
@@ -74,8 +75,7 @@ class _WalletState extends State<WalletWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      home: new Scaffold(
+    return CustomScaffold(
         body: Column(
           children: <Widget>[
             Expanded(
@@ -111,7 +111,6 @@ class _WalletState extends State<WalletWidget> {
             ),
           ],
         ),
-      ),
     );
   }
 }
