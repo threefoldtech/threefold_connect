@@ -19,8 +19,6 @@ class RegisteredScreen extends StatefulWidget {
 class _RegisteredScreenState extends State<RegisteredScreen> with WidgetsBindingObserver {
   // We will treat this error as a singleton
 
-
-  final navbarKey = new GlobalKey<BottomNavBarState>();
   bool showSettings = false;
   bool showPreference = false;
 

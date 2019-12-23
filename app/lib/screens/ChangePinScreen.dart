@@ -25,44 +25,23 @@ class _ChangePinScreenState extends State<ChangePinScreen> {
         title: Text("Change pincode"),
         elevation: 0.0,
       ),
-      body: Container(
-        width: double.infinity,
-        height: double.infinity,
-        color: Theme.of(context).primaryColor,
-        child: Container(
-          child: Container(
-            decoration: BoxDecoration(
-              color: Theme.of(context).scaffoldBackgroundColor,
-              borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(20.0),
-                topRight: Radius.circular(20.0),
-              ),
-            ),
-            child: Container(
-              padding: EdgeInsets.only(top: 0.0, bottom: 0.0),
-              child: Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  mainAxisSize: MainAxisSize.max,
-                  children: <Widget>[
-                    Container(
-                      padding: EdgeInsets.only(top: 0.0, bottom: 32.0),
-                      child: Center(
-                          child: Text(
-                        helperText,
-                      )),
-                    ),
-                    !pinChanged
-                        ? PinField(
-                            callback: (p) => changePin(p),
-                          )
-                        : succesfulChange(),
-                  ],
-                ),
-              ),
-            ),
+      body: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisSize: MainAxisSize.max,
+        children: <Widget>[
+          Container(
+            padding: EdgeInsets.only(top: 0.0, bottom: 32.0),
+            child: Center(
+                child: Text(
+              helperText,
+            )),
           ),
-        ),
+          !pinChanged
+              ? PinField(
+                  callback: (p) => changePin(p),
+                )
+              : succesfulChange(),
+        ],
       ),
     );
   }
@@ -97,8 +76,8 @@ class _ChangePinScreenState extends State<ChangePinScreen> {
   }
 
   void checkUserNewPin(String oldPin) {
-     if (newPin == oldPin) {
-       setState(() {
+    if (newPin == oldPin) {
+      setState(() {
         newPin = null;
       });
 

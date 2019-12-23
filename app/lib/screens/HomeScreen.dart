@@ -279,7 +279,6 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     );
 
     return CustomScaffold(
-      navbarKey: navbarKey,
       appBar: PreferredSize(
         child: appBar,
         preferredSize: Size.fromHeight(0),
@@ -313,24 +312,5 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
       selectedIndex = 0;
       showPreference = false;
     });
-  }
-
-
-  Size getBottomNavbarHeight() {
-    final State state = navbarKey.currentState;
-    final RenderBox box = state.context.findRenderObject();
-
-    return box.size;
-  }
-
-  Size getPreferredSizeForWebview() {
-    var contextSize = MediaQuery.of(bodyContext).size;
-
-    var preferredHeight = contextSize.height -
-        appBar.preferredSize.height -
-        getBottomNavbarHeight().height;
-    var preferredWidth = contextSize.width;
-
-    return new Size(preferredWidth, preferredHeight);
   }
 }

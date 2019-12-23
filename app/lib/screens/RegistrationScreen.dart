@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:threebotlogin/services/socketService.dart';
 import 'package:threebotlogin/widgets/CustomDialog.dart';
+import 'package:threebotlogin/widgets/CustomScaffold.dart';
 import 'package:threebotlogin/widgets/PinField.dart';
 import 'package:threebotlogin/services/userService.dart';
 import 'package:threebotlogin/services/3botService.dart';
@@ -126,7 +127,7 @@ class _ScanScreenState extends State<RegistrationScreen>
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return CustomScaffold(
       key: _scaffoldKey,
       body: Stack(
         children: [

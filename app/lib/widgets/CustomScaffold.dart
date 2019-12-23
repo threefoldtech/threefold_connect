@@ -2,29 +2,28 @@ import 'package:flutter/material.dart';
 import 'package:threebotlogin/main.dart';
 import 'package:threebotlogin/widgets/BottomNavbar.dart';
 
-class CustomScaffold extends StatelessWidget {
+class CustomScaffold extends StatefulWidget {
   final Widget body;
-  final int selectedApp;
   final Widget appBar;
-  final GlobalKey<BottomNavBarState> navbarKey;
 
-  const CustomScaffold(
-      {Key key,
-      @required this.body,
-      this.selectedApp = 0,
-      this.appBar,
-      this.navbarKey})
+  CustomScaffold({Key key, @required this.body, this.appBar})
       : super(key: key);
 
   @override
-  Scaffold build(BuildContext context) {
+  _CustomScaffoldState createState() => _CustomScaffoldState();
+}
+
+class _CustomScaffoldState extends State<CustomScaffold> {
+  var selectedApp = 0;
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
-      appBar: appBar,
+      appBar: widget.appBar,
       body: SafeArea(
-        child: body,
+        child: widget.body,
       ),
       bottomNavigationBar: BottomNavBar(
-        key: navbarKey,
         selectedIndex: selectedApp,
         onItemTapped: changeView,
       ),
@@ -32,7 +31,9 @@ class CustomScaffold extends StatelessWidget {
   }
 
   void changeView(int newId, BuildContext context) {
-    print('Opening $newId : ' + apps[newId]);
     Navigator.pushNamed(context, apps[newId]);
+    setState(() {
+      selectedApp = newId;
+    });
   }
 }

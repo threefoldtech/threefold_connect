@@ -33,7 +33,6 @@ String buildNumber;
 List<String> apps = ['/', '/wallet', '/ffp'];
 
 // Hack to get the height of the bottom navbar
-final navbarKey = new GlobalKey<BottomNavBarState>();
 void main() => runApp(MyApp());
 
 Widget getErrorWidget(BuildContext context, FlutterErrorDetails error) {
@@ -126,7 +125,7 @@ class MyApp extends StatelessWidget {
         '/': (context) => HomeScreen(),
         '/wallet': (context) => Wallet().widget(),
         '/ffp': (context) => Ffp().widget(),
-        
+
         '/scan': (context) => RegistrationScreen(),
         '/register': (context) => RegistrationScreen(),
         '/success': (context) => SuccessfulScreen(registration: false),
