@@ -1,25 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
+
 import 'package:threebotlogin/helpers/HexColor.dart';
 import 'package:threebotlogin/widgets/BottomNavbar.dart';
 import 'package:threebotlogin/widgets/PreferenceWidget.dart';
 
 class RegisteredScreen extends StatefulWidget {
   final Widget registeredScreen;
-  final Function openFfp;
   final Function routeToHome;
   final int selectedIndex;
   final bool isLoading;
 
-  RegisteredScreen({Key key, this.registeredScreen, this.selectedIndex, this.isLoading, this.openFfp, this.routeToHome}) : super(key: key);
+  RegisteredScreen({Key key, this.registeredScreen, this.selectedIndex, this.isLoading, this.routeToHome}) : super(key: key);
 
   _RegisteredScreenState createState() => _RegisteredScreenState();
 }
 
 class _RegisteredScreenState extends State<RegisteredScreen> with WidgetsBindingObserver {
   // We will treat this error as a singleton
-  WebViewHttpError webViewError;
+
 
   final navbarKey = new GlobalKey<BottomNavBarState>();
   bool showSettings = false;
@@ -110,7 +109,6 @@ class _RegisteredScreenState extends State<RegisteredScreen> with WidgetsBinding
                           heroTag: "tft",
                           backgroundColor: Colors.redAccent,
                           elevation: 0,
-                          onPressed: () => widget.openFfp(0),
                           child: CircleAvatar(
                             backgroundImage: ExactAssetImage(
                                 'assets/circle_images/tftokens.jpg'),
@@ -130,7 +128,6 @@ class _RegisteredScreenState extends State<RegisteredScreen> with WidgetsBinding
                           heroTag: "tfgrid",
                           backgroundColor: Colors.greenAccent,
                           elevation: 0,
-                          onPressed: () => widget.openFfp(1),
                           child: CircleAvatar(
                             backgroundImage: ExactAssetImage(
                                 'assets/circle_images/tfgrid.jpg'),
@@ -150,7 +147,6 @@ class _RegisteredScreenState extends State<RegisteredScreen> with WidgetsBinding
                           heroTag: "tftfarmers",
                           backgroundColor: Colors.blueAccent,
                           elevation: 0,
-                          onPressed: () => widget.openFfp(2),
                           child: CircleAvatar(
                             backgroundImage: ExactAssetImage(
                                 'assets/circle_images/tffarmers.jpg'),
@@ -170,7 +166,6 @@ class _RegisteredScreenState extends State<RegisteredScreen> with WidgetsBinding
                           heroTag: "ffnation",
                           backgroundColor: Colors.grey,
                           elevation: 0,
-                          onPressed: () => widget.openFfp(3),
                           child: CircleAvatar(
                             backgroundImage: ExactAssetImage(
                                 'assets/circle_images/ffnation.jpg'),
@@ -190,7 +185,6 @@ class _RegisteredScreenState extends State<RegisteredScreen> with WidgetsBinding
                           heroTag: "3bot",
                           backgroundColor: Colors.orangeAccent,
                           elevation: 0,
-                          onPressed: () => widget.openFfp(4),
                           child: CircleAvatar(
                             backgroundImage: ExactAssetImage(
                                 'assets/circle_images/3bot.jpg'),

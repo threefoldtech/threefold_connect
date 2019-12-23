@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
 import 'package:threebotlogin/helpers/HexColor.dart';
 import 'package:threebotlogin/screens/LoginScreen.dart';
 import 'package:threebotlogin/screens/MobileRegistrationScreen.dart';
@@ -45,7 +44,6 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   int failedApp;
 
   // We will treat this error as a singleton
-  WebViewHttpError webViewError;
 
   // Hack to get the height of the bottom navbar
   final navbarKey = new GlobalKey<BottomNavBarState>();
@@ -67,8 +65,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     super.initState();
     KeyboardVisibilityNotification().addNewListener(
       onChange: (bool visible) {
-        webViewResizer(visible, bodyContext, this.getPreferredSizeForWebview(),
-            appBar.preferredSize);
+       //resize webview
       },
     );
     WidgetsBinding.instance.addObserver(this);
@@ -288,7 +285,6 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     );
 
     return CustomScaffold(
-      renderBackground: selectedIndex != 0,
       appBar: PreferredSize(
         child: appBar,
         preferredSize: Size.fromHeight(0),
@@ -300,25 +296,10 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
             this.bodyContext = context;
             return RegisteredScreen(
                 isLoading: isLoading,
-                openFfp: this.openFfp,
                 selectedIndex: selectedIndex,
                 routeToHome: this.routeToHome);
           } else {
             return UnregisteredScreen();
-          }
-        },
-      ),
-      footer: FutureBuilder(
-        future: getDoubleName(),
-        builder: (BuildContext context, AsyncSnapshot snapshot) {
-          if (snapshot.hasData) {
-            return BottomNavBar(
-              key: navbarKey,
-              selectedIndex: selectedIndex,
-              onItemTapped: onItemTapped,
-            );
-          } else {
-            return new Container(width: 0.0, height: 0.0);
           }
         },
       ),
@@ -328,11 +309,6 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   void onItemTapped(int index) {
     setState(() {
       isLoading = true;
-      for (var flutterWebViewPlugin in flutterWebViewPlugins) {
-        if (flutterWebViewPlugin != null) {
-          flutterWebViewPlugin.hide();
-        }
-      }
       showPreference = false;
       if (!(apps[index]['openInBrowser'] && Platform.isIOS)) {
         selectedIndex = index;
@@ -340,37 +316,8 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
         selectedIndex = 0;
       }
     });
-    this.launchWebviewApp(index);
   }
 
-  void launchWebviewApp(int index) {
-    updateApp(
-      apps[index],
-      flutterWebViewPlugins,
-      this.getPreferredSizeForWebview(),
-      appBar.preferredSize,
-      this.routeToHome,
-      selectedIndex,
-      this.webviewReadyWithLoad,
-      isLoading,
-      bodyContext,
-      failedApp,
-    ).then((value) {}, onError: (error) {
-      print(error);
-      setState(() {
-        isLoading = false;
-      });
-    });
-  }
-
-  void webviewReadyWithLoad(bool ready) async {
-    if (ready) {
-      setState(() {
-        this.isLoading = false;
-      });
-      await flutterWebViewPlugins[selectedIndex].show();
-    }
-  }
 
   void updatePreference(bool preference) {
     setState(() {
@@ -385,48 +332,6 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     });
   }
 
-  void openFfp(int urlIndex) async {
-    var ffpInstance = flutterWebViewPlugins[3];
-    bool hadToStartInstance = false;
-    bool callbackSuccess = false;
-
-    setState(() {
-      for (var flutterWebViewPlugin in flutterWebViewPlugins) {
-        if (flutterWebViewPlugin != null &&
-            ffpInstance != flutterWebViewPlugin) {
-          flutterWebViewPlugin.dispose();
-        }
-      }
-      selectedIndex = 3;
-    });
-
-    if (ffpInstance == null) {
-      setState(() {
-        isLoading = true;
-      });
-      this.launchWebviewApp(3);
-      ffpInstance = flutterWebViewPlugins[3];
-      hadToStartInstance = true;
-    }
-
-    if (ffpInstance != null) {
-      if (hadToStartInstance) {
-        ffpInstance.onStateChanged.listen((viewData) async {
-          if (viewData.type == WebViewState.finishLoad && !callbackSuccess) {
-            await ffpInstance.evalJavascript("window.location.href = \"" +
-                apps[3]['ffpUrls'][urlIndex] +
-                "\"");
-            callbackSuccess = true;
-          }
-        });
-      } else {
-        var url = apps[3]['ffpUrls'][urlIndex];
-
-        await ffpInstance.reloadUrl(url);
-        return ffpInstance.show();
-      }
-    }
-  }
 
   Size getBottomNavbarHeight() {
     final State state = navbarKey.currentState;

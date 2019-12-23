@@ -33,7 +33,6 @@ class LoginScreen extends StatefulWidget {
 
 Future<bool> _onWillPop() async {
   cancelLogin(await getDoubleName());
-  showLastOpenendWebview();
   return Future.value(true);
 }
 
@@ -273,7 +272,6 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
-      onWillPop: _onWillPop,
       child: new Scaffold(
         key: _scaffoldKey,
         appBar: AppBar(
@@ -383,8 +381,6 @@ class _LoginScreenState extends State<LoginScreen> {
   cancelIt() async {
     cancelLogin(await getDoubleName());
     Navigator.popUntil(context, ModalRoute.withName('/'));
-
-    showLastOpenendWebview();
   }
 
   sendIt() async {

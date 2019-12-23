@@ -118,7 +118,6 @@ Future openLogin(context, data) async {
       Navigator.popUntil(context, ModalRoute.withName('/'));
       Navigator.push(
           context, MaterialPageRoute(builder: (context) => LoginScreen(data)));
-          hideWebviews();
     } else if (data['type'] == 'email_verification') {
       getEmail().then((email) async {
         if (email['email'] != null && (await getSignedEmailIdentifier()) == null) {

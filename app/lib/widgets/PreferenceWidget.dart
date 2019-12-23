@@ -281,12 +281,6 @@ class _PreferenceWidgetState extends State<PreferenceWidget> {
             onPressed: () async {
               Navigator.pop(context);
 
-              for (var flutterWebViewPlugin in flutterWebViewPlugins) {
-                if (flutterWebViewPlugin != null) {
-                  await flutterWebViewPlugin.cleanCookies();
-                  await flutterWebViewPlugin.close();
-                }
-              }
 
               hexColor = Color(0xff0f296a);
               bool result = await clearData();

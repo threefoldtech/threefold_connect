@@ -1,6 +1,5 @@
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
 import 'package:package_info/package_info.dart';
 import 'package:threebotlogin/helpers/HexColor.dart';
 import 'package:threebotlogin/screens/MobileRegistrationScreen.dart';
@@ -22,7 +21,6 @@ String deviceId;
 Config config;
 LoggingService logger;
 bool showButton;
-List<FlutterWebviewPlugin> flutterWebViewPlugins = new List(6);
 int lastAppUsed;
 int keyboardUsedApp;
 bool finger = false;

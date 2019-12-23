@@ -10,16 +10,11 @@ class SuccessfulScreen extends StatefulWidget {
   _SuccessfulScreenState createState() => _SuccessfulScreenState();
 }
 
-Future<bool> _onWillPop() {
-  showLastOpenendWebview();
-  return Future.value(true);
-}
 
 class _SuccessfulScreenState extends State<SuccessfulScreen> {
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
-      onWillPop: _onWillPop,
       child: Scaffold(
         appBar: AppBar(
           title: widget.registration ? Text('Registered') : Text('Logged in'),

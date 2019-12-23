@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:threebotlogin/services/userService.dart';
+import 'package:threebotlogin/widgets/CustomScaffold.dart';
 
 import 'package:threebotlogin/widgets/PinField.dart';
 
@@ -18,7 +19,7 @@ class _ChangePinScreenState extends State<ChangePinScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return CustomScaffold(
       key: _scaffoldKey,
       appBar: new AppBar(
         title: Text("Change pincode"),

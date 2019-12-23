@@ -1,10 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:threebotlogin/Apps/wallet.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'config.dart';
 import 'main.dart';
+/*
+Future main() async {
+  runApp(new Wallet());
+}*/
 
 void main() async {
+  runApp(new Wallet());
+  /*
   var config = Config(
       name: '3bot staging',
       threeBotApiUrl: 'https://login.staging.jimber.org/api',
@@ -100,5 +107,5 @@ void main() async {
       .then((_) {
     runApp(config);
     logger.log("running main_staging.dart");
-  });
+  });*/
 }

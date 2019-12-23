@@ -17,7 +17,6 @@ class _ErrorScreenState extends State<ErrorScreen> {
   @override
   void initState() {
     super.initState();
-    hideWebviews();
     PackageInfo.fromPlatform().then((packageInfo) => {
           setState(() {
             version = packageInfo.version;
