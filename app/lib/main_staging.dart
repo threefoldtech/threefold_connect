@@ -11,7 +11,7 @@ Future main() async {
 
 void main() async {
   runApp(new Wallet());
-  /*
+  /*wallet
   var config = Config(
       name: '3bot staging',
       threeBotApiUrl: 'https://login.staging.jimber.org/api',
