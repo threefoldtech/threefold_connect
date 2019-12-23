@@ -131,8 +131,6 @@ class _MobileRegistrationScreenState extends State<MobileRegistrationScreen> {
   }
 
   void registrationToPin() async {
-    updateDeviceId(await messaging.getToken(), doubleName, keys['privateKey']);
-
     var registrationData = {
       "privateKey": keys['privateKey'],
       "doubleName": doubleNameController.text + '.3bot',

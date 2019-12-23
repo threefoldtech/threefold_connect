@@ -59,13 +59,6 @@ class _RecoverScreenState extends State<RecoverScreen> {
   }
 
   continueRecoverAccount() async {
-    updateDeviceId(await messaging.getToken(), doubleName, privateKey)
-        .then((onValue) {
-      logger.log(onValue);
-    }).catchError((e) {
-      logger.log(e);
-    });
-
     var registrationData = {
       "privateKey": privateKey,
       "doubleName": doubleName,

@@ -26,7 +26,6 @@ dependencies:
       url: https://github.com/coeneivan/fast_qr_reader_view
   shared_preferences:
   http:
-  firebase_messaging:
   flutter_sodium:
     git:
       url: https://github.com/rmtmckenzie/flutter_sodium

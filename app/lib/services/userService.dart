@@ -189,21 +189,6 @@ Future<void> saveTrustedDevice(String appId, String trustedDeviceId) async {
 }
 
 Future<bool> clearData() async {
-  final prefs = await SharedPreferences.getInstance();
-  Response response;
-  try {
-    response = await removeDeviceId(prefs.getString('doubleName'));
-    await removeDeviceId(prefs.getString('doubleName'));
-  } catch (e) {
-    print(e);
-    response = null;
-  }
-
-  if (response != null && response.statusCode == 200) {
-    prefs.clear();
-    return true;
-  } else {
-    print("Something went wrong while removing your account");
-    return false;
-  }
+  final pref = await SharedPreferences.getInstance();
+  return await pref.clear();
 }

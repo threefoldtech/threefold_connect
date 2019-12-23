@@ -140,59 +140,6 @@ def force_refetch_handler():
     else:
         return Response()
 
-
-@app.route('/api/flag', methods=['POST'])
-def flag_handler():
-    body = request.get_json()
-    logger.debug("Flag %s", body)
-    login_attempt = None
-    user = db.getUserByName(conn, body.get('doubleName'))
-
-    try:
-        login_attempt = db.getAuthByStateHash(conn, body.get('hash'))
-    except Exception as e:
-        pass
-
-    if user:
-        print("user found")
-        try:
-            public_key = base64.b64decode(user[3])
-            signed_device_id = base64.b64decode(body.get('deviceId'))
-            bytes_signed_device_id = bytes(signed_device_id)
-            verify_key = nacl.signing.VerifyKey(
-                public_key.hex(), encoder=nacl.encoding.HexEncoder)
-            verified_device_id = verify_key.verify(bytes_signed_device_id)
-            if verified_device_id:
-                verified_device_id = verified_device_id.decode("utf-8")
-                update_sql = "UPDATE users SET device_id=?  WHERE device_id=?;"
-                db.update_user(conn, update_sql, '', verified_device_id)
-
-                sio.emit('scannedFlag', {'scanned': True}, room=user[0])
-            return Response("Ok")
-        except Exception as e:
-            logger.debug("Exception: %s", e)
-            return Response("Sinature invalid", status=400)
-
-        if login_attempt:
-            print("login attempt found")
-            if verified_device_id:
-                verified_device_id = verified_device_id.decode("utf-8")
-                update_sql = "UPDATE users SET device_id=?  WHERE device_id=?;"
-                db.update_user(conn, update_sql, '', verified_device_id)
-
-                update_sql = "UPDATE auth SET scanned=?, data=?  WHERE double_name=?;"
-                db.update_auth(conn, update_sql, 1, '', login_attempt[0])
-
-                update_sql = "UPDATE users SET device_id =?  WHERE double_name=?;"
-                db.update_user(conn, update_sql,
-                               verified_device_id, login_attempt[0])
-
-            return Response("Ok")
-    else:
-        print("user not found")
-        return Response('User not found', status=404)
-
-
 @app.route('/api/signRegister', methods=['POST'])
 def signRegisterHandler():
     print('inside signRegister...')
@@ -332,78 +279,6 @@ def mobile_registration_handler():
             db.insert_user(conn, update_sql, double_name,
                            sid, email, public_key)
         return Response("Succes", status=200)
-
-
-@app.route('/api/users/<doublename>/deviceid', methods=['PUT'])
-def update_device_id(doublename):
-    body = request.get_json()
-    doublename = doublename.lower()
-    logger.debug("Updating deviceid of user %s", doublename)
-    try:
-        signed_device_id = body.get('signedDeviceId')
-
-        if (signed_device_id is not None):
-            device_id = verify_signed_data(
-                doublename, signed_device_id).decode('utf-8')
-
-            if device_id:
-                logger.debug("Updating deviceid %s", device_id)
-                db.update_deviceid(conn, device_id, doublename)
-                return device_id
-            else:
-                logger.debug(
-                    "Signed timestamp inside the header could not be verified")
-        else:
-            logger.debug("Header was not present")
-    except:
-        logger.debug("Something went wrong while trying to verify the header")
-
-
-@app.route('/api/users/<doublename>/deviceid', methods=['DELETE'])
-def remove_device_id(doublename):
-    doublename = doublename.lower()
-    logger.debug("Removing device id from user %s", doublename)
-
-    try:
-        auth_header = request.headers.get('Jimber-Authorization')
-        logger.debug(auth_header)
-        if (auth_header is not None):
-            data = verify_signed_data(doublename, auth_header)
-            if data:
-                data = json.loads(data.decode("utf-8"))
-                if(data["intention"] == "delete-deviceid"):
-                    timestamp = data["timestamp"]
-                    readable_signed_timestamp = datetime.fromtimestamp(
-                        int(timestamp) / 1000)
-                    current_timestamp = time.time() * 1000
-                    readable_current_timestamp = datetime.fromtimestamp(
-                        int(current_timestamp / 1000))
-                    difference = (int(timestamp) -
-                                  int(current_timestamp)) / 1000
-                    if difference < 30:
-                        db.update_deviceid(conn, "", doublename)
-                        device_id = db.get_deviceid(conn, doublename)[0]
-
-                        if not device_id:
-                            return Response("ok", status=200)
-                        else:
-                            return Response("Device ID not found", status=200)
-
-                        return Response("something went wrong", status=400)
-                    else:
-                        logger.debug("Timestamp was expired")
-                        return Response("Request took to long", status=418)
-            else:
-                logger.debug(
-                    "Signed timestamp inside the header could not be verified")
-                return Response("something went wrong", status=404)
-        else:
-            logger.debug("Header was not present")
-            return Response("Header was not present", status=400)
-    except:
-        logger.debug("Something went wrong while trying to verify the header")
-        return Response("something went wrong", status=400)
-
 
 @app.route('/api/users/<doublename>', methods=['GET'])
 def get_user_handler(doublename):

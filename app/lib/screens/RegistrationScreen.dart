@@ -157,19 +157,6 @@ class _ScanScreenState extends State<RegistrationScreen>
         phrase == null ||
         keys['privateKey'] == null) {
       showError();
-    } else {
-      var signedDeviceId = signData(deviceId, keys['privateKey']);
-      sendScannedFlag(hash, await signedDeviceId, doubleName).then((response) {
-        sliderAnimationController.forward();
-        setState(() {
-          helperText = "Choose new pin";
-        });
-      }).catchError((e) {
-        print(e);
-        showError();
-      });
-      updateDeviceId(
-          await messaging.getToken(), doubleName, keys['privateKey']);
     }
   }
 

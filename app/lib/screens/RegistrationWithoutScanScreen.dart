@@ -36,15 +36,8 @@ class _RegistrationWithoutScanScreen
   void initState() {
     super.initState();
     if (!widget.resetPin) {
-      getPrivateKey().then((pk) => pk != null ? _showDialog() : sendFlag(pk));
+      getPrivateKey().then((pk) => pk != null ? _showDialog() : null );
     }
-  }
-
-  Future sendFlag(pk) async {
-    sendScannedFlag(
-        widget.initialData['state'],
-        await signData(deviceId, widget.initialData['privateKey']),
-        widget.initialData['doubleName']);
   }
 
   @override
@@ -220,10 +213,6 @@ class _RegistrationWithoutScanScreen
             onPressed: () async {
               Navigator.pop(context);
               clearData();
-              sendScannedFlag(
-                  widget.initialData['state'],
-                  await signData(deviceId, widget.initialData['privateKey']),
-                  widget.initialData['doubleName']);
             },
           ),
         ],

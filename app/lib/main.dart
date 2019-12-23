@@ -1,4 +1,3 @@
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
 import 'package:package_info/package_info.dart';
@@ -15,7 +14,6 @@ import 'package:fast_qr_reader_view/fast_qr_reader_view.dart';
 import 'package:threebotlogin/services/userService.dart';
 import 'package:threebotlogin/screens/ChangePinScreen.dart';
 
-FirebaseMessaging messaging = FirebaseMessaging();
 List<CameraDescription> cameras;
 String pk;
 String deviceId;
@@ -95,12 +93,6 @@ void init() async {
   } on QRReaderException catch (e) {
     print(e);
   }
-
-  messaging.requestNotificationPermissions();
-  messaging.getToken().then((t) {
-    deviceId = t;
-    logger.log('Got device id $deviceId');
-  });
 }
 
 bool get isInDebugMode {
