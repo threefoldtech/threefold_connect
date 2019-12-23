@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:threebotlogin/Apps/wallet.dart';
-import 'package:flutter/services.dart';
+
 import 'package:flutter/widgets.dart';
+import 'Apps/Wallet/walletWidget.dart';
 import 'config.dart';
 import 'main.dart';
 /*
@@ -10,7 +10,7 @@ Future main() async {
 }*/
 
 void main() async {
-  runApp(new Wallet());
+  runApp(new WalletWidget());
   /*wallet
   var config = Config(
       name: '3bot staging',
