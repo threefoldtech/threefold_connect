@@ -45,7 +45,6 @@ import 'openKYCService.dart';
 //           await prefs.setBool('firstvalidation', true);
 //         }
 
-//         showButton = true;
 //         lastAppUsed = app['id'];
 //         keyboardUsedApp = app['id'];
 

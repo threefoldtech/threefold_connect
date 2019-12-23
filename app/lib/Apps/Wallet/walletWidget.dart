@@ -7,11 +7,8 @@ import 'package:threebotlogin/services/cryptoService.dart';
 import 'package:threebotlogin/services/toolsService.dart';
 import 'package:threebotlogin/services/userService.dart';
 import 'package:threebotlogin/widgets/CustomScaffold.dart';
-import 'config.dart';
-/*
-Future main() async {
-  runApp(new WalletWidget());
-}*/
+
+import 'WalletConfig.dart';
 
 class WalletWidget extends StatefulWidget {
   @override
@@ -22,8 +19,36 @@ class _WalletState extends State<WalletWidget> {
   InAppWebViewController webView;
   String url = "";
   double progress = 0;
-  var config = WalletConfig().config();
+  var config = WalletConfig();
+  InAppWebView iaWebView;
 
+  _WalletState() {
+    iaWebView = InAppWebView(
+      initialUrl: 'https://{config.appId()',
+      initialHeaders: {},
+      initialOptions: InAppWebViewWidgetOptions(),
+      onWebViewCreated: (InAppWebViewController controller) {
+        webView = controller;
+        this.addHandler();
+        //initKeys();
+      },
+      onLoadStart: (InAppWebViewController controller, String url) {
+        setState(() {
+          this.url = url;
+        });
+      },
+      onLoadStop: (InAppWebViewController controller, String url) async {
+        setState(() {
+          this.url = url;
+        });
+      },
+      onProgressChanged: (InAppWebViewController controller, int progress) {
+        setState(() {
+          this.progress = progress / 100;
+        });
+      },
+    );
+  }
   @override
   void initState() {
     super.initState();
@@ -33,8 +58,6 @@ class _WalletState extends State<WalletWidget> {
   void dispose() {
     super.dispose();
   }
-
-
 
   initKeys() async {
     final union = '?';
@@ -53,7 +76,7 @@ class _WalletState extends State<WalletWidget> {
 
     var scope = {};
     scope['doubleName'] = await getDoubleName();
-    scope['derivedSeed'] = await getDerivedSeed(config.appId);
+    scope['derivedSeed'] = await getDerivedSeed(config.appId());
     var encrypted =
         await encrypt(jsonEncode(scope), keys["publicKey"], privateKey);
     var jsonData = jsonEncode(encrypted);
@@ -62,55 +85,26 @@ class _WalletState extends State<WalletWidget> {
     var loadUrl =
         'https://${config.appId}${config.redirectUrl}${union}username=${await getDoubleName()}&signedhash=${Uri.encodeQueryComponent(signedHash)}&data=$data';
 
-
     webView.loadUrl(url: loadUrl);
   }
 
-
-
   addHandler() {
-    webView.addJavaScriptHandler(handlerName: "ADD_IMPORT_WALLET", callback: saveImportedWallet);
-    webView.addJavaScriptHandler(handlerName: "ADD_APP_WALLET", callback: saveAppWallet);
+    webView.addJavaScriptHandler(
+        handlerName: "ADD_IMPORT_WALLET", callback: saveImportedWallet);
+    webView.addJavaScriptHandler(
+        handlerName: "ADD_APP_WALLET", callback: saveAppWallet);
   }
 
   @override
   Widget build(BuildContext context) {
     return CustomScaffold(
-        body: Column(
-          children: <Widget>[
-            Expanded(
-              child: Container(
-                child: InAppWebView(
-                  initialUrl: "http://192.168.2.90:8080/handlertest.html?test=3",
-                  initialHeaders: {},
-                  initialOptions: InAppWebViewWidgetOptions(),
-                  onWebViewCreated: (InAppWebViewController controller) {
-                    webView = controller;
-                    this.addHandler();
-                    //initKeys();
-                  },
-                  onLoadStart: (InAppWebViewController controller, String url) {
-                    setState(() {
-                      this.url = url;
-                    });
-                  },
-                  onLoadStop:
-                      (InAppWebViewController controller, String url) async {
-                    setState(() {
-                      this.url = url;
-                    });
-                  },
-                  onProgressChanged:
-                      (InAppWebViewController controller, int progress) {
-                    setState(() {
-                      this.progress = progress / 100;
-                    });
-                  },
-                ),
-              ),
-            ),
-          ],
-        ),
+      body: Column(
+        children: <Widget>[
+          Expanded(
+            child: Container(child: iaWebView),
+          ),
+        ],
+      ),
     );
   }
 }

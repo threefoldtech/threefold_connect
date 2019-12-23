@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/http.dart';
+import 'package:threebotlogin/AppConfig.dart';
 import 'package:threebotlogin/main.dart';
 import 'dart:convert';
 
@@ -9,7 +10,7 @@ import 'package:threebotlogin/screens/ErrorScreen.dart';
 import 'package:threebotlogin/services/cryptoService.dart';
 import 'package:threebotlogin/services/userService.dart';
 
-String threeBotApiUrl = config.threeBotApiUrl;
+String threeBotApiUrl = AppConfig().threeBotApiUrl;
 Map<String, String> requestHeaders = {'Content-type': 'application/json'};
 
 sendScannedFlag(String hash, String deviceId, String doubleName) async {

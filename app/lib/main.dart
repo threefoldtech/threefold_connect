@@ -1,26 +1,24 @@
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
-import 'package:package_info/package_info.dart';
+import 'package:threebotlogin/App.dart';
 import 'package:threebotlogin/helpers/HexColor.dart';
 import 'package:threebotlogin/screens/MobileRegistrationScreen.dart';
 import 'package:threebotlogin/services/loggingService.dart';
-import 'config.dart';
+import 'package:threebotlogin/widgets/BottomNavbar.dart';
+import 'Apps/Wallet/walletWidget.dart';
 import 'package:threebotlogin/screens/HomeScreen.dart';
 import 'package:threebotlogin/screens/RegistrationScreen.dart';
 import 'package:threebotlogin/screens/SuccessfulScreen.dart';
 import 'package:threebotlogin/screens/ErrorScreen.dart';
 import 'package:threebotlogin/screens/RecoverScreen.dart';
 import 'package:fast_qr_reader_view/fast_qr_reader_view.dart';
-import 'package:threebotlogin/services/userService.dart';
 import 'package:threebotlogin/screens/ChangePinScreen.dart';
 
 FirebaseMessaging messaging = FirebaseMessaging();
 List<CameraDescription> cameras;
 String pk;
 String deviceId;
-Config config;
 LoggingService logger;
-bool showButton;
 int lastAppUsed;
 int keyboardUsedApp;
 bool finger = false;
@@ -30,7 +28,11 @@ String appName;
 String packageName;
 String version;
 String buildNumber;
-List<Map<String, dynamic>> apps = [];
+List<String> apps = ['/', '/wallet', '/scan'];
+
+// Hack to get the height of the bottom navbar
+final navbarKey = new GlobalKey<BottomNavBarState>();
+void main() => runApp(MyApp());
 
 Widget getErrorWidget(BuildContext context, FlutterErrorDetails error) {
   return SafeArea(
@@ -74,32 +76,31 @@ Widget getErrorWidget(BuildContext context, FlutterErrorDetails error) {
   );
 }
 
-void init() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  PackageInfo.fromPlatform().then((PackageInfo packageInfo) {
-    appName = packageInfo.appName;
-    packageName = packageInfo.packageName;
-    version = packageInfo.version;
-    buildNumber = packageInfo.buildNumber;
-  });
+// void init() async {
+//   WidgetsFlutterBinding.ensureInitialized();
+//   PackageInfo.fromPlatform().then((PackageInfo packageInfo) {
+//     appName = packageInfo.appName;
+//     packageName = packageInfo.packageName;
+//     version = packageInfo.version;
+//     buildNumber = packageInfo.buildNumber;
+//   });
 
-  logger = new LoggingService();
-  showButton = false;
+//   logger = new LoggingService();
 
-  pk = await getPrivateKey();
+//   pk = await getPrivateKey();
 
-  try {
-    cameras = await availableCameras();
-  } on QRReaderException catch (e) {
-    print(e);
-  }
+//   try {
+//     cameras = await availableCameras();
+//   } on QRReaderException catch (e) {
+//     print(e);
+//   }
 
-  messaging.requestNotificationPermissions();
-  messaging.getToken().then((t) {
-    deviceId = t;
-    logger.log('Got device id $deviceId');
-  });
-}
+//   messaging.requestNotificationPermissions();
+//   messaging.getToken().then((t) {
+//     deviceId = t;
+//     logger.log('Got device id $deviceId');
+//   });
+// }
 
 bool get isInDebugMode {
   bool inDebugMode = false;
@@ -116,14 +117,12 @@ class MyApp extends StatelessWidget {
     ErrorWidget.builder = (FlutterErrorDetails errorDetails) {
       return getErrorWidget(context, errorDetails);
     };
-    config = Config.of(context);
-
     return MaterialApp(
-      title: config.name,
       theme: ThemeData(
           primaryColor: HexColor("#2d4052"), accentColor: Color(0xff16a085)),
       routes: {
         '/': (context) => HomeScreen(),
+        '/wallet': (context) => WalletWidget(),
         '/scan': (context) => RegistrationScreen(),
         '/register': (context) => RegistrationScreen(),
         '/success': (context) => SuccessfulScreen(registration: false),

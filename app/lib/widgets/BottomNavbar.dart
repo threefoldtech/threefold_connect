@@ -4,7 +4,7 @@ import 'package:threebotlogin/helpers/HexColor.dart';
 
 class BottomNavBar extends StatefulWidget {
   final int selectedIndex;
-  final Function(int) onItemTapped;
+  final Function(int, BuildContext) onItemTapped;
 
   BottomNavBar({GlobalKey key, this.selectedIndex, this.onItemTapped})
       : super(key: key);
@@ -26,7 +26,7 @@ class BottomNavBarState extends State<BottomNavBar> {
       return;
     }
 
-    widget.onItemTapped(index);
+    widget.onItemTapped(index, context);
   }
 
   @override

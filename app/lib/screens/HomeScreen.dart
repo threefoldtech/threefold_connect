@@ -14,7 +14,6 @@ import 'package:threebotlogin/services/userService.dart';
 import 'package:package_info/package_info.dart';
 import 'package:threebotlogin/main.dart';
 import 'package:threebotlogin/widgets/CustomDialog.dart';
-import 'package:threebotlogin/widgets/BottomNavbar.dart';
 import 'package:threebotlogin/widgets/CustomScaffold.dart';
 import 'package:uni_links/uni_links.dart';
 import 'ErrorScreen.dart';
@@ -42,11 +41,6 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   bool isLoading = false;
   bool showPreference = false;
   int failedApp;
-
-  // We will treat this error as a singleton
-
-  // Hack to get the height of the bottom navbar
-  final navbarKey = new GlobalKey<BottomNavBarState>();
 
   @override
   void initState() {
@@ -285,6 +279,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     );
 
     return CustomScaffold(
+      navbarKey: navbarKey,
       appBar: PreferredSize(
         child: appBar,
         preferredSize: Size.fromHeight(0),
@@ -304,18 +299,6 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
         },
       ),
     );
-  }
-
-  void onItemTapped(int index) {
-    setState(() {
-      isLoading = true;
-      showPreference = false;
-      if (!(apps[index]['openInBrowser'] && Platform.isIOS)) {
-        selectedIndex = index;
-      } else {
-        selectedIndex = 0;
-      }
-    });
   }
 
 

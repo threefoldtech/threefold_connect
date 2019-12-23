@@ -1,5 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="org.jimber.threebotlogin.staging">
+    package="org.jimber.threebotlogin">
 
     <!-- io.flutter.app.FlutterApplication is an android.app.Application that
          calls FlutterMain.startInitialization(this); in its onCreate method.
@@ -18,7 +18,7 @@
 
     <application
         android:name="io.flutter.app.FlutterApplication"
-        android:label="3bot_staging"
+        android:label="3bot"
         android:icon="@mipmap/ic_launcher"
         android:usesCleartextTraffic="true">
         <activity

@@ -40,9 +40,9 @@ PODS:
     - GoogleUtilities/UserDefaults (~> 6.2)
     - Protobuf (~> 3.1)
   - Flutter (1.0.0)
-  - flutter_sodium (0.0.1):
+  - flutter_inappwebview (0.0.1):
     - Flutter
-  - flutter_webview_plugin (0.0.1):
+  - flutter_sodium (0.0.1):
     - Flutter
   - GoogleAppMeasurement (6.0.1):
     - GoogleUtilities/AppDelegateSwizzler (~> 6.0)
@@ -93,8 +93,8 @@ DEPENDENCIES:
   - fast_qr_reader_view (from `.symlinks/plugins/fast_qr_reader_view/ios`)
   - firebase_messaging (from `.symlinks/plugins/firebase_messaging/ios`)
   - Flutter (from `.symlinks/flutter/ios`)
+  - flutter_inappwebview (from `.symlinks/plugins/flutter_inappwebview/ios`)
   - flutter_sodium (from `.symlinks/plugins/flutter_sodium/ios`)
-  - flutter_webview_plugin (from `.symlinks/plugins/flutter_webview_plugin/ios`)
   - keyboard_visibility (from `.symlinks/plugins/keyboard_visibility/ios`)
   - local_auth (from `.symlinks/plugins/local_auth/ios`)
   - package_info (from `.symlinks/plugins/package_info/ios`)
@@ -103,7 +103,7 @@ DEPENDENCIES:
   - url_launcher (from `.symlinks/plugins/url_launcher/ios`)
 
 SPEC REPOS:
-  https://github.com/cocoapods/specs.git:
+  https://github.com/CocoaPods/Specs.git:
     - Firebase
     - FirebaseAnalytics
     - FirebaseAnalyticsInterop
@@ -123,10 +123,10 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/firebase_messaging/ios"
   Flutter:
     :path: ".symlinks/flutter/ios"
+  flutter_inappwebview:
+    :path: ".symlinks/plugins/flutter_inappwebview/ios"
   flutter_sodium:
     :path: ".symlinks/plugins/flutter_sodium/ios"
-  flutter_webview_plugin:
-    :path: ".symlinks/plugins/flutter_webview_plugin/ios"
   keyboard_visibility:
     :path: ".symlinks/plugins/keyboard_visibility/ios"
   local_auth:
@@ -143,15 +143,15 @@ EXTERNAL SOURCES:
 SPEC CHECKSUMS:
   fast_qr_reader_view: 53b38a544886e650381ca579e0cdd5ae142fffa6
   Firebase: 5965bac23e7fcb5fa6d926ed429c9ecef8a2014e
-  firebase_messaging: db3f19ec4490799e5c660723626740e539c41c04
+  firebase_messaging: f03ce4dde6d920529db53efdb8ba51fd538cdd4a
   FirebaseAnalytics: 629301c2b9925f3537d4093a17a72751ae5b7084
   FirebaseAnalyticsInterop: efbe45c8385ec626e29f9525e5ebd38520dfb6c1
   FirebaseCore: b0f0262acebfa540e5f97b3832dbb13186980822
   FirebaseInstanceID: cdb3827746d53ece7ae87a5c51c25c3055443366
   FirebaseMessaging: 20b6626c41be7840aed7a3dd9a14003efae3d588
   Flutter: 0e3d915762c693b495b44d77113d4970485de6ec
+  flutter_inappwebview: 239198123453705522ba6c4f78d3d7468215f248
   flutter_sodium: 562e27775421e43bfe223c3a1565f2ad14aea6fa
-  flutter_webview_plugin: ed9e8a6a96baf0c867e90e1bce2673913eeac694
   GoogleAppMeasurement: 51d8d9ea48f0ca44484d29cfbdef976fbd4fc336
   GoogleUtilities: 996e0db07153674fd1b54b220fda3a3dc3547cba
   keyboard_visibility: 96a24de806fe6823c3ad956c01ba2ec6d056616f
@@ -166,4 +166,4 @@ SPEC CHECKSUMS:
 
 PODFILE CHECKSUM: b65fdc01ac03a090f3353379dc29c17e902177aa
 
-COCOAPODS: 1.6.1
+COCOAPODS: 1.8.4

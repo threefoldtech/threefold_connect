@@ -5,17 +5,18 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:threebotlogin/screens/LoginScreen.dart';
 import 'package:threebotlogin/services/3botService.dart';
-import 'package:threebotlogin/services/WebviewService.dart';
 import 'package:threebotlogin/services/cryptoService.dart';
 import 'package:threebotlogin/services/openKYCService.dart';
 import 'package:threebotlogin/main.dart';
 import 'package:threebotlogin/widgets/CustomDialog.dart';
 
+import '../AppConfig.dart';
+
 IO.Socket socket;
 BuildContext ctx;
 bool conntected = false;
 
-String threeBotSocketUrl = config.threeBotSocketUrl;
+String threeBotSocketUrl = AppConfig().threeBotSocketUrl;
 
 createSocketConnection(BuildContext context, String doubleName) async {
   if (conntected) return;

@@ -1,16 +1,15 @@
 import 'package:flutter/material.dart';
 
 import 'package:flutter/widgets.dart';
-import 'Apps/Wallet/walletWidget.dart';
-import 'config.dart';
-import 'main.dart';
+import 'Apps/FreeFlowPages/FfpWidget.dart';
+
 /*
 Future main() async {
   runApp(new Wallet());
 }*/
 
 void main() async {
-  runApp(new WalletWidget());
+  runApp(new FfpWidget());
   /*wallet
   var config = Config(
       name: '3bot staging',

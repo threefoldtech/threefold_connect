@@ -38,7 +38,7 @@ android {
     }
 
     defaultConfig {
-        applicationId "org.jimber.threebotlogin.staging"
+        applicationId "org.jimber.threebotlogin"
         minSdkVersion 21
         targetSdkVersion 28
         versionCode flutterVersionCode.toInteger()
