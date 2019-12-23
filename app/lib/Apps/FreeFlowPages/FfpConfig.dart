@@ -1,6 +1,6 @@
 import '../../AppConfig.dart';
 
-class FfpConfig extends AppConfig {
+class FfpConfig extends EnvConfig {
   FfpConfigImpls impl;
 
   FfpConfig() {

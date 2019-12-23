@@ -1,6 +1,8 @@
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:threebotlogin/App.dart';
+import 'package:threebotlogin/Apps/FreeFlowPages/ffp.dart';
+import 'package:threebotlogin/Apps/Wallet/wallet.dart';
 import 'package:threebotlogin/helpers/HexColor.dart';
 import 'package:threebotlogin/screens/MobileRegistrationScreen.dart';
 import 'package:threebotlogin/services/loggingService.dart';
@@ -28,7 +30,7 @@ String appName;
 String packageName;
 String version;
 String buildNumber;
-List<String> apps = ['/', '/wallet', '/scan'];
+List<String> apps = ['/', '/wallet', '/ffp'];
 
 // Hack to get the height of the bottom navbar
 final navbarKey = new GlobalKey<BottomNavBarState>();
@@ -122,7 +124,9 @@ class MyApp extends StatelessWidget {
           primaryColor: HexColor("#2d4052"), accentColor: Color(0xff16a085)),
       routes: {
         '/': (context) => HomeScreen(),
-        '/wallet': (context) => WalletWidget(),
+        '/wallet': (context) => Wallet().widget(),
+        '/ffp': (context) => Ffp().widget(),
+        
         '/scan': (context) => RegistrationScreen(),
         '/register': (context) => RegistrationScreen(),
         '/success': (context) => SuccessfulScreen(registration: false),

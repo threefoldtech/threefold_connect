@@ -5,7 +5,7 @@ import 'package:threebotlogin/Apps/Wallet/walletWidget.dart';
 
 import '../../App.dart';
 
-class Wallet implements App{
+class Wallet implements App {
   Widget widget(){
     return  WalletWidget();
   }

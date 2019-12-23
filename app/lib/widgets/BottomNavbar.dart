@@ -19,13 +19,6 @@ class BottomNavBarState extends State<BottomNavBar> {
   final Color backgroundColor = HexColor("#2d4052");
 
   void _onItemTapped(int index) {
-    if (index == 2) {
-      Scaffold.of(context).showSnackBar(SnackBar(
-        content: Text("Coming soon"),
-      ));
-      return;
-    }
-
     widget.onItemTapped(index, context);
   }
 
@@ -48,16 +41,8 @@ class BottomNavBarState extends State<BottomNavBar> {
           title: Text('Pay'),
         ),
         new BottomNavigationBarItem(
-          icon: Icon(
-            Icons.supervised_user_circle,
-            color: Colors.grey.shade700,
-          ),
-          title: Text(
-            'Circles',
-            style: new TextStyle(
-              color: Colors.grey.shade700,
-            ),
-          ),
+          icon: Icon(Icons.account_balance_wallet),
+          title: Text('Bla'),
         ),
         new BottomNavigationBarItem(
             icon: Icon(Icons.people), title: Text('Social')),

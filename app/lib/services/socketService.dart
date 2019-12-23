@@ -16,7 +16,7 @@ IO.Socket socket;
 BuildContext ctx;
 bool conntected = false;
 
-String threeBotSocketUrl = AppConfig().threeBotSocketUrl;
+String threeBotSocketUrl = AppConfig().threeBotSocketUrl();
 
 createSocketConnection(BuildContext context, String doubleName) async {
   if (conntected) return;

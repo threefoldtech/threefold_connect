@@ -5,9 +5,9 @@ import 'package:threebotlogin/AppConfig.dart';
 import 'cryptoService.dart';
 import 'userService.dart';
 
-String openKycApiUrl = AppConfig().openKycApiUrl;
-String threeBotApiUrl = AppConfig().threeBotApiUrl;
-String threeBotFrontEndUrl = AppConfig().threeBotFrontEndUrl;
+String openKycApiUrl = AppConfig().openKycApiUrl();
+String threeBotApiUrl = AppConfig().threeBotApiUrl();
+String threeBotFrontEndUrl = AppConfig().threeBotFrontEndUrl();
 
 Map<String, String> requestHeaders = {'Content-type': 'application/json'};
 

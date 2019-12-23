@@ -41,18 +41,18 @@ abstract class AppConfigImpl {
 
 class AppConfigStaging extends AppConfigImpl {
   String openKycApiUrl() {
-    return "url";
+    return "https://openkyc.staging.jimber.org";
   }
 
   String threeBotApiUrl() {
-    return "url";
+    return "https://login.staging.jimber.org/api";
   }
 
   String threeBotFrontEndUrl() {
-    return "url";
+    return "https://login.staging.jimber.org/";
   }
 
   String threeBotSocketUrl() {
-    return "url";
+    return "ws://login.staging.jimber.org";
   }
 }

@@ -6,6 +6,7 @@ import 'package:threebotlogin/Apps/FreeFlowPages/FfpConfig.dart';
 
 import 'package:threebotlogin/services/cryptoService.dart';
 import 'package:threebotlogin/services/userService.dart';
+import 'package:threebotlogin/widgets/CustomScaffold.dart';
 
 /*
 Future main() async {
@@ -34,7 +35,7 @@ class _WalletState extends State<FfpWidget> {
         initKeys();
       },
       onLoadStart: (InAppWebViewController controller, String url) {
-        if(url.contains('state=')){
+        if (url.contains('state=')) {
           controller.injectCSSCode(source: '* { display: none; }');
         }
         setState(() {
@@ -98,15 +99,13 @@ class _WalletState extends State<FfpWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      home: new Scaffold(
-        body: Column(
-          children: <Widget>[
-            Expanded(
-              child: Container(child: iaWebview),
-            ),
-          ],
-        ),
+    return CustomScaffold(
+      body: Column(
+        children: <Widget>[
+          Expanded(
+            child: Container(child: iaWebview),
+          ),
+        ],
       ),
     );
   }
