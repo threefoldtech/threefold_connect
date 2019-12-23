@@ -6,18 +6,17 @@ import 'package:threebotlogin/services/openKYCService.dart';
 import 'package:threebotlogin/services/socketService.dart';
 import 'package:threebotlogin/services/userService.dart';
 import 'package:threebotlogin/widgets/CustomDialog.dart';
+import 'package:threebotlogin/widgets/CustomScaffold.dart';
 import 'package:threebotlogin/widgets/PinField.dart';
 
-class PreferenceWidget extends StatefulWidget {
-  final Function(bool) showPreference;
-  final Function routeToHome;
-  PreferenceWidget(this.showPreference, this.routeToHome, {Key key})
+class PreferencePage extends StatefulWidget {
+  PreferencePage({Key key})
       : super(key: key);
   @override
-  _PreferenceWidgetState createState() => _PreferenceWidgetState();
+  _PreferencePageState createState() => _PreferencePageState();
 }
 
-class _PreferenceWidgetState extends State<PreferenceWidget> {
+class _PreferencePageState extends State<PreferencePage> {
   Map email;
   String doubleName = '';
   String phrase = '';
@@ -41,127 +40,123 @@ class _PreferenceWidgetState extends State<PreferenceWidget> {
   @override
   Widget build(BuildContext context) {
     preferenceContext = context;
-    return ListView(
-      children: <Widget>[
-        AppBar(
-          backgroundColor: Colors.transparent,
-          elevation: 0.0,
-          title: Text(
-            'Settings',
-            style: TextStyle(color: Colors.black),
+    return CustomScaffold(
+      appBar: AppBar(
+            backgroundColor: Colors.transparent,
+            elevation: 0.0,
+            title: Text(
+              'Settings',
+              style: TextStyle(color: Colors.black),
+            ),
           ),
-          leading: FlatButton(
-              child: Icon(Icons.arrow_back),
-              onPressed: () {
-                setState(() {
-                  widget.showPreference(false);
-                });
-              }),
-        ),
-        ListTile(
-          title: Text("Profile"),
-        ),
-        Material(
-          child: ListTile(
-            leading: Icon(Icons.person),
-            title: Text(doubleName),
+      body: ListView(
+        children: <Widget>[
+          
+          ListTile(
+            title: Text("Profile"),
           ),
-        ),
-        Material(
-          child: ListTile(
-            trailing: !emailVerified ? Icon(Icons.refresh) : null,
-            leading: Icon(Icons.mail),
-            title: Text(emailAdress.toLowerCase()),
-            subtitle: !emailVerified
-                ? Text(
-                    "Unverified",
-                    style: TextStyle(color: Colors.grey),
-                  )
-                : Text(
-                    "Verified",
-                    style: TextStyle(color: Colors.green),
+          Material(
+            child: ListTile(
+              leading: Icon(Icons.person),
+              title: Text(doubleName),
+            ),
+          ),
+          Material(
+            child: ListTile(
+              trailing: !emailVerified ? Icon(Icons.refresh) : null,
+              leading: Icon(Icons.mail),
+              title: Text(emailAdress.toLowerCase()),
+              subtitle: !emailVerified
+                  ? Text(
+                      "Unverified",
+                      style: TextStyle(color: Colors.grey),
+                    )
+                  : Text(
+                      "Verified",
+                      style: TextStyle(color: Colors.green),
+                    ),
+              onTap: !emailVerified ? sendVerificationEmail : null,
+            ),
+          ),
+          FutureBuilder(
+            future: getPhrase(),
+            builder: (context, snapshot) {
+              if (snapshot.hasData) {
+                return Material(
+                  child: ListTile(
+                    trailing: Padding(
+                      padding: new EdgeInsets.only(right: 7.5),
+                      child: Icon(Icons.visibility),
+                    ),
+                    leading: Icon(Icons.vpn_key),
+                    title: Text("Show Phrase"),
+                    onTap: () {
+                      _chooseFunctionalityPhrase();
+                    },
                   ),
-            onTap: !emailVerified ? sendVerificationEmail : null,
+                );
+              } else {
+                return Container();
+              }
+            },
           ),
-        ),
-        FutureBuilder(
-          future: getPhrase(),
-          builder: (context, snapshot) {
-            if (snapshot.hasData) {
-              return Material(
-                child: ListTile(
-                  trailing: Padding(
-                    padding: new EdgeInsets.only(right: 7.5),
-                    child: Icon(Icons.visibility),
-                  ),
-                  leading: Icon(Icons.vpn_key),
-                  title: Text("Show Phrase"),
-                  onTap: () {
-                    _chooseFunctionalityPhrase();
-                  },
-                ),
-              );
-            } else {
-              return Container();
-            }
-          },
-        ),
-        Visibility(
-          visible: biometricsCheck,
-          child: Material(
-            child: CheckboxListTile(
-              secondary: Icon(Icons.fingerprint),
-              value: finger,
-              title: Text("Fingerprint"),
-              activeColor: Theme.of(context).accentColor,
-              onChanged: (bool newValue) {
-                setState(() {
-                  logger.log('newvalue:', newValue, finger);
-                });
+          Visibility(
+            visible: biometricsCheck,
+            child: Material(
+              child: CheckboxListTile(
+                secondary: Icon(Icons.fingerprint),
+                value: finger,
+                title: Text("Fingerprint"),
+                activeColor: Theme.of(context).accentColor,
+                onChanged: (bool newValue) {
+                  setState(() {
+                    logger.log('newvalue:', newValue, finger);
+                  });
 
-                _chooseDialogFingerprint(newValue);
+                  _chooseDialogFingerprint(newValue);
+                },
+              ),
+            ),
+          ),
+          Material(
+            child: ListTile(
+              leading: Icon(Icons.lock),
+              title: Text("Change pincode"),
+              onTap: () {
+                Navigator.pushNamed(context, '/changepin');
               },
             ),
           ),
-        ),
-        Material(
-          child: ListTile(
-            leading: Icon(Icons.lock),
-            title: Text("Change pincode"),
-            onTap: () {
-              Navigator.pushNamed(context, '/changepin');
-            },
-          ),
-        ),
-        Material(
-          child: ListTile(
-            leading: Icon(Icons.info_outline),
-            title: Text("Version: " + version + " - " + buildNumber),
-          ),
-        ),
-        ExpansionTile(
-          title: Text(
-            "Advanced settings",
-            style: TextStyle(color: Colors.black),
-          ),
-          children: <Widget>[
-            Material(
-              child: ListTile(
-                leading: Icon(Icons.person),
-                title: Text(
-                  "Remove Account From Device",
-                  style: TextStyle(color: Colors.red),
-                ),
-                trailing: Icon(
-                  Icons.remove_circle,
-                  color: Colors.red,
-                ),
-                onTap: _showDialog,
-              ),
+          Material(
+            child: ListTile(
+              leading: Icon(Icons.info_outline),
+              title: Text("Version: " + version + " - " + buildNumber),
             ),
-          ],
-        ),
-      ],
+          ),
+          ExpansionTile(
+            title: Text(
+              "Advanced settings",
+              style: TextStyle(color: Colors.black),
+            ),
+            children: <Widget>[
+              Material(
+                child: ListTile(
+                  leading: Icon(Icons.person),
+                  title: Text(
+                    "Remove Account From Device",
+                    style: TextStyle(color: Colors.red),
+                  ),
+                  trailing: Icon(
+                    Icons.remove_circle,
+                    color: Colors.red,
+                  ),
+                  onTap: _showDialog,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
     );
   }
 
@@ -293,7 +288,6 @@ class _PreferenceWidgetState extends State<PreferenceWidget> {
 
                 closeSocketConnection(this.doubleName);
                 await Navigator.pushNamed(preferenceContext, '/');
-                widget.routeToHome();
               } else {
                 showDialog(
                     context: preferenceContext,

@@ -15,7 +15,7 @@ class WalletWidget extends StatefulWidget {
   _WalletState createState() => new _WalletState();
 }
 
-class _WalletState extends State<WalletWidget> {
+class _WalletState extends State<WalletWidget> with AutomaticKeepAliveClientMixin{
   InAppWebViewController webView;
   String url = "";
   double progress = 0;
@@ -107,4 +107,8 @@ class _WalletState extends State<WalletWidget> {
       ),
     );
   }
+
+  @override
+  // TODO: implement wantKeepAlive
+  bool get wantKeepAlive => true;
 }

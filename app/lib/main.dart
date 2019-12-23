@@ -4,6 +4,7 @@ import 'package:threebotlogin/App.dart';
 import 'package:threebotlogin/Apps/FreeFlowPages/ffp.dart';
 import 'package:threebotlogin/Apps/Wallet/wallet.dart';
 import 'package:threebotlogin/helpers/HexColor.dart';
+import 'package:threebotlogin/router.dart';
 import 'package:threebotlogin/screens/MobileRegistrationScreen.dart';
 import 'package:threebotlogin/services/loggingService.dart';
 import 'package:threebotlogin/widgets/BottomNavbar.dart';
@@ -21,16 +22,14 @@ List<CameraDescription> cameras;
 String pk;
 String deviceId;
 LoggingService logger;
-int lastAppUsed;
-int keyboardUsedApp;
 bool finger = false;
 Color hexColor = Color(0xff0f296a);
-
+int selectedIndex = 0;
 String appName;
 String packageName;
 String version;
 String buildNumber;
-List<String> apps = ['/', '/wallet', '/ffp'];
+List<String> apps = ['/', '/wallet', '/ffp', '/settings'];
 
 // Hack to get the height of the bottom navbar
 void main() => runApp(MyApp());
@@ -118,23 +117,25 @@ class MyApp extends StatelessWidget {
     ErrorWidget.builder = (FlutterErrorDetails errorDetails) {
       return getErrorWidget(context, errorDetails);
     };
-    return MaterialApp(
-      theme: ThemeData(
-          primaryColor: HexColor("#2d4052"), accentColor: Color(0xff16a085)),
-      routes: {
-        '/': (context) => HomeScreen(),
-        '/wallet': (context) => Wallet().widget(),
-        '/ffp': (context) => Ffp().widget(),
 
-        '/scan': (context) => RegistrationScreen(),
-        '/register': (context) => RegistrationScreen(),
-        '/success': (context) => SuccessfulScreen(registration: false),
-        '/registered': (context) => SuccessfulScreen(registration: true),
-        '/error': (context) => ErrorScreen(),
-        '/recover': (context) => RecoverScreen(),
-        '/changepin': (context) => ChangePinScreen(),
-        '/registration': (context) => MobileRegistrationScreen()
-      },
+    var tabs = MaterialApp(
+      theme: ThemeData(
+        primaryColor: HexColor("#2d4052"),
+        accentColor: Color(0xff16a085),
+      ),
+      home: DefaultTabController(
+        length: Router().routes.length,
+        child: Scaffold(
+          body: TabBarView(
+            children: Router().getContent()
+          ),
+          bottomNavigationBar: new TabBar(
+            tabs: Router().getIconButtons(),
+          ),
+          backgroundColor: Theme.of(context).accentColor,
+        ),
+      )
     );
+    return tabs;
   }
 }

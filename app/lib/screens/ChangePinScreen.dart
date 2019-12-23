@@ -5,7 +5,7 @@ import 'package:threebotlogin/widgets/CustomScaffold.dart';
 import 'package:threebotlogin/widgets/PinField.dart';
 
 class ChangePinScreen extends StatefulWidget {
-  ChangePinScreen({Key key}) : super(key: key);
+ChangePinScreen({Key key}) : super(key: key);
   _ChangePinScreenState createState() => _ChangePinScreenState();
 }
 
