@@ -1,10 +1,12 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
-import 'package:http/http.dart' as http;
+import 'package:threebotlogin/Apps/FreeFlowPages/FfpConfig.dart';
+
 import 'package:threebotlogin/services/cryptoService.dart';
 import 'package:threebotlogin/services/userService.dart';
-import 'config.dart';
+
 /*
 Future main() async {
   runApp(new FfpWidget());
@@ -21,6 +23,37 @@ class _WalletState extends State<FfpWidget> {
   double progress = 0;
   FfpConfig config = FfpConfig();
 
+  InAppWebView iaWebview;
+  _WalletState() {
+    iaWebview = InAppWebView(
+      initialUrl: config.cookieUrl(),
+      initialHeaders: {},
+      initialOptions: InAppWebViewWidgetOptions(),
+      onWebViewCreated: (InAppWebViewController controller) {
+        webView = controller;
+        initKeys();
+      },
+      onLoadStart: (InAppWebViewController controller, String url) {
+        if(url.contains('state=')){
+          controller.injectCSSCode(source: '* { display: none; }');
+        }
+        setState(() {
+          this.url = url;
+        });
+      },
+      onLoadStop: (InAppWebViewController controller, String url) async {
+        setState(() {
+          this.url = url;
+        });
+      },
+      onProgressChanged: (InAppWebViewController controller, int progress) {
+        setState(() {
+          this.progress = progress / 100;
+        });
+      },
+    );
+  }
+
   @override
   void initState() {
     super.initState();
@@ -32,7 +65,10 @@ class _WalletState extends State<FfpWidget> {
   }
 
   initKeys() async {
-    var url = await webView.getUrl(); // get url after login redir
+    var url = await webView.getUrl();
+    while (!url.contains('state')) {
+      url = await webView.getUrl();
+    }
 
     final state = Uri.decodeFull(url.split("&state=")[1]);
     final union = '?';
@@ -67,34 +103,7 @@ class _WalletState extends State<FfpWidget> {
         body: Column(
           children: <Widget>[
             Expanded(
-              child: Container(
-                child: InAppWebView(
-                  initialUrl: config.cookieUrl(),
-                  initialHeaders: {},
-                  initialOptions: InAppWebViewWidgetOptions(),
-                  onWebViewCreated: (InAppWebViewController controller) {
-                    webView = controller;
-                    initKeys();
-                  },
-                  onLoadStart: (InAppWebViewController controller, String url) {
-                    setState(() {
-                      this.url = url;
-                    });
-                  },
-                  onLoadStop:
-                      (InAppWebViewController controller, String url) async {
-                    setState(() {
-                      this.url = url;
-                    });
-                  },
-                  onProgressChanged:
-                      (InAppWebViewController controller, int progress) {
-                    setState(() {
-                      this.progress = progress / 100;
-                    });
-                  },
-                ),
-              ),
+              child: Container(child: iaWebview),
             ),
           ],
         ),
