@@ -10,71 +10,24 @@ import 'package:threebotlogin/widgets/CustomScaffold.dart';
 
 import 'WalletConfig.dart';
 
-bool created = false;
-
 class WalletWidget extends StatefulWidget {
   @override
-  _WalletState createState() => _WalletState();
-
+  _WalletState createState() => new _WalletState();
 }
 
-class _WalletState extends State<WalletWidget>  with AutomaticKeepAliveClientMixin{
-
-  @override
-  bool get wantKeepAlive => true;
-
+class WalletController {
   InAppWebViewController webView;
-  String url = "";
-  double progress = 0;
-  var config = WalletConfig();
   InAppWebView iaWebView;
+  var config = WalletConfig();
+  String url = "";
 
-  _WalletState() {
-    iaWebView = InAppWebView(
-      initialUrl: 'http://192.168.2.90:8080/handlertest.html?cache=5',
-      initialHeaders: {},
-      initialOptions: InAppWebViewWidgetOptions(
-        android: AndroidInAppWebViewOptions(
-                              supportMultipleWindows: true
-                            )
-      ),
-      onWebViewCreated: (InAppWebViewController controller) {
-        webView = controller;
-        this.addHandler();
-        //initKeys();
-      },
-      onCreateWindow: (InAppWebViewController controller, OnCreateWindowRequest req){
-          
-         
-          controller.evaluateJavascript(source: "window.close()");
-      },
-      onLoadStart: (InAppWebViewController controller, String url) {
-      
-        setState(() {
-          this.url = url;
-        });
-      },
-      onLoadStop: (InAppWebViewController controller, String url) async {
-        setState(() {
-          this.url = url;
-        });
-      },
-      onProgressChanged: (InAppWebViewController controller, int progress) {
-        setState(() {
-          this.progress = progress / 100;
-        });
-      },
-    );
-    
-  }
-  @override
-  void initState() {
-    super.initState();
+  static final WalletController _instance = new WalletController._();
+  static WalletController instance() {
+    return _instance;
   }
 
-  @override
-  void dispose() {
-    super.dispose();
+  InAppWebView webview() {
+    return iaWebView;
   }
 
   initKeys() async {
@@ -113,13 +66,44 @@ class _WalletState extends State<WalletWidget>  with AutomaticKeepAliveClientMix
         handlerName: "ADD_APP_WALLET", callback: saveAppWallet);
   }
 
+  WalletController._() {
+    iaWebView = InAppWebView(
+      initialUrl: 'https://${config.appId()}',
+      initialHeaders: {},
+      initialOptions: InAppWebViewWidgetOptions(),
+      onWebViewCreated: (InAppWebViewController controller) {
+        webView = controller;
+        this.addHandler();
+        //initKeys();
+      },
+      onLoadStart: (InAppWebViewController controller, String url) {},
+      onLoadStop: (InAppWebViewController controller, String url) async {},
+      onProgressChanged: (InAppWebViewController controller, int progress) {},
+    );
+  }
+}
+
+class _WalletState extends State<WalletWidget> {
+  double progress = 0;
+
+  _WalletState() {}
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return CustomScaffold(
       body: Column(
         children: <Widget>[
           Expanded(
-            child: Container( child: iaWebView),
+            child: Container(child: WalletController.instance().webview()),
           ),
         ],
       ),

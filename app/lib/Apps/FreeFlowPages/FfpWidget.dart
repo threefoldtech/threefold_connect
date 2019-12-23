@@ -15,21 +15,29 @@ Future main() async {
 
 class FfpWidget extends StatefulWidget {
   @override
-  _WalletState createState() => new _WalletState();
+  _FfpState createState() => new _FfpState();
 }
 
-class _WalletState extends State<FfpWidget> {
+class _FfpState extends State<FfpWidget>  with AutomaticKeepAliveClientMixin{
+
+  @override
+  bool get wantKeepAlive => true;
+  
   InAppWebViewController webView;
   String url = "";
   double progress = 0;
   FfpConfig config = FfpConfig();
 
   InAppWebView iaWebview;
-  _WalletState() {
+  _FfpState() {
     iaWebview = InAppWebView(
       initialUrl: config.cookieUrl(),
       initialHeaders: {},
-      initialOptions: InAppWebViewWidgetOptions(),
+     initialOptions: InAppWebViewWidgetOptions(
+        android: AndroidInAppWebViewOptions(
+                              supportMultipleWindows: true
+                            )
+      ),
       onWebViewCreated: (InAppWebViewController controller) {
         webView = controller;
         initKeys();
