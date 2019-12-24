@@ -29,7 +29,7 @@ class _WalletState extends State<WalletWidget>
 
   _WalletState() {
     iaWebView = InAppWebView(
-      initialUrl:  'http://192.168.0.221:8080/handlertest.html?nocache=3', //'https://${config.appId()}',
+      initialUrl:  'https://${config.appId()}', //'http://192.168.0.221:8080/handlertest.html?nocache=3',
       initialHeaders: {},
       initialOptions: InAppWebViewWidgetOptions(
           android: AndroidInAppWebViewOptions(supportMultipleWindows: true)),
