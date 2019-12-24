@@ -38,11 +38,6 @@ class Router {
       icon: Icons.settings,
       view: PreferenceScreen(),
     ),
-    Route(
-      path: '/scan',
-      name: 'Scan',
-      view: RegistrationScreen(),
-    ),
   ];
   Map<String, Widget Function(BuildContext)> getRoutes() {
     return Map.fromIterable(routes, key: (v) => v.path, value: (v) => v.view);

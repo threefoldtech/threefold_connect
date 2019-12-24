@@ -1,27 +1,23 @@
-import 'dart:convert';
+
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:threebotlogin/widgets/CustomDialog.dart';
-import 'package:threebotlogin/widgets/PinField.dart';
-import 'package:threebotlogin/services/userService.dart';
-import 'package:threebotlogin/services/3botService.dart';
-import 'package:threebotlogin/services/cryptoService.dart';
-import 'package:threebotlogin/main.dart';
+
 import 'package:threebotlogin/widgets/Scanner.dart';
 
 class RegistrationScreen extends StatefulWidget {
   final Widget registrationScreen;
-  
+
   RegistrationScreen({Key key, this.registrationScreen}) : super(key: key);
   _ScanScreenState createState() => _ScanScreenState();
 }
 
 class _ScanScreenState extends State<RegistrationScreen>
     with TickerProviderStateMixin {
-  String helperText = "In order to finish registration, scan QR code";
+  String helperText = "Aim at QR code to scan";
   AnimationController sliderAnimationController;
   Animation<double> offset;
-  dynamic qrData = '';
+  
   String pin;
   final _scaffoldKey = GlobalKey<ScaffoldState>();
   var scope = Map();
@@ -62,7 +58,7 @@ class _ScanScreenState extends State<RegistrationScreen>
                   width: 60.0,
                 ),
                 Text(
-                  'REGISTRATION',
+                  'Scan QR',
                   textAlign: TextAlign.center,
                   style: TextStyle(
                       color: Colors.white,
@@ -110,9 +106,7 @@ class _ScanScreenState extends State<RegistrationScreen>
                     padding: EdgeInsets.only(bottom: 12),
                     curve: Curves.bounceInOut,
                     width: double.infinity,
-                    child: qrData != ''
-                        ? PinField(callback: (p) => pinFilledIn(p))
-                        : null,
+                    child: null,
                   ),
                 ],
               ),
@@ -140,8 +134,8 @@ class _ScanScreenState extends State<RegistrationScreen>
   }
 
   gotQrData(value) async {
-   print("Value scanned!!" + value);
-   Navigator.pop(context);
+
+    Navigator.pop(context, value);
   }
 
   showError() {
@@ -151,72 +145,11 @@ class _ScanScreenState extends State<RegistrationScreen>
   }
 
   pinFilledIn(String value) async {
-    if (pin == null) {
-      setState(() {
-        pin = value;
-        helperText = 'Confirm pin';
-      });
-    } else if (pin != value) {
-      setState(() {
-        pin = null;
-        helperText = 'Pins do not match, choose pin';
-      });
-    } else if (pin == value) {
-      var scopeFromQR;
-      scope['doubleName'] = qrData['doubleName'];
-
-      if (qrData['scope'] != null) {
-        print('scope of qrdata ${jsonDecode(qrData['scope'])}');
-        scopeFromQR = jsonDecode(qrData['scope']);
-
-        if (scopeFromQR.containsKey('email'))
-          scope['email'] = {'email': qrData['email'], 'verified': false};
-        if (scopeFromQR.containsKey('derivedSeed'))
-          scope['derivedSeed'] = {'derivedSeed': qrData['derivedSeed']};
-      }
-      saveValues();
-    }
+  //deprecated
   }
 
   saveValues() async {
-    logger.log('save values');
-    var hash = qrData['hash'];
-    var doubleName = qrData['doubleName'];
-    var email = qrData['email'];
-    var phrase = qrData['phrase'];
-
-    savePin(pin);
-
-    Map<String, String> keys = await generateKeysFromSeedPhrase(phrase);
-
-    savePrivateKey(keys['privateKey']);
-    savePublicKey(keys['publicKey']);
-
-    saveEmail(email, false);
-    saveDoubleName(doubleName);
-    savePhrase(phrase);
-    saveFingerprint(false);
-    if (keys['publicKey'] != null && hash != null) {
-      try {
-        var signedHash = signData(hash, keys['privateKey']);
-        var data =
-            encrypt(jsonEncode(scope), keys['publicKey'], keys['privateKey']);
-
-        sendData(hash, await signedHash, await data, null).then((x) {
-          Navigator.popUntil(context, ModalRoute.withName('/'));
-          Navigator.of(context).pushNamed('/registered');
-        });
-      } catch (exception) {
-        Navigator.popUntil(context, ModalRoute.withName('/'));
-        showError();
-      }
-    } else {
-      print('signing $doubleName');
-      sendRegisterSign(doubleName);
-
-      Navigator.popUntil(context, ModalRoute.withName('/'));
-      Navigator.of(context).pushNamed('/registered');
-    }
+   //deprecated
   }
 
   _showInformation() {

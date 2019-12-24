@@ -1,7 +1,9 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:threebotlogin/Apps/Wallet/walletUserData.dart';
+import 'package:threebotlogin/main.dart';
 import 'package:threebotlogin/screens/RegistrationScreen.dart';
 
 import 'package:threebotlogin/services/cryptoService.dart';
@@ -27,14 +29,14 @@ class _WalletState extends State<WalletWidget>
 
   _WalletState() {
     iaWebView = InAppWebView(
-      initialUrl:  'http://localhost:8080', //'https://${config.appId()}',
+      initialUrl:  'http://192.168.0.221:8080/handlertest.html?nocache=3', //'https://${config.appId()}',
       initialHeaders: {},
       initialOptions: InAppWebViewWidgetOptions(
           android: AndroidInAppWebViewOptions(supportMultipleWindows: true)),
       onWebViewCreated: (InAppWebViewController controller) {
         webView = controller;
         this.addHandler();
-        initKeys();
+      //  initKeys();
       },
       onCreateWindow:
           (InAppWebViewController controller, OnCreateWindowRequest req) {
@@ -95,9 +97,11 @@ class _WalletState extends State<WalletWidget>
     webView.loadUrl(url: loadUrl);
   }
 
-  scanQrCode(List<dynamic> params){
-      Navigator.pushNamed(context, '/scan');
-      print("scan done");
+  scanQrCode(List<dynamic> params) async {
+      dynamic result = await Navigator.pushNamed(context, '/scan');
+      print("got result");
+      print(result);
+      return result;
   }
   addHandler() {
     webView.addJavaScriptHandler(

@@ -98,7 +98,6 @@ class MyApp extends StatelessWidget {
         primaryColor: primaryColor,
       ),
       routes: {
-        '/': (context) => HomeScreen(),
         '/scan': (context) => RegistrationScreen(),
         '/register': (context) => RegistrationScreen(),
         '/success': (context) => SuccessfulScreen(registration: false),

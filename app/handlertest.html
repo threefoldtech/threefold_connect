@@ -1,16 +1,15 @@
 <script>
- window.addEventListener("flutterInAppWebViewPlatformReady", function(event) {
-     window.flutter_inappwebview.callHandler('SCAN_QR').then(function(result) {
-       console.log(result);
+
+function scan(){
+   window.flutter_inappwebview.callHandler('SCAN_QR').then(function(result) {
+       alert(result);
+       document.getElementById("result").innerHtml(result);
      });
-   });
+    }
 </script>
 
-
-hiiiii!!!<br>
-hiiiii!!!<br>
-hiiiii!!!<br>
-<a href="close_test.html">HOEHEL</a>
+<div id="result"> RESULT HERE 2 </div>
+<a href="#" onClick="scan();">SCAN</a>
 hiiiii!!!<br>
 hiiiii!!!<br>
 hiiiii!!!<br>
