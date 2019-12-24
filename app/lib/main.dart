@@ -86,7 +86,10 @@ class MyApp extends StatelessWidget {
         length: Router().routes.length,
         child: Scaffold(
           body: SafeArea(
-            child: TabBarView(children: Router().getContent()),
+            child: TabBarView(
+              physics: NeverScrollableScrollPhysics(),
+              children: Router().getContent(),
+            ),
           ),
           bottomNavigationBar: Container(
             color: primaryColor,

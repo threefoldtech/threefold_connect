@@ -3,18 +3,17 @@ import 'package:flutter/services.dart';
 import 'package:threebotlogin/main.dart';
 import 'package:threebotlogin/services/fingerprintService.dart';
 import 'package:threebotlogin/services/openKYCService.dart';
-import 'package:threebotlogin/services/socketService.dart';
 import 'package:threebotlogin/services/userService.dart';
 import 'package:threebotlogin/widgets/CustomDialog.dart';
 import 'package:threebotlogin/widgets/PinField.dart';
 
-class PreferencePage extends StatefulWidget {
-  PreferencePage({Key key}) : super(key: key);
+class PreferenceScreen extends StatefulWidget {
+  PreferenceScreen({Key key}) : super(key: key);
   @override
-  _PreferencePageState createState() => _PreferencePageState();
+  _PreferenceScreenState createState() => _PreferenceScreenState();
 }
 
-class _PreferencePageState extends State<PreferencePage> {
+class _PreferenceScreenState extends State<PreferenceScreen> {
   Map email;
   String doubleName = '';
   String phrase = '';
@@ -40,10 +39,9 @@ class _PreferencePageState extends State<PreferencePage> {
     preferenceContext = context;
     return ListView(
       children: <Widget>[
-        ListTile(
+        AppBar(
           title: Text(
             'Settings',
-            style: TextStyle(color: Colors.black),
           ),
         ),
         ListTile(
@@ -277,8 +275,6 @@ class _PreferencePageState extends State<PreferencePage> {
                   preferenceContext,
                   ModalRoute.withName('/'),
                 );
-
-                closeSocketConnection(this.doubleName);
                 await Navigator.pushNamed(preferenceContext, '/');
               } else {
                 showDialog(

@@ -8,8 +8,6 @@ import 'package:threebotlogin/screens/MobileRegistrationScreen.dart';
 import 'package:threebotlogin/screens/RegisteredScreen.dart';
 import 'package:threebotlogin/screens/UnregisteredScreen.dart';
 import 'package:threebotlogin/services/3botService.dart';
-import 'package:threebotlogin/services/WebviewService.dart';
-import 'package:threebotlogin/services/socketService.dart';
 import 'package:threebotlogin/services/userService.dart';
 import 'package:package_info/package_info.dart';
 import 'package:threebotlogin/main.dart';
@@ -97,7 +95,6 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
           }
         }
 
-        socketLoginMobile(data);
         return openPage(
             LoginScreen(link.queryParameters, autoLogin: autoLogin));
       } else {
@@ -201,7 +198,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     if (response == 1) {
       String tmpDoubleName = await getDoubleName();
       if (initSocket) {
-        await createSocketConnection(context, tmpDoubleName);
+        // await createSocketConnection(context, tmpDoubleName);
       }
 
       checkIfThereAreLoginAttempts(tmpDoubleName);

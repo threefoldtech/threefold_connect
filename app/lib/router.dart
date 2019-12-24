@@ -3,7 +3,7 @@ import 'package:threebotlogin/Apps/Chatbot/chatbot.dart';
 import 'package:threebotlogin/Apps/FreeFlowPages/ffp.dart';
 import 'package:threebotlogin/Apps/Wallet/wallet.dart';
 import 'package:threebotlogin/screens/HomeScreen.dart';
-import 'package:threebotlogin/screens/PreferenceWidget.dart';
+import 'package:threebotlogin/screens/PreferenceScreen.dart';
 
 class Router {
   List<Route> routes = [
@@ -35,7 +35,7 @@ class Router {
       path: '/settings',
       name: 'Settings',
       icon: Icons.settings,
-      view: PreferencePage(),
+      view: PreferenceScreen(),
     ),
   ];
   Map<String, Widget Function(BuildContext)> getRoutes() {
