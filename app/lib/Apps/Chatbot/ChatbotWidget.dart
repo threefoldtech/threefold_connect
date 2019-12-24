@@ -3,7 +3,6 @@ import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:threebotlogin/Apps/Chatbot/ChatbotConfig.dart';
 import 'package:threebotlogin/services/userService.dart';
 
-import 'package:threebotlogin/widgets/CustomScaffold.dart';
 
 class ChatbotWidget extends StatefulWidget {
   @override
@@ -16,11 +15,9 @@ class _ChatbotState extends State<ChatbotWidget>
 
   ChatbotConfig config = ChatbotConfig();
   InAppWebView iaWebview;
-  
 
   _ChatbotState() {
-      init();
-   
+    init();
   }
   init() async {
     var email = await getEmail();
@@ -34,19 +31,12 @@ class _ChatbotState extends State<ChatbotWidget>
       },
       onCreateWindow:
           (InAppWebViewController controller, OnCreateWindowRequest req) {
-            print("Create!");
+        print("Create!");
         //browser.open(url: req.url, options: InAppBrowserClassOptions());
       },
-      onLoadStart: (InAppWebViewController controller, String url) {
-
-
-      },
-      onLoadStop: (InAppWebViewController controller, String url) async {
-  
-      },
-      onProgressChanged: (InAppWebViewController controller, int progress) {
-
-      },
+      onLoadStart: (InAppWebViewController controller, String url) {},
+      onLoadStop: (InAppWebViewController controller, String url) async {},
+      onProgressChanged: (InAppWebViewController controller, int progress) {},
     );
   }
 
@@ -62,14 +52,12 @@ class _ChatbotState extends State<ChatbotWidget>
 
   @override
   Widget build(BuildContext context) {
-    return CustomScaffold(
-      body: Column(
-        children: <Widget>[
-          Expanded(
-            child: Container(child: iaWebview),
-          ),
-        ],
-      ),
+    return Column(
+      children: <Widget>[
+        Expanded(
+          child: Container(child: iaWebview),
+        ),
+      ],
     );
   }
 

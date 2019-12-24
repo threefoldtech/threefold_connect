@@ -13,28 +13,6 @@ import 'package:threebotlogin/services/userService.dart';
 String threeBotApiUrl = AppConfig().threeBotApiUrl();
 Map<String, String> requestHeaders = {'Content-type': 'application/json'};
 
-sendScannedFlag(String hash, String deviceId, String doubleName) async {
-  http.post(
-    '$threeBotApiUrl/flag',
-    body: json.encode({
-      'hash': hash,
-      'deviceId': deviceId,
-      'isSigned': true,
-      'doubleName': doubleName
-    }),
-    headers: requestHeaders,
-  );
-}
-
-Future updateDeviceId(
-    String deviceId, String doubleName, String privateKey) async {
-  String signedDeviceId = await signData(deviceId, privateKey);
-
-  return http.put('$threeBotApiUrl/users/$doubleName/deviceid',
-      body: json.encode({'signedDeviceId': signedDeviceId}),
-      headers: requestHeaders);
-}
-
 Future sendData(String hash, String signedHash, data, selectedImageId) {
   return http.post('$threeBotApiUrl/sign',
       body: json.encode({

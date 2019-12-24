@@ -6,7 +6,6 @@ import 'package:threebotlogin/Apps/Wallet/walletUserData.dart';
 import 'package:threebotlogin/services/cryptoService.dart';
 import 'package:threebotlogin/services/toolsService.dart';
 import 'package:threebotlogin/services/userService.dart';
-import 'package:threebotlogin/widgets/CustomScaffold.dart';
 
 import 'WalletConfig.dart';
 
@@ -15,10 +14,10 @@ bool created = false;
 class WalletWidget extends StatefulWidget {
   @override
   _WalletState createState() => _WalletState();
-
 }
 
-class _WalletState extends State<WalletWidget> with AutomaticKeepAliveClientMixin{
+class _WalletState extends State<WalletWidget>
+    with AutomaticKeepAliveClientMixin {
   InAppWebViewController webView;
   String url = "";
   double progress = 0;
@@ -30,22 +29,17 @@ class _WalletState extends State<WalletWidget> with AutomaticKeepAliveClientMixi
       initialUrl: 'https://${config.appId}',
       initialHeaders: {},
       initialOptions: InAppWebViewWidgetOptions(
-        android: AndroidInAppWebViewOptions(
-                              supportMultipleWindows: true
-                            )
-      ),
+          android: AndroidInAppWebViewOptions(supportMultipleWindows: true)),
       onWebViewCreated: (InAppWebViewController controller) {
         webView = controller;
         this.addHandler();
         //initKeys();
       },
-      onCreateWindow: (InAppWebViewController controller, OnCreateWindowRequest req){
-          
-         
-          controller.evaluateJavascript(source: "window.close()");
+      onCreateWindow:
+          (InAppWebViewController controller, OnCreateWindowRequest req) {
+        controller.evaluateJavascript(source: "window.close()");
       },
       onLoadStart: (InAppWebViewController controller, String url) {
-      
         setState(() {
           this.url = url;
         });
@@ -61,7 +55,6 @@ class _WalletState extends State<WalletWidget> with AutomaticKeepAliveClientMixi
         });
       },
     );
-    
   }
   @override
   void initState() {
@@ -111,14 +104,12 @@ class _WalletState extends State<WalletWidget> with AutomaticKeepAliveClientMixi
 
   @override
   Widget build(BuildContext context) {
-    return CustomScaffold(
-      body: Column(
-        children: <Widget>[
-          Expanded(
-            child: Container( child: iaWebView),
-          ),
-        ],
-      ),
+    return Column(
+      children: <Widget>[
+        Expanded(
+          child: Container(child: iaWebView),
+        ),
+      ],
     );
   }
 

@@ -6,17 +6,10 @@ import 'package:threebotlogin/Apps/FreeFlowPages/FfpConfig.dart';
 
 import 'package:threebotlogin/services/cryptoService.dart';
 import 'package:threebotlogin/services/userService.dart';
-import 'package:threebotlogin/widgets/CustomScaffold.dart';
-
-
-
-
 
 /**************** */
 
-
 class MyInAppBrowser extends InAppBrowser {
-
   @override
   void onLoadStart(String url) {
     super.onLoadStart(url);
@@ -40,7 +33,6 @@ class MyInAppBrowser extends InAppBrowser {
     super.onExit();
     print("\n\nBrowser closed!\n\n");
   }
-
 }
 
 MyInAppBrowser inAppBrowser = new MyInAppBrowser();
@@ -63,7 +55,6 @@ class _FfpState extends State<FfpWidget> with AutomaticKeepAliveClientMixin {
 
   InAppWebView iaWebview;
   _FfpState() {
-
     iaWebview = InAppWebView(
       initialUrl: config.cookieUrl(),
       initialHeaders: {},
@@ -77,9 +68,8 @@ class _FfpState extends State<FfpWidget> with AutomaticKeepAliveClientMixin {
       onCreateWindow:
           (InAppWebViewController controller, OnCreateWindowRequest req) {
         print("Create window");
-        
-        inAppBrowser.open(url: req.url, options: InAppBrowserClassOptions());
 
+        inAppBrowser.open(url: req.url, options: InAppBrowserClassOptions());
       },
       onLoadStart: (InAppWebViewController controller, String url) {
         if (url.contains('state=')) {
@@ -150,14 +140,12 @@ class _FfpState extends State<FfpWidget> with AutomaticKeepAliveClientMixin {
 
   @override
   Widget build(BuildContext context) {
-    return CustomScaffold(
-      body: Column(
-        children: <Widget>[
-          Expanded(
-            child: Container(child: iaWebview),
-          ),
-        ],
-      ),
+    return Column(
+      children: <Widget>[
+        Expanded(
+          child: Container(child: iaWebview),
+        ),
+      ],
     );
   }
 

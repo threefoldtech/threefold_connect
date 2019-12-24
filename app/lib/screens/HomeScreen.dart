@@ -14,7 +14,6 @@ import 'package:threebotlogin/services/userService.dart';
 import 'package:package_info/package_info.dart';
 import 'package:threebotlogin/main.dart';
 import 'package:threebotlogin/widgets/CustomDialog.dart';
-import 'package:threebotlogin/widgets/CustomScaffold.dart';
 import 'package:uni_links/uni_links.dart';
 import 'ErrorScreen.dart';
 import 'RegistrationWithoutScanScreen.dart';
@@ -59,7 +58,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     super.initState();
     KeyboardVisibilityNotification().addNewListener(
       onChange: (bool visible) {
-       //resize webview
+        //resize webview
       },
     );
     WidgetsBinding.instance.addObserver(this);
@@ -76,7 +75,6 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
 
   checkWhatPageToOpen(Uri link) async {
     if (link.host == 'login') {
-
       var state = link.queryParameters['state'];
       var doubleName = await getDoubleName();
       if (doubleName != null) {
@@ -92,35 +90,32 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
         var scope = jsonDecode(link.queryParameters['scope']);
         if (scope['trustedDevice'] != null) {
           var trustedDevice = scope['trustedDevice'];
-          if (await isTrustedDevice(link.queryParameters['appId'], trustedDevice)) {
+          if (await isTrustedDevice(
+              link.queryParameters['appId'], trustedDevice)) {
             print('you are logged in');
             autoLogin = true;
           }
         }
 
         socketLoginMobile(data);
-        return openPage(LoginScreen(link.queryParameters, autoLogin: autoLogin));
+        return openPage(
+            LoginScreen(link.queryParameters, autoLogin: autoLogin));
       } else {
         if (doubleName == null) {
           Navigator.popUntil(context, ModalRoute.withName('/'));
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => MobileRegistrationScreen(
-                  doubleName: '',
-                  link: link
-              ),
+              builder: (context) =>
+                  MobileRegistrationScreen(doubleName: '', link: link),
             ),
           );
         }
       }
     }
     if (link.host == 'register') {
-      openPage(RegistrationWithoutScanScreen(
-        link.queryParameters,
-        resetPin: false,
-        link: null
-      ));
+      openPage(RegistrationWithoutScanScreen(link.queryParameters,
+          resetPin: false, link: null));
     } else if (link.host == "registeraccount") {
       // Check if we already have an account registered before showing this screen.
       String doubleName = await getDoubleName();
@@ -132,8 +127,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
           context,
           MaterialPageRoute(
             builder: (context) => MobileRegistrationScreen(
-                doubleName: link.queryParameters['doubleName'],
-                link: null),
+                doubleName: link.queryParameters['doubleName'], link: null),
           ),
         );
       } else {
@@ -210,7 +204,6 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
         await createSocketConnection(context, tmpDoubleName);
       }
 
-
       checkIfThereAreLoginAttempts(tmpDoubleName);
       await initUniLinks();
 
@@ -278,28 +271,21 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
       elevation: 0.0,
     );
 
-    return CustomScaffold(
-      appBar: PreferredSize(
-        child: appBar,
-        preferredSize: Size.fromHeight(0),
-      ),
-      body: FutureBuilder(
-        future: getDoubleName(),
-        builder: (BuildContext context, AsyncSnapshot snapshot) {
-          if (snapshot.hasData) {
-            this.bodyContext = context;
-            return RegisteredScreen(
-                isLoading: isLoading,
-                selectedIndex: selectedIndex,
-                routeToHome: this.routeToHome);
-          } else {
-            return UnregisteredScreen();
-          }
-        },
-      ),
+    return FutureBuilder(
+      future: getDoubleName(),
+      builder: (BuildContext context, AsyncSnapshot snapshot) {
+        if (snapshot.hasData) {
+          this.bodyContext = context;
+          return RegisteredScreen(
+              isLoading: isLoading,
+              selectedIndex: selectedIndex,
+              routeToHome: this.routeToHome);
+        } else {
+          return UnregisteredScreen();
+        }
+      },
     );
   }
-
 
   void updatePreference(bool preference) {
     setState(() {

@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:threebotlogin/main.dart';
 import 'package:threebotlogin/screens/RegistrationWithoutScanScreen.dart';
 import 'package:threebotlogin/services/3botService.dart';
 import 'package:threebotlogin/services/toolsService.dart';
 import 'package:threebotlogin/services/cryptoService.dart';
-import 'package:threebotlogin/widgets/CustomScaffold.dart';
 import 'package:threebotlogin/widgets/ReusableTextStep.dart';
 import 'package:threebotlogin/widgets/ReuseableTextFieldStep.dart';
 
@@ -131,7 +129,6 @@ class _MobileRegistrationScreenState extends State<MobileRegistrationScreen> {
   }
 
   void registrationToPin() async {
-    updateDeviceId(await messaging.getToken(), doubleName, keys['privateKey']);
 
     var registrationData = {
       "privateKey": keys['privateKey'],
@@ -427,7 +424,7 @@ class _MobileRegistrationScreenState extends State<MobileRegistrationScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return CustomScaffold(
+    return Scaffold(
       appBar: AppBar(
         title: Text('3Bot connect - Registration'),
       ),

@@ -1,23 +1,9 @@
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
-import 'package:threebotlogin/App.dart';
-import 'package:threebotlogin/Apps/FreeFlowPages/ffp.dart';
-import 'package:threebotlogin/Apps/Wallet/wallet.dart';
 import 'package:threebotlogin/helpers/HexColor.dart';
 import 'package:threebotlogin/router.dart';
-import 'package:threebotlogin/screens/MobileRegistrationScreen.dart';
 import 'package:threebotlogin/services/loggingService.dart';
-import 'package:threebotlogin/widgets/BottomNavbar.dart';
-import 'Apps/Wallet/walletWidget.dart';
-import 'package:threebotlogin/screens/HomeScreen.dart';
-import 'package:threebotlogin/screens/RegistrationScreen.dart';
-import 'package:threebotlogin/screens/SuccessfulScreen.dart';
-import 'package:threebotlogin/screens/ErrorScreen.dart';
-import 'package:threebotlogin/screens/RecoverScreen.dart';
 import 'package:fast_qr_reader_view/fast_qr_reader_view.dart';
-import 'package:threebotlogin/screens/ChangePinScreen.dart';
 
-FirebaseMessaging messaging = FirebaseMessaging();
 List<CameraDescription> cameras;
 String pk;
 String deviceId;
@@ -76,32 +62,6 @@ Widget getErrorWidget(BuildContext context, FlutterErrorDetails error) {
   );
 }
 
-// void init() async {
-//   WidgetsFlutterBinding.ensureInitialized();
-//   PackageInfo.fromPlatform().then((PackageInfo packageInfo) {
-//     appName = packageInfo.appName;
-//     packageName = packageInfo.packageName;
-//     version = packageInfo.version;
-//     buildNumber = packageInfo.buildNumber;
-//   });
-
-//   logger = new LoggingService();
-
-//   pk = await getPrivateKey();
-
-//   try {
-//     cameras = await availableCameras();
-//   } on QRReaderException catch (e) {
-//     print(e);
-//   }
-
-//   messaging.requestNotificationPermissions();
-//   messaging.getToken().then((t) {
-//     deviceId = t;
-//     logger.log('Got device id $deviceId');
-//   });
-// }
-
 bool get isInDebugMode {
   bool inDebugMode = false;
   assert(inDebugMode = true);
@@ -117,24 +77,25 @@ class MyApp extends StatelessWidget {
     ErrorWidget.builder = (FlutterErrorDetails errorDetails) {
       return getErrorWidget(context, errorDetails);
     };
-
+    Color primaryColor = HexColor("#2d4052");
     var tabs = MaterialApp(
       theme: ThemeData(
-        primaryColor: HexColor("#2d4052"),
-        accentColor: HexColor("#2d4052"),
+        primaryColor: primaryColor,
       ),
       home: DefaultTabController(
         length: Router().routes.length,
         child: Scaffold(
-          body: TabBarView(
-            children: Router().getContent()
+          body: SafeArea(
+            child: TabBarView(children: Router().getContent()),
           ),
-          bottomNavigationBar: new TabBar(
-            tabs: Router().getIconButtons(),
+          bottomNavigationBar: Container(
+            color: primaryColor,
+            child: TabBar(
+              tabs: Router().getIconButtons(),
+            ),
           ),
-          backgroundColor: HexColor("#2d4052"),
         ),
-      )
+      ),
     );
     return tabs;
   }

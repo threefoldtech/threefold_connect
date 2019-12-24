@@ -6,12 +6,10 @@ import 'package:threebotlogin/services/openKYCService.dart';
 import 'package:threebotlogin/services/socketService.dart';
 import 'package:threebotlogin/services/userService.dart';
 import 'package:threebotlogin/widgets/CustomDialog.dart';
-import 'package:threebotlogin/widgets/CustomScaffold.dart';
 import 'package:threebotlogin/widgets/PinField.dart';
 
 class PreferencePage extends StatefulWidget {
-  PreferencePage({Key key})
-      : super(key: key);
+  PreferencePage({Key key}) : super(key: key);
   @override
   _PreferencePageState createState() => _PreferencePageState();
 }
@@ -40,123 +38,118 @@ class _PreferencePageState extends State<PreferencePage> {
   @override
   Widget build(BuildContext context) {
     preferenceContext = context;
-    return CustomScaffold(
-      appBar: AppBar(
-            backgroundColor: Colors.transparent,
-            elevation: 0.0,
-            title: Text(
-              'Settings',
-              style: TextStyle(color: Colors.black),
-            ),
+    return ListView(
+      children: <Widget>[
+        ListTile(
+          title: Text(
+            'Settings',
+            style: TextStyle(color: Colors.black),
           ),
-      body: ListView(
-        children: <Widget>[
-          
-          ListTile(
-            title: Text("Profile"),
+        ),
+        ListTile(
+          title: Text("Profile"),
+        ),
+        Material(
+          child: ListTile(
+            leading: Icon(Icons.person),
+            title: Text(doubleName),
           ),
-          Material(
-            child: ListTile(
-              leading: Icon(Icons.person),
-              title: Text(doubleName),
-            ),
-          ),
-          Material(
-            child: ListTile(
-              trailing: !emailVerified ? Icon(Icons.refresh) : null,
-              leading: Icon(Icons.mail),
-              title: Text(emailAdress.toLowerCase()),
-              subtitle: !emailVerified
-                  ? Text(
-                      "Unverified",
-                      style: TextStyle(color: Colors.grey),
-                    )
-                  : Text(
-                      "Verified",
-                      style: TextStyle(color: Colors.green),
-                    ),
-              onTap: !emailVerified ? sendVerificationEmail : null,
-            ),
-          ),
-          FutureBuilder(
-            future: getPhrase(),
-            builder: (context, snapshot) {
-              if (snapshot.hasData) {
-                return Material(
-                  child: ListTile(
-                    trailing: Padding(
-                      padding: new EdgeInsets.only(right: 7.5),
-                      child: Icon(Icons.visibility),
-                    ),
-                    leading: Icon(Icons.vpn_key),
-                    title: Text("Show Phrase"),
-                    onTap: () {
-                      _chooseFunctionalityPhrase();
-                    },
+        ),
+        Material(
+          child: ListTile(
+            trailing: !emailVerified ? Icon(Icons.refresh) : null,
+            leading: Icon(Icons.mail),
+            title: Text(emailAdress.toLowerCase()),
+            subtitle: !emailVerified
+                ? Text(
+                    "Unverified",
+                    style: TextStyle(color: Colors.grey),
+                  )
+                : Text(
+                    "Verified",
+                    style: TextStyle(color: Colors.green),
                   ),
-                );
-              } else {
-                return Container();
-              }
-            },
+            onTap: !emailVerified ? sendVerificationEmail : null,
           ),
-          Visibility(
-            visible: biometricsCheck,
-            child: Material(
-              child: CheckboxListTile(
-                secondary: Icon(Icons.fingerprint),
-                value: finger,
-                title: Text("Fingerprint"),
-                activeColor: Theme.of(context).accentColor,
-                onChanged: (bool newValue) {
-                  setState(() {
-                    logger.log('newvalue:', newValue, finger);
-                  });
+        ),
+        FutureBuilder(
+          future: getPhrase(),
+          builder: (context, snapshot) {
+            if (snapshot.hasData) {
+              return Material(
+                child: ListTile(
+                  trailing: Padding(
+                    padding: new EdgeInsets.only(right: 7.5),
+                    child: Icon(Icons.visibility),
+                  ),
+                  leading: Icon(Icons.vpn_key),
+                  title: Text("Show Phrase"),
+                  onTap: () {
+                    _chooseFunctionalityPhrase();
+                  },
+                ),
+              );
+            } else {
+              return Container();
+            }
+          },
+        ),
+        Visibility(
+          visible: biometricsCheck,
+          child: Material(
+            child: CheckboxListTile(
+              secondary: Icon(Icons.fingerprint),
+              value: finger,
+              title: Text("Fingerprint"),
+              activeColor: Theme.of(context).accentColor,
+              onChanged: (bool newValue) {
+                setState(() {
+                  logger.log('newvalue:', newValue, finger);
+                });
 
-                  _chooseDialogFingerprint(newValue);
-                },
-              ),
-            ),
-          ),
-          Material(
-            child: ListTile(
-              leading: Icon(Icons.lock),
-              title: Text("Change pincode"),
-              onTap: () {
-                Navigator.pushNamed(context, '/changepin');
+                _chooseDialogFingerprint(newValue);
               },
             ),
           ),
-          Material(
-            child: ListTile(
-              leading: Icon(Icons.info_outline),
-              title: Text("Version: " ), //+ version + " - " + buildNumber
-            ),
+        ),
+        Material(
+          child: ListTile(
+            leading: Icon(Icons.lock),
+            title: Text("Change pincode"),
+            onTap: () {
+              Navigator.pushNamed(context, '/changepin');
+            },
           ),
-          ExpansionTile(
-            title: Text(
-              "Advanced settings",
-              style: TextStyle(color: Colors.black),
-            ),
-            children: <Widget>[
-              Material(
-                child: ListTile(
-                  leading: Icon(Icons.person),
-                  title: Text(
-                    "Remove Account From Device",
-                    style: TextStyle(color: Colors.red),
-                  ),
-                  trailing: Icon(
-                    Icons.remove_circle,
-                    color: Colors.red,
-                  ),
-                  onTap: _showDialog,
+        ),
+        Material(
+          child: ListTile(
+            leading: Icon(Icons.info_outline),
+            title: Text("Version: "), //+ version + " - " + buildNumber
+          ),
+        ),
+        ExpansionTile(
+          title: Text(
+            "Advanced settings",
+            style: TextStyle(color: Colors.black),
+          ),
+          children: <Widget>[
+            Material(
+              child: ListTile(
+                leading: Icon(Icons.person),
+                title: Text(
+                  "Remove Account From Device",
+                  style: TextStyle(color: Colors.red),
                 ),
+                trailing: Icon(
+                  Icons.remove_circle,
+                  color: Colors.red,
+                ),
+                onTap: _showDialog,
               ),
-            ],
-          ),
-        ],
-      ),
+            ),
+          ],
+        ),
+      ],
     );
   }
 
@@ -276,14 +269,13 @@ class _PreferencePageState extends State<PreferencePage> {
             onPressed: () async {
               Navigator.pop(context);
 
-
               hexColor = Color(0xff0f296a);
               bool result = await clearData();
 
               if (result) {
                 Navigator.popUntil(
-                    preferenceContext,
-                    ModalRoute.withName('/'),
+                  preferenceContext,
+                  ModalRoute.withName('/'),
                 );
 
                 closeSocketConnection(this.doubleName);
@@ -293,12 +285,14 @@ class _PreferencePageState extends State<PreferencePage> {
                     context: preferenceContext,
                     builder: (BuildContext context) => CustomDialog(
                           title: 'Error',
-                          description: Text('Something went wrong when trying to remove your account.'),
+                          description: Text(
+                              'Something went wrong when trying to remove your account.'),
                           actions: <Widget>[
                             FlatButton(
                               child: Text('Ok'),
                               onPressed: () {
-                                Navigator.popUntil(context, ModalRoute.withName('/preference'));
+                                Navigator.popUntil(context,
+                                    ModalRoute.withName('/preference'));
                               },
                             )
                           ],
