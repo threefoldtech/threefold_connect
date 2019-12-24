@@ -18,7 +18,15 @@ String buildNumber;
 List<String> apps = ['/', '/wallet', '/ffp', '/settings'];
 
 // Hack to get the height of the bottom navbar
-void main() => runApp(MyApp());
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  try {
+    cameras = await availableCameras();
+  } on QRReaderException catch (e) {
+    print(e);
+  }
+  runApp(MyApp());
+}
 
 Widget getErrorWidget(BuildContext context, FlutterErrorDetails error) {
   return SafeArea(

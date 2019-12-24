@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:threebotlogin/Apps/Wallet/walletUserData.dart';
+import 'package:threebotlogin/screens/RegistrationScreen.dart';
 
 import 'package:threebotlogin/services/cryptoService.dart';
 import 'package:threebotlogin/services/toolsService.dart';
@@ -26,7 +27,7 @@ class _WalletState extends State<WalletWidget>
 
   _WalletState() {
     iaWebView = InAppWebView(
-      initialUrl: 'https://${config.appId()}',
+      initialUrl:  'http://localhost:8080', //'https://${config.appId()}',
       initialHeaders: {},
       initialOptions: InAppWebViewWidgetOptions(
           android: AndroidInAppWebViewOptions(supportMultipleWindows: true)),
@@ -37,7 +38,6 @@ class _WalletState extends State<WalletWidget>
       },
       onCreateWindow:
           (InAppWebViewController controller, OnCreateWindowRequest req) {
-        controller.evaluateJavascript(source: "window.close()");
       },
       onLoadStart: (InAppWebViewController controller, String url) {
         setState(() {
@@ -95,11 +95,17 @@ class _WalletState extends State<WalletWidget>
     webView.loadUrl(url: loadUrl);
   }
 
+  scanQrCode(List<dynamic> params){
+      Navigator.pushNamed(context, '/scan');
+      print("scan done");
+  }
   addHandler() {
     webView.addJavaScriptHandler(
         handlerName: "ADD_IMPORT_WALLET", callback: saveImportedWallet);
     webView.addJavaScriptHandler(
         handlerName: "ADD_APP_WALLET", callback: saveAppWallet);
+    webView.addJavaScriptHandler(
+      handlerName: "SCAN_QR", callback: scanQrCode);
   }
 
   @override

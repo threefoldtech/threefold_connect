@@ -1,7 +1,9 @@
 <script>
-alert("opening!")
-window.open("http://www.google.be")
-
+ window.addEventListener("flutterInAppWebViewPlatformReady", function(event) {
+     window.flutter_inappwebview.callHandler('SCAN_QR').then(function(result) {
+       console.log(result);
+     });
+   });
 </script>
 
 

@@ -4,6 +4,7 @@ import 'package:threebotlogin/Apps/FreeFlowPages/ffp.dart';
 import 'package:threebotlogin/Apps/Wallet/wallet.dart';
 import 'package:threebotlogin/screens/HomeScreen.dart';
 import 'package:threebotlogin/screens/PreferenceScreen.dart';
+import 'package:threebotlogin/screens/RegistrationScreen.dart';
 
 class Router {
   List<Route> routes = [
@@ -36,6 +37,11 @@ class Router {
       name: 'Settings',
       icon: Icons.settings,
       view: PreferenceScreen(),
+    ),
+    Route(
+      path: '/scan',
+      name: 'Scan',
+      view: RegistrationScreen(),
     ),
   ];
   Map<String, Widget Function(BuildContext)> getRoutes() {

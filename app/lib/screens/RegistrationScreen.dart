@@ -140,25 +140,8 @@ class _ScanScreenState extends State<RegistrationScreen>
   }
 
   gotQrData(value) async {
-    setState(() {
-      qrData = jsonDecode(value);
-    });
-
-    var hash = qrData['hash'];
-    var doubleName = qrData['doubleName'];
-    var email = qrData['email'];
-    var phrase = qrData['phrase'];
-
-    Map<String, String> keys = await generateKeysFromSeedPhrase(phrase);
-
-    if (doubleName == null ||
-        email == null ||
-        phrase == null ||
-        keys['privateKey'] == null) {
-      showError();
-    } else {
-      
-    }
+   print("Value scanned!!" + value);
+   Navigator.pop(context);
   }
 
   showError() {
