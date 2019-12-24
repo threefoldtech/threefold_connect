@@ -1,6 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:threebotlogin/helpers/HexColor.dart';
 import 'package:threebotlogin/router.dart';
+import 'package:threebotlogin/screens/ChangePinScreen.dart';
+import 'package:threebotlogin/screens/ErrorScreen.dart';
+import 'package:threebotlogin/screens/HomeScreen.dart';
+import 'package:threebotlogin/screens/MobileRegistrationScreen.dart';
+import 'package:threebotlogin/screens/RecoverScreen.dart';
+import 'package:threebotlogin/screens/RegistrationScreen.dart';
+import 'package:threebotlogin/screens/SuccessfulScreen.dart';
 import 'package:threebotlogin/services/loggingService.dart';
 import 'package:fast_qr_reader_view/fast_qr_reader_view.dart';
 
@@ -90,6 +97,17 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primaryColor: primaryColor,
       ),
+      routes: {
+        '/': (context) => HomeScreen(),
+        '/scan': (context) => RegistrationScreen(),
+        '/register': (context) => RegistrationScreen(),
+        '/success': (context) => SuccessfulScreen(registration: false),
+        '/registered': (context) => SuccessfulScreen(registration: true),
+        '/error': (context) => ErrorScreen(),
+        '/recover': (context) => RecoverScreen(),
+        '/changepin': (context) => ChangePinScreen(),
+        '/registration': (context) => MobileRegistrationScreen()
+      },
       home: DefaultTabController(
         length: Router().routes.length,
         child: Scaffold(
