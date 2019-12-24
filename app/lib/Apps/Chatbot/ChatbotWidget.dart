@@ -20,9 +20,9 @@ class _ChatbotState extends State<ChatbotWidget>
     init();
   }
   init() async {
-    var email = await getEmail();
+    // var email = await getEmail();
     iaWebview = InAppWebView(
-      initialUrl: '${config.url()}${email['email']}',
+      initialUrl: 'https://google.es', //'${config.url()}${email['email']}',
       initialHeaders: {},
       initialOptions: InAppWebViewWidgetOptions(
           android: AndroidInAppWebViewOptions(supportMultipleWindows: true)),

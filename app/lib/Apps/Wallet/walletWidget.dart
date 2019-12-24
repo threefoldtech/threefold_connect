@@ -26,14 +26,14 @@ class _WalletState extends State<WalletWidget>
 
   _WalletState() {
     iaWebView = InAppWebView(
-      initialUrl: 'https://${config.appId}',
+      initialUrl: 'https://${config.appId()}',
       initialHeaders: {},
       initialOptions: InAppWebViewWidgetOptions(
           android: AndroidInAppWebViewOptions(supportMultipleWindows: true)),
       onWebViewCreated: (InAppWebViewController controller) {
         webView = controller;
         this.addHandler();
-        //initKeys();
+        initKeys();
       },
       onCreateWindow:
           (InAppWebViewController controller, OnCreateWindowRequest req) {
@@ -90,7 +90,7 @@ class _WalletState extends State<WalletWidget>
     var data = Uri.encodeQueryComponent(jsonData); //Uri.encodeFull();
 
     var loadUrl =
-        'https://${config.appId}${config.redirectUrl}${union}username=${await getDoubleName()}&signedhash=${Uri.encodeQueryComponent(signedHash)}&data=$data';
+        'https://${config.appId()}${config.redirectUrl()}${union}username=${await getDoubleName()}&signedhash=${Uri.encodeQueryComponent(signedHash)}&data=$data';
 
     webView.loadUrl(url: loadUrl);
   }
@@ -107,7 +107,7 @@ class _WalletState extends State<WalletWidget>
     return Column(
       children: <Widget>[
         Expanded(
-          child: Container(child: iaWebView),
+          child: Container( child: iaWebView),
         ),
       ],
     );
