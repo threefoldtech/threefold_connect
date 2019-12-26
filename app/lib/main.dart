@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:threebotlogin/Init.dart';
 import 'package:threebotlogin/helpers/HexColor.dart';
 import 'package:threebotlogin/router.dart';
 import 'package:threebotlogin/screens/ChangePinScreen.dart';
 import 'package:threebotlogin/screens/ErrorScreen.dart';
-import 'package:threebotlogin/screens/HomeScreen.dart';
 import 'package:threebotlogin/screens/MobileRegistrationScreen.dart';
 import 'package:threebotlogin/screens/RecoverScreen.dart';
 import 'package:threebotlogin/screens/RegistrationScreen.dart';
@@ -32,7 +33,14 @@ Future<void> main() async {
   } on QRReaderException catch (e) {
     print(e);
   }
-  runApp(MyApp());
+
+  final prefs = await SharedPreferences.getInstance();
+  bool initDone =
+      prefs.getBool('initDone') != null && prefs.getBool('initDone');
+  AppWidget app = new AppWidget(initDone: initDone);
+  await app.init();
+
+  runApp(app);
 }
 
 Widget getErrorWidget(BuildContext context, FlutterErrorDetails error) {
@@ -86,20 +94,54 @@ bool get isInDebugMode {
 String kAndroidUserAgent =
     'Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/62.0.3202.94 Mobile Safari/537.36';
 
-class MyApp extends StatelessWidget {
+class AppWidget extends StatefulWidget {
+  final bool initDone;
+  final Router router = new Router();
+  _AppState state;
+
+  AppWidget({this.initDone, router});
+
+  init() async {
+    await router.init();
+  }
+
+  finish() {
+    state.finish();
+  }
+
+  @override
+  _AppState createState() {
+    state = _AppState(initDone: this.initDone, router: this.router);
+    return state;
+  }
+}
+
+class _AppState extends State<AppWidget> {
+  bool initDone;
+  Router router;
+
+  _AppState({this.initDone, this.router});
+
+  finish() {
+    setState(() {
+      this.initDone = true;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     ErrorWidget.builder = (FlutterErrorDetails errorDetails) {
       return getErrorWidget(context, errorDetails);
     };
+
     Color primaryColor = HexColor("#2d4052");
+
     var tabs = MaterialApp(
       theme: ThemeData(
         primaryColor: primaryColor,
       ),
       routes: {
         '/scan': (context) => RegistrationScreen(),
-        '/register': (context) => RegistrationScreen(),
         '/success': (context) => SuccessfulScreen(registration: false),
         '/registered': (context) => SuccessfulScreen(registration: true),
         '/error': (context) => ErrorScreen(),
@@ -108,23 +150,36 @@ class MyApp extends StatelessWidget {
         '/registration': (context) => MobileRegistrationScreen()
       },
       home: DefaultTabController(
-        length: Router().routes.length,
+        length: router.routes.length,
         child: Scaffold(
           body: SafeArea(
             child: TabBarView(
               physics: NeverScrollableScrollPhysics(),
-              children: Router().getContent(),
+              children: router.getContent(),
             ),
           ),
           bottomNavigationBar: Container(
             color: primaryColor,
+            padding: EdgeInsets.all(0.0),
+            height: 65,
+            margin: EdgeInsets.all(0.0),
+
             child: TabBar(
-              tabs: Router().getIconButtons(),
+              isScrollable: false,
+              indicatorSize: TabBarIndicatorSize.tab,
+              tabs: router.getIconButtons(),
+              labelPadding: EdgeInsets.all(0.0),
+              indicatorPadding: EdgeInsets.all(0.0),
             ),
           ),
         ),
       ),
     );
+
+    if (!initDone) {
+      print("init widget");
+      return InitWidget(this.widget);
+    }
     return tabs;
   }
 }

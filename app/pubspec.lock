@@ -110,7 +110,7 @@ packages:
     dependency: "direct main"
     description:
       path: "."
-      ref: HEAD
+      ref: master
       resolved-ref: "9c7ac0da8f01ceb40430da58397bdb31968ca5b1"
       url: "https://github.com/pichillilorenzo/flutter_inappwebview"
     source: git

@@ -7,7 +7,10 @@ import 'package:threebotlogin/screens/PreferenceScreen.dart';
 import 'package:threebotlogin/screens/RegistrationScreen.dart';
 
 class Router {
-  List<Route> routes = [
+  List<Route> routes;
+
+  init() async {
+     routes = [
     Route(
       path: '/',
       name: 'Home',
@@ -18,19 +21,19 @@ class Router {
       path: '/wallet',
       name: 'Wallet',
       icon: Icons.account_balance_wallet,
-      view: Wallet().widget(),
+      view: await Wallet().widget(),
     ),
     Route(
       path: '/ffp',
       name: 'Social',
       icon: Icons.person,
-      view: Ffp().widget(),
+      view: await Ffp().widget(),
     ),
     Route(
       path: '/chatbot',
       name: 'Support',
       icon: Icons.chat,
-      view: Chatbot().widget(),
+      view: await Chatbot().widget(),
     ),
     Route(
       path: '/settings',
@@ -39,6 +42,7 @@ class Router {
       view: PreferenceScreen(),
     ),
   ];
+  }
   Map<String, Widget Function(BuildContext)> getRoutes() {
     return Map.fromIterable(routes, key: (v) => v.path, value: (v) => v.view);
   }
@@ -51,13 +55,17 @@ class Router {
     return containers;
   }
 
-  List<Tab> getIconButtons() {
-    List<Tab> iconButtons = [];
+  List<Container> getIconButtons() {
+    List<Container> iconButtons = [];
     routes.forEach((r) {
-      iconButtons.add(Tab(
-        icon: Icon(r.icon),
+      iconButtons.add(Container(
+
+        padding: EdgeInsets.all(0.0),
+        child: Tab(
+
+        icon: Icon(r.icon, size: 20,),
         text: r.name,
-      ));
+      )));
     });
     return iconButtons;
   }

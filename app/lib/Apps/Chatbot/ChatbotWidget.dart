@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:threebotlogin/Apps/Chatbot/ChatbotConfig.dart';
-import 'package:threebotlogin/services/userService.dart';
-
-
+import 'package:threebotlogin/Browser.dart';
 class ChatbotWidget extends StatefulWidget {
+  final String email;
+
+  ChatbotWidget({this.email});
   @override
-  _ChatbotState createState() => new _ChatbotState();
+  _ChatbotState createState() => new _ChatbotState(email: this.email);
 }
 
 class _ChatbotState extends State<ChatbotWidget>
@@ -15,30 +16,30 @@ class _ChatbotState extends State<ChatbotWidget>
 
   ChatbotConfig config = ChatbotConfig();
   InAppWebView iaWebview;
+  final String email;
 
-  _ChatbotState() {
-    init();
-  }
-  init() async {
-    // var email = await getEmail();
+  _ChatbotState({this.email}) {
     iaWebview = InAppWebView(
-      initialUrl: 'https://google.es', //'${config.url()}${email['email']}',
+      initialUrl: '${config.url()}$email',
       initialHeaders: {},
       initialOptions: InAppWebViewWidgetOptions(
           android: AndroidInAppWebViewOptions(supportMultipleWindows: true)),
       onWebViewCreated: (InAppWebViewController controller) {
         webView = controller;
+         webView.evaluateJavascript(source: "document.addEventListener('copy', function(e) { alert('COPY!!!'); });");
       },
       onCreateWindow:
           (InAppWebViewController controller, OnCreateWindowRequest req) {
         print("Create!");
-        //browser.open(url: req.url, options: InAppBrowserClassOptions());
+        inAppBrowser.open(url: req.url, options: InAppBrowserClassOptions());
       },
       onLoadStart: (InAppWebViewController controller, String url) {},
       onLoadStop: (InAppWebViewController controller, String url) async {},
       onProgressChanged: (InAppWebViewController controller, int progress) {},
     );
+    
   }
+
 
   @override
   void initState() {

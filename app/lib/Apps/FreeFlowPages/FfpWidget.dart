@@ -3,39 +3,13 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:threebotlogin/Apps/FreeFlowPages/FfpConfig.dart';
+import 'package:threebotlogin/Browser.dart';
 
 import 'package:threebotlogin/services/cryptoService.dart';
 import 'package:threebotlogin/services/userService.dart';
 
 /**************** */
 
-class MyInAppBrowser extends InAppBrowser {
-  @override
-  void onLoadStart(String url) {
-    super.onLoadStart(url);
-    print("\n\nStarted $url\n\n");
-  }
-
-  @override
-  void onLoadStop(String url) {
-    super.onLoadStop(url);
-    print("\n\nStopped $url\n\n");
-  }
-
-  // @override
-  // void onLoadError(String url, String code, String message) {
-  //   super.onLoadStop(url);
-  //   print("\n\nCan't load $url.. Error: $message\n\n");
-  // }
-
-  @override
-  void onExit() {
-    super.onExit();
-    print("\n\nBrowser closed!\n\n");
-  }
-}
-
-MyInAppBrowser inAppBrowser = new MyInAppBrowser();
 
 /*
 Future main() async {
@@ -58,19 +32,7 @@ class _FfpState extends State<FfpWidget> with AutomaticKeepAliveClientMixin {
     iaWebview = InAppWebView(
       initialUrl: config.cookieUrl(),
       initialHeaders: {},
-      initialOptions: InAppWebViewWidgetOptions(
-          android: AndroidInAppWebViewOptions(supportMultipleWindows: true)),
-      onWebViewCreated: (InAppWebViewController controller) {
-        webView = controller;
-
-        initKeys();
-      },
-      onCreateWindow:
-          (InAppWebViewController controller, OnCreateWindowRequest req) {
-        print("Create window");
-
-        inAppBrowser.open(url: req.url, options: InAppBrowserClassOptions());
-      },
+      initialOptions: InAppWebViewWidgetOptions(),
       onLoadStart: (InAppWebViewController controller, String url) {
         if (url.contains('state=')) {
           controller.injectCSSCode(source: '* { display: none; }');

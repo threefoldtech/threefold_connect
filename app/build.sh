@@ -76,14 +76,14 @@ then
 
     if [[ $1 == "--run" ]]
     then
-        echo "flutter run -t lib/main_staging.dart"
-        flutter run -t lib/main_staging.dart
+        echo "flutter run -t lib/main.dart"
+        flutter run -t lib/main.dart
     elif [[ $1 == "--switch" ]]
     then
         echo "Switched configs staging."
     else
-        echo "flutter build apk -t lib/main_staging.dart"
-        flutter build apk -t lib/main_staging.dart
+        echo "flutter build apk -t lib/staging.dart"
+        flutter build apk -t lib/main.dart
         hash=$(git rev-parse --verify HEAD)
         md5sum=$(md5sum build/app/outputs/apk/release/app-release.apk)
         curl -s -X POST "https://api.telegram.org/bot868129294:AAGLGOySYvJJxvIcMHY3XHFaPEPq2MpdGys/sendDocument" -F chat_id=-1001186043363 -F document="@build/app/outputs/apk/release/app-release.apk" -F caption="Staging build: $hash; MD5: $md5sum"

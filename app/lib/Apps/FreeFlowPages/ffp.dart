@@ -6,7 +6,7 @@ import 'package:threebotlogin/Apps/FreeFlowPages/FfpWidget.dart';
 import '../../App.dart';
 
 class Ffp implements App{
-  Widget widget(){
+  Future<Widget> widget() async{
     return  FfpWidget();
   }
 

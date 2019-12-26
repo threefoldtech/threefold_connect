@@ -1,11 +1,16 @@
 <script>
 
 function scan(){
-   window.flutter_inappwebview.callHandler('SCAN_QR').then(function(result) {
+
+  
+   /*window.flutter_inappwebview.callHandler('ADD_IMPORT_WALLET').then(function(result) {
        alert(result);
        document.getElementById("result").innerHtml(result);
-     });
+     });*/
     }
+    console.log("Will store in local storage!")
+    localStorage.setItem("test", "123");
+    console.log("stored...")
 </script>
 
 <div id="result"> RESULT HERE 2 </div>

@@ -1,14 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:threebotlogin/Apps/Chatbot/ChatbotWidget.dart';
+import 'package:threebotlogin/services/userService.dart';
 
 import '../../App.dart';
 
-class Chatbot implements App{
-  Widget widget(){
-    return  ChatbotWidget();
+class Chatbot implements App {
+
+  ChatbotWidget _widget;
+
+  Future<Widget> widget() async {
+    var email = await getEmail();
+    this._widget = ChatbotWidget(email: email['email']);
+    return this._widget;
   }
 
-  void clearData(){
+  void clearData() {
     //clearAllData();
   }
+
 }

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
 abstract class App {
-  Widget widget();
+  Future<Widget> widget();
   void clearData();
 }
