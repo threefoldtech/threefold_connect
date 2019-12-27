@@ -130,11 +130,7 @@ class _WalletState extends State<WalletWidget>
           jsToExecute += "localStorage.setItem('appWallets', null);";
         }
 
-        print(jsToExecute);
-  print("storing...");
- 
     this.webView.evaluateJavascript(source: jsToExecute);
-    this.webView.evaluateJavascript(source: "try { localStorage.setItem('piep', 'yop'); console.log('###########################storing is np'); }  catch (err) { console.log('err...', err); }");
 
   }
 

@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:threebotlogin/Apps/Chatbot/ChatbotConfig.dart';
 import 'package:threebotlogin/Browser.dart';
+import 'package:threebotlogin/ClipboardHack/ClipboardHack.dart';
+
 class ChatbotWidget extends StatefulWidget {
   final String email;
 
@@ -9,6 +11,9 @@ class ChatbotWidget extends StatefulWidget {
   @override
   _ChatbotState createState() => new _ChatbotState(email: this.email);
 }
+
+var copyhack =
+    "document.querySelector('body').addEventListener('contextmenu', function( event ) {        event.preventDefault(); document.execCommand('copy'); console.log('TEXT SELECTED!!!!! ');});";
 
 class _ChatbotState extends State<ChatbotWidget>
     with AutomaticKeepAliveClientMixin {
@@ -20,26 +25,33 @@ class _ChatbotState extends State<ChatbotWidget>
 
   _ChatbotState({this.email}) {
     iaWebview = InAppWebView(
-      initialUrl: '${config.url()}$email',
+      initialUrl: 'http://www.google.be', //'${config.url()}$email',
       initialHeaders: {},
       initialOptions: InAppWebViewWidgetOptions(
           android: AndroidInAppWebViewOptions(supportMultipleWindows: true)),
       onWebViewCreated: (InAppWebViewController controller) {
         webView = controller;
-         webView.evaluateJavascript(source: "document.addEventListener('copy', function(e) { alert('COPY!!!'); });");
+        webView.evaluateJavascript(
+            source:
+                "document.addEventListener('copy', function(e) { alert('COPY!!!'); });");
+        webView.evaluateJavascript(source: copyhack);
       },
       onCreateWindow:
           (InAppWebViewController controller, OnCreateWindowRequest req) {
         print("Create!");
         inAppBrowser.open(url: req.url, options: InAppBrowserClassOptions());
       },
+      onConsoleMessage:
+          (InAppWebViewController controller, ConsoleMessage consoleMessage) {
+        print("CB console: " + consoleMessage.message);
+      },
       onLoadStart: (InAppWebViewController controller, String url) {},
-      onLoadStop: (InAppWebViewController controller, String url) async {},
+      onLoadStop: (InAppWebViewController controller, String url) async {
+        addClipboardHack(controller); 
+      },
       onProgressChanged: (InAppWebViewController controller, int progress) {},
     );
-    
   }
-
 
   @override
   void initState() {
