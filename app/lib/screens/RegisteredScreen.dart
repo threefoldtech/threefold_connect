@@ -1,15 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
-import 'package:threebotlogin/helpers/HexColor.dart';
-
 class RegisteredScreen extends StatefulWidget {
-  final Widget registeredScreen;
-  final Function routeToHome;
-  final int selectedIndex;
-  final bool isLoading;
 
-  RegisteredScreen({Key key, this.registeredScreen, this.selectedIndex, this.isLoading, this.routeToHome}) : super(key: key);
+
+  RegisteredScreen();
 
   _RegisteredScreenState createState() => _RegisteredScreenState();
 }
@@ -23,8 +18,6 @@ class _RegisteredScreenState extends State<RegisteredScreen> with WidgetsBinding
   @override
   Widget build(BuildContext context) {
 
-    switch (widget.selectedIndex) {
-      case 0:
         return Column(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: <Widget>[
@@ -32,7 +25,7 @@ class _RegisteredScreenState extends State<RegisteredScreen> with WidgetsBinding
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: <Widget>[
                 SizedBox(height: 50.0),
-                !showPreference
+                showPreference
                     ? FloatingActionButton(
                         heroTag: "preference",
                         elevation: 0.0,
@@ -44,7 +37,7 @@ class _RegisteredScreenState extends State<RegisteredScreen> with WidgetsBinding
                             showPreference = true;
                           });
                         })
-                    : null
+                    : Container()
               ],
             ),
             Column(
@@ -212,15 +205,7 @@ class _RegisteredScreenState extends State<RegisteredScreen> with WidgetsBinding
             ),
           ],
         );
-      case 2:
-        return Scaffold(
-          backgroundColor: HexColor("#2d4052"),
-        );
-      default:
-        return widget.isLoading
-            ? Center(child: CircularProgressIndicator())
-            : Container();
-    }
+      
   }
 
   void updatePreference(bool preference) {

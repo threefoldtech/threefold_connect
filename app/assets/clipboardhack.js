@@ -1,10 +1,11 @@
 if (document.getElementById('webview_copy') == null) {
+    console.log("Adding clipboard hack");
     let cbh_css = `
     #cbh-custom-menu {
         user-select: none;
         all: initial;
         display: none;
-        z-index: 1000;
+        z-index: 9999999;
         position: fixed;
         background-color: #fff;
         border: 1px solid #ddd;
@@ -59,6 +60,13 @@ if (document.getElementById('webview_copy') == null) {
         let cbh_menu = document.getElementById('cbh-custom-menu');
         cbh_menu.style.top = `${evt.clientY}px`;
         cbh_menu.style.left = `${evt.clientX}px`;
+        if (window.innerHeight - 50 < evt.clientY){
+            cbh_menu.style.top = `${evt.clientY-50}px`;
+        }
+        if (window.innerHeight - 50 < evt.clientX){
+            cbh_menu.style.left = `${evt.clientX-70}px`;
+        }
+
         cbh_menu.style.display = 'block';
         evt.preventDefault();
     }, false);

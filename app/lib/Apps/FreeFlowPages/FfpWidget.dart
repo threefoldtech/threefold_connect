@@ -1,31 +1,25 @@
 import 'dart:convert';
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
+import 'package:threebotlogin/Apps/EmailMustBeVerified.dart';
 import 'package:threebotlogin/Apps/FreeFlowPages/FfpConfig.dart';
-import 'package:threebotlogin/Browser.dart';
+import 'package:threebotlogin/ClipboardHack/ClipboardHack.dart';
 
 import 'package:threebotlogin/services/cryptoService.dart';
 import 'package:threebotlogin/services/userService.dart';
-
-/**************** */
-
-
-/*
-Future main() async {
-  runApp(new FfpWidget());
-}*/
 
 class FfpWidget extends StatefulWidget {
   @override
   _FfpState createState() => new _FfpState();
 }
 
-class _FfpState extends State<FfpWidget> with AutomaticKeepAliveClientMixin {
+class _FfpState extends State<FfpWidget>
+    with AutomaticKeepAliveClientMixin, EmailMustBeVerified {
   InAppWebViewController webView;
   String url = "";
   double progress = 0;
   FfpConfig config = FfpConfig();
+
 
   InAppWebView iaWebview;
   _FfpState() {
@@ -34,28 +28,23 @@ class _FfpState extends State<FfpWidget> with AutomaticKeepAliveClientMixin {
       initialHeaders: {},
       initialOptions: InAppWebViewWidgetOptions(),
       onLoadStart: (InAppWebViewController controller, String url) {
+        webView = controller;
+        initKeys();
         if (url.contains('state=')) {
           controller.injectCSSCode(source: '* { display: none; }');
         }
         controller.injectCSSCode(
             source: ".crisp-client {display: none !important;}");
-        setState(() {
-          this.url = url;
-        });
       },
       onLoadStop: (InAppWebViewController controller, String url) async {
+        if (!mounted) return;
         controller.injectCSSCode(
             source: ".crisp-client {display: none !important;}");
-        setState(() {
-          this.url = url;
-        });
+        addClipboardHack(controller);
       },
-      onProgressChanged: (InAppWebViewController controller, int progress) {
-        setState(() {
-          this.progress = progress / 100;
-        });
-      },
+      onProgressChanged: (InAppWebViewController controller, int progress) {},
     );
+
   }
 
   @override
@@ -71,6 +60,8 @@ class _FfpState extends State<FfpWidget> with AutomaticKeepAliveClientMixin {
   initKeys() async {
     var url = await webView.getUrl();
     while (!url.contains('state')) {
+      if (!mounted)
+        return; //If widget is no longer mounted, dont keep getting url; this causes error
       url = await webView.getUrl();
     }
 
@@ -105,13 +96,12 @@ class _FfpState extends State<FfpWidget> with AutomaticKeepAliveClientMixin {
     return Column(
       children: <Widget>[
         Expanded(
-          child: Container(child: iaWebview),
+          child: isHidden ? Container() : Container(child: iaWebview),
         ),
       ],
     );
   }
 
   @override
-  // TODO: implement wantKeepAlive
   bool get wantKeepAlive => true;
 }

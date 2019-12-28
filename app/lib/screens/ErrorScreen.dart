@@ -75,7 +75,7 @@ class _ErrorScreenState extends State<ErrorScreen> {
                         Expanded(
                           child: Container(),
                         ),
-                        Text('v ' + version + (isInDebugMode ? '-DEBUG' : '')),
+                        Text('v ' + version + (Globals.isInDebugMode ? '-DEBUG' : '')),
                       ],
                     ),
                   ),

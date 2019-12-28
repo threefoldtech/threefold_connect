@@ -13,14 +13,14 @@ String randomString(int strlen) {
   return result;
 }
 
-String validateEmail(String value) {
+bool validateEmail(String value) {
     Pattern pattern =
         r'[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}';
     RegExp regex = new RegExp(pattern);
     if (!regex.hasMatch(value)) {
-      return 'Enter Valid Email';
+      return false;
     }
-    return null;
+    return true;
   }
 
 bool validateSeedWords(String seed, String confirmationWords) {

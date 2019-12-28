@@ -6,7 +6,7 @@ import 'package:crypto/crypto.dart';
 import 'package:threebotlogin/main.dart';
 import 'package:threebotlogin/services/3botService.dart';
 import 'package:threebotlogin/services/cryptoService.dart';
-import 'RegistrationWithoutScanScreen.dart';
+import 'ChangePinScreen.dart';
 
 class RecoverScreen extends StatefulWidget {
   final Widget recoverScreen;
@@ -71,10 +71,7 @@ class _RecoverScreenState extends State<RecoverScreen> {
     Navigator.push(
         context,
         MaterialPageRoute(
-            builder: (context) => RegistrationWithoutScanScreen(
-                registrationData,
-                resetPin: true,
-                link: null)));
+            builder: (context) => ChangePinScreen()));
   }
 
   checkSeedLength(seedPhrase) {
@@ -113,6 +110,7 @@ class _RecoverScreenState extends State<RecoverScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+         backgroundColor: Globals.color,
         title: Text('Recover Account'),
       ),
       body: Container(
@@ -123,10 +121,7 @@ class _RecoverScreenState extends State<RecoverScreen> {
           child: Container(
             decoration: BoxDecoration(
               color: Theme.of(context).scaffoldBackgroundColor,
-              borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(20.0),
-                topRight: Radius.circular(20.0),
-              ),
+            
             ),
             child: Container(
               child: Container(
@@ -231,7 +226,7 @@ class _RecoverScreenState extends State<RecoverScreen> {
                 'Recover Account',
                 style: TextStyle(color: Colors.white),
               ),
-              color: Theme.of(context).accentColor,
+              color: Theme.of(context).primaryColor,
               onPressed: () async {
                 showDialog(
                   context: context,

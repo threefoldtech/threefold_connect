@@ -1,26 +1,47 @@
 import 'package:flutter/material.dart';
+import 'package:threebotlogin/helpers/HexColor.dart';
 import 'package:threebotlogin/services/userService.dart';
 
 import 'package:threebotlogin/widgets/PinField.dart';
 
 class ChangePinScreen extends StatefulWidget {
-ChangePinScreen({Key key}) : super(key: key);
-  _ChangePinScreenState createState() => _ChangePinScreenState();
+  final currentPin;
+  ChangePinScreen({this.currentPin});
+  _ChangePinScreenState createState() =>
+      _ChangePinScreenState(currentPin: currentPin);
 }
 
-class _ChangePinScreenState extends State<ChangePinScreen> {
-  bool pinChanged = false;
-  bool oldPinOk = false;
-  String helperText = 'Enter old pincode';
-  var newPin;
+enum _State { CurrentPin, CurrentPinWrong, NewPinWrong, NewPin, Confirm, Done }
 
-  final _scaffoldKey = GlobalKey<ScaffoldState>();
+class _ChangePinScreenState extends State<ChangePinScreen> {
+  final currentPin;
+  var newPin;
+  var state;
+
+  _ChangePinScreenState({this.currentPin}) {
+    state = currentPin == null ? _State.NewPin : _State.CurrentPin;
+  }
+  getText() {
+    switch (state) {
+      case _State.CurrentPin:
+        return "Please enter your current PIN";
+      case _State.CurrentPinWrong:
+        return "The PIN you entered was not correct, enter your current PIN";
+      case _State.NewPinWrong:
+        return "The PIN did not match. Enter your new PIN";
+      case _State.NewPin:
+        return "Please enter your new PIN";
+      case _State.Confirm:
+        return "Please confirm your new PIN";
+    }
+    return "";
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      key: _scaffoldKey,
       appBar: new AppBar(
+        backgroundColor: HexColor("#2d4052"),
         title: Text("Change pincode"),
         elevation: 0.0,
       ),
@@ -32,99 +53,45 @@ class _ChangePinScreenState extends State<ChangePinScreen> {
             padding: EdgeInsets.only(top: 0.0, bottom: 32.0),
             child: Center(
                 child: Text(
-              helperText,
+              getText(),
             )),
           ),
-          !pinChanged
-              ? PinField(
-                  callback: (p) => changePin(p),
-                )
-              : succesfulChange(),
+          PinField(
+            callback: (p) => changePin(p),
+          )
         ],
       ),
     );
   }
 
-  changePin(p) async {
-    final oldPin = await getPin();
-
-    if (!oldPinOk) {
-      checkUserCurrentPin(oldPin, p);
-    } else {
-      if (newPin == null) {
-        newPin = p;
-        checkUserNewPin(oldPin);
-      } else {
-        confirmUserNewPin(p);
+  Future<void> changePin(enteredPinCode) async {
+    setState(() {
+      switch (state) {
+        case _State.CurrentPinWrong:
+        case _State.CurrentPin:
+          if (enteredPinCode == currentPin) {
+            state = _State.NewPin;
+          } else {
+            state = _State.CurrentPinWrong;
+          }
+          break;
+        case _State.NewPinWrong:
+        case _State.NewPin:
+          newPin = enteredPinCode;
+          state = _State.Confirm;
+          break;
+        case _State.Confirm:
+          if (newPin == enteredPinCode) {
+            state = _State.Done;
+          } else {
+            state = _State.NewPinWrong;
+          }
+          break;
       }
+    });
+    if (state == _State.Done) {
+      await savePin(enteredPinCode);
+      Navigator.pop(context);
     }
-  }
-
-  void confirmUserNewPin(p) {
-    if (newPin == p) {
-      savePin(newPin);
-      setState(() {
-        helperText = '';
-        pinChanged = true;
-      });
-    } else {
-      _scaffoldKey.currentState.showSnackBar(SnackBar(
-          content: Text('Oops... pin does not match'),
-          duration: Duration(milliseconds: 500)));
-    }
-  }
-
-  void checkUserNewPin(String oldPin) {
-    if (newPin == oldPin) {
-      setState(() {
-        newPin = null;
-      });
-
-      _scaffoldKey.currentState.showSnackBar(SnackBar(
-          content: Text('Oops... pin is the same as current pin'),
-          duration: Duration(milliseconds: 500)));
-    } else {
-      setState(() {
-        helperText = "Confirm new pincode";
-      });
-    }
-  }
-
-  void checkUserCurrentPin(String oldPin, p) {
-    if (oldPin == p) {
-      setState(() {
-        helperText = "Enter new pincode";
-        oldPinOk = true;
-      });
-    } else {
-      _scaffoldKey.currentState.showSnackBar(SnackBar(
-          content: Text('Oops... you entered the wrong pin'),
-          duration: Duration(milliseconds: 500)));
-    }
-  }
-
-  Widget succesfulChange() {
-    return Container(
-      padding: EdgeInsets.only(top: 24.0, bottom: 38.0),
-      child: Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            Icon(
-              Icons.check_circle,
-              size: 42.0,
-              color: Theme.of(context).accentColor,
-            ),
-            SizedBox(
-              height: 20.0,
-            ),
-            Text('You have successfully changed you pincode'),
-            SizedBox(
-              height: 60.0,
-            ),
-          ],
-        ),
-      ),
-    );
   }
 }

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:threebotlogin/helpers/HexColor.dart';
 import 'package:threebotlogin/main.dart';
+import 'package:threebotlogin/screens/ChangePinScreen.dart';
 import 'package:threebotlogin/services/fingerprintService.dart';
 import 'package:threebotlogin/services/openKYCService.dart';
 import 'package:threebotlogin/services/userService.dart';
@@ -34,16 +36,23 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
     checkBiometrics();
   }
 
+  showChangePin() async {
+    var pin = await getPin();
+    Navigator.push(context, MaterialPageRoute(
+             builder: (context) => ChangePinScreen(currentPin: pin)));
+  }
   @override
   Widget build(BuildContext context) {
     preferenceContext = context;
     return ListView(
       children: <Widget>[
-        AppBar(
+        Container( child: AppBar(
+          automaticallyImplyLeading: false,
+          backgroundColor: HexColor("#2d4052"),
           title: Text(
             'Settings',
           ),
-        ),
+        )),
         ListTile(
           title: Text("Profile"),
         ),
@@ -102,7 +111,7 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
               activeColor: Theme.of(context).accentColor,
               onChanged: (bool newValue) {
                 setState(() {
-                  logger.log('newvalue:', newValue, finger);
+                  //logger.log('newvalue:', newValue, finger);
                 });
 
                 _chooseDialogFingerprint(newValue);
@@ -115,7 +124,7 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
             leading: Icon(Icons.lock),
             title: Text("Change pincode"),
             onTap: () {
-              Navigator.pushNamed(context, '/changepin');
+              showChangePin();
             },
           ),
         ),
@@ -267,7 +276,6 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
             onPressed: () async {
               Navigator.pop(context);
 
-              hexColor = Color(0xff0f296a);
               bool result = await clearData();
 
               if (result) {
@@ -311,7 +319,7 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
   }
 
   void _showResendEmailDialog() {
-    logger.log('Dialogging');
+    
     if (context != null) {
       showDialog(
         context: context,

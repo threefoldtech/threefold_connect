@@ -5,14 +5,14 @@ import 'package:threebotlogin/widgets/CustomDialog.dart';
 
 import 'package:threebotlogin/widgets/Scanner.dart';
 
-class RegistrationScreen extends StatefulWidget {
+class ScanScreen extends StatefulWidget {
   final Widget registrationScreen;
 
-  RegistrationScreen({Key key, this.registrationScreen}) : super(key: key);
+  ScanScreen({Key key, this.registrationScreen}) : super(key: key);
   _ScanScreenState createState() => _ScanScreenState();
 }
 
-class _ScanScreenState extends State<RegistrationScreen>
+class _ScanScreenState extends State<ScanScreen>
     with TickerProviderStateMixin {
   String helperText = "Aim at QR code to scan";
   AnimationController sliderAnimationController;

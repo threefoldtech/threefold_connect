@@ -2,10 +2,11 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:threebotlogin/Apps/Wallet/walletUserData.dart';
-
+import 'package:threebotlogin/ClipboardHack/ClipboardHack.dart';
 import 'package:threebotlogin/services/cryptoService.dart';
 import 'package:threebotlogin/services/toolsService.dart';
 import 'package:threebotlogin/services/userService.dart';
+
 
 import 'WalletConfig.dart';
 
@@ -26,46 +27,41 @@ class _WalletState extends State<WalletWidget>
 
   _WalletState() {
     iaWebView = InAppWebView(
-      
-      initialUrl: //'http://192.168.2.90:8080/handlertest.html?nocache',//
-           'http://192.168.2.120:8080/error?cache=2',//'https://${config.appId()}', //http://192.168.2.120:8080/', //'http://192.168.0.221:8080/handlertest.html?nocache=3',
-      initialHeaders: {},
-      initialOptions: InAppWebViewWidgetOptions(
-        crossPlatform: InAppWebViewOptions(debuggingEnabled: true),
-          android: AndroidInAppWebViewOptions(supportMultipleWindows: true, thirdPartyCookiesEnabled: true)),
-      onWebViewCreated: (InAppWebViewController controller) {
-        webView = controller;
-        this.addHandler();
-        initKeys();
-        initWallets();
-      },
-      onCreateWindow:
-          (InAppWebViewController controller, OnCreateWindowRequest req) {},
-      onLoadStart: (InAppWebViewController controller, String url) {
-        setState(() {
-          this.url = url;
+        initialUrl: //'http://192.168.2.90:8080/handlertest.html?nocache',//
+            'http://192.168.2.120:8080/error?cache=2', //'https://${config.appId()}', //http://192.168.2.120:8080/', //'http://192.168.0.221:8080/handlertest.html?nocache=3',
+        initialHeaders: {},
+        initialOptions: InAppWebViewWidgetOptions(
+            crossPlatform: InAppWebViewOptions(debuggingEnabled: true),
+            android: AndroidInAppWebViewOptions(
+                supportMultipleWindows: true, thirdPartyCookiesEnabled: true)),
+        onWebViewCreated: (InAppWebViewController controller) {
+          webView = controller;
+          this.addHandler();
+          initKeys();
+          initWallets();
+        },
+        onCreateWindow:
+            (InAppWebViewController controller, OnCreateWindowRequest req) {},
+        onLoadStart: (InAppWebViewController controller, String url) {
+          addClipboardHack(controller);
+          setState(() {
+            this.url = url;
+          });
+        },
+        onLoadStop: (InAppWebViewController controller, String url) async {
+          setState(() {
+            this.url = url;
+          });
+        },
+        onProgressChanged: (InAppWebViewController controller, int progress) {
+          setState(() {
+            this.progress = progress / 100;
+          });
+        },
+        onConsoleMessage:
+            (InAppWebViewController controller, ConsoleMessage consoleMessage) {
+          print("Wallet console: " + consoleMessage.message);
         });
-      },
-      onLoadStop: (InAppWebViewController controller, String url) async {
-        setState(() {
-          this.url = url;
-        });
-      },
-      onProgressChanged: (InAppWebViewController controller, int progress) {
-        setState(() {
-          this.progress = progress / 100;
-        });
-      },
-      onConsoleMessage: ( InAppWebViewController controller, ConsoleMessage consoleMessage) {
-       
-        print("Wallet console: " + consoleMessage.message);
-      }
-    );
-    
-  }
-  @override
-  void initState() {
-    super.initState();
   }
 
   @override
@@ -104,34 +100,30 @@ class _WalletState extends State<WalletWidget>
   }
 
   initWallets() async {
-     print(await webView.getUrl());
-        var jsToExecute = '';
-        var importedWallets = await getImportedWallets();
-        var appWallets = await getAppWallets();
+    print(await webView.getUrl());
+    var jsToExecute = '';
+    var importedWallets = await getImportedWallets();
+    var appWallets = await getAppWallets();
 
-        if (importedWallets != null) {
-          String jsonString = "[" + importedWallets.join(',') + "]";
-          jsToExecute +=
-              "localStorage.setItem('importedWallets', JSON.stringify(" +
-                  jsonString +
-                  "));";
-        } else {
-          jsToExecute +=
-              "localStorage.setItem('importedWallets', null);";
-        }
+    if (importedWallets != null) {
+      String jsonString = "[" + importedWallets.join(',') + "]";
+      jsToExecute += "localStorage.setItem('importedWallets', JSON.stringify(" +
+          jsonString +
+          "));";
+    } else {
+      jsToExecute += "localStorage.setItem('importedWallets', null);";
+    }
 
-        if (appWallets != null) {
-          String jsonString = "[" + appWallets.join(',') + "]";
-          jsToExecute +=
-              "localStorage.setItem('appWallets', JSON.stringify(" +
-                  jsonString +
-                  "));";
-        } else {
-          jsToExecute += "localStorage.setItem('appWallets', null);";
-        }
+    if (appWallets != null) {
+      String jsonString = "[" + appWallets.join(',') + "]";
+      jsToExecute += "localStorage.setItem('appWallets', JSON.stringify(" +
+          jsonString +
+          "));";
+    } else {
+      jsToExecute += "localStorage.setItem('appWallets', null);";
+    }
 
     this.webView.evaluateJavascript(source: jsToExecute);
-
   }
 
   scanQrCode(List<dynamic> params) async {

@@ -12,9 +12,6 @@ class ChatbotWidget extends StatefulWidget {
   _ChatbotState createState() => new _ChatbotState(email: this.email);
 }
 
-var copyhack =
-    "document.querySelector('body').addEventListener('contextmenu', function( event ) {        event.preventDefault(); document.execCommand('copy'); console.log('TEXT SELECTED!!!!! ');});";
-
 class _ChatbotState extends State<ChatbotWidget>
     with AutomaticKeepAliveClientMixin {
   InAppWebViewController webView;
@@ -25,20 +22,15 @@ class _ChatbotState extends State<ChatbotWidget>
 
   _ChatbotState({this.email}) {
     iaWebview = InAppWebView(
-      initialUrl: 'http://www.google.be', //'${config.url()}$email',
+      initialUrl: '${config.url()}$email',
       initialHeaders: {},
       initialOptions: InAppWebViewWidgetOptions(
           android: AndroidInAppWebViewOptions(supportMultipleWindows: true)),
       onWebViewCreated: (InAppWebViewController controller) {
         webView = controller;
-        webView.evaluateJavascript(
-            source:
-                "document.addEventListener('copy', function(e) { alert('COPY!!!'); });");
-        webView.evaluateJavascript(source: copyhack);
       },
       onCreateWindow:
           (InAppWebViewController controller, OnCreateWindowRequest req) {
-        print("Create!");
         inAppBrowser.open(url: req.url, options: InAppBrowserClassOptions());
       },
       onConsoleMessage:
@@ -47,7 +39,7 @@ class _ChatbotState extends State<ChatbotWidget>
       },
       onLoadStart: (InAppWebViewController controller, String url) {},
       onLoadStop: (InAppWebViewController controller, String url) async {
-        addClipboardHack(controller); 
+       addClipboardHack(controller);
       },
       onProgressChanged: (InAppWebViewController controller, int progress) {},
     );
