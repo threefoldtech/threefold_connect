@@ -59,7 +59,6 @@ class _RecoverScreenState extends State<RecoverScreen> {
   }
 
   continueRecoverAccount() async {
-
     var registrationData = {
       "privateKey": privateKey,
       "doubleName": doubleName,

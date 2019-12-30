@@ -1,7 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:http/http.dart';
 import 'package:threebotlogin/AppConfig.dart';
 import 'package:threebotlogin/main.dart';
 import 'dart:convert';
@@ -61,29 +60,6 @@ Future checkLoginAttempts(String doubleName, {String privateKey = ''}) async {
 
   return http.get('$threeBotApiUrl/attempts/$doubleName',
       headers: loginRequestHeaders);
-}
-
-Future<Response> removeDeviceId(String doubleName) async {
-  String timestamp = new DateTime.now().millisecondsSinceEpoch.toString();
-  String privatekey = await getPrivateKey();
-
-  Map<String, dynamic> payload = {
-    "timestamp": timestamp,
-    "intention": "delete-deviceid"
-  };
-  String signedPayload = await signData(jsonEncode(payload), privatekey);
-
-  Map<String, String> loginRequestHeaders = {
-    'Content-type': 'application/json',
-    'Jimber-Authorization': signedPayload
-  };
-
-  try {
-    return await http.delete('$threeBotApiUrl/users/$doubleName/deviceid',
-        headers: loginRequestHeaders);
-  } catch (e) {
-    return null;
-  }
 }
 
 Future<int> checkVersionNumber(BuildContext context, String version) async {

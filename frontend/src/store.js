@@ -69,7 +69,6 @@ export default new Vuex.Store({
     },
     setScope (state, scope) {
       let parsedScope = JSON.parse(scope)
-      debugger
       // if the trustedDevice scope is present get it out of the cookies and put the id on the scope to pass it to the app
       if (parsedScope.trustedDevice) {
         // get the cookie specific for this app id
