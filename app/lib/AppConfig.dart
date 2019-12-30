@@ -53,6 +53,6 @@ class AppConfigStaging extends AppConfigImpl {
   }
 
   String threeBotSocketUrl() {
-    return "ws://login.staging.jimber.org";
+    return "wss://login.staging.jimber.org";
   }
 }

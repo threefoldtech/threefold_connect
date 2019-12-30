@@ -9,6 +9,8 @@ import 'package:threebotlogin/screens/MainScreen.dart';
 import 'package:threebotlogin/services/3botService.dart';
 import 'package:threebotlogin/services/userService.dart';
 
+import 'services/socketService.dart';
+
 void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
@@ -45,11 +47,9 @@ class RotatorWidgetState extends State<RotatorWidget> {
         //   await Navigator.push(
         // context, MaterialPageRoute(builder: (context) => MainScreen(initDone: true,registered: true,)));
 
-      var doubleName = await getDoubleName();
-      var pk = await getPrivateKey();
-
-      Response attempts = await checkLoginAttempts(doubleName, privateKey: pk);
-      print(attempts.body);
+    var doubleName = await getDoubleName();
+    // var pk = await getPrivateKey();
+    await createSocketConnection(context, doubleName);
   }
 
   @override
