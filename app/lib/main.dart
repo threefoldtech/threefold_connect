@@ -27,7 +27,7 @@ Future<void> main() async {
   bool registered = doubleName != null;
   Router router = new Router();
   await router.init();
-  runApp(MyApp(initDone: initDone, registered: registered, router: router));
+  runApp(MyApp(initDone: initDone, doubleName: doubleName, registered: registered, router: router));
 }
 
 class MyApp extends StatelessWidget {
