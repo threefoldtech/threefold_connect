@@ -1,0 +1,10 @@
+[default]
+name=Default
+runtime=host
+config-opts=
+run-opts=
+prefix=/home/delruej/.cache/gnome-builder/install/app/host
+app-id=
+postbuild=
+prebuild=
+default=true

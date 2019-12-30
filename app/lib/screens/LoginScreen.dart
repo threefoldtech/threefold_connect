@@ -4,7 +4,6 @@ import 'dart:io';
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:threebotlogin/services/WebviewService.dart';
 import 'package:threebotlogin/services/fingerprintService.dart';
 import 'package:threebotlogin/widgets/ImageButton.dart';
 import 'package:threebotlogin/widgets/PinField.dart';
@@ -131,8 +130,8 @@ class _LoginScreenState extends State<LoginScreen> {
     if (decodedValue == null) return false;
     if (decodedValue is String) {
       return true;
-    }
-    else return decodedValue && decodedValue != null;
+    } else
+      return decodedValue && decodedValue != null;
   }
 
   makePermissionPrefs() async {
@@ -147,7 +146,8 @@ class _LoginScreenState extends State<LoginScreen> {
 
       if (jsonDecode(widget.message['scope']).containsKey('trustedDevice')) {
         var trustedDevice = {};
-        trustedDevice['trustedDevice'] = json.decode(widget.message['scope'])['trustedDevice'];
+        trustedDevice['trustedDevice'] =
+            json.decode(widget.message['scope'])['trustedDevice'];
         scope['trustedDevice'] = trustedDevice;
       }
     }
@@ -174,10 +174,16 @@ class _LoginScreenState extends State<LoginScreen> {
       }
       saveScopePermissions(jsonEncode(initialPermissions));
     } else {
-      List<String> permissions = ['doubleName', 'email', 'derivedSeed', 'trustedDevice'];
+      List<String> permissions = [
+        'doubleName',
+        'email',
+        'derivedSeed',
+        'trustedDevice'
+      ];
 
       permissions.forEach((var permission) {
-        if (!initialPermissions[widget.message['appId']].containsKey(permission)) {
+        if (!initialPermissions[widget.message['appId']]
+            .containsKey(permission)) {
           initialPermissions[widget.message['appId']][permission] = {
             'enabled': true,
             'required': isRequired(permission, widget.message['scope'])
@@ -405,31 +411,19 @@ class _LoginScreenState extends State<LoginScreen> {
       print(exception);
     }
 
-    var data = await encrypt(jsonEncode(tmpScope), publicKey, await getPrivateKey());
-
+    var data =
+        await encrypt(jsonEncode(tmpScope), publicKey, await getPrivateKey());
+    //push to backend with signed
     await sendData(state, await signedHash, data, selectedImageId);
 
     if (scope['trustedDevice'] != null) {
       // Save the trusted deviceid
-      saveTrustedDevice(widget.message['appId'], scope['trustedDevice']['trustedDevice']);
+      saveTrustedDevice(
+          widget.message['appId'], scope['trustedDevice']['trustedDevice']);
     }
 
     if (selectedImageId == correctImage || isMobileCheck) {
-      if (widget.closeWhenLoggedIn && isMobileCheck) {
-        if (Platform.isIOS) {
-          Navigator.popUntil(context, ModalRoute.withName('/'));
-          Navigator.pushNamed(context, '/success');
-        } else {
-          SystemChannels.platform.invokeMethod('SystemNavigator.pop');
-        }
-      } else {
-        try {
-          Navigator.popUntil(context, ModalRoute.withName('/'));
-          Navigator.pushNamed(context, '/success');
-        } catch (e) {
-          print(e);
-        }
-      }
+      Navigator.pop(context, widget.closeWhenLoggedIn && isMobileCheck);
     }
   }
 

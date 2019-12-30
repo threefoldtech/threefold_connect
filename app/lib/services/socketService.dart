@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
+import 'package:threebotlogin/screens/SuccessfulScreen.dart';
 import 'package:threebotlogin/services/userService.dart';
 import 'dart:convert';
 import 'dart:io';
@@ -14,19 +15,15 @@ import '../AppConfig.dart';
 
 IO.Socket socket;
 BuildContext ctx;
-bool conntected = false;
+bool connected = false;
 
 String threeBotSocketUrl = AppConfig().threeBotSocketUrl();
 
 createSocketConnection(BuildContext context, String doubleName) async {
-  if (conntected) return;
+  if (connected) return;
   ctx = context;
 
-  if (doubleName == null) {
-    doubleName = await getDoubleName();
-  }
-
-  print('creating socket conncetion....');
+  print('creating socket connection....');
   socket = IO.io(threeBotSocketUrl, <String, dynamic>{
     'transports': ['websocket']
   });
@@ -37,7 +34,7 @@ createSocketConnection(BuildContext context, String doubleName) async {
     if (doubleName != null) {
       print('joining room....');
       // once a client has connected, we let him join a room
-      socket.emit('join', { 'room': doubleName });
+      socket.emit('join', {'room': doubleName});
     }
   });
 
@@ -54,7 +51,7 @@ createSocketConnection(BuildContext context, String doubleName) async {
 
   socket.on('disconnect', (_) {
     print('disconnect');
-    conntected = false;
+    connected = false;
   });
 
   socket.on('fromServer', (_) => print(_));
@@ -63,13 +60,13 @@ createSocketConnection(BuildContext context, String doubleName) async {
 
 void closeSocketConnection(String doubleName) {
   print('closing socket connection....');
-  socket.emit('leave', { 'room': doubleName });
+  socket.emit('leave', {'room': doubleName});
   socket.close();
 }
 
 void joinRoom(String doubleName) {
   print('joining room....');
-  socket.emit('join', { 'room': doubleName });
+  socket.emit('join', {'room': doubleName});
 }
 
 void socketLoginMobile(Map<String, dynamic> data) {
@@ -116,52 +113,69 @@ Future openLogin(context, data) async {
   } else {
     logger.log(data['type']);
     if (data['type'] == 'login' && data['mobile'] != 'true') {
-      Navigator.popUntil(context, ModalRoute.withName('/'));
-      Navigator.push(
+      var loggedIn = await Navigator.push(
           context, MaterialPageRoute(builder: (context) => LoginScreen(data)));
+      if (loggedIn) {
+        await Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => SuccessfulScreen(
+                    title: "Logged in", text: "You are now logged in.")));
+      }
     } else if (data['type'] == 'email_verification') {
       getEmail().then((email) async {
-        if (email['email'] != null && (await getSignedEmailIdentifier()) == null) {
+        if (email['email'] != null &&
+            (await getSignedEmailIdentifier()) == null) {
           var tmpDoubleName = (await getDoubleName()).toLowerCase();
 
-          getSignedEmailIdentifierFromOpenKYC(tmpDoubleName).then((response) async {
+          getSignedEmailIdentifierFromOpenKYC(tmpDoubleName)
+              .then((response) async {
             var body = jsonDecode(response.body);
 
             var signedEmailIdentifier = body["signed_email_identifier"];
 
-            if(signedEmailIdentifier != null && signedEmailIdentifier.isNotEmpty) {
-              logger.log("Received signedEmailIdentifier: " + signedEmailIdentifier);
+            if (signedEmailIdentifier != null &&
+                signedEmailIdentifier.isNotEmpty) {
+              logger.log(
+                  "Received signedEmailIdentifier: " + signedEmailIdentifier);
 
-              var vsei = json.decode((await verifySignedEmailIdentifier(signedEmailIdentifier)).body);
+              var vsei = json.decode(
+                  (await verifySignedEmailIdentifier(signedEmailIdentifier))
+                      .body);
 
-              if(vsei != null && vsei["email"] == email["email"] && vsei["identifier"] == tmpDoubleName) {
-                logger.log("Verified signedEmailIdentifier authenticity, saving data.");
+              if (vsei != null &&
+                  vsei["email"] == email["email"] &&
+                  vsei["identifier"] == tmpDoubleName) {
+                logger.log(
+                    "Verified signedEmailIdentifier authenticity, saving data.");
                 await saveEmail(vsei["email"], true);
                 await saveSignedEmailIdentifier(signedEmailIdentifier);
 
                 showDialog(
                   context: context,
                   builder: (BuildContext context) => CustomDialog(
-                        image: Icons.email,
-                        title: "Email verified",
-                        description: new Text("Your email has been verfied!"),
-                        actions: <Widget>[
-                          FlatButton(
-                            child: new Text("Ok"),
-                            onPressed: () {
-                              Navigator.pop(context);
-                            },
-                          ),
-                        ],
+                    image: Icons.email,
+                    title: "Email verified",
+                    description: new Text("Your email has been verfied!"),
+                    actions: <Widget>[
+                      FlatButton(
+                        child: new Text("Ok"),
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
                       ),
+                    ],
+                  ),
                 );
               } else {
-                logger.log("Couldn't verify authenticity, saving unverified email.");
+                logger.log(
+                    "Couldn't verify authenticity, saving unverified email.");
                 await saveEmail(email["email"], false);
                 await removeSignedEmailIdentifier();
               }
             } else {
-              logger.log("No valid signed email has been found, please redo the verification process.");
+              logger.log(
+                  "No valid signed email has been found, please redo the verification process.");
             }
           });
         }

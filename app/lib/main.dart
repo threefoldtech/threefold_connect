@@ -15,30 +15,13 @@ class Globals {
   static final color = HexColor("#2d4052");
 }
 
-// Hack to get the height of the bottom navbar
-/*Future<void> main() async {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   try {
     cameras = await availableCameras();
   } on QRReaderException catch (e) {
     print(e);
   }
-
-  final prefs = await SharedPreferences.getInstance();
-  bool initDone =
-      prefs.getBool('initDone') != null && prefs.getBool('initDone');
-
-  var email = await getEmail();
-
-  AppWidget app = new AppWidget(initDone: initDone, registered: email == null);
-
-  await app.init();
-
-  runApp(app);
-}*/
-
-Future<void> main() async {
-  WidgetsFlutterBinding.ensureInitialized();
   bool initDone = await getInitDone();
   String doubleName = await getDoubleName();
   bool registered = doubleName != null;
@@ -62,6 +45,6 @@ class MyApp extends StatelessWidget {
           primaryColor: HexColor("#2d4052"), //@todo theme obj,
         ),
         home: new MainScreen(
-            initDone: initDone, registered: registered, router: router));
+            initDone: initDone, registered: registered, router: router, doubleName: doubleName));
   }
 }

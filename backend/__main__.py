@@ -69,38 +69,42 @@ def checkname_handler(data):
 def cancel_handler(data):
     print('')
 
-
-@sio.on('register')
-def registration_handler(data):
-    logger.debug("Registration %s", data)
-    doublename = data.get('doubleName').lower()
-    email = data.get('email')
-    sid = request.sid
-    publickey = data.get('publicKey')
-    user = db.getUserByName(conn, doublename)
-    if (user is None):
-        update_sql = "INSERT into users (double_name, sid, email, public_key) VALUES(?,?,?,?);"
-        db.insert_user(conn, update_sql, doublename, sid, email, publickey)
+# Only mobile registration, so we dont need this I guess
+# @sio.on('register')
+# def registration_handler(data):
+#     logger.debug("Registration %s", data)
+#     doublename = data.get('doubleName').lower()
+#     email = data.get('email')
+#     sid = request.sid
+#     publickey = data.get('publicKey')
+#     user = db.getUserByName(conn, doublename)
+#     if (user is None):
+#         update_sql = "INSERT into users (double_name, sid, email, public_key) VALUES(?,?,?,?);"
+#         db.insert_user(conn, update_sql, doublename, sid, email, publickey)
 
 
 @sio.on('login')
 def login_handler(data):
     logger.debug("Login %s", data)
+    double_name = data.get('doubleName').lower()
+    state = data.get('state')
+    first_time = data.get('firstTime')
+    mobile = data.get('mobile')
+
     data['type'] = 'login'
     sid = request.sid
-    user = db.getUserByName(conn, data.get('doubleName').lower())
+    user = db.getUserByName(conn, double_name)
     if user:
         logger.debug("User found %s", user[0])
         update_sql = "UPDATE users SET sid=?  WHERE double_name=?;"
         db.update_user(conn, update_sql, sid, user[0])
 
-    if data.get('firstTime') == False and data.get('mobile') == False:
-        user = db.getUserByName(conn, data.get('doubleName').lower())
+    if first_time == False and mobile == False:
+        user = db.getUserByName(conn, double_name)
         emit('login', data, room=user[0])
 
     insert_auth_sql = "INSERT INTO auth (double_name,state_hash,timestamp,scanned,data) VALUES (?,?,?,?,?);"
-    db.insert_auth(conn, insert_auth_sql, data.get('doubleName').lower(
-    ), data.get('state'), datetime.now(), 0, json.dumps(data))
+    db.insert_auth(conn, insert_auth_sql, double_name, state, datetime.now(), 0, json.dumps(data))
     print('')
 
 

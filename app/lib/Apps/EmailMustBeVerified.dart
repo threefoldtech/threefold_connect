@@ -30,7 +30,6 @@ mixin EmailMustBeVerified<T extends StatefulWidget> on State<T> {
           child: new Text("Ok"),
           onPressed: () async {
             Navigator.pop(context);
-            Navigator.pop(context); // @todo 2 pops restarts material app, losing webview states..
           },
         ),
       ];

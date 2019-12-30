@@ -3,15 +3,16 @@ import 'package:threebotlogin/router.dart';
 import 'package:threebotlogin/screens/HomeScreen.dart';
 import 'package:threebotlogin/screens/InitScreen.dart';
 import 'package:threebotlogin/screens/UnregisteredScreen.dart';
+import 'package:threebotlogin/services/socketService.dart';
 import 'package:threebotlogin/widgets/ErrorWidget.dart';
 
 class MainScreen extends StatefulWidget {
   final bool initDone;
   final bool registered;
-
+  final String doubleName;
   final Router router = new Router();
 
-  MainScreen({this.initDone, this.registered, router});
+  MainScreen({this.initDone, this.registered, router, this.doubleName});
 
   @override
   _AppState createState() => _AppState();
@@ -28,17 +29,17 @@ class _AppState extends State<MainScreen> {
     if (!widget.registered) {
       await Navigator.push(context,
           MaterialPageRoute(builder: (context) => UnregisteredScreen()));
-    
     }
 
     await widget.router.init();
+    //Here user is registered
 
-    while (true) {
-      await Navigator.push(
-          context,
-          MaterialPageRoute(
-              builder: (context) => HomeScreen(router: widget.router)));
-    }
+    await createSocketConnection(context, widget.doubleName);
+    
+    Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+            builder: (context) => HomeScreen(router: widget.router)));
   }
 
   @override

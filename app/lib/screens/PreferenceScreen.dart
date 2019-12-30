@@ -38,15 +38,19 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
 
   showChangePin() async {
     var pin = await getPin();
-    Navigator.push(context, MaterialPageRoute(
-             builder: (context) => ChangePinScreen(currentPin: pin)));
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) => ChangePinScreen(currentPin: pin)));
   }
+
   @override
   Widget build(BuildContext context) {
     preferenceContext = context;
     return ListView(
       children: <Widget>[
-        Container( child: AppBar(
+        Container(
+            child: AppBar(
           automaticallyImplyLeading: false,
           backgroundColor: HexColor("#2d4052"),
           title: Text(
@@ -272,19 +276,11 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
             },
           ),
           FlatButton(
-            child: new Text("Yes"),
-            onPressed: () async {
-              Navigator.pop(context);
+              child: new Text("Yes"),
+              onPressed: () async {
+                bool result = await clearData();
 
-              bool result = await clearData();
-
-              if (result) {
-                Navigator.popUntil(
-                  preferenceContext,
-                  ModalRoute.withName('/'),
-                );
-                await Navigator.pushNamed(preferenceContext, '/');
-              } else {
+                Navigator.pop(context);
                 showDialog(
                     context: preferenceContext,
                     builder: (BuildContext context) => CustomDialog(
@@ -295,17 +291,14 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
                             FlatButton(
                               child: Text('Ok'),
                               onPressed: () {
-                                Navigator.popUntil(context,
-                                    ModalRoute.withName('/preference'));
+                                Navigator.pop(context);
                               },
                             )
                           ],
                         ));
-              }
 
-              setState(() {});
-            },
-          ),
+                setState(() {});
+              }),
         ],
       ),
     );
@@ -319,7 +312,6 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
   }
 
   void _showResendEmailDialog() {
-    
     if (context != null) {
       showDialog(
         context: context,
