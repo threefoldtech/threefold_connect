@@ -22,7 +22,7 @@ config = configparser.ConfigParser()
 config.read('config.ini')
 
 app = Flask(__name__)
-sio = SocketIO(app)
+sio = SocketIO(app, transports=["websocket"])
 
 CORS(app, resources={r"*": {"origins": ["*"]}})
 
