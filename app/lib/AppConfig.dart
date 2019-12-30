@@ -1,7 +1,7 @@
 enum Environment { Staging, Production, Local }
 
 abstract class EnvConfig {
-  Environment enviroment = Environment.Staging;
+  Environment enviroment = Environment.Local;
 }
 
 class AppConfig extends EnvConfig {
@@ -12,7 +12,7 @@ class AppConfig extends EnvConfig {
     } else if (enviroment == Environment.Production) {
       appConfig = AppConfigStaging();
     } else if (enviroment == Environment.Local) {
-      appConfig = AppConfigStaging();
+      appConfig = AppConfigLocal();
     }
   }
   String openKycApiUrl() {
@@ -56,3 +56,22 @@ class AppConfigStaging extends AppConfigImpl {
     return "wss://login.staging.jimber.org";
   }
 }
+
+class AppConfigLocal extends AppConfigImpl {
+  String openKycApiUrl() {
+    return "http://192.168.8.66:5005";
+  }
+
+  String threeBotApiUrl() {
+    return "http://192.168.8.66:5000/api";
+  }
+
+  String threeBotFrontEndUrl() {
+    return "http://192.168.8.66:8001";
+  }
+
+  String threeBotSocketUrl() {
+    return "ws://192.168.8.66:5000";
+  }
+}
+

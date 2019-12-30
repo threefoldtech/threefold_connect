@@ -2,17 +2,26 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:threebotlogin/helpers/HexColor.dart';
 import 'package:threebotlogin/router.dart';
+import 'package:threebotlogin/services/socketService.dart';
 
 /* Screen shows tabbar and all pages defined in router.dart */
 class HomeScreen extends StatefulWidget {
   final Router router;
+  final String doubleName;
 
-  HomeScreen({this.router});
+  HomeScreen({this.router, this.doubleName});
 
   _HomeScreenState createState() => _HomeScreenState();
 }
 
 class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
+
+  @override
+  void initState() {
+    super.initState();
+    createSocketConnection(context, widget.doubleName);
+  }
+
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
