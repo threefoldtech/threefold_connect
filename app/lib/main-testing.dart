@@ -5,8 +5,10 @@
 import 'package:community_material_icon/community_material_icon.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
+import 'package:threebotlogin/screens/ChangePinScreen.dart';
 import 'package:threebotlogin/screens/MainScreen.dart';
 import 'package:threebotlogin/services/3botService.dart';
+import 'package:threebotlogin/services/socketService.dart';
 import 'package:threebotlogin/services/userService.dart';
 
 void main() => runApp(MyApp());
@@ -25,9 +27,9 @@ class RotatorWidget extends StatefulWidget {
 
 class RotatorWidgetState extends State<RotatorWidget> {
   getNext() async {
-    // print("Starting changepincode without current PIN");
-    //  await Navigator.push(
-    //      context, MaterialPageRoute(builder: (context) => ChangePinScreen()));
+    print("Starting changepincode without current PIN");
+    // await Navigator.push(
+    //     context, MaterialPageRoute(builder: (context) => ChangePinScreen()));
     // print("Starting changepincode with current PIN");
     // await Navigator.push(
     //     context,
@@ -42,14 +44,14 @@ class RotatorWidgetState extends State<RotatorWidget> {
     // await Navigator.push(
     //     context, MaterialPageRoute(builder: (context) => InitScreen()));
 
-        //   await Navigator.push(
-        // context, MaterialPageRoute(builder: (context) => MainScreen(initDone: true,registered: true,)));
+    //   await Navigator.push(
+    // context, MaterialPageRoute(builder: (context) => MainScreen(initDone: true,registered: true,)));
 
-      var doubleName = await getDoubleName();
-      var pk = await getPrivateKey();
-
-      Response attempts = await checkLoginAttempts(doubleName, privateKey: pk);
-      print(attempts.body);
+    var doubleName = await getDoubleName();
+    // var pk = await getPrivateKey();
+    await createSocketConnection(context, doubleName);
+    // Response attempts = await checkLoginAttempts(doubleName, privateKey: pk);
+    //print(attempts.body);
   }
 
   @override
