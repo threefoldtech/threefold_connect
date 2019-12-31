@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:threebotlogin/helpers/HexColor.dart';
 import 'package:threebotlogin/router.dart';
 import 'package:threebotlogin/screens/MainScreen.dart';
@@ -13,6 +14,16 @@ LoggingService logger;
 class Globals {
   static final isInDebugMode = true;
   static final color = HexColor("#2d4052");
+  ValueNotifier<bool> emailVerified = ValueNotifier(false);
+  final Router router = new Router();
+  /* Singleton */
+  static final Globals _singleton = new Globals._internal();
+  factory Globals() {
+    return _singleton;
+  }
+  Globals._internal() {
+    //initialize
+  }
 }
 
 Future<void> main() async {
@@ -24,19 +35,22 @@ Future<void> main() async {
   }
   bool initDone = await getInitDone();
   String doubleName = await getDoubleName();
+  Globals().emailVerified.value = (await getSignedEmailIdentifier() != null);
   bool registered = doubleName != null;
-  Router router = new Router();
-  await router.init();
-  runApp(MyApp(initDone: initDone, registered: registered, router: router));
+
+  runApp(MyApp(
+      initDone: initDone,
+      doubleName: doubleName,
+      registered: registered));
 }
 
 class MyApp extends StatelessWidget {
-  MyApp({this.initDone, this.doubleName, this.registered, this.router});
+  MyApp({this.initDone, this.doubleName, this.registered});
 
   final bool initDone;
   final String doubleName;
   final bool registered;
-  final Router router;
+
 
   @override
   Widget build(BuildContext context) {
@@ -45,6 +59,9 @@ class MyApp extends StatelessWidget {
           primaryColor: HexColor("#2d4052"), //@todo theme obj,
         ),
         home: new MainScreen(
-            initDone: initDone, registered: registered, router: router, doubleName: doubleName));
+            initDone: initDone,
+            registered: registered,
+          
+            doubleName: doubleName));
   }
 }

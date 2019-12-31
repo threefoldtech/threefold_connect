@@ -3,25 +3,21 @@ import 'package:socket_io_client/socket_io_client.dart' as IO;
 import 'package:threebotlogin/screens/SuccessfulScreen.dart';
 import 'package:threebotlogin/services/userService.dart';
 import 'dart:convert';
-import 'dart:io';
 import 'package:threebotlogin/screens/LoginScreen.dart';
 import 'package:threebotlogin/services/3botService.dart';
 import 'package:threebotlogin/services/cryptoService.dart';
 import 'package:threebotlogin/services/openKYCService.dart';
-import 'package:threebotlogin/main.dart';
 import 'package:threebotlogin/widgets/CustomDialog.dart';
 
 import '../AppConfig.dart';
 
 IO.Socket socket;
-BuildContext ctx;
 bool connected = false;
 
 String threeBotSocketUrl = AppConfig().threeBotSocketUrl();
 
 createSocketConnection(BuildContext context, String doubleName) async {
   if (connected) return;
-  ctx = context;
 
   print('creating socket connection....');
   socket = IO.io(threeBotSocketUrl, <String, dynamic>{
@@ -75,111 +71,104 @@ void socketLoginMobile(Map<String, dynamic> data) {
 }
 
 Future openLogin(context, data) async {
-  if (Platform.isIOS) {
-    data = data;
+  String messageType = data["type"];
+  var mobile = data["mobile"];
+  var loginToken = data["loginToken"];
+  var state = data['state'];
+  var publicKey = data['appPublicKey'];
+  var scope = data["scope"];
+  var appId = data['appId'];
+
+  if (loginToken != null) {
+    return await loginFromToken(loginToken, state, publicKey, appId, scope);
   }
 
-  logger.log(data);
-
-  if (data['logintoken'] != null) {
-    if (data['logintoken'] == await getLoginToken()) {
-      var state = data['state'];
-      var publicKey = data['appPublicKey'];
-      var privateKey = getPrivateKey();
-      var email = getEmail();
-      var keys = getKeys(data['appId'], await getDoubleName());
-
-      var signedHash = signData(state, await privateKey);
-      var scope = {};
-      var dataToSend;
-
-      if (data['scope'] != null) {
-        if (data['scope'].split(",").contains('user:email')) {
-          scope['email'] = await email;
-        }
-
-        if (data['scope'].split(",").contains('user:keys')) {
-          scope['keys'] = await keys;
-        }
-      }
-
-      if (scope.isNotEmpty) {
-        logger.log(scope.isEmpty);
-        dataToSend =
-            await encrypt(jsonEncode(scope), publicKey, await privateKey);
-      }
-      sendData(state, await signedHash, dataToSend, null);
+  if (messageType == 'login' && mobile != 'true') {
+    var loggedIn = await Navigator.push(
+        context, MaterialPageRoute(builder: (context) => LoginScreen(data)));
+    if (loggedIn) {
+      await Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) => SuccessfulScreen(
+                  title: "Logged in", text: "You are now logged in.")));
     }
-  } else {
-    logger.log(data['type']);
-    if (data['type'] == 'login' && data['mobile'] != 'true') {
-      var loggedIn = await Navigator.push(
-          context, MaterialPageRoute(builder: (context) => LoginScreen(data)));
-      if (loggedIn) {
-        await Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) => SuccessfulScreen(
-                    title: "Logged in", text: "You are now logged in.")));
-      }
-    } else if (data['type'] == 'email_verification') {
-      getEmail().then((email) async {
-        if (email['email'] != null &&
-            (await getSignedEmailIdentifier()) == null) {
-          var tmpDoubleName = (await getDoubleName()).toLowerCase();
+  } else if (messageType == 'email_verification') {
+    getEmail().then((email) async {
+      if (email['email'] != null &&
+          (await getSignedEmailIdentifier()) == null) {
+        var tmpDoubleName = (await getDoubleName()).toLowerCase();
 
-          getSignedEmailIdentifierFromOpenKYC(tmpDoubleName)
-              .then((response) async {
-            var body = jsonDecode(response.body);
+        getSignedEmailIdentifierFromOpenKYC(tmpDoubleName)
+            .then((response) async {
+          var body = jsonDecode(response.body);
 
-            var signedEmailIdentifier = body["signed_email_identifier"];
+          var signedEmailIdentifier = body["signed_email_identifier"];
 
-            if (signedEmailIdentifier != null &&
-                signedEmailIdentifier.isNotEmpty) {
-              logger.log(
-                  "Received signedEmailIdentifier: " + signedEmailIdentifier);
+          if (signedEmailIdentifier != null &&
+              signedEmailIdentifier.isNotEmpty) {
+            var vsei = json.decode(
+                (await verifySignedEmailIdentifier(signedEmailIdentifier))
+                    .body);
 
-              var vsei = json.decode(
-                  (await verifySignedEmailIdentifier(signedEmailIdentifier))
-                      .body);
+            if (vsei != null &&
+                vsei["email"] == email["email"] &&
+                vsei["identifier"] == tmpDoubleName) {
+              await saveEmail(vsei["email"], true);
+              await saveSignedEmailIdentifier(signedEmailIdentifier);
 
-              if (vsei != null &&
-                  vsei["email"] == email["email"] &&
-                  vsei["identifier"] == tmpDoubleName) {
-                logger.log(
-                    "Verified signedEmailIdentifier authenticity, saving data.");
-                await saveEmail(vsei["email"], true);
-                await saveSignedEmailIdentifier(signedEmailIdentifier);
-
-                showDialog(
-                  context: context,
-                  builder: (BuildContext context) => CustomDialog(
-                    image: Icons.email,
-                    title: "Email verified",
-                    description: new Text("Your email has been verfied!"),
-                    actions: <Widget>[
-                      FlatButton(
-                        child: new Text("Ok"),
-                        onPressed: () {
-                          Navigator.pop(context);
-                        },
-                      ),
-                    ],
-                  ),
-                );
-              } else {
-                logger.log(
-                    "Couldn't verify authenticity, saving unverified email.");
-                await saveEmail(email["email"], false);
-                await removeSignedEmailIdentifier();
-              }
+              showDialog(
+                context: context,
+                builder: (BuildContext context) => CustomDialog(
+                  image: Icons.email,
+                  title: "Email verified",
+                  description: new Text("Your email has been verfied!"),
+                  actions: <Widget>[
+                    FlatButton(
+                      child: new Text("Ok"),
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                    ),
+                  ],
+                ),
+              );
             } else {
-              logger.log(
-                  "No valid signed email has been found, please redo the verification process.");
+              await saveEmail(email["email"], false);
+              await removeSignedEmailIdentifier();
             }
-          });
-        }
-      });
+          }
+        });
+      }
+    });
+  }
+}
+
+Future<void> loginFromToken(
+    String loginToken, String state, String publicKey, String appId, String stringScope) async {
+  if (loginToken == await getLoginToken()) {
+    var privateKey = getPrivateKey();
+    var email = getEmail();
+    var keys = getKeys(appId, await getDoubleName());
+
+    var signedHash = signData(state, await privateKey);
+    var scope = {};
+    var dataToSend;
+
+    if (scope != null) {
+      if (stringScope.split(",").contains('user:email')) {
+        scope['email'] = await email;
+      }
+
+      if (stringScope.split(",").contains('user:keys')) {
+        scope['keys'] = await keys;
+      }
     }
+
+    if (scope.isNotEmpty) {
+      dataToSend =
+          await encrypt(jsonEncode(scope), publicKey, await privateKey);
+    }
+    sendData(state, await signedHash, dataToSend, null);
   }
 }

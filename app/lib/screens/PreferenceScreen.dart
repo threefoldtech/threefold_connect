@@ -29,11 +29,18 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
 
   var thiscolor = Colors.green;
 
+  setEmailVerified() {
+    setState(() {
+      this.emailVerified = Globals().emailVerified.value;
+    });
+  }
+
   @override
   void initState() {
     super.initState();
     getUserValues();
     checkBiometrics();
+    Globals().emailVerified.addListener(setEmailVerified);
   }
 
   showChangePin() async {

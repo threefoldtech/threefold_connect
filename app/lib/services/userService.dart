@@ -2,10 +2,9 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:core';
 
-import 'package:http/http.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:threebotlogin/services/cryptoService.dart';
-
+import 'package:threebotlogin/main.dart';
 import '3botService.dart';
 import 'cryptoService.dart';
 
@@ -113,16 +112,19 @@ Future<Map<String, Object>> getEmail() async {
 
 Future<void> removeSignedEmailIdentifier() async {
   final prefs = await SharedPreferences.getInstance();
+  Globals().emailVerified.value = false;
   prefs.remove("signedEmailIdentifier");
 }
 
 Future<void> saveSignedEmailIdentifier(signedEmailIdentifier) async {
   final prefs = await SharedPreferences.getInstance();
+  Globals().emailVerified.value = (signedEmailIdentifier != null);
   prefs.setString('signedEmailIdentifier', signedEmailIdentifier);
 }
 
 Future<String> getSignedEmailIdentifier() async {
   final prefs = await SharedPreferences.getInstance();
+
   return prefs.getString('signedEmailIdentifier');
 }
 
@@ -192,9 +194,10 @@ Future<void> saveInitDone() async {
   final prefs = await SharedPreferences.getInstance();
   prefs.setBool('initDone', true);
 }
-Future<bool> getInitDone() async{
-   final prefs = await SharedPreferences.getInstance();
-   return prefs.getBool('initDone');
+
+Future<bool> getInitDone() async {
+  final prefs = await SharedPreferences.getInstance();
+  return prefs.getBool('initDone');
 }
 
 Future<bool> clearData() async {

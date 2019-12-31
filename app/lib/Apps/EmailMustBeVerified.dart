@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:threebotlogin/main.dart';
 import 'package:threebotlogin/services/userService.dart';
 import 'package:threebotlogin/widgets/CustomDialog.dart';
 
@@ -9,13 +10,19 @@ mixin EmailMustBeVerified<T extends StatefulWidget> on State<T> {
   bool get isHidden {
     return hidden;
   }
+  updateHidden(){
+  setState(() {
+      this.hidden = Globals().emailVerified.value;
+    });
+  }
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) => checkEmailVerified());
+    Globals().emailVerified.addListener(updateHidden);
   }
-
+  
   checkEmailVerified() async {
     if (!mounted) return;
     var email = await getEmail();

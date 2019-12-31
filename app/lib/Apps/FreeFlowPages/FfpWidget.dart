@@ -29,7 +29,7 @@ class _FfpState extends State<FfpWidget>
       initialOptions: InAppWebViewWidgetOptions(),
       onLoadStart: (InAppWebViewController controller, String url) {
         webView = controller;
-        initKeys();
+        initKeys(url);
         if (url.contains('state=')) {
           controller.injectCSSCode(source: '* { display: none; }');
         }
@@ -57,12 +57,10 @@ class _FfpState extends State<FfpWidget>
     super.dispose();
   }
 
-  initKeys() async {
+  initKeys(String url) async {
     var url = await webView.getUrl();
-    while (!url.contains('state')) {
-      if (!mounted)
-        return; //If widget is no longer mounted, dont keep getting url; this causes error
-      url = await webView.getUrl();
+    if (!url.contains('state')) {
+      return;
     }
 
     final state = Uri.decodeFull(url.split("&state=")[1]);
