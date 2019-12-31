@@ -5,15 +5,15 @@ import 'package:threebotlogin/widgets/CustomDialog.dart';
 
 mixin EmailMustBeVerified<T extends StatefulWidget> on State<T> {
   BuildContext get context;
-  bool hidden = false;
+  bool hidden = true;
 
   bool get isHidden {
     return hidden;
   }
   updateHidden(){
-  setState(() {
-      this.hidden = Globals().emailVerified.value;
-    });
+   setState(() {
+        hidden = Globals().emailVerified.value;
+      });
   }
 
   @override
@@ -26,11 +26,6 @@ mixin EmailMustBeVerified<T extends StatefulWidget> on State<T> {
   checkEmailVerified() async {
     if (!mounted) return;
     var email = await getEmail();
-
-    setState(() {
-      hidden = true;
-    });
-
     if (email != null && !email['verified']) {
       var actions = <Widget>[
         FlatButton(
@@ -48,6 +43,11 @@ mixin EmailMustBeVerified<T extends StatefulWidget> on State<T> {
             description: Text('Please verify email first.'),
             actions: actions),
       );
+    }else{
+      setState(() {
+        hidden = false;
+      });
+      
     }
   }
 }

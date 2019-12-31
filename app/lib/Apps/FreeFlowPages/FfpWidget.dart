@@ -23,18 +23,13 @@ class _FfpState extends State<FfpWidget>
 
   InAppWebView iaWebview;
   _FfpState() {
-    iaWebview = InAppWebView(
+    iaWebview = new InAppWebView(
       initialUrl: config.cookieUrl(),
       initialHeaders: {},
       initialOptions: InAppWebViewWidgetOptions(),
       onLoadStart: (InAppWebViewController controller, String url) {
         webView = controller;
         initKeys(url);
-        if (url.contains('state=')) {
-          controller.injectCSSCode(source: '* { display: none; }');
-        }
-        controller.injectCSSCode(
-            source: ".crisp-client {display: none !important;}");
       },
       onLoadStop: (InAppWebViewController controller, String url) async {
         if (!mounted) return;
@@ -58,7 +53,6 @@ class _FfpState extends State<FfpWidget>
   }
 
   initKeys(String url) async {
-    var url = await webView.getUrl();
     if (!url.contains('state')) {
       return;
     }
@@ -91,6 +85,9 @@ class _FfpState extends State<FfpWidget>
 
   @override
   Widget build(BuildContext context) {
+    if(this.iaWebview == null){
+      return null;
+    }
     return Column(
       children: <Widget>[
         Expanded(
