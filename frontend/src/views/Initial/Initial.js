@@ -147,7 +147,7 @@ export default {
         if (/iPhone|iPad|iPod/i.test(navigator.userAgent)) {
           window.location.replace(url)
         } else if (/Android|webOS|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
-          window.open(url)
+          window.location.href = url
         }
       }
     },
