@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:package_info/package_info.dart';
 import 'package:threebotlogin/helpers/HexColor.dart';
 import 'package:threebotlogin/main.dart';
 import 'package:threebotlogin/screens/ChangePinScreen.dart';
@@ -28,6 +29,9 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
   bool biometricsCheck = false;
   bool finger = false;
 
+  String version = '';
+  String buildNumber = '';
+
   var thiscolor = Colors.green;
 
   setEmailVerified() {
@@ -36,12 +40,22 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
     });
   }
 
+  setVersion() {
+    PackageInfo.fromPlatform().then((packageInfo) => {
+          setState(() {
+            version = packageInfo.version;
+            buildNumber = packageInfo.buildNumber;
+          })
+        });
+  }
+
   @override
   void initState() {
     super.initState();
     getUserValues();
     checkBiometrics();
     Globals().emailVerified.addListener(setEmailVerified);
+    setVersion();
   }
 
   showChangePin() async {
@@ -54,7 +68,6 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
 
   @override
   Widget build(BuildContext context) {
-    preferenceContext = context;
     return ListView(
       children: <Widget>[
         Container(
@@ -143,7 +156,7 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
         Material(
           child: ListTile(
             leading: Icon(Icons.info_outline),
-            title: Text("Version: "), //+ version + " - " + buildNumber
+            title: Text("Version: " + version + " - " + buildNumber),
           ),
         ),
         ExpansionTile(
@@ -288,7 +301,8 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
               onPressed: () async {
                 bool result = await clearData();
                 if (result) {
-                  await Navigator.push( //@todo this feels like a bug, should not push on current screen
+                  await Navigator.push(
+                      //@todo this feels like a bug, should not push on current screen
                       context,
                       MaterialPageRoute(
                           builder: (context) => UnregisteredScreen()));
