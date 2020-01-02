@@ -36,7 +36,7 @@ class _RegistrationWithoutScanScreen
   void initState() {
     super.initState();
     if (!widget.resetPin) {
-      getPrivateKey().then((pk) => pk != null ? _showDialog() : null );
+      getPrivateKey().then((pk) => pk != null ? _showDialog() : null);
     }
   }
 
@@ -47,41 +47,22 @@ class _RegistrationWithoutScanScreen
         title: Text('Registration'),
         elevation: 0.0,
       ),
-      body: Container(
-        width: double.infinity,
-        height: double.infinity,
-        color: Theme.of(context).primaryColor,
-        child: Container(
-          child: Container(
-            decoration: BoxDecoration(
-              color: Theme.of(context).scaffoldBackgroundColor,
-              borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(20.0),
-                topRight: Radius.circular(20.0),
-              ),
-            ),
-            child: Container(
-              padding: EdgeInsets.only(top: 0.0, bottom: 0.0),
+      body: Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            Container(
+              width: double.infinity,
+              padding: EdgeInsets.only(top: 0.0, bottom: 24.0),
               child: Center(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: <Widget>[
-                    Container(
-                      width: double.infinity,
-                      padding: EdgeInsets.only(top: 0.0, bottom: 24.0),
-                      child: Center(
-                        child: Text(
-                          helperText,
-                          style: TextStyle(fontSize: 16.0),
-                        ),
-                      ),
-                    ),
-                    PinField(callback: (p) => pinFilledIn(p))
-                  ],
+                child: Text(
+                  helperText,
+                  style: TextStyle(fontSize: 16.0),
                 ),
               ),
             ),
-          ),
+            PinField(callback: (p) => pinFilledIn(p))
+          ],
         ),
       ),
     );
@@ -147,15 +128,15 @@ class _RegistrationWithoutScanScreen
     Navigator.popUntil(context, ModalRoute.withName('/'));
 
     if (widget.link != null) {
-       Map<String, dynamic> data = {
-          'doubleName': doubleName,
-          'mobile': true,
-          'firstTime': false,
-          'sid': 'random',
-          'state': widget.link.queryParameters['state']
-        };
-        socketLoginMobile(data);
-        return openPage(LoginScreen(widget.link.queryParameters));
+      Map<String, dynamic> data = {
+        'doubleName': doubleName,
+        'mobile': true,
+        'firstTime': false,
+        'sid': 'random',
+        'state': widget.link.queryParameters['state']
+      };
+      socketLoginMobile(data);
+      return openPage(LoginScreen(widget.link.queryParameters));
     }
 
     Navigator.of(context).pushNamed('/registered');

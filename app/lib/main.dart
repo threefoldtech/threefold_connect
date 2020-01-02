@@ -54,7 +54,8 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return new MaterialApp(
         theme: ThemeData(
-          primaryColor: HexColor("#2d4052"), //@todo theme obj,
+          primaryColor: HexColor("#2d4052"),
+          accentColor: HexColor("#16a085"),
         ),
         home: new MainScreen(
             initDone: initDone,

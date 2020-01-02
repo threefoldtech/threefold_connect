@@ -284,68 +284,50 @@ class _LoginScreenState extends State<LoginScreen> {
           title: Text('Login'),
           elevation: 0.0,
         ),
-        body: Container(
-          width: double.infinity,
-          height: double.infinity,
-          color: Theme.of(context).primaryColor,
-          child: Container(
-            child: Container(
-              decoration: BoxDecoration(
-                color: Theme.of(context).scaffoldBackgroundColor,
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(20.0),
-                  topRight: Radius.circular(20.0),
-                ),
+        body: Column(
+          children: <Widget>[
+            Visibility(
+              visible: showPinfield,
+              child: Expanded(
+                flex: 2,
+                child: Center(child: Text(helperText)),
               ),
-              child: Container(
-                child: Column(
-                  children: <Widget>[
-                    Visibility(
-                      visible: showPinfield,
-                      child: Expanded(
-                        flex: 2,
-                        child: Center(child: Text(helperText)),
-                      ),
+            ),
+            Visibility(
+              visible: showPinfield,
+              child: Expanded(
+                flex: 6,
+                child: showPinfield
+                    ? PinField(callback: (p) => pinFilledIn(p))
+                    : Container(),
+              ),
+            ),
+            Visibility(
+              visible: showScopeAndEmoji,
+              child: Expanded(flex: 6, child: scopeEmojiView()),
+            ),
+            Visibility(
+              visible: cancelBtnVisible,
+              child: Expanded(
+                flex: 0,
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: FlatButton(
+                    child: Text(
+                      "It wasn\'t me - cancel",
+                      style:
+                          TextStyle(fontSize: 16.0, color: Color(0xff0f296a)),
                     ),
-                    Visibility(
-                      visible: showPinfield,
-                      child: Expanded(
-                        flex: 6,
-                        child: showPinfield
-                            ? PinField(callback: (p) => pinFilledIn(p))
-                            : Container(),
-                      ),
-                    ),
-                    Visibility(
-                      visible: showScopeAndEmoji,
-                      child: Expanded(flex: 6, child: scopeEmojiView()),
-                    ),
-                    Visibility(
-                      visible: cancelBtnVisible,
-                      child: Expanded(
-                        flex: 0,
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: FlatButton(
-                            child: Text(
-                              "It wasn\'t me - cancel",
-                              style: TextStyle(
-                                  fontSize: 16.0, color: Color(0xff0f296a)),
-                            ),
-                            onPressed: () {
-                              cancelIt();
-                              Navigator.of(context).pop();
-                              _onWillPop();
-                            },
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
+                    onPressed: () {
+                      cancelIt();
+                      Navigator.of(context).pop();
+                      _onWillPop();
+                    },
+                  ),
                 ),
               ),
             ),
-          ),
+          ],
         ),
       ),
     );
