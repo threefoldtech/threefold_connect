@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:threebotlogin/screens/MobileRegistrationScreen.dart';
+
 import 'package:threebotlogin/services/openKYCService.dart';
 import 'package:threebotlogin/services/socketService.dart';
 import 'package:threebotlogin/widgets/CustomDialog.dart';
@@ -10,7 +10,7 @@ import 'package:threebotlogin/widgets/PinField.dart';
 import 'package:threebotlogin/services/userService.dart';
 import 'package:threebotlogin/services/cryptoService.dart';
 import 'package:threebotlogin/services/3botService.dart';
-import 'package:threebotlogin/main.dart';
+
 
 import 'LoginScreen.dart';
 
