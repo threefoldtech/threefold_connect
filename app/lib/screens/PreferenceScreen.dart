@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:threebotlogin/helpers/HexColor.dart';
 import 'package:threebotlogin/main.dart';
 import 'package:threebotlogin/screens/ChangePinScreen.dart';
+import 'package:threebotlogin/screens/UnregisteredScreen.dart';
 import 'package:threebotlogin/services/fingerprintService.dart';
 import 'package:threebotlogin/services/openKYCService.dart';
 import 'package:threebotlogin/services/userService.dart';
@@ -286,25 +287,28 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
               child: new Text("Yes"),
               onPressed: () async {
                 bool result = await clearData();
-
-                Navigator.pop(context);
-                showDialog(
-                    context: preferenceContext,
-                    builder: (BuildContext context) => CustomDialog(
-                          title: 'Error',
-                          description: Text(
-                              'Something went wrong when trying to remove your account.'),
-                          actions: <Widget>[
-                            FlatButton(
-                              child: Text('Ok'),
-                              onPressed: () {
-                                Navigator.pop(context);
-                              },
-                            )
-                          ],
-                        ));
-
-                setState(() {});
+                if (result) {
+                  await Navigator.push( //@todo this feels like a bug, should not push on current screen
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => UnregisteredScreen()));
+                } else {
+                  showDialog(
+                      context: preferenceContext,
+                      builder: (BuildContext context) => CustomDialog(
+                            title: 'Error',
+                            description: Text(
+                                'Something went wrong when trying to remove your account.'),
+                            actions: <Widget>[
+                              FlatButton(
+                                child: Text('Ok'),
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                },
+                              )
+                            ],
+                          ));
+                }
               }),
         ],
       ),

@@ -126,7 +126,7 @@ class _RegistrationWithoutScanScreen
       saveEmail(email, widget.initialData['emailVerified']);
     }
 
-    joinRoom(doubleName);
+    // joinRoom(doubleName);
     saveDoubleName(doubleName);
     savePhrase(phrase);
 

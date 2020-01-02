@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:threebotlogin/helpers/HexColor.dart';
 import 'package:threebotlogin/router.dart';
 import 'package:threebotlogin/screens/MainScreen.dart';
@@ -28,6 +29,7 @@ class Globals {
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
   try {
     cameras = await availableCameras();
   } on QRReaderException catch (e) {
@@ -38,10 +40,7 @@ Future<void> main() async {
   Globals().emailVerified.value = (await getSignedEmailIdentifier() != null);
   bool registered = doubleName != null;
 
-  runApp(MyApp(
-      initDone: initDone,
-      doubleName: doubleName,
-      registered: registered));
+  runApp(MyApp(initDone: initDone, registered: registered));
 }
 
 class MyApp extends StatelessWidget {
@@ -51,17 +50,12 @@ class MyApp extends StatelessWidget {
   final String doubleName;
   final bool registered;
 
-
   @override
   Widget build(BuildContext context) {
-    return new MaterialApp(
+    return MaterialApp(
         theme: ThemeData(
           primaryColor: HexColor("#2d4052"), //@todo theme obj,
         ),
-        home: new MainScreen(
-            initDone: initDone,
-            registered: registered,
-          
-            doubleName: doubleName));
+        home: MainScreen(initDone: initDone, registered: registered));
   }
 }

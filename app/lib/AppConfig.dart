@@ -30,6 +30,21 @@ class AppConfig extends EnvConfig {
   String threeBotSocketUrl() {
     return appConfig.threeBotSocketUrl();
   }
+
+  Map<String, String> circleUrls() {
+    var circleUrls = Map<String, String>();
+
+    circleUrls['tftokens'] = 'https://staging.freeflowpages.com/join/tf-tokens';
+    circleUrls['tf-grid-users'] =
+        'https://staging.freeflowpages.com/join/tf-grid-users';
+    circleUrls['tf-grid-farming'] =
+        'https://staging.freeflowpages.com/join/tf-grid-farming';
+    circleUrls['freeflownation'] =
+        'https://staging.freeflowpages.com/join/freeflownation';
+    circleUrls['3bot'] = 'https://staging.freeflowpages.com/join/3bot';
+
+    return circleUrls;
+  }
 }
 
 abstract class AppConfigImpl {
@@ -55,6 +70,21 @@ class AppConfigStaging extends AppConfigImpl {
   String threeBotSocketUrl() {
     return "wss://login.staging.jimber.org";
   }
+
+  Map<String, String> circleUrls() {
+    var circleUrls = Map<String, String>();
+
+    circleUrls['tftokens'] = 'https://staging.freeflowpages.com/join/tf-tokens';
+    circleUrls['tf-grid-users'] =
+        'https://staging.freeflowpages.com/join/tf-grid-users';
+    circleUrls['tf-grid-farming'] =
+        'https://staging.freeflowpages.com/join/tf-grid-farming';
+    circleUrls['freeflownation'] =
+        'https://staging.freeflowpages.com/join/freeflownation';
+    circleUrls['3bot'] = 'https://staging.freeflowpages.com/join/3bot';
+
+    return circleUrls;
+  }
 }
 
 class AppConfigLocal extends AppConfigImpl {
@@ -73,5 +103,19 @@ class AppConfigLocal extends AppConfigImpl {
   String threeBotSocketUrl() {
     return "ws://192.168.8.66:5000";
   }
-}
 
+  Map<String, String> circleUrls() {
+    var circleUrls = Map<String, String>();
+
+    circleUrls['tftokens'] = 'https://staging.freeflowpages.com/join/tf-tokens';
+    circleUrls['tf-grid-users'] =
+        'https://staging.freeflowpages.com/join/tf-grid-users';
+    circleUrls['tf-grid-farming'] =
+        'https://staging.freeflowpages.com/join/tf-grid-farming';
+    circleUrls['freeflownation'] =
+        'https://staging.freeflowpages.com/join/freeflownation';
+    circleUrls['3bot'] = 'https://staging.freeflowpages.com/join/3bot';
+
+    return circleUrls;
+  }
+}

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:threebotlogin/Apps/FreeFlowPages/FfpEvents.dart';
@@ -5,12 +7,12 @@ import 'package:threebotlogin/Events/Events.dart';
 import 'package:threebotlogin/helpers/HexColor.dart';
 import 'package:threebotlogin/main.dart';
 import 'package:threebotlogin/services/socketService.dart';
+import 'package:threebotlogin/services/uniLinkService.dart';
+import 'package:uni_links/uni_links.dart';
 
 /* Screen shows tabbar and all pages defined in router.dart */
 class HomeScreen extends StatefulWidget {
-  final String doubleName;
-
-  HomeScreen({this.doubleName});
+  HomeScreen();
 
   _HomeScreenState createState() => _HomeScreenState();
 }
@@ -18,6 +20,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen>
     with WidgetsBindingObserver, SingleTickerProviderStateMixin {
   TabController tabController;
+    StreamSubscription _sub;
 
   _HomeScreenState() {
     tabController = TabController(
@@ -34,7 +37,10 @@ class _HomeScreenState extends State<HomeScreen>
   @override
   void initState() {
     super.initState();
-    createSocketConnection(context, widget.doubleName);
+    _sub = getLinksStream().listen((String incomingLink) {
+      checkWhatPageToOpen(Uri.parse(incomingLink), context);
+    });
+    createSocketConnection(context);
   }
 
   @override

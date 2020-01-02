@@ -24,7 +24,6 @@ mixin EmailMustBeVerified<T extends StatefulWidget> on State<T> {
   }
   
   checkEmailVerified() async {
-    if (!mounted) return;
     var email = await getEmail();
     if (email != null && !email['verified']) {
       var actions = <Widget>[

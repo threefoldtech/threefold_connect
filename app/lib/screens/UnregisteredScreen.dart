@@ -19,6 +19,8 @@ class _UnregisteredScreenState extends State<UnregisteredScreen>
   Future<void> startRegistration() async {
     final bool registered = await Navigator.push(context,
         MaterialPageRoute(builder: (context) => MobileRegistrationScreen()));
+
+    if (registered != null && registered) {
     await Navigator.push(
         context, MaterialPageRoute(builder: (context) => ChangePinScreen()));
     await Navigator.push(
@@ -27,7 +29,6 @@ class _UnregisteredScreenState extends State<UnregisteredScreen>
             builder: (context) => SuccessfulScreen(
                 title: "Registered", text: "You are now registered.")));
 
-    if (registered != null && registered) {
       Navigator.pop(context);
     }
   }

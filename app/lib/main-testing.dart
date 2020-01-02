@@ -29,7 +29,7 @@ class RotatorWidget extends StatefulWidget {
 
 class RotatorWidgetState extends State<RotatorWidget> {
   getNext() async {
-    print("Starting changepincode without current PIN");
+    print("Starting changepincode withWout current PIN");
     // await Navigator.push(
     //     context, MaterialPageRoute(builder: (context) => ChangePinScreen()));
     // print("Starting changepincode with current PIN");
@@ -39,7 +39,7 @@ class RotatorWidgetState extends State<RotatorWidget> {
     //         builder: (context) => ChangePinScreen(currentPin: "1234")));
 
     /*await Navigator.push(
-        context,
+        context,S
         MaterialPageRoute(
             builder: (context) => MobileRegistrationScreen(doubleName: "jdelrue.3bot")));*/
 
@@ -49,9 +49,8 @@ class RotatorWidgetState extends State<RotatorWidget> {
         //   await Navigator.push(
         // context, MaterialPageRoute(builder: (context) => MainScreen(initDone: true,registered: true,)));
 
-    var doubleName = await getDoubleName();
     // var pk = await getPrivateKey();
-    await createSocketConnection(context, doubleName);
+    await createSocketConnection(context);
   }
 
   @override

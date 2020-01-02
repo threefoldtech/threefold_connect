@@ -9,7 +9,7 @@ import configparser
 import database as db
 import logging
 
-from flask import Flask, Response, request, json
+from flask import Flask, Response, request, json, redirect
 from flask_socketio import SocketIO, emit, join_room, leave_room, send
 from flask_cors import CORS
 from datetime import datetime, timedelta
@@ -393,6 +393,15 @@ def show_apps_handler():
 @app.route('/api/minversion', methods=['get'])
 def min_version_handler():
     return Response('45')
+
+@app.route('/api/openapp', methods=['GET'])
+def openapp():
+    state = request.args('state')
+    mobile = request.args('mobile')
+    scope = request.args('scope')
+    appId = request.args('appId')
+    appPublicKey = request.args('appPublicKey')
+    return redirect('threebot://login/?state={}&mobile={}&scope={}&appId={}&appPublicKey={}'.format(state, mobile, scope, appId, appPublicKey), code=302)
 
 
 def verify_signed_data(double_name, data):
