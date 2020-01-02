@@ -55,7 +55,7 @@ class Router {
     return containers;
   }
 
-  List<Container> getIconButtons() {
+  List<Container> getAppButtons() {
     List<Container> iconButtons = [];
     routes.forEach((r) {
       iconButtons.add(Container(

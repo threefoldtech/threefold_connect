@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:threebotlogin/Apps/FreeFlowPages/FfpEvents.dart';
+import 'package:threebotlogin/Events/Events.dart';
 import 'package:threebotlogin/helpers/HexColor.dart';
 import 'package:threebotlogin/main.dart';
 import 'package:threebotlogin/services/socketService.dart';
@@ -13,7 +15,22 @@ class HomeScreen extends StatefulWidget {
   _HomeScreenState createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
+class _HomeScreenState extends State<HomeScreen>
+    with WidgetsBindingObserver, SingleTickerProviderStateMixin {
+  TabController tabController;
+
+  _HomeScreenState() {
+    tabController = TabController(
+        initialIndex: 0, length: Globals().router.routes.length, vsync: this);
+    Events().onEvent(FfpBrowseEvent().runtimeType, activateFfpTab);
+  }
+  activateFfpTab(FfpBrowseEvent event) {
+    int ffpTab = 2;
+    setState(() {
+      tabController.animateTo(ffpTab);
+    });
+  }
+
   @override
   void initState() {
     super.initState();
@@ -27,6 +44,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
       child: Scaffold(
         body: SafeArea(
           child: TabBarView(
+            controller: tabController,
             physics: NeverScrollableScrollPhysics(),
             children: Globals().router.getContent(),
           ),
@@ -37,9 +55,10 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
           height: 65,
           margin: EdgeInsets.all(0.0),
           child: TabBar(
+            controller: tabController,
             isScrollable: false,
             indicatorSize: TabBarIndicatorSize.tab,
-            tabs: Globals().router.getIconButtons(),
+            tabs: Globals().router.getAppButtons(),
             labelPadding: EdgeInsets.all(0.0),
             indicatorPadding: EdgeInsets.all(0.0),
           ),

@@ -15,6 +15,7 @@ class Globals {
   static final color = HexColor("#2d4052");
   ValueNotifier<bool> emailVerified = ValueNotifier(false);
   final Router router = new Router();
+
   /* Singleton */
   static final Globals _singleton = new Globals._internal();
   factory Globals() {

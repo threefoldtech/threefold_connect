@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:threebotlogin/Apps/EmailMustBeVerified.dart';
 import 'package:threebotlogin/Apps/FreeFlowPages/FfpConfig.dart';
+import 'package:threebotlogin/Apps/FreeFlowPages/FfpEvents.dart';
 import 'package:threebotlogin/ClipboardHack/ClipboardHack.dart';
+import 'package:threebotlogin/Events/Events.dart';
 
 import 'package:threebotlogin/services/cryptoService.dart';
 import 'package:threebotlogin/services/userService.dart';
@@ -19,7 +21,6 @@ class _FfpState extends State<FfpWidget>
   String url = "";
   double progress = 0;
   FfpConfig config = FfpConfig();
-
 
   InAppWebView iaWebview;
   _FfpState() {
@@ -39,7 +40,7 @@ class _FfpState extends State<FfpWidget>
       },
       onProgressChanged: (InAppWebViewController controller, int progress) {},
     );
-
+    Events().onEvent(FfpBrowseEvent().runtimeType, _browseToUrl);
   }
 
   @override
@@ -50,6 +51,12 @@ class _FfpState extends State<FfpWidget>
   @override
   void dispose() {
     super.dispose();
+  }
+
+  _browseToUrl(FfpBrowseEvent event) {
+    if (this.webView != null) {
+      this.webView.loadUrl(url: event.url);
+    }
   }
 
   initKeys(String url) async {
@@ -85,7 +92,7 @@ class _FfpState extends State<FfpWidget>
 
   @override
   Widget build(BuildContext context) {
-    if(this.iaWebview == null){
+    if (this.iaWebview == null) {
       return null;
     }
     return Column(

@@ -1,10 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:threebotlogin/Apps/FreeFlowPages/FfpEvents.dart';
+import 'package:threebotlogin/Events/Events.dart';
 
 class RegisteredScreen extends StatefulWidget {
+  static final RegisteredScreen _singleton = new RegisteredScreen._internal();
 
+  factory RegisteredScreen() {
+    return _singleton;
+  }
 
-  RegisteredScreen();
+  RegisteredScreen._internal() {
+   //init
+  }
 
   _RegisteredScreenState createState() => _RegisteredScreenState();
 }
@@ -100,7 +108,9 @@ class _RegisteredScreenState extends State<RegisteredScreen> with WidgetsBinding
                                 'assets/circle_images/tftokens.jpg'),
                             minRadius: 90,
                             maxRadius: 150,
-                          ),
+                          ),onPressed: () {
+                           Events().emit(FfpBrowseEvent(url: 'http://www.google.es'));
+                          },
                         ),
                         Padding(
                           padding: EdgeInsets.all(5),

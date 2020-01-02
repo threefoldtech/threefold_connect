@@ -30,7 +30,6 @@ abstract class FfpConfigImpls {
   String url();
   String cookieUrl();
 }
-
 class FfpConfigStaging extends FfpConfigImpls {
   String appId() {
     return 'staging.freeflowpages.com';
