@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:threebotlogin/screens/MobileRegistrationScreen.dart';
 import 'package:threebotlogin/services/openKYCService.dart';
 import 'package:threebotlogin/services/socketService.dart';
 import 'package:threebotlogin/widgets/CustomDialog.dart';
@@ -95,10 +96,6 @@ class _RegistrationWithoutScanScreen
 
     savePin(pin);
 
-    Map<String, String> keys = await generateKeysFromSeedPhrase(phrase);
-
-    savePrivateKey(keys['privateKey']);
-    savePublicKey(keys['publicKey']);
     saveFingerprint(false);
 
     if (!widget.resetPin) {
@@ -109,7 +106,6 @@ class _RegistrationWithoutScanScreen
 
     // joinRoom(doubleName);
     saveDoubleName(doubleName);
-    savePhrase(phrase);
 
     if (!widget.resetPin) {
       var signedHash = signData(hash, privateKey);

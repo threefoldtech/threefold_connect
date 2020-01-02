@@ -1,9 +1,11 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:threebotlogin/screens/ChangePinScreen.dart';
 import 'package:threebotlogin/screens/HomeScreen.dart';
 import 'package:threebotlogin/screens/LoginScreen.dart';
+import 'package:threebotlogin/screens/MainScreen.dart';
 import 'package:threebotlogin/screens/MobileRegistrationScreen.dart';
 import 'package:threebotlogin/screens/RegistrationWithoutScanScreen.dart';
 import 'package:threebotlogin/screens/SuccessfulScreen.dart';
@@ -13,6 +15,13 @@ import 'package:threebotlogin/services/userService.dart';
 import 'package:threebotlogin/widgets/CustomDialog.dart';
 
 BuildContext ctx;
+Map<String, dynamic> data = {
+  'doubleName': '',
+  'mobile': true,
+  'firstTime': false,
+  'sid': 'random',
+  'state': ''
+};
 
 checkWhatPageToOpen(Uri link, BuildContext context) async {
   String doubleName = await getDoubleName();
@@ -22,13 +31,8 @@ checkWhatPageToOpen(Uri link, BuildContext context) async {
   if (link.host == 'login') {
     var state = link.queryParameters['state'];
     if (doubleName != null) {
-      Map<String, dynamic> data = {
-        'doubleName': doubleName,
-        'mobile': true,
-        'firstTime': false,
-        'sid': 'random',
-        'state': state
-      };
+      data['doubleName'] = doubleName;
+      data['state'] = state;
 
       bool autoLogin = false;
       var scope = jsonDecode(link.queryParameters['scope']);
@@ -41,7 +45,9 @@ checkWhatPageToOpen(Uri link, BuildContext context) async {
         }
       }
 
+      // send login request
       socketLoginMobile(data);
+
       Navigator.push(
           ctx,
           MaterialPageRoute(
@@ -53,29 +59,40 @@ checkWhatPageToOpen(Uri link, BuildContext context) async {
             ctx,
             MaterialPageRoute(
                 builder: (context) => MobileRegistrationScreen()));
-        await Navigator.push(ctx,
-            MaterialPageRoute(builder: (context) => ChangePinScreen()));
 
+        await Navigator.push(
+            ctx, MaterialPageRoute(builder: (context) => ChangePinScreen()));
         if (registered != null && registered) {
-          final bool loggedIn = await Navigator.push(ctx,
-              MaterialPageRoute(builder: (context) => LoginScreen(link.queryParameters)));
-          if(loggedIn != null && loggedIn) {
-            print("user should be logged in");
-            await Navigator.push(ctx,
-              MaterialPageRoute(builder: (context) => HomeScreen()));
-          }
+          await Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => SuccessfulScreen(
+                      title: "Registered", text: "You are now registered.")));
+          await Navigator.push(
+              ctx,
+              MaterialPageRoute(
+                  builder: (context) =>
+                      MainScreen(initDone: true, registered: registered)));
+
+          // Get the doublename and send a login request
+          data['doubleName'] = await getDoubleName();
+          socketLoginMobile(data);
+
+          // After 2 seconds, show the login prompt
+          Timer(
+              Duration(seconds: 2),
+              () => Navigator.push(
+                  ctx,
+                  MaterialPageRoute(
+                      builder: (context) =>
+                          LoginScreen(link.queryParameters))));
         }
       }
     }
   }
   if (link.host == 'register') {
-    Navigator.push(
-        context,
-        MaterialPageRoute(
-            builder: (context) => RegistrationWithoutScanScreen(
-                link.queryParameters,
-                resetPin: false,
-                link: null)));
+    await Navigator.push(ctx,
+        MaterialPageRoute(builder: (context) => MobileRegistrationScreen()));
   } else if (link.host == "registeraccount") {
     // Check if we already have an account registered before showing this screen.
     String privateKey = await getPrivateKey();

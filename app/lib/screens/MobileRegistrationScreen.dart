@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:threebotlogin/main.dart';
 import 'package:threebotlogin/services/3botService.dart';
+import 'package:threebotlogin/services/openKYCService.dart';
 import 'package:threebotlogin/services/toolsService.dart';
 import 'package:threebotlogin/services/cryptoService.dart';
 import 'package:threebotlogin/services/userService.dart';
@@ -123,6 +124,7 @@ class _MobileRegistrationScreenState extends State<MobileRegistrationScreen> {
         emailController.text, 'random', _registrationData.keys['publicKey']);
     if (response.statusCode == 200) {
       saveRegistration();
+
       Navigator.pop(context); // Remove loading screen
       Navigator.pop(context, true); // Pop this
     } else {
@@ -167,6 +169,9 @@ class _MobileRegistrationScreenState extends State<MobileRegistrationScreen> {
     saveEmail(_registrationData.email, false);
     saveDoubleName(_registrationData.doubleName);
     savePhrase(_registrationData.phrase);
+
+    await sendRegisterSign(_registrationData.doubleName);
+    await sendVerificationEmail();
   }
 
   loadingDialog() {
