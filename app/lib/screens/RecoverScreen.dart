@@ -68,9 +68,7 @@ class _RecoverScreenState extends State<RecoverScreen> {
     };
 
     Navigator.push(
-        context,
-        MaterialPageRoute(
-            builder: (context) => ChangePinScreen()));
+        context, MaterialPageRoute(builder: (context) => ChangePinScreen()));
   }
 
   checkSeedLength(seedPhrase) {
@@ -109,37 +107,13 @@ class _RecoverScreenState extends State<RecoverScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-         backgroundColor: Globals.color,
+        backgroundColor: Globals.color,
         title: Text('Recover Account'),
       ),
       body: Container(
-        width: double.infinity,
-        height: double.infinity,
-        color: Theme.of(context).primaryColor,
-        child: Container(
-          child: Container(
-            decoration: BoxDecoration(
-              color: Theme.of(context).scaffoldBackgroundColor,
-            
-            ),
-            child: Container(
-              child: Container(
-                decoration: BoxDecoration(
-                  color: Theme.of(context).scaffoldBackgroundColor,
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(20.0),
-                    topRight: Radius.circular(20.0),
-                  ),
-                ),
-                child: Container(
-                  padding: EdgeInsets.all(20.0),
-                  child: Center(
-                    child: recoverForm(),
-                  ),
-                ),
-              ),
-            ),
-          ),
+        padding: EdgeInsets.all(20.0),
+        child: Center(
+          child: recoverForm(),
         ),
       ),
     );
