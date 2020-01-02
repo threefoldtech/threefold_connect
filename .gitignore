@@ -314,3 +314,4 @@ example/public/config.js
 
 openkyc/*
 Makefile
+*pubspec.lock
