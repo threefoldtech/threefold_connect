@@ -16,8 +16,14 @@ bool connected = false;
 
 String threeBotSocketUrl = AppConfig().threeBotSocketUrl();
 
-createSocketConnection(BuildContext context, String doubleName) async {
+createSocketConnection(BuildContext context) async {
   if (connected) return;
+
+  String doubleName = await getDoubleName();
+  if (doubleName == null) {
+    print('no doublename is set, not opening socket');
+    return;
+  }
 
   print('creating socket connection....');
   socket = IO.io(threeBotSocketUrl, <String, dynamic>{
@@ -26,12 +32,10 @@ createSocketConnection(BuildContext context, String doubleName) async {
 
   socket.on('connect', (res) {
     print('connected');
-    // If a doubleName already exists/provided join room with this doublename
-    if (doubleName != null) {
-      print('joining room....');
-      // once a client has connected, we let him join a room
-      socket.emit('join', {'room': doubleName});
-    }
+    // once a client has connected, we let him join a room
+    socket.emit('join', {'room': doubleName});
+    print('joined room');
+    connected = true;
   });
 
   socket.on('signed', (data) {

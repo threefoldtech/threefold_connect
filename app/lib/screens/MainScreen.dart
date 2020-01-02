@@ -1,16 +1,19 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:threebotlogin/main.dart';
 import 'package:threebotlogin/screens/HomeScreen.dart';
 import 'package:threebotlogin/screens/InitScreen.dart';
 import 'package:threebotlogin/screens/UnregisteredScreen.dart';
 import 'package:threebotlogin/widgets/ErrorWidget.dart';
+import 'package:threebotlogin/services/uniLinkService.dart';
+import 'package:uni_links/uni_links.dart';
 
 class MainScreen extends StatefulWidget {
   final bool initDone;
   final bool registered;
-  final String doubleName;
 
-  MainScreen({this.initDone, this.registered, this.doubleName});
+  MainScreen({this.initDone, this.registered});
 
   @override
   _AppState createState() => _AppState();
@@ -18,6 +21,7 @@ class MainScreen extends StatefulWidget {
 
 class _AppState extends State<MainScreen> {
   _AppState();
+  StreamSubscription _sub;
 
   pushScreens() async {
     if (widget.initDone != null && !widget.initDone) {
@@ -34,16 +38,22 @@ class _AppState extends State<MainScreen> {
     Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-            builder: (context) => HomeScreen(
-                  doubleName: widget.doubleName,
-                )));
+            builder: (context) => HomeScreen()));
   }
 
   @override
   void initState() {
     super.initState();
-
+    _sub = getLinksStream().listen((String incomingLink) {
+      checkWhatPageToOpen(Uri.parse(incomingLink), context);
+    });
     WidgetsBinding.instance.addPostFrameCallback((_) => pushScreens());
+  }
+
+  @override
+  void dispose() {
+    _sub.cancel();
+    super.dispose();
   }
 
   @override

@@ -130,12 +130,13 @@ class _MobileRegistrationScreenState extends State<MobileRegistrationScreen> {
       print("ELSE????");
     }
   }
+
   initKeys() async {
-           if (_registrationData.phrase == null ||
-            _registrationData.phrase == '') {
-          _registrationData.phrase = await generateSeedPhrase();
-        }
+    if (_registrationData.phrase == null || _registrationData.phrase == '') {
+      _registrationData.phrase = await generateSeedPhrase();
+    }
   }
+
   checkStep(currentStep) async {
     switch (currentStep) {
       case _State.DoubleName:

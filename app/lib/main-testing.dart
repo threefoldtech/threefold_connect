@@ -49,9 +49,8 @@ class RotatorWidgetState extends State<RotatorWidget> {
         //   await Navigator.push(
         // context, MaterialPageRoute(builder: (context) => MainScreen(initDone: true,registered: true,)));
 
-    var doubleName = await getDoubleName();
     // var pk = await getPrivateKey();
-    await createSocketConnection(context, doubleName);
+    await createSocketConnection(context);
   }
 
   @override

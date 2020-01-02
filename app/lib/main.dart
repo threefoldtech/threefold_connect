@@ -39,7 +39,6 @@ Future<void> main() async {
 
   runApp(MyApp(
       initDone: initDone,
-      doubleName: doubleName,
       registered: registered));
 }
 
@@ -59,8 +58,8 @@ class MyApp extends StatelessWidget {
         ),
         home: new MainScreen(
             initDone: initDone,
-            registered: registered,
-          
-            doubleName: doubleName));
+            registered: registered
+        )
+    );
   }
 }
