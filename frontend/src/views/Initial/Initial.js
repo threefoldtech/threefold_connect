@@ -67,8 +67,7 @@ export default {
       this.setAppPublicKey(this.$route.query.publickey || null)
       if (this.$route.query.scope === undefined) {
         this.setScope(JSON.stringify({ doubleName: true, email: false, keys: false }))
-      }
-      else {
+      } else {
         this.setScope(this.$route.query.scope || null)
       }
     } else {
@@ -139,7 +138,7 @@ export default {
           mobile: isMobile,
           firstTime: false
         })
-        var url = `threebot://login/?state=${encodeURIComponent(this.hash)}&mobile=true`
+        var url = `/api/openapp?state=${encodeURIComponent(this.hash)}&mobile=true`
         if (this.scope) url += `&scope=${encodeURIComponent(this.scope)}`
         if (this.appId) url += `&appId=${encodeURIComponent(this.appId)}`
         if (this.appPublicKey) url += `&appPublicKey=${encodeURIComponent(this.appPublicKey)}`

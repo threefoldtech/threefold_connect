@@ -396,12 +396,23 @@ def min_version_handler():
 
 @app.route('/api/openapp', methods=['GET'])
 def openapp():
-    state = request.args('state')
-    mobile = request.args('mobile')
-    scope = request.args('scope')
-    appId = request.args('appId')
-    appPublicKey = request.args('appPublicKey')
-    return redirect('threebot://login/?state={}&mobile={}&scope={}&appId={}&appPublicKey={}'.format(state, mobile, scope, appId, appPublicKey), code=302)
+    params = '?'
+    params = '{}&state={}'.format(params, request.args['state'])
+    try:
+        if 'mobile' in request.args:
+            params = '{}&mobile={}'.format(params, request.args['mobile'])
+        if 'scope' in request.args:
+            params = '{}&scope={}'.format(params, request.args['scope'])
+        if 'appId' in request.args:
+            params = '{}&appid={}'.format(params, request.args['appid'])
+        if 'appPublicKey' in request.args:
+            params = '{}&appPublicKey={}'.format(params, request.args['appPublicKey'])
+
+    except:
+        e = sys.exc_info()[0]
+        print("ERROR {}".format(e))
+    print('threebot://login/?{}'.format(params))
+    return redirect('threebot://login/?{}'.format(params), code=302)
 
 
 def verify_signed_data(double_name, data):
