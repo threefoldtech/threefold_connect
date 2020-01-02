@@ -301,7 +301,7 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
               onPressed: () async {
                 bool result = await clearData();
                 if (result) {
-                  await Navigator.push(
+                  await Navigator.pushReplacement(
                       //@todo this feels like a bug, should not push on current screen
                       context,
                       MaterialPageRoute(
