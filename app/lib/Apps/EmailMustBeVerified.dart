@@ -10,10 +10,11 @@ mixin EmailMustBeVerified<T extends StatefulWidget> on State<T> {
   bool get isHidden {
     return hidden;
   }
-  updateHidden(){
-   setState(() {
-        hidden = Globals().emailVerified.value;
-      });
+
+  updateHidden() {
+    setState(() {
+      hidden = Globals().emailVerified.value;
+    });
   }
 
   @override
@@ -22,7 +23,7 @@ mixin EmailMustBeVerified<T extends StatefulWidget> on State<T> {
     WidgetsBinding.instance.addPostFrameCallback((_) => checkEmailVerified());
     Globals().emailVerified.addListener(updateHidden);
   }
-  
+
   checkEmailVerified() async {
     var email = await getEmail();
     if (email != null && !email['verified']) {
@@ -42,11 +43,10 @@ mixin EmailMustBeVerified<T extends StatefulWidget> on State<T> {
             description: Text('Please verify email first.'),
             actions: actions),
       );
-    }else{
+    } else {
       setState(() {
         hidden = false;
       });
-      
     }
   }
 }
