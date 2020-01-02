@@ -21,13 +21,13 @@ class _UnregisteredScreenState extends State<UnregisteredScreen>
         MaterialPageRoute(builder: (context) => MobileRegistrationScreen()));
 
     if (registered != null && registered) {
-    await Navigator.push(
-        context, MaterialPageRoute(builder: (context) => ChangePinScreen()));
-    await Navigator.push(
-        context,
-        MaterialPageRoute(
-            builder: (context) => SuccessfulScreen(
-                title: "Registered", text: "You are now registered.")));
+      await Navigator.push(
+          context, MaterialPageRoute(builder: (context) => ChangePinScreen()));
+      await Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) => SuccessfulScreen(
+                  title: "Registered", text: "You are now registered.")));
 
       Navigator.pop(context);
     }
@@ -36,15 +36,15 @@ class _UnregisteredScreenState extends State<UnregisteredScreen>
   Future<void> startRecovery() async {
     final bool registered = await Navigator.push(
         context, MaterialPageRoute(builder: (context) => RecoverScreen()));
-    await Navigator.push(
-        context, MaterialPageRoute(builder: (context) => ChangePinScreen()));
-    await Navigator.push(
-        context,
-        MaterialPageRoute(
-            builder: (context) => SuccessfulScreen(
-                title: "Registered", text: "You are now registered.")));
-
     if (registered != null && registered) {
+      await Navigator.push(
+          context, MaterialPageRoute(builder: (context) => ChangePinScreen()));
+      await Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) => SuccessfulScreen(
+                  title: "Registered", text: "You are now registered.")));
+
       Navigator.pop(context);
     }
   }
