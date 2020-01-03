@@ -5,7 +5,6 @@ import 'package:threebotlogin/main.dart';
 import 'package:threebotlogin/screens/HomeScreen.dart';
 import 'package:threebotlogin/screens/InitScreen.dart';
 import 'package:threebotlogin/screens/UnregisteredScreen.dart';
-import 'package:threebotlogin/services/openKYCService.dart';
 import 'package:threebotlogin/widgets/ErrorWidget.dart';
 import 'package:threebotlogin/services/uniLinkService.dart';
 import 'package:uni_links/uni_links.dart';
@@ -35,7 +34,6 @@ class _AppState extends State<MainScreen> {
     }
 
     await Globals().router.init();
-    sendVerificationEmail();
     Navigator.pushReplacement(
         context,
         MaterialPageRoute(

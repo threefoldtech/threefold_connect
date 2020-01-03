@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:threebotlogin/Apps/Wallet/walletUserData.dart';
 import 'package:threebotlogin/ClipboardHack/ClipboardHack.dart';
+import 'package:threebotlogin/screens/ScanScreen.dart';
 import 'package:threebotlogin/services/cryptoService.dart';
 import 'package:threebotlogin/services/toolsService.dart';
 import 'package:threebotlogin/services/userService.dart';
@@ -26,8 +27,7 @@ class _WalletState extends State<WalletWidget>
 
   _WalletState() {
     iaWebView = InAppWebView(
-        initialUrl:
-            'https://${config.appId()}/error?nocache=1', 
+        initialUrl:  'http://192.168.2.229:8080/init', //https://${config.appId()}/init',
         initialHeaders: {},
         initialOptions: InAppWebViewWidgetOptions(
             crossPlatform: InAppWebViewOptions(debuggingEnabled: true),
@@ -41,12 +41,10 @@ class _WalletState extends State<WalletWidget>
             (InAppWebViewController controller, OnCreateWindowRequest req) {},
         onLoadStart: (InAppWebViewController controller, String url) {
           addClipboardHack(controller);
-          setState(() {
-            this.url = url;
-          });
+
         },
         onLoadStop: (InAppWebViewController controller, String url) async {
-          if (url.contains('/error')) {
+          if (url.contains('/init')) {
             initKeys();
             initWallets();
           }
@@ -68,31 +66,11 @@ class _WalletState extends State<WalletWidget>
   }
 
   initKeys() async {
-    final union = '?';
+    var seed = await getDerivedSeed(config.appId());
+    var doubleName = await getDoubleName();
+    var jsStartApp = "window.vueInstance.startWallet('$doubleName', '$seed');";
 
-    var keys = await generateKeyPair();
-
-    final state = randomString(15);
-
-    final privateKey = await getPrivateKey();
-    final signedHash = await signData(state, privateKey);
-
-    var jsToExecute =
-        "(function() { try {localStorage.setItem('tempKeys', \'{\"privateKey\": \"${keys["privateKey"]}\", \"publicKey\": \"${keys["publicKey"]}\"}\');  localStorage.setItem('state', '$state'); } catch (err) { return err; } })();";
-
-    webView.evaluateJavascript(source: jsToExecute);
-    print(jsToExecute);
-    var scope = {};
-    scope['doubleName'] = await getDoubleName();
-    scope['derivedSeed'] = await getDerivedSeed(config.appId());
-    var encrypted =
-        await encrypt(jsonEncode(scope), keys["publicKey"], privateKey);
-    var jsonData = jsonEncode(encrypted);
-    var data = Uri.encodeQueryComponent(jsonData); //Uri.encodeFull();
-
-    var loadUrl = //${config.appId()}
-        'http://${config.appId()}/${config.redirectUrl()}${union}username=${await getDoubleName()}&signedhash=${Uri.encodeQueryComponent(signedHash)}&data=$data';
-    webView.loadUrl(url: loadUrl);
+    webView.evaluateJavascript(source: jsStartApp);
   }
 
   initWallets() async {
@@ -123,7 +101,8 @@ class _WalletState extends State<WalletWidget>
   }
 
   scanQrCode(List<dynamic> params) async {
-    dynamic result = await Navigator.pushNamed(context, '/scan');
+    dynamic result = await Navigator.push(context,
+        MaterialPageRoute(builder: (context) => ScanScreen()));
     return result;
   }
 
