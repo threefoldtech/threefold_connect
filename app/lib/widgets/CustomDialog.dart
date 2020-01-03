@@ -17,6 +17,25 @@ class CustomDialog extends StatelessWidget {
     this.image = Icons.person,
     this.hiddenaction,
   });
+  show(context) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) => CustomDialog(
+        image: Icons.error,
+        title: "Please verify email",
+        description: new Text("Please verify email before using this app"),
+        actions: <Widget>[ //@todo make this configurable, ok;okcancel
+          FlatButton(
+            child: new Text("Ok"),
+            onPressed: () {
+              Navigator.pop(context);
+            },
+          )
+        ],
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
