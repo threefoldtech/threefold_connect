@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:threebotlogin/Apps/FreeFlowPages/FfpConfig.dart';
 import 'package:threebotlogin/Apps/FreeFlowPages/FfpEvents.dart';
+import 'package:threebotlogin/Browser.dart';
 import 'package:threebotlogin/ClipboardHack/ClipboardHack.dart';
 import 'package:threebotlogin/Events/Events.dart';
 
@@ -14,8 +15,7 @@ class FfpWidget extends StatefulWidget {
   _FfpState createState() => new _FfpState();
 }
 
-class _FfpState extends State<FfpWidget>
-    with AutomaticKeepAliveClientMixin {
+class _FfpState extends State<FfpWidget> with AutomaticKeepAliveClientMixin {
   InAppWebViewController webView;
   String url = "";
   double progress = 0;
@@ -26,12 +26,13 @@ class _FfpState extends State<FfpWidget>
     iaWebview = new InAppWebView(
       initialUrl: config.cookieUrl(),
       initialHeaders: {},
-      initialOptions: InAppWebViewWidgetOptions(),
+      initialOptions: InAppWebViewWidgetOptions(
+          android: AndroidInAppWebViewOptions(supportMultipleWindows: true)),
       onLoadStart: (InAppWebViewController controller, String url) {
         webView = controller;
-         if (url.contains('state')){
-           controller.stopLoading();
-         }
+        if (url.contains('state')) {
+          controller.stopLoading();
+        }
         initKeys(url);
       },
       onLoadStop: (InAppWebViewController controller, String url) async {
@@ -39,6 +40,10 @@ class _FfpState extends State<FfpWidget>
         controller.injectCSSCode(
             source: ".crisp-client {display: none !important;}");
         addClipboardHack(controller);
+      },
+      onCreateWindow:
+          (InAppWebViewController controller, OnCreateWindowRequest req) {
+        inAppBrowser.open(url: req.url, options: InAppBrowserClassOptions());
       },
       onProgressChanged: (InAppWebViewController controller, int progress) {},
     );
