@@ -4,8 +4,12 @@ import 'package:flutter/widgets.dart';
 import 'dart:convert';
 import 'package:crypto/crypto.dart';
 import 'package:threebotlogin/main.dart';
+import 'package:threebotlogin/screens/HomeScreen.dart';
+import 'package:threebotlogin/screens/MainScreen.dart';
 import 'package:threebotlogin/services/3botService.dart';
 import 'package:threebotlogin/services/cryptoService.dart';
+import 'package:threebotlogin/services/openKYCService.dart';
+import 'package:threebotlogin/services/userService.dart';
 import 'ChangePinScreen.dart';
 
 class RecoverScreen extends StatefulWidget {
@@ -59,16 +63,15 @@ class _RecoverScreenState extends State<RecoverScreen> {
   }
 
   continueRecoverAccount() async {
-    var registrationData = {
-      "privateKey": privateKey,
-      "doubleName": doubleName,
-      "emailVerified": emailVerified,
-      "email": emailFromForm,
-      "phrase": seedPhrase,
-    };
+    Map<String, String> keys = await generateKeysFromSeedPhrase(seedPhrase);
 
-    Navigator.push(
-        context, MaterialPageRoute(builder: (context) => ChangePinScreen()));
+    await savePrivateKey(keys['privateKey']);
+    await savePublicKey(keys['publicKey']);
+    await saveFingerprint(false);
+    await saveEmail(emailFromForm, null);
+    await saveDoubleName(doubleName);
+    await savePhrase(seedPhrase);
+    await sendVerificationEmail();
   }
 
   checkSeedLength(seedPhrase) {
@@ -147,7 +150,7 @@ class _RecoverScreenState extends State<RecoverScreen> {
                   controller: doubleNameController,
                   validator: (value) {
                     if (value.isEmpty) {
-                      return 'Enter your Name';
+                      return 'Please enter your Name';
                     }
                     return null;
                   }),
@@ -160,7 +163,7 @@ class _RecoverScreenState extends State<RecoverScreen> {
                     border: OutlineInputBorder(), labelText: 'Email'),
                 validator: (value) {
                   if (value.isEmpty) {
-                    return 'Enter your Email';
+                    return 'Please enter your Email';
                   }
                   return null;
                 },
@@ -177,7 +180,7 @@ class _RecoverScreenState extends State<RecoverScreen> {
                 controller: seedPhrasecontroller,
                 validator: (value) {
                   if (value.isEmpty) {
-                    return 'Enter your Seedphrase';
+                    return 'Please enter your Seed phrase';
                   }
                   return null;
                 },
@@ -239,15 +242,19 @@ class _RecoverScreenState extends State<RecoverScreen> {
                       emailFromForm.isNotEmpty &&
                       emailCheck == true) {
                     await checkSeedPhrase(doubleName, seedPhrase);
-                    // await checkEmail(doubleName, (emailFromForm.toLowerCase()));
-                    Navigator.pop(context);
                     await continueRecoverAccount();
+                  } else {
+                    throw new Exception("");
                   }
-                } catch (e) {
+
                   Navigator.pop(context);
+                  Navigator.pop(context, true);
+                } catch (e) {
+                  Navigator.pop(context, false);
                   setState(() {
                     // error = e.message;
-                    error = 'Invalid seed phrase.';
+                    error =
+                        'Please make sure everything is correctly filled in';
                   });
                 }
               },
