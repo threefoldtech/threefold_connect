@@ -160,7 +160,7 @@ class _RecoverScreenState extends State<RecoverScreen> {
                     border: OutlineInputBorder(), labelText: 'Email'),
                 validator: (value) {
                   if (value.isEmpty) {
-                    return 'Enter an email';
+                    return 'Enter your Email';
                   }
                   return null;
                 },
@@ -242,13 +242,12 @@ class _RecoverScreenState extends State<RecoverScreen> {
                     // await checkEmail(doubleName, (emailFromForm.toLowerCase()));
                     Navigator.pop(context);
                     await continueRecoverAccount();
-                  } else {
-                    throw new Exception('Please enter an email.');
                   }
                 } catch (e) {
                   Navigator.pop(context);
                   setState(() {
-                    error = e.message;
+                    // error = e.message;
+                    error = 'Invalid seed phrase.';
                   });
                 }
               },
