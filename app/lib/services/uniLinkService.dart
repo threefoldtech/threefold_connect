@@ -89,42 +89,4 @@ checkWhatPageToOpen(Uri link, BuildContext context) async {
       }
     }
   }
-  // Where is this used ?
-  if (link.host == 'register') {
-    await Navigator.push(ctx,
-        MaterialPageRoute(builder: (context) => MobileRegistrationScreen()));
-  } else if (link.host == "registeraccount") {
-    // Check if we already have an account registered before showing this screen.
-    String privateKey = await getPrivateKey();
-
-    if (doubleName == null || privateKey == null) {
-      Navigator.popUntil(context, ModalRoute.withName('/'));
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => MobileRegistrationScreen(
-              doubleName: link.queryParameters['doubleName']),
-        ),
-      );
-    } else {
-      showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (BuildContext context) => CustomDialog(
-          image: Icons.check,
-          title: "You're already logged in",
-          description: new Text(
-              "We cannot create a new account, you already have an account registered on your device. Please restart the application if this message persists."),
-          actions: <Widget>[
-            FlatButton(
-              child: new Text("Ok"),
-              onPressed: () {
-                Navigator.pop(context);
-              },
-            ),
-          ],
-        ),
-      );
-    }
-  }
 }
