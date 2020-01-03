@@ -89,7 +89,7 @@ class _UnregisteredScreenState extends State<UnregisteredScreen>
                       Padding(
                         padding: const EdgeInsets.only(left: 8.0),
                         child: Text(
-                          "Bot",
+                          "Bot Connect",
                           style: TextStyle(
                               fontSize: 40,
                               fontWeight: FontWeight.bold,
@@ -122,7 +122,7 @@ class _UnregisteredScreenState extends State<UnregisteredScreen>
                           ),
                           SizedBox(width: 10.0),
                           Text(
-                            'Register Now!',
+                            'Register now',
                             style: TextStyle(color: Colors.white),
                           ),
                         ],
