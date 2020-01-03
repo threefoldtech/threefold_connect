@@ -29,6 +29,9 @@ class _FfpState extends State<FfpWidget>
       initialOptions: InAppWebViewWidgetOptions(),
       onLoadStart: (InAppWebViewController controller, String url) {
         webView = controller;
+         if (url.contains('state')){
+           controller.stopLoading();
+         }
         initKeys(url);
       },
       onLoadStop: (InAppWebViewController controller, String url) async {
@@ -59,7 +62,7 @@ class _FfpState extends State<FfpWidget>
   }
 
   initKeys(String url) async {
-    if (!url.contains('state')) {
+    if (!url.contains('state') || url.contains('threebot://')) {
       return;
     }
 
