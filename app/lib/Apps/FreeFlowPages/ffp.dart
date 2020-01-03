@@ -14,4 +14,9 @@ class Ffp implements App{
   void clearData(){
     //clearAllData();
   }
+
+  @override
+  bool emailVerificationRequired() {
+    return true;
+  }
 }

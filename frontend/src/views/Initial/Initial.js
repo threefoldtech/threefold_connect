@@ -142,7 +142,7 @@ export default {
         if (this.scope) url += `&scope=${encodeURIComponent(this.scope)}`
         if (this.appId) url += `&appId=${encodeURIComponent(this.appId)}`
         if (this.appPublicKey) url += `&appPublicKey=${encodeURIComponent(this.appPublicKey)}`
-        if (this.hash) url += `&state=${encodeURIComponent(this.hash)}`
+        if (this.redirectUrl) url += `&redirecturl=${encodeURIComponent(this.redirectUrl)}`
         console.log(url)
         if (/iPhone|iPad|iPod/i.test(navigator.userAgent)) {
           window.location.replace(url)
@@ -163,6 +163,7 @@ export default {
         if (this.appId) url += `&appId=${encodeURIComponent(this.appId)}`
         if (this.appPublicKey) url += `&appPublicKey=${encodeURIComponent(this.appPublicKey)}`
         if (this.$route.query.logintoken) url += `&logintoken=${encodeURIComponent(this.$route.query.logintoken)}`
+
         window.open(url)
       }
       this.$router.push({

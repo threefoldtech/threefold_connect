@@ -99,8 +99,7 @@ Future openLogin(context, data) async {
     }
   } else if (messageType == 'email_verification') {
     getEmail().then((email) async {
-      if (email['email'] != null &&
-          (await getSignedEmailIdentifier()) == null) {
+      if (email['email'] != null) {
         var tmpDoubleName = (await getDoubleName()).toLowerCase();
 
         getSignedEmailIdentifierFromOpenKYC(tmpDoubleName)
@@ -118,8 +117,7 @@ Future openLogin(context, data) async {
             if (vsei != null &&
                 vsei["email"] == email["email"] &&
                 vsei["identifier"] == tmpDoubleName) {
-              await saveEmail(vsei["email"], true);
-              await saveSignedEmailIdentifier(signedEmailIdentifier);
+              await saveEmail(vsei["email"], signedEmailIdentifier);
 
               showDialog(
                 context: context,
@@ -138,8 +136,7 @@ Future openLogin(context, data) async {
                 ),
               );
             } else {
-              await saveEmail(email["email"], false);
-              await removeSignedEmailIdentifier();
+              await saveEmail(email["email"], null);
             }
           }
         });

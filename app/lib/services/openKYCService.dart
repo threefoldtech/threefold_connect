@@ -40,17 +40,7 @@ Future checkVerificationStatus(String doubleName) async {
   return http.get('$openKycApiUrl/users/$doubleName', headers: requestHeaders);
 }
 
-Future<http.Response> resendVerificationEmail() async {
-  return http.post('$openKycApiUrl/users',
-      body: json.encode({
-        'user_id': await getDoubleName(),
-        'email': (await getEmail())['email'],
-        'callback_url': threeBotFrontEndUrl + "verifyemail",
-        'public_key': await getPublicKey(),
-        'resend': 'true'
-      }),
-      headers: requestHeaders);
-}
+
 
 Future<http.Response> sendVerificationEmail() async {
   return http.post('$openKycApiUrl/users',

@@ -8,6 +8,7 @@ import 'package:threebotlogin/helpers/HexColor.dart';
 import 'package:threebotlogin/main.dart';
 import 'package:threebotlogin/services/socketService.dart';
 import 'package:threebotlogin/services/uniLinkService.dart';
+import 'package:threebotlogin/widgets/EmailVerificationNeeded.dart';
 import 'package:uni_links/uni_links.dart';
 
 /* Screen shows tabbar and all pages defined in router.dart */
@@ -19,18 +20,29 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen>
     with WidgetsBindingObserver, SingleTickerProviderStateMixin {
-  TabController tabController;
-    StreamSubscription _sub;
+  TabController _tabController;
+  StreamSubscription _sub;
 
   _HomeScreenState() {
-    tabController = TabController(
+    _tabController = TabController(
         initialIndex: 0, length: Globals().router.routes.length, vsync: this);
     Events().onEvent(FfpBrowseEvent().runtimeType, activateFfpTab);
+    _tabController.addListener(_handleTabSelection);
   }
+
+  _handleTabSelection() async {
+    if (_tabController.indexIsChanging) {
+      if (Globals().router.emailMustBeVerified(_tabController.index) && !Globals().emailVerified.value) {
+        _tabController.animateTo(_tabController.previousIndex);
+        await emailVerificationDialog(context);
+      }
+    }
+  }
+
   activateFfpTab(FfpBrowseEvent event) {
     int ffpTab = 2;
     setState(() {
-      tabController.animateTo(ffpTab);
+      _tabController.animateTo(ffpTab);
     });
   }
 
@@ -50,7 +62,7 @@ class _HomeScreenState extends State<HomeScreen>
       child: Scaffold(
         body: SafeArea(
           child: TabBarView(
-            controller: tabController,
+            controller: _tabController,
             physics: NeverScrollableScrollPhysics(),
             children: Globals().router.getContent(),
           ),
@@ -61,7 +73,7 @@ class _HomeScreenState extends State<HomeScreen>
           height: 65,
           margin: EdgeInsets.all(0.0),
           child: TabBar(
-            controller: tabController,
+            controller: _tabController,
             isScrollable: false,
             indicatorSize: TabBarIndicatorSize.tab,
             tabs: Globals().router.getAppButtons(),

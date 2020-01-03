@@ -3,13 +3,10 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:threebotlogin/screens/ChangePinScreen.dart';
-import 'package:threebotlogin/screens/HomeScreen.dart';
 import 'package:threebotlogin/screens/LoginScreen.dart';
 import 'package:threebotlogin/screens/MainScreen.dart';
 import 'package:threebotlogin/screens/MobileRegistrationScreen.dart';
-import 'package:threebotlogin/screens/RegistrationWithoutScanScreen.dart';
 import 'package:threebotlogin/screens/SuccessfulScreen.dart';
-import 'package:threebotlogin/screens/UnregisteredScreen.dart';
 import 'package:threebotlogin/services/socketService.dart';
 import 'package:threebotlogin/services/userService.dart';
 import 'package:threebotlogin/widgets/CustomDialog.dart';

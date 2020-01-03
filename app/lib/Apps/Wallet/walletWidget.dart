@@ -7,7 +7,6 @@ import 'package:threebotlogin/services/cryptoService.dart';
 import 'package:threebotlogin/services/toolsService.dart';
 import 'package:threebotlogin/services/userService.dart';
 
-
 import 'WalletConfig.dart';
 
 bool created = false;
@@ -28,7 +27,7 @@ class _WalletState extends State<WalletWidget>
   _WalletState() {
     iaWebView = InAppWebView(
         initialUrl: //'http://192.168.2.90:8080/handlertest.html?nocache',//
-            'http://192.168.2.120:8080/error?cache=2', //'https://${config.appId()}', //http://192.168.2.120:8080/', //'http://192.168.0.221:8080/handlertest.html?nocache=3',
+            'https://${config.appId()}/error', //http://192.168.2.120:8080/', //'http://192.168.0.221:8080/handlertest.html?nocache=3',
         initialHeaders: {},
         initialOptions: InAppWebViewWidgetOptions(
             crossPlatform: InAppWebViewOptions(debuggingEnabled: true),
@@ -37,8 +36,6 @@ class _WalletState extends State<WalletWidget>
         onWebViewCreated: (InAppWebViewController controller) {
           webView = controller;
           this.addHandler();
-          initKeys();
-          initWallets();
         },
         onCreateWindow:
             (InAppWebViewController controller, OnCreateWindowRequest req) {},
@@ -49,9 +46,10 @@ class _WalletState extends State<WalletWidget>
           });
         },
         onLoadStop: (InAppWebViewController controller, String url) async {
-          setState(() {
-            this.url = url;
-          });
+          if (url.contains('/error')) {
+            initKeys();
+            initWallets();
+          }
         },
         onProgressChanged: (InAppWebViewController controller, int progress) {
           setState(() {
@@ -93,9 +91,7 @@ class _WalletState extends State<WalletWidget>
     var data = Uri.encodeQueryComponent(jsonData); //Uri.encodeFull();
 
     var loadUrl = //${config.appId()}
-        'http://192.168.2.120:8080/${config.redirectUrl()}${union}username=${await getDoubleName()}&signedhash=${Uri.encodeQueryComponent(signedHash)}&data=$data';
-    print("LOADURL");
-    print(loadUrl);
+        'http://${config.appId()}/${config.redirectUrl()}${union}username=${await getDoubleName()}&signedhash=${Uri.encodeQueryComponent(signedHash)}&data=$data';
     webView.loadUrl(url: loadUrl);
   }
 

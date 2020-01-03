@@ -9,8 +9,13 @@ class Wallet implements App {
   Future<Widget> widget() async{
     return  WalletWidget();
   }
-
+ 
   void clearData(){
     clearAllData();
+  }
+
+  @override
+  bool emailVerificationRequired() {
+    return false;
   }
 }

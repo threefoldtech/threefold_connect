@@ -344,31 +344,5 @@ import 'openKYCService.dart';
 //           });
 // }
 // */
-void sendVerificationEmail(BuildContext context) async {
-  final snackbarResending = SnackBar(
-      content: Text('Resending verification email...'),
-      duration: Duration(seconds: 1));
-  Scaffold.of(context).showSnackBar(snackbarResending);
-  await resendVerificationEmail();
-  _showResendEmailDialog(context);
-}
 
-void _showResendEmailDialog(BuildContext context) {
-  showDialog(
-    context: context,
-    barrierDismissible: false,
-    builder: (BuildContext context) => CustomDialog(
-      image: Icons.check,
-      title: "Email has been resent.",
-      description: new Text("A new verification email has been sent."),
-      actions: <Widget>[
-        FlatButton(
-          child: new Text("Ok"),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
-      ],
-    ),
-  );
-}
+
