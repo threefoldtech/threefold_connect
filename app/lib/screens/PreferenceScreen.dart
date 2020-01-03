@@ -9,6 +9,7 @@ import 'package:threebotlogin/services/fingerprintService.dart';
 import 'package:threebotlogin/services/openKYCService.dart';
 import 'package:threebotlogin/services/userService.dart';
 import 'package:threebotlogin/widgets/CustomDialog.dart';
+import 'package:threebotlogin/widgets/EmailVerificationNeeded.dart';
 import 'package:threebotlogin/widgets/PinField.dart';
 
 class PreferenceScreen extends StatefulWidget {
@@ -89,20 +90,24 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
         ),
         Material(
           child: ListTile(
-            trailing: !emailVerified ? Icon(Icons.refresh) : null,
-            leading: Icon(Icons.mail),
-            title: Text(emailAdress.toLowerCase()),
-            subtitle: !emailVerified
-                ? Text(
-                    "Unverified",
-                    style: TextStyle(color: Colors.grey),
-                  )
-                : Text(
-                    "Verified",
-                    style: TextStyle(color: Colors.green),
-                  ),
-            onTap: !emailVerified ? sendVerificationEmail : null,
-          ),
+              trailing: !emailVerified ? Icon(Icons.refresh) : null,
+              leading: Icon(Icons.mail),
+              title: Text(emailAdress.toLowerCase()),
+              subtitle: !emailVerified
+                  ? Text(
+                      "Unverified",
+                      style: TextStyle(color: Colors.grey),
+                    )
+                  : Text(
+                      "Verified",
+                      style: TextStyle(color: Colors.green),
+                    ),
+              onTap: () {
+                if (!emailVerified) {
+                  sendVerificationEmail();
+                  emailResendedDialog(context);
+                }
+              }),
         ),
         FutureBuilder(
           future: getPhrase(),
@@ -328,8 +333,6 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
       ),
     );
   }
-
-
 
   void _showPinDialog(callbackParam) {
     if (callbackParam == 'fingerprint') {

@@ -85,7 +85,7 @@ class _RecoverScreenState extends State<RecoverScreen> {
     RegExp regex = new RegExp(pattern);
     if (!regex.hasMatch(value)) {
       emailCheck = false;
-      return 'Enter Valid Email';
+      return 'Enter valid e-mail';
     }
     emailCheck = true;
     return null;

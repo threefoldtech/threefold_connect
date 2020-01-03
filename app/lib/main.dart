@@ -37,7 +37,7 @@ Future<void> main() async {
   }
   bool initDone = await getInitDone();
   String doubleName = await getDoubleName();
-  await saveEmail('jonas.delrue@jimber.org', null);
+
   var email = await getEmail();
   // Email is now a tuple of address and the signedemail identifier, the bool is removed. But we need to migrate t. To be removed next version.
 

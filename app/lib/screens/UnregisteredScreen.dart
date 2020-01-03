@@ -5,6 +5,7 @@ import 'package:threebotlogin/screens/ChangePinScreen.dart';
 import 'package:threebotlogin/screens/MobileRegistrationScreen.dart';
 import 'package:threebotlogin/screens/RecoverScreen.dart';
 import 'package:threebotlogin/screens/SuccessfulScreen.dart';
+import 'package:threebotlogin/widgets/CustomDialog.dart';
 
 class UnregisteredScreen extends StatefulWidget {
   UnregisteredScreen();
@@ -28,7 +29,8 @@ class _UnregisteredScreenState extends State<UnregisteredScreen>
           MaterialPageRoute(
               builder: (context) => SuccessfulScreen(
                   title: "Registered", text: "You are now registered.")));
-
+     /* CustomDialog(
+          title: "Registered", description: Text("You are now registered.")).show(context);*/
       Navigator.pop(context);
     }
   }
@@ -89,7 +91,7 @@ class _UnregisteredScreenState extends State<UnregisteredScreen>
                       Padding(
                         padding: const EdgeInsets.only(left: 8.0),
                         child: Text(
-                          "Bot",
+                          "Bot Connect",
                           style: TextStyle(
                               fontSize: 40,
                               fontWeight: FontWeight.bold,
@@ -122,7 +124,7 @@ class _UnregisteredScreenState extends State<UnregisteredScreen>
                           ),
                           SizedBox(width: 10.0),
                           Text(
-                            'Register Now!',
+                            'Register now',
                             style: TextStyle(color: Colors.white),
                           ),
                         ],
