@@ -134,6 +134,8 @@ def force_refetch_handler():
     loggin_attempt = db.getAuthByStateHash(conn, data['hash'])
     logger.debug("Login attempt %s", loggin_attempt)
     if (loggin_attempt != None):
+        db.deleteAuthByStateHash(conn, data['hash'])
+        logger.debug("Removing login attempt")
         data = {"scanned": loggin_attempt[3], "signed": {'signedHash': loggin_attempt[4], 'data': loggin_attempt[5], 'doubleName': loggin_attempt[0]}}
         response = app.response_class(
             response=json.dumps(data),
@@ -404,7 +406,7 @@ def openapp():
     if 'scope' in request.args:
         params = '{}&scope={}'.format(params, request.args['scope'])
     if 'appId' in request.args:
-        params = '{}&appid={}'.format(params, request.args['appId'])
+        params = '{}&appId={}'.format(params, request.args['appId'])
     if 'appPublicKey' in request.args:
         params = '{}&appPublicKey={}'.format(params, request.args['appPublicKey'])
     if 'redirecturl' in request.args:

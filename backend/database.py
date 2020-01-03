@@ -178,6 +178,15 @@ def getAuthByStateHash(conn, sate_hash):
     except Error as e:
         logger.debug(e)
 
+def deleteAuthByStateHash(conn, state_hash):
+    del_statement = "DELETE FROM auth WHERE state_hash=?;"
+    try:
+        c = conn.cursor()
+        c.execute(del_statement, (state_hash,))
+        conn.commit()
+    except Error as e:
+        logger.debug(e)
+
 
 def getAuthByDoubleName(conn, doublename):
     try:

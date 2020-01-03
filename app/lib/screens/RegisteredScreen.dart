@@ -89,7 +89,7 @@ class _RegisteredScreenState extends State<RegisteredScreen>
               alignment: Alignment.centerLeft,
               child: Container(
                 padding: new EdgeInsets.all(10.0),
-                child: Text("Circles",
+                child: Text("Threefold News Circles",
                     style:
                         TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
               ),
