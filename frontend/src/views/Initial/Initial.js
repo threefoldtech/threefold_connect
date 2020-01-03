@@ -26,7 +26,8 @@ export default {
       spinner: false,
       rechecked: false,
       didLeavePage: false,
-      nameCheckerTimeOut: null
+      nameCheckerTimeOut: null,
+      isMobile: /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
     }
   },
   mounted () {
@@ -75,7 +76,7 @@ export default {
     }
 
     // If user is on mobile
-    this.promptLoginToMobileUser()
+    // this.promptLoginToMobileUser()
   },
   computed: {
     ...mapGetters([
@@ -102,7 +103,8 @@ export default {
       'checkName',
       'clearCheckStatus',
       'setAttemptCanceled',
-      'forceRefetchStatus'
+      'forceRefetchStatus',
+      'deleteLoginAttempt'
     ]),
     registerOrLogin () {
       if (this.actionBtnDisabled()) {
@@ -126,29 +128,26 @@ export default {
       this.didLeavePage = true
     },
     gotFocus () {
-      if (this.didLeavePage) {
+      var isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
+      if (this.didLeavePage && isMobile) {
         this.forceRefetchStatus()
       }
     },
     promptLoginToMobileUser () {
-      var isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
-
-      if (isMobile) {
-        this.loginUserMobile({
-          mobile: isMobile,
-          firstTime: false
-        })
-        var url = `/api/openapp?state=${encodeURIComponent(this.hash)}&mobile=true`
-        if (this.scope) url += `&scope=${encodeURIComponent(this.scope)}`
-        if (this.appId) url += `&appId=${encodeURIComponent(this.appId)}`
-        if (this.appPublicKey) url += `&appPublicKey=${encodeURIComponent(this.appPublicKey)}`
-        if (this.redirectUrl) url += `&redirecturl=${encodeURIComponent(this.redirectUrl)}`
-        console.log(url)
-        if (/iPhone|iPad|iPod/i.test(navigator.userAgent)) {
-          window.location.replace(url)
-        } else if (/Android|webOS|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
-          window.location.href = url
-        }
+      this.loginUserMobile({
+        mobile: this.isMobile,
+        firstTime: false
+      })
+      var url = `threebot://login?state=${encodeURIComponent(this.hash)}&mobile=true`
+      if (this.scope) url += `&scope=${encodeURIComponent(this.scope)}`
+      if (this.appId) url += `&appId=${encodeURIComponent(this.appId)}`
+      if (this.appPublicKey) url += `&appPublicKey=${encodeURIComponent(this.appPublicKey)}`
+      if (this.redirectUrl) url += `&redirecturl=${encodeURIComponent(this.redirectUrl)}`
+      console.log(url)
+      if (/iPhone|iPad|iPod/i.test(navigator.userAgent)) {
+        window.location.replace(url)
+      } else if (/Android|webOS|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+        window.location.href = url
       }
     },
     login () {
@@ -208,6 +207,9 @@ export default {
   },
   watch: {
     signed (val) {
+      var isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
+      if (!isMobile) return
+
       try {
         if (val) {
           window.localStorage.setItem('username', val.doubleName)
@@ -222,6 +224,7 @@ export default {
 
           console.log('signedHash: ', signedHash)
           console.log('data', data)
+          this.deleteLoginAttempt()
 
           if (data && signedHash) {
             var union = '?'

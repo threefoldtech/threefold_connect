@@ -102,6 +102,8 @@ export default new Vuex.Store({
         context.commit('setDoubleName', doubleName)
       } else {
         context.commit('setDoubleName', `${doubleName}.3bot`)
+
+        socketService.emit('join', { room: `${doubleName}.3bot` })
       }
     },
     setAttemptCanceled (context, payload) {
@@ -211,6 +213,16 @@ export default new Vuex.Store({
         axios.get(`${config.apiurl}api/forcerefetch?hash=${context.getters.hash}`).then(response => {
           if (response.data.scanned) context.commit('setScannedFlagUp', response.data.scanned)
           if (response.data.signed) context.commit('setSigned', response.data.signed)
+        }).catch(e => {
+          alert(e)
+        })
+      }
+    },
+    deleteLoginAttempt (context) {
+      if (context.getters.hash) {
+        console.log(`Deleting login attempt for`)
+        axios.delete(`${config.apiurl}api/attempts/${context.getters.hash}`).then(response => {
+          console.log(response)
         }).catch(e => {
           alert(e)
         })

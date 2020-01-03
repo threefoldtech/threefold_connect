@@ -67,8 +67,8 @@ class CustomDialog extends StatelessWidget {
         onPressed: () {
           if (hiddenaction != null) {
             timesPressed++;
-            logger.log('= ' + hiddenaction.toString());
-            logger.log('--------------+++++++++ ' + timesPressed.toString());
+            // logger.log('= ' + hiddenaction.toString());
+            // logger.log('--------------+++++++++ ' + timesPressed.toString());
             if (timesPressed >= timesPressedToReveal) {
               hiddenaction();
               timesPressed = 0;
