@@ -163,6 +163,7 @@ export default {
         if (this.appId) url += `&appId=${encodeURIComponent(this.appId)}`
         if (this.appPublicKey) url += `&appPublicKey=${encodeURIComponent(this.appPublicKey)}`
         if (this.$route.query.logintoken) url += `&logintoken=${encodeURIComponent(this.$route.query.logintoken)}`
+        if (this.redirectUrl) url += `&redirecturl=${encodeURIComponent(this.redirectUrl)}`
         window.open(url)
       }
       this.$router.push({
