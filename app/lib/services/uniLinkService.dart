@@ -71,22 +71,25 @@ checkWhatPageToOpen(Uri link, BuildContext context) async {
                   builder: (context) =>
                       MainScreen(initDone: true, registered: registered)));
 
-          // Get the doublename and send a login request
-          data['doubleName'] = await getDoubleName();
-          socketLoginMobile(data);
-
           // After 2 seconds, show the login prompt
           Timer(
               Duration(seconds: 2),
-              () => Navigator.push(
+              () async => {
+                // Get the doublename and send a login request
+                data['doubleName'] = await getDoubleName(),
+                socketLoginMobile(data),
+                Navigator.push(
                   ctx,
                   MaterialPageRoute(
                       builder: (context) =>
-                          LoginScreen(link.queryParameters))));
+                          LoginScreen(link.queryParameters)))
+              }
+          );
         }
       }
     }
   }
+  // Where is this used ?
   if (link.host == 'register') {
     await Navigator.push(ctx,
         MaterialPageRoute(builder: (context) => MobileRegistrationScreen()));

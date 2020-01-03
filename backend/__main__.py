@@ -134,6 +134,8 @@ def force_refetch_handler():
     loggin_attempt = db.getAuthByStateHash(conn, data['hash'])
     logger.debug("Login attempt %s", loggin_attempt)
     if (loggin_attempt != None):
+        db.deleteAuthByStateHash(conn, data['hash'])
+        logger.debug("Removing login attempt")
         data = {"scanned": loggin_attempt[3], "signed": {'signedHash': loggin_attempt[4], 'data': loggin_attempt[5], 'doubleName': loggin_attempt[0]}}
         response = app.response_class(
             response=json.dumps(data),
