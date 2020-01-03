@@ -247,7 +247,6 @@ class _RecoverScreenState extends State<RecoverScreen> {
                   }
                 } catch (e) {
                   Navigator.pop(context);
-                  logger.log(e);
                   setState(() {
                     error = e.message;
                   });
