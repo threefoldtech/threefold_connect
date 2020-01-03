@@ -406,7 +406,7 @@ def openapp():
     if 'scope' in request.args:
         params = '{}&scope={}'.format(params, request.args['scope'])
     if 'appId' in request.args:
-        params = '{}&appid={}'.format(params, request.args['appId'])
+        params = '{}&appId={}'.format(params, request.args['appId'])
     if 'appPublicKey' in request.args:
         params = '{}&appPublicKey={}'.format(params, request.args['appPublicKey'])
     if 'redirecturl' in request.args:
