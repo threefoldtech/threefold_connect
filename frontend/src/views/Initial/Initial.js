@@ -102,7 +102,8 @@ export default {
       'checkName',
       'clearCheckStatus',
       'setAttemptCanceled',
-      'forceRefetchStatus'
+      'forceRefetchStatus',
+      'deleteLoginAttempt'
     ]),
     registerOrLogin () {
       if (this.actionBtnDisabled()) {
@@ -126,7 +127,8 @@ export default {
       this.didLeavePage = true
     },
     gotFocus () {
-      if (this.didLeavePage) {
+      var isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
+      if (this.didLeavePage && isMobile) {
         this.forceRefetchStatus()
       }
     },
@@ -138,7 +140,7 @@ export default {
           mobile: isMobile,
           firstTime: false
         })
-        var url = `/api/openapp?state=${encodeURIComponent(this.hash)}&mobile=true`
+        var url = `threebot://login?state=${encodeURIComponent(this.hash)}&mobile=true`
         if (this.scope) url += `&scope=${encodeURIComponent(this.scope)}`
         if (this.appId) url += `&appId=${encodeURIComponent(this.appId)}`
         if (this.appPublicKey) url += `&appPublicKey=${encodeURIComponent(this.appPublicKey)}`
@@ -208,6 +210,9 @@ export default {
   },
   watch: {
     signed (val) {
+      var isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
+      if (!isMobile) return
+
       try {
         if (val) {
           window.localStorage.setItem('username', val.doubleName)
@@ -222,6 +227,7 @@ export default {
 
           console.log('signedHash: ', signedHash)
           console.log('data', data)
+          this.deleteLoginAttempt()
 
           if (data && signedHash) {
             var union = '?'
