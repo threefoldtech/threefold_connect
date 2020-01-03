@@ -33,7 +33,7 @@ createSocketConnection(BuildContext context) async {
   socket.on('connect', (res) {
     print('connected');
     // once a client has connected, we let him join a room
-    socket.emit('join', {'room': doubleName});
+    socket.emit('join', {'room': doubleName.toLowerCase()});
     print('joined room');
     connected = true;
   });

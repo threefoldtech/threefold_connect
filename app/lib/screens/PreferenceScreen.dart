@@ -12,6 +12,8 @@ import 'package:threebotlogin/widgets/CustomDialog.dart';
 import 'package:threebotlogin/widgets/EmailVerificationNeeded.dart';
 import 'package:threebotlogin/widgets/PinField.dart';
 
+import 'MainScreen.dart';
+
 class PreferenceScreen extends StatefulWidget {
   PreferenceScreen({Key key}) : super(key: key);
   @override
@@ -306,11 +308,12 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
               onPressed: () async {
                 bool result = await clearData();
                 if (result) {
-                  await Navigator.pushReplacement(
+                  Navigator.pop(context); // pop pref
+                  await Navigator.pushReplacement( // replace home
                       //@todo this feels like a bug, should not push on current screen
                       context,
                       MaterialPageRoute(
-                          builder: (context) => UnregisteredScreen()));
+                          builder: (context) => MainScreen(initDone: true, registered: false)));
                 } else {
                   showDialog(
                       context: preferenceContext,

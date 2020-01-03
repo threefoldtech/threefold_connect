@@ -26,8 +26,8 @@ class _WalletState extends State<WalletWidget>
 
   _WalletState() {
     iaWebView = InAppWebView(
-        initialUrl: //'http://192.168.2.90:8080/handlertest.html?nocache',//
-            'https://${config.appId()}/error', //http://192.168.2.120:8080/', //'http://192.168.0.221:8080/handlertest.html?nocache=3',
+        initialUrl:
+            'https://${config.appId()}/error?nocache', 
         initialHeaders: {},
         initialOptions: InAppWebViewWidgetOptions(
             crossPlatform: InAppWebViewOptions(debuggingEnabled: true),
