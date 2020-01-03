@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
-import 'package:threebotlogin/Apps/EmailMustBeVerified.dart';
 import 'package:threebotlogin/Apps/FreeFlowPages/FfpConfig.dart';
 import 'package:threebotlogin/Apps/FreeFlowPages/FfpEvents.dart';
 import 'package:threebotlogin/ClipboardHack/ClipboardHack.dart';
@@ -16,7 +15,7 @@ class FfpWidget extends StatefulWidget {
 }
 
 class _FfpState extends State<FfpWidget>
-    with AutomaticKeepAliveClientMixin, EmailMustBeVerified {
+    with AutomaticKeepAliveClientMixin {
   InAppWebViewController webView;
   String url = "";
   double progress = 0;
@@ -98,7 +97,7 @@ class _FfpState extends State<FfpWidget>
     return Column(
       children: <Widget>[
         Expanded(
-          child: isHidden ? Container() : Container(child: iaWebview),
+          child: Container(child: iaWebview),
         ),
       ],
     );

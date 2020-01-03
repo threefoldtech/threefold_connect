@@ -166,14 +166,14 @@ class _MobileRegistrationScreenState extends State<MobileRegistrationScreen> {
     savePrivateKey(_registrationData.keys['privateKey']);
     savePublicKey(_registrationData.keys['publicKey']);
     saveFingerprint(false);
-    saveEmail(_registrationData.email, false);
+    saveEmail(_registrationData.email, null);
     saveDoubleName(_registrationData.doubleName);
     savePhrase(_registrationData.phrase);
 
     await sendRegisterSign(_registrationData.doubleName);
     await sendVerificationEmail();
   }
-
+  
   loadingDialog() {
     return showDialog(
       context: context,

@@ -18,4 +18,9 @@ class Chatbot implements App {
     //clearAllData();
   }
 
+  @override
+  bool emailVerificationRequired() {
+    return false;
+  }
+
 }

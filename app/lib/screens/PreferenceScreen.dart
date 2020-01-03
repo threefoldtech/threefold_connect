@@ -329,34 +329,7 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
     );
   }
 
-  void sendVerificationEmail() async {
-    final snackBar = SnackBar(content: Text('Resending verification email...'));
-    Scaffold.of(context).showSnackBar(snackBar);
-    await resendVerificationEmail();
-    _showResendEmailDialog();
-  }
 
-  void _showResendEmailDialog() {
-    if (context != null) {
-      showDialog(
-        context: context,
-        builder: (BuildContext context) => CustomDialog(
-          image: Icons.check,
-          title: "Email has been resent.",
-          description: new Text("A new verification email has been sent."),
-          actions: <Widget>[
-            FlatButton(
-              child: new Text("Ok"),
-              onPressed: () {
-                Navigator.pop(context);
-                setState(() {});
-              },
-            ),
-          ],
-        ),
-      );
-    }
-  }
 
   void _showPinDialog(callbackParam) {
     if (callbackParam == 'fingerprint') {
@@ -460,7 +433,7 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
       setState(() {
         if (emailMap['email'] != null) {
           emailAdress = emailMap['email'];
-          emailVerified = emailMap['verified'];
+          emailVerified = (emailMap['verified'] != null);
         }
       });
     });

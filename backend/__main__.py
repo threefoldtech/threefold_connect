@@ -407,6 +407,8 @@ def openapp():
         params = '{}&appid={}'.format(params, request.args['appId'])
     if 'appPublicKey' in request.args:
         params = '{}&appPublicKey={}'.format(params, request.args['appPublicKey'])
+    if 'redirecturl' in request.args:
+        params = '{}&redirecturl={}'.format(params, request.args['redirecturl'])
 
     return redirect('threebot://login/?{}'.format(params), code=302)
 
