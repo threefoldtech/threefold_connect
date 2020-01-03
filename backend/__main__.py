@@ -134,8 +134,8 @@ def force_refetch_handler():
     loggin_attempt = db.getAuthByStateHash(conn, data['hash'])
     logger.debug("Login attempt %s", loggin_attempt)
     if (loggin_attempt != None):
-        db.deleteAuthByStateHash(conn, data['hash'])
-        logger.debug("Removing login attempt")
+        # db.deleteAuthByStateHash(conn, data['hash'])
+        # logger.debug("Removing login attempt")
         data = {"scanned": loggin_attempt[3], "signed": {'signedHash': loggin_attempt[4], 'data': loggin_attempt[5], 'doubleName': loggin_attempt[0]}}
         response = app.response_class(
             response=json.dumps(data),
@@ -178,9 +178,17 @@ def sign_handler():
             'selectedImageId': body.get('selectedImageId'),
         }, room=user[0])
         logger.debug('signed emitted')
+        # db.deleteAuthByStateHash(conn, body.get('hash'))
+        # logger.debug("Removing login attempt")
         return Response("Ok")
     else:
         return Response("Something went wrong", status=500)
+
+@app.route('/api/attempts/<state_hash>', methods=['DELETE'])
+def remove_login_attempt_by_hash(state_hash):
+    db.deleteAuthByStateHash(conn, state_hash)
+    logger.debug("Removing login attempt")
+    return Response("Ok")
 
 @app.route('/api/attempts/<doublename>', methods=['GET'])
 def get_attempts_handler(doublename):
