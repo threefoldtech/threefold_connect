@@ -7,8 +7,10 @@ import 'package:threebotlogin/Events/Events.dart';
 import 'package:threebotlogin/Events/GoHomeEvent.dart';
 import 'package:threebotlogin/helpers/HexColor.dart';
 import 'package:threebotlogin/main.dart';
+import 'package:threebotlogin/services/3botService.dart';
 import 'package:threebotlogin/services/socketService.dart';
 import 'package:threebotlogin/services/uniLinkService.dart';
+import 'package:threebotlogin/services/userService.dart';
 import 'package:threebotlogin/widgets/EmailVerificationNeeded.dart';
 import 'package:uni_links/uni_links.dart';
 
@@ -29,6 +31,7 @@ class _HomeScreenState extends State<HomeScreen>
         initialIndex: 0, length: Globals().router.routes.length, vsync: this);
     Events().onEvent(FfpBrowseEvent().runtimeType, activateFfpTab);
     _tabController.addListener(_handleTabSelection);
+    
   }
 
   _handleTabSelection() async {
@@ -61,6 +64,11 @@ class _HomeScreenState extends State<HomeScreen>
     });
     createSocketConnection(context);
     Events().onEvent(GoHomeEvent().runtimeType, close);
+    _checkLoginAttempts();
+    
+  }
+  _checkLoginAttempts() async {
+    checkLoginAttempts(await getDoubleName());
   }
 
   @override

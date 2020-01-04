@@ -124,7 +124,7 @@ Future openLogin(context, data) async {
                 builder: (BuildContext context) => CustomDialog(
                   image: Icons.email,
                   title: "Email verified",
-                  description: new Text("Your email has been verfied!"),
+                  description: new Text("Your email has been verified!"),
                   actions: <Widget>[
                     FlatButton(
                       child: new Text("Ok"),
