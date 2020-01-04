@@ -51,11 +51,13 @@ def disconnect_handler():
     print(request.sid)
     print("disconnected!!")
     logger.debug("DisConnected.")
-    room = socketRoom[request.sid]
-    del socketRoom[request.sid]
-    leave_room(room)
-    usersInRoom[room] -= 1
-    print("users left in room {}".format(usersInRoom[room]))
+    if request.sid in socketRoom:
+        room = socketRoom[request.sid]
+        del socketRoom[request.sid]
+        leave_room(room)
+        if usersInRoom[room] > 0:
+            usersInRoom[room] -= 1
+            print("users left in room {}".format(usersInRoom[room]))
 
 @sio.on('join')
 def on_join(data):
