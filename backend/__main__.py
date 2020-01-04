@@ -122,7 +122,6 @@ messageQueue = {} #messaged queued for a room (only queued when room is empty)
 socketRoom = {} #room bound to a socket
 
 def emitOrQueue(event, data, room):
-    print("room is {}, usersinroom is {}".format(room, usersInRoom[room]))
     if not room in usersInRoom  or usersInRoom[room] == 0:
         if not room in messageQueue:
             messageQueue[room] = []
