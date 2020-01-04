@@ -67,6 +67,7 @@ def on_join(data):
     join_room(room)
     
     if 'app' in data:
+        print('app in data..')
         socketRoom[request.sid] = room
 
         if not room in usersInRoom:
