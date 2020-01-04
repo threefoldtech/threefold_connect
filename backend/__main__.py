@@ -147,13 +147,13 @@ def login_handler(data):
         update_sql = "UPDATE users SET sid=?  WHERE double_name=?;"
         db.update_user(conn, update_sql, sid, user[0])
 
-    if first_time == False and mobile == False:
-        print("**queueing login attempt to socket")
-        user = db.getUserByName(conn, double_name)
-        emitOrQueue('login', data, room=user[0])
+    #if first_time == False and mobile == False:
+    print("**queueing login attempt to socket")
+    user = db.getUserByName(conn, double_name)
+    emitOrQueue('login', data, room=user[0])
 
-    insert_auth_sql = "INSERT INTO auth (double_name,state_hash,timestamp,scanned,data) VALUES (?,?,?,?,?);"
-    db.insert_auth(conn, insert_auth_sql, double_name, state, datetime.now(), 0, json.dumps(data))
+    #insert_auth_sql = "INSERT INTO auth (double_name,state_hash,timestamp,scanned,data) VALUES (?,?,?,?,?);"
+    #db.insert_auth(conn, insert_auth_sql, double_name, state, datetime.now(), 0, json.dumps(data))
     print('')
 
 
