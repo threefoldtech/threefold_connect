@@ -1,23 +1,23 @@
-
 import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:threebotlogin/widgets/CustomDialog.dart';
-
-import 'package:threebotlogin/widgets/Scanner.dart';
+import 'package:qr_code_scanner/qr_code_scanner.dart';
 
 class ScanScreen extends StatefulWidget {
   final Widget registrationScreen;
+  final GlobalKey qrKey = GlobalKey(debugLabel: 'QR');
 
   ScanScreen({Key key, this.registrationScreen}) : super(key: key);
   _ScanScreenState createState() => _ScanScreenState();
 }
 
-class _ScanScreenState extends State<ScanScreen>
-    with TickerProviderStateMixin {
+class _ScanScreenState extends State<ScanScreen> with TickerProviderStateMixin {
   String helperText = "Aim at QR code to scan";
   AnimationController sliderAnimationController;
   Animation<double> offset;
-  
+  bool popped = false;
+  final GlobalKey qrKey = GlobalKey(debugLabel: 'QR');
+  QRViewController controller;
+
   String pin;
   final _scaffoldKey = GlobalKey<ScaffoldState>();
   var scope = Map();
@@ -34,6 +34,16 @@ class _ScanScreenState extends State<ScanScreen>
 
     offset = Tween<double>(begin: 0.0, end: 500.0).animate(CurvedAnimation(
         parent: sliderAnimationController, curve: Curves.bounceOut));
+  }
+
+  void _onQRViewCreated(QRViewController controller) {
+    this.controller = controller;
+    controller.scannedDataStream.listen((scanData) {
+      if (!popped) {
+        popped = true;
+        Navigator.pop(context, scanData);
+      }
+    });
   }
 
   Widget content() {
@@ -68,9 +78,7 @@ class _ScanScreenState extends State<ScanScreen>
                 FloatingActionButton(
                   tooltip: "What should I do?",
                   mini: true,
-                  onPressed: () {
-                    _showInformation();
-                  },
+                  onPressed: () {},
                   child: Icon(Icons.help_outline),
                 ),
               ],
@@ -123,9 +131,9 @@ class _ScanScreenState extends State<ScanScreen>
       key: _scaffoldKey,
       body: Stack(
         children: [
-          Scanner(
-            callback: (qr) => gotQrData(qr),
-            context: context,
+          QRView(
+            key: qrKey,
+            onQRViewCreated: _onQRViewCreated,
           ),
           Align(alignment: Alignment.bottomCenter, child: content()),
         ],
@@ -133,50 +141,9 @@ class _ScanScreenState extends State<ScanScreen>
     );
   }
 
-  gotQrData(value) async {
-
-    Navigator.pop(context, value);
-  }
-
   showError() {
     _scaffoldKey.currentState.showSnackBar(SnackBar(
       content: Text('Something went wrong, please try again later.'),
     ));
-  }
-
-  pinFilledIn(String value) async {
-  //deprecated
-  }
-
-  saveValues() async {
-   //deprecated
-  }
-
-  _showInformation() {
-    var _stepsList =
-        'Step 1: Go to the website: https://www.freeflowpages.com/  \n' +
-            'Step 2: Create an account\n' +
-            'Step 3: Scan the QR code\n';
-
-    showDialog(
-      context: context,
-      builder: (BuildContext context) => CustomDialog(
-        image: Icons.error,
-        title: "Steps",
-        description: new Text(
-          _stepsList,
-          textAlign: TextAlign.center,
-          textScaleFactor: 1.2,
-        ),
-        actions: <Widget>[
-          FlatButton(
-            child: new Text("Continue"),
-            onPressed: () {
-              Navigator.pop(context);
-            },
-          ),
-        ],
-      ),
-    );
   }
 }

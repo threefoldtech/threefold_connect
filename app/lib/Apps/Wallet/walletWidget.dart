@@ -27,7 +27,7 @@ class _WalletState extends State<WalletWidget>
 
   _WalletState() {
     iaWebView = InAppWebView(
-        initialUrl:  'http://192.168.2.229:8080/init', //https://${config.appId()}/init',
+        initialUrl:   'https://${config.appId()}/init',
         initialHeaders: {},
         initialOptions: InAppWebViewWidgetOptions(
             crossPlatform: InAppWebViewOptions(debuggingEnabled: true),
@@ -101,7 +101,7 @@ class _WalletState extends State<WalletWidget>
   }
 
   scanQrCode(List<dynamic> params) async {
-    dynamic result = await Navigator.push(context,
+    String result = await Navigator.push(context,
         MaterialPageRoute(builder: (context) => ScanScreen()));
     return result;
   }

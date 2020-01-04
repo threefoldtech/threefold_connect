@@ -11,9 +11,9 @@ dependencies:
   intl: ^0.15.8
   flutter:
     sdk: flutter
-  fast_qr_reader_view:
+  qr_code_scanner:
     git:
-      url: https://github.com/coeneivan/fast_qr_reader_view
+      url: https://github.com/juliuscanute/qr_code_scanner
   shared_preferences:
   http:
   flutter_sodium:

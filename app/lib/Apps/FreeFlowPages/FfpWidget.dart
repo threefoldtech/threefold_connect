@@ -34,9 +34,10 @@ class _FfpState extends State<FfpWidget> with AutomaticKeepAliveClientMixin {
           controller.stopLoading();
         }
         initKeys(url);
+        controller.injectCSSCode(
+            source: ".crisp-client {display: none !important;}");
       },
       onLoadStop: (InAppWebViewController controller, String url) async {
-        if (!mounted) return;
         controller.injectCSSCode(
             source: ".crisp-client {display: none !important;}");
         addClipboardHack(controller);

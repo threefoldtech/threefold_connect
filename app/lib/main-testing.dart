@@ -4,14 +4,8 @@
 
 import 'package:community_material_icon/community_material_icon.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart';
-import 'package:threebotlogin/screens/ChangePinScreen.dart';
-import 'package:threebotlogin/screens/MainScreen.dart';
-import 'package:threebotlogin/services/3botService.dart';
-import 'package:threebotlogin/services/socketService.dart';
-import 'package:threebotlogin/services/userService.dart';
 
-import 'services/socketService.dart';
+import 'package:threebotlogin/screens/ScanScreen.dart';
 
 void main() => runApp(MyApp());
 
@@ -46,11 +40,15 @@ class RotatorWidgetState extends State<RotatorWidget> {
     // await Navigator.push(
     //     context, MaterialPageRoute(builder: (context) => InitScreen()));
 
-        //   await Navigator.push(
-        // context, MaterialPageRoute(builder: (context) => MainScreen(initDone: true,registered: true,)));
+    //   await Navigator.push(
+    // context, MaterialPageRoute(builder: (context) => MainScreen(initDone: true,registered: true,)));
 
     // var pk = await getPrivateKey();
-    await createSocketConnection(context);
+    //await createSocketConnection(context);
+
+    String barcodeContent = await Navigator.push(
+        context, MaterialPageRoute(builder: (context) => ScanScreen()));
+    print("BARCODE IS " + barcodeContent);
   }
 
   @override

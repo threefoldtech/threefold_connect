@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:threebotlogin/helpers/HexColor.dart';
 import 'package:threebotlogin/router.dart';
 import 'package:threebotlogin/screens/MainScreen.dart';
 
 import 'package:threebotlogin/services/loggingService.dart';
-import 'package:fast_qr_reader_view/fast_qr_reader_view.dart';
+
 import 'package:threebotlogin/services/userService.dart';
 
-List<CameraDescription> cameras;
+//List<CameraDescription> cameras;
 LoggingService logger;
 
 class Globals {
@@ -30,11 +29,11 @@ class Globals {
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  try {
-    cameras = await availableCameras();
-  } on QRReaderException catch (e) {
-    print(e);
-  }
+  // try {
+  //   cameras = await availableCameras();
+  // } on QRReaderException catch (e) {
+  //   print(e);
+  // }
   bool initDone = await getInitDone();
   String doubleName = await getDoubleName();
 
