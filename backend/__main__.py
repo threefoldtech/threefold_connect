@@ -148,6 +148,7 @@ def login_handler(data):
         db.update_user(conn, update_sql, sid, user[0])
 
     if first_time == False and mobile == False:
+        print("**queueing login attempt to socket")
         user = db.getUserByName(conn, double_name)
         emitOrQueue('login', data, room=user[0])
 
