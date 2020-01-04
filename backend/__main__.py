@@ -126,7 +126,7 @@ def emitOrQueue(event, data, room):
         print("queueing in room {}".format(room))
         messageQueue[room].append((event, data, room))
     else:
-       sio.emit(event, data, room)
+       sio.emit(event, data, room=room)
 
 
 @sio.on('login')
