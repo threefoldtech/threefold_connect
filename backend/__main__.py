@@ -75,7 +75,7 @@ def on_join(data):
         print("room {} is in messagq".format(room))
         for message in messageQueue[room]:
             print("emitting message {} {} {} ".format(message[0], message[1],message[2]))
-            sio.emit(message[0], message[1], message[2])
+            sio.emit(message[0], message[1], room=message[2])
         messageQueue[room] = []
     
 
