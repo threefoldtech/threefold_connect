@@ -25,7 +25,7 @@ dependencies:
       url: https://github.com/MathiasDeWeerdt/uni_links
   flutter_inappwebview:
     git:
-      url: https://github.com/pichillilorenzo/flutter_inappwebview
+      url: https://github.com/jimbertools/flutter_inappwebview
       ref: master
   cupertino_icons: ^0.1.2
   crypto: ^2.0.6

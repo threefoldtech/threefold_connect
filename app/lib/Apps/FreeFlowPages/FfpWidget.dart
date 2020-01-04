@@ -6,6 +6,7 @@ import 'package:threebotlogin/Apps/FreeFlowPages/FfpEvents.dart';
 import 'package:threebotlogin/Browser.dart';
 import 'package:threebotlogin/ClipboardHack/ClipboardHack.dart';
 import 'package:threebotlogin/Events/Events.dart';
+import 'package:threebotlogin/Events/GoHomeEvent.dart';
 
 import 'package:threebotlogin/services/cryptoService.dart';
 import 'package:threebotlogin/services/userService.dart';
@@ -26,7 +27,7 @@ class _FfpState extends State<FfpWidget> with AutomaticKeepAliveClientMixin {
     iaWebview = new InAppWebView(
       initialUrl: config.cookieUrl(),
       initialHeaders: {},
-      initialOptions: InAppWebViewWidgetOptions(
+      initialOptions: InAppWebViewWidgetOptions(crossPlatform: InAppWebViewOptions(useShouldOverrideUrlLoading: true),
           android: AndroidInAppWebViewOptions(supportMultipleWindows: true)),
       onLoadStart: (InAppWebViewController controller, String url) {
         webView = controller;
@@ -44,11 +45,16 @@ class _FfpState extends State<FfpWidget> with AutomaticKeepAliveClientMixin {
       },
       onCreateWindow:
           (InAppWebViewController controller, OnCreateWindowRequest req) {
+        if (req.url.contains("freeflowpages.com/")) {
+          controller.loadUrl(url: req.url);
+          return;
+        }
         inAppBrowser.open(url: req.url, options: InAppBrowserClassOptions());
       },
       onProgressChanged: (InAppWebViewController controller, int progress) {},
     );
     Events().onEvent(FfpBrowseEvent().runtimeType, _browseToUrl);
+    Events().onEvent(FfpBackEvent().runtimeType, _browserBack);
   }
 
   @override
@@ -59,6 +65,16 @@ class _FfpState extends State<FfpWidget> with AutomaticKeepAliveClientMixin {
   @override
   void dispose() {
     super.dispose();
+  }
+
+  bool closeNext = false;
+  _browserBack(FfpBackEvent event) async {
+    String url = await webView.getUrl();
+    if(url.endsWith('/dashboard')){
+      Events().emit(GoHomeEvent());
+    }
+    this.webView.goBack();
+
   }
 
   _browseToUrl(FfpBrowseEvent event) {

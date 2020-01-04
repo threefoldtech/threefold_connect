@@ -1,8 +1,11 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
+import 'package:threebotlogin/Apps/Wallet/walletEvents.dart';
 import 'package:threebotlogin/Apps/Wallet/walletUserData.dart';
 import 'package:threebotlogin/ClipboardHack/ClipboardHack.dart';
+import 'package:threebotlogin/Events/Events.dart';
+import 'package:threebotlogin/Events/GoHomeEvent.dart';
 import 'package:threebotlogin/screens/ScanScreen.dart';
 import 'package:threebotlogin/services/cryptoService.dart';
 import 'package:threebotlogin/services/toolsService.dart';
@@ -25,9 +28,19 @@ class _WalletState extends State<WalletWidget>
   var config = WalletConfig();
   InAppWebView iaWebView;
 
+  _back(WalletBackEvent event) async {
+    String url = await webView.getUrl();
+    String endsWith = config.appId() + '/';
+    if (url.endsWith(endsWith)) {
+      Events().emit(GoHomeEvent());
+      return;
+    }
+    this.webView.goBack();
+  }
+
   _WalletState() {
     iaWebView = InAppWebView(
-        initialUrl:   'https://${config.appId()}/init',
+        initialUrl: 'https://${config.appId()}/init',
         initialHeaders: {},
         initialOptions: InAppWebViewWidgetOptions(
             crossPlatform: InAppWebViewOptions(debuggingEnabled: true),
@@ -41,7 +54,6 @@ class _WalletState extends State<WalletWidget>
             (InAppWebViewController controller, OnCreateWindowRequest req) {},
         onLoadStart: (InAppWebViewController controller, String url) {
           addClipboardHack(controller);
-
         },
         onLoadStop: (InAppWebViewController controller, String url) async {
           if (url.contains('/init')) {
@@ -58,6 +70,7 @@ class _WalletState extends State<WalletWidget>
             (InAppWebViewController controller, ConsoleMessage consoleMessage) {
           print("Wallet console: " + consoleMessage.message);
         });
+    Events().onEvent(WalletBackEvent().runtimeType, _back);
   }
 
   @override
@@ -101,8 +114,8 @@ class _WalletState extends State<WalletWidget>
   }
 
   scanQrCode(List<dynamic> params) async {
-    String result = await Navigator.push(context,
-        MaterialPageRoute(builder: (context) => ScanScreen()));
+    String result = await Navigator.push(
+        context, MaterialPageRoute(builder: (context) => ScanScreen()));
     return result;
   }
 

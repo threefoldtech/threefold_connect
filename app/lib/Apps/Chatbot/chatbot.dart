@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:threebotlogin/Apps/Chatbot/ChatbotWidget.dart';
+import 'package:threebotlogin/Events/Events.dart';
+import 'package:threebotlogin/Events/GoHomeEvent.dart';
 import 'package:threebotlogin/services/userService.dart';
 
 import '../../App.dart';
@@ -21,6 +23,11 @@ class Chatbot implements App {
   @override
   bool emailVerificationRequired() {
     return false;
+  }
+
+  @override
+  void back() {
+    Events().emit(GoHomeEvent());
   }
 
 }

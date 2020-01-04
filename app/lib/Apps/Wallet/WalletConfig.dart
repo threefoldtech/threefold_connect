@@ -39,11 +39,11 @@ class WalletConfigStaging extends WalletConfigImpls {
 
 class WalletConfigProduction extends WalletConfigImpls {
   String appId() {
-    return 'freeflowpages.com';
+    return 'wallet.threefold.me';
   }
 
   String redirectUrl() {
-    return 'wallet.threefold.me';
+    return 'login';
   }
 }
 

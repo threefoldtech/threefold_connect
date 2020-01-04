@@ -6,7 +6,8 @@ import 'package:threebotlogin/widgets/PinField.dart';
 
 class ChangePinScreen extends StatefulWidget {
   final currentPin;
-  ChangePinScreen({this.currentPin});
+  bool hideBackButton;
+  ChangePinScreen({this.currentPin, this.hideBackButton});
   _ChangePinScreenState createState() =>
       _ChangePinScreenState(currentPin: currentPin);
 }
@@ -44,6 +45,7 @@ class _ChangePinScreenState extends State<ChangePinScreen> {
         backgroundColor: HexColor("#2d4052"),
         title: Text("Change pincode"),
         elevation: 0.0,
+        automaticallyImplyLeading: !widget.hideBackButton
       ),
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,

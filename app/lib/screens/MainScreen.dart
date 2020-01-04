@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:threebotlogin/main.dart';
 import 'package:threebotlogin/screens/HomeScreen.dart';
 import 'package:threebotlogin/screens/InitScreen.dart';
@@ -34,10 +35,8 @@ class _AppState extends State<MainScreen> {
     }
 
     await Globals().router.init();
-    Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-            builder: (context) => HomeScreen()));
+    await Navigator.pushReplacement(
+        context, MaterialPageRoute(builder: (context) => HomeScreen()));
   }
 
   @override

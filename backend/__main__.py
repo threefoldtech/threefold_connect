@@ -42,15 +42,48 @@ logger.addHandler(handler)
 
 @sio.on('connect')
 def connect_handler():
+    print(request.sid)
+    print("connected!!")
     logger.debug("Connected.")
+
+@sio.on('disconnect')
+def disconnect_handler():
+    print(request.sid)
+    print("disconnected!!")
+    logger.debug("DisConnected.")
+    room = socketRoom[request.sid]
+    del socketRoom[request.sid]
+    leave_room(room)
+    usersInRoom[room] -= 1
+    print("users left in room {}".format(usersInRoom[room]))
 
 @sio.on('join')
 def on_join(data):
-    join_room(data['room'])
+   
+    room = data['room']
+    print("joining room # {} ".format(room))
+    join_room(room)
+    
+
+    socketRoom[request.sid] = room
+
+    if not room in usersInRoom:
+        usersInRoom[room] = 1
+    else:
+        usersInRoom[room] += 1
+    if room in messageQueue:
+        print("room {} is in messagq".format(room))
+        for message in messageQueue[room]:
+            print("emitting message {} {} {} ".format(message[0], message[1],message[2]))
+            sio.emit(message[0], message[1], message[2])
+        messageQueue[room] = []
+    
 
 @sio.on('leave')
 def on_leave(data):
-    leave_room(data['room'])
+    print("leaving ")
+    room = data['room']
+
 
 @sio.on('checkname')
 def checkname_handler(data):
@@ -82,6 +115,19 @@ def cancel_handler(data):
 #         update_sql = "INSERT into users (double_name, sid, email, public_key) VALUES(?,?,?,?);"
 #         db.insert_user(conn, update_sql, doublename, sid, email, publickey)
 
+usersInRoom = {} #users that are in a room
+messageQueue = {} #messaged queued for a room (only queued when room is empty)
+socketRoom = {} #room bound to a socket
+
+def emitOrQueue(event, data, room):
+    if not room in usersInRoom  or usersInRoom[room] == 0:
+        if not room in messageQueue:
+            messageQueue[room] = []
+        print("queueing in room {}".format(room))
+        messageQueue[room].append((event, data, room))
+    else:
+       sio.emit(event, data, room)
+
 
 @sio.on('login')
 def login_handler(data):
@@ -101,7 +147,7 @@ def login_handler(data):
 
     if first_time == False and mobile == False:
         user = db.getUserByName(conn, double_name)
-        emit('login', data, room=user[0])
+        emitOrQueue('login', data, room=user[0])
 
     insert_auth_sql = "INSERT INTO auth (double_name,state_hash,timestamp,scanned,data) VALUES (?,?,?,?,?);"
     db.insert_auth(conn, insert_auth_sql, double_name, state, datetime.now(), 0, json.dumps(data))
@@ -121,7 +167,7 @@ def resend_handler(data):
 
     user = db.getUserByName(conn, data.get('doubleName').lower())
     data['type'] = 'login'
-    emit('login', data, room=user[0])
+    emitOrQueue('login', data, room=user[0])
 
 
 @app.route('/api/forcerefetch', methods=['GET'])
@@ -331,7 +377,7 @@ def set_email_verified_handler(doublename):
     logger.debug(user)
     logger.debug(user[4])
     data = {'type': 'email_verification'}
-    sio.emit('login', data, room=user[0])
+    emitOrQueue('login', data, room=user[0])
     return Response('Ok')
 
 

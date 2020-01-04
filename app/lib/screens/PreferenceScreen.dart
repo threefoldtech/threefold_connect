@@ -66,7 +66,7 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
     Navigator.push(
         context,
         MaterialPageRoute(
-            builder: (context) => ChangePinScreen(currentPin: pin)));
+            builder: (context) => ChangePinScreen(currentPin: pin, hideBackButton: false)));
   }
 
   @override

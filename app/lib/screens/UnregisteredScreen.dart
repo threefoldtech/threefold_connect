@@ -23,7 +23,7 @@ class _UnregisteredScreenState extends State<UnregisteredScreen>
 
     if (registered != null && registered) {
       await Navigator.push(
-          context, MaterialPageRoute(builder: (context) => ChangePinScreen()));
+          context, MaterialPageRoute(builder: (context) => ChangePinScreen(hideBackButton: true)));
       await Navigator.push(
           context,
           MaterialPageRoute(
@@ -40,7 +40,7 @@ class _UnregisteredScreenState extends State<UnregisteredScreen>
         context, MaterialPageRoute(builder: (context) => RecoverScreen()));
     if (registered != null && registered) {
       await Navigator.push(
-          context, MaterialPageRoute(builder: (context) => ChangePinScreen()));
+          context, MaterialPageRoute(builder: (context) => ChangePinScreen(hideBackButton: true)));
       await Navigator.push(
           context,
           MaterialPageRoute(

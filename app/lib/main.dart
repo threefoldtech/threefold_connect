@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:threebotlogin/helpers/HexColor.dart';
 import 'package:threebotlogin/router.dart';
 import 'package:threebotlogin/screens/MainScreen.dart';
@@ -28,7 +29,7 @@ class Globals {
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
+  SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
   // try {
   //   cameras = await availableCameras();
   // } on QRReaderException catch (e) {
@@ -39,7 +40,6 @@ Future<void> main() async {
 
   var email = await getEmail();
   // Email is now a tuple of address and the signedemail identifier, the bool is removed. But we need to migrate t. To be removed next version.
-
 
   Globals().emailVerified.value = (email['verified'] != null);
   bool registered = doubleName != null;

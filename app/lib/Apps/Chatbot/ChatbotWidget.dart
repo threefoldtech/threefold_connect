@@ -24,8 +24,8 @@ class _ChatbotState extends State<ChatbotWidget>
     iaWebview = InAppWebView(
       initialUrl: '${config.url()}$email',
       initialHeaders: {},
-      initialOptions: InAppWebViewWidgetOptions(
-          android: AndroidInAppWebViewOptions(supportMultipleWindows: true)),
+      initialOptions: InAppWebViewWidgetOptions( crossPlatform: InAppWebViewOptions(useShouldOverrideUrlLoading: true),
+          android: AndroidInAppWebViewOptions( supportMultipleWindows: true)),
       onWebViewCreated: (InAppWebViewController controller) {
         webView = controller;
       },

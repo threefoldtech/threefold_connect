@@ -68,7 +68,7 @@ class AppConfigStaging extends AppConfigImpl {
   }
 
   String threeBotSocketUrl() {
-    return "wss://login.staging.jimber.org";
+    return "ws://192.168.0.221:5000";
   }
 
   Map<String, String> circleUrls() {
