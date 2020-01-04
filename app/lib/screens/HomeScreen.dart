@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:threebotlogin/Apps/FreeFlowPages/FfpEvents.dart';
+import 'package:threebotlogin/Apps/FreeFlowPages/ffp.dart';
 import 'package:threebotlogin/Events/Events.dart';
 import 'package:threebotlogin/Events/GoHomeEvent.dart';
 import 'package:threebotlogin/helpers/HexColor.dart';
@@ -31,7 +32,6 @@ class _HomeScreenState extends State<HomeScreen>
         initialIndex: 0, length: Globals().router.routes.length, vsync: this);
     Events().onEvent(FfpBrowseEvent().runtimeType, activateFfpTab);
     _tabController.addListener(_handleTabSelection);
-    
   }
 
   _handleTabSelection() async {
@@ -46,6 +46,7 @@ class _HomeScreenState extends State<HomeScreen>
 
   activateFfpTab(FfpBrowseEvent event) {
     int ffpTab = 2;
+    Ffp().firstUrlToLoad = event.url;
     setState(() {
       _tabController.animateTo(ffpTab);
     });
@@ -65,8 +66,8 @@ class _HomeScreenState extends State<HomeScreen>
     createSocketConnection(context);
     Events().onEvent(GoHomeEvent().runtimeType, close);
     _checkLoginAttempts();
-    
   }
+
   _checkLoginAttempts() async {
     checkLoginAttempts(await getDoubleName());
   }
@@ -109,9 +110,13 @@ class _HomeScreenState extends State<HomeScreen>
       return Future(() => true); // if home screen exit
     }
     if (Globals().router.routes[_tabController.index].app == null) {
-      Events().emit(GoHomeEvent());  // if not an app, eg settings, go home
+      Events().emit(GoHomeEvent()); // if not an app, eg settings, go home
     }
-    Globals().router.routes[_tabController.index].app.back(); // if app ask app to handle back event
+    Globals()
+        .router
+        .routes[_tabController.index]
+        .app
+        .back(); // if app ask app to handle back event
 
     return Future(() => false);
   }

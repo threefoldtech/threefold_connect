@@ -30,11 +30,7 @@ class Globals {
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
-  // try {
-  //   cameras = await availableCameras();
-  // } on QRReaderException catch (e) {
-  //   print(e);
-  // }
+
   bool initDone = await getInitDone();
   String doubleName = await getDoubleName();
 

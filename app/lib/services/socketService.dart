@@ -33,7 +33,7 @@ createSocketConnection(BuildContext context) async {
   socket.on('connect', (res) {
     print('connected');
     // once a client has connected, we let him join a room
-    socket.emit('join', {'room': doubleName.toLowerCase()});
+    socket.emit('join', {'room': doubleName.toLowerCase(), 'app' : true});
     print('joined room');
     connected = true;
   });
@@ -66,7 +66,7 @@ void closeSocketConnection(String doubleName) {
 
 void joinRoom(String doubleName) {
   print('joining room....');
-  socket.emit('join', {'room': doubleName});
+  socket.emit('join', {'room': doubleName, 'app': true});
 }
 
 void socketLoginMobile(Map<String, dynamic> data) {

@@ -319,7 +319,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                     onPressed: () {
                       cancelIt();
-                      Navigator.of(context).pop();
+                      Navigator.pop(context, false);
                       _onWillPop();
                     },
                   ),
@@ -367,7 +367,6 @@ class _LoginScreenState extends State<LoginScreen> {
 
   cancelIt() async {
     cancelLogin(await getDoubleName());
-    Navigator.popUntil(context, ModalRoute.withName('/'));
   }
 
   sendIt() async {

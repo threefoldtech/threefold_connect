@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:threebotlogin/Apps/FreeFlowPages/FfpConfig.dart';
 import 'package:threebotlogin/Apps/FreeFlowPages/FfpEvents.dart';
+import 'package:threebotlogin/Apps/FreeFlowPages/ffp.dart';
 import 'package:threebotlogin/Browser.dart';
 import 'package:threebotlogin/ClipboardHack/ClipboardHack.dart';
 import 'package:threebotlogin/Events/Events.dart';
@@ -18,16 +19,17 @@ class FfpWidget extends StatefulWidget {
 
 class _FfpState extends State<FfpWidget> with AutomaticKeepAliveClientMixin {
   InAppWebViewController webView;
-  String url = "";
+
   double progress = 0;
   FfpConfig config = FfpConfig();
+  bool switchToCircle = false;
 
   InAppWebView iaWebview;
   _FfpState() {
     iaWebview = new InAppWebView(
       initialUrl: config.cookieUrl(),
       initialHeaders: {},
-      initialOptions: InAppWebViewWidgetOptions(crossPlatform: InAppWebViewOptions(useShouldOverrideUrlLoading: true),
+      initialOptions: InAppWebViewWidgetOptions(
           android: AndroidInAppWebViewOptions(supportMultipleWindows: true)),
       onLoadStart: (InAppWebViewController controller, String url) {
         webView = controller;
@@ -42,6 +44,10 @@ class _FfpState extends State<FfpWidget> with AutomaticKeepAliveClientMixin {
         controller.injectCSSCode(
             source: ".crisp-client {display: none !important;}");
         addClipboardHack(controller);
+        if (switchToCircle) {
+          switchToCircle = false;
+          controller.loadUrl(url: Ffp().firstUrlToLoad);
+        }
       },
       onCreateWindow:
           (InAppWebViewController controller, OnCreateWindowRequest req) {
@@ -53,6 +59,7 @@ class _FfpState extends State<FfpWidget> with AutomaticKeepAliveClientMixin {
       },
       onProgressChanged: (InAppWebViewController controller, int progress) {},
     );
+
     Events().onEvent(FfpBrowseEvent().runtimeType, _browseToUrl);
     Events().onEvent(FfpBackEvent().runtimeType, _browserBack);
   }
@@ -70,11 +77,10 @@ class _FfpState extends State<FfpWidget> with AutomaticKeepAliveClientMixin {
   bool closeNext = false;
   _browserBack(FfpBackEvent event) async {
     String url = await webView.getUrl();
-    if(url.endsWith('/dashboard')){
+    if (url.endsWith('/dashboard')) {
       Events().emit(GoHomeEvent());
     }
     this.webView.goBack();
-
   }
 
   _browseToUrl(FfpBrowseEvent event) {
@@ -112,6 +118,7 @@ class _FfpState extends State<FfpWidget> with AutomaticKeepAliveClientMixin {
         'https://${config.appId()}${redirecturl}${union}username=${await getDoubleName()}&signedhash=${Uri.encodeComponent(await signedHash)}&data=$data';
 
     webView.loadUrl(url: loadUrl);
+    switchToCircle = true;
   }
 
   @override

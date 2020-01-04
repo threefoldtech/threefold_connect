@@ -161,6 +161,7 @@ export default {
         if (this.scope) url += `&scope=${encodeURIComponent(this.scope)}`
         if (this.appId) url += `&appId=${encodeURIComponent(this.appId)}`
         if (this.appPublicKey) url += `&appPublicKey=${encodeURIComponent(this.appPublicKey)}`
+        if (this.redirectUrl) url += `&redirecturl=${encodeURIComponent(this.redirectUrl)}`
         if (this.$route.query.logintoken) url += `&logintoken=${encodeURIComponent(this.$route.query.logintoken)}`
 
         window.open(url)

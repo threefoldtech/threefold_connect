@@ -43,7 +43,7 @@ class _ChangePinScreenState extends State<ChangePinScreen> {
     return Scaffold(
       appBar: new AppBar(
         backgroundColor: HexColor("#2d4052"),
-        title: Text("Change pincode"),
+        title: currentPin == null ? Text("Choose your pincode") : Text("Change pincode"),
         elevation: 0.0,
         automaticallyImplyLeading: !widget.hideBackButton
       ),
