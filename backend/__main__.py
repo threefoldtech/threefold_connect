@@ -66,20 +66,20 @@ def on_join(data):
     print("joining room # {} ".format(room))
     join_room(room)
     
+    if 'app' in data:
+        socketRoom[request.sid] = room
 
-    socketRoom[request.sid] = room
-
-    if not room in usersInRoom:
-        usersInRoom[room] = 1
-    else:
-        usersInRoom[room] += 1
-    if room in messageQueue:
-        print("room {} is in messagq".format(room))
-        for message in messageQueue[room]:
-            print("emitting message {} {} {} ".format(message[0], message[1],message[2]))
-            sio.emit(message[0], message[1], room=message[2])
-        messageQueue[room] = []
-    
+        if not room in usersInRoom:
+            usersInRoom[room] = 1
+        else:
+            usersInRoom[room] += 1
+        if room in messageQueue:
+            print("room {} is in messagq".format(room))
+            for message in messageQueue[room]:
+                print("emitting message {} {} {} ".format(message[0], message[1],message[2]))
+                sio.emit(message[0], message[1], room=message[2])
+            messageQueue[room] = []
+        
 
 @sio.on('leave')
 def on_leave(data):
