@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
+import 'package:threebotlogin/Events/Events.dart';
+import 'package:threebotlogin/Events/NewLoginEvent.dart';
 import 'package:threebotlogin/screens/SuccessfulScreen.dart';
 import 'package:threebotlogin/services/userService.dart';
 import 'dart:convert';
@@ -75,6 +77,7 @@ void socketLoginMobile(Map<String, dynamic> data) {
 }
 
 Future openLogin(context, data) async {
+  Events().emit(NewLoginEvent());
   String messageType = data["type"];
   var mobile = data["mobile"];
   var loginToken = data["loginToken"];
@@ -87,7 +90,7 @@ Future openLogin(context, data) async {
     return await loginFromToken(loginToken, state, publicKey, appId, scope);
   }
 
-  if (messageType == 'login' && mobile != 'true') {
+  if (messageType == 'login' && mobile != true) {
     var loggedIn = await Navigator.push(
         context, MaterialPageRoute(builder: (context) => LoginScreen(data)));
     if (loggedIn) {

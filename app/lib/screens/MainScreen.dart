@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -6,6 +7,7 @@ import 'package:threebotlogin/main.dart';
 import 'package:threebotlogin/screens/HomeScreen.dart';
 import 'package:threebotlogin/screens/InitScreen.dart';
 import 'package:threebotlogin/screens/UnregisteredScreen.dart';
+import 'package:threebotlogin/widgets/CustomDialog.dart';
 import 'package:threebotlogin/widgets/ErrorWidget.dart';
 import 'package:threebotlogin/services/uniLinkService.dart';
 import 'package:uni_links/uni_links.dart';
@@ -25,6 +27,22 @@ class _AppState extends State<MainScreen> {
   StreamSubscription _sub;
 
   pushScreens() async {
+    try {
+      final result = await InternetAddress.lookup('google.com');
+      if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
+        print('connected to the internet');
+      }
+    } on SocketException catch (_) {
+      var dialog = CustomDialog(
+          title: "No internet connection available",
+          description: Text(
+            "Please enable your internet connection to use this app.",
+            textAlign: TextAlign.center,
+          ));
+      await dialog.show(context);
+      SystemNavigator.pop();
+    }
+
     if (widget.initDone != null && !widget.initDone) {
       await Navigator.push(
           context, MaterialPageRoute(builder: (context) => InitScreen()));

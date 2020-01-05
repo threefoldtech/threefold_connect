@@ -3,6 +3,8 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:threebotlogin/Events/Events.dart';
+import 'package:threebotlogin/Events/NewLoginEvent.dart';
 import 'package:threebotlogin/services/fingerprintService.dart';
 import 'package:threebotlogin/widgets/ImageButton.dart';
 import 'package:threebotlogin/widgets/PinField.dart';
@@ -37,9 +39,9 @@ Future<bool> _onWillPop() async {
 class _LoginScreenState extends State<LoginScreen> {
   String helperText = '';
   String scopeTextMobile =
-      'Please select your preferred scopes and press Accept';
+      'Please select the data you want to share and press Accept';
   String scopeText =
-      'Please select your preferred scopes and press the corresponding emoji';
+      'Please select the data you want to share and press the corresponding emoji';
 
   List<int> imageList = new List();
   Map scope = Map();
@@ -54,9 +56,14 @@ class _LoginScreenState extends State<LoginScreen> {
 
   final _scaffoldKey = GlobalKey<ScaffoldState>();
 
+  _newLogin(NewLoginEvent event){
+    //new login attempt, get rid of this screen
+    Navigator.pop(context, false);
+  }
   @override
   void initState() {
     super.initState();
+   
     isMobileCheck = checkMobile();
 
     makePermissionPrefs();
@@ -75,6 +82,7 @@ class _LoginScreenState extends State<LoginScreen> {
     } else {
       checkFingerPrintActive();
     }
+     Events().onEvent(NewLoginEvent().runtimeType, _newLogin);
   }
 
   void generateEmojiImageList() {
@@ -253,19 +261,25 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
             Visibility(
               visible: isMobileCheck,
-              child: RaisedButton(
-                shape: new RoundedRectangleBorder(
-                  borderRadius: new BorderRadius.circular(30),
+           
+              child: 
+                 Padding(
+                   padding: const EdgeInsets.only(bottom: 30.0),
+                child: RaisedButton(
+                  shape: new RoundedRectangleBorder(
+                    borderRadius: new BorderRadius.circular(30),
+                  ),
+                  padding:
+                      EdgeInsets.symmetric(horizontal: 11.0, vertical: 6.0),
+                  color: Theme.of(context).accentColor,
+                  child: Text(
+                    'Accept',
+                    style: TextStyle(color: Colors.white, fontSize: 22),
+                  ),
+                  onPressed: () {
+                    sendIt();
+                  },
                 ),
-                padding: EdgeInsets.symmetric(horizontal: 11.0, vertical: 6.0),
-                color: Theme.of(context).accentColor,
-                child: Text(
-                  'Accept',
-                  style: TextStyle(color: Colors.white, fontSize: 22),
-                ),
-                onPressed: () {
-                  sendIt();
-                },
               ),
             )
           ],

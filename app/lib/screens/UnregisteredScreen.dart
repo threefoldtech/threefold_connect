@@ -24,11 +24,6 @@ class _UnregisteredScreenState extends State<UnregisteredScreen>
     if (registered != null && registered) {
       await Navigator.push(
           context, MaterialPageRoute(builder: (context) => ChangePinScreen(hideBackButton: true)));
-      await Navigator.push(
-          context,
-          MaterialPageRoute(
-              builder: (context) => SuccessfulScreen(
-                  title: "Registered", text: "You are now registered.")));
      /* CustomDialog(
           title: "Registered", description: Text("You are now registered.")).show(context);*/
       Navigator.pop(context);
@@ -107,7 +102,7 @@ class _UnregisteredScreenState extends State<UnregisteredScreen>
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: <Widget>[
-                    Text('Welcome to 3Bot connect.',
+                    Text('Welcome to 3Bot Connect.',
                         style: TextStyle(fontSize: 24, color: Colors.black)),
                     SizedBox(height: 10),
                     RaisedButton(
