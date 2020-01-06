@@ -3,7 +3,7 @@ class Events {
   factory Events() {
     return _singleton;
   }
-  final Map<Type, dynamic> eventList = Map<Type, dynamic>();
+  Map<Type, dynamic> eventList = Map<Type, dynamic>();
 
   Events._internal(); // init here
 
@@ -23,5 +23,8 @@ class Events {
     for (var function in this.eventList[eventType]) {
       function(event);
     }
+  }
+  reset(){
+    eventList = Map<Type, dynamic>();
   }
 }

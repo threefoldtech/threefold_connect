@@ -3,6 +3,8 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:threebotlogin/Events/Events.dart';
+import 'package:threebotlogin/Events/UniLinkEvent.dart';
 import 'package:threebotlogin/main.dart';
 import 'package:threebotlogin/screens/HomeScreen.dart';
 import 'package:threebotlogin/screens/InitScreen.dart';
@@ -61,17 +63,20 @@ class _AppState extends State<MainScreen> {
 
     _backendConnection = BackendConnection(await getDoubleName());
     _backendConnection.init();
+    _sub.cancel();
     await Navigator.pushReplacement(
         context,
         MaterialPageRoute(
             builder: (context) => HomeScreen(
-                  backendConnection: _backendConnection,initialLink: initialLink,
+                  backendConnection: _backendConnection,
+                  initialLink: initialLink,
                 )));
   }
 
   @override
   void initState() {
     super.initState();
+    Events().reset();
     initUniLinks();
     WidgetsBinding.instance.addPostFrameCallback((_) => pushScreens());
   }
@@ -80,7 +85,10 @@ class _AppState extends State<MainScreen> {
     initialLink = await getInitialLink();
 
     _sub = getLinksStream().listen((String incomingLink) {
-      this.initialLink = incomingLink;
+      if (!mounted) {
+        return;
+      }
+      initialLink = incomingLink;
     });
   }
 

@@ -7,6 +7,7 @@ import 'package:threebotlogin/Apps/FreeFlowPages/ffp.dart';
 import 'package:threebotlogin/Events/Events.dart';
 import 'package:threebotlogin/Events/GoHomeEvent.dart';
 import 'package:threebotlogin/Events/NewLoginEvent.dart';
+import 'package:threebotlogin/Events/UniLinkEvent.dart';
 import 'package:threebotlogin/helpers/HexColor.dart';
 import 'package:threebotlogin/main.dart';
 import 'package:threebotlogin/services/3botService.dart';
@@ -82,17 +83,21 @@ class _HomeScreenState extends State<HomeScreen>
   }
 
   Future<Null> initUniLinks() async {
+    Events().onEvent(
+        UniLinkEvent(null, null, null).runtimeType, checkWhatPageToOpen);
     initialLink = widget.initialLink;
 
     if (initialLink != null) {
-      checkWhatPageToOpen(
-          Uri.parse(initialLink), context, widget.backendConnection);
-    } else {
-      _sub = getLinksStream().listen((String incomingLink) {
-        checkWhatPageToOpen(
-            Uri.parse(incomingLink), context, widget.backendConnection);
-      });
+      Events().emit(UniLinkEvent(
+          Uri.parse(initialLink), context, widget.backendConnection));
     }
+    _sub = getLinksStream().listen((String incomingLink) {
+      if (!mounted) {
+        return;
+      }
+      Events().emit(UniLinkEvent(
+          Uri.parse(incomingLink), context, widget.backendConnection));
+    });
   }
 
   _checkLoginAttempts() async {

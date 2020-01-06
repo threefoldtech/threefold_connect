@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:threebotlogin/Events/UniLinkEvent.dart';
 import 'package:threebotlogin/screens/LoginScreen.dart';
 import 'package:threebotlogin/screens/SuccessfulScreen.dart';
 import 'package:threebotlogin/services/socketService.dart';
@@ -15,8 +16,11 @@ Map<String, dynamic> data = {
   'state': ''
 };
 
-checkWhatPageToOpen(
-    Uri link, BuildContext context, BackendConnection connection) async {
+checkWhatPageToOpen(UniLinkEvent e) async {
+  Uri link = e.link;
+  BuildContext context = e.context;
+  BackendConnection connection = e.connection;
+
   String doubleName = await getDoubleName();
   if (context != null) {
     ctx = context;
@@ -41,17 +45,20 @@ checkWhatPageToOpen(
       // send login request
       connection.socketLoginMobile(data);
 
-      await Navigator.push(
+      var loggedIn = await Navigator.push(
           ctx,
           MaterialPageRoute(
               builder: (context) =>
-                  LoginScreen(link.queryParameters  , autoLogin: autoLogin)));
-      await Navigator.push(
-          context,
-          MaterialPageRoute(
-              builder: (context) => SuccessfulScreen(
-                  title: "Logged in",
-                  text: "You are now logged in. Return to browser.")));
+                  LoginScreen(link.queryParameters, autoLogin: autoLogin)));
+
+      if (loggedIn) {
+        await Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => SuccessfulScreen(
+                    title: "Logged in",
+                    text: "You are now logged in. Return to browser.")));
+      }
     }
   }
 }
