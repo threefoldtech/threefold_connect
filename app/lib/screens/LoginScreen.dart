@@ -56,7 +56,7 @@ class _LoginScreenState extends State<LoginScreen> {
     if (!this.mounted) {
       return;
     }
-    if (event.loginId != widget.message['loginId']) {
+    if (!isMobileCheck && event.loginId != widget.message['loginId']) {
       Navigator.pop(context, false);
     }
   }
