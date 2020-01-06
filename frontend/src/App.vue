@@ -1,8 +1,8 @@
 <template>
   <v-app>
     <div class="overlay primary darken-2"></div>
-    <v-content fill-height>
-      <v-container>
+    <v-content class="fill-height">
+      <v-container class="fill-height">
         <router-view/>
       </v-container>
     </v-content>
