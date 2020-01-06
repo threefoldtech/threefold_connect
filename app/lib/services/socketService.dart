@@ -96,12 +96,13 @@ Future openLogin(context, data) async {
   if (messageType == 'login' && mobile != true) {
     var loggedIn = await Navigator.push(
         context, MaterialPageRoute(builder: (context) => LoginScreen(data)));
+    
     if (loggedIn) {
       await Navigator.push(
           context,
           MaterialPageRoute(
               builder: (context) => SuccessfulScreen(
-                  title: "Logged in", text: "You are now logged in.")));
+                  title: "Logged in", text: "You are now logged in. Return to browser.")));
     }
   } else if (messageType == 'email_verification') {
     getEmail().then((email) async {

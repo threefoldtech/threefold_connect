@@ -19,7 +19,8 @@ Map<String, dynamic> data = {
   'state': ''
 };
 
-checkWhatPageToOpen(Uri link, BuildContext context, BackendConnection connection) async {
+checkWhatPageToOpen(
+    Uri link, BuildContext context, BackendConnection connection) async {
   String doubleName = await getDoubleName();
   if (context != null) {
     ctx = context;
@@ -44,11 +45,17 @@ checkWhatPageToOpen(Uri link, BuildContext context, BackendConnection connection
       // send login request
       connection.socketLoginMobile(data);
 
-     await Navigator.push(
+      await Navigator.push(
           ctx,
           MaterialPageRoute(
               builder: (context) =>
                   LoginScreen(link.queryParameters, autoLogin: autoLogin)));
+      await Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) => SuccessfulScreen(
+                  title: "Logged in",
+                  text: "You are now logged in. Return to browser.")));
     } else {
       if (doubleName == null) {
         final bool registered = await Navigator.push(
@@ -74,16 +81,15 @@ checkWhatPageToOpen(Uri link, BuildContext context, BackendConnection connection
           Timer(
               Duration(seconds: 2),
               () async => {
-                // Get the doublename and send a login request
-                data['doubleName'] = await getDoubleName(),
-                connection.socketLoginMobile(data),
-                Navigator.push(
-                  ctx,
-                  MaterialPageRoute(
-                      builder: (context) =>
-                          LoginScreen(link.queryParameters)))
-              }
-          );
+                    // Get the doublename and send a login request
+                    data['doubleName'] = await getDoubleName(),
+                    connection.socketLoginMobile(data),
+                    Navigator.push(
+                        ctx,
+                        MaterialPageRoute(
+                            builder: (context) =>
+                                LoginScreen(link.queryParameters)))
+                  });
         }
       }
     }
