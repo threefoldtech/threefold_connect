@@ -12,7 +12,8 @@ class Ffp implements App {
     return _singleton;
   }
 
-  Ffp._internal() {}
+  Ffp._internal();
+  
   String firstUrlToLoad = ""; // quick fix make pretty
   @override
   Future<Widget> widget() async {

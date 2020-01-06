@@ -1,11 +1,12 @@
 enum Environment { Staging, Production, Local }
 
 abstract class EnvConfig {
-  Environment enviroment = Environment.Staging;
+  Environment enviroment = Environment.Local;
 }
 
 class AppConfig extends EnvConfig {
   AppConfigImpl appConfig;
+  
   AppConfig() {
     if (enviroment == Environment.Staging) {
       appConfig = AppConfigStaging();
@@ -15,6 +16,7 @@ class AppConfig extends EnvConfig {
       appConfig = AppConfigLocal();
     }
   }
+
   String openKycApiUrl() {
     return appConfig.openKycApiUrl();
   }

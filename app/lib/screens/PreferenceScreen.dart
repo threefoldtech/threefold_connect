@@ -4,7 +4,6 @@ import 'package:package_info/package_info.dart';
 import 'package:threebotlogin/helpers/HexColor.dart';
 import 'package:threebotlogin/main.dart';
 import 'package:threebotlogin/screens/ChangePinScreen.dart';
-import 'package:threebotlogin/screens/UnregisteredScreen.dart';
 import 'package:threebotlogin/services/fingerprintService.dart';
 import 'package:threebotlogin/services/openKYCService.dart';
 import 'package:threebotlogin/services/userService.dart';

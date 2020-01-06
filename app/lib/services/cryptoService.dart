@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:typed_data';
-import 'package:convert/convert.dart';
 import 'package:flutter_sodium/flutter_sodium.dart';
 import 'package:bip39/bip39.dart' as bip39;
 import 'package:password_hash/password_hash.dart';

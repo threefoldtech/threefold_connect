@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:package_info/package_info.dart';
 import 'package:threebotlogin/main.dart';
-import 'package:threebotlogin/services/WebviewService.dart';
 
 class ErrorScreen extends StatefulWidget {
   final Widget errorScreen;
