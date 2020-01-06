@@ -53,6 +53,7 @@ class BackendConnection {
       print('disconnect');
 
     });
+    
 
     socket.on('fromServer', (_) => print(_));
     socket.on('connect_error', (err) => print(err));
