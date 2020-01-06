@@ -6,6 +6,7 @@ abstract class EnvConfig {
 
 class AppConfig extends EnvConfig {
   AppConfigImpl appConfig;
+  
   AppConfig() {
     if (enviroment == Environment.Staging) {
       appConfig = AppConfigStaging();
@@ -15,6 +16,7 @@ class AppConfig extends EnvConfig {
       appConfig = AppConfigLocal();
     }
   }
+
   String openKycApiUrl() {
     return appConfig.openKycApiUrl();
   }
@@ -89,19 +91,19 @@ class AppConfigStaging extends AppConfigImpl {
 
 class AppConfigLocal extends AppConfigImpl {
   String openKycApiUrl() {
-    return "http://192.168.0.225:5005";
+    return "http://192.168.2.60:5005";
   }
 
   String threeBotApiUrl() {
-    return "http://192.168.0.225:5000/api";
+    return "http://192.168.2.60:5000/api";
   }
 
   String threeBotFrontEndUrl() {
-    return "http://192.168.0.225:8001";
+    return "http://192.168.2.60:8081";
   }
 
   String threeBotSocketUrl() {
-    return "ws://192.168.0.225:5000";
+    return "ws://192.168.2.60:5000";
   }
 
   Map<String, String> circleUrls() {

@@ -9,7 +9,6 @@ import 'package:threebotlogin/screens/MobileRegistrationScreen.dart';
 import 'package:threebotlogin/screens/SuccessfulScreen.dart';
 import 'package:threebotlogin/services/socketService.dart';
 import 'package:threebotlogin/services/userService.dart';
-import 'package:threebotlogin/widgets/CustomDialog.dart';
 
 BuildContext ctx;
 Map<String, dynamic> data = {
@@ -20,7 +19,7 @@ Map<String, dynamic> data = {
   'state': ''
 };
 
-checkWhatPageToOpen(Uri link, BuildContext context) async {
+checkWhatPageToOpen(Uri link, BuildContext context, BackendConnection connection) async {
   String doubleName = await getDoubleName();
   if (context != null) {
     ctx = context;
@@ -43,9 +42,9 @@ checkWhatPageToOpen(Uri link, BuildContext context) async {
       }
 
       // send login request
-      socketLoginMobile(data);
+      connection.socketLoginMobile(data);
 
-      Navigator.push(
+     await Navigator.push(
           ctx,
           MaterialPageRoute(
               builder: (context) =>
@@ -77,7 +76,7 @@ checkWhatPageToOpen(Uri link, BuildContext context) async {
               () async => {
                 // Get the doublename and send a login request
                 data['doubleName'] = await getDoubleName(),
-                socketLoginMobile(data),
+                connection.socketLoginMobile(data),
                 Navigator.push(
                   ctx,
                   MaterialPageRoute(

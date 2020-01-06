@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
+import 'package:threebotlogin/Events/CloseSocketEvent.dart';
 import 'package:threebotlogin/Events/Events.dart';
 import 'package:threebotlogin/Events/NewLoginEvent.dart';
 import 'package:threebotlogin/screens/SuccessfulScreen.dart';
@@ -14,67 +15,69 @@ import 'package:threebotlogin/widgets/CustomDialog.dart';
 
 import '../AppConfig.dart';
 
-IO.Socket socket;
-bool connected = false;
+class BackendConnection {
+  IO.Socket socket;
 
-String threeBotSocketUrl = AppConfig().threeBotSocketUrl();
+  String doubleName;
+  String threeBotSocketUrl = AppConfig().threeBotSocketUrl();
 
-createSocketConnection(BuildContext context) async {
-  if (connected) return;
+  BackendConnection(this.doubleName);
 
-  String doubleName = await getDoubleName();
-  if (doubleName == null) {
-    print('no doublename is set, not opening socket');
-    return;
+  init() async {
+    print('creating socket connection....');
+    socket = IO.io(threeBotSocketUrl, <String, dynamic>{
+      'transports': ['websocket'],
+      'forceNew' : true
+    });
+    socket.on('connect', (res) {
+      print('connected');
+      // once a client has connected, we let him join a room
+      socket.emit('join', {'room': doubleName.toLowerCase(), 'app': true});
+      print('joined room');
+
+    });
+
+    socket.on('signed', (data) {
+      print('---------signed-----------');
+      print(data);
+    });
+
+    socket.on('login', (data) {
+      print('---------login-----------');
+      print(data);
+      data['loginId'] = randomString(10);
+      Events().emit(NewLoginEvent(data: data, loginId: data['loginId']));
+    });
+
+    socket.on('disconnect', (_) {
+      print('disconnect');
+
+    });
+    
+
+    socket.on('fromServer', (_) => print(_));
+    socket.on('connect_error', (err) => print(err));
+    Events().onEvent(CloseSocketEvent().runtimeType, closeSocketConnection);
   }
 
-  print('creating socket connection....');
-  socket = IO.io(threeBotSocketUrl, <String, dynamic>{
-    'transports': ['websocket']
-  });
+  void closeSocketConnection(CloseSocketEvent event) {
+    print('closing socket connection....');
+    socket.emit('leave', {'room': doubleName});
+    socket.clearListeners();
+    socket.disconnect();
+    socket.close();
+    socket.destroy();
+  }
 
-  socket.on('connect', (res) {
-    print('connected');
-    // once a client has connected, we let him join a room
-    socket.emit('join', {'room': doubleName.toLowerCase(), 'app' : true});
-    print('joined room');
-    connected = true;
-  });
+  void joinRoom() {
+    print('joining room....');
+    socket.emit('join', {'room': doubleName, 'app': true});
+  }
 
-  socket.on('signed', (data) {
-    print('---------signed-----------');
-    print(data);
-  });
-
-  socket.on('login', (data) {
-    print('---------login-----------');
-    print(data);
-    openLogin(context, data);
-  });
-
-  socket.on('disconnect', (_) {
-    print('disconnect');
-    connected = false;
-  });
-
-  socket.on('fromServer', (_) => print(_));
-  socket.on('connect_error', (err) => print(err));
-}
-
-void closeSocketConnection(String doubleName) {
-  print('closing socket connection....');
-  socket.emit('leave', {'room': doubleName});
-  socket.close();
-}
-
-void joinRoom(String doubleName) {
-  print('joining room....');
-  socket.emit('join', {'room': doubleName, 'app': true});
-}
-
-void socketLoginMobile(Map<String, dynamic> data) {
-  print('loging in');
-  return socket.emit('login', data);
+  void socketLoginMobile(Map<String, dynamic> data) {
+    print('loging in');
+    return socket.emit('login', data);
+  }
 }
 
 Future openLogin(context, data) async {
@@ -85,8 +88,7 @@ Future openLogin(context, data) async {
   var publicKey = data['appPublicKey'];
   var scope = data["scope"];
   var appId = data['appId'];
-  data['loginId'] = randomString(10);
-  Events().emit(NewLoginEvent(loginId: data['loginId']));
+
   if (loginToken != null) {
     return await loginFromToken(loginToken, state, publicKey, appId, scope);
   }
@@ -149,8 +151,8 @@ Future openLogin(context, data) async {
   }
 }
 
-Future<void> loginFromToken(
-    String loginToken, String state, String publicKey, String appId, String stringScope) async {
+Future<void> loginFromToken(String loginToken, String state, String publicKey,
+    String appId, String stringScope) async {
   if (loginToken == await getLoginToken()) {
     var privateKey = getPrivateKey();
     var email = getEmail();

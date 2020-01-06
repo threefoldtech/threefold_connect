@@ -13,7 +13,7 @@ class Wallet implements App {
     return _singleton;
   }
 
-  Wallet._internal() {}
+  Wallet._internal();
 
   Future<Widget> widget() async {
     return _walletWidget;

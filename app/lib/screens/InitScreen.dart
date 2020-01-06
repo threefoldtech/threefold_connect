@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:threebotlogin/services/userService.dart';
 
 class InitScreen extends StatefulWidget {
@@ -27,7 +26,7 @@ class _InitState extends State<InitScreen>  {
   _InitState() {
 
     iaWebView = InAppWebView(
-      initialUrl: 'https://www.jimber.org/wizardnew?nocache=6',
+      initialUrl: 'https://wizard.jimber.org/',
       initialHeaders: {},
       initialOptions: InAppWebViewWidgetOptions(
           android: AndroidInAppWebViewOptions(supportMultipleWindows: true)),

@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:package_info/package_info.dart';
+import 'package:threebotlogin/Events/CloseSocketEvent.dart';
+import 'package:threebotlogin/Events/Events.dart';
 import 'package:threebotlogin/helpers/HexColor.dart';
 import 'package:threebotlogin/main.dart';
 import 'package:threebotlogin/screens/ChangePinScreen.dart';
-import 'package:threebotlogin/screens/UnregisteredScreen.dart';
 import 'package:threebotlogin/services/fingerprintService.dart';
 import 'package:threebotlogin/services/openKYCService.dart';
+import 'package:threebotlogin/services/socketService.dart';
 import 'package:threebotlogin/services/userService.dart';
 import 'package:threebotlogin/widgets/CustomDialog.dart';
 import 'package:threebotlogin/widgets/EmailVerificationNeeded.dart';
@@ -306,8 +308,10 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
           FlatButton(
               child: new Text("Yes"),
               onPressed: () async {
+                Events().emit(CloseSocketEvent());
                 bool result = await clearData();
                 if (result) {
+                  
                   Navigator.pop(context); // pop pref
                   await Navigator.pushReplacement( // replace home
                       //@todo this feels like a bug, should not push on current screen

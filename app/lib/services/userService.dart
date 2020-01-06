@@ -186,5 +186,7 @@ Future<bool> getInitDone() async {
 
 Future<bool> clearData() async {
   final pref = await SharedPreferences.getInstance();
-  return await pref.clear();
+   bool cleared = await pref.clear();
+   saveInitDone();
+  return cleared;
 }

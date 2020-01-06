@@ -115,7 +115,7 @@ class _FfpState extends State<FfpWidget> with AutomaticKeepAliveClientMixin {
         (await encrypt(jsonEncode(scopeData), publickey, privateKey)));
     var data = Uri.encodeQueryComponent(jsonData); //Uri.encodeFull();
     var loadUrl =
-        'https://${config.appId()}${redirecturl}${union}username=${await getDoubleName()}&signedhash=${Uri.encodeComponent(await signedHash)}&data=$data';
+        'https://${config.appId()}$redirecturl${union}username=${await getDoubleName()}&signedhash=${Uri.encodeComponent(await signedHash)}&data=$data';
 
     webView.loadUrl(url: loadUrl);
     switchToCircle = true;
