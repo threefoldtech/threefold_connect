@@ -6,6 +6,7 @@ abstract class EnvConfig {
 
 class AppConfig extends EnvConfig {
   AppConfigImpl appConfig;
+  
   AppConfig() {
     if (enviroment == Environment.Staging) {
       appConfig = AppConfigStaging();
@@ -15,6 +16,7 @@ class AppConfig extends EnvConfig {
       appConfig = AppConfigLocal();
     }
   }
+
   String openKycApiUrl() {
     return appConfig.openKycApiUrl();
   }

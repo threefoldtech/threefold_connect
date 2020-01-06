@@ -5,7 +5,6 @@ import 'package:threebotlogin/screens/ChangePinScreen.dart';
 import 'package:threebotlogin/screens/MobileRegistrationScreen.dart';
 import 'package:threebotlogin/screens/RecoverScreen.dart';
 import 'package:threebotlogin/screens/SuccessfulScreen.dart';
-import 'package:threebotlogin/widgets/CustomDialog.dart';
 
 class UnregisteredScreen extends StatefulWidget {
   UnregisteredScreen();
