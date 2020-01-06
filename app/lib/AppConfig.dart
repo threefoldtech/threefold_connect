@@ -1,7 +1,7 @@
 enum Environment { Staging, Production, Local }
 
 abstract class EnvConfig {
-  Environment enviroment = Environment.Staging;
+  Environment enviroment = Environment.Local;
 }
 
 class AppConfig extends EnvConfig {
@@ -91,19 +91,19 @@ class AppConfigStaging extends AppConfigImpl {
 
 class AppConfigLocal extends AppConfigImpl {
   String openKycApiUrl() {
-    return "http://192.168.2.231:5005";
+    return "http://192.168.2.60:5005";
   }
 
   String threeBotApiUrl() {
-    return "http://192.168.2.231:5000/api";
+    return "http://192.168.2.60:5000/api";
   }
 
   String threeBotFrontEndUrl() {
-    return "http://192.168.2.231:8080";
+    return "http://192.168.2.60:8081";
   }
 
   String threeBotSocketUrl() {
-    return "ws://192.168.2.231:5000";
+    return "ws://192.168.2.60:5000";
   }
 
   Map<String, String> circleUrls() {

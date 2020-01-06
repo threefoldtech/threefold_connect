@@ -7,6 +7,8 @@ import 'package:threebotlogin/main.dart';
 import 'package:threebotlogin/screens/HomeScreen.dart';
 import 'package:threebotlogin/screens/InitScreen.dart';
 import 'package:threebotlogin/screens/UnregisteredScreen.dart';
+import 'package:threebotlogin/services/socketService.dart';
+import 'package:threebotlogin/services/userService.dart';
 import 'package:threebotlogin/widgets/CustomDialog.dart';
 import 'package:threebotlogin/widgets/ErrorWidget.dart';
 import 'package:threebotlogin/services/uniLinkService.dart';
@@ -25,6 +27,7 @@ class MainScreen extends StatefulWidget {
 class _AppState extends State<MainScreen> {
   _AppState();
   StreamSubscription _sub;
+  BackendConnection _backendConnection;
 
   pushScreens() async {
     try {
@@ -53,15 +56,18 @@ class _AppState extends State<MainScreen> {
     }
 
     await Globals().router.init();
+    
+    _backendConnection = BackendConnection(await getDoubleName());
+    _backendConnection.init();
     await Navigator.pushReplacement(
-        context, MaterialPageRoute(builder: (context) => HomeScreen()));
+        context, MaterialPageRoute(builder: (context) => HomeScreen(backendConnection: _backendConnection,)));
   }
 
   @override
   void initState() {
     super.initState();
     _sub = getLinksStream().listen((String incomingLink) {
-      checkWhatPageToOpen(Uri.parse(incomingLink), context);
+      checkWhatPageToOpen(Uri.parse(incomingLink), context, _backendConnection);
     });
     WidgetsBinding.instance.addPostFrameCallback((_) => pushScreens());
   }

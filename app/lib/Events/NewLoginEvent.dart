@@ -2,5 +2,6 @@
 
 class NewLoginEvent{
   String loginId;
-  NewLoginEvent({this.loginId});
+  dynamic data;
+  NewLoginEvent({this.loginId, this.data});
 }

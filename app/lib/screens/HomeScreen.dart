@@ -6,6 +6,7 @@ import 'package:threebotlogin/Apps/FreeFlowPages/FfpEvents.dart';
 import 'package:threebotlogin/Apps/FreeFlowPages/ffp.dart';
 import 'package:threebotlogin/Events/Events.dart';
 import 'package:threebotlogin/Events/GoHomeEvent.dart';
+import 'package:threebotlogin/Events/NewLoginEvent.dart';
 import 'package:threebotlogin/helpers/HexColor.dart';
 import 'package:threebotlogin/main.dart';
 import 'package:threebotlogin/services/3botService.dart';
@@ -17,8 +18,8 @@ import 'package:uni_links/uni_links.dart';
 
 /* Screen shows tabbar and all pages defined in router.dart */
 class HomeScreen extends StatefulWidget {
-  HomeScreen();
-
+  HomeScreen({this.backendConnection});
+  final BackendConnection backendConnection;
   _HomeScreenState createState() => _HomeScreenState();
 }
 
@@ -26,7 +27,7 @@ class _HomeScreenState extends State<HomeScreen>
     with WidgetsBindingObserver, SingleTickerProviderStateMixin {
   TabController _tabController;
   StreamSubscription _sub;
-
+  
   _HomeScreenState() {
     _tabController = TabController(
         initialIndex: 0, length: Globals().router.routes.length, vsync: this);
@@ -60,11 +61,17 @@ class _HomeScreenState extends State<HomeScreen>
   @override
   void initState() {
     super.initState();
+
+
     _sub = getLinksStream().listen((String incomingLink) {
-      checkWhatPageToOpen(Uri.parse(incomingLink), context);
+      checkWhatPageToOpen(Uri.parse(incomingLink), context, widget.backendConnection);
     });
-    createSocketConnection(context);
+
     Events().onEvent(GoHomeEvent().runtimeType, close);
+    Events().onEvent(NewLoginEvent().runtimeType, (NewLoginEvent event) {
+      openLogin(context, event.data);
+    });
+
     _checkLoginAttempts();
   }
 

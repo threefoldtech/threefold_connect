@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:package_info/package_info.dart';
+import 'package:threebotlogin/Events/CloseSocketEvent.dart';
+import 'package:threebotlogin/Events/Events.dart';
 import 'package:threebotlogin/helpers/HexColor.dart';
 import 'package:threebotlogin/main.dart';
 import 'package:threebotlogin/screens/ChangePinScreen.dart';
@@ -306,7 +308,7 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
           FlatButton(
               child: new Text("Yes"),
               onPressed: () async {
-                closeSocketConnection(await getDoubleName());
+                Events().emit(CloseSocketEvent());
                 bool result = await clearData();
                 if (result) {
                   

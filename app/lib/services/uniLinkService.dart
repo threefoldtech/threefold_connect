@@ -19,7 +19,7 @@ Map<String, dynamic> data = {
   'state': ''
 };
 
-checkWhatPageToOpen(Uri link, BuildContext context) async {
+checkWhatPageToOpen(Uri link, BuildContext context, BackendConnection connection) async {
   String doubleName = await getDoubleName();
   if (context != null) {
     ctx = context;
@@ -42,7 +42,7 @@ checkWhatPageToOpen(Uri link, BuildContext context) async {
       }
 
       // send login request
-      socketLoginMobile(data);
+      connection.socketLoginMobile(data);
 
       Navigator.push(
           ctx,
@@ -76,7 +76,7 @@ checkWhatPageToOpen(Uri link, BuildContext context) async {
               () async => {
                 // Get the doublename and send a login request
                 data['doubleName'] = await getDoubleName(),
-                socketLoginMobile(data),
+                connection.socketLoginMobile(data),
                 Navigator.push(
                   ctx,
                   MaterialPageRoute(
