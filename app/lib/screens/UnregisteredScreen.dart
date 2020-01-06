@@ -43,7 +43,7 @@ class _UnregisteredScreenState extends State<UnregisteredScreen>
           context,
           MaterialPageRoute(
               builder: (context) => SuccessfulScreen(
-                  title: "Registered", text: "You are now registered.")));
+                  title: "Recovered", text: "Your account has been recovered.")));
 
       Navigator.pop(context);
     }
