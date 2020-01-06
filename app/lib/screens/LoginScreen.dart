@@ -58,6 +58,9 @@ class _LoginScreenState extends State<LoginScreen> {
 
   _newLogin(NewLoginEvent event) {
     //new login attempt, get rid of this screen
+    if(!this.mounted){
+      return;
+    }
     if (event.loginId != widget.message['loginId']) {
       Navigator.pop(context, false);
     }
