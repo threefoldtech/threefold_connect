@@ -25,6 +25,7 @@ class MainScreen extends StatefulWidget {
 class _AppState extends State<MainScreen> {
   _AppState();
   StreamSubscription _sub;
+  String initialLink;
 
   pushScreens() async {
     try {
@@ -60,9 +61,7 @@ class _AppState extends State<MainScreen> {
   @override
   void initState() {
     super.initState();
-    _sub = getLinksStream().listen((String incomingLink) {
-      checkWhatPageToOpen(Uri.parse(incomingLink), context);
-    });
+    initUniLinks();
     WidgetsBinding.instance.addPostFrameCallback((_) => pushScreens());
   }
 
@@ -70,6 +69,18 @@ class _AppState extends State<MainScreen> {
   void dispose() {
     _sub.cancel();
     super.dispose();
+  }
+
+  Future<Null> initUniLinks() async {
+    initialLink = await getInitialLink();
+
+    if (initialLink != null) {
+      checkWhatPageToOpen(Uri.parse(initialLink), context);
+    } else {
+      _sub = getLinksStream().listen((String incomingLink) {
+        checkWhatPageToOpen(Uri.parse(incomingLink), context);
+      });
+    }
   }
 
   @override

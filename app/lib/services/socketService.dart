@@ -78,7 +78,6 @@ void socketLoginMobile(Map<String, dynamic> data) {
 }
 
 Future openLogin(context, data) async {
-  
   String messageType = data["type"];
   var mobile = data["mobile"];
   var loginToken = data["loginToken"];

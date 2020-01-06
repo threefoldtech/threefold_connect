@@ -26,6 +26,7 @@ class _HomeScreenState extends State<HomeScreen>
     with WidgetsBindingObserver, SingleTickerProviderStateMixin {
   TabController _tabController;
   StreamSubscription _sub;
+  String initialLink;
 
   _HomeScreenState() {
     _tabController = TabController(
@@ -60,12 +61,28 @@ class _HomeScreenState extends State<HomeScreen>
   @override
   void initState() {
     super.initState();
-    _sub = getLinksStream().listen((String incomingLink) {
-      checkWhatPageToOpen(Uri.parse(incomingLink), context);
-    });
+    initUniLinks();
     createSocketConnection(context);
     Events().onEvent(GoHomeEvent().runtimeType, close);
     _checkLoginAttempts();
+  }
+
+  @override
+  void dispose() {
+    _sub.cancel();
+    super.dispose();
+  }
+
+  Future<Null> initUniLinks() async {
+    initialLink = await getInitialLink();
+
+    if (initialLink != null) {
+      checkWhatPageToOpen(Uri.parse(initialLink), context);
+    } else {
+      _sub = getLinksStream().listen((String incomingLink) {
+        checkWhatPageToOpen(Uri.parse(incomingLink), context);
+      });
+    }
   }
 
   _checkLoginAttempts() async {
