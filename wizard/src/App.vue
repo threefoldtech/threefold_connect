@@ -3,6 +3,7 @@
   <v-app>
     <v-content fill-height>
       <v-btn
+      id="skip"
         onclick="window.flutter_inappwebview.callHandler('FINISH')"
         class="mt-5"
         absolute
@@ -161,5 +162,8 @@ export default {
 </script>
 <style>
 #app {
+}
+#skip{
+  z-index: 1000;
 }
 </style>
