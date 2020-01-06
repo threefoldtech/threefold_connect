@@ -219,12 +219,13 @@ def sign_handler():
         # logger.debug("Removing login attempt")
         return Response("Ok")
     else:
+        logger.debug("Something went wrong")
         return Response("Something went wrong", status=500)
 
 @app.route('/api/attempts/<state_hash>', methods=['DELETE'])
 def remove_login_attempt_by_hash(state_hash):
     db.deleteAuthByStateHash(conn, state_hash)
-    logger.debug("Removing login attempt")
+    logger.debug("Removing login attempt")  
     return Response("Ok")
 
 @app.route('/api/attempts/<doublename>', methods=['GET'])
