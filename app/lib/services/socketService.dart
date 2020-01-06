@@ -3,6 +3,7 @@ import 'package:socket_io_client/socket_io_client.dart' as IO;
 import 'package:threebotlogin/Events/Events.dart';
 import 'package:threebotlogin/Events/NewLoginEvent.dart';
 import 'package:threebotlogin/screens/SuccessfulScreen.dart';
+import 'package:threebotlogin/services/toolsService.dart';
 import 'package:threebotlogin/services/userService.dart';
 import 'dart:convert';
 import 'package:threebotlogin/screens/LoginScreen.dart';
@@ -77,7 +78,7 @@ void socketLoginMobile(Map<String, dynamic> data) {
 }
 
 Future openLogin(context, data) async {
-  Events().emit(NewLoginEvent());
+  
   String messageType = data["type"];
   var mobile = data["mobile"];
   var loginToken = data["loginToken"];
@@ -85,7 +86,8 @@ Future openLogin(context, data) async {
   var publicKey = data['appPublicKey'];
   var scope = data["scope"];
   var appId = data['appId'];
-
+  data['loginId'] = randomString(10);
+  Events().emit(NewLoginEvent(loginId: data['loginId']));
   if (loginToken != null) {
     return await loginFromToken(loginToken, state, publicKey, appId, scope);
   }

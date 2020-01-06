@@ -136,6 +136,5 @@ class _WalletState extends State<WalletWidget>
   }
 
   @override
-  // TODO: implement wantKeepAlive
   bool get wantKeepAlive => true;
 }
