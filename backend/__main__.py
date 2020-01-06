@@ -48,36 +48,31 @@ def connect_handler():
 
 @sio.on('disconnect')
 def disconnect_handler():
-    print(request.sid)
-    print("disconnected!!")
-    logger.debug("DisConnected.")
+
+    logger.debug("disconnected.")
     if request.sid in socketRoom:
         room = socketRoom[request.sid]
+        logger.debug("User was disconnected, user was known {}".format(room))
         del socketRoom[request.sid]
         leave_room(room)
         if usersInRoom[room] > 0:
             usersInRoom[room] -= 1
-            print("users left in room {}".format(usersInRoom[room]))
+            logger.debug("User was removed from room, users left in room {}".format(usersInRoom[room]))
 
 @sio.on('join')
 def on_join(data):
-   
+    logger.debug("Joining %s", data)
     room = data['room']
-    print("joining room # {} ".format(room))
     join_room(room)
     
     if 'app' in data:
-        print('app in data..')
         socketRoom[request.sid] = room
-
         if not room in usersInRoom:
             usersInRoom[room] = 1
         else:
             usersInRoom[room] += 1
         if room in messageQueue:
-            print("room {} is in messagq".format(room))
             for message in messageQueue[room]:
-                print("emitting message {} {} {} ".format(message[0], message[1],message[2]))
                 sio.emit(message[0], message[1], room=message[2])
             messageQueue[room] = []
         
@@ -105,31 +100,23 @@ def checkname_handler(data):
 def cancel_handler(data):
     print('')
 
-# Only mobile registration, so we dont need this I guess
-# @sio.on('register')
-# def registration_handler(data):
-#     logger.debug("Registration %s", data)
-#     doublename = data.get('doubleName').lower()
-#     email = data.get('email')
-#     sid = request.sid
-#     publickey = data.get('publicKey')
-#     user = db.getUserByName(conn, doublename)
-#     if (user is None):
-#         update_sql = "INSERT into users (double_name, sid, email, public_key) VALUES(?,?,?,?);"
-#         db.insert_user(conn, update_sql, doublename, sid, email, publickey)
 
 usersInRoom = {} #users that are in a room
 messageQueue = {} #messaged queued for a room (only queued when room is empty)
 socketRoom = {} #room bound to a socket
 
 def emitOrQueue(event, data, room):
+    logger.debug("Emit or queue data %s", data)
     if not room in usersInRoom  or usersInRoom[room] == 0:
+        logger.debug("Room is unknown or no users in room, so might queue for %s", room)
         if not room in messageQueue:
+            logger.debug("Room is not known yet in queue, creating %s", room)
             messageQueue[room] = []
-        print("queueing in room {}".format(room))
+        logger.debug("Queueing in room %s", room)
         messageQueue[room].append((event, data, room))
     else:
-       sio.emit(event, data, room=room)
+        logger.debug("App is connected, sending to %s", room)
+        sio.emit(event, data, room=room)
 
 
 @sio.on('login')
@@ -137,8 +124,6 @@ def login_handler(data):
     logger.debug("Login %s", data)
     double_name = data.get('doubleName').lower()
     state = data.get('state')
-    first_time = data.get('firstTime')
-    mobile = data.get('mobile')
 
     data['type'] = 'login'
     sid = request.sid
@@ -148,8 +133,7 @@ def login_handler(data):
         update_sql = "UPDATE users SET sid=?  WHERE double_name=?;"
         db.update_user(conn, update_sql, sid, user[0])
 
-    #if first_time == False and mobile == False:
-    print("**queueing login attempt to socket")
+
     user = db.getUserByName(conn, double_name)
     emitOrQueue('login', data, room=user[0])
 
