@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:threebotlogin/Apps/Wallet/walletEvents.dart';
@@ -7,8 +6,6 @@ import 'package:threebotlogin/ClipboardHack/ClipboardHack.dart';
 import 'package:threebotlogin/Events/Events.dart';
 import 'package:threebotlogin/Events/GoHomeEvent.dart';
 import 'package:threebotlogin/screens/ScanScreen.dart';
-import 'package:threebotlogin/services/cryptoService.dart';
-import 'package:threebotlogin/services/toolsService.dart';
 import 'package:threebotlogin/services/userService.dart';
 
 import 'WalletConfig.dart';

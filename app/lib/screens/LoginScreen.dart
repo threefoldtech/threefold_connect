@@ -346,7 +346,9 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
           ],
         ),
-      ),
+      ), onWillPop: () {
+        return null; // TODO: Check this. 
+      },
     );
   }
 

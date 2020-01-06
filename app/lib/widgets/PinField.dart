@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import '../main.dart';
-
 class PinField extends StatefulWidget {
   final int pinLength = 4;
   final callback;

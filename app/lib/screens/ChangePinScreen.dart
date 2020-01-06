@@ -6,7 +6,7 @@ import 'package:threebotlogin/widgets/PinField.dart';
 
 class ChangePinScreen extends StatefulWidget {
   final currentPin;
-  bool hideBackButton;
+  final bool hideBackButton;
   ChangePinScreen({this.currentPin, this.hideBackButton});
   _ChangePinScreenState createState() =>
       _ChangePinScreenState(currentPin: currentPin);

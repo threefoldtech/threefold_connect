@@ -9,7 +9,6 @@ import 'package:threebotlogin/screens/MobileRegistrationScreen.dart';
 import 'package:threebotlogin/screens/SuccessfulScreen.dart';
 import 'package:threebotlogin/services/socketService.dart';
 import 'package:threebotlogin/services/userService.dart';
-import 'package:threebotlogin/widgets/CustomDialog.dart';
 
 BuildContext ctx;
 Map<String, dynamic> data = {
