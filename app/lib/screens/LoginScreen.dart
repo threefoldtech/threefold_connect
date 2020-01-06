@@ -58,7 +58,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   _newLogin(NewLoginEvent event) {
     //new login attempt, get rid of this screen
-    if(!this.mounted){
+    if (!this.mounted) {
       return;
     }
     if (event.loginId != widget.message['loginId']) {
@@ -78,7 +78,7 @@ class _LoginScreenState extends State<LoginScreen> {
     generateEmojiImageList();
 
     if (widget.autoLogin) {
-      sendIt();
+      sendIt(true);
       return;
     }
 
@@ -281,7 +281,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     style: TextStyle(color: Colors.white, fontSize: 22),
                   ),
                   onPressed: () {
-                    sendIt();
+                    sendIt(true);
                   },
                 ),
               ),
@@ -346,8 +346,9 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
           ],
         ),
-      ), onWillPop: () {
-        return null; // TODO: Check this. 
+      ),
+      onWillPop: () {
+        return null; // TODO: Check this.
       },
     );
   }
@@ -357,22 +358,24 @@ class _LoginScreenState extends State<LoginScreen> {
       selectedImageId = imageId;
     });
 
-    // If nothing selected ? Show error
-    if (selectedImageId == -1) {
+    if (selectedImageId != -1) {
+      if (selectedImageId == correctImage) {
+        setState(() {
+          print('send it again');
+          sendIt(true);
+        });
+      } else {
+        setState(() {
+          print('send it again');
+          sendIt(false);
+        });
+        _scaffoldKey.currentState.showSnackBar(
+            SnackBar(content: Text('Oops... that\'s the wrong emoji')));
+      }
+    } else {
       _scaffoldKey.currentState
           .showSnackBar(SnackBar(content: Text('Please select an emoji')));
-      return;
     }
-
-    // If incorrect emoji, show error
-    if (selectedImageId != correctImage) {
-      _scaffoldKey.currentState.showSnackBar(
-          SnackBar(content: Text('Oops... that\'s the wrong emoji')));
-      return;
-    }
-
-    // Else send it
-    sendIt();
   }
 
   pinFilledIn(p) async {
@@ -389,7 +392,7 @@ class _LoginScreenState extends State<LoginScreen> {
     cancelLogin(await getDoubleName());
   }
 
-  sendIt() async {
+  sendIt(bool includeData) async {
     var state = widget.message['state'];
 
     var publicKey = widget.message['appPublicKey']?.replaceAll(" ", "+");
@@ -414,7 +417,11 @@ class _LoginScreenState extends State<LoginScreen> {
     var data =
         await encrypt(jsonEncode(tmpScope), publicKey, await getPrivateKey());
     //push to backend with signed
-    await sendData(state, await signedHash, data, selectedImageId);
+    if (!includeData) {
+      await sendData(state, "", null, selectedImageId); // temp fix send empty data
+    } else {
+      await sendData(state, await signedHash, data, selectedImageId);
+    }
 
     if (scope['trustedDevice'] != null) {
       // Save the trusted deviceid
