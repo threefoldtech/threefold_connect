@@ -167,6 +167,7 @@ export default new Vuex.Store({
       context.commit('setCancelLoginUp', true)
     },
     SOCKET_signed (context, data) {
+      console.log('signed', data)
       if (data.selectedImageId && !context.getters.firstTime && !context.getters.isMobile && data.selectedImageId !== context.getters.randomImageId) {
         context.dispatch('resendNotification')
       } else {

@@ -35,6 +35,9 @@ logger.setLevel(level=logging.DEBUG)
 handler = logging.StreamHandler()
 formatter = logging.Formatter(
     "[%(asctime)s][%(filename)s:%(lineno)s - %(funcName)s()]: %(message)s", "%Y-%m-%d %H:%M:%S")
+
+formatter = logging.Formatter(
+    "!!%(message)s", "%Y-%m-%d %H:%M:%S")
 handler.setFormatter(formatter)
 
 logger.addHandler(handler)
@@ -211,7 +214,7 @@ def sign_handler():
             'data': body.get('data'),
             'selectedImageId': body.get('selectedImageId'),
         }, room=user[0])
-        logger.debug('signed emitted')
+
         # db.deleteAuthByStateHash(conn, body.get('hash'))
         # logger.debug("Removing login attempt")
         return Response("Ok")
