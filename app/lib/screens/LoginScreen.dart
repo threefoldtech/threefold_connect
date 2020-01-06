@@ -31,11 +31,6 @@ class LoginScreen extends StatefulWidget {
   _LoginScreenState createState() => _LoginScreenState();
 }
 
-Future<bool> _onWillPop() async {
-  cancelLogin(await getDoubleName());
-  return Future.value(true);
-}
-
 class _LoginScreenState extends State<LoginScreen> {
   String helperText = '';
   String scopeTextMobile =
@@ -338,7 +333,6 @@ class _LoginScreenState extends State<LoginScreen> {
                     onPressed: () {
                       cancelIt();
                       Navigator.pop(context, false);
-                      _onWillPop();
                     },
                   ),
                 ),
@@ -348,7 +342,8 @@ class _LoginScreenState extends State<LoginScreen> {
         ),
       ),
       onWillPop: () {
-        return null; // TODO: Check this.
+        cancelIt();
+        return Future.value(true);
       },
     );
   }
@@ -418,7 +413,8 @@ class _LoginScreenState extends State<LoginScreen> {
         await encrypt(jsonEncode(tmpScope), publicKey, await getPrivateKey());
     //push to backend with signed
     if (!includeData) {
-      await sendData(state, "", null, selectedImageId); // temp fix send empty data
+      await sendData(
+          state, "", null, selectedImageId); // temp fix send empty data
     } else {
       await sendData(state, await signedHash, data, selectedImageId);
     }
