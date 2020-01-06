@@ -56,14 +56,17 @@ class _LoginScreenState extends State<LoginScreen> {
 
   final _scaffoldKey = GlobalKey<ScaffoldState>();
 
-  _newLogin(NewLoginEvent event){
+  _newLogin(NewLoginEvent event) {
     //new login attempt, get rid of this screen
-    Navigator.pop(context, false);
+    if (event.loginId != widget.message['loginId']) {
+      Navigator.pop(context, false);
+    }
   }
+
   @override
   void initState() {
     super.initState();
-   
+
     isMobileCheck = checkMobile();
 
     makePermissionPrefs();
@@ -82,7 +85,7 @@ class _LoginScreenState extends State<LoginScreen> {
     } else {
       checkFingerPrintActive();
     }
-     Events().onEvent(NewLoginEvent().runtimeType, _newLogin);
+    Events().onEvent(NewLoginEvent().runtimeType, _newLogin);
   }
 
   void generateEmojiImageList() {
@@ -261,10 +264,8 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
             Visibility(
               visible: isMobileCheck,
-           
-              child: 
-                 Padding(
-                   padding: const EdgeInsets.only(bottom: 30.0),
+              child: Padding(
+                padding: const EdgeInsets.only(bottom: 30.0),
                 child: RaisedButton(
                   shape: new RoundedRectangleBorder(
                     borderRadius: new BorderRadius.circular(30),
