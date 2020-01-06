@@ -27,6 +27,7 @@ class MainScreen extends StatefulWidget {
 class _AppState extends State<MainScreen> {
   _AppState();
   StreamSubscription _sub;
+  String initialLink;
   BackendConnection _backendConnection;
 
   pushScreens() async {
@@ -64,15 +65,23 @@ class _AppState extends State<MainScreen> {
         context,
         MaterialPageRoute(
             builder: (context) => HomeScreen(
-                  backendConnection: _backendConnection,
+                  backendConnection: _backendConnection,initialLink: initialLink,
                 )));
   }
 
   @override
   void initState() {
     super.initState();
-
+    initUniLinks();
     WidgetsBinding.instance.addPostFrameCallback((_) => pushScreens());
+  }
+
+  Future<Null> initUniLinks() async {
+    initialLink = await getInitialLink();
+
+    _sub = getLinksStream().listen((String incomingLink) {
+      this.initialLink = incomingLink;
+    });
   }
 
   @override
@@ -86,6 +95,6 @@ class _AppState extends State<MainScreen> {
       return getErrorWidget(context, errorDetails);
     };
 
-    return Container(color: Colors.white, child: Text("Main"));
+    return Container();
   }
 }

@@ -1,11 +1,7 @@
-import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:threebotlogin/screens/ChangePinScreen.dart';
 import 'package:threebotlogin/screens/LoginScreen.dart';
-import 'package:threebotlogin/screens/MainScreen.dart';
-import 'package:threebotlogin/screens/MobileRegistrationScreen.dart';
 import 'package:threebotlogin/screens/SuccessfulScreen.dart';
 import 'package:threebotlogin/services/socketService.dart';
 import 'package:threebotlogin/services/userService.dart';
@@ -49,49 +45,13 @@ checkWhatPageToOpen(
           ctx,
           MaterialPageRoute(
               builder: (context) =>
-                  LoginScreen(link.queryParameters, autoLogin: autoLogin)));
+                  LoginScreen(link.queryParameters  , autoLogin: autoLogin)));
       await Navigator.push(
           context,
           MaterialPageRoute(
               builder: (context) => SuccessfulScreen(
                   title: "Logged in",
                   text: "You are now logged in. Return to browser.")));
-    } else {
-      if (doubleName == null) {
-        final bool registered = await Navigator.push(
-            ctx,
-            MaterialPageRoute(
-                builder: (context) => MobileRegistrationScreen()));
-
-        await Navigator.push(
-            ctx, MaterialPageRoute(builder: (context) => ChangePinScreen()));
-        if (registered != null && registered) {
-          await Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (context) => SuccessfulScreen(
-                      title: "Registered", text: "You are now registered.")));
-          await Navigator.push(
-              ctx,
-              MaterialPageRoute(
-                  builder: (context) =>
-                      MainScreen(initDone: true, registered: registered)));
-
-          // After 2 seconds, show the login prompt
-          Timer(
-              Duration(seconds: 2),
-              () async => {
-                    // Get the doublename and send a login request
-                    data['doubleName'] = await getDoubleName(),
-                    connection.socketLoginMobile(data),
-                    Navigator.push(
-                        ctx,
-                        MaterialPageRoute(
-                            builder: (context) =>
-                                LoginScreen(link.queryParameters)))
-                  });
-        }
-      }
     }
   }
 }
