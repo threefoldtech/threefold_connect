@@ -64,8 +64,15 @@ class _ScanScreenState extends State<ScanScreen> with TickerProviderStateMixin {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: <Widget>[
-                SizedBox(
-                  width: 60.0,
+                FloatingActionButton(
+                  tooltip: "Go back",
+                  backgroundColor: Colors.transparent,
+                  elevation: 0.0,
+                  mini: true,
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  child: Icon(Icons.arrow_back_ios),
                 ),
                 Text(
                   'Scan QR',
@@ -75,12 +82,7 @@ class _ScanScreenState extends State<ScanScreen> with TickerProviderStateMixin {
                       fontWeight: FontWeight.bold,
                       fontSize: 21.0),
                 ),
-                FloatingActionButton(
-                  tooltip: "What should I do?",
-                  mini: true,
-                  onPressed: () {},
-                  child: Icon(Icons.help_outline),
-                ),
+                SizedBox(width: 60.0,)
               ],
             ),
           ),
