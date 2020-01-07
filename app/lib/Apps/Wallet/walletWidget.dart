@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:threebotlogin/Apps/Wallet/walletEvents.dart';
@@ -37,7 +39,7 @@ class _WalletState extends State<WalletWidget>
 
   _WalletState() {
     iaWebView = InAppWebView(
-        initialUrl: 'https://${config.appId()}/init',
+        initialUrl: 'http://${config.appId()}/init',
         initialHeaders: {},
         initialOptions: InAppWebViewWidgetOptions(
             crossPlatform: InAppWebViewOptions(debuggingEnabled: true),
@@ -54,7 +56,6 @@ class _WalletState extends State<WalletWidget>
         },
         onLoadStop: (InAppWebViewController controller, String url) async {
           if (url.contains('/init')) {
-            initWallets();
             initKeys();
           }
         },
@@ -78,36 +79,12 @@ class _WalletState extends State<WalletWidget>
   initKeys() async {
     var seed = await getDerivedSeed(config.appId());
     var doubleName = await getDoubleName();
-    var jsStartApp = "window.vueInstance.startWallet('$doubleName', '$seed');";
-
-    webView.evaluateJavascript(source: jsStartApp);
-  }
-
-  initWallets() async {
-    print(await webView.getUrl());
-    var jsToExecute = '';
     var importedWallets = await getImportedWallets();
     var appWallets = await getAppWallets();
 
-    if (importedWallets != null) {
-      String jsonString = "[" + importedWallets.join(',') + "]";
-      jsToExecute += "localStorage.setItem('importedWallets', JSON.stringify(" +
-          jsonString +
-          "));";
-    } else {
-      jsToExecute += "localStorage.setItem('importedWallets', null);";
-    }
+    var jsStartApp = "window.vueInstance.startWallet('$doubleName', '$seed', '$importedWallets', '$appWallets');";
 
-    if (appWallets != null) {
-      String jsonString = "[" + appWallets.join(',') + "]";
-      jsToExecute += "localStorage.setItem('appWallets', JSON.stringify(" +
-          jsonString +
-          "));";
-    } else {
-      jsToExecute += "localStorage.setItem('appWallets', null);";
-    }
-
-    await this.webView.evaluateJavascript(source: jsToExecute);
+    webView.evaluateJavascript(source: jsStartApp);
   }
 
   scanQrCode(List<dynamic> params) async {
