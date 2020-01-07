@@ -40,30 +40,38 @@ class _ChangePinScreenState extends State<ChangePinScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: new AppBar(
-          backgroundColor: HexColor("#2d4052"),
-          title: currentPin == null
-              ? Text("Choose your pincode")
-              : Text("Change pincode"),
-          elevation: 0.0,
-          automaticallyImplyLeading: !widget.hideBackButton),
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        mainAxisSize: MainAxisSize.max,
-        children: <Widget>[
-          Container(
-            padding: EdgeInsets.only(top: 0.0, bottom: 32.0),
-            child: Center(
-                child: Text(
-              getText(),
-            )),
-          ),
-          PinField(
-            callback: (p) => changePin(p),
-          )
-        ],
+    return WillPopScope(
+      child: Scaffold(
+        appBar: new AppBar(
+            backgroundColor: HexColor("#2d4052"),
+            title: currentPin == null
+                ? Text("Choose your pincode")
+                : Text("Change pincode"),
+            elevation: 0.0,
+            automaticallyImplyLeading: !widget.hideBackButton),
+        body: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.max,
+          children: <Widget>[
+            Container(
+              padding: EdgeInsets.only(top: 0.0, bottom: 32.0),
+              child: Center(
+                  child: Text(
+                getText(),
+              )),
+            ),
+            PinField(
+              callback: (p) => changePin(p),
+            )
+          ],
+        ),
       ),
+      onWillPop: () {
+        if (state != _State.Done) {
+          return Future(() => false);
+        }
+        return Future(() => true);
+      },
     );
   }
 
