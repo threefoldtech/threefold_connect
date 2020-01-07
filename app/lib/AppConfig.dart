@@ -1,7 +1,7 @@
 enum Environment { Staging, Production, Local }
 
 abstract class EnvConfig {
-  Environment enviroment = Environment.Staging;
+  Environment enviroment = Environment.Local;
 }
 
 class AppConfig extends EnvConfig {
