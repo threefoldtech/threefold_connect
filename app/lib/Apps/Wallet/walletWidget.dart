@@ -54,8 +54,8 @@ class _WalletState extends State<WalletWidget>
         },
         onLoadStop: (InAppWebViewController controller, String url) async {
           if (url.contains('/init')) {
-            initKeys();
             initWallets();
+            initKeys();
           }
         },
         onProgressChanged: (InAppWebViewController controller, int progress) {
@@ -107,7 +107,7 @@ class _WalletState extends State<WalletWidget>
       jsToExecute += "localStorage.setItem('appWallets', null);";
     }
 
-    this.webView.evaluateJavascript(source: jsToExecute);
+    await this.webView.evaluateJavascript(source: jsToExecute);
   }
 
   scanQrCode(List<dynamic> params) async {
