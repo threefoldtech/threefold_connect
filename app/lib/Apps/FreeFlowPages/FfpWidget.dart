@@ -26,6 +26,8 @@ class _FfpState extends State<FfpWidget> with AutomaticKeepAliveClientMixin {
   bool switchToCircle = false;
 
   InAppWebView iaWebview;
+
+  bool finalDestinationLoading = false;
   _FfpState() {
     iaWebview = new InAppWebView(
       initialUrl: config.cookieUrl(),
@@ -45,7 +47,8 @@ class _FfpState extends State<FfpWidget> with AutomaticKeepAliveClientMixin {
         controller.injectCSSCode(
             source: ".crisp-client {display: none !important;}");
         addClipboardHack(controller);
-        if (switchToCircle) {
+
+        if (switchToCircle && Ffp().firstUrlToLoad != "") {
           switchToCircle = false;
           controller.loadUrl(url: Ffp().firstUrlToLoad);
         }
@@ -59,14 +62,15 @@ class _FfpState extends State<FfpWidget> with AutomaticKeepAliveClientMixin {
         inAppBrowser.open(url: req.url, options: InAppBrowserClassOptions());
       },
       onProgressChanged: (InAppWebViewController controller, int progress) {
-        controller.getUrl().then((url) {
-          if (Platform.isIOS) {
-            if (url.contains('state')) {
+        if (!finalDestinationLoading) {
+          finalDestinationLoading = true;
+          controller.getUrl().then((url) {
+            if (Platform.isIOS && url.contains('state')) {
               controller.stopLoading();
               initKeys(url);
             }
-          }
-        });
+          });
+        }
       },
     );
 
