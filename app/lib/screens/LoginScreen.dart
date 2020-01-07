@@ -5,13 +5,17 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:threebotlogin/Events/Events.dart';
 import 'package:threebotlogin/Events/NewLoginEvent.dart';
+import 'package:threebotlogin/Events/PopAllLoginEvent.dart';
 import 'package:threebotlogin/services/fingerprintService.dart';
+import 'package:threebotlogin/services/toolsService.dart';
 import 'package:threebotlogin/widgets/ImageButton.dart';
 import 'package:threebotlogin/widgets/PinField.dart';
 import 'package:threebotlogin/services/userService.dart';
 import 'package:threebotlogin/services/cryptoService.dart';
 import 'package:threebotlogin/services/3botService.dart';
 import 'package:threebotlogin/widgets/PreferenceDialog.dart';
+
+_LoginScreenState lastState;
 
 class LoginScreen extends StatefulWidget {
   final Widget loginScreen;
@@ -48,23 +52,22 @@ class _LoginScreenState extends State<LoginScreen> {
   bool showPinfield = false;
   bool showScopeAndEmoji = false;
   bool isMobileCheck = false;
-
+  String emitCode = randomString(10);
   final _scaffoldKey = GlobalKey<ScaffoldState>();
 
-  _newLogin(NewLoginEvent event) {
-    //new login attempt, get rid of this screen
-    if (!this.mounted) {
+  close(PopAllLoginEvent e) {
+    if (e.emitCode == emitCode) {
       return;
     }
-    if (!isMobileCheck && event.loginId != widget.message['loginId']) {
-     // Navigator.pop(context, false);
+    if (mounted) {
+      Navigator.pop(context, false);
     }
   }
 
   @override
   void initState() {
     super.initState();
-
+    Events().onEvent(PopAllLoginEvent("").runtimeType, close);
     isMobileCheck = checkMobile();
 
     makePermissionPrefs();
@@ -83,7 +86,7 @@ class _LoginScreenState extends State<LoginScreen> {
     } else {
       checkFingerPrintActive();
     }
-    Events().onEvent(NewLoginEvent().runtimeType, _newLogin);
+    // Events().onEvent(NewLoginEvent().runtimeType, _newLogin);
   }
 
   void generateEmojiImageList() {
@@ -333,6 +336,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     onPressed: () {
                       cancelIt();
                       Navigator.pop(context, false);
+                      Events().emit(PopAllLoginEvent(emitCode));
                     },
                   ),
                 ),
@@ -427,8 +431,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
     if (selectedImageId == correctImage || isMobileCheck) {
       Navigator.pop(context, true);
-    }else{
-       Navigator.pop(context, false);
+      Events().emit(PopAllLoginEvent(emitCode));
     }
   }
 
