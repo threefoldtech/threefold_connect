@@ -39,7 +39,7 @@ class _WalletState extends State<WalletWidget>
 
   _WalletState() {
     iaWebView = InAppWebView(
-        initialUrl: 'http://${config.appId()}/init',
+        initialUrl: 'https://${config.appId()}/init',
         initialHeaders: {},
         initialOptions: InAppWebViewWidgetOptions(
             crossPlatform: InAppWebViewOptions(debuggingEnabled: true),

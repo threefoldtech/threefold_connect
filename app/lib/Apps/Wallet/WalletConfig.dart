@@ -29,8 +29,7 @@ abstract class WalletConfigImpls {
 
 class WalletConfigStaging extends WalletConfigImpls {
   String appId() {
-    return '192.168.0.135:8080';
-    // return 'wallet.staging.jimber.org';
+    return 'wallet.staging.jimber.org';
   }
 
   String redirectUrl() {
