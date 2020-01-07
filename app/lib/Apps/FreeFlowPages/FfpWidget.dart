@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:threebotlogin/Apps/FreeFlowPages/FfpConfig.dart';
@@ -57,7 +58,16 @@ class _FfpState extends State<FfpWidget> with AutomaticKeepAliveClientMixin {
         }
         inAppBrowser.open(url: req.url, options: InAppBrowserClassOptions());
       },
-      onProgressChanged: (InAppWebViewController controller, int progress) {},
+      onProgressChanged: (InAppWebViewController controller, int progress) {
+        controller.getUrl().then((url) {
+          if (Platform.isIOS) {
+            if (url.contains('state')) {
+              controller.stopLoading();
+              initKeys(url);
+            }
+          }
+        });
+      },
     );
 
     Events().onEvent(FfpBrowseEvent().runtimeType, _browseToUrl);
