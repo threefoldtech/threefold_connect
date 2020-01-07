@@ -23,27 +23,26 @@ Future<List<String>> getImportedWallets() async {
   return prefs.getStringList("importedWallets");
 }
 
-void saveAppWallet(List<dynamic> params) async {
-  String appWallet = params[0].toString();
+Future<bool> saveAppWallet(List<dynamic> params) async {
+  String appWalletToAdd = params[0].toString();
   final prefs = await SharedPreferences.getInstance();
   List<String> appWallets = await getAppWallets();
 
-  if (appWallet == null) {
-    await prefs.remove('appWallets');
-    await prefs.setStringList('appWallets', []);
-    return;
+  if (appWalletToAdd == null) {
+    return false;
   }
 
   if (appWallets == null) {
     appWallets = new List<String>();
   }
 
-  if (!appWallets.contains(appWallet)) {
-    appWallets.add(appWallet);
-
+  if (!appWallets.contains(appWalletToAdd)) {
+    appWallets.add(appWalletToAdd);
     await prefs.remove('appWallets');
     await prefs.setStringList('appWallets', appWallets);
+    return true;
   }
+  return false;
 }
 
 Future<List<String>> getAppWallets() async {

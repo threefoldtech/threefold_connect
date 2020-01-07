@@ -32,6 +32,13 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
+  static final _LoginScreenState _singleton = new _LoginScreenState._internal();
+  factory _LoginScreenState() {
+    return _singleton;
+  }
+
+  _LoginScreenState._internal(); // init here
+
   String helperText = '';
   String scopeTextMobile =
       'Please select the data you want to share and press Accept';
