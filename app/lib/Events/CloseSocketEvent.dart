@@ -1,3 +1,3 @@
-class CloseSocketEvent{
+class CloseSocketEvent {
   CloseSocketEvent();
 }

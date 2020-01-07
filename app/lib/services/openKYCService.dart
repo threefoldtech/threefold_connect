@@ -40,8 +40,6 @@ Future checkVerificationStatus(String doubleName) async {
   return http.get('$openKycApiUrl/users/$doubleName', headers: requestHeaders);
 }
 
-
-
 Future<http.Response> sendVerificationEmail() async {
   return http.post('$openKycApiUrl/users',
       body: json.encode({

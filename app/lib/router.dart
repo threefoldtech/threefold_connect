@@ -64,12 +64,14 @@ class Router {
   Map<String, Widget Function(BuildContext)> getRoutes() {
     return Map.fromIterable(routes, key: (v) => v.path, value: (v) => v.view);
   }
-  bool emailMustBeVerified(int index){
-    if(routes[index].app != null){
+
+  bool emailMustBeVerified(int index) {
+    if (routes[index].app != null) {
       return routes[index].app.emailVerificationRequired();
     }
     return false;
   }
+
   List<Widget> getContent() {
     List<Widget> containers = [];
     routes.forEach((r) {

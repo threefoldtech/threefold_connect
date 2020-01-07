@@ -1,7 +1,8 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter/material.dart';
 
-class CustomDialog extends StatelessWidget { //@todo this is used for everything, just seems like a very bad idea. Make dialogs for the seperate things. Maybe a popup dialog with info ok/cancel and other dialogs for eg pin entry
+class CustomDialog extends StatelessWidget {
+  //@todo this is used for everything, just seems like a very bad idea. Make dialogs for the seperate things. Maybe a popup dialog with info ok/cancel and other dialogs for eg pin entry
   final Widget description;
   final List<Widget> actions;
   final String title;
@@ -16,14 +17,15 @@ class CustomDialog extends StatelessWidget { //@todo this is used for everything
     this.hiddenaction,
   });
   show(context) {
-   return showDialog(
+    return showDialog(
       context: context,
       barrierDismissible: false,
       builder: (BuildContext context) => CustomDialog(
         image: Icons.error,
         title: this.title,
         description: this.description,
-        actions: <Widget>[ //@todo make this configurable, ok;okcancel
+        actions: <Widget>[
+          //@todo make this configurable, ok;okcancel
           FlatButton(
             child: new Text("Ok"),
             onPressed: () {

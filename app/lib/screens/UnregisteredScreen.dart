@@ -43,7 +43,8 @@ class _UnregisteredScreenState extends State<UnregisteredScreen>
           context,
           MaterialPageRoute(
               builder: (context) => SuccessfulScreen(
-                  title: "Recovered", text: "Your account has been recovered.")));
+                  title: "Recovered",
+                  text: "Your account has been recovered.")));
 
       Navigator.pop(context);
     }
@@ -162,8 +163,9 @@ class _UnregisteredScreenState extends State<UnregisteredScreen>
               ],
             ),
           ),
-        ), onWillPop: () {
-            return Future.value(false);
+        ),
+        onWillPop: () {
+          return Future.value(false);
         },
       ),
     );

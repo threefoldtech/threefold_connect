@@ -3,14 +3,13 @@ import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:threebotlogin/services/userService.dart';
 
 class InitScreen extends StatefulWidget {
- 
   InitScreen();
 
   @override
   _InitState createState() => _InitState();
 }
 
-class _InitState extends State<InitScreen>  {
+class _InitState extends State<InitScreen> {
   InAppWebViewController webView;
 
   InAppWebView iaWebView;
@@ -24,7 +23,6 @@ class _InitState extends State<InitScreen>  {
   }
 
   _InitState() {
-
     iaWebView = InAppWebView(
       initialUrl: 'https://wizard.jimber.org/',
       initialHeaders: {},
@@ -54,8 +52,7 @@ class _InitState extends State<InitScreen>  {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-    home: SafeArea(child: iaWebView),
+      home: SafeArea(child: iaWebView),
     );
   }
-
 }

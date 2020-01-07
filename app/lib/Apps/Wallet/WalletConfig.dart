@@ -19,7 +19,6 @@ class WalletConfig extends EnvConfig {
   String redirectUrl() {
     return impl.redirectUrl();
   }
-
 }
 
 abstract class WalletConfigImpls {
@@ -55,5 +54,4 @@ class WalletConfigLocal extends WalletConfigImpls {
   String redirectUrl() {
     return 'login';
   }
-
 }

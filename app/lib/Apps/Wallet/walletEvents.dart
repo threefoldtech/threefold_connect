@@ -1,3 +1,3 @@
-class WalletBackEvent{
+class WalletBackEvent {
   WalletBackEvent();
 }

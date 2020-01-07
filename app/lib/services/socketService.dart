@@ -27,14 +27,13 @@ class BackendConnection {
     print('creating socket connection....');
     socket = IO.io(threeBotSocketUrl, <String, dynamic>{
       'transports': ['websocket'],
-      'forceNew' : true
+      'forceNew': true
     });
     socket.on('connect', (res) {
       print('connected');
       // once a client has connected, we let him join a room
       socket.emit('join', {'room': doubleName.toLowerCase(), 'app': true});
       print('joined room');
-
     });
 
     socket.on('signed', (data) {
@@ -51,9 +50,7 @@ class BackendConnection {
 
     socket.on('disconnect', (_) {
       print('disconnect');
-
     });
-    
 
     socket.on('fromServer', (_) => print(_));
     socket.on('connect_error', (err) => print(err));
@@ -96,13 +93,14 @@ Future openLogin(context, data) async {
   if (messageType == 'login' && mobile != true) {
     var loggedIn = await Navigator.push(
         context, MaterialPageRoute(builder: (context) => LoginScreen(data)));
-    
+
     if (loggedIn) {
       await Navigator.push(
           context,
           MaterialPageRoute(
               builder: (context) => SuccessfulScreen(
-                  title: "Logged in", text: "You are now logged in. Return to browser.")));
+                  title: "Logged in",
+                  text: "You are now logged in. Return to browser.")));
     }
   } else if (messageType == 'email_verification') {
     getEmail().then((email) async {
