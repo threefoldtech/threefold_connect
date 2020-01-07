@@ -72,13 +72,15 @@ then
     else
         echo "[Staging]: Building apk."
 
-        flutter build apk -t lib/main.dart
+        flutter build apk -t lib/main.dart --target-platform android-arm64
         
         hash=$(git log --pretty=format:'%h' -n 1)
         current_time=$(date "+%Y.%m.%d-%H.%M.%S")
+        md5hash=$(md5sum build/app/outputs/apk/release/app-release.apk | cut -f 1 -d " ")
+        size=$(stat -c '%s' build/app/outputs/apk/release/app-release.apk)
         mv build/app/outputs/apk/release/app-release.apk "build/app/outputs/apk/release/$hash-3BotConnect-Staging-$current_time.apk"
-        md5hash=$(md5sum build/app/outputs/apk/release/$hash-3BotConnect-Staging-$current_time.apk)
-        curl -s -X POST "https://api.telegram.org/bot868129294:AAGLGOySYvJJxvIcMHY3XHFaPEPq2MpdGys/sendDocument" -F chat_id=-1001186043363 -F document="@build/app/outputs/apk/release/$hash-3BotConnect-Staging-$current_time.apk" -F caption="Type: **Local**\nMD5: $md5hash"
+        curl -s -X POST "https://api.telegram.org/bot868129294:AAGLGOySYvJJxvIcMHY3XHFaPEPq2MpdGys/sendMessage" -d parse_mode=markdown -d chat_id=-1001186043363 -d parse_mode=markdown -d text="Type: *Staging* %0AGit hash: *$hash* %0ATime: *$current_time* %0ASize: *$size* %0AMD5: *$md5hash*"
+        curl -s -X POST "https://api.telegram.org/bot868129294:AAGLGOySYvJJxvIcMHY3XHFaPEPq2MpdGys/sendDocument" -F chat_id=-1001186043363 -F document="@build/app/outputs/apk/release/$hash-3BotConnect-Staging-$current_time.apk"
         paplay /usr/share/sounds/gnome/default/alerts/glass.ogg
     fi
 
@@ -111,13 +113,15 @@ then
     else
         echo "[Production]: Building apk."
 
-        flutter build apk -t lib/main.dart
+        flutter build apk -t lib/main.dart --target-platform android-arm64
         
         hash=$(git log --pretty=format:'%h' -n 1)
         current_time=$(date "+%Y.%m.%d-%H.%M.%S")
+        md5hash=$(md5sum build/app/outputs/apk/release/app-release.apk | cut -f 1 -d " ")
+        size=$(stat -c '%s' build/app/outputs/apk/release/app-release.apk)
         mv build/app/outputs/apk/release/app-release.apk "build/app/outputs/apk/release/$hash-3BotConnect-Production-$current_time.apk"
-        md5hash=$(md5sum build/app/outputs/apk/release/$hash-3BotConnect-Production-$current_time.apk)
-        curl -s -X POST "https://api.telegram.org/bot868129294:AAGLGOySYvJJxvIcMHY3XHFaPEPq2MpdGys/sendDocument" -F chat_id=-1001186043363 -F document="@build/app/outputs/apk/release/$hash-3BotConnect-Production-$current_time.apk" -F caption="Type: **Local**\nMD5: $md5hash"
+        curl -s -X POST "https://api.telegram.org/bot868129294:AAGLGOySYvJJxvIcMHY3XHFaPEPq2MpdGys/sendMessage" -d parse_mode=markdown -d chat_id=-1001186043363 -d parse_mode=markdown -d text="Type: *Production* %0AGit hash: *$hash* %0ATime: *$current_time* %0ASize: *$size* %0AMD5: *$md5hash*"
+        curl -s -X POST "https://api.telegram.org/bot868129294:AAGLGOySYvJJxvIcMHY3XHFaPEPq2MpdGys/sendDocument" -F chat_id=-1001186043363 -F document="@build/app/outputs/apk/release/$hash-3BotConnect-Production-$current_time.apk"
         paplay /usr/share/sounds/gnome/default/alerts/glass.ogg
     fi
 
