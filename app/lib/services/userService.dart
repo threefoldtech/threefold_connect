@@ -3,8 +3,8 @@ import 'dart:convert';
 import 'dart:core';
 
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:threebotlogin/helpers/Globals.dart';
 import 'package:threebotlogin/services/cryptoService.dart';
-import 'package:threebotlogin/main.dart';
 import '3botService.dart';
 import 'cryptoService.dart';
 

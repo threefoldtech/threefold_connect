@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:threebotlogin/helpers/Globals.dart';
 import 'package:threebotlogin/helpers/HexColor.dart';
-import 'package:threebotlogin/router.dart';
 import 'package:threebotlogin/screens/MainScreen.dart';
 
 import 'package:threebotlogin/services/loggingService.dart';
@@ -10,22 +10,6 @@ import 'package:threebotlogin/services/userService.dart';
 
 //List<CameraDescription> cameras;
 LoggingService logger;
-
-class Globals {
-  static final isInDebugMode = true;
-  static final color = HexColor("#2d4052");
-  ValueNotifier<bool> emailVerified = ValueNotifier(false);
-  final Router router = new Router();
-
-  /* Singleton */
-  static final Globals _singleton = new Globals._internal();
-  factory Globals() {
-    return _singleton;
-  }
-  Globals._internal() {
-    //initialize
-  }
-}
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();

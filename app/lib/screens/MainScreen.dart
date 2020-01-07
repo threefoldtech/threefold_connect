@@ -4,8 +4,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:threebotlogin/Events/Events.dart';
-import 'package:threebotlogin/Events/UniLinkEvent.dart';
-import 'package:threebotlogin/main.dart';
+import 'package:threebotlogin/helpers/Globals.dart';
 import 'package:threebotlogin/screens/HomeScreen.dart';
 import 'package:threebotlogin/screens/InitScreen.dart';
 import 'package:threebotlogin/screens/UnregisteredScreen.dart';
@@ -13,7 +12,6 @@ import 'package:threebotlogin/services/socketService.dart';
 import 'package:threebotlogin/services/userService.dart';
 import 'package:threebotlogin/widgets/CustomDialog.dart';
 import 'package:threebotlogin/widgets/ErrorWidget.dart';
-import 'package:threebotlogin/services/uniLinkService.dart';
 import 'package:uni_links/uni_links.dart';
 
 class MainScreen extends StatefulWidget {

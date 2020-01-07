@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'dart:convert';
 import 'package:crypto/crypto.dart';
-import 'package:threebotlogin/main.dart';
+import 'package:threebotlogin/helpers/Globals.dart';
 import 'package:threebotlogin/services/3botService.dart';
 import 'package:threebotlogin/services/cryptoService.dart';
 import 'package:threebotlogin/services/openKYCService.dart';

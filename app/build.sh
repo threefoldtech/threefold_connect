@@ -66,7 +66,7 @@ then
     if [[ $1 == "--run" ]]
     then
         echo "[Staging]: Running."
-        flutter run -t lib/main.dart
+        flutter run -t lib/main.dart --release
     elif [[ $1 == "--switch" ]]
     then
         echo "[Staging]: Switched configs."
@@ -74,7 +74,7 @@ then
         echo "[Staging]: Building apk."
 
         # flutter build apk --target-platform android-arm,android-arm64 --split-per-abi
-        flutter build apk -t lib/main.dart
+        flutter build apk -t lib/main.dart --release
         
         hash=$(git log --pretty=format:'%h' -n 1)
         current_time=$(date "+%Y.%m.%d-%H.%M.%S")
@@ -108,7 +108,7 @@ then
     then
         echo "[Production]: Running."
 
-        flutter run -t lib/main.dart
+        flutter run -t lib/main.dart --release
     elif [[ $1 == "--switch" ]]
     then
         echo "[Production]: Switched configs."
@@ -116,7 +116,7 @@ then
         echo "[Production]: Building apk."
 
         # flutter build apk --target-platform android-arm,android-arm64 --split-per-abi
-        flutter build apk -t lib/main.dart
+        flutter build apk -t lib/main.dart --release
         
         hash=$(git log --pretty=format:'%h' -n 1)
         current_time=$(date "+%Y.%m.%d-%H.%M.%S")

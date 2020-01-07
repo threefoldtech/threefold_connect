@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:threebotlogin/main.dart';
+import 'package:threebotlogin/helpers/Globals.dart';
 import 'package:threebotlogin/services/3botService.dart';
 import 'package:threebotlogin/services/openKYCService.dart';
 import 'package:threebotlogin/services/toolsService.dart';
