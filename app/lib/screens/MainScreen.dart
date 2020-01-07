@@ -63,7 +63,10 @@ class _AppState extends State<MainScreen> {
 
     _backendConnection = BackendConnection(await getDoubleName());
     _backendConnection.init();
+    if(_sub != null){
     _sub.cancel();
+    }
+
     await Navigator.pushReplacement(
         context,
         MaterialPageRoute(

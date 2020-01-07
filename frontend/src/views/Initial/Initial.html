@@ -1,6 +1,6 @@
-<section class="initial fill-height" v-if="isMobile" style="width: 100%;">
+<section class="initial fill-height">
 
-  <v-layout column justify-space-around class="fill-height" fill-height>
+  <v-layout v-if="isMobile" style="width: 100%;" column justify-space-around fill-height>
     <v-layout align-center row wrap justify-center class="py-5">
 
       <v-layout column align-center>
@@ -13,156 +13,85 @@
         </v-btn>
       </v-layout>
     </v-layout>
+  </v-layout>
+  <v-layout v-else>
+    <v-progress-linear style="position:fixed; top:0; left: 0;" class="ma-0" indeterminate
+      v-if="nameCheckStatus.checking">
+    </v-progress-linear>
+    <v-layout justify-center v-if="!spinner">
+      <v-flex md8>
+        <v-card>
+          <v-toolbar class="primary">
+            <h1 class="headline white--text text-xs-center fw">
+              Identify yourself
+            </h1>
+          </v-toolbar>
+          <v-form v-model="valid" @submit.prevent="login">
+            <v-card-text>
+              <v-stepper v-if="firstvisit" class="elevation-0" flat>
+                <v-stepper-header class="elevation-0">
+                  <v-stepper-step color="accent" step="1">Personal info</v-stepper-step>
+                  <v-divider></v-divider>
+                  <v-stepper-step color="accent" step="2">Your key</v-stepper-step>
+                  <v-divider></v-divider>
+                  <v-stepper-step color="accent" step="3">Finishing</v-stepper-step>
+                </v-stepper-header>
+              </v-stepper>
+              <p class="subheading pb-2" v-if="firstvisit">
+                <span class="font-weight-bold">{{appid}}</span><span v-if="!appid">You were redirected by a service
+                  that</span> is using the 3bot application for decentralized login.
+                This is a passwordless and fully secure system.
+                Not a single person in the world will be able to login to your account (not even us).
+                Please choose a name, which will later be the address of your digital avatar on the web.
+                <br>
+                <br>
+                <a target="_blank" href="https://www.youtube.com/embed/4exjbFvnGkk">More info.</a>
+              </p>
+              <p class="subheading" v-if="!firstvisit">
+                Hi! What is your 3bot name?
+              </p>
+              <v-text-field @input="checkNameAvailability" :disabled="nameCheckStatus.checking" :rules="nameRules"
+                v-model="doubleName" box label="Name"
+                :hint="doubleName ? `Your 3bot address: ${doubleName}.3bot` : `Whats your 3bot address?`" required
+                counter=50></v-text-field>
+              <br>
+            </v-card-text>
+            <v-card-actions>
+              <v-layout column align-center>
+                <v-layout justify-end class="pb-3" style="width: 100%;"
+                  v-if="nameCheckStatus.checked">
+                  <v-spacer></v-spacer>
+                  <v-btn type="submit" flat :disabled="!nameCheckStatus.checking && nameCheckStatus.available">
+                    Sign in</v-btn>
+                </v-layout>
 
-    <br />
-    <v-layout column>
-      <v-layout row justify-center align-center>
-        <a md12 class="mx-2" href="https://play.google.com/store/apps/details?id=org.jimber.threebotlogin"
-        target="_blank">
-          <img src="googleplay.png" height="50" />
-        </a>
-        <a class="mx-2" href="https://itunes.apple.com/be/app/3bot-login/id1459845885?l=nl&mt=8" target="_blank">
-          <img src="applestore.png" height="50" />
-        </a>
-      </v-layout>
+                <v-flex
+                  v-if="nameCheckStatus.checked && !nameCheckStatus.checking && valid && nameCheckStatus.available"
+                  class="text-xs-center">
+                  This account doesn't exist yet. Please register using the mobile app! <br>
+                  If you don't have the app, you can download by clicking below.
+                </v-flex>
+                <v-flex class="text-xs-center" v-else>
+                  You can login using the 3bot app. <br>
+                  Download this app on the Google Play/Apple app store.
+                </v-flex>
+              </v-layout>
+            </v-card-actions>
+          </v-form>
+        </v-card>
+      </v-flex>
     </v-layout>
   </v-layout>
-</section>
 
-<section class="initial" v-else>
-  <v-progress-linear style="position:fixed; top:0; left: 0;" class="ma-0" indeterminate v-if="nameCheckStatus.checking">
-  </v-progress-linear>
-  <v-layout justify-center v-if="!spinner">
-    <v-flex md8>
-      <v-card>
-        <v-toolbar class="primary">
-          <h1 class="headline white--text text-xs-center fw">
-            Identify yourself
-          </h1>
-        </v-toolbar>
-        <v-form v-model="valid" @submit.prevent="registerOrLogin">
-          <v-card-text>
-            <v-stepper v-if="firstvisit" class="elevation-0" flat>
-              <v-stepper-header class="elevation-0">
-                <v-stepper-step color="accent" step="1">Personal info</v-stepper-step>
-                <v-divider></v-divider>
-                <v-stepper-step color="accent" step="2">Your key</v-stepper-step>
-                <v-divider></v-divider>
-                <v-stepper-step color="accent" step="3">Finishing</v-stepper-step>
-              </v-stepper-header>
-            </v-stepper>
-            <p class="subheading pb-2" v-if="firstvisit">
-              <span class="font-weight-bold">{{appid}}</span><span v-if="!appid">You were redirected by a service
-                that</span> is using the 3bot application for decentralized login.
-              This is a passwordless and fully secure system.
-              Not a single person in the world will be able to login to your account (not even us).
-              Please choose a name, which will later be the address of your digital avatar on the web.
-              <br>
-              <br>
-              <a target="_blank" href="https://www.youtube.com/embed/4exjbFvnGkk">More info.</a>
-            </p>
-            <p class="subheading" v-if="!firstvisit">
-              Hi! What is your 3bot name?
-            </p>
-            <v-text-field @input="checkNameAvailability" :disabled="nameCheckStatus.checking" :rules="nameRules"
-              v-model="doubleName" box label="Name"
-              :hint="doubleName ? `Your 3bot address: ${doubleName}.3bot` : `Whats your 3bot address?`" required
-              counter=50></v-text-field>
-            <br>
-          </v-card-text>
-          <v-card-actions>
-            <v-spacer></v-spacer>
-            <p v-if="!nameCheckStatus.checking && valid && actionBtnDisabled() || !doubleName" class="pr-1">
-              {{nameCheckStatus.available ? "" :  "This account already exists "}}
-              <p v-else class="pr-1"> This account already exists · You've got to come from an app to sign in.
-                <v-tooltip bottom>
-                  <a slot="activator" v-if="!nameCheckStatus.available && valid && actionBtnDisabled()" class="pr-3"
-                    @click="$router.push('recover')"> · recover</a>
-                  <span>Is this your account? Click for more information on how to recover your account.</span>
-                </v-tooltip>
-              </p>
-              <!-- <v-btn v-if="!nameCheckStatus.available" icon outline @click.stop="dialog = true">?</v-btn> -->
-              <!-- <v-btn type="submit" flat :disabled="!(nameCheckStatus.checked && !nameCheckStatus.checking && valid)">{{nameCheckStatus.available ? "Register" :  "Sign in"}}</v-btn> -->
-              <v-btn type="submit" flat :disabled="!(nameCheckStatus.checked && !nameCheckStatus.checking && valid)"
-                v-if="!nameCheckStatus.available && actionBtnDisabled()">
-                {{nameCheckStatus.available ? "Register" :  "Sign in"}}</v-btn>
-          </v-card-actions>
-        </v-form>
-
-        <v-card-text v-if="!nameCheckStatus.checking && valid && actionBtnDisabled()" class="subheading pt-3">This
-          account doesn't exist yet. Please register using the mobile app! If you don't have the app, you can download
-          by clicking below.</v-card-text>
-        <v-card-text v-else class="subheading pt-3">You can login using the 3bot app. Download this app on the Google
-          Play/ Apple app store.</v-card-text>
-      </v-card>
-    </v-flex>
+  <v-layout column class="pt-5" align-center>
+    <v-layout row justify-center align-center>
+      <a md12 class="mx-2" href="https://play.google.com/store/apps/details?id=org.jimber.threebotlogin"
+        target="_blank">
+        <img src="googleplay.png" height="50" />
+      </a>
+      <a class="mx-2" href="https://itunes.apple.com/be/app/3bot-login/id1459845885?l=nl&mt=8" target="_blank">
+        <img src="applestore.png" height="50" />
+      </a>
+    </v-layout>
   </v-layout>
-
-  <v-layout justify-center v-if="spinner">
-    <v-flex md8>
-      <v-card>
-        <v-toolbar class="primary">
-          <h1 class="headline white--text text-xs-center fw">
-            Identify yourself
-          </h1>
-        </v-toolbar>
-        <v-form v-model="valid" @submit.prevent="registerOrLogin">
-          <v-card-text>
-            <v-layout justify-center>
-              <v-progress-circular :size="100" :width="15" color="accent" indeterminate></v-progress-circular>
-            </v-layout justify-center>
-          </v-card-text>
-        </v-form>
-      </v-card>
-    </v-flex>
-  </v-layout>
-
-  <v-dialog v-model="areYouSureDialog" width="700">
-    <v-card>
-      <v-toolbar class="primary">
-        <h1 class="headline white--text text-xs-center fw">
-          Install 3botlogin
-        </h1>
-      </v-toolbar>
-      <v-card-text>
-        <p>If you have the application installed click continue, otherwise please install before proceeding. </p>
-        <v-card-text class="subheading pt-3">Download this app on the Google Play / Apple app store.</v-card-text>
-        <v-layout justify-center>
-          <div>
-            <a md12 class="mx-2" href="https://play.google.com/store/apps/details?id=org.jimber.threebotlogin"
-              target="_blank">
-              <img src="googleplay.png" height="50" />
-            </a>
-            <a class="mx-2" href="https://itunes.apple.com/be/app/3bot-login/id1459845885?l=nl&mt=8" target="_blank">
-              <img src="applestore.png" height="50" />
-            </a>
-          </div>
-        </v-layout>
-      </v-card-text>
-      <v-card-actions>
-        <v-spacer />
-        <v-btn flat @click="areYouSureDialog = false">Cancel</v-btn>
-        <v-btn flat @click="openAppToRegister">Continue</v-btn>
-      </v-card-actions>
-    </v-card>
-  </v-dialog>
-
-  <v-dialog v-model="continueToLogin" width="700">
-    <v-card>
-      <v-toolbar class="primary">
-        <h1 class="headline white--text text-xs-center fw">
-          Do you want to log in?
-        </h1>
-      </v-toolbar>
-      <v-card-text>
-        <p class="subheading">This accountname is already known.</p>
-        <p class="subheading">Do you want to log in with {{doubleName}}.3bot?</p>
-      </v-card-text>
-      <v-card-actions>
-        <v-spacer />
-        <v-btn flat @click="continueToLogin = false">No</v-btn>
-        <v-btn flat @click="login">Yup</v-btn>
-      </v-card-actions>
-    </v-card>
-  </v-dialog>
 </section>

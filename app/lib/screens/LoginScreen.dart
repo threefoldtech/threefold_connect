@@ -57,7 +57,7 @@ class _LoginScreenState extends State<LoginScreen> {
       return;
     }
     if (!isMobileCheck && event.loginId != widget.message['loginId']) {
-      Navigator.pop(context, false);
+     // Navigator.pop(context, false);
     }
   }
 
@@ -427,6 +427,8 @@ class _LoginScreenState extends State<LoginScreen> {
 
     if (selectedImageId == correctImage || isMobileCheck) {
       Navigator.pop(context, true);
+    }else{
+       Navigator.pop(context, false);
     }
  
   }
