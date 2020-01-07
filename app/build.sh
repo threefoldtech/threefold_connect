@@ -32,7 +32,8 @@ then
     else
         echo "[Local]: Building apk."
 
-        flutter build apk -t lib/main.dart --target-platform android-arm64
+        # flutter build apk --target-platform android-arm,android-arm64 --split-per-abi
+        flutter build apk -t lib/main.dart
         
         hash=$(git log --pretty=format:'%h' -n 1)
         current_time=$(date "+%Y.%m.%d-%H.%M.%S")
@@ -72,7 +73,8 @@ then
     else
         echo "[Staging]: Building apk."
 
-        flutter build apk -t lib/main.dart --target-platform android-arm64
+        # flutter build apk --target-platform android-arm,android-arm64 --split-per-abi
+        flutter build apk -t lib/main.dart
         
         hash=$(git log --pretty=format:'%h' -n 1)
         current_time=$(date "+%Y.%m.%d-%H.%M.%S")
@@ -113,7 +115,8 @@ then
     else
         echo "[Production]: Building apk."
 
-        flutter build apk -t lib/main.dart --target-platform android-arm64
+        # flutter build apk --target-platform android-arm,android-arm64 --split-per-abi
+        flutter build apk -t lib/main.dart
         
         hash=$(git log --pretty=format:'%h' -n 1)
         current_time=$(date "+%Y.%m.%d-%H.%M.%S")
