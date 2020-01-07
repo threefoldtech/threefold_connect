@@ -91,19 +91,19 @@ class AppConfigStaging extends AppConfigImpl {
 
 class AppConfigLocal extends AppConfigImpl {
   String openKycApiUrl() {
-    return "http://192.168.2.60:5005";
+    return "https://openkyc.staging.jimber.org";
   }
 
   String threeBotApiUrl() {
-    return "http://192.168.2.60:5000/api";
+    return "http://192.168.2.80:5000/api";
   }
 
   String threeBotFrontEndUrl() {
-    return "http://192.168.2.60:8081";
+    return "http://192.168.2.80:8080";
   }
 
   String threeBotSocketUrl() {
-    return "ws://192.168.2.60:5000";
+    return "ws://192.168.2.80:5000";
   }
 
   Map<String, String> circleUrls() {
