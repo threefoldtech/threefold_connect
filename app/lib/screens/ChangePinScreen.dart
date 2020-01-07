@@ -67,7 +67,7 @@ class _ChangePinScreenState extends State<ChangePinScreen> {
         ),
       ),
       onWillPop: () {
-        if (state != _State.Done) {
+        if (state != _State.Done && widget.hideBackButton) {
           return Future(() => false);
         }
         return Future(() => true);
