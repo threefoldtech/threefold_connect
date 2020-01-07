@@ -1,4 +1,5 @@
-import '../../AppConfig.dart';
+import 'package:threebotlogin/helpers/EnvConfig.dart';
+import 'package:threebotlogin/helpers/Environment.dart';
 
 class WalletConfig extends EnvConfig {
   WalletConfigImpls impl;

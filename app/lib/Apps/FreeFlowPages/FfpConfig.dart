@@ -1,4 +1,5 @@
-import '../../AppConfig.dart';
+import 'package:threebotlogin/helpers/EnvConfig.dart';
+import 'package:threebotlogin/helpers/Environment.dart';
 
 class FfpConfig extends EnvConfig {
   FfpConfigImpls impl;

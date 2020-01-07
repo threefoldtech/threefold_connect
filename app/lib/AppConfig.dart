@@ -1,8 +1,5 @@
-enum Environment { Staging, Production, Local }
-
-abstract class EnvConfig {
-  Environment enviroment = Environment.Staging;
-}
+import 'package:threebotlogin/helpers/EnvConfig.dart';
+import 'package:threebotlogin/helpers/Environment.dart';
 
 class AppConfig extends EnvConfig {
   AppConfigImpl appConfig;

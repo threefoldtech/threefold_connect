@@ -9,8 +9,8 @@ fi
 
 if [[ $2 == "--local" ]]
 then
-    sed -i -e 's/Environment enviroment = Environment.Staging;/Environment enviroment = Environment.Local;/g' lib/AppConfig.dart
-    sed -i -e 's/Environment enviroment = Environment.Production;/Environment enviroment = Environment.Local;/g' lib/AppConfig.dart
+    sed -i -e 's/Environment enviroment = Environment.Staging;/Environment enviroment = Environment.Local;/g' lib/helpers/EnvConfig.dart
+    sed -i -e 's/Environment enviroment = Environment.Production;/Environment enviroment = Environment.Local;/g' lib/helpers/EnvConfig.dart
 
     if grep -q "3Bot Staging" "android/app/src/main/AndroidManifest.xml";
     then
@@ -50,8 +50,8 @@ fi
 
 if [[ $2 == "--staging" ]]
 then
-    sed -i -e 's/Environment enviroment = Environment.Local;/Environment enviroment = Environment.Staging;/g' lib/AppConfig.dart
-    sed -i -e 's/Environment enviroment = Environment.Production;/Environment enviroment = Environment.Staging;/g' lib/AppConfig.dart
+    sed -i -e 's/Environment enviroment = Environment.Local;/Environment enviroment = Environment.Staging;/g' lib/helpers/EnvConfig.dart
+    sed -i -e 's/Environment enviroment = Environment.Production;/Environment enviroment = Environment.Staging;/g' lib/helpers/EnvConfig.dart
 
     if grep -q "3Bot Local" "android/app/src/main/AndroidManifest.xml";
     then
@@ -91,8 +91,8 @@ fi
 
 if [[ $2 == "--production" ]]
 then
-    sed -i -e 's/Environment enviroment = Environment.Local;/Environment enviroment = Environment.Production;/g' lib/AppConfig.dart
-    sed -i -e 's/Environment enviroment = Environment.Staging;/Environment enviroment = Environment.Production;/g' lib/AppConfig.dart
+    sed -i -e 's/Environment enviroment = Environment.Local;/Environment enviroment = Environment.Production;/g' lib/helpers/EnvConfig.dart
+    sed -i -e 's/Environment enviroment = Environment.Staging;/Environment enviroment = Environment.Production;/g' lib/helpers/EnvConfig.dart
 
     if grep -q "3Bot Local" "android/app/src/main/AndroidManifest.xml";
     then
