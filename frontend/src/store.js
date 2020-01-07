@@ -4,13 +4,11 @@ import socketService from './services/socketService'
 import cryptoService from './services/cryptoService'
 import axios from 'axios'
 import config from '../public/config'
-import createPersistedState from 'vuex-persistedstate'
 import { uuid } from 'vue-uuid'
 
 Vue.use(Vuex)
 
 export default new Vuex.Store({
-  plugins: [createPersistedState()],
   state: {
     hash: null,
     redirectUrl: null,
@@ -44,6 +42,7 @@ export default new Vuex.Store({
       state.keys = keys
     },
     setDoubleName (state, name) {
+      console.log(`Setting doubleName to ${name}`)
       state.doubleName = name
     },
     setHash (state, hash) {
@@ -97,14 +96,11 @@ export default new Vuex.Store({
   },
   actions: {
     setDoubleName (context, doubleName) {
-      var extension = '.3bot'
-      if (doubleName.indexOf(extension) >= 0) {
-        context.commit('setDoubleName', doubleName)
-      } else {
-        context.commit('setDoubleName', `${doubleName}.3bot`)
-
-        socketService.emit('join', { room: `${doubleName}.3bot` })
+      if (doubleName.indexOf('.3bot') < 0) {
+        doubleName = `${doubleName}.3bot`
       }
+      context.commit('setDoubleName', doubleName)
+      socketService.emit('join', { room: doubleName })
     },
     setAttemptCanceled (context, payload) {
       context.commit('setCancelLoginUp', payload)
@@ -150,18 +146,6 @@ export default new Vuex.Store({
     async generateKeys (context) {
       context.commit('setKeys', await cryptoService.generateKeys())
     },
-    registerUser (context, data) {
-      console.log(`Register user`)
-      socketService.emit('register', {
-        doubleName: context.getters.doubleName,
-        email: data.email,
-        publicKey: context.getters.keys.publicKey
-      })
-      context.dispatch('loginUser', { firstTime: true })
-    },
-    SOCKET_scannedFlag (context, data) {
-      context.commit('setScannedFlagUp', true)
-    },
     SOCKET_cancelLogin (context) {
       console.log('f')
       context.commit('setCancelLoginUp', true)
@@ -175,6 +159,8 @@ export default new Vuex.Store({
       }
     },
     loginUser (context, data) {
+      console.log(`LoginUser`)
+      context.dispatch('setDoubleName', data.doubleName)
       context.commit('setSigned', null)
       context.commit('setFirstTime', data.firstTime)
       context.commit('setRandomImageId')

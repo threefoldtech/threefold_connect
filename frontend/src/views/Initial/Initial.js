@@ -21,7 +21,6 @@ export default {
         v => this.nameRegex.test(v) || 'Name can only contain alphanumeric characters.',
         v => v.length <= 50 || 'Name must be less than 50 characters.'
       ],
-      continueToLogin: false,
       url: '',
       spinner: false,
       rechecked: false,
@@ -33,32 +32,23 @@ export default {
   mounted () {
     window.onblur = this.lostFocus
     window.onfocus = this.gotFocus
-
+    this.appid = this.$route.query.appid
+    console.log(`this.$route.query.appid`, this.$route.query.appid)
+    if (!this.appid) {
+      // this.$router.push({ name: 'error' })
+    }
     console.log(this.$route)
     this.setAttemptCanceled(false)
     var tempName = localStorage.getItem('username')
     if (tempName) {
+      console.log(`Got tempName`, tempName)
       this.doubleName = tempName.split('.')[0]
       this.checkNameAvailability()
-    }
-    if (this.$route.query.logintoken && this.$route.query.doublename) {
-      this.doubleName = this.$route.query.doublename
-      this.setDoubleName(this.$route.query.doublename)
-      this.url = `${this.$route.query.doublename} && ${this.$route.query.logintoken}`
-      this.loginUser({
-        mobile: true,
-        firstTime: false,
-        logintoken: this.$route.query.logintoken
-      })
-    }
-    if (this.$route.query.logintoken) {
-      this.spinner = true
     }
     this.firstvisit = !cookies.get('firstvisit')
     if (this.firstvisit) {
       cookies.set('firstvisit', true)
     }
-    this.appid = this.$route.query.appid
     if (this.$route.query) {
       this.$store.dispatch('saveState', {
         hash: this.hash ? this.hash : this.$route.query.state,
@@ -74,9 +64,6 @@ export default {
     } else {
       this.$router.push('error')
     }
-
-    // If user is on mobile
-    // this.promptLoginToMobileUser()
   },
   computed: {
     ...mapGetters([
@@ -106,30 +93,11 @@ export default {
       'forceRefetchStatus',
       'deleteLoginAttempt'
     ]),
-    registerOrLogin () {
-      if (this.actionBtnDisabled()) {
-        this.setDoubleName(this.doubleName)
-
-        if (this.nameCheckStatus.checked && this.nameCheckStatus.available) {
-          if (this.isMobile()) {
-            this.areYouSureDialog = true
-          } else {
-            this.register()
-          }
-        } else {
-          this.login()
-        }
-      }
-    },
-    isMobile () {
-      return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
-    },
     lostFocus () {
       this.didLeavePage = true
     },
     gotFocus () {
-      var isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
-      if (this.didLeavePage && isMobile) {
+      if (this.didLeavePage && this.isMobile) {
         this.forceRefetchStatus()
       }
     },
@@ -151,42 +119,22 @@ export default {
       }
     },
     login () {
-      var isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
       this.loginUser({
-        mobile: isMobile,
+        doubleName: this.doubleName,
+        mobile: this.isMobile,
         firstTime: false
       })
-      if (isMobile) {
+      if (this.isMobile) {
         var url = `threebot://login/?state=${encodeURIComponent(this.hash)}&mobile=true`
         if (this.scope) url += `&scope=${encodeURIComponent(this.scope)}`
         if (this.appId) url += `&appId=${encodeURIComponent(this.appId)}`
         if (this.appPublicKey) url += `&appPublicKey=${encodeURIComponent(this.appPublicKey)}`
         if (this.redirectUrl) url += `&redirecturl=${encodeURIComponent(this.redirectUrl)}`
-        if (this.$route.query.logintoken) url += `&logintoken=${encodeURIComponent(this.$route.query.logintoken)}`
 
         window.open(url)
       }
       this.$router.push({
         name: 'login'
-      })
-    },
-    openAppToRegister () {
-      var isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
-
-      // window.open('https://google.be#' + isMobile)
-      if (isMobile) {
-        var url = `threebot://registerAccount/?doubleName=${encodeURIComponent(this.doubleName)}`
-
-        if (/iPhone|iPad|iPod/i.test(navigator.userAgent)) {
-          window.location.replace(url)
-        } else if (/Android|webOS|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
-          window.open(url)
-        }
-      }
-    },
-    register () {
-      this.$router.push({
-        name: 'register'
       })
     },
     checkNameAvailability () {
@@ -197,19 +145,12 @@ export default {
           this.checkName(this.doubleName)
         }, 500)
       }
-    },
-    hasAppid () {
-      return this.$route.query.appid !== undefined
-    },
-    actionBtnDisabled () {
-      if (!this.nameCheckStatus.available && !this.hasAppid()) return false // login and appid = btn disabled
-      return true // !(this.nameCheckStatus.checked && !this.nameCheckStatus.checking && this.valid)
     }
   },
   watch: {
     signed (val) {
-      var isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
-      if (!isMobile) return
+      console.log(`signed`, val)
+      if (!this.isMobile) return
 
       try {
         if (val) {
