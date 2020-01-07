@@ -8,7 +8,6 @@ class Events {
   Events._internal(); // init here
 
   onEvent(Type eventType, Function function) {
-
     if (this.eventList[eventType] == null) {
       this.eventList[eventType] = new List<Function>();
     }
@@ -24,7 +23,8 @@ class Events {
       function(event);
     }
   }
-  reset(){
+
+  reset() {
     eventList = Map<Type, dynamic>();
   }
 }

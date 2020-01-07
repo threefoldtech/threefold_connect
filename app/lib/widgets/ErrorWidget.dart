@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 
 Widget getErrorWidget(BuildContext context, FlutterErrorDetails error) {

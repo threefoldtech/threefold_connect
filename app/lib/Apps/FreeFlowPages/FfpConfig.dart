@@ -23,15 +23,12 @@ class FfpConfig extends EnvConfig {
   String cookieUrl() {
     return impl.cookieUrl();
   }
-
-
 }
 
 abstract class FfpConfigImpls {
   String appId();
   String url();
   String cookieUrl();
-
 }
 
 class FfpConfigStaging extends FfpConfigImpls {
@@ -46,7 +43,6 @@ class FfpConfigStaging extends FfpConfigImpls {
   String cookieUrl() {
     return 'https://staging.freeflowpages.com/user/auth/external?authclient=3bot';
   }
-
 }
 
 class FfpConfigProduction extends FfpConfigImpls {
@@ -75,6 +71,4 @@ class FfpConfigLocal extends FfpConfigImpls {
   String cookieUrl() {
     return 'https://freeflowpages.com/user/auth/external?authclient=3bot';
   }
-
-
 }

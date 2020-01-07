@@ -31,7 +31,10 @@ class _SuccessfulScreenState extends State<SuccessfulScreen> {
               SizedBox(
                 height: 20.0,
               ),
-              Text(widget.text, style: TextStyle(fontSize: 18),),
+              Text(
+                widget.text,
+                style: TextStyle(fontSize: 18),
+              ),
               SizedBox(
                 height: 60.0,
               ),

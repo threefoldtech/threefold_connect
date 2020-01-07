@@ -13,17 +13,17 @@ class Ffp implements App {
   }
 
   Ffp._internal();
-  
+
   String firstUrlToLoad = ""; // quick fix make pretty
   @override
   Future<Widget> widget() async {
-    
     return _ffpWidget;
   }
-  void back(){
+
+  void back() {
     Events().emit(FfpBackEvent());
-    
   }
+
   void clearData() {
     //clearAllData();
   }

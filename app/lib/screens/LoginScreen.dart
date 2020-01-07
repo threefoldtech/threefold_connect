@@ -430,7 +430,6 @@ class _LoginScreenState extends State<LoginScreen> {
     }else{
        Navigator.pop(context, false);
     }
- 
   }
 
   dynamic buildScope() async {

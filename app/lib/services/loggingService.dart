@@ -6,7 +6,12 @@ class LoggingService {
 
   void log(Object s, [Object o, Object o2]) {
     if (debug) {
-      print("[" + getDateTime() + "]: " + s.toString() + ((o != null) ? ", " + o.toString() : "") + ((o2 != null) ? ", " + o2.toString() : ""));
+      print("[" +
+          getDateTime() +
+          "]: " +
+          s.toString() +
+          ((o != null) ? ", " + o.toString() : "") +
+          ((o2 != null) ? ", " + o2.toString() : ""));
     }
 
     if (writeToFile) {

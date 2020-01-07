@@ -6,7 +6,7 @@ abstract class EnvConfig {
 
 class AppConfig extends EnvConfig {
   AppConfigImpl appConfig;
-  
+
   AppConfig() {
     if (enviroment == Environment.Staging) {
       appConfig = AppConfigStaging();

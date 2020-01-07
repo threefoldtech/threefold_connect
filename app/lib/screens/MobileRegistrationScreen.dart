@@ -173,7 +173,7 @@ class _MobileRegistrationScreenState extends State<MobileRegistrationScreen> {
     await sendRegisterSign(_registrationData.doubleName);
     await sendVerificationEmail();
   }
-  
+
   loadingDialog() {
     return showDialog(
       context: context,

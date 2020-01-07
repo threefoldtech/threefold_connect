@@ -68,7 +68,8 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
     Navigator.push(
         context,
         MaterialPageRoute(
-            builder: (context) => ChangePinScreen(currentPin: pin, hideBackButton: false)));
+            builder: (context) =>
+                ChangePinScreen(currentPin: pin, hideBackButton: false)));
   }
 
   @override
@@ -311,13 +312,14 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
                 Events().emit(CloseSocketEvent());
                 bool result = await clearData();
                 if (result) {
-                  
                   Navigator.pop(context); // pop pref
-                  await Navigator.pushReplacement( // replace home
+                  await Navigator.pushReplacement(
+                      // replace home
                       //@todo this feels like a bug, should not push on current screen
                       context,
                       MaterialPageRoute(
-                          builder: (context) => MainScreen(initDone: true, registered: false)));
+                          builder: (context) =>
+                              MainScreen(initDone: true, registered: false)));
                 } else {
                   showDialog(
                       context: preferenceContext,

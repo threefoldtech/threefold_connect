@@ -1,3 +1,3 @@
-class GoHomeEvent{
+class GoHomeEvent {
   GoHomeEvent();
 }

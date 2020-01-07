@@ -6,7 +6,8 @@ class ImageButton extends StatefulWidget {
   final selectedImageId;
   final callback;
 
-  ImageButton(this.imageId, this.selectedImageId, this.callback, {Key key}) : super(key: key);
+  ImageButton(this.imageId, this.selectedImageId, this.callback, {Key key})
+      : super(key: key);
 
   _ImageButtonState createState() => _ImageButtonState();
 }
@@ -16,10 +17,11 @@ class _ImageButtonState extends State<ImageButton> {
   Widget build(BuildContext context) {
     return Container(
         decoration: new BoxDecoration(
-            border: (widget.selectedImageId == widget.imageId)
-                ? Border.all(width: 2, color: Theme.of(context).primaryColor)
-                : Border.all(width: 2, color: Colors.transparent),
-            shape: BoxShape.circle,),
+          border: (widget.selectedImageId == widget.imageId)
+              ? Border.all(width: 2, color: Theme.of(context).primaryColor)
+              : Border.all(width: 2, color: Colors.transparent),
+          shape: BoxShape.circle,
+        ),
         width: 50,
         height: 50,
         child: FlatButton(
@@ -31,7 +33,6 @@ class _ImageButtonState extends State<ImageButton> {
           ),
           padding: EdgeInsets.all(10),
           shape: new CircleBorder(),
-        )
-    );
+        ));
   }
 }

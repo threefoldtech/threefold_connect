@@ -7,7 +7,6 @@ import 'package:threebotlogin/services/userService.dart';
 import '../../App.dart';
 
 class Chatbot implements App {
-
   ChatbotWidget _widget;
 
   Future<Widget> widget() async {
@@ -29,5 +28,4 @@ class Chatbot implements App {
   void back() {
     Events().emit(GoHomeEvent());
   }
-
 }
