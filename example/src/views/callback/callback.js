@@ -23,6 +23,7 @@ export default {
       console.log("show some error", this.error)
       return
     }
+
     threebotService.getUserData(username).then(async (response) => {
       var user = response.data
       var hash = window.localStorage.getItem('state')
@@ -31,6 +32,7 @@ export default {
         name: username
       }
       var data = JSON.parse(url.searchParams.get('data'))
+
       if (data) {
         cryptoService.generateKeys(config.seedPhrase).then(async (keys) => {
           var decrypted = await cryptoService.decrypt(data.ciphertext, data.nonce, keys.privateKey, user.publicKey)

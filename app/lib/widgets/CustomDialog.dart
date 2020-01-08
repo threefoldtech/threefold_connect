@@ -1,10 +1,8 @@
-import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:threebotlogin/main.dart';
-
-import '../main.dart';
+import 'package:flutter/material.dart';
 
 class CustomDialog extends StatelessWidget {
+  //@todo this is used for everything, just seems like a very bad idea. Make dialogs for the seperate things. Maybe a popup dialog with info ok/cancel and other dialogs for eg pin entry
   final Widget description;
   final List<Widget> actions;
   final String title;
@@ -18,6 +16,26 @@ class CustomDialog extends StatelessWidget {
     this.image = Icons.person,
     this.hiddenaction,
   });
+  show(context) {
+    return showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) => CustomDialog(
+        image: Icons.error,
+        title: this.title,
+        description: this.description,
+        actions: <Widget>[
+          //@todo make this configurable, ok;okcancel
+          FlatButton(
+            child: new Text("Ok"),
+            onPressed: () {
+              Navigator.pop(context);
+            },
+          )
+        ],
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -49,8 +67,8 @@ class CustomDialog extends StatelessWidget {
         onPressed: () {
           if (hiddenaction != null) {
             timesPressed++;
-            logger.log('= ' + hiddenaction.toString());
-            logger.log('--------------+++++++++ ' + timesPressed.toString());
+            // logger.log('= ' + hiddenaction.toString());
+            // logger.log('--------------+++++++++ ' + timesPressed.toString());
             if (timesPressed >= timesPressedToReveal) {
               hiddenaction();
               timesPressed = 0;

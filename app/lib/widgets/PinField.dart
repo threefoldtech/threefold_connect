@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import '../main.dart';
-
 class PinField extends StatefulWidget {
   final int pinLength = 4;
   final callback;
@@ -32,8 +30,8 @@ class _PinFieldState extends State<PinField> {
     double size = input.length > i ? maxSize : 1;
     double height = MediaQuery.of(context).size.height;
     return AnimatedContainer(
-      margin: EdgeInsets.all(height/120),
-      height: height/50,
+      margin: EdgeInsets.all(height / 120),
+      height: height / 50,
       width: size,
       decoration: BoxDecoration(color: Colors.black, shape: BoxShape.circle),
       duration: Duration(milliseconds: 100),
@@ -42,7 +40,7 @@ class _PinFieldState extends State<PinField> {
   }
 
   Widget buildNumberPin(String buttonText, BuildContext context,
-    {Color backgroundColor: Colors.blueGrey}) {
+      {Color backgroundColor: Colors.blueGrey}) {
     var onPressedMethod = () => handleInput(buttonText);
     double height = MediaQuery.of(context).size.height;
 
@@ -51,7 +49,7 @@ class _PinFieldState extends State<PinField> {
     if (buttonText == 'C')
       onPressedMethod = input.length >= 1 ? () => onClear() : null;
     return Container(
-        padding: EdgeInsets.only(top: height/136, bottom: height/136),
+        padding: EdgeInsets.only(top: height / 136, bottom: height / 136),
         child: Center(
             child: RawMaterialButton(
           padding: EdgeInsets.all(12),

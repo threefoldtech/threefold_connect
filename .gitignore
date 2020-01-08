@@ -73,11 +73,6 @@ app/android/app-key\.keystore
 app/android/app/app-key.keystore
 
 app/android/key\.properties
-app/android/app/google-services-prod.json
-app/android/app/google-services-staging.json
-app/android/app/google-services-local.json
-app/android/app/google-services.json
-
 app/android/app/app-key.keystore
 
 
@@ -311,7 +306,10 @@ example/*.njsproj
 example/*.sln
 example/*.sw*
 example/public/config.js
-example/package.json
 
 openkyc/*
 Makefile
+*pubspec.lock
+app/lib/AppConfig.dart
+app/android/app/src/main/AndroidManifest.xml
+app/lib/helpers/EnvConfig.dart

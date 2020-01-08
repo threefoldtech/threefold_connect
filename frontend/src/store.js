@@ -4,12 +4,11 @@ import socketService from './services/socketService'
 import cryptoService from './services/cryptoService'
 import axios from 'axios'
 import config from '../public/config'
-import createPersistedState from 'vuex-persistedstate'
+import { uuid } from 'vue-uuid'
 
 Vue.use(Vuex)
 
 export default new Vuex.Store({
-  plugins: [createPersistedState()],
   state: {
     hash: null,
     redirectUrl: null,
@@ -43,6 +42,7 @@ export default new Vuex.Store({
       state.keys = keys
     },
     setDoubleName (state, name) {
+      console.log(`Setting doubleName to ${name}`)
       state.doubleName = name
     },
     setHash (state, hash) {
@@ -67,7 +67,19 @@ export default new Vuex.Store({
       state.emailVerificationStatus = status
     },
     setScope (state, scope) {
-      state.scope = scope
+      let parsedScope = JSON.parse(scope)
+      // if the trustedDevice scope is present get it out of the cookies and put the id on the scope to pass it to the app
+      if (parsedScope.trustedDevice) {
+        // get the cookie specific for this app id
+        const trustedAppDevice = localStorage.getItem(`td-${state.appId}`)
+        if (trustedAppDevice) {
+          parsedScope.trustedDevice = trustedAppDevice
+        } else {
+          parsedScope.trustedDevice = uuid.v4()
+          localStorage.setItem(`td-${state.appId}`, parsedScope.trustedDevice)
+        }
+      }
+      state.scope = JSON.stringify(parsedScope)
     },
     setAppId (state, appId) {
       state.appId = appId
@@ -84,12 +96,11 @@ export default new Vuex.Store({
   },
   actions: {
     setDoubleName (context, doubleName) {
-      var extension = '.3bot'
-      if (doubleName.indexOf(extension) >= 0) {
-        context.commit('setDoubleName', doubleName)
-      } else {
-        context.commit('setDoubleName', `${doubleName}.3bot`)
+      if (doubleName.indexOf('.3bot') < 0) {
+        doubleName = `${doubleName}.3bot`
       }
+      context.commit('setDoubleName', doubleName)
+      socketService.emit('join', { room: doubleName })
     },
     setAttemptCanceled (context, payload) {
       context.commit('setCancelLoginUp', payload)
@@ -135,23 +146,12 @@ export default new Vuex.Store({
     async generateKeys (context) {
       context.commit('setKeys', await cryptoService.generateKeys())
     },
-    registerUser (context, data) {
-      console.log(`Register user`)
-      socketService.emit('register', {
-        doubleName: context.getters.doubleName,
-        email: data.email,
-        publicKey: context.getters.keys.publicKey
-      })
-      context.dispatch('loginUser', { firstTime: true })
-    },
-    SOCKET_scannedFlag (context, data) {
-      context.commit('setScannedFlagUp', true)
-    },
     SOCKET_cancelLogin (context) {
       console.log('f')
       context.commit('setCancelLoginUp', true)
     },
     SOCKET_signed (context, data) {
+      console.log('signed', data)
       if (data.selectedImageId && !context.getters.firstTime && !context.getters.isMobile && data.selectedImageId !== context.getters.randomImageId) {
         context.dispatch('resendNotification')
       } else {
@@ -159,6 +159,8 @@ export default new Vuex.Store({
       }
     },
     loginUser (context, data) {
+      console.log(`LoginUser`)
+      context.dispatch('setDoubleName', data.doubleName)
       context.commit('setSigned', null)
       context.commit('setFirstTime', data.firstTime)
       context.commit('setRandomImageId')
@@ -175,6 +177,12 @@ export default new Vuex.Store({
         logintoken: (data.logintoken || null)
       })
     },
+    loginUserMobile (context, data) {
+      context.commit('setSigned', null)
+      context.commit('setFirstTime', data.firstTime)
+      context.commit('setRandomImageId')
+      context.commit('setIsMobile', data.mobile)
+    },
     resendNotification (context) {
       context.commit('setRandomImageId')
       socketService.emit('resend', {
@@ -187,11 +195,21 @@ export default new Vuex.Store({
       })
     },
     forceRefetchStatus (context) {
-      if (context.getters.hash && context.getters.doubleName) {
-        console.log(`Forcerefetching for ${context.getters.doubleName}`)
-        axios.get(`${config.apiurl}api/forcerefetch?hash=${context.getters.hash}&doublename=${context.getters.doubleName}`).then(response => {
+      if (context.getters.hash) {
+        // console.log(`Forcerefetching for ${context.getters.doubleName}`)
+        axios.get(`${config.apiurl}api/forcerefetch?hash=${context.getters.hash}`).then(response => {
           if (response.data.scanned) context.commit('setScannedFlagUp', response.data.scanned)
           if (response.data.signed) context.commit('setSigned', response.data.signed)
+        }).catch(e => {
+          alert(e)
+        })
+      }
+    },
+    deleteLoginAttempt (context) {
+      if (context.getters.hash) {
+        console.log(`Deleting login attempt for`)
+        axios.delete(`${config.apiurl}api/attempts/${context.getters.hash}`).then(response => {
+          console.log(response)
         }).catch(e => {
           alert(e)
         })

@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:typed_data';
-import 'package:convert/convert.dart';
 import 'package:flutter_sodium/flutter_sodium.dart';
 import 'package:bip39/bip39.dart' as bip39;
 import 'package:password_hash/password_hash.dart';
@@ -18,7 +17,7 @@ Future<Map<String, String>> generateKeyPair() async {
   };
 }
 
-Uint8List toHex(String input) {
+Uint8List _toHex(String input) {
   double length = input.length / 2;
   Uint8List bytes = new Uint8List(length.ceil());
 
@@ -33,7 +32,7 @@ Uint8List toHex(String input) {
 Future<Map<String, String>> generateKeysFromSeedPhrase(seedPhrase) async {
   String entropy = bip39.mnemonicToEntropy(seedPhrase);
   Map<String, Uint8List> key =
-      await Sodium.cryptoSignSeedKeypair(toHex(entropy));
+      await Sodium.cryptoSignSeedKeypair(_toHex(entropy));
 
   return {
     'publicKey': base64.encode(key['pk']).toString(),
@@ -47,14 +46,6 @@ Future<String> signData(String data, String sk) async {
       await Sodium.cryptoSign(Uint8List.fromList(data.codeUnits), private);
 
   return base64.encode(signed);
-}
-
-Future<bool> verifySign(String data, String pk) async {
-  var sig = base64.decode(data);
-  var h = hex.encode(sig);
-  var valid = await CryptoSign.verify(sig, h, base64.decode(pk));
-
-  return valid;
 }
 
 Future<Map<String, String>> encrypt(

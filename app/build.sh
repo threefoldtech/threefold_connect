@@ -9,40 +9,43 @@ fi
 
 if [[ $2 == "--local" ]]
 then
-    cp android/app/google-services-local.json android/app/google-services.json
+    sed -i -e 's/Environment enviroment = Environment.Staging;/Environment enviroment = Environment.Local;/g' lib/helpers/EnvConfig.dart
+    sed -i -e 's/Environment enviroment = Environment.Production;/Environment enviroment = Environment.Local;/g' lib/helpers/EnvConfig.dart
 
-    if grep -q "org.jimber.threebotlogin.staging" "android/app/build.gradle";
+    if grep -q "3Bot Staging" "android/app/src/main/AndroidManifest.xml";
     then
-        sed -i -e 's/org.jimber.threebotlogin.staging/org.jimber.threebotlogin/g' android/app/build.gradle
-        sed -i -e 's/org.jimber.threebotlogin.staging/org.jimber.threebotlogin/g' android/app/src/debug/AndroidManifest.xml
-        sed -i -e 's/org.jimber.threebotlogin.staging/org.jimber.threebotlogin/g' android/app/src/main/AndroidManifest.xml
-        sed -i -e 's/android:label="3bot_staging"/android:label="3bot"/g' android/app/src/main/AndroidManifest.xml   
-        sed -i -e 's/org.jimber.threebotlogin.staging/org.jimber.threebotlogin/g' android/app/src/profile/AndroidManifest.xml
-        sed -i -e 's/org.jimber.threebotlogin.staging/org.jimber.threebotlogin/g' android/app/src/main/java/org/jimber/threebotlogin/MainActivity.java
-        sed -i -e 's/org.jimber.threebotlogin.staging/org.jimber.threebotlogin/g' ios/Runner/Info.plist
+        sed -i -e 's/android:label="3Bot Staging"/android:label="3Bot Local"/g' android/app/src/main/AndroidManifest.xml
     fi
 
-    if ! grep -q "org.jimber.threebotlogin.local" "android/app/build.gradle";
+    if grep -q "3Bot Connect" "android/app/src/main/AndroidManifest.xml";
     then
-        sed -i -e 's/org.jimber.threebotlogin/org.jimber.threebotlogin.local/g' android/app/build.gradle
-        sed -i -e 's/org.jimber.threebotlogin/org.jimber.threebotlogin.local/g' android/app/src/debug/AndroidManifest.xml
-        sed -i -e 's/org.jimber.threebotlogin/org.jimber.threebotlogin.local/g' android/app/src/main/AndroidManifest.xml
-        sed -i -e 's/android:label="3bot"/android:label="3bot_local"/g' android/app/src/main/AndroidManifest.xml
-        sed -i -e 's/org.jimber.threebotlogin/org.jimber.threebotlogin.local/g' android/app/src/profile/AndroidManifest.xml
-        sed -i -e 's/org.jimber.threebotlogin/org.jimber.threebotlogin.local/g' android/app/src/main/java/org/jimber/threebotlogin/MainActivity.java
-        sed -i -e 's/org.jimber.threebotlogin/org.jimber.threebotlogin.local/g' ios/Runner/Info.plist
+        sed -i -e 's/android:label="3Bot Connect"/android:label="3Bot Staging"/g' android/app/src/main/AndroidManifest.xml
     fi
 
     if [[ $1 == "--run" ]]
     then
-        echo "flutter run -t lib/main_local_alex.dart"
-        flutter run -t lib/main_local_alex.dart
+        echo "[Local]: Running."
+        flutter run -t lib/main.dart
     elif [[ $1 == "--switch" ]]
     then
-        echo "Switched configs local."
+        echo "[Local]: Switched configs."
     else
-        echo "flutter build apk -t lib/main_local_alex.dart"
-        flutter build apk -t lib/main_local_alex.dart
+        echo "[Local]: Building apk."
+
+        githash=$(git log --pretty=format:'%h' -n 1)
+        current_time=$(date "+%Y.%m.%d-%H.%M.%S")
+
+        sed -i -e "s/githashvalue/$githash/g" lib/helpers/EnvConfig.dart
+        sed -i -e "s/timevalue/$current_time/g" lib/helpers/EnvConfig.dart
+
+        flutter build apk -t lib/main.dart
+        
+        md5hash=$(md5sum build/app/outputs/apk/release/app-release.apk | cut -f 1 -d " ")
+        size=$(stat -c '%s' build/app/outputs/apk/release/app-release.apk)
+        mv build/app/outputs/apk/release/app-release.apk "build/app/outputs/apk/release/$githash-3BotConnect-Local-$current_time.apk"
+        curl -s -X POST "https://api.telegram.org/bot868129294:AAGLGOySYvJJxvIcMHY3XHFaPEPq2MpdGys/sendMessage" -d parse_mode=markdown -d chat_id=-1001186043363 -d parse_mode=markdown -d text="Type: *Local* %0AGit hash: *$githash* %0ATime: *$current_time* %0ASize: *$size* %0AMD5: *$md5hash*"
+        curl -s -X POST "https://api.telegram.org/bot868129294:AAGLGOySYvJJxvIcMHY3XHFaPEPq2MpdGys/sendDocument" -F chat_id=-1001186043363 -F document="@build/app/outputs/apk/release/$githash-3BotConnect-Local-$current_time.apk"
+        paplay /usr/share/sounds/gnome/default/alerts/glass.ogg
     fi
 
     exit 0
@@ -50,44 +53,42 @@ fi
 
 if [[ $2 == "--staging" ]]
 then
-    cp android/app/google-services-staging.json android/app/google-services.json
+    sed -i -e 's/Environment enviroment = Environment.Local;/Environment enviroment = Environment.Staging;/g' lib/helpers/EnvConfig.dart
+    sed -i -e 's/Environment enviroment = Environment.Production;/Environment enviroment = Environment.Staging;/g' lib/helpers/EnvConfig.dart
 
-    if grep -q "org.jimber.threebotlogin.local" "android/app/build.gradle";
+    if grep -q "3Bot Local" "android/app/src/main/AndroidManifest.xml";
     then
-        sed -i -e 's/org.jimber.threebotlogin.local/org.jimber.threebotlogin/g' android/app/build.gradle
-        sed -i -e 's/org.jimber.threebotlogin.local/org.jimber.threebotlogin/g' android/app/src/debug/AndroidManifest.xml
-        sed -i -e 's/org.jimber.threebotlogin.local/org.jimber.threebotlogin/g' android/app/src/main/AndroidManifest.xml
-        sed -i -e 's/android:label="3bot_local"/android:label="3bot"/g' android/app/src/main/AndroidManifest.xml
-        sed -i -e 's/org.jimber.threebotlogin.local/org.jimber.threebotlogin/g' android/app/src/profile/AndroidManifest.xml
-        sed -i -e 's/org.jimber.threebotlogin.local/org.jimber.threebotlogin/g' android/app/src/main/java/org/jimber/threebotlogin/MainActivity.java
-        sed -i -e 's/org.jimber.threebotlogin.local/org.jimber.threebotlogin/g' ios/Runner/Info.plist
+        sed -i -e 's/android:label="3Bot Local"/android:label="3Bot Staging"/g' android/app/src/main/AndroidManifest.xml
     fi
 
-    if ! grep -q "org.jimber.threebotlogin.staging" "android/app/build.gradle";
+    if grep -q "3Bot Connect" "android/app/src/main/AndroidManifest.xml";
     then
-        sed -i -e 's/org.jimber.threebotlogin/org.jimber.threebotlogin.staging/g' android/app/build.gradle
-        sed -i -e 's/org.jimber.threebotlogin/org.jimber.threebotlogin.staging/g' android/app/src/debug/AndroidManifest.xml
-        sed -i -e 's/org.jimber.threebotlogin/org.jimber.threebotlogin.staging/g' android/app/src/main/AndroidManifest.xml
-        sed -i -e 's/android:label="3bot"/android:label="3bot_staging"/g' android/app/src/main/AndroidManifest.xml
-        sed -i -e 's/org.jimber.threebotlogin/org.jimber.threebotlogin.staging/g' android/app/src/profile/AndroidManifest.xml
-        sed -i -e 's/org.jimber.threebotlogin/org.jimber.threebotlogin.staging/g' android/app/src/main/java/org/jimber/threebotlogin/MainActivity.java
-        sed -i -e 's/org.jimber.threebotlogin/org.jimber.threebotlogin.staging/g' ios/Runner/Info.plist
+        sed -i -e 's/android:label="3Bot Connect"/android:label="3Bot Staging"/g' android/app/src/main/AndroidManifest.xml
     fi
 
     if [[ $1 == "--run" ]]
     then
-        echo "flutter run -t lib/main_staging.dart"
-        flutter run -t lib/main_staging.dart
+        echo "[Staging]: Running."
+        flutter run -t lib/main.dart --release
     elif [[ $1 == "--switch" ]]
     then
-        echo "Switched configs staging."
+        echo "[Staging]: Switched configs."
     else
-        echo "flutter build apk -t lib/main_staging.dart"
-        flutter build apk -t lib/main_staging.dart
-        hash=$(git rev-parse --verify HEAD)
-        md5sum=$(md5sum build/app/outputs/apk/release/app-release.apk)
-        curl -s -X POST "https://api.telegram.org/bot868129294:AAGLGOySYvJJxvIcMHY3XHFaPEPq2MpdGys/sendDocument" -F chat_id=-1001186043363 -F document="@build/app/outputs/apk/release/app-release.apk" -F caption="Staging build: $hash; MD5: $md5sum"
-        curl -s -X POST "https://api.telegram.org/bot868129294:AAGLGOySYvJJxvIcMHY3XHFaPEPq2MpdGys/sendMessage" -d chat_id=-1001186043363 -d text="MD5: $md5sum"
+        echo "[Staging]: Building apk."
+
+        githash=$(git log --pretty=format:'%h' -n 1)
+        current_time=$(date "+%Y.%m.%d-%H.%M.%S")
+
+        sed -i -e "s/githashvalue/$githash/g" lib/helpers/EnvConfig.dart
+        sed -i -e "s/timevalue/$current_time/g" lib/helpers/EnvConfig.dart
+
+        flutter build apk -t lib/main.dart
+        
+        md5hash=$(md5sum build/app/outputs/apk/release/app-release.apk | cut -f 1 -d " ")
+        size=$(stat -c '%s' build/app/outputs/apk/release/app-release.apk)
+        mv build/app/outputs/apk/release/app-release.apk "build/app/outputs/apk/release/$githash-3BotConnect-Staging-$current_time.apk"
+        curl -s -X POST "https://api.telegram.org/bot868129294:AAGLGOySYvJJxvIcMHY3XHFaPEPq2MpdGys/sendMessage" -d parse_mode=markdown -d chat_id=-1001186043363 -d parse_mode=markdown -d text="Type: *Staging* %0AGit hash: *$githash* %0ATime: *$current_time* %0ASize: *$size* %0AMD5: *$md5hash*"
+        curl -s -X POST "https://api.telegram.org/bot868129294:AAGLGOySYvJJxvIcMHY3XHFaPEPq2MpdGys/sendDocument" -F chat_id=-1001186043363 -F document="@build/app/outputs/apk/release/$githash-3BotConnect-Staging-$current_time.apk"
         paplay /usr/share/sounds/gnome/default/alerts/glass.ogg
     fi
 
@@ -96,46 +97,44 @@ fi
 
 if [[ $2 == "--production" ]]
 then
-    cp android/app/google-services-prod.json android/app/google-services.json
+    sed -i -e 's/Environment enviroment = Environment.Local;/Environment enviroment = Environment.Production;/g' lib/helpers/EnvConfig.dart
+    sed -i -e 's/Environment enviroment = Environment.Staging;/Environment enviroment = Environment.Production;/g' lib/helpers/EnvConfig.dart
 
-    if grep -q "org.jimber.threebotlogin.local" "android/app/build.gradle";
+    if grep -q "3Bot Local" "android/app/src/main/AndroidManifest.xml";
     then
-        sed -i -e 's/org.jimber.threebotlogin.local/org.jimber.threebotlogin/g' android/app/build.gradle
-        sed -i -e 's/org.jimber.threebotlogin.local/org.jimber.threebotlogin/g' android/app/src/debug/AndroidManifest.xml
-        sed -i -e 's/org.jimber.threebotlogin.local/org.jimber.threebotlogin/g' android/app/src/main/AndroidManifest.xml
-        sed -i -e 's/android:label="3bot_local"/android:label="3bot"/g' android/app/src/main/AndroidManifest.xml
-        sed -i -e 's/org.jimber.threebotlogin.local/org.jimber.threebotlogin/g' android/app/src/profile/AndroidManifest.xml
-        sed -i -e 's/org.jimber.threebotlogin.local/org.jimber.threebotlogin/g' android/app/src/main/java/org/jimber/threebotlogin/MainActivity.java
-        sed -i -e 's/org.jimber.threebotlogin.local/org.jimber.threebotlogin/g' ios/Runner/Info.plist
+        sed -i -e 's/android:label="3Bot Local"/android:label="3Bot Connect"/g' android/app/src/main/AndroidManifest.xml
     fi
 
-    if grep -q "org.jimber.threebotlogin.staging" "android/app/build.gradle";
+    if grep -q "3Bot Staging" "android/app/src/main/AndroidManifest.xml";
     then
-        sed -i -e 's/org.jimber.threebotlogin.staging/org.jimber.threebotlogin/g' android/app/build.gradle
-        sed -i -e 's/org.jimber.threebotlogin.staging/org.jimber.threebotlogin/g' android/app/src/debug/AndroidManifest.xml
-        sed -i -e 's/org.jimber.threebotlogin.staging/org.jimber.threebotlogin/g' android/app/src/main/AndroidManifest.xml
-        sed -i -e 's/android:label="3bot_staging"/android:label="3bot"/g' android/app/src/main/AndroidManifest.xml
-        sed -i -e 's/org.jimber.threebotlogin.staging/org.jimber.threebotlogin/g' android/app/src/profile/AndroidManifest.xml
-        sed -i -e 's/org.jimber.threebotlogin.staging/org.jimber.threebotlogin/g' android/app/src/main/java/org/jimber/threebotlogin/MainActivity.java
-        sed -i -e 's/org.jimber.threebotlogin.staging/org.jimber.threebotlogin/g' ios/Runner/Info.plist
+        sed -i -e 's/android:label="3Bot Staging"/android:label="3Bot Connect"/g' android/app/src/main/AndroidManifest.xml
     fi
 
     if [[ $1 == "--run" ]]
     then
-        echo "flutter run -t lib/main_prod.dart"
-        flutter run -t lib/main_prod.dart
+        echo "[Production]: Running."
+
+        flutter run -t lib/main.dart --release
     elif [[ $1 == "--switch" ]]
     then
-        echo "Switched configs to production."
+        echo "[Production]: Switched configs."
     else
-        echo 'oooo'
-        echo "flutter build apk -t lib/main_prod.dart"
-        flutter build appbundle -t lib/main_prod.dart  
-        # hash=$(git rev-parse --verify HEAD)
-        # md5sum=$(md5sum build/app/outputs/apk/release/app-release.apk)
-        # curl -s -X POST "https://api.telegram.org/bot868129294:AAEAKE_v8ctmh472stPHtK8ZnP__pNu4448/sendDocument" -F chat_id=-1001186043363 -F document="@build/app/outputs/apk/release/app-release.apk" -F caption="Production build: $hash; MD5: $md5sum"
-        # curl -s -X POST "https://api.telegram.org/bot868129294:AAEAKE_v8ctmh472stPHtK8ZnP__pNu4448/sendMessage" -d chat_id=-1001186043363 -d text="MD5: $md5sum"
-        # paplay /usr/share/sounds/gnome/default/alerts/glass.ogg
+        echo "[Production]: Building apk."
+
+        githash=$(git log --pretty=format:'%h' -n 1)
+        current_time=$(date "+%Y.%m.%d-%H.%M.%S")
+
+        sed -i -e "s/githashvalue/$githash/g" lib/helpers/EnvConfig.dart
+        sed -i -e "s/timevalue/$current_time/g" lib/helpers/EnvConfig.dart
+
+        flutter build apk -t lib/main.dart
+        
+        md5hash=$(md5sum build/app/outputs/apk/release/app-release.apk | cut -f 1 -d " ")
+        size=$(stat -c '%s' build/app/outputs/apk/release/app-release.apk)
+        mv build/app/outputs/apk/release/app-release.apk "build/app/outputs/apk/release/$githash-3BotConnect-Production-$current_time.apk"
+        curl -s -X POST "https://api.telegram.org/bot868129294:AAGLGOySYvJJxvIcMHY3XHFaPEPq2MpdGys/sendMessage" -d parse_mode=markdown -d chat_id=-1001186043363 -d parse_mode=markdown -d text="Type: *Production* %0AGit hash: *$githash* %0ATime: *$current_time* %0ASize: *$size* %0AMD5: *$md5hash*"
+        curl -s -X POST "https://api.telegram.org/bot868129294:AAGLGOySYvJJxvIcMHY3XHFaPEPq2MpdGys/sendDocument" -F chat_id=-1001186043363 -F document="@build/app/outputs/apk/release/$githash-3BotConnect-Production-$current_time.apk"
+        paplay /usr/share/sounds/gnome/default/alerts/glass.ogg
     fi
 
     exit 0

@@ -33,7 +33,7 @@ export default {
   methods: {
     ...mapActions([
       'resendNotification',
-      'forceRefetchStatus'
+      'deleteLoginAttempt'
     ]),
     openApp () {
       if (this.isMobile) {
@@ -47,19 +47,6 @@ export default {
         } else if (/Android|webOS|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
           window.open(url)
         }
-      }
-    },
-    lostFocus () {
-      console.log(`Lost focus, set flag`)
-      this.didLeavePage = true
-    },
-    gotFocus () {
-      console.log(`--- Got focus again, flag is ${this.didLeavePage}`)
-      if (this.didLeavePage) {
-        if (!this.rechecked) {
-          this.forceRefetchStatus()
-        }
-        this.rechecked = true
       }
     }
   },
@@ -80,6 +67,8 @@ export default {
             data = encodeURIComponent(val.data)
           }
 
+          this.deleteLoginAttempt()
+
           console.log('signedHash: ', signedHash)
           console.log('data', data)
 
@@ -99,6 +88,7 @@ export default {
             }
 
             var url = `//${this.appId}${safeRedirectUri}${union}username=${this.doubleName}&signedhash=${signedHash}&data=${data}`
+
             if (!this.isRedirecting) {
               this.isRedirecting = true
               console.log('Changing href: ', url)

@@ -3,10 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'dart:convert';
 import 'package:crypto/crypto.dart';
-import 'package:threebotlogin/main.dart';
+import 'package:threebotlogin/helpers/Globals.dart';
 import 'package:threebotlogin/services/3botService.dart';
 import 'package:threebotlogin/services/cryptoService.dart';
-import 'RegistrationWithoutScanScreen.dart';
+import 'package:threebotlogin/services/openKYCService.dart';
+import 'package:threebotlogin/services/userService.dart';
 
 class RecoverScreen extends StatefulWidget {
   final Widget recoverScreen;
@@ -59,27 +60,15 @@ class _RecoverScreenState extends State<RecoverScreen> {
   }
 
   continueRecoverAccount() async {
-    updateDeviceId(await messaging.getToken(), doubleName, privateKey)
-        .then((onValue) {
-      logger.log(onValue);
-    }).catchError((e) {
-      logger.log(e);
-    });
+    Map<String, String> keys = await generateKeysFromSeedPhrase(seedPhrase);
 
-    var registrationData = {
-      "privateKey": privateKey,
-      "doubleName": doubleName,
-      "emailVerified": emailVerified,
-      "email": emailFromForm,
-      "phrase": seedPhrase,
-    };
-
-    Navigator.push(
-        context,
-        MaterialPageRoute(
-            builder: (context) => RegistrationWithoutScanScreen(
-                registrationData,
-                resetPin: true)));
+    await savePrivateKey(keys['privateKey']);
+    await savePublicKey(keys['publicKey']);
+    await saveFingerprint(false);
+    await saveEmail(emailFromForm, null);
+    await saveDoubleName(doubleName);
+    await savePhrase(seedPhrase);
+    await sendVerificationEmail();
   }
 
   checkSeedLength(seedPhrase) {
@@ -96,7 +85,7 @@ class _RecoverScreenState extends State<RecoverScreen> {
     RegExp regex = new RegExp(pattern);
     if (!regex.hasMatch(value)) {
       emailCheck = false;
-      return 'Enter Valid Email';
+      return 'Enter valid e-mail';
     }
     emailCheck = true;
     return null;
@@ -118,39 +107,13 @@ class _RecoverScreenState extends State<RecoverScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: Globals.color,
         title: Text('Recover Account'),
       ),
       body: Container(
-        width: double.infinity,
-        height: double.infinity,
-        color: Theme.of(context).primaryColor,
-        child: Container(
-          child: Container(
-            decoration: BoxDecoration(
-              color: Theme.of(context).scaffoldBackgroundColor,
-              borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(20.0),
-                topRight: Radius.circular(20.0),
-              ),
-            ),
-            child: Container(
-              child: Container(
-                decoration: BoxDecoration(
-                  color: Theme.of(context).scaffoldBackgroundColor,
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(20.0),
-                    topRight: Radius.circular(20.0),
-                  ),
-                ),
-                child: Container(
-                  padding: EdgeInsets.all(20.0),
-                  child: Center(
-                    child: recoverForm(),
-                  ),
-                ),
-              ),
-            ),
-          ),
+        padding: EdgeInsets.all(20.0),
+        child: Center(
+          child: recoverForm(),
         ),
       ),
     );
@@ -184,7 +147,7 @@ class _RecoverScreenState extends State<RecoverScreen> {
                   controller: doubleNameController,
                   validator: (value) {
                     if (value.isEmpty) {
-                      return 'Enter your Name';
+                      return 'Please enter your Name';
                     }
                     return null;
                   }),
@@ -197,7 +160,7 @@ class _RecoverScreenState extends State<RecoverScreen> {
                     border: OutlineInputBorder(), labelText: 'Email'),
                 validator: (value) {
                   if (value.isEmpty) {
-                    return 'Enter an email';
+                    return 'Please enter your Email';
                   }
                   return null;
                 },
@@ -214,7 +177,7 @@ class _RecoverScreenState extends State<RecoverScreen> {
                 controller: seedPhrasecontroller,
                 validator: (value) {
                   if (value.isEmpty) {
-                    return 'Enter your Seedphrase';
+                    return 'Please enter your Seed phrase';
                   }
                   return null;
                 },
@@ -236,7 +199,7 @@ class _RecoverScreenState extends State<RecoverScreen> {
                 'Recover Account',
                 style: TextStyle(color: Colors.white),
               ),
-              color: Theme.of(context).accentColor,
+              color: Theme.of(context).primaryColor,
               onPressed: () async {
                 showDialog(
                   context: context,
@@ -276,17 +239,19 @@ class _RecoverScreenState extends State<RecoverScreen> {
                       emailFromForm.isNotEmpty &&
                       emailCheck == true) {
                     await checkSeedPhrase(doubleName, seedPhrase);
-                    // await checkEmail(doubleName, (emailFromForm.toLowerCase()));
-                    Navigator.pop(context);
                     await continueRecoverAccount();
                   } else {
-                    throw new Exception('Please enter an email.');
+                    throw new Exception("");
                   }
-                } catch (e) {
+
                   Navigator.pop(context);
-                  logger.log(e);
+                  Navigator.pop(context, true);
+                } catch (e) {
+                  Navigator.pop(context, false);
                   setState(() {
-                    error = e.message;
+                    // error = e.message;
+                    error =
+                        'Please make sure everything is correctly filled in';
                   });
                 }
               },

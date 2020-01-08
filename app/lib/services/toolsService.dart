@@ -1,7 +1,6 @@
 import 'dart:core';
 import 'dart:math';
 
-
 const chars = "abcdefghijklmnopqrstuvwxyz0123456789";
 
 String randomString(int strlen) {
@@ -13,15 +12,14 @@ String randomString(int strlen) {
   return result;
 }
 
-String validateEmail(String value) {
-    Pattern pattern =
-        r'[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}';
-    RegExp regex = new RegExp(pattern);
-    if (!regex.hasMatch(value)) {
-      return 'Enter Valid Email';
-    }
-    return null;
+bool validateEmail(String value) {
+  Pattern pattern = r'[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}';
+  RegExp regex = new RegExp(pattern);
+  if (!regex.hasMatch(value)) {
+    return false;
   }
+  return true;
+}
 
 bool validateSeedWords(String seed, String confirmationWords) {
   List<String> words = confirmationWords.split(" ");
@@ -30,7 +28,7 @@ bool validateSeedWords(String seed, String confirmationWords) {
   // if lenght is not correct return already here
   if (words.length != 3) return false;
 
-  for(final word in words){
+  for (final word in words) {
     // check every word in list against the seed
     if (!seedWords.contains(word)) {
       return false;

@@ -9,11 +9,10 @@ import configparser
 import database as db
 import logging
 
-from flask import Flask, Response, request, json
-from flask_socketio import SocketIO, emit
+from flask import Flask, Response, request, json, redirect
+from flask_socketio import SocketIO, emit, join_room, leave_room, send
 from flask_cors import CORS
 from datetime import datetime, timedelta
-from pyfcm import FCMNotification
 
 epoch = datetime.utcfromtimestamp(0)
 conn = db.create_connection("pythonsqlite.db")  # connection
@@ -21,10 +20,10 @@ db.create_db(conn)  # create tables
 
 config = configparser.ConfigParser()
 config.read('config.ini')
-push_service = FCMNotification(api_key=config['DEFAULT']['API_KEY'])
 
 app = Flask(__name__)
-sio = SocketIO(app)
+sio = SocketIO(app, transports=["websocket"])
+
 CORS(app, resources={r"*": {"origins": ["*"]}})
 
 # Disables the default spamm logging that's caused by flask.
@@ -36,6 +35,9 @@ logger.setLevel(level=logging.DEBUG)
 handler = logging.StreamHandler()
 formatter = logging.Formatter(
     "[%(asctime)s][%(filename)s:%(lineno)s - %(funcName)s()]: %(message)s", "%Y-%m-%d %H:%M:%S")
+
+formatter = logging.Formatter(
+    "!!%(message)s", "%Y-%m-%d %H:%M:%S")
 handler.setFormatter(formatter)
 
 logger.addHandler(handler)
@@ -43,13 +45,50 @@ logger.addHandler(handler)
 
 @sio.on('connect')
 def connect_handler():
+    print(request.sid)
+    print("connected!!")
     logger.debug("Connected.")
+
+@sio.on('disconnect')
+def disconnect_handler():
+
+    logger.debug("disconnected.")
+    if request.sid in socketRoom:
+        room = socketRoom[request.sid]
+        logger.debug("User was disconnected, user was known {}".format(room))
+        del socketRoom[request.sid]
+        leave_room(room)
+        if usersInRoom[room] > 0:
+            usersInRoom[room] -= 1
+            logger.debug("User was removed from room, users left in room {}".format(usersInRoom[room]))
+
+@sio.on('join')
+def on_join(data):
+    logger.debug("Joining %s", data)
+    room = data['room']
+    join_room(room)
+    
+    if 'app' in data:
+        socketRoom[request.sid] = room
+        if not room in usersInRoom:
+            usersInRoom[room] = 1
+        else:
+            usersInRoom[room] += 1
+        if room in messageQueue:
+            for message in messageQueue[room]:
+                sio.emit(message[0], message[1], room=message[2])
+            messageQueue[room] = []
+        
+
+@sio.on('leave')
+def on_leave(data):
+    print("leaving ")
+    room = data['room']
 
 
 @sio.on('checkname')
 def checkname_handler(data):
     logger.debug("Checking name %s", data)
-    sid = request.sid
     user = db.getUserByName(conn, data.get('doubleName').lower())
 
     if user:
@@ -65,39 +104,44 @@ def cancel_handler(data):
     print('')
 
 
-@sio.on('register')
-def registration_handler(data):
-    logger.debug("Registration %s", data)
-    doublename = data.get('doubleName').lower()
-    email = data.get('email')
-    sid = request.sid
-    publickey = data.get('publicKey')
-    user = db.getUserByName(conn, doublename)
-    if (user is None):
-        update_sql = "INSERT into users (double_name, sid, email, public_key) VALUES(?,?,?,?);"
-        db.insert_user(conn, update_sql, doublename, sid, email, publickey)
+usersInRoom = {} #users that are in a room
+messageQueue = {} #messaged queued for a room (only queued when room is empty)
+socketRoom = {} #room bound to a socket
+
+def emitOrQueue(event, data, room):
+    logger.debug("Emit or queue data %s", data)
+    if not room in usersInRoom  or usersInRoom[room] == 0:
+        logger.debug("Room is unknown or no users in room, so might queue for %s", room)
+        if not room in messageQueue:
+            logger.debug("Room is not known yet in queue, creating %s", room)
+            messageQueue[room] = []
+        logger.debug("Queueing in room %s", room)
+        messageQueue[room].append((event, data, room))
+    else:
+        logger.debug("App is connected, sending to %s", room)
+        sio.emit(event, data, room=room)
 
 
 @sio.on('login')
 def login_handler(data):
     logger.debug("Login %s", data)
-    data['type'] = 'login'
+    double_name = data.get('doubleName').lower()
+    state = data.get('state')
 
+    data['type'] = 'login'
     sid = request.sid
-    user = db.getUserByName(conn, data.get('doubleName').lower())
+    user = db.getUserByName(conn, double_name)
     if user:
         logger.debug("User found %s", user[0])
         update_sql = "UPDATE users SET sid=?  WHERE double_name=?;"
         db.update_user(conn, update_sql, sid, user[0])
 
-    if data.get('firstTime') == False and data.get('mobile') == False:
-        user = db.getUserByName(conn, data.get('doubleName').lower())
-        push_service.notify_single_device(registration_id=user[4], message_title='Finish login',
-                                          message_body='Tap to finish login', data_message=data, click_action='FLUTTER_NOTIFICATION_CLICK', tag='testLogin', collapse_key='testLogin')
+
+    user = db.getUserByName(conn, double_name)
+    emitOrQueue('login', data, room=user[0])
 
     insert_auth_sql = "INSERT INTO auth (double_name,state_hash,timestamp,scanned,data) VALUES (?,?,?,?,?);"
-    db.insert_auth(conn, insert_auth_sql, data.get('doubleName').lower(
-    ), data.get('state'), datetime.now(), 0, json.dumps(data))
+    db.insert_auth(conn, insert_auth_sql, double_name, state, datetime.now(), 0, json.dumps(data))
     print('')
 
 
@@ -114,9 +158,7 @@ def resend_handler(data):
 
     user = db.getUserByName(conn, data.get('doubleName').lower())
     data['type'] = 'login'
-    push_service.notify_single_device(registration_id=user[4], message_title='Finish login',
-                                      message_body='Tap to finish login', data_message=data, click_action='FLUTTER_NOTIFICATION_CLICK', collapse_key='testLogin')
-    print('')
+    emitOrQueue('login', data, room=user[0])
 
 
 @app.route('/api/forcerefetch', methods=['GET'])
@@ -129,7 +171,9 @@ def force_refetch_handler():
     loggin_attempt = db.getAuthByStateHash(conn, data['hash'])
     logger.debug("Login attempt %s", loggin_attempt)
     if (loggin_attempt != None):
-        data = {"scanned": loggin_attempt[3], "signed": {'signedHash': loggin_attempt[4], 'data': loggin_attempt[5]}}
+        # db.deleteAuthByStateHash(conn, data['hash'])
+        # logger.debug("Removing login attempt")
+        data = {"scanned": loggin_attempt[3], "signed": {'signedHash': loggin_attempt[4], 'data': loggin_attempt[5], 'doubleName': loggin_attempt[0]}}
         response = app.response_class(
             response=json.dumps(data),
             mimetype='application/json'
@@ -138,59 +182,6 @@ def force_refetch_handler():
         return response
     else:
         return Response()
-
-
-@app.route('/api/flag', methods=['POST'])
-def flag_handler():
-    body = request.get_json()
-    logger.debug("Flag %s", body)
-    login_attempt = None
-    user = db.getUserByName(conn, body.get('doubleName'))
-
-    try:
-        login_attempt = db.getAuthByStateHash(conn, body.get('hash'))
-    except Exception as e:
-        pass
-
-    if user:
-        print("user found")
-        try:
-            public_key = base64.b64decode(user[3])
-            signed_device_id = base64.b64decode(body.get('deviceId'))
-            bytes_signed_device_id = bytes(signed_device_id)
-            verify_key = nacl.signing.VerifyKey(
-                public_key.hex(), encoder=nacl.encoding.HexEncoder)
-            verified_device_id = verify_key.verify(bytes_signed_device_id)
-            if verified_device_id:
-                verified_device_id = verified_device_id.decode("utf-8")
-                update_sql = "UPDATE users SET device_id=?  WHERE device_id=?;"
-                db.update_user(conn, update_sql, '', verified_device_id)
-
-                sio.emit('scannedFlag', {'scanned': True}, room=user[1])
-            return Response("Ok")
-        except Exception as e:
-            logger.debug("Exception: %s", e)
-            return Response("Sinature invalid", status=400)
-
-        if login_attempt:
-            print("login attempt found")
-            if verified_device_id:
-                verified_device_id = verified_device_id.decode("utf-8")
-                update_sql = "UPDATE users SET device_id=?  WHERE device_id=?;"
-                db.update_user(conn, update_sql, '', verified_device_id)
-
-                update_sql = "UPDATE auth SET scanned=?, data=?  WHERE double_name=?;"
-                db.update_auth(conn, update_sql, 1, '', login_attempt[0])
-
-                update_sql = "UPDATE users SET device_id =?  WHERE double_name=?;"
-                db.update_user(conn, update_sql,
-                               verified_device_id, login_attempt[0])
-
-            return Response("Ok")
-    else:
-        print("user not found")
-        return Response('User not found', status=404)
-
 
 @app.route('/api/signRegister', methods=['POST'])
 def signRegisterHandler():
@@ -201,7 +192,8 @@ def signRegisterHandler():
     if user:
         sio.emit('signed', {
             'data': body.get('data'),
-        }, room=user[1])
+            'doubleName': body.get('doubleName')
+        }, room=user[0])
         return Response('Ok')
     else:
         return Response('User not found', status=404)
@@ -220,12 +212,21 @@ def sign_handler():
         sio.emit('signed', {
             'signedHash': body.get('signedHash'),
             'data': body.get('data'),
-            'selectedImageId': body.get('selectedImageId')
-        }, room=user[1])
+            'selectedImageId': body.get('selectedImageId'),
+        }, room=user[0])
+
+        # db.deleteAuthByStateHash(conn, body.get('hash'))
+        # logger.debug("Removing login attempt")
         return Response("Ok")
     else:
+        logger.debug("Something went wrong")
         return Response("Something went wrong", status=500)
 
+@app.route('/api/attempts/<state_hash>', methods=['DELETE'])
+def remove_login_attempt_by_hash(state_hash):
+    db.deleteAuthByStateHash(conn, state_hash)
+    logger.debug("Removing login attempt")  
+    return Response("Ok")
 
 @app.route('/api/attempts/<doublename>', methods=['GET'])
 def get_attempts_handler(doublename):
@@ -331,78 +332,6 @@ def mobile_registration_handler():
                            sid, email, public_key)
         return Response("Succes", status=200)
 
-
-@app.route('/api/users/<doublename>/deviceid', methods=['PUT'])
-def update_device_id(doublename):
-    body = request.get_json()
-    doublename = doublename.lower()
-    logger.debug("Updating deviceid of user %s", doublename)
-    try:
-        signed_device_id = body.get('signedDeviceId')
-
-        if (signed_device_id is not None):
-            device_id = verify_signed_data(
-                doublename, signed_device_id).decode('utf-8')
-
-            if device_id:
-                logger.debug("Updating deviceid %s", device_id)
-                db.update_deviceid(conn, device_id, doublename)
-                return device_id
-            else:
-                logger.debug(
-                    "Signed timestamp inside the header could not be verified")
-        else:
-            logger.debug("Header was not present")
-    except:
-        logger.debug("Something went wrong while trying to verify the header")
-
-
-@app.route('/api/users/<doublename>/deviceid', methods=['DELETE'])
-def remove_device_id(doublename):
-    doublename = doublename.lower()
-    logger.debug("Removing device id from user %s", doublename)
-
-    try:
-        auth_header = request.headers.get('Jimber-Authorization')
-        logger.debug(auth_header)
-        if (auth_header is not None):
-            data = verify_signed_data(doublename, auth_header)
-            if data:
-                data = json.loads(data.decode("utf-8"))
-                if(data["intention"] == "delete-deviceid"):
-                    timestamp = data["timestamp"]
-                    readable_signed_timestamp = datetime.fromtimestamp(
-                        int(timestamp) / 1000)
-                    current_timestamp = time.time() * 1000
-                    readable_current_timestamp = datetime.fromtimestamp(
-                        int(current_timestamp / 1000))
-                    difference = (int(timestamp) -
-                                  int(current_timestamp)) / 1000
-                    if difference < 30:
-                        db.update_deviceid(conn, "", doublename)
-                        device_id = db.get_deviceid(conn, doublename)[0]
-
-                        if not device_id:
-                            return Response("ok", status=200)
-                        else:
-                            return Response("Device ID not found", status=200)
-
-                        return Response("something went wrong", status=400)
-                    else:
-                        logger.debug("Timestamp was expired")
-                        return Response("Request took to long", status=418)
-            else:
-                logger.debug(
-                    "Signed timestamp inside the header could not be verified")
-                return Response("something went wrong", status=404)
-        else:
-            logger.debug("Header was not present")
-            return Response("Header was not present", status=400)
-    except:
-        logger.debug("Something went wrong while trying to verify the header")
-        return Response("something went wrong", status=400)
-
-
 @app.route('/api/users/<doublename>', methods=['GET'])
 def get_user_handler(doublename):
     doublename = doublename.lower()
@@ -429,7 +358,7 @@ def cancel_login_attempt(doublename):
     user = db.getUserByName(conn, doublename.lower())
     db.delete_auth_for_user(conn, doublename.lower())
 
-    sio.emit('cancelLogin', {'scanned': True}, room=user[1])
+    sio.emit('cancelLogin', {'scanned': True}, room=user[0])
     return Response('Canceled by User')
 
 
@@ -439,8 +368,8 @@ def set_email_verified_handler(doublename):
     user = db.getUserByName(conn, doublename.lower())
     logger.debug(user)
     logger.debug(user[4])
-    push_service.notify_single_device(registration_id=user[4], message_title='Email verified', message_body='Thanks for verifying your email', data_message={
-                                      'type': 'email_verification'}, click_action='EMAIL_VERIFIED')
+    data = {'type': 'email_verification'}
+    emitOrQueue('login', data, room=user[0])
     return Response('Ok')
 
 
@@ -513,6 +442,24 @@ def show_apps_handler():
 def min_version_handler():
     return Response('45')
 
+@app.route('/api/openapp', methods=['GET'])
+def openapp():
+    params = '?'
+    params = '{}&state={}'.format(params, request.args['state'])
+
+    if 'mobile' in request.args:
+        params = '{}&mobile={}'.format(params, request.args['mobile'])
+    if 'scope' in request.args:
+        params = '{}&scope={}'.format(params, request.args['scope'])
+    if 'appId' in request.args:
+        params = '{}&appId={}'.format(params, request.args['appId'])
+    if 'appPublicKey' in request.args:
+        params = '{}&appPublicKey={}'.format(params, request.args['appPublicKey'])
+    if 'redirecturl' in request.args:
+        params = '{}&redirecturl={}'.format(params, request.args['redirecturl'])
+
+    return redirect('threebot://login/?{}'.format(params), code=302)
+
 
 def verify_signed_data(double_name, data):
     # print('/n### --- data verification --- ###')
@@ -537,4 +484,7 @@ def verify_signed_data(double_name, data):
     return verified_signed_data
 
 
-app.run(host='0.0.0.0', port=5000)
+# app.run(host='0.0.0.0', port=5000)
+
+if __name__ == '__main__':
+    sio.run(app, host='0.0.0.0', port=5000)

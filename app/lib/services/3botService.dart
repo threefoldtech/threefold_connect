@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:http/http.dart';
+import 'package:threebotlogin/AppConfig.dart';
 import 'package:threebotlogin/main.dart';
 import 'dart:convert';
 
@@ -9,24 +9,8 @@ import 'package:threebotlogin/screens/ErrorScreen.dart';
 import 'package:threebotlogin/services/cryptoService.dart';
 import 'package:threebotlogin/services/userService.dart';
 
-String threeBotApiUrl = config.threeBotApiUrl;
+String threeBotApiUrl = AppConfig().threeBotApiUrl();
 Map<String, String> requestHeaders = {'Content-type': 'application/json'};
-
-sendScannedFlag(String hash, String deviceId, String doubleName) async {
-  http.post(
-    '$threeBotApiUrl/flag',
-    body: json.encode({'hash': hash, 'deviceId': deviceId, 'isSigned': true, 'doubleName': doubleName}),
-    headers: requestHeaders,
-  );
-}
-
-Future updateDeviceId(String deviceId, String doubleName, String privateKey) async {
-  String signedDeviceId = await signData(deviceId, privateKey);
-
-  return http.put('$threeBotApiUrl/users/$doubleName/deviceid',
-      body: json.encode({'signedDeviceId': signedDeviceId}),
-      headers: requestHeaders);
-}
 
 Future sendData(String hash, String signedHash, data, selectedImageId) {
   return http.post('$threeBotApiUrl/sign',
@@ -78,30 +62,6 @@ Future checkLoginAttempts(String doubleName, {String privateKey = ''}) async {
       headers: loginRequestHeaders);
 }
 
-Future<Response> removeDeviceId(String doubleName) async {
-  String timestamp = new DateTime.now().millisecondsSinceEpoch.toString();
-  String privatekey = await getPrivateKey();
-
-  Map<String, dynamic> payload = {
-    "timestamp": timestamp,
-    "intention": "delete-deviceid"
-  };
-  String signedPayload = await signData(jsonEncode(payload), privatekey);
-
-  Map<String, String> loginRequestHeaders = {
-    'Content-type': 'application/json',
-    'Jimber-Authorization': signedPayload
-  };
-
-  try {
-    return await http.delete('$threeBotApiUrl/users/$doubleName/deviceid',
-      headers: loginRequestHeaders);
-  } catch (e) {
-    return null;
-  }
-
-}
-
 Future<int> checkVersionNumber(BuildContext context, String version) async {
   var minVersion;
 
@@ -143,18 +103,19 @@ Future cancelLogin(doubleName) {
 }
 
 Future getUserInfo(doubleName) {
-  return http.get('$threeBotApiUrl/users/$doubleName',
-     headers: requestHeaders);
+  return http.get('$threeBotApiUrl/users/$doubleName', headers: requestHeaders);
 }
 
-Future<http.Response> finishRegistration(String doubleName, String email, String sid, String publicKey) async {
-  return http.post('$threeBotApiUrl/mobileregistration', body: json.encode({
-    'doubleName' : doubleName+'.3bot',
-    'sid' : sid,
-    'email' : email,
-    'public_key' : publicKey,
-  }),
-  headers: requestHeaders);
+Future<http.Response> finishRegistration(
+    String doubleName, String email, String sid, String publicKey) async {
+  return http.post('$threeBotApiUrl/mobileregistration',
+      body: json.encode({
+        'doubleName': doubleName + '.3bot',
+        'sid': sid,
+        'email': email,
+        'public_key': publicKey,
+      }),
+      headers: requestHeaders);
 }
 
 Future sendRegisterSign(String doubleName) {
@@ -166,5 +127,5 @@ Future sendRegisterSign(String doubleName) {
 }
 
 Future<http.Response> getShowApps() async {
-    return http.get('$threeBotApiUrl/showapps', headers: requestHeaders);
+  return http.get('$threeBotApiUrl/showapps', headers: requestHeaders);
 }

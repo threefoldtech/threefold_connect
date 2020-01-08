@@ -15,6 +15,9 @@
         <v-btn large class="accent" @click="loginWithCustomScope({ doubleName : true, email : false, derivedSeed : false})">
           Click here to authenticate & get the users emailaddress and derived seed.
         </v-btn>
+        <v-btn large class="accent" @click="loginWithCustomScope({ trustedDevice: true, email : true })">
+          Click here to authenticate with trusted device scope.
+        </v-btn>
       </v-layout>
     </v-flex>
     <!-- <v-flex md12 class="white pa-2">

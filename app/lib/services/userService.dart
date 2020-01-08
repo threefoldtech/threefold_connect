@@ -2,10 +2,9 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:core';
 
-import 'package:http/http.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:threebotlogin/helpers/Globals.dart';
 import 'package:threebotlogin/services/cryptoService.dart';
-
 import '3botService.dart';
 import 'cryptoService.dart';
 
@@ -90,40 +89,23 @@ Future<void> removeEmail() async {
   prefs.remove('emailVerified');
 }
 
-Future<void> saveEmail(String email, bool verified) async {
+Future<void> saveEmail(String email, String signedEmailIdentifier) async {
   final prefs = await SharedPreferences.getInstance();
   prefs.remove('email');
   prefs.setString('email', email);
 
   prefs.remove('emailVerified');
-  prefs.setBool('emailVerified', verified);
+  prefs.setString('signedEmailIdentifier', signedEmailIdentifier);
+
+  Globals().emailVerified.value = (signedEmailIdentifier != null);
 }
 
 Future<Map<String, Object>> getEmail() async {
   final prefs = await SharedPreferences.getInstance();
-
   return {
     'email': prefs.getString('email'),
-    'verified': prefs.getBool('emailVerified') != null &&
-        prefs.getBool('emailVerified') &&
-        prefs.getString('signedEmailIdentifier') != null &&
-        prefs.getString('signedEmailIdentifier').isNotEmpty
+    'verified': prefs.getString('signedEmailIdentifier')
   };
-}
-
-Future<void> removeSignedEmailIdentifier() async {
-  final prefs = await SharedPreferences.getInstance();
-  prefs.remove("signedEmailIdentifier");
-}
-
-Future<void> saveSignedEmailIdentifier(signedEmailIdentifier) async {
-  final prefs = await SharedPreferences.getInstance();
-  prefs.setString('signedEmailIdentifier', signedEmailIdentifier);
-}
-
-Future<String> getSignedEmailIdentifier() async {
-  final prefs = await SharedPreferences.getInstance();
-  return prefs.getString('signedEmailIdentifier');
 }
 
 Future<Map<String, Object>> getKeys(String appId, String doubleName) async {
@@ -174,22 +156,37 @@ Future<String> getScopePermissions() async {
   return prefs.getString('scopePermissions');
 }
 
-Future<bool> clearData() async {
+Future<bool> isTrustedDevice(String appId, String trustedDevice) async {
   final prefs = await SharedPreferences.getInstance();
-  Response response;
-  try {
-    response = await removeDeviceId(prefs.getString('doubleName'));
-    await removeDeviceId(prefs.getString('doubleName'));
-  } catch (e) {
-    print(e);
-    response = null;
-  }
+  var trustedDeviceApp = prefs.getString('$appId-trusted');
+  if (trustedDeviceApp == null) return false;
 
-  if (response != null && response.statusCode == 200) {
-    prefs.clear();
-    return true;
-  } else {
-    print("Something went wrong while removing your account");
-    return false;
+  return trustedDeviceApp == trustedDevice;
+}
+
+Future<void> saveTrustedDevice(String appId, String trustedDeviceId) async {
+  final prefs = await SharedPreferences.getInstance();
+  prefs.remove('$appId-trusted');
+  prefs.setString('$appId-trusted', trustedDeviceId);
+}
+
+Future<void> saveInitDone() async {
+  final prefs = await SharedPreferences.getInstance();
+  prefs.setBool('initDone', true);
+}
+
+Future<bool> getInitDone() async {
+  final prefs = await SharedPreferences.getInstance();
+  bool initDone = prefs.getBool('initDone');
+  if (initDone == null) {
+    initDone = false;
   }
+  return initDone;
+}
+
+Future<bool> clearData() async {
+  final pref = await SharedPreferences.getInstance();
+  bool cleared = await pref.clear();
+  saveInitDone();
+  return cleared;
 }
