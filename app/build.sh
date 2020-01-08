@@ -1,6 +1,12 @@
 #!/bin/bash
 shouldBuild=0
 
+if [[ $1 == "--init" ]]
+then
+    # Init files here.
+    exit 0
+fi
+
 if [[ $1 == "--help" ]]
 then
     echo "Usage: ./build.sh --[run|build|switch] --[local|staging|production]"
