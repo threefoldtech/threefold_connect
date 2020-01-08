@@ -5,11 +5,11 @@ class FfpConfig extends EnvConfig {
   FfpConfigImpls impl;
 
   FfpConfig() {
-    if (enviroment == Environment.Staging) {
+    if (environment == Environment.Staging) {
       impl = FfpConfigStaging();
-    } else if (enviroment == Environment.Production) {
+    } else if (environment == Environment.Production) {
       impl = FfpConfigProduction();
-    } else if (enviroment == Environment.Local) {
+    } else if (environment == Environment.Local) {
       impl = FfpConfigLocal();
     }
   }
