@@ -8,7 +8,7 @@ class AppConfig extends EnvConfig {
     if (environment == Environment.Staging) {
       appConfig = AppConfigStaging();
     } else if (environment == Environment.Production) {
-      appConfig = AppConfigStaging();
+      appConfig = AppConfigProduction();
     } else if (environment == Environment.Local) {
       appConfig = AppConfigLocal();
     }
@@ -51,6 +51,36 @@ abstract class AppConfigImpl {
   String threeBotApiUrl();
   String threeBotFrontEndUrl();
   String threeBotSocketUrl();
+}
+
+class AppConfigProduction extends AppConfigImpl {
+  String openKycApiUrl() {
+    return "https://openkyc.live";
+  }
+
+  String threeBotApiUrl() {
+    return "https://login.threefold.me/api";
+  }
+
+  String threeBotFrontEndUrl() {
+    return "https://login.threefold.me/";
+  }
+
+  String threeBotSocketUrl() {
+    return "wss://login.threefold.me";
+  }
+
+  Map<String, String> circleUrls() {
+    var circleUrls = Map<String, String>();
+
+    circleUrls['tftokens'] = 'https://freeflowpages.com/join/tf-ieo'; // Deze is archieved? 
+    circleUrls['tf-grid-users'] = 'https://freeflowpages.com/join/tf-grid-users'; // Deze werkt niet?
+    circleUrls['tf-grid-farming'] = 'https://freeflowpages.com/join/threefoldfoundation';
+    circleUrls['freeflownation'] = 'https://freeflowpages.com/join/freeflownation';
+    circleUrls['3bot'] = 'https://freeflowpages.com/join/3bot';
+
+    return circleUrls;
+  }
 }
 
 class AppConfigStaging extends AppConfigImpl {
