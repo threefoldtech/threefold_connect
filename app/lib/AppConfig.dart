@@ -73,8 +73,8 @@ class AppConfigProduction extends AppConfigImpl {
   Map<String, String> circleUrls() {
     var circleUrls = Map<String, String>();
 
-    circleUrls['tftokens'] = 'https://freeflowpages.com/join/tf-ieo'; // Deze is archieved? 
-    circleUrls['tf-grid-users'] = 'https://freeflowpages.com/join/tf-grid-users'; // Deze werkt niet?
+    circleUrls['tftokens'] = 'https://freeflowpages.com/join/tf-tokens';
+    circleUrls['tf-grid-users'] = 'https://freeflowpages.com/join/tf-grid';
     circleUrls['tf-grid-farming'] = 'https://freeflowpages.com/join/threefoldfoundation';
     circleUrls['freeflownation'] = 'https://freeflowpages.com/join/freeflownation';
     circleUrls['3bot'] = 'https://freeflowpages.com/join/3bot';
