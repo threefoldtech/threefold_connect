@@ -5,11 +5,11 @@ class AppConfig extends EnvConfig {
   AppConfigImpl appConfig;
 
   AppConfig() {
-    if (enviroment == Environment.Staging) {
+    if (environment == Environment.Staging) {
       appConfig = AppConfigStaging();
-    } else if (enviroment == Environment.Production) {
+    } else if (environment == Environment.Production) {
       appConfig = AppConfigStaging();
-    } else if (enviroment == Environment.Local) {
+    } else if (environment == Environment.Local) {
       appConfig = AppConfigLocal();
     }
   }

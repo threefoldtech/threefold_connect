@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:package_info/package_info.dart';
+import 'package:threebotlogin/AppConfig.dart';
 import 'package:threebotlogin/Events/CloseSocketEvent.dart';
 import 'package:threebotlogin/Events/Events.dart';
+import 'package:threebotlogin/helpers/EnvConfig.dart';
+import 'package:threebotlogin/helpers/Environment.dart';
 import 'package:threebotlogin/helpers/Globals.dart';
 import 'package:threebotlogin/helpers/HexColor.dart';
 import 'package:threebotlogin/screens/ChangePinScreen.dart';
@@ -166,6 +169,36 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
           child: ListTile(
             leading: Icon(Icons.info_outline),
             title: Text("Version: " + version + " - " + buildNumber),
+            onTap: () {
+              // Seems to be a weird way to access the environment.
+              try {
+                var appConfig = AppConfig();
+
+                if (appConfig.environment != Environment.Production) {
+                  showDialog(
+                    context: context,
+                    builder: (BuildContext context) => CustomDialog(
+                      image: Icons.perm_device_information,
+                      title: "Build information",
+                      description: Container(
+                        child: Text("Type: ${appConfig.environment}\nGit hash: ${appConfig.githash}\nTime: ${appConfig.time}"),
+                      ),
+                      actions: <Widget>[
+                        FlatButton(
+                          child: new Text("Ok"),
+                          onPressed: () {
+                            Navigator.pop(context);
+                            setState(() {});
+                          },
+                        ),
+                      ],
+                    ),
+                  );
+                }
+              } catch (Exception) {
+                // Doesn't matter, just needs to be caught.
+              }
+            },
           ),
         ),
         ExpansionTile(

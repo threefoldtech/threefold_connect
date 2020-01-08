@@ -5,11 +5,11 @@ class ChatbotConfig extends EnvConfig {
   ChatbotConfigImpls impl;
 
   ChatbotConfig() {
-    if (enviroment == Environment.Staging) {
+    if (environment == Environment.Staging) {
       impl = ChatbotConfigStaging();
-    } else if (enviroment == Environment.Production) {
+    } else if (environment == Environment.Production) {
       impl = ChatbotConfigProduction();
-    } else if (enviroment == Environment.Local) {
+    } else if (environment == Environment.Local) {
       impl = ChatbotConfigLocal();
     }
   }
