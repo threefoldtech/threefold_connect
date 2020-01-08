@@ -5,7 +5,6 @@ import nacl.encoding
 import binascii
 import struct
 import base64
-import configparser
 import database as db
 import logging
 
@@ -17,9 +16,6 @@ from datetime import datetime, timedelta
 epoch = datetime.utcfromtimestamp(0)
 conn = db.create_connection("pythonsqlite.db")  # connection
 db.create_db(conn)  # create tables
-
-config = configparser.ConfigParser()
-config.read('config.ini')
 
 app = Flask(__name__)
 sio = SocketIO(app, transports=["websocket"])
