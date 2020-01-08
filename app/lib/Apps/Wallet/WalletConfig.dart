@@ -5,11 +5,11 @@ class WalletConfig extends EnvConfig {
   WalletConfigImpls impl;
 
   WalletConfig() {
-    if (enviroment == Environment.Staging) {
+    if (environment == Environment.Staging) {
       impl = WalletConfigStaging();
-    } else if (enviroment == Environment.Production) {
+    } else if (environment == Environment.Production) {
       impl = WalletConfigProduction();
-    } else if (enviroment == Environment.Local) {
+    } else if (environment == Environment.Local) {
       impl = WalletConfigLocal();
     }
   }
