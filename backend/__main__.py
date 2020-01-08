@@ -440,7 +440,7 @@ def show_apps_handler():
 
 @app.route('/api/minversion', methods=['get'])
 def min_version_handler():
-    return Response('45')
+    return Response('56')
 
 @app.route('/api/openapp', methods=['GET'])
 def openapp():
