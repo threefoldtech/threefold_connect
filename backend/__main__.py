@@ -30,10 +30,8 @@ logger.setLevel(level=logging.DEBUG)
 
 handler = logging.StreamHandler()
 formatter = logging.Formatter(
-    "[%(asctime)s][%(filename)s:%(lineno)s - %(funcName)s()]: %(message)s", "%Y-%m-%d %H:%M:%S")
+    "[%(asctime)s][%(lineno)s - %(funcName)s()]: %(message)s", "%Y-%m-%d %H:%M:%S")
 
-formatter = logging.Formatter(
-    "!!%(message)s", "%Y-%m-%d %H:%M:%S")
 handler.setFormatter(formatter)
 
 logger.addHandler(handler)
@@ -41,14 +39,12 @@ logger.addHandler(handler)
 
 @sio.on('connect')
 def connect_handler():
-    print(request.sid)
-    print("connected!!")
-    logger.debug("Connected.")
+    logger.debug("/Connect")
 
 @sio.on('disconnect')
 def disconnect_handler():
 
-    logger.debug("disconnected.")
+    logger.debug("/disconnected.")
     if request.sid in socketRoom:
         room = socketRoom[request.sid]
         logger.debug("User was disconnected, user was known {}".format(room))
@@ -60,7 +56,7 @@ def disconnect_handler():
 
 @sio.on('join')
 def on_join(data):
-    logger.debug("Joining %s", data)
+    logger.debug("/Join %s", data)
     room = data['room']
     join_room(room)
     
@@ -78,13 +74,13 @@ def on_join(data):
 
 @sio.on('leave')
 def on_leave(data):
-    print("leaving ")
+    print("/leave ")
     room = data['room']
 
 
 @sio.on('checkname')
 def checkname_handler(data):
-    logger.debug("Checking name %s", data)
+    logger.debug("/checkname %s", data)
     user = db.getUserByName(conn, data.get('doubleName').lower())
 
     if user:
@@ -120,7 +116,7 @@ def emitOrQueue(event, data, room):
 
 @sio.on('login')
 def login_handler(data):
-    logger.debug("Login %s", data)
+    logger.debug("/Login %s", data)
     double_name = data.get('doubleName').lower()
     state = data.get('state')
 
@@ -143,7 +139,7 @@ def login_handler(data):
 
 @sio.on('resend')
 def resend_handler(data):
-    logger.debug("Resend %s", data)
+    logger.debug("/resend %s", data)
 
     db.delete_auth_for_user(conn, data.get('doubleName').lower())
 
@@ -160,7 +156,7 @@ def resend_handler(data):
 @app.route('/api/forcerefetch', methods=['GET'])
 def force_refetch_handler():
     data = request.args
-    logger.debug("Force refetch %s", data)
+    logger.debug("/forcerefetch %s", data)
     if (data == None):
         return Response("Got no data", status=400)
     logger.debug("Hash %s", data['hash'])
@@ -181,10 +177,11 @@ def force_refetch_handler():
 
 @app.route('/api/signRegister', methods=['POST'])
 def signRegisterHandler():
-    print('inside signRegister...')
     body = request.get_json()
+    logger.debug("/signRegister %s", body)
+    
     user = db.getUserByName(conn, body.get('doubleName'))
-    print(user)
+
     if user:
         sio.emit('signed', {
             'data': body.get('data'),
@@ -198,7 +195,8 @@ def signRegisterHandler():
 @app.route('/api/sign', methods=['POST'])
 def sign_handler():
     body = request.get_json()
-    logger.debug("Sign: %s", body)
+    logger.debug("/sign: %s", body)
+
     login_attempt = db.getAuthByStateHash(conn, body.get('hash'))
     if login_attempt != None:
         user = db.getUserByName(conn, login_attempt[0])
@@ -215,103 +213,19 @@ def sign_handler():
         # logger.debug("Removing login attempt")
         return Response("Ok")
     else:
-        logger.debug("Something went wrong")
+        logger.debug("Auth was not found in db for hash {} ".format(body.get('hash')))
         return Response("Something went wrong", status=500)
 
 @app.route('/api/attempts/<state_hash>', methods=['DELETE'])
 def remove_login_attempt_by_hash(state_hash):
+    logger.debug("/remove_login_attempt_by_hash ")
     db.deleteAuthByStateHash(conn, state_hash)
     logger.debug("Removing login attempt")  
     return Response("Ok")
 
-@app.route('/api/attempts/<doublename>', methods=['GET'])
-def get_attempts_handler(doublename):
-    doublename = doublename.lower()
-    logger.debug("Getting attempts for %s", doublename)
-    try:
-        auth_header = request.headers.get('Jimber-Authorization')
-        if (auth_header is not None):
-            data = verify_signed_data(doublename, auth_header)
-            if data:
-                data = json.loads(data.decode("utf-8"))
-                if(data["intention"] == "attempts"):
-                    timestamp = data["timestamp"]
-                    readable_signed_timestamp = datetime.fromtimestamp(
-                        int(timestamp) / 1000)
-                    current_timestamp = time.time() * 1000
-                    readable_current_timestamp = datetime.fromtimestamp(
-                        int(current_timestamp / 1000))
-                    difference = (int(timestamp) -
-                                  int(current_timestamp)) / 1000
-                    if difference < 30:
-                        logger.debug("Verification succeeded.")
-                        login_attempt = db.getAuthByDoubleName(
-                            conn, doublename)
-                        if (login_attempt is not None):
-                            logger.debug("Login attempt %s", login_attempt)
-                            response = app.response_class(
-                                response=json.dumps(
-                                    json.loads(login_attempt[5])),
-                                mimetype='application/json'
-                            )
-                            return response
-                        else:
-                            logger.debug("No login attempts found")
-                            return Response("No login attempts found", status=204)
-                    else:
-                        logger.debug(
-                            "Signed timestamp inside the header has expired")
-                        return Response("", status=400)
-                else:
-                    logger.debug("Intention was not correct!")
-            else:
-                logger.debug(
-                    "Signed timestamp inside the header could not be verified")
-                # return Response("Signed timestamp inside the header could not be verified", status=400)
-        else:
-            logger.debug("Header was not present")
-            # return Response("Header was not present", status=400)
-    except Exception as e:
-        logger.debug(
-            "Something went wrong while trying to verify the header %e", e)
-        # return Response("Something went wrong while trying to verify the header", status=400)
-
-
-@app.route('/api/verify', methods=['POST'])
-def verify_handler():
-    body = request.get_json()
-    logger.debug("Verify %s", body)
-    user = db.getUserByName(conn, body.get('username'))
-    login_attempt = db.getAuthByStateHash(conn, body.get('hash'))
-    try:
-        if user and login_attempt:
-            requested_datetime = datetime.strptime(
-                login_attempt[2], '%Y-%m-%d %H:%M:%S.%f')
-            max_datetime = requested_datetime + timedelta(minutes=10)
-            if requested_datetime < max_datetime:
-                public_key = base64.b64decode(user[3])
-                signed_hash = base64.b64decode(login_attempt[4])
-                original_hash = login_attempt[1]
-                try:
-                    bytes_signed_hash = bytes(signed_hash)
-                    bytes_original_hash = bytes(original_hash, encoding='utf8')
-                    verify_key = nacl.signing.VerifyKey(
-                        public_key.hex(), encoder=nacl.encoding.HexEncoder)
-                    verify_key.verify(bytes_original_hash, bytes_signed_hash)
-                    return Response("Ok")
-                except:
-                    return Response("Sinature invalid", status=400)
-            else:
-                return Response("You are too late", status=400)
-
-        else:
-            return Response("Oops.. user or login attempt not found", status=404)
-    except Exception as e:
-        logger.log("Something went wrong while trying to verify the header %e", e)
-
-
 @app.route('/api/mobileregistration', methods=['POST'])
 def mobile_registration_handler():
+    logger.debug("/mobile_registration_handler ")
     body = request.get_json()
     double_name = body.get('doubleName').lower()
     sid = body.get('sid')
@@ -331,7 +245,7 @@ def mobile_registration_handler():
 @app.route('/api/users/<doublename>', methods=['GET'])
 def get_user_handler(doublename):
     doublename = doublename.lower()
-    logger.debug("Getting user %s", doublename)
+    logger.debug("/doublename user %s", doublename)
     user = db.getUserByName(conn, doublename)
     if (user is not None):
         data = {
@@ -351,6 +265,7 @@ def get_user_handler(doublename):
 
 @app.route('/api/users/<doublename>/cancel', methods=['POST'])
 def cancel_login_attempt(doublename):
+    logger.debug("/cancel %s", doublename)
     user = db.getUserByName(conn, doublename.lower())
     db.delete_auth_for_user(conn, doublename.lower())
 
@@ -360,7 +275,7 @@ def cancel_login_attempt(doublename):
 
 @app.route('/api/users/<doublename>/emailverified', methods=['post'])
 def set_email_verified_handler(doublename):
-    logger.debug("Verified email from user %s", doublename.lower())
+    logger.debug("/emailverified from user %s", doublename.lower())
     user = db.getUserByName(conn, doublename.lower())
     logger.debug(user)
     logger.debug(user[4])
@@ -437,24 +352,6 @@ def show_apps_handler():
 @app.route('/api/minversion', methods=['get'])
 def min_version_handler():
     return Response('56')
-
-@app.route('/api/openapp', methods=['GET'])
-def openapp():
-    params = '?'
-    params = '{}&state={}'.format(params, request.args['state'])
-
-    if 'mobile' in request.args:
-        params = '{}&mobile={}'.format(params, request.args['mobile'])
-    if 'scope' in request.args:
-        params = '{}&scope={}'.format(params, request.args['scope'])
-    if 'appId' in request.args:
-        params = '{}&appId={}'.format(params, request.args['appId'])
-    if 'appPublicKey' in request.args:
-        params = '{}&appPublicKey={}'.format(params, request.args['appPublicKey'])
-    if 'redirecturl' in request.args:
-        params = '{}&redirecturl={}'.format(params, request.args['redirecturl'])
-
-    return redirect('threebot://login/?{}'.format(params), code=302)
 
 
 def verify_signed_data(double_name, data):
