@@ -8,7 +8,7 @@ class AppConfig extends EnvConfig {
     if (environment == Environment.Staging) {
       appConfig = AppConfigStaging();
     } else if (environment == Environment.Production) {
-      appConfig = AppConfigStaging();
+      appConfig = AppConfigProduction();
     } else if (environment == Environment.Local) {
       appConfig = AppConfigLocal();
     }
@@ -31,18 +31,7 @@ class AppConfig extends EnvConfig {
   }
 
   Map<String, String> circleUrls() {
-    var circleUrls = Map<String, String>();
-
-    circleUrls['tftokens'] = 'https://staging.freeflowpages.com/join/tf-tokens';
-    circleUrls['tf-grid-users'] =
-        'https://staging.freeflowpages.com/join/tf-grid-users';
-    circleUrls['tf-grid-farming'] =
-        'https://staging.freeflowpages.com/join/tf-grid-farming';
-    circleUrls['freeflownation'] =
-        'https://staging.freeflowpages.com/join/freeflownation';
-    circleUrls['3bot'] = 'https://staging.freeflowpages.com/join/3bot';
-
-    return circleUrls;
+    return appConfig.circleUrls();
   }
 }
 
@@ -51,6 +40,37 @@ abstract class AppConfigImpl {
   String threeBotApiUrl();
   String threeBotFrontEndUrl();
   String threeBotSocketUrl();
+  Map<String, String> circleUrls();
+}
+
+class AppConfigProduction extends AppConfigImpl {
+  String openKycApiUrl() {
+    return "https://openkyc.live";
+  }
+
+  String threeBotApiUrl() {
+    return "https://login.threefold.me/api";
+  }
+
+  String threeBotFrontEndUrl() {
+    return "https://login.threefold.me/";
+  }
+
+  String threeBotSocketUrl() {
+    return "wss://login.threefold.me";
+  }
+
+  Map<String, String> circleUrls() {
+    var circleUrls = Map<String, String>();
+
+    circleUrls['tftokens'] = 'https://freeflowpages.com/join/tf-tokens';
+    circleUrls['tf-grid-users'] = 'https://freeflowpages.com/join/tf-grid';
+    circleUrls['tf-grid-farming'] = 'https://freeflowpages.com/join/threefoldfoundation';
+    circleUrls['freeflownation'] = 'https://freeflowpages.com/join/freeflownation';
+    circleUrls['3bot'] = 'https://freeflowpages.com/join/3bot';
+
+    return circleUrls;
+  }
 }
 
 class AppConfigStaging extends AppConfigImpl {
@@ -74,12 +94,9 @@ class AppConfigStaging extends AppConfigImpl {
     var circleUrls = Map<String, String>();
 
     circleUrls['tftokens'] = 'https://staging.freeflowpages.com/join/tf-tokens';
-    circleUrls['tf-grid-users'] =
-        'https://staging.freeflowpages.com/join/tf-grid-users';
-    circleUrls['tf-grid-farming'] =
-        'https://staging.freeflowpages.com/join/tf-grid-farming';
-    circleUrls['freeflownation'] =
-        'https://staging.freeflowpages.com/join/freeflownation';
+    circleUrls['tf-grid-users'] = 'https://staging.freeflowpages.com/join/tf-grid-users';
+    circleUrls['tf-grid-farming'] = 'https://staging.freeflowpages.com/join/tf-grid-farming';
+    circleUrls['freeflownation'] = 'https://staging.freeflowpages.com/join/freeflownation';
     circleUrls['3bot'] = 'https://staging.freeflowpages.com/join/3bot';
 
     return circleUrls;
@@ -107,12 +124,9 @@ class AppConfigLocal extends AppConfigImpl {
     var circleUrls = Map<String, String>();
 
     circleUrls['tftokens'] = 'https://staging.freeflowpages.com/join/tf-tokens';
-    circleUrls['tf-grid-users'] =
-        'https://staging.freeflowpages.com/join/tf-grid-users';
-    circleUrls['tf-grid-farming'] =
-        'https://staging.freeflowpages.com/join/tf-grid-farming';
-    circleUrls['freeflownation'] =
-        'https://staging.freeflowpages.com/join/freeflownation';
+    circleUrls['tf-grid-users'] = 'https://staging.freeflowpages.com/join/tf-grid-users';
+    circleUrls['tf-grid-farming'] = 'https://staging.freeflowpages.com/join/tf-grid-farming';
+    circleUrls['freeflownation'] = 'https://staging.freeflowpages.com/join/freeflownation';
     circleUrls['3bot'] = 'https://staging.freeflowpages.com/join/3bot';
 
     return circleUrls;

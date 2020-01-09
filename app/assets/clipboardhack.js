@@ -72,7 +72,6 @@ if (document.getElementById('webview_copy') == null) {
     }, false);
 
     document.getElementById('webview_copy').onclick = function () {
-        console.log("copy!!", webview_copy_value);
 
         window.flutter_inappwebview.callHandler('COPY', webview_copy_value).then(function (result) {
 

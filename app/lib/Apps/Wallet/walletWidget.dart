@@ -57,7 +57,9 @@ class _WalletState extends State<WalletWidget>
         onLoadStop: (InAppWebViewController controller, String url) async {
           if (url.contains('/init')) {
             initKeys();
+         
           }
+          
         },
         onProgressChanged: (InAppWebViewController controller, int progress) {
           setState(() {
