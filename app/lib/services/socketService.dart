@@ -175,6 +175,6 @@ Future<void> loginFromToken(String loginToken, String state, String publicKey,
       dataToSend =
           await encrypt(jsonEncode(scope), publicKey, await privateKey);
     }
-    sendData(state, await signedHash, dataToSend, null);
+    sendData(state, await signedHash, dataToSend, null, null);
   }
 }

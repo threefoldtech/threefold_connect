@@ -134,48 +134,14 @@ def login_handler(data):
     user = db.getUserByName(conn, double_name)
     emitOrQueue('login', data, room=user[0])
 
-    insert_auth_sql = "INSERT INTO auth (double_name,state_hash,timestamp,scanned,data) VALUES (?,?,?,?,?);"
-    db.insert_auth(conn, insert_auth_sql, double_name, state, datetime.now(), 0, json.dumps(data))
-    print('')
-
 
 @sio.on('resend')
 def resend_handler(data):
     logger.debug("/resend %s", data)
+    user = data.get('doubleName').lower()
 
-    db.delete_auth_for_user(conn, data.get('doubleName').lower())
-
-    insert_auth_sql = "INSERT INTO auth (double_name,state_hash,timestamp,scanned,data) VALUES (?,?,?,?,?);"
-
-    db.insert_auth(conn, insert_auth_sql, data.get('doubleName').lower(
-    ), data.get('state'), datetime.now(), 0, json.dumps(data))
-
-    user = db.getUserByName(conn, data.get('doubleName').lower())
     data['type'] = 'login'
-    emitOrQueue('login', data, room=user[0])
-
-
-@app.route('/api/forcerefetch', methods=['GET'])
-def force_refetch_handler():
-    data = request.args
-    logger.debug("/forcerefetch %s", data)
-    if (data == None):
-        return Response("Got no data", status=400)
-    logger.debug("Hash %s", data['hash'])
-    loggin_attempt = db.getAuthByStateHash(conn, data['hash'])
-    logger.debug("Login attempt %s", loggin_attempt)
-    if (loggin_attempt != None):
-        # db.deleteAuthByStateHash(conn, data['hash'])
-        # logger.debug("Removing login attempt")
-        data = {"scanned": loggin_attempt[3], "signed": {'signedHash': loggin_attempt[4], 'data': loggin_attempt[5], 'doubleName': loggin_attempt[0]}}
-        response = app.response_class(
-            response=json.dumps(data),
-            mimetype='application/json'
-        )
-        logger.debug("Data %s", data)
-        return response
-    else:
-        return Response()
+    emitOrQueue('login', data, room=user)
 
 @app.route('/api/signRegister', methods=['POST'])
 def signRegisterHandler():
@@ -199,30 +165,24 @@ def sign_handler():
     body = request.get_json()
     logger.debug("/sign: %s", body)
 
-    login_attempt = db.getAuthByStateHash(conn, body.get('hash'))
-    if login_attempt != None:
-        user = db.getUserByName(conn, login_attempt[0])
-        update_sql = "UPDATE auth SET singed_statehash =?, data=?  WHERE state_hash=?;"
-        db.update_auth(conn, update_sql, body.get('signedHash'),
-                       json.dumps(body.get('data')), body.get('hash'))
-        sio.emit('signed', {
+
+    logger.debug("body.get('doubleName'): %s", body.get('doubleName'))
+
+    roomToSendTo = body.get('signedRoom')
+    
+    if roomToSendTo is None:
+        roomToSendTo = body.get('doubleName')
+
+
+    logger.debug("roomToSendTo %s", roomToSendTo)
+
+    sio.emit('signed', {
             'signedHash': body.get('signedHash'),
+            'doubleName': body.get('doubleName'),
             'data': body.get('data'),
             'selectedImageId': body.get('selectedImageId'),
-        }, room=user[0])
-
-        # db.deleteAuthByStateHash(conn, body.get('hash'))
-        # logger.debug("Removing login attempt")
-        return Response("Ok")
-    else:
-        logger.debug("Auth was not found in db for hash {} ".format(body.get('hash')))
-        return Response("Something went wrong", status=500)
-
-@app.route('/api/attempts/<state_hash>', methods=['DELETE'])
-def remove_login_attempt_by_hash(state_hash):
-    logger.debug("/remove_login_attempt_by_hash ")
-    db.deleteAuthByStateHash(conn, state_hash)
-    logger.debug("Removing login attempt")  
+        }, room=roomToSendTo)
+        
     return Response("Ok")
 
 @app.route('/api/mobileregistration', methods=['POST'])
@@ -269,7 +229,6 @@ def get_user_handler(doublename):
 def cancel_login_attempt(doublename):
     logger.debug("/cancel %s", doublename)
     user = db.getUserByName(conn, doublename.lower())
-    db.delete_auth_for_user(conn, doublename.lower())
 
     sio.emit('cancelLogin', {'scanned': True}, room=user[0])
     return Response('Canceled by User')

@@ -73,7 +73,6 @@ class _HomeScreenState extends State<HomeScreen>
       openLogin(context, event.data);
     });
 
-    _checkLoginAttempts();
   }
 
   @override
@@ -98,10 +97,6 @@ class _HomeScreenState extends State<HomeScreen>
       Events().emit(UniLinkEvent(
           Uri.parse(incomingLink), context, widget.backendConnection));
     });
-  }
-
-  _checkLoginAttempts() async {
-    checkLoginAttempts(await getDoubleName());
   }
 
   @override

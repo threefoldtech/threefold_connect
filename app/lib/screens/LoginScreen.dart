@@ -393,7 +393,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   sendIt(bool includeData) async {
     var state = widget.message['state'];
-
+    var signedRoom = widget.message['signedRoom'];
     var publicKey = widget.message['appPublicKey']?.replaceAll(" ", "+");
     bool hashMatch = RegExp(r"[^A-Za-z0-9]+").hasMatch(state);
 
@@ -417,10 +417,9 @@ class _LoginScreenState extends State<LoginScreen> {
         await encrypt(jsonEncode(tmpScope), publicKey, await getPrivateKey());
     //push to backend with signed
     if (!includeData) {
-      await sendData(
-          state, "", null, selectedImageId); // temp fix send empty data
+      await sendData(state, "", null, selectedImageId, null); // temp fix send empty data for regenerate emoji
     } else {
-      await sendData(state, await signedHash, data, selectedImageId);
+      await sendData(state, await signedHash, data, selectedImageId, signedRoom);
     }
 
     if (scope['trustedDevice'] != null) {

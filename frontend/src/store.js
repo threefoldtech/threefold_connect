@@ -102,11 +102,14 @@ export default new Vuex.Store({
       context.commit('setDoubleName', doubleName)
       socketService.emit('join', { room: doubleName })
     },
+    setSignedRoom (context, signedRoom) {
+      socketService.emit('join', { room: signedRoom })
+    },
     setAttemptCanceled (context, payload) {
       context.commit('setCancelLoginUp', payload)
     },
     SOCKET_connect (context, payload) {
-      context.dispatch('forceRefetchStatus')
+      // context.dispatch('forceRefetchStatus')
       console.log(`hi, connected with SOCKET_connect`)
     },
     saveState (context, payload) {
@@ -194,27 +197,27 @@ export default new Vuex.Store({
         randomImageId: context.getters.randomImageId.toString()
       })
     },
-    forceRefetchStatus (context) {
-      if (context.getters.hash) {
-        // console.log(`Forcerefetching for ${context.getters.doubleName}`)
-        axios.get(`${config.apiurl}api/forcerefetch?hash=${context.getters.hash}`).then(response => {
-          if (response.data.scanned) context.commit('setScannedFlagUp', response.data.scanned)
-          if (response.data.signed) context.commit('setSigned', response.data.signed)
-        }).catch(e => {
-          alert(e)
-        })
-      }
-    },
-    deleteLoginAttempt (context) {
-      if (context.getters.hash) {
-        console.log(`Deleting login attempt for`)
-        axios.delete(`${config.apiurl}api/attempts/${context.getters.hash}`).then(response => {
-          console.log(response)
-        }).catch(e => {
-          alert(e)
-        })
-      }
-    },
+    // forceRefetchStatus (context) {
+    //   if (context.getters.hash) {
+    //     // console.log(`Forcerefetching for ${context.getters.doubleName}`)
+    //     axios.get(`${config.apiurl}api/forcerefetch?hash=${context.getters.hash}`).then(response => {
+    //       if (response.data.scanned) context.commit('setScannedFlagUp', response.data.scanned)
+    //       if (response.data.signed) context.commit('setSigned', response.data.signed)
+    //     }).catch(e => {
+    //       alert(e)
+    //     })
+    //   }
+    // },
+    // deleteLoginAttempt (context) {
+    //   if (context.getters.hash) {
+    //     console.log(`Deleting login attempt for`)
+    //     axios.delete(`${config.apiurl}api/attempts/${context.getters.hash}`).then(response => {
+    //       console.log(response)
+    //     }).catch(e => {
+    //       alert(e)
+    //     })
+    //   }
+    // },
     sendValidationEmail (context, data) {
       var callbackUrl = `${window.location.protocol}//${window.location.host}/verifyemail`
 

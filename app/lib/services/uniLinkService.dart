@@ -27,6 +27,7 @@ checkWhatPageToOpen(UniLinkEvent e) async {
   }
   if (link.host == 'login') {
     var state = link.queryParameters['state'];
+
     if (doubleName != null) {
       data['doubleName'] = doubleName;
       data['state'] = state;
