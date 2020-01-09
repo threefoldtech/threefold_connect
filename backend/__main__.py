@@ -164,16 +164,10 @@ def signRegisterHandler():
 def sign_handler():
     body = request.get_json()
     logger.debug("/sign: %s", body)
-
-
     logger.debug("body.get('doubleName'): %s", body.get('doubleName'))
-
     roomToSendTo = body.get('signedRoom')
-    
     if roomToSendTo is None:
         roomToSendTo = body.get('doubleName')
-
-
     logger.debug("roomToSendTo %s", roomToSendTo)
 
     sio.emit('signed', {

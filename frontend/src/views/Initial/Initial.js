@@ -107,7 +107,7 @@ export default {
         mobile: this.isMobile,
         firstTime: false
       })
-      var roomToListenForSigned = Math.random().toString(32)
+      var roomToListenForSigned = Math.random().toString(32).substring(2)
       this.setSignedRoom(roomToListenForSigned)
 
       var url = `threebot://login?state=${encodeURIComponent(this.hash)}&mobile=true&signedRoom=${roomToListenForSigned}`
