@@ -22,8 +22,10 @@ sio = SocketIO(app, transports=["websocket"])
 
 CORS(app, resources={r"*": {"origins": ["*"]}})
 
-# Disables the default spamm logging that's caused by flask.
-logging.getLogger("werkzeug").setLevel(level=logging.ERROR)
+# Disables the default spam logging that's caused by flask / socketIO and engineIO.
+logging.getLogger("werkzeug").setLevel(logging.ERROR)
+logging.getLogger('socketio').setLevel(logging.ERROR)
+logging.getLogger('engineio').setLevel(logging.ERROR)
 
 logger = logging.getLogger(__name__)
 logger.setLevel(level=logging.DEBUG)
