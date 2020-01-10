@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:package_info/package_info.dart';
 import 'package:threebotlogin/AppConfig.dart';
 import 'package:threebotlogin/main.dart';
 import 'dart:convert';
@@ -44,39 +45,31 @@ Future sendPublicKey(Map<String, Object> data) async {
       body: json.encode(data), headers: loginRequestHeaders);
 }
 
-Future<int> checkVersionNumber(BuildContext context, String version) async {
-  var minVersion;
+Future<bool> isAppUpToDate() async {
+  PackageInfo packageInfo = await PackageInfo.fromPlatform();
+  var currentBuildNumber = packageInfo.buildNumber;
+
+  var minBuildNumber;
 
   try {
-    minVersion =
-        (await http.get('$threeBotApiUrl/minversion', headers: requestHeaders))
-            .body;
-  } on SocketException catch (error) {
-    logger.log("Can't connect to server: " + error.toString());
+    // TODO: Should be renamed to minBuildNumber instead of minVersion.
+    minBuildNumber = (await http.get('$threeBotApiUrl/minversion', headers: requestHeaders)).body;
+  } on SocketException catch (_) {
+    return false;
   }
 
-  if (minVersion == null) {
-    Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-            builder: (context) =>
-                ErrorScreen(errorMessage: "Can't connect to server.")));
-    return -1;
-  } else {
+  if (minBuildNumber != null && currentBuildNumber != null) {
     try {
-      int min = int.parse(minVersion);
-      int current = int.parse(version);
+      int min = int.parse(minBuildNumber);
+      int current = int.parse(currentBuildNumber);
 
-      if (min <= current) {
-        return 1;
-      }
-    } on Exception catch (e) {
-      print(e);
-      return 0;
+      return min <= current;
+    } on Exception catch (_) {
+      return false;
     }
   }
 
-  return 0;
+  return false;
 }
 
 Future cancelLogin(doubleName) {

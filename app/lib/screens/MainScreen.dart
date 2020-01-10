@@ -8,6 +8,7 @@ import 'package:threebotlogin/helpers/Globals.dart';
 import 'package:threebotlogin/screens/HomeScreen.dart';
 import 'package:threebotlogin/screens/InitScreen.dart';
 import 'package:threebotlogin/screens/UnregisteredScreen.dart';
+import 'package:threebotlogin/services/3botService.dart';
 import 'package:threebotlogin/services/socketService.dart';
 import 'package:threebotlogin/services/userService.dart';
 import 'package:threebotlogin/widgets/CustomDialog.dart';
@@ -31,6 +32,8 @@ class _AppState extends State<MainScreen> {
   BackendConnection _backendConnection;
 
   pushScreens() async {
+
+    // Internet connection check. 
     try {
       final result = await InternetAddress.lookup('google.com');
       if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
@@ -43,6 +46,19 @@ class _AppState extends State<MainScreen> {
             "Please enable your internet connection to use this app.",
             textAlign: TextAlign.center,
           ));
+      await dialog.show(context);
+      SystemNavigator.pop();
+    }
+
+    // Version check. TODO: Maybe add a button to open the app / playstore?
+    if(!await isAppUpToDate()) {
+      var dialog = CustomDialog(
+        title: "Update required",
+        description: Text(
+          "The app is outdated. Please, update it to the latest version.",
+          textAlign: TextAlign.center,
+      ));
+
       await dialog.show(context);
       SystemNavigator.pop();
     }
