@@ -64,8 +64,8 @@ class AppConfigProduction extends AppConfigImpl {
     var circleUrls = Map<String, String>();
 
     circleUrls['tftokens'] = 'https://freeflowpages.com/join/tf-tokens';
-    circleUrls['tf-grid-users'] = 'https://freeflowpages.com/join/tf-grid';
-    circleUrls['tf-grid-farming'] = 'https://freeflowpages.com/join/threefoldfoundation';
+    circleUrls['tf-news'] = 'https://freeflowpages.com/join/threefoldfoundation/';
+    circleUrls['tf-grid'] = 'https://freeflowpages.com/join/tf-grid';
     circleUrls['freeflownation'] = 'https://freeflowpages.com/join/freeflownation';
     circleUrls['3bot'] = 'https://freeflowpages.com/join/3bot';
 
@@ -94,8 +94,8 @@ class AppConfigStaging extends AppConfigImpl {
     var circleUrls = Map<String, String>();
 
     circleUrls['tftokens'] = 'https://staging.freeflowpages.com/join/tf-tokens';
-    circleUrls['tf-grid-users'] = 'https://staging.freeflowpages.com/join/tf-grid-users';
-    circleUrls['tf-grid-farming'] = 'https://staging.freeflowpages.com/join/tf-grid-farming';
+    circleUrls['tf-news'] = 'https://staging.freeflowpages.com/join/threefoldfoundation/';
+    circleUrls['tf-grid'] = 'https://staging.freeflowpages.com/join/tf-grid';
     circleUrls['freeflownation'] = 'https://staging.freeflowpages.com/join/freeflownation';
     circleUrls['3bot'] = 'https://staging.freeflowpages.com/join/3bot';
 
@@ -109,23 +109,23 @@ class AppConfigLocal extends AppConfigImpl {
   }
 
   String threeBotApiUrl() {
-    return "http://192.168.2.80:5000/api";
+    return "http://192.168.2.90:5000/api";
   }
 
   String threeBotFrontEndUrl() {
-    return "http://192.168.2.80:8080";
+    return "http://192.168.2.90:8080";
   }
 
   String threeBotSocketUrl() {
-    return "ws://192.168.2.80:5000";
+    return "ws://192.168.2.90:5000";
   }
 
   Map<String, String> circleUrls() {
     var circleUrls = Map<String, String>();
-
+    
     circleUrls['tftokens'] = 'https://staging.freeflowpages.com/join/tf-tokens';
-    circleUrls['tf-grid-users'] = 'https://staging.freeflowpages.com/join/tf-grid-users';
-    circleUrls['tf-grid-farming'] = 'https://staging.freeflowpages.com/join/tf-grid-farming';
+    circleUrls['tf-news'] = 'https://staging.freeflowpages.com/join/threefoldfoundation/';
+    circleUrls['tf-grid'] = 'https://staging.freeflowpages.com/join/tf-grid';
     circleUrls['freeflownation'] = 'https://staging.freeflowpages.com/join/freeflownation';
     circleUrls['3bot'] = 'https://staging.freeflowpages.com/join/3bot';
 
