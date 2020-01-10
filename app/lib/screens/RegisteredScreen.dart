@@ -117,25 +117,48 @@ class _RegisteredScreenState extends State<RegisteredScreen>
                     ),
                     Padding(
                       padding: EdgeInsets.all(5),
-                      child: Text("TF Tokens"),
+                      child: Text("TF IEO"),
                     ),
                   ],
-                ),
-                Column(
+                ), 
+                Column( //2 News
                   children: <Widget>[
                     FloatingActionButton(
-                      heroTag: "tfgrid",
+                      heroTag: "tfnews",
                       backgroundColor: Colors.greenAccent,
                       elevation: 0,
                       child: CircleAvatar(
                         backgroundImage:
-                            ExactAssetImage('assets/circle_images/tfgrid.jpg'),
+                            ExactAssetImage('assets/circle_images/tffamily.jpg'),
                         minRadius: 90,
                         maxRadius: 150,
                       ),
                       onPressed: () {
                         Events().emit(FfpBrowseEvent(
-                            url: AppConfig().circleUrls()['tf-grid-users']));
+                            url: AppConfig().circleUrls()['tf-news']));
+                      },
+                    ),
+                    Padding(
+                      padding: EdgeInsets.all(5),
+                      child: Text("TF News"),
+                    ),
+                  ],
+                ),
+                Column( //3 tf grid
+                  children: <Widget>[
+                    FloatingActionButton(
+                      heroTag: "tfgrid",
+                      backgroundColor: Colors.blueAccent,
+                      elevation: 0,
+                      child: CircleAvatar(
+                        backgroundImage: ExactAssetImage(
+                            'assets/circle_images/tfgrid.jpg'),
+                        minRadius: 90,
+                        maxRadius: 150,
+                      ),
+                      onPressed: () {
+                        Events().emit(FfpBrowseEvent(
+                            url: AppConfig().circleUrls()['tf-grid']));
                       },
                     ),
                     Padding(
@@ -144,30 +167,7 @@ class _RegisteredScreenState extends State<RegisteredScreen>
                     ),
                   ],
                 ),
-                Column(
-                  children: <Widget>[
-                    FloatingActionButton(
-                      heroTag: "tftfarmers",
-                      backgroundColor: Colors.blueAccent,
-                      elevation: 0,
-                      child: CircleAvatar(
-                        backgroundImage: ExactAssetImage(
-                            'assets/circle_images/tffarmers.jpg'),
-                        minRadius: 90,
-                        maxRadius: 150,
-                      ),
-                      onPressed: () {
-                        Events().emit(FfpBrowseEvent(
-                            url: AppConfig().circleUrls()['tf-grid-farming']));
-                      },
-                    ),
-                    Padding(
-                      padding: EdgeInsets.all(5),
-                      child: Text("TF Foundation"),
-                    ),
-                  ],
-                ),
-                Column(
+                Column( // 4
                   children: <Widget>[
                     FloatingActionButton(
                       heroTag: "ffnation",
@@ -190,7 +190,7 @@ class _RegisteredScreenState extends State<RegisteredScreen>
                     ),
                   ],
                 ),
-                Column(
+                Column( // 5
                   children: <Widget>[
                     FloatingActionButton(
                       heroTag: "3bot",
