@@ -313,3 +313,4 @@ Makefile
 app/lib/AppConfigLocal.dart
 app/android/app/src/main/AndroidManifest.xml
 app/lib/helpers/EnvConfig.dart
+*.dart-e
