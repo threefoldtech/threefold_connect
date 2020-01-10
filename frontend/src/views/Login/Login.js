@@ -32,8 +32,8 @@ export default {
   },
   methods: {
     ...mapActions([
-      'resendNotification',
-      'deleteLoginAttempt'
+      'resendNotification'
+      // 'deleteLoginAttempt'
     ]),
     openApp () {
       if (this.isMobile) {
@@ -67,10 +67,10 @@ export default {
             data = encodeURIComponent(val.data)
           }
 
-          this.deleteLoginAttempt()
+          // this.deleteLoginAttempt()
 
           console.log('signedHash: ', signedHash)
-          console.log('data', data)
+          console.log('!!!!data', data)
 
           if (data && signedHash) {
             var union = '?'
@@ -87,6 +87,7 @@ export default {
               safeRedirectUri = '/' + this.redirectUrl
             }
 
+            console.log('!!!! this.doubleName: ', this.doubleName)
             var url = `//${this.appId}${safeRedirectUri}${union}username=${this.doubleName}&signedhash=${signedHash}&data=${data}`
 
             if (!this.isRedirecting) {
