@@ -90,15 +90,16 @@ export default {
       'checkName',
       'clearCheckStatus',
       'setAttemptCanceled',
-      'forceRefetchStatus',
-      'deleteLoginAttempt'
+      'setSignedRoom'
+      // 'forceRefetchStatus',
+      // 'deleteLoginAttempt'
     ]),
     lostFocus () {
       this.didLeavePage = true
     },
     gotFocus () {
       if (this.didLeavePage && this.isMobile) {
-        this.forceRefetchStatus()
+        // this.forceRefetchStatus()
       }
     },
     promptLoginToMobileUser () {
@@ -106,7 +107,10 @@ export default {
         mobile: this.isMobile,
         firstTime: false
       })
-      var url = `threebot://login?state=${encodeURIComponent(this.hash)}&mobile=true`
+      var roomToListenForSigned = Math.random().toString(32).substring(2)
+      this.setSignedRoom(roomToListenForSigned)
+
+      var url = `threebot://login?state=${encodeURIComponent(this.hash)}&mobile=true&signedRoom=${roomToListenForSigned}`
       if (this.scope) url += `&scope=${encodeURIComponent(this.scope)}`
       if (this.appId) url += `&appId=${encodeURIComponent(this.appId)}`
       if (this.appPublicKey) url += `&appPublicKey=${encodeURIComponent(this.appPublicKey)}`
@@ -165,8 +169,8 @@ export default {
           }
 
           console.log('signedHash: ', signedHash)
-          console.log('data', data)
-          this.deleteLoginAttempt()
+          console.log('!!!!data', data)
+          // this.deleteLoginAttempt()
 
           if (data && signedHash) {
             var union = '?'

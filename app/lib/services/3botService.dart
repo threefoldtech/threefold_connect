@@ -12,13 +12,15 @@ import 'package:threebotlogin/services/userService.dart';
 String threeBotApiUrl = AppConfig().threeBotApiUrl();
 Map<String, String> requestHeaders = {'Content-type': 'application/json'};
 
-Future sendData(String hash, String signedHash, data, selectedImageId) {
+Future sendData(String hash, String signedHash, data, selectedImageId, String signedRoom) async {
   return http.post('$threeBotApiUrl/sign',
       body: json.encode({
         'hash': hash,
         'signedHash': signedHash,
         'data': data,
-        'selectedImageId': selectedImageId
+        'selectedImageId': selectedImageId,
+        'doubleName': await getDoubleName(),
+        'signedRoom': signedRoom
       }),
       headers: requestHeaders);
 }
@@ -40,26 +42,6 @@ Future sendPublicKey(Map<String, Object> data) async {
 
   return http.post('$threeBotApiUrl/savederivedpublickey',
       body: json.encode(data), headers: loginRequestHeaders);
-}
-
-Future checkLoginAttempts(String doubleName, {String privateKey = ''}) async {
-  if (privateKey == '') {
-    privateKey = await getPrivateKey();
-  }
-  String timestamp = new DateTime.now().millisecondsSinceEpoch.toString();
-  Map<String, dynamic> payload = {
-    "timestamp": timestamp,
-    "intention": "attempts"
-  };
-  String signedPayload = await signData(jsonEncode(payload), privateKey);
-
-  Map<String, String> loginRequestHeaders = {
-    'Content-type': 'application/json',
-    'Jimber-Authorization': signedPayload
-  };
-
-  return http.get('$threeBotApiUrl/attempts/$doubleName',
-      headers: loginRequestHeaders);
 }
 
 Future<int> checkVersionNumber(BuildContext context, String version) async {
