@@ -10,10 +10,8 @@ import 'package:threebotlogin/Events/NewLoginEvent.dart';
 import 'package:threebotlogin/Events/UniLinkEvent.dart';
 import 'package:threebotlogin/helpers/Globals.dart';
 import 'package:threebotlogin/helpers/HexColor.dart';
-import 'package:threebotlogin/services/3botService.dart';
+import 'package:threebotlogin/services/UniLinkService.dart';
 import 'package:threebotlogin/services/socketService.dart';
-import 'package:threebotlogin/services/uniLinkService.dart';
-import 'package:threebotlogin/services/userService.dart';
 import 'package:threebotlogin/widgets/EmailVerificationNeeded.dart';
 import 'package:uni_links/uni_links.dart';
 
