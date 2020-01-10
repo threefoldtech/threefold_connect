@@ -133,6 +133,7 @@ class _FfpState extends State<FfpWidget> with AutomaticKeepAliveClientMixin {
 
     webView.loadUrl(url: loadUrl);
     switchToCircle = true;
+
   }
 
   @override
