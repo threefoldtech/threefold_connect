@@ -19,10 +19,10 @@ import 'package:uni_links/uni_links.dart';
 
 /* Screen shows tabbar and all pages defined in router.dart */
 class HomeScreen extends StatefulWidget {
-  final BackendConnection backendConnection;
+
   final String initialLink;
 
-  HomeScreen({this.backendConnection, this.initialLink});
+  HomeScreen({ this.initialLink});
 
   _HomeScreenState createState() => _HomeScreenState();
 }
@@ -83,19 +83,19 @@ class _HomeScreenState extends State<HomeScreen>
 
   Future<Null> initUniLinks() async {
     Events().onEvent(
-        UniLinkEvent(null, null, null).runtimeType, checkWhatPageToOpen);
+        UniLinkEvent(null, null).runtimeType, UniLinkService.handleUniLink);
     initialLink = widget.initialLink;
 
     if (initialLink != null) {
       Events().emit(UniLinkEvent(
-          Uri.parse(initialLink), context, widget.backendConnection));
+          Uri.parse(initialLink), context));
     }
     _sub = getLinksStream().listen((String incomingLink) {
       if (!mounted) {
         return;
       }
       Events().emit(UniLinkEvent(
-          Uri.parse(incomingLink), context, widget.backendConnection));
+          Uri.parse(incomingLink), context));
     });
   }
 

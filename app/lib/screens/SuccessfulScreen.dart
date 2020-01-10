@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:threebotlogin/Events/Events.dart';
+import 'package:threebotlogin/Events/PopAllLoginEvent.dart';
 
 class SuccessfulScreen extends StatefulWidget {
   final String title;
@@ -10,6 +12,16 @@ class SuccessfulScreen extends StatefulWidget {
 }
 
 class _SuccessfulScreenState extends State<SuccessfulScreen> {
+  _SuccessfulScreenState() {
+    Events().onEvent(PopAllLoginEvent("").runtimeType, close);
+  }
+
+  close(PopAllLoginEvent e) {
+    if (mounted) {
+      Navigator.pop(context, false);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
