@@ -314,3 +314,11 @@ app/lib/AppConfigLocal.dart
 app/android/app/src/main/AndroidManifest.xml
 app/lib/helpers/EnvConfig.dart
 *.dart-e
+*.DS_Store
+android/app/build.gradle
+android/app/src/main/java/org/jimber/threebotlogin/MainActivity.java
+android/app/src/main/res/mipmap-hdpi/ic_launcher.png
+android/app/src/main/res/mipmap-mdpi/ic_launcher.png
+android/app/src/main/res/mipmap-xhdpi/ic_launcher.png
+android/app/src/main/res/mipmap-xxhdpi/ic_launcher.png
+android/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png

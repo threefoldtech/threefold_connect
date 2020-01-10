@@ -34,6 +34,15 @@ msgTelegram () {
     paplay /usr/share/sounds/gnome/default/alerts/glass.ogg
 }
 
+generateFile () {
+    if ! test -f "$1"; then
+        echo "$1 doesn't exist, generating ..."
+        cp $2 $1
+     else
+        echo "$1 already exists."
+    fi
+}
+
 if [[ $1 == "--help" ]]
 then
     echo "Usage: ./build.sh --[run|build|switch] --[local|staging|production]"
@@ -46,19 +55,26 @@ then
     EnvConfigFilePath=lib/helpers/EnvConfig.dart
     AppConfigLocalFilePath=lib/AppConfigLocal.dart
 
-    if ! test -f "$EnvConfigFilePath"; then
-        echo "EnvConfig.dart doesn't exist, generating ..."
-        cp lib/helpers/EnvConfig_local.template lib/helpers/EnvConfig.dart
-    else
-        echo "EnvConfig.dart already exists."
-    fi
+    MainActivityPath=android/app/src/main/java/org/jimber/threebotlogin/MainActivity.java
+    BuildGradlePath=android/app/build.gradle
 
-    if ! test -f "$AppConfigLocalFilePath"; then
-        echo "AppConfigLocal.dart doesn't exist, generating ..."
-        cp lib/AppConfigLocal.template lib/AppConfigLocal.dart
-     else
-        echo "AppConfigLocal.dart already exists."
-    fi
+    LauncherImgPath1=android/app/src/main/res/mipmap-hdpi/ic_launcher.png
+    LauncherImgPath2=android/app/src/main/res/mipmap-mdpi/ic_launcher.png
+    LauncherImgPath3=android/app/src/main/res/mipmap-xhdpi/ic_launcher.png
+    LauncherImgPath4=android/app/src/main/res/mipmap-xxhdpi/ic_launcher.png
+    LauncherImgPath5=android/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png
+
+    generateFile $EnvConfigFilePath lib/helpers/EnvConfig_local.template
+    generateFile $AppConfigLocalFilePath lib/AppConfigLocal.template
+
+    generateFile $MainActivityPath android/app/src/main/java/org/jimber/threebotlogin/MainActivity_local
+    generateFile $BuildGradlePath android/app/build_local
+    
+    generateFile $LauncherImgPath1 android/app/src/main/res/mipmap-hdpi/ic_launcher_local.png
+    generateFile $LauncherImgPath2 android/app/src/main/res/mipmap-mdpi/ic_launcher_local.png
+    generateFile $LauncherImgPath3 android/app/src/main/res/mipmap-xhdpi/ic_launcher_local.png
+    generateFile $LauncherImgPath4 android/app/src/main/res/mipmap-xxhdpi/ic_launcher_local.png
+    generateFile $LauncherImgPath5 android/app/src/main/res/mipmap-xxxhdpi/ic_launcher_local.png
 
     exit 0
 fi
