@@ -7,6 +7,7 @@ current_time=$(date "+%H.%M.%S-%d.%m.%Y")
 
 switchConfigs() {
     cp android/app/src/main/AndroidManifest_$1 android/app/src/main/AndroidManifest.xml
+    cp android/app/src/main/AndroidManifest_$1 android/app/src/debug/AndroidManifest.xml
     cp android/app/src/main/java/org/jimber/threebotlogin/MainActivity_$1 android/app/src/main/java/org/jimber/threebotlogin/MainActivity.java
     cp android/app/build_$1 android/app/build.gradle
     cp lib/helpers/EnvConfig_$1.template lib/helpers/EnvConfig.dart
@@ -52,6 +53,9 @@ fi
 
 if [[ $1 == "--init" ]]
 then
+    AndroidManifestMainPath=android/app/src/main/AndroidManifest.xml
+    AndroidManifestDebugPath=android/app/src/debug/AndroidManifest.xml
+
     EnvConfigFilePath=lib/helpers/EnvConfig.dart
     AppConfigLocalFilePath=lib/AppConfigLocal.dart
 
@@ -75,6 +79,8 @@ then
     generateFile $LauncherImgPath3 android/app/src/main/res/mipmap-xhdpi/ic_launcher_local.png
     generateFile $LauncherImgPath4 android/app/src/main/res/mipmap-xxhdpi/ic_launcher_local.png
     generateFile $LauncherImgPath5 android/app/src/main/res/mipmap-xxxhdpi/ic_launcher_local.png
+    generateFile $AndroidManifestMainPath android/app/src/main/AndroidManifest_local
+    generateFile $AndroidManifestDebugPath android/app/src/main/AndroidManifest_local
 
     exit 0
 fi
