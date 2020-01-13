@@ -79,6 +79,8 @@ then
     generateFile $LauncherImgPath3 android/app/src/main/res/mipmap-xhdpi/ic_launcher_local.png
     generateFile $LauncherImgPath4 android/app/src/main/res/mipmap-xxhdpi/ic_launcher_local.png
     generateFile $LauncherImgPath5 android/app/src/main/res/mipmap-xxxhdpi/ic_launcher_local.png
+
+    mkdir android/app/src/debug
     generateFile $AndroidManifestMainPath android/app/src/main/AndroidManifest_local
     generateFile $AndroidManifestDebugPath android/app/src/main/AndroidManifest_local
 
