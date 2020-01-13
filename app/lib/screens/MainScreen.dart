@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:threebotlogin/AppConfig.dart';
 import 'package:threebotlogin/Events/Events.dart';
 import 'package:threebotlogin/helpers/Globals.dart';
 import 'package:threebotlogin/screens/HomeScreen.dart';
@@ -32,7 +33,6 @@ class _AppState extends State<MainScreen> {
   BackendConnection _backendConnection;
 
   pushScreens() async {
-
     // Internet connection check. 
     try {
       final result = await InternetAddress.lookup('google.com');
@@ -44,6 +44,24 @@ class _AppState extends State<MainScreen> {
           title: "No internet connection available",
           description: Text(
             "Please enable your internet connection to use this app.",
+            textAlign: TextAlign.center,
+          ));
+      await dialog.show(context);
+      SystemNavigator.pop();
+    }
+
+    // Internet connection check to our servers.
+    try {
+      String threeBotApiUrl = AppConfig().threeBotApiUrl();
+      final result = await InternetAddress.lookup('$threeBotApiUrl/minversion');
+      if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
+        print('connected to the internet');
+      }
+    } on SocketException catch (_) {
+      var dialog = CustomDialog(
+          title: "Oops",
+          description: Text(
+            "Something went wrong, please try again. Contact support if this issue persists.",
             textAlign: TextAlign.center,
           ));
       await dialog.show(context);
