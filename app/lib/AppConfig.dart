@@ -1,3 +1,4 @@
+import 'package:threebotlogin/AppConfigLocal.dart';
 import 'package:threebotlogin/helpers/EnvConfig.dart';
 import 'package:threebotlogin/helpers/Environment.dart';
 
@@ -12,6 +13,10 @@ class AppConfig extends EnvConfig {
     } else if (environment == Environment.Local) {
       appConfig = AppConfigLocal();
     }
+  }
+
+  String baseUrl() {
+    return appConfig.baseUrl();
   }
 
   String openKycApiUrl() {
@@ -36,6 +41,7 @@ class AppConfig extends EnvConfig {
 }
 
 abstract class AppConfigImpl {
+  String baseUrl();
   String openKycApiUrl();
   String threeBotApiUrl();
   String threeBotFrontEndUrl();
@@ -44,6 +50,11 @@ abstract class AppConfigImpl {
 }
 
 class AppConfigProduction extends AppConfigImpl {
+
+  String baseUrl() {
+    return "login.threefold.me";
+  }
+
   String openKycApiUrl() {
     return "https://openkyc.live";
   }
@@ -74,6 +85,11 @@ class AppConfigProduction extends AppConfigImpl {
 }
 
 class AppConfigStaging extends AppConfigImpl {
+
+  String baseUrl() {
+    return "login.staging.jimber.org";
+  }
+
   String openKycApiUrl() {
     return "https://openkyc.staging.jimber.org";
   }
@@ -93,36 +109,6 @@ class AppConfigStaging extends AppConfigImpl {
   Map<String, String> circleUrls() {
     var circleUrls = Map<String, String>();
 
-    circleUrls['tftokens'] = 'https://staging.freeflowpages.com/join/tf-tokens';
-    circleUrls['tf-news'] = 'https://staging.freeflowpages.com/join/threefoldfoundation/';
-    circleUrls['tf-grid'] = 'https://staging.freeflowpages.com/join/tf-grid';
-    circleUrls['freeflownation'] = 'https://staging.freeflowpages.com/join/freeflownation';
-    circleUrls['3bot'] = 'https://staging.freeflowpages.com/join/3bot';
-
-    return circleUrls;
-  }
-}
-
-class AppConfigLocal extends AppConfigImpl {
-  String openKycApiUrl() {
-    return "http://192.168.2.60:5005";
-  }
-
-  String threeBotApiUrl() {
-    return "http://192.168.2.60:5000/api";
-  }
-
-  String threeBotFrontEndUrl() {
-    return "http://192.168.2.60:8081/";
-  }
-
-  String threeBotSocketUrl() {
-    return "ws://192.168.2.60:5000";
-  }
-
-  Map<String, String> circleUrls() {
-    var circleUrls = Map<String, String>();
-    
     circleUrls['tftokens'] = 'https://staging.freeflowpages.com/join/tf-tokens';
     circleUrls['tf-news'] = 'https://staging.freeflowpages.com/join/threefoldfoundation/';
     circleUrls['tf-grid'] = 'https://staging.freeflowpages.com/join/tf-grid';

@@ -1,0 +1,36 @@
+import 'package:threebotlogin/AppConfig.dart';
+
+class AppConfigLocal extends AppConfigImpl {
+
+  String baseUrl() {
+    return "192.168.0.0:5000";
+  }
+
+  String openKycApiUrl() {
+    return "http://192.168.0.0:5005";
+  }
+
+  String threeBotApiUrl() {
+    return "http://192.168.0.0:5000/api";
+  }
+
+  String threeBotFrontEndUrl() {
+    return "http://192.168.0.0:8080/";
+  }
+
+  String threeBotSocketUrl() {
+    return "ws://192.168.0.0:5000";
+  }
+
+  Map<String, String> circleUrls() {
+    var circleUrls = Map<String, String>();
+    
+    circleUrls['tftokens'] = 'https://staging.freeflowpages.com/join/tf-tokens';
+    circleUrls['tf-news'] = 'https://staging.freeflowpages.com/join/threefoldfoundation/';
+    circleUrls['tf-grid'] = 'https://staging.freeflowpages.com/join/tf-grid';
+    circleUrls['freeflownation'] = 'https://staging.freeflowpages.com/join/freeflownation';
+    circleUrls['3bot'] = 'https://staging.freeflowpages.com/join/3bot';
+
+    return circleUrls;
+  }
+}
