@@ -43,25 +43,28 @@ logger.addHandler(handler)
 def connect_handler():
     logger.debug("/Connect")
 
+
 @sio.on('disconnect')
 def disconnect_handler():
 
     logger.debug("/disconnected.")
     if request.sid in socketRoom:
-        room = socketRoom[request.sid]
+        room = socketRoom[request.sid].lower()
         logger.debug("User was disconnected, user was known {}".format(room))
         del socketRoom[request.sid]
         leave_room(room)
         if usersInRoom[room] > 0:
             usersInRoom[room] -= 1
-            logger.debug("User was removed from room, users left in room {}".format(usersInRoom[room]))
+            logger.debug(
+                "User was removed from room, users left in room {}".format(usersInRoom[room]))
+
 
 @sio.on('join')
 def on_join(data):
     logger.debug("/Join %s", data)
-    room = data['room']
+    room = data['room'].lower()
     join_room(room)
-    
+
     if 'app' in data:
         socketRoom[request.sid] = room
         if not room in usersInRoom:
@@ -72,7 +75,7 @@ def on_join(data):
             for message in messageQueue[room]:
                 sio.emit(message[0], message[1], room=message[2])
             messageQueue[room] = []
-        
+
 
 @sio.on('leave')
 def on_leave(data):
@@ -98,14 +101,17 @@ def cancel_handler(data):
     print('')
 
 
-usersInRoom = {} #users that are in a room
-messageQueue = {} #messaged queued for a room (only queued when room is empty)
-socketRoom = {} #room bound to a socket
+usersInRoom = {}  # users that are in a room
+# messaged queued for a room (only queued when room is empty)
+messageQueue = {}
+socketRoom = {}  # room bound to a socket
+
 
 def emitOrQueue(event, data, room):
     logger.debug("Emit or queue data %s", data)
-    if not room in usersInRoom  or usersInRoom[room] == 0:
-        logger.debug("Room is unknown or no users in room, so might queue for %s", room)
+    if not room in usersInRoom or usersInRoom[room] == 0:
+        logger.debug(
+            "Room is unknown or no users in room, so might queue for %s", room)
         if not room in messageQueue:
             logger.debug("Room is not known yet in queue, creating %s", room)
             messageQueue[room] = []
@@ -130,7 +136,6 @@ def login_handler(data):
         update_sql = "UPDATE users SET sid=?  WHERE double_name=?;"
         db.update_user(conn, update_sql, sid, user[0])
 
-
     user = db.getUserByName(conn, double_name)
     emitOrQueue('login', data, room=user[0])
 
@@ -143,17 +148,19 @@ def resend_handler(data):
     data['type'] = 'login'
     emitOrQueue('login', data, room=user)
 
+
 @app.route('/api/signRegister', methods=['POST'])
 def signRegisterHandler():
     body = request.get_json()
+    double_name = body.get('doubleName').lower()
     logger.debug("/signRegister %s", body)
-    
-    user = db.getUserByName(conn, body.get('doubleName'))
+
+    user = db.getUserByName(conn, double_name)
 
     if user:
         sio.emit('signed', {
             'data': body.get('data'),
-            'doubleName': body.get('doubleName')
+            'doubleName': double_name
         }, room=user[0])
         return Response('Ok')
     else:
@@ -163,9 +170,10 @@ def signRegisterHandler():
 @app.route('/api/sign', methods=['POST'])
 def sign_handler():
     body = request.get_json()
+
     logger.debug("/sign: %s", body)
     logger.debug("body.get('doubleName'): %s", body.get('doubleName'))
-    roomToSendTo = body.get('signedRoom')
+    roomToSendTo = body.get('signedRoom').lower()
     if roomToSendTo is None:
         roomToSendTo = body.get('doubleName')
     logger.debug("roomToSendTo %s", roomToSendTo)
@@ -235,14 +243,14 @@ def set_email_verified_handler(doublename):
     logger.debug(user)
     logger.debug(user[4])
     data = {'type': 'email_verification'}
-    emitOrQueue('login', data, room=user[0])
+    emitOrQueue('login', data, room=user[0].lower())
     return Response('Ok')
 
 
 @app.route('/api/savederivedpublickey', methods=['POST'])
 def save_derived_public_key():
     body = request.get_json()
-    double_name = body['doubleName']
+    double_name = body['doubleName'].lower()
     logger.debug(body)
     try:
         auth_header = request.headers.get('Jimber-Authorization')
@@ -312,7 +320,7 @@ def min_version_handler():
 def verify_signed_data(double_name, data):
     # print('/n### --- data verification --- ###')
     # print("Verifying data: ", data)
-
+    double_name = double_name.lower()
     decoded_data = base64.b64decode(data)
     # print("Decoding data: ", decoded_data)
 
