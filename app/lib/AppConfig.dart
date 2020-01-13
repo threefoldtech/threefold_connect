@@ -15,6 +15,10 @@ class AppConfig extends EnvConfig {
     }
   }
 
+  String baseUrl() {
+    return appConfig.baseUrl();
+  }
+
   String openKycApiUrl() {
     return appConfig.openKycApiUrl();
   }
@@ -37,6 +41,7 @@ class AppConfig extends EnvConfig {
 }
 
 abstract class AppConfigImpl {
+  String baseUrl();
   String openKycApiUrl();
   String threeBotApiUrl();
   String threeBotFrontEndUrl();
@@ -45,6 +50,11 @@ abstract class AppConfigImpl {
 }
 
 class AppConfigProduction extends AppConfigImpl {
+
+  String baseUrl() {
+    return "login.threefold.me";
+  }
+
   String openKycApiUrl() {
     return "https://openkyc.live";
   }
@@ -75,6 +85,11 @@ class AppConfigProduction extends AppConfigImpl {
 }
 
 class AppConfigStaging extends AppConfigImpl {
+
+  String baseUrl() {
+    return "login.staging.jimber.org";
+  }
+
   String openKycApiUrl() {
     return "https://openkyc.staging.jimber.org";
   }

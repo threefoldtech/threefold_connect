@@ -1,6 +1,11 @@
 import 'package:threebotlogin/AppConfig.dart';
 
 class AppConfigLocal extends AppConfigImpl {
+
+  String baseUrl() {
+    return "192.168.0.0:5000";
+  }
+
   String openKycApiUrl() {
     return "http://192.168.0.0:5005";
   }
