@@ -23,7 +23,7 @@ setConfigsAndBuild() {
     sed -i -e "s/githashvalue/$githash/g" lib/helpers/EnvConfig.dart
     sed -i -e "s/timevalue/$logcurrent_time/g" lib/helpers/EnvConfig.dart
 
-    flutter build apk -t lib/main.dart --release
+    flutter build apk -t lib/main.dart --target-platform android-arm,android-arm64 --release
 }
 
 msgTelegram () {
