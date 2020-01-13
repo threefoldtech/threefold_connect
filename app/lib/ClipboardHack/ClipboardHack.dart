@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/services.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 
@@ -10,9 +12,11 @@ Future<String> paste(List<dynamic> params) async {
 }
 
 void addClipboardHack(InAppWebViewController webview) {
-  webview.injectJavascriptFileFromAsset(
-      assetFilePath: 'assets/clipboardhack.js');
-  addClipboardHandlersOnly(webview);
+  if (Platform.isAndroid) {
+    webview.injectJavascriptFileFromAsset(
+        assetFilePath: 'assets/clipboardhack.js');
+    addClipboardHandlersOnly(webview);
+  }
 }
 
 void addClipboardHandlersOnly(InAppWebViewController webview) {
