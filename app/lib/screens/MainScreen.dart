@@ -52,8 +52,8 @@ class _AppState extends State<MainScreen> {
 
     // Internet connection check to our servers.
     try {
-      String threeBotApiUrl = AppConfig().threeBotApiUrl();
-      final result = await InternetAddress.lookup('$threeBotApiUrl/minversion');
+      String baseUrl = AppConfig().baseUrl();
+      final result = await InternetAddress.lookup('$baseUrl');
       if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
         print('connected to the internet');
       }
