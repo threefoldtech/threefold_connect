@@ -50,23 +50,23 @@ class _AppState extends State<MainScreen> {
       SystemNavigator.pop();
     }
 
-    // Internet connection check to our servers.
-    try {
-      String baseUrl = AppConfig().baseUrl();
-      final result = await InternetAddress.lookup('$baseUrl');
-      if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
-        print('connected to the internet');
-      }
-    } on SocketException catch (_) {
-      var dialog = CustomDialog(
-          title: "Oops",
-          description: Text(
-            "Something went wrong, please try again. Contact support if this issue persists.",
-            textAlign: TextAlign.center,
-          ));
-      await dialog.show(context);
-      SystemNavigator.pop();
-    }
+    // // Internet connection check to our servers.
+    // try {
+    //   String baseUrl = AppConfig().baseUrl();
+    //   final result = await InternetAddress.lookup('$baseUrl');
+    //   if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
+    //     print('connected to the internet');
+    //   }
+    // } on SocketException catch (_) {
+    //   var dialog = CustomDialog(
+    //       title: "Oops",
+    //       description: Text(
+    //         "Something went wrong, please try again. Contact support if this issue persists.",
+    //         textAlign: TextAlign.center,
+    //       ));
+    //   await dialog.show(context);
+    //   SystemNavigator.pop();
+    // }
 
     // Version check. TODO: Maybe add a button to open the app / playstore?
     if(!await isAppUpToDate()) {
