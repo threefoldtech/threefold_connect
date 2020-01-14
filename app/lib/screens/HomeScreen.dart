@@ -66,7 +66,7 @@ class _HomeScreenState extends State<HomeScreen>
   _handleTabSelection() async {
     if (_tabController.indexIsChanging) {
       if (Globals().router.pinRequired(_tabController.index) &&
-          checkPinAgain()) {
+          checkPinAgain() && !pinCheckOpen) {
         checkPin();
       }
 
