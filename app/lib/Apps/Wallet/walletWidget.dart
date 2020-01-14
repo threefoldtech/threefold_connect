@@ -105,6 +105,7 @@ class _WalletState extends State<WalletWidget>
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     return Column(
       children: <Widget>[
         Expanded(

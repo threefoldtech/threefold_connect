@@ -12,15 +12,16 @@ import 'package:threebotlogin/helpers/Globals.dart';
 import 'package:threebotlogin/helpers/HexColor.dart';
 import 'package:threebotlogin/services/UniLinkService.dart';
 import 'package:threebotlogin/services/socketService.dart';
+import 'package:threebotlogin/services/userService.dart';
 import 'package:threebotlogin/widgets/EmailVerificationNeeded.dart';
+import 'package:threebotlogin/widgets/PinFieldNew.dart';
 import 'package:uni_links/uni_links.dart';
 
 /* Screen shows tabbar and all pages defined in router.dart */
 class HomeScreen extends StatefulWidget {
-
   final String initialLink;
 
-  HomeScreen({ this.initialLink});
+  HomeScreen({this.initialLink});
 
   _HomeScreenState createState() => _HomeScreenState();
 }
@@ -30,6 +31,10 @@ class _HomeScreenState extends State<HomeScreen>
   TabController _tabController;
   StreamSubscription _sub;
   String initialLink;
+  bool backgroundSincePinCheck = true;
+  bool pinCheckOpen = false;
+  int lastPinCheck = 0;
+  final int pinCheckTimeout = 60000 * 1; //5 minutes in milliseconds
 
   _HomeScreenState() {
     _tabController = TabController(
@@ -37,9 +42,34 @@ class _HomeScreenState extends State<HomeScreen>
     Events().onEvent(FfpBrowseEvent().runtimeType, activateFfpTab);
     _tabController.addListener(_handleTabSelection);
   }
+  bool checkPinAgain() {
+    var now = new DateTime.now().millisecondsSinceEpoch;
+    return (now - lastPinCheck > pinCheckTimeout) && backgroundSincePinCheck;
+  }
+
+  void checkPin() async {
+    String correctPin = await getPin();
+    pinCheckOpen = true;
+    bool pinIsCorrect = await Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) => PinFieldNew(correctPin: correctPin)));
+    pinCheckOpen = false;
+    if (pinIsCorrect == null || !pinIsCorrect) {
+      _tabController.animateTo(_tabController.previousIndex);
+    } else {
+      lastPinCheck = new DateTime.now().millisecondsSinceEpoch;
+      backgroundSincePinCheck = false;
+    }
+  }
 
   _handleTabSelection() async {
     if (_tabController.indexIsChanging) {
+      if (Globals().router.pinRequired(_tabController.index) &&
+          checkPinAgain()) {
+        checkPin();
+      }
+
       if (Globals().router.emailMustBeVerified(_tabController.index) &&
           !Globals().emailVerified.value) {
         _tabController.animateTo(_tabController.previousIndex);
@@ -70,13 +100,32 @@ class _HomeScreenState extends State<HomeScreen>
     Events().onEvent(NewLoginEvent().runtimeType, (NewLoginEvent event) {
       openLogin(context, event.data);
     });
-
+    WidgetsBinding.instance.addObserver(this);
   }
 
   @override
   void dispose() {
     _sub.cancel();
+    WidgetsBinding.instance.removeObserver(this);
     super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      if(pinCheckOpen){
+        return;
+      }
+      backgroundSincePinCheck = true;
+      if (Globals().router.pinRequired(_tabController.index) &&
+          checkPinAgain()) {
+        checkPin();
+      }
+    } else if (state == AppLifecycleState.inactive) {
+      // app is inactive
+    } else if (state == AppLifecycleState.paused) {
+      // user is about quit our app temporally
+    }
   }
 
   Future<Null> initUniLinks() async {
@@ -85,15 +134,13 @@ class _HomeScreenState extends State<HomeScreen>
     initialLink = widget.initialLink;
 
     if (initialLink != null) {
-      Events().emit(UniLinkEvent(
-          Uri.parse(initialLink), context));
+      Events().emit(UniLinkEvent(Uri.parse(initialLink), context));
     }
     _sub = getLinksStream().listen((String incomingLink) {
       if (!mounted) {
         return;
       }
-      Events().emit(UniLinkEvent(
-          Uri.parse(incomingLink), context));
+      Events().emit(UniLinkEvent(Uri.parse(incomingLink), context));
     });
   }
 

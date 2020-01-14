@@ -29,6 +29,11 @@ class Wallet implements App {
   }
 
   @override
+  bool pinRequired() {
+    return true;
+  }
+
+  @override
   void back() {
     Events().emit(WalletBackEvent());
   }

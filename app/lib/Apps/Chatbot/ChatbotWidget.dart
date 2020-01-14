@@ -58,6 +58,7 @@ class _ChatbotState extends State<ChatbotWidget>
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     return Column(
       children: <Widget>[
         Expanded(
