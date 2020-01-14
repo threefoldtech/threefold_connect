@@ -13,7 +13,8 @@ import 'package:threebotlogin/services/userService.dart';
 String threeBotApiUrl = AppConfig().threeBotApiUrl();
 Map<String, String> requestHeaders = {'Content-type': 'application/json'};
 
-Future sendData(String hash, String signedHash, data, selectedImageId, String signedRoom) async {
+Future sendData(String hash, String signedHash, data, selectedImageId,
+    String signedRoom) async {
   return http.post('$threeBotApiUrl/sign',
       body: json.encode({
         'hash': hash,
@@ -46,30 +47,25 @@ Future sendPublicKey(Map<String, Object> data) async {
 }
 
 Future<bool> isAppUpToDate() async {
-  PackageInfo packageInfo = await PackageInfo.fromPlatform();
-  var currentBuildNumber = packageInfo.buildNumber;
-
-  var minBuildNumber;
-
   try {
-    // TODO: Should be renamed to minBuildNumber instead of minVersion.
-    minBuildNumber = (await http.get('$threeBotApiUrl/minversion', headers: requestHeaders)).body;
-  } on SocketException catch (_) {
+    PackageInfo packageInfo = await PackageInfo.fromPlatform();
+
+    int currentBuildNumber = int.parse(packageInfo.buildNumber);
+    int minimumBuildNumber = 0;
+
+    var jsonResponse = (await http.get('$threeBotApiUrl/minimumversion', headers: requestHeaders)).body;
+    var minimumVersion = json.decode(jsonResponse);
+
+    if (Platform.isAndroid) {
+      minimumBuildNumber = minimumVersion['android'];
+    } else if (Platform.isIOS) {
+      minimumBuildNumber = minimumVersion['ios'];
+    }
+
+    return currentBuildNumber >= minimumBuildNumber;
+  } on Exception catch (_) {
     return false;
   }
-
-  if (minBuildNumber != null && currentBuildNumber != null) {
-    try {
-      int min = int.parse(minBuildNumber);
-      int current = int.parse(currentBuildNumber);
-
-      return min <= current;
-    } on Exception catch (_) {
-      return false;
-    }
-  }
-
-  return false;
 }
 
 Future cancelLogin(doubleName) {
