@@ -176,6 +176,7 @@ def sign_handler():
     roomToSendTo = body.get('signedRoom').lower()
     if roomToSendTo is None:
         roomToSendTo = body.get('doubleName')
+    roomToSendTo = roomToSendTo.lower()
     logger.debug("roomToSendTo %s", roomToSendTo)
 
     sio.emit('signed', {
