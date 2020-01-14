@@ -34,7 +34,7 @@ class _HomeScreenState extends State<HomeScreen>
   bool backgroundSincePinCheck = true;
   bool pinCheckOpen = false;
   int lastPinCheck = 0;
-  final int pinCheckTimeout = 60000 * 1; //5 minutes in milliseconds
+  final int pinCheckTimeout = 60000 * 5; //5 minutes in milliseconds
 
   _HomeScreenState() {
     _tabController = TabController(
