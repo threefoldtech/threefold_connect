@@ -32,4 +32,9 @@ class Ffp implements App {
   bool emailVerificationRequired() {
     return true;
   }
+
+  @override
+  bool pinRequired() {
+    return false;
+  }
 }

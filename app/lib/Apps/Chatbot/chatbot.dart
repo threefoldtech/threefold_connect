@@ -25,6 +25,11 @@ class Chatbot implements App {
   }
 
   @override
+  bool pinRequired() {
+    return false;
+  }
+
+  @override
   void back() {
     Events().emit(GoHomeEvent());
   }

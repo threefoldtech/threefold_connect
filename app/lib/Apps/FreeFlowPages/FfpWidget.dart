@@ -138,6 +138,7 @@ class _FfpState extends State<FfpWidget> with AutomaticKeepAliveClientMixin {
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     if (this.iaWebview == null) {
       return null;
     }

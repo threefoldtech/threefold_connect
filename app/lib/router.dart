@@ -72,6 +72,13 @@ class Router {
     return false;
   }
 
+  bool pinRequired(int index) {
+    if (routes[index].app != null) {
+      return routes[index].app.pinRequired();
+    }
+    return false;
+  }
+
   List<Widget> getContent() {
     List<Widget> containers = [];
     routes.forEach((r) {
