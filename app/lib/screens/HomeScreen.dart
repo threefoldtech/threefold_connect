@@ -10,6 +10,7 @@ import 'package:threebotlogin/Events/NewLoginEvent.dart';
 import 'package:threebotlogin/Events/UniLinkEvent.dart';
 import 'package:threebotlogin/helpers/Globals.dart';
 import 'package:threebotlogin/helpers/HexColor.dart';
+import 'package:threebotlogin/main.dart';
 import 'package:threebotlogin/services/UniLinkService.dart';
 import 'package:threebotlogin/services/socketService.dart';
 import 'package:threebotlogin/services/userService.dart';
@@ -31,10 +32,10 @@ class _HomeScreenState extends State<HomeScreen>
   TabController _tabController;
   StreamSubscription _sub;
   String initialLink;
-  bool backgroundSincePinCheck = true;
+  bool timeoutExpiredInBackground = true;
   bool pinCheckOpen = false;
-  int lastPinCheck = 0;
-  final int pinCheckTimeout = 60000 * 1; //5 minutes in milliseconds
+  int lastCheck = 0;
+  final int pinCheckTimeout = 10000;
 
   _HomeScreenState() {
     _tabController = TabController(
@@ -42,31 +43,33 @@ class _HomeScreenState extends State<HomeScreen>
     Events().onEvent(FfpBrowseEvent().runtimeType, activateFfpTab);
     _tabController.addListener(_handleTabSelection);
   }
-  bool checkPinAgain() {
-    var now = new DateTime.now().millisecondsSinceEpoch;
-    return (now - lastPinCheck > pinCheckTimeout) && backgroundSincePinCheck;
-  }
 
   void checkPin() async {
     String correctPin = await getPin();
     pinCheckOpen = true;
+
     bool pinIsCorrect = await Navigator.push(
-        context,
-        MaterialPageRoute(
-            builder: (context) => PinFieldNew(correctPin: correctPin)));
+      context,
+      MaterialPageRoute(
+        builder: (context) => PinFieldNew(correctPin: correctPin),
+      ),
+    );
+
     pinCheckOpen = false;
+
     if (pinIsCorrect == null || !pinIsCorrect) {
       _tabController.animateTo(_tabController.previousIndex);
     } else {
-      lastPinCheck = new DateTime.now().millisecondsSinceEpoch;
-      backgroundSincePinCheck = false;
+      lastCheck = new DateTime.now().millisecondsSinceEpoch;
+      timeoutExpiredInBackground = false;
     }
   }
 
   _handleTabSelection() async {
     if (_tabController.indexIsChanging) {
       if (Globals().router.pinRequired(_tabController.index) &&
-          checkPinAgain() && !pinCheckOpen) {
+          timeoutExpiredInBackground &&
+          !pinCheckOpen) {
         checkPin();
       }
 
@@ -113,18 +116,24 @@ class _HomeScreenState extends State<HomeScreen>
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
-      if(pinCheckOpen){
+      if (pinCheckOpen) {
         return;
       }
-      backgroundSincePinCheck = true;
+
+      var timeSpendWithPausedApp =
+          new DateTime.now().millisecondsSinceEpoch - lastCheck;
+
+      if (timeSpendWithPausedApp >= pinCheckTimeout) {
+        timeoutExpiredInBackground = true;
+      }
+
       if (Globals().router.pinRequired(_tabController.index) &&
-          checkPinAgain()) {
+          timeoutExpiredInBackground) {
         checkPin();
       }
     } else if (state == AppLifecycleState.inactive) {
-      // app is inactive
     } else if (state == AppLifecycleState.paused) {
-      // user is about quit our app temporally
+      lastCheck = new DateTime.now().millisecondsSinceEpoch;
     }
   }
 
