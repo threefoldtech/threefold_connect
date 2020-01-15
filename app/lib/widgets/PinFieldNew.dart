@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:local_auth/local_auth.dart';
 import 'package:threebotlogin/helpers/HexColor.dart';
+import 'package:threebotlogin/services/fingerprintService.dart';
+import 'package:threebotlogin/services/userService.dart';
 import 'package:threebotlogin/widgets/CustomDialog.dart';
 
 //@todo PinFieldNewnew should replace PinFieldNew
@@ -16,6 +19,19 @@ class PinFieldNew extends StatefulWidget {
 class _PinFieldNewState extends State<PinFieldNew> {
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) => checkFingerprint());
+  }
+
+  checkFingerprint() async {
+    bool isFingerprintEnabled = await getFingerprint();
+
+    if (isFingerprintEnabled) {
+      bool isAuthenticated = await authenticate();
+
+      if (isAuthenticated) {
+        Navigator.pop(context, true);
+      }
+    }
   }
 
   List<String> input = List();
@@ -130,7 +146,7 @@ class _PinFieldNewState extends State<PinFieldNew> {
     return Scaffold(
         appBar: new AppBar(
             backgroundColor: HexColor("#2d4052"),
-            title: Text("Enter pincode"),
+            title: Text("Authenticate"),
             elevation: 0.0,
             automaticallyImplyLeading: true),
         body: Container(
@@ -140,7 +156,7 @@ class _PinFieldNewState extends State<PinFieldNew> {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: <Widget>[
                 Container(
-                  child: Text("Please enter pincode to access the wallet"),
+                  child: Text("Please authenticate to access the wallet"),
                   padding: const EdgeInsets.only(bottom: 50),
                 ), //@todo text should be variable; also use app names
                 Container(
