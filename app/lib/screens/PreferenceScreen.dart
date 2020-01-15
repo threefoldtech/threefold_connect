@@ -4,7 +4,6 @@ import 'package:package_info/package_info.dart';
 import 'package:threebotlogin/AppConfig.dart';
 import 'package:threebotlogin/Events/CloseSocketEvent.dart';
 import 'package:threebotlogin/Events/Events.dart';
-import 'package:threebotlogin/helpers/EnvConfig.dart';
 import 'package:threebotlogin/helpers/Environment.dart';
 import 'package:threebotlogin/helpers/Globals.dart';
 import 'package:threebotlogin/helpers/HexColor.dart';

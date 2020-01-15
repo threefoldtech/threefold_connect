@@ -4,7 +4,6 @@ import 'dart:io';
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:threebotlogin/Events/Events.dart';
-import 'package:threebotlogin/Events/NewLoginEvent.dart';
 import 'package:threebotlogin/Events/PopAllLoginEvent.dart';
 import 'package:threebotlogin/services/fingerprintService.dart';
 import 'package:threebotlogin/services/toolsService.dart';

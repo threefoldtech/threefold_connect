@@ -1,12 +1,9 @@
 import 'dart:io';
-import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:package_info/package_info.dart';
 import 'package:threebotlogin/AppConfig.dart';
-import 'package:threebotlogin/main.dart';
 import 'dart:convert';
 
-import 'package:threebotlogin/screens/ErrorScreen.dart';
 import 'package:threebotlogin/services/cryptoService.dart';
 import 'package:threebotlogin/services/userService.dart';
 
