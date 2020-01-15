@@ -34,7 +34,7 @@ class _HomeScreenState extends State<HomeScreen>
   bool timeoutExpiredInBackground = true;
   bool pinCheckOpen = false;
   int lastCheck = 0;
-  final int pinCheckTimeout = 60000 * 5;
+  final int pinCheckTimeout = 10000 * 1;
 
   _HomeScreenState() {
     _tabController = TabController(
@@ -128,7 +128,9 @@ class _HomeScreenState extends State<HomeScreen>
 
       if (Globals().router.pinRequired(_tabController.index) &&
           timeoutExpiredInBackground) {
-        checkPin();
+        // checkPin();
+        int homeTab = 0;
+        _tabController.animateTo(homeTab);
       }
     } else if (state == AppLifecycleState.inactive) {
     } else if (state == AppLifecycleState.paused) {
