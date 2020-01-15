@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:threebotlogin/AppConfig.dart';
 import 'package:threebotlogin/Events/Events.dart';
+import 'package:threebotlogin/helpers/Environment.dart';
 import 'package:threebotlogin/helpers/Globals.dart';
 import 'package:threebotlogin/screens/HomeScreen.dart';
 import 'package:threebotlogin/screens/InitScreen.dart';
@@ -32,54 +33,32 @@ class _AppState extends State<MainScreen> {
   String initialLink;
   BackendConnection _backendConnection;
 
+  @override
+  void initState() {
+    super.initState();
+    Events().reset();
+    initUniLinks();
+    WidgetsBinding.instance.addPostFrameCallback((_) => pushScreens());
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    ErrorWidget.builder = (FlutterErrorDetails errorDetails) {
+      return getErrorWidget(context, errorDetails);
+    };
+
+    return Container();
+  }
+
   pushScreens() async {
-    // Internet connection check. 
-    try {
-      final result = await InternetAddress.lookup('google.com');
-      if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
-        print('connected to the internet');
-      }
-    } on SocketException catch (_) {
-      var dialog = CustomDialog(
-          title: "No internet connection available",
-          description: Text(
-            "Please enable your internet connection to use this app.",
-            textAlign: TextAlign.center,
-          ));
-      await dialog.show(context);
-      SystemNavigator.pop();
-    }
-
-    // Internet connection check to our servers.
-    try {
-      String baseUrl = AppConfig().baseUrl();
-      final result = await InternetAddress.lookup('$baseUrl');
-      if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
-        print('connected to the internet');
-      }
-    } on SocketException catch (_) {
-      var dialog = CustomDialog(
-          title: "Oops",
-          description: Text(
-            "Something went wrong, please try again. Contact support if this issue persists.",
-            textAlign: TextAlign.center,
-          ));
-      await dialog.show(context);
-      SystemNavigator.pop();
-    }
-
-    // Version check. TODO: Maybe add a button to open the app / playstore?
-    if(!await isAppUpToDate()) {
-      var dialog = CustomDialog(
-        title: "Update required",
-        description: Text(
-          "The app is outdated. Please, update it to the latest version.",
-          textAlign: TextAlign.center,
-      ));
-
-      await dialog.show(context);
-      SystemNavigator.pop();
-    }
+    checkInternetConnection();
+    checkInternetConnectionWithOurServers();
+    checkIfAppIsUpToDate();
 
     if (widget.initDone != null && !widget.initDone) {
       await Navigator.push(
@@ -95,8 +74,8 @@ class _AppState extends State<MainScreen> {
 
     _backendConnection = BackendConnection(await getDoubleName());
     _backendConnection.init();
-    if(_sub != null){
-    _sub.cancel();
+    if (_sub != null) {
+      _sub.cancel();
     }
 
     await Navigator.pushReplacement(
@@ -107,12 +86,57 @@ class _AppState extends State<MainScreen> {
                 )));
   }
 
-  @override
-  void initState() {
-    super.initState();
-    Events().reset();
-    initUniLinks();
-    WidgetsBinding.instance.addPostFrameCallback((_) => pushScreens());
+  checkInternetConnection() async {
+    try {
+      final result = await InternetAddress.lookup('google.com');
+      if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
+        print('connected to the internet');
+      }
+    } on SocketException catch (_) {
+      var dialog = CustomDialog(
+          title: "No internet connection available",
+          description: Text(
+            "Please enable your internet connection to use this app.",
+            textAlign: TextAlign.center,
+          ));
+      await dialog.show(context);
+      SystemNavigator.pop();
+    }
+  }
+
+  checkInternetConnectionWithOurServers() async {
+    if (AppConfig().environment != Environment.Local) {
+      try {
+        String baseUrl = AppConfig().baseUrl();
+        final result = await InternetAddress.lookup('$baseUrl');
+        if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
+          print('connected to the internet');
+        }
+      } on SocketException catch (_) {
+        var dialog = CustomDialog(
+            title: "Oops",
+            description: Text(
+              "Something went wrong, please try again. Contact support if this issue persists.",
+              textAlign: TextAlign.center,
+            ));
+        await dialog.show(context);
+        SystemNavigator.pop();
+      }
+    }
+  }
+
+  checkIfAppIsUpToDate() async {
+    if (!await isAppUpToDate()) {
+      var dialog = CustomDialog(
+          title: "Update required",
+          description: Text(
+            "The app is outdated. Please, update it to the latest version.",
+            textAlign: TextAlign.center,
+          ));
+
+      await dialog.show(context);
+      SystemNavigator.pop();
+    }
   }
 
   Future<Null> initUniLinks() async {
@@ -124,19 +148,5 @@ class _AppState extends State<MainScreen> {
       }
       initialLink = incomingLink;
     });
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    ErrorWidget.builder = (FlutterErrorDetails errorDetails) {
-      return getErrorWidget(context, errorDetails);
-    };
-
-    return Container();
   }
 }
