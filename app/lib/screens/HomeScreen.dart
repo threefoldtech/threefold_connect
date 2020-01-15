@@ -35,7 +35,7 @@ class _HomeScreenState extends State<HomeScreen>
   bool timeoutExpiredInBackground = true;
   bool pinCheckOpen = false;
   int lastCheck = 0;
-  final int pinCheckTimeout = 10000;
+  final int pinCheckTimeout = 60000 * 5;
 
   _HomeScreenState() {
     _tabController = TabController(
