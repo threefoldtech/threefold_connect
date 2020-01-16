@@ -104,7 +104,7 @@ class _ChangePinScreenState extends State<ChangePinScreen> {
           state = _State.Confirm;
           break;
         case _State.Confirm:
-          if (newPin == enteredPinCode) {
+          if (newPin == enteredPinCode && (wrongAttempts <= 3)) {
             state = _State.Done;
           } else {
             state = _State.NewPinWrong;
@@ -117,17 +117,17 @@ class _ChangePinScreenState extends State<ChangePinScreen> {
 
     var timePassed = currentTime - lastWrongAttempt;
 
-    if (wrongAttempts >= 3 &&
-        (timePassed < timeoutLockDelay) &&
-        state == _State.CurrentPinWrong) {
+    if (wrongAttempts > 3) {
       lastWrongAttempt = new DateTime.now().millisecondsSinceEpoch;
-      return;
-    } else if (wrongAttempts >= 3 && (timePassed >= timeoutLockDelay)) {
+    }
+
+    if (wrongAttempts > 3 && (timePassed >= timeoutLockDelay)) {
       wrongAttempts = 0;
     }
 
     if (state == _State.CurrentPinWrong) {
       wrongAttempts++;
+      lastWrongAttempt = new DateTime.now().millisecondsSinceEpoch;
     }
 
     if (state == _State.Done) {

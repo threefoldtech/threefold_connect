@@ -27,14 +27,6 @@ class _RegisteredScreenState extends State<RegisteredScreen>
   bool showSettings = false;
   bool showPreference = false;
 
-  void _openIeoLink() async {
-    const url = 'https://www.liquid.com/?affiliate=kmOSQysu714987';
-
-    if (await canLaunch(url)) {
-      await launch(url);
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Column(
