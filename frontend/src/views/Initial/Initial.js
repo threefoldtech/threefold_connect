@@ -35,7 +35,7 @@ export default {
     this.appid = this.$route.query.appid
     console.log(`this.$route.query.appid`, this.$route.query.appid)
     if (!this.appid) {
-      // this.$router.push({ name: 'error' })
+      this.$router.push({ name: 'error' })
     }
     console.log(this.$route)
     this.setAttemptCanceled(false)
