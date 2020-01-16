@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:threebotlogin/helpers/Globals.dart';
 import 'package:threebotlogin/services/3botService.dart';
 import 'package:threebotlogin/services/openKYCService.dart';
@@ -61,7 +62,7 @@ class _MobileRegistrationScreenState extends State<MobileRegistrationScreen> {
         _registrationData.email = emailController.text;
         state = _State.SeedPhrase;
       } else {
-        errorStepperText = "Enter Valid Email";
+        errorStepperText = "Please enter a valid email.";
       }
       Navigator.pop(context); // pop Loading
     });
@@ -80,17 +81,17 @@ class _MobileRegistrationScreenState extends State<MobileRegistrationScreen> {
           });
         } else {
           setState(() {
-            errorStepperText = 'Name already exists.';
+            errorStepperText = 'Sorry, this name is already in use.';
           });
         }
       } else {
         setState(() {
-          errorStepperText = 'Name needs to be alphanumeric';
+          errorStepperText = 'Please enter a valid name.';
         });
       }
     } else {
       setState(() {
-        errorStepperText = 'Name can\'t be empty';
+        errorStepperText = 'Please choose a name.';
       });
     }
     Navigator.pop(context);
@@ -113,7 +114,7 @@ class _MobileRegistrationScreenState extends State<MobileRegistrationScreen> {
       });
     } else {
       setState(() {
-        errorStepperText = 'Words are not correct.';
+        errorStepperText = 'Please enter the correct words.';
       });
     }
   }
@@ -278,6 +279,9 @@ class _MobileRegistrationScreenState extends State<MobileRegistrationScreen> {
                           suffixStyle: TextStyle(fontWeight: FontWeight.bold),
                         ),
                         controller: doubleNameController,
+                        inputFormatters: <TextInputFormatter>[
+                          WhitelistingTextInputFormatter(RegExp("[a-z0-9]"))
+                        ],
                       ),
                     ),
                     Row(
