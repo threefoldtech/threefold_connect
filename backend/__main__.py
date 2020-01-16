@@ -207,6 +207,11 @@ def mobile_registration_handler():
     if double_name == None or email == None or public_key == None or sid == None:
         return Response("Missing data", status=400)
     else:
+        # Email validation should be added
+
+        if len(double_name) > 55 and double_name.endswith(".3bot"):
+            return Response("doubleName exceeds length of 50 or does not contain .3bot", status=400)
+
         user = db.getUserByName(conn, double_name)
         if user is None:
             update_sql = "INSERT into users (double_name, sid, email, public_key) VALUES(?,?,?,?);"

@@ -6,6 +6,7 @@ import 'package:threebotlogin/services/openKYCService.dart';
 import 'package:threebotlogin/services/toolsService.dart';
 import 'package:threebotlogin/services/cryptoService.dart';
 import 'package:threebotlogin/services/userService.dart';
+import 'package:threebotlogin/widgets/CustomDialog.dart';
 import 'package:threebotlogin/widgets/ReusableTextStep.dart';
 import 'package:threebotlogin/widgets/ReuseableTextFieldStep.dart';
 
@@ -129,8 +130,24 @@ class _MobileRegistrationScreenState extends State<MobileRegistrationScreen> {
       Navigator.pop(context); // Remove loading screen
       Navigator.pop(context, true); // Pop this
     } else {
-      //Probably error?
-      print("ELSE????");
+      Navigator.pop(context); // Remove loading screen
+
+      showDialog(
+          context: context,
+          builder: (BuildContext context) => CustomDialog(
+                image: Icons.error,
+                title: 'Error',
+                description: Text(
+                    'Something went wrong when trying to create your account.'),
+                actions: <Widget>[
+                  FlatButton(
+                    child: Text('Ok'),
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                  )
+                ],
+              ));
     }
   }
 
@@ -270,6 +287,7 @@ class _MobileRegistrationScreenState extends State<MobileRegistrationScreen> {
                     Padding(
                       padding: const EdgeInsets.only(top: 8.5),
                       child: TextField(
+                        maxLength: 100,
                         autofocus: true,
                         keyboardType: TextInputType.text,
                         decoration: InputDecoration(
