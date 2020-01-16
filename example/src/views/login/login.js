@@ -23,6 +23,9 @@ export default {
     }
   },
   methods: {
+    async loginToDesktop () {
+      window.location.href = `https://dev.jimber.org/desktop`
+    },
     async login () {
       var state = randomstring.generate()
       window.localStorage.setItem('state', state)
