@@ -13,26 +13,27 @@ dependencies:
     sdk: flutter
   qr_code_scanner:
     git:
-      url: https://github.com/juliuscanute/qr_code_scanner
+      url: https://github.com/jimbertools/qr_code_scanner
   shared_preferences:
   http:
   flutter_sodium:
     git:
-      url: https://github.com/rmtmckenzie/flutter_sodium
+      url: https://github.com/jimbertools/flutter_sodium
   package_info:
   uni_links:
     git:
-      url: https://github.com/MathiasDeWeerdt/uni_links
+      url: https://github.com/jimbertools/uni_links
   flutter_inappwebview:
     git:
       url: https://github.com/jimbertools/flutter_inappwebview
-      ref: master
   cupertino_icons: ^0.1.2
   crypto: ^2.0.6
   bip39: ^1.0.3
   uuid: 2.0.4
   socket_io_client: ^0.9.7+1
-  keyboard_visibility: 0.5.0
+  keyboard_visibility:
+    git:
+      url: https://github.com/jimbertools/flutter_keyboard_visibility
   community_material_icon:
   local_auth: 0.6.0
   url_launcher:
