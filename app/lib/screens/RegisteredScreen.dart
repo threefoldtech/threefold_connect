@@ -40,21 +40,7 @@ class _RegisteredScreenState extends State<RegisteredScreen>
     return Column(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: <Widget>[
-        Row(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: <Widget>[
-            Padding(
-                padding: EdgeInsets.all(15),
-                child: GestureDetector(
-                  onTap: _openIeoLink,
-                  child: Image(
-                    image: AssetImage('assets/ieo.png'),
-                    width: 200,
-                    semanticLabel: "Initial Exchange Offering",
-                  ),
-                )),
-          ],
-        ),
+        SizedBox(height: 10.0),
         Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[

@@ -323,3 +323,5 @@ app/android/app/src/main/res/mipmap-xhdpi/ic_launcher.png
 app/android/app/src/main/res/mipmap-xxhdpi/ic_launcher.png
 app/android/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png
 app/android/app/src/debug/AndroidManifest.xml
+app/ios/Flutter/flutter_export_environment.sh
+app/.flutter-plugins-dependencies
