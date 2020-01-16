@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:threebotlogin/Apps/FreeFlowPages/FfpEvents.dart';
 import 'package:threebotlogin/Events/Events.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../AppConfig.dart';
 
@@ -26,28 +27,32 @@ class _RegisteredScreenState extends State<RegisteredScreen>
   bool showSettings = false;
   bool showPreference = false;
 
+  void _openIeoLink() async {
+    const url = 'https://www.liquid.com/?affiliate=kmOSQysu714987';
+
+    if (await canLaunch(url)) {
+      await launch(url);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: <Widget>[
         Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          mainAxisAlignment: MainAxisAlignment.start,
           children: <Widget>[
-            SizedBox(height: 50.0),
-            showPreference
-                ? FloatingActionButton(
-                    heroTag: "preference",
-                    elevation: 0.0,
-                    backgroundColor: Colors.transparent,
-                    foregroundColor: Theme.of(context).accentColor,
-                    child: Icon(Icons.settings),
-                    onPressed: () {
-                      setState(() {
-                        showPreference = true;
-                      });
-                    })
-                : Container()
+            Padding(
+                padding: EdgeInsets.all(15),
+                child: GestureDetector(
+                  onTap: _openIeoLink,
+                  child: Image(
+                    image: AssetImage('assets/ieo.png'),
+                    width: 200,
+                    semanticLabel: "Initial Exchange Offering",
+                  ),
+                )),
           ],
         ),
         Column(
@@ -120,16 +125,17 @@ class _RegisteredScreenState extends State<RegisteredScreen>
                       child: Text("TF IEO"),
                     ),
                   ],
-                ), 
-                Column( //2 News
+                ),
+                Column(
+                  //2 News
                   children: <Widget>[
                     FloatingActionButton(
                       heroTag: "tfnews",
                       backgroundColor: Colors.greenAccent,
                       elevation: 0,
                       child: CircleAvatar(
-                        backgroundImage:
-                            ExactAssetImage('assets/circle_images/tffamily.jpg'),
+                        backgroundImage: ExactAssetImage(
+                            'assets/circle_images/tffamily.jpg'),
                         minRadius: 90,
                         maxRadius: 150,
                       ),
@@ -144,15 +150,16 @@ class _RegisteredScreenState extends State<RegisteredScreen>
                     ),
                   ],
                 ),
-                Column( //3 tf grid
+                Column(
+                  //3 tf grid
                   children: <Widget>[
                     FloatingActionButton(
                       heroTag: "tfgrid",
                       backgroundColor: Colors.blueAccent,
                       elevation: 0,
                       child: CircleAvatar(
-                        backgroundImage: ExactAssetImage(
-                            'assets/circle_images/tfgrid.jpg'),
+                        backgroundImage:
+                            ExactAssetImage('assets/circle_images/tfgrid.jpg'),
                         minRadius: 90,
                         maxRadius: 150,
                       ),
@@ -167,7 +174,8 @@ class _RegisteredScreenState extends State<RegisteredScreen>
                     ),
                   ],
                 ),
-                Column( // 4
+                Column(
+                  // 4
                   children: <Widget>[
                     FloatingActionButton(
                       heroTag: "ffnation",
@@ -190,7 +198,8 @@ class _RegisteredScreenState extends State<RegisteredScreen>
                     ),
                   ],
                 ),
-                Column( // 5
+                Column(
+                  // 5
                   children: <Widget>[
                     FloatingActionButton(
                       heroTag: "3bot",
