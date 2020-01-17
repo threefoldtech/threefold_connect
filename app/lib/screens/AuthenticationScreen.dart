@@ -5,17 +5,19 @@ import 'package:threebotlogin/services/fingerprintService.dart';
 import 'package:threebotlogin/services/userService.dart';
 import 'package:threebotlogin/widgets/CustomDialog.dart';
 
-//@todo PinFieldNewnew should replace PinFieldNew
-
-class PinFieldNew extends StatefulWidget {
+class AuthenticationScreen extends StatefulWidget {
   final int pinLength = 4;
   final String correctPin;
+  final String userMessage;
 
-  PinFieldNew({this.correctPin});
-  _PinFieldNewState createState() => _PinFieldNewState();
+  @override
+  AuthenticationScreen({this.correctPin, this.userMessage});
+
+  @override
+  AuthenticationScreenState createState() => AuthenticationScreenState();
 }
 
-class _PinFieldNewState extends State<PinFieldNew> {
+class AuthenticationScreenState extends State<AuthenticationScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) => checkFingerprint());
@@ -145,7 +147,7 @@ class _PinFieldNewState extends State<PinFieldNew> {
     return Scaffold(
         appBar: new AppBar(
             backgroundColor: HexColor("#2d4052"),
-            title: Text("Authenticate"),
+            title: Text("Authentication"),
             elevation: 0.0,
             automaticallyImplyLeading: true),
         body: Container(
@@ -155,9 +157,9 @@ class _PinFieldNewState extends State<PinFieldNew> {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: <Widget>[
                 Container(
-                  child: Text("Please authenticate to access the wallet"),
+                  child: Text("Please authenticate to " + widget.userMessage),
                   padding: const EdgeInsets.only(bottom: 50),
-                ), //@todo text should be variable; also use app names
+                ),
                 Container(
                   alignment: Alignment.center,
                   color: Colors.white,
@@ -181,9 +183,8 @@ class _PinFieldNewState extends State<PinFieldNew> {
           description: Text("Your pincode is incorrect."));
       await dialog.show(context);
       setState(() {
-         input.removeRange(0, 4);
+        input.removeRange(0, 4);
       });
-     
     } else {
       Navigator.pop(context, pin == widget.correctPin);
     }

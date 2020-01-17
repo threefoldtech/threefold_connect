@@ -7,6 +7,7 @@ import 'package:threebotlogin/Events/Events.dart';
 import 'package:threebotlogin/helpers/Environment.dart';
 import 'package:threebotlogin/helpers/Globals.dart';
 import 'package:threebotlogin/helpers/HexColor.dart';
+import 'package:threebotlogin/screens/AuthenticationScreen.dart';
 import 'package:threebotlogin/screens/ChangePinScreen.dart';
 import 'package:threebotlogin/services/fingerprintService.dart';
 import 'package:threebotlogin/services/openKYCService.dart';
@@ -69,8 +70,8 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
     Navigator.push(
         context,
         MaterialPageRoute(
-            builder: (context) =>
-                ChangePinScreen(currentPin: pin, hideBackButton: false)));
+          builder: (context) => AuthenticationScreen(correctPin: pin),
+        ));
   }
 
   @override
@@ -127,8 +128,8 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
                   ),
                   leading: Icon(Icons.vpn_key),
                   title: Text("Show Phrase"),
-                  onTap: () {
-                    _chooseFunctionalityPhrase();
+                  onTap: () async {
+                    _showPhrase();
                   },
                 ),
               );
@@ -145,12 +146,8 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
               value: finger,
               title: Text("Fingerprint"),
               activeColor: Theme.of(context).accentColor,
-              onChanged: (bool newValue) {
-                setState(() {
-                  //logger.log('newvalue:', newValue, finger);
-                });
-
-                _chooseDialogFingerprint(newValue);
+              onChanged: (bool newValue) async {
+                _toggleFingerprint(newValue);
               },
             ),
           ),
@@ -159,8 +156,8 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
           child: ListTile(
             leading: Icon(Icons.lock),
             title: Text("Change pincode"),
-            onTap: () {
-              showChangePin();
+            onTap: () async {
+              _changePincode();
             },
           ),
         ),
@@ -169,34 +166,7 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
             leading: Icon(Icons.info_outline),
             title: Text("Version: " + version + " - " + buildNumber),
             onTap: () {
-              // Seems to be a weird way to access the environment.
-              try {
-                var appConfig = AppConfig();
-
-                if (appConfig.environment != Environment.Production) {
-                  showDialog(
-                    context: context,
-                    builder: (BuildContext context) => CustomDialog(
-                      image: Icons.perm_device_information,
-                      title: "Build information",
-                      description: Container(
-                        child: Text("Type: ${appConfig.environment}\nGit hash: ${appConfig.githash}\nTime: ${appConfig.time}"),
-                      ),
-                      actions: <Widget>[
-                        FlatButton(
-                          child: new Text("Ok"),
-                          onPressed: () {
-                            Navigator.pop(context);
-                            setState(() {});
-                          },
-                        ),
-                      ],
-                    ),
-                  );
-                }
-              } catch (Exception) {
-                // Doesn't matter, just needs to be caught.
-              }
+              _showVersionInfo();
             },
           ),
         ),
@@ -229,61 +199,6 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
   checkBiometrics() async {
     biometricsCheck = await checkBiometricsAvailable();
     return biometricsCheck;
-  }
-
-  void _chooseDialogFingerprint(isValue) async {
-    if (isValue) {
-      _showEnabledFingerprint();
-    } else {
-      _showPinDialog('fingerprint');
-    }
-  }
-
-  void _chooseFunctionalityPhrase() async {
-    bool fingerActive = await getFingerprint();
-    if (!fingerActive) {
-      _showPinDialog('phrase');
-    } else {
-      var isValue = await authenticate();
-      isValue ? _showPhrase() : _showPinDialog('phrase');
-      setState(() {
-        finger = true;
-      });
-    }
-  }
-
-  void _showEnabledFingerprint() {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) => CustomDialog(
-        image: Icons.error,
-        title: "Enable Fingerprint",
-        description: new Text(
-          "If you enable fingerprint, anyone who has a registered fingerprint on this device will have access to your account.",
-          textAlign: TextAlign.center,
-        ),
-        actions: <Widget>[
-          FlatButton(
-            child: new Text("Cancel"),
-            onPressed: () async {
-              Navigator.pop(context);
-              finger = false;
-              await saveFingerprint(false);
-              setState(() {});
-            },
-          ),
-          FlatButton(
-            child: new Text("Yes"),
-            onPressed: () async {
-              Navigator.pop(context);
-              finger = true;
-              await saveFingerprint(true);
-              setState(() {});
-            },
-          ),
-        ],
-      ),
-    );
   }
 
   void _showDisableFingerprint() {
@@ -343,10 +258,8 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
                 Events().emit(CloseSocketEvent());
                 bool result = await clearData();
                 if (result) {
-                  Navigator.pop(context); // pop pref
+                  Navigator.pop(context);
                   await Navigator.pushReplacement(
-                      // replace home
-                      //@todo this feels like a bug, should not push on current screen
                       context,
                       MaterialPageRoute(
                           builder: (context) =>
@@ -412,11 +325,8 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
       content: Text('Seedphrase copied to clipboard'),
       duration: Duration(seconds: 1),
     );
-    Scaffold.of(context).showSnackBar(seedCopied);
 
-    // _prefScaffold.currentState.showSnackBar(SnackBar(
-    //   content: Text('Seedphrase copied to clipboard'),
-    // ));
+    Scaffold.of(context).showSnackBar(seedCopied);
   }
 
   void checkPin(pin, callbackParam) async {
@@ -437,33 +347,6 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
       ));
     }
     setState(() {});
-  }
-
-  void _showPhrase() async {
-    final phrase = await getPhrase();
-
-    showDialog(
-      context: context,
-      builder: (BuildContext context) => CustomDialog(
-        hiddenaction: copySeedPhrase,
-        image: Icons.create,
-        title: "Please write this down on a piece of paper",
-        description: Text(
-          phrase.toString(),
-          textAlign: TextAlign.center,
-        ),
-        actions: <Widget>[
-          // usually buttons at the bottom of the dialog
-          FlatButton(
-            child: new Text("Close"),
-            onPressed: () {
-              Navigator.pop(context);
-              setState(() {});
-            },
-          ),
-        ],
-      ),
-    );
   }
 
   void getUserValues() {
@@ -494,5 +377,144 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
         }
       });
     });
+  }
+
+  void _showPhrase() async {
+    var pin = await getPin();
+
+    bool authenticated = await Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => AuthenticationScreen(
+            correctPin: pin,
+            userMessage: "show your phrase.",
+          ),
+        ));
+
+    if (authenticated != null && authenticated) {
+      final phrase = await getPhrase();
+
+      showDialog(
+        context: context,
+        builder: (BuildContext context) => CustomDialog(
+          hiddenaction: copySeedPhrase,
+          image: Icons.create,
+          title: "Please write this down on a piece of paper",
+          description: Text(
+            phrase.toString(),
+            textAlign: TextAlign.center,
+          ),
+          actions: <Widget>[
+            // usually buttons at the bottom of the dialog
+            FlatButton(
+              child: new Text("Close"),
+              onPressed: () {
+                Navigator.pop(context);
+                setState(() {});
+              },
+            ),
+          ],
+        ),
+      );
+    }
+  }
+
+  void _toggleFingerprint(bool newFingerprintValue) async {
+    var pin = await getPin();
+
+    bool authenticated = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => AuthenticationScreen(
+          correctPin: pin,
+          userMessage: "toggle fingerprint.",
+        ),
+      ),
+    );
+
+    if (authenticated != null && authenticated) {
+      finger = newFingerprintValue;
+      await saveFingerprint(newFingerprintValue);
+      setState(() {});
+    }
+  }
+
+  void _changePincode() async {
+    var pin = await getPin();
+
+    bool authenticated = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => AuthenticationScreen(
+          correctPin: pin,
+          userMessage: "change your pincode.",
+        ),
+      ),
+    );
+
+    if (authenticated != null && authenticated) {
+      bool pinChanged = await Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => ChangePinScreen(
+            currentPin: pin,
+            hideBackButton: false,
+          ),
+        ),
+      );
+
+      if (pinChanged != null && pinChanged) {
+        showDialog(
+          context: context,
+          builder: (BuildContext context) => CustomDialog(
+            image: Icons.check,
+            title: "Success",
+            description: new Text(
+              "Your pincode was successfully changed.",
+              textAlign: TextAlign.center,
+            ),
+            actions: <Widget>[
+              FlatButton(
+                child: new Text("Ok"),
+                onPressed: () async {
+                  Navigator.pop(context);
+                },
+              ),
+            ],
+          ),
+        );
+      }
+    }
+  }
+
+  void _showVersionInfo() {
+    try {
+      var appConfig = AppConfig();
+
+      if (appConfig.environment != Environment.Production) {
+        showDialog(
+          context: context,
+          builder: (BuildContext context) => CustomDialog(
+            image: Icons.perm_device_information,
+            title: "Build information",
+            description: Container(
+              child: Text(
+                  "Type: ${appConfig.environment}\nGit hash: ${appConfig.githash}\nTime: ${appConfig.time}"),
+            ),
+            actions: <Widget>[
+              FlatButton(
+                child: new Text("Ok"),
+                onPressed: () {
+                  Navigator.pop(context);
+                  setState(() {});
+                },
+              ),
+            ],
+          ),
+        );
+      }
+    } catch (Exception) {
+      // Doesn't matter, just needs to be caught.
+    }
   }
 }

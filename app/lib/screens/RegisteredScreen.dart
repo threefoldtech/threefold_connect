@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:threebotlogin/Apps/FreeFlowPages/FfpEvents.dart';
 import 'package:threebotlogin/Events/Events.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 import '../AppConfig.dart';
 

@@ -36,10 +36,9 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   String helperText = '';
-  String scopeTextMobile =
-      'Please select the data you want to share and press Accept';
-  String scopeText =
-      'Please select the data you want to share and press the corresponding emoji';
+
+  String scopeTextMobile = 'Please select the data you want to share and press Accept';
+  String scopeText = 'Please select the data you want to share and press the corresponding emoji';
 
   List<int> imageList = new List();
   Map scope = Map();
@@ -85,17 +84,13 @@ class _LoginScreenState extends State<LoginScreen> {
     } else {
       checkFingerPrintActive();
     }
-    // Events().onEvent(NewLoginEvent().runtimeType, _newLogin);
   }
 
   void generateEmojiImageList() {
-    // Parse correct emoji image id that comes from our API.
     correctImage = parseImageId(widget.message['randomImageId']);
 
-    // Add it to the list
     imageList.add(correctImage);
 
-    // Generate 3 other random emoji image ids
     int generated = 1;
     var rng = new Random();
     while (generated <= 3) {
@@ -106,7 +101,6 @@ class _LoginScreenState extends State<LoginScreen> {
       }
     }
 
-    // Shuffle the list
     setState(() {
       imageList.shuffle();
     });
@@ -119,11 +113,10 @@ class _LoginScreenState extends State<LoginScreen> {
       bool isAuthenticated = await authenticate();
 
       if (isAuthenticated) {
-        // Show scopes + emmoji
         return finishLogin();
       }
     }
-    // Show Pinfield
+
     goToPinfield();
   }
 
@@ -412,8 +405,8 @@ class _LoginScreenState extends State<LoginScreen> {
       print(exception);
     }
 
-    var data =
-        await encrypt(jsonEncode(tmpScope), publicKey, await getPrivateKey());
+    var data = await encrypt(jsonEncode(tmpScope), publicKey, await getPrivateKey());
+    
     //push to backend with signed
     if (!includeData) {
       await sendData(state, "", null, selectedImageId, null); // temp fix send empty data for regenerate emoji

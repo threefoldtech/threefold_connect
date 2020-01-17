@@ -23,25 +23,21 @@ class _ChangePinScreenState extends State<ChangePinScreen> {
   int lastWrongAttempt = 0;
 
   _ChangePinScreenState({this.currentPin}) {
-    state = currentPin == null ? _State.NewPin : _State.CurrentPin;
+    state = _State.NewPin;
   }
 
   getText() {
-    int currentTime = new DateTime.now().millisecondsSinceEpoch;
+    // int currentTime = new DateTime.now().millisecondsSinceEpoch;
 
-    var timePassed = currentTime - lastWrongAttempt;
+    // var timePassed = currentTime - lastWrongAttempt;
 
-    if (wrongAttempts >= 3 && (timePassed < timeoutLockDelay)) {
-      return "Too many attempts, try again in ${(timeoutLockDelay - timePassed) / 1000} seconds.";
-    }
+    // if (wrongAttempts >= 3 && (timePassed < timeoutLockDelay)) {
+    //   return "Too many attempts, try again in ${(timeoutLockDelay - timePassed) / 1000} seconds.";
+    // }
 
     switch (state) {
-      case _State.CurrentPin:
-        return "Please enter your current PIN";
-      case _State.CurrentPinWrong:
-        return "The PIN you entered was not correct, enter your current PIN";
       case _State.NewPinWrong:
-        return "The PIN did not match. Enter your new PIN";
+        return "Confirmation incorrect, Please enter your new PIN";
       case _State.NewPin:
         return "Please enter your new PIN";
       case _State.Confirm:
@@ -90,21 +86,13 @@ class _ChangePinScreenState extends State<ChangePinScreen> {
   Future<void> changePin(enteredPinCode) async {
     setState(() {
       switch (state) {
-        case _State.CurrentPinWrong:
-        case _State.CurrentPin:
-          if (enteredPinCode == currentPin) {
-            state = _State.NewPin;
-          } else {
-            state = _State.CurrentPinWrong;
-          }
-          break;
         case _State.NewPinWrong:
         case _State.NewPin:
           newPin = enteredPinCode;
           state = _State.Confirm;
           break;
         case _State.Confirm:
-          if (newPin == enteredPinCode && (wrongAttempts <= 3)) {
+          if (newPin == enteredPinCode) {
             state = _State.Done;
           } else {
             state = _State.NewPinWrong;
@@ -113,26 +101,26 @@ class _ChangePinScreenState extends State<ChangePinScreen> {
       }
     });
 
-    var currentTime = new DateTime.now().millisecondsSinceEpoch;
+    // var currentTime = new DateTime.now().millisecondsSinceEpoch;
 
-    var timePassed = currentTime - lastWrongAttempt;
+    // var timePassed = currentTime - lastWrongAttempt;
 
-    if (wrongAttempts > 3) {
-      lastWrongAttempt = new DateTime.now().millisecondsSinceEpoch;
-    }
+    // if (wrongAttempts > 3) {
+    //   lastWrongAttempt = new DateTime.now().millisecondsSinceEpoch;
+    // }
 
-    if (wrongAttempts > 3 && (timePassed >= timeoutLockDelay)) {
-      wrongAttempts = 0;
-    }
+    // if (wrongAttempts > 3 && (timePassed >= timeoutLockDelay)) {
+    //   wrongAttempts = 0;
+    // }
 
-    if (state == _State.CurrentPinWrong) {
-      wrongAttempts++;
-      lastWrongAttempt = new DateTime.now().millisecondsSinceEpoch;
-    }
+    // if (state == _State.CurrentPinWrong) {
+    //   wrongAttempts++;
+    //   lastWrongAttempt = new DateTime.now().millisecondsSinceEpoch;
+    // }
 
     if (state == _State.Done) {
       await savePin(enteredPinCode);
-      Navigator.pop(context);
+      Navigator.pop(context, true);
     }
   }
 }

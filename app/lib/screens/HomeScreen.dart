@@ -10,11 +10,11 @@ import 'package:threebotlogin/Events/NewLoginEvent.dart';
 import 'package:threebotlogin/Events/UniLinkEvent.dart';
 import 'package:threebotlogin/helpers/Globals.dart';
 import 'package:threebotlogin/helpers/HexColor.dart';
+import 'package:threebotlogin/screens/AuthenticationScreen.dart';
 import 'package:threebotlogin/services/UniLinkService.dart';
 import 'package:threebotlogin/services/socketService.dart';
 import 'package:threebotlogin/services/userService.dart';
 import 'package:threebotlogin/widgets/EmailVerificationNeeded.dart';
-import 'package:threebotlogin/widgets/PinFieldNew.dart';
 import 'package:uni_links/uni_links.dart';
 
 /* Screen shows tabbar and all pages defined in router.dart */
@@ -50,7 +50,7 @@ class _HomeScreenState extends State<HomeScreen>
     bool pinIsCorrect = await Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => PinFieldNew(correctPin: correctPin),
+        builder: (context) => AuthenticationScreen(correctPin: correctPin),
       ),
     );
 
