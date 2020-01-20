@@ -94,7 +94,7 @@ Future openLogin(context, data) async {
     var loggedIn = await Navigator.push(
         context, MaterialPageRoute(builder: (context) => LoginScreen(data)));
 
-    if (loggedIn) {
+    if (loggedIn != null && loggedIn) {
       await Navigator.push(
           context,
           MaterialPageRoute(

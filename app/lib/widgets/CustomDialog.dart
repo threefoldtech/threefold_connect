@@ -16,6 +16,7 @@ class CustomDialog extends StatelessWidget {
     this.image = Icons.person,
     this.hiddenaction,
   });
+  
   show(context) {
     return showDialog(
       context: context,

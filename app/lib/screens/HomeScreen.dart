@@ -34,7 +34,7 @@ class _HomeScreenState extends State<HomeScreen>
   bool timeoutExpiredInBackground = true;
   bool pinCheckOpen = false;
   int lastCheck = 0;
-  final int pinCheckTimeout = 60000 * 5;
+  final int pinCheckTimeout = 10000;
 
   _HomeScreenState() {
     _tabController = TabController(
@@ -43,24 +43,27 @@ class _HomeScreenState extends State<HomeScreen>
     _tabController.addListener(_handleTabSelection);
   }
 
-  void checkPin() async {
-    String correctPin = await getPin();
+  void checkPin(int indexIfAuthIsSuccess) async {
+    var pin = await getPin();
+
     pinCheckOpen = true;
 
-    bool pinIsCorrect = await Navigator.push(
+    bool authenticated = await Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => AuthenticationScreen(correctPin: correctPin),
+        builder: (context) => AuthenticationScreen(
+          correctPin: pin,
+          userMessage: "access the wallet.",
+        ),
       ),
     );
 
     pinCheckOpen = false;
 
-    if (pinIsCorrect == null || !pinIsCorrect) {
-      _tabController.animateTo(_tabController.previousIndex);
-    } else {
+    if (authenticated != null && authenticated) {
       lastCheck = new DateTime.now().millisecondsSinceEpoch;
       timeoutExpiredInBackground = false;
+      _tabController.animateTo(indexIfAuthIsSuccess);
     }
   }
 
@@ -69,7 +72,10 @@ class _HomeScreenState extends State<HomeScreen>
       if (Globals().router.pinRequired(_tabController.index) &&
           timeoutExpiredInBackground &&
           !pinCheckOpen) {
-        checkPin();
+        int authenticatedAppIndex = _tabController.index;
+        _tabController.animateTo(_tabController.previousIndex);
+
+        checkPin(authenticatedAppIndex);
       }
 
       if (Globals().router.emailMustBeVerified(_tabController.index) &&
@@ -128,7 +134,6 @@ class _HomeScreenState extends State<HomeScreen>
 
       if (Globals().router.pinRequired(_tabController.index) &&
           timeoutExpiredInBackground) {
-        // checkPin();
         int homeTab = 0;
         _tabController.animateTo(homeTab);
       }
