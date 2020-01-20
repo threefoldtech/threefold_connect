@@ -18,23 +18,12 @@ class _ChangePinScreenState extends State<ChangePinScreen> {
   final currentPin;
   var newPin;
   var state;
-  int wrongAttempts = 0;
-  int timeoutLockDelay = 5000;
-  int lastWrongAttempt = 0;
 
   _ChangePinScreenState({this.currentPin}) {
     state = _State.NewPin;
   }
 
   getText() {
-    // int currentTime = new DateTime.now().millisecondsSinceEpoch;
-
-    // var timePassed = currentTime - lastWrongAttempt;
-
-    // if (wrongAttempts >= 3 && (timePassed < timeoutLockDelay)) {
-    //   return "Too many attempts, try again in ${(timeoutLockDelay - timePassed) / 1000} seconds.";
-    // }
-
     switch (state) {
       case _State.NewPinWrong:
         return "Confirmation incorrect, Please enter your new PIN";
@@ -100,23 +89,6 @@ class _ChangePinScreenState extends State<ChangePinScreen> {
           break;
       }
     });
-
-    // var currentTime = new DateTime.now().millisecondsSinceEpoch;
-
-    // var timePassed = currentTime - lastWrongAttempt;
-
-    // if (wrongAttempts > 3) {
-    //   lastWrongAttempt = new DateTime.now().millisecondsSinceEpoch;
-    // }
-
-    // if (wrongAttempts > 3 && (timePassed >= timeoutLockDelay)) {
-    //   wrongAttempts = 0;
-    // }
-
-    // if (state == _State.CurrentPinWrong) {
-    //   wrongAttempts++;
-    //   lastWrongAttempt = new DateTime.now().millisecondsSinceEpoch;
-    // }
 
     if (state == _State.Done) {
       await savePin(enteredPinCode);

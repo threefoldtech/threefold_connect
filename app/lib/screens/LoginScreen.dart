@@ -4,7 +4,6 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:threebotlogin/Events/Events.dart';
 import 'package:threebotlogin/Events/PopAllLoginEvent.dart';
-import 'package:threebotlogin/screens/AuthenticationScreen.dart';
 import 'package:threebotlogin/services/toolsService.dart';
 import 'package:threebotlogin/widgets/ImageButton.dart';
 import 'package:threebotlogin/services/userService.dart';
@@ -75,7 +74,7 @@ class _LoginScreenState extends State<LoginScreen> {
     //   return;
     // }
 
-    _authenticationProcess();
+    finishLogin();
   }
 
   void generateEmojiImageList() {
@@ -96,21 +95,6 @@ class _LoginScreenState extends State<LoginScreen> {
     setState(() {
       imageList.shuffle();
     });
-  }
-
-  void _authenticationProcess() async {
-    var pin = await getPin();
-
-    bool authenticated = await Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => AuthenticationScreen(
-              correctPin: pin, userMessage: "sign your attempt"),
-        ));
-
-    if (authenticated != null && authenticated) {
-      finishLogin();
-    }
   }
 
   bool isRequired(value, givenScope) {

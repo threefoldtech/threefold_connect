@@ -8,6 +8,9 @@ class Globals {
   ValueNotifier<bool> emailVerified = ValueNotifier(false);
   final Router router = new Router();
 
+  bool tooManyAuthenticationAttempts = false;
+  int lockedUntill = 0;
+
   /* Singleton */
   static final Globals _singleton = new Globals._internal();
   factory Globals() {
