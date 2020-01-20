@@ -22,7 +22,6 @@ class AuthenticationScreen extends StatefulWidget {
 
 class AuthenticationScreenState extends State<AuthenticationScreen> {
   int timeout = 30000;
-  int incorrectPincodeAttempts = 0;
   Globals globals = Globals();
 
   void initState() {
@@ -188,26 +187,27 @@ class AuthenticationScreenState extends State<AuthenticationScreen> {
 
     int currentTime = new DateTime.now().millisecondsSinceEpoch;
 
-    if (incorrectPincodeAttempts >= 3 &&
+    if (globals.incorrectPincodeAttempts >= 3 &&
         (globals.tooManyAuthenticationAttempts &&
             globals.lockedUntill < currentTime)) {
       globals.tooManyAuthenticationAttempts = false;
       globals.lockedUntill = 0;
-      incorrectPincodeAttempts = 0;
+      globals.incorrectPincodeAttempts = 0;
     }
 
     if (pin == widget.correctPin && !globals.tooManyAuthenticationAttempts) {
+      globals.incorrectPincodeAttempts = 0;
       Navigator.pop(context, pin == widget.correctPin);
       return;
     }
 
     if (pin != widget.correctPin) {
-      incorrectPincodeAttempts++;
+      globals.incorrectPincodeAttempts++;
     }
 
     var dialog;
 
-    if (incorrectPincodeAttempts >= 3 ||
+    if (globals.incorrectPincodeAttempts >= 3 ||
         (globals.tooManyAuthenticationAttempts &&
             globals.lockedUntill >= currentTime)) {
       if (!globals.tooManyAuthenticationAttempts) {
