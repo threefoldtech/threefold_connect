@@ -20,16 +20,13 @@ class _ChangePinScreenState extends State<ChangePinScreen> {
   var state;
 
   _ChangePinScreenState({this.currentPin}) {
-    state = currentPin == null ? _State.NewPin : _State.CurrentPin;
+    state = _State.NewPin;
   }
+
   getText() {
     switch (state) {
-      case _State.CurrentPin:
-        return "Please enter your current PIN";
-      case _State.CurrentPinWrong:
-        return "The PIN you entered was not correct, enter your current PIN";
       case _State.NewPinWrong:
-        return "The PIN did not match. Enter your new PIN";
+        return "Confirmation incorrect, Please enter your new PIN";
       case _State.NewPin:
         return "Please enter your new PIN";
       case _State.Confirm:
@@ -78,14 +75,6 @@ class _ChangePinScreenState extends State<ChangePinScreen> {
   Future<void> changePin(enteredPinCode) async {
     setState(() {
       switch (state) {
-        case _State.CurrentPinWrong:
-        case _State.CurrentPin:
-          if (enteredPinCode == currentPin) {
-            state = _State.NewPin;
-          } else {
-            state = _State.CurrentPinWrong;
-          }
-          break;
         case _State.NewPinWrong:
         case _State.NewPin:
           newPin = enteredPinCode;
@@ -100,9 +89,10 @@ class _ChangePinScreenState extends State<ChangePinScreen> {
           break;
       }
     });
+
     if (state == _State.Done) {
       await savePin(enteredPinCode);
-      Navigator.pop(context);
+      Navigator.pop(context, true);
     }
   }
 }

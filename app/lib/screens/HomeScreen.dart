@@ -10,11 +10,11 @@ import 'package:threebotlogin/Events/NewLoginEvent.dart';
 import 'package:threebotlogin/Events/UniLinkEvent.dart';
 import 'package:threebotlogin/helpers/Globals.dart';
 import 'package:threebotlogin/helpers/HexColor.dart';
+import 'package:threebotlogin/screens/AuthenticationScreen.dart';
 import 'package:threebotlogin/services/UniLinkService.dart';
 import 'package:threebotlogin/services/socketService.dart';
 import 'package:threebotlogin/services/userService.dart';
 import 'package:threebotlogin/widgets/EmailVerificationNeeded.dart';
-import 'package:threebotlogin/widgets/PinFieldNew.dart';
 import 'package:uni_links/uni_links.dart';
 
 /* Screen shows tabbar and all pages defined in router.dart */
@@ -43,24 +43,27 @@ class _HomeScreenState extends State<HomeScreen>
     _tabController.addListener(_handleTabSelection);
   }
 
-  void checkPin() async {
-    String correctPin = await getPin();
+  void checkPin(int indexIfAuthIsSuccess) async {
+    var pin = await getPin();
+
     pinCheckOpen = true;
 
-    bool pinIsCorrect = await Navigator.push(
+    bool authenticated = await Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => PinFieldNew(correctPin: correctPin),
+        builder: (context) => AuthenticationScreen(
+          correctPin: pin,
+          userMessage: "access the wallet.",
+        ),
       ),
     );
 
     pinCheckOpen = false;
 
-    if (pinIsCorrect == null || !pinIsCorrect) {
-      _tabController.animateTo(_tabController.previousIndex);
-    } else {
+    if (authenticated != null && authenticated) {
       lastCheck = new DateTime.now().millisecondsSinceEpoch;
       timeoutExpiredInBackground = false;
+      _tabController.animateTo(indexIfAuthIsSuccess);
     }
   }
 
@@ -69,7 +72,10 @@ class _HomeScreenState extends State<HomeScreen>
       if (Globals().router.pinRequired(_tabController.index) &&
           timeoutExpiredInBackground &&
           !pinCheckOpen) {
-        checkPin();
+        int authenticatedAppIndex = _tabController.index;
+        _tabController.animateTo(_tabController.previousIndex);
+
+        checkPin(authenticatedAppIndex);
       }
 
       if (Globals().router.emailMustBeVerified(_tabController.index) &&
@@ -128,7 +134,6 @@ class _HomeScreenState extends State<HomeScreen>
 
       if (Globals().router.pinRequired(_tabController.index) &&
           timeoutExpiredInBackground) {
-        // checkPin();
         int homeTab = 0;
         _tabController.animateTo(homeTab);
       }

@@ -1,21 +1,29 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:threebotlogin/helpers/Globals.dart';
 import 'package:threebotlogin/helpers/HexColor.dart';
 import 'package:threebotlogin/services/fingerprintService.dart';
 import 'package:threebotlogin/services/userService.dart';
 import 'package:threebotlogin/widgets/CustomDialog.dart';
 
-//@todo PinFieldNewnew should replace PinFieldNew
-
-class PinFieldNew extends StatefulWidget {
+class AuthenticationScreen extends StatefulWidget {
   final int pinLength = 4;
   final String correctPin;
+  final String userMessage;
 
-  PinFieldNew({this.correctPin});
-  _PinFieldNewState createState() => _PinFieldNewState();
+  @override
+  AuthenticationScreen({this.correctPin, this.userMessage});
+
+  @override
+  AuthenticationScreenState createState() => AuthenticationScreenState();
 }
 
-class _PinFieldNewState extends State<PinFieldNew> {
+class AuthenticationScreenState extends State<AuthenticationScreen> {
+  int timeout = 30000;
+  Globals globals = Globals();
+
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) => checkFingerprint());
@@ -145,7 +153,7 @@ class _PinFieldNewState extends State<PinFieldNew> {
     return Scaffold(
         appBar: new AppBar(
             backgroundColor: HexColor("#2d4052"),
-            title: Text("Authenticate"),
+            title: Text("Authentication"),
             elevation: 0.0,
             automaticallyImplyLeading: true),
         body: Container(
@@ -155,9 +163,9 @@ class _PinFieldNewState extends State<PinFieldNew> {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: <Widget>[
                 Container(
-                  child: Text("Please authenticate to access the wallet"),
+                  child: Text("Please authenticate to " + widget.userMessage),
                   padding: const EdgeInsets.only(bottom: 50),
-                ), //@todo text should be variable; also use app names
+                ),
                 Container(
                   alignment: Alignment.center,
                   color: Colors.white,
@@ -173,20 +181,57 @@ class _PinFieldNewState extends State<PinFieldNew> {
 
   Future<void> onOk() async {
     HapticFeedback.mediumImpact();
+
     String pin = "";
     input.forEach((char) => pin += char);
-    if (pin != widget.correctPin) {
-      var dialog = CustomDialog(
-          title: "Incorrect pin",
-          description: Text("Your pincode is incorrect."));
-      await dialog.show(context);
-      setState(() {
-         input.removeRange(0, 4);
-      });
-     
-    } else {
-      Navigator.pop(context, pin == widget.correctPin);
+
+    int currentTime = new DateTime.now().millisecondsSinceEpoch;
+
+    if (globals.incorrectPincodeAttempts >= 3 &&
+        (globals.tooManyAuthenticationAttempts &&
+            globals.lockedUntill < currentTime)) {
+      globals.tooManyAuthenticationAttempts = false;
+      globals.lockedUntill = 0;
+      globals.incorrectPincodeAttempts = 0;
     }
+
+    if (pin == widget.correctPin && !globals.tooManyAuthenticationAttempts) {
+      globals.incorrectPincodeAttempts = 0;
+      Navigator.pop(context, pin == widget.correctPin);
+      return;
+    }
+
+    if (pin != widget.correctPin) {
+      globals.incorrectPincodeAttempts++;
+    }
+
+    var dialog;
+
+    if (globals.incorrectPincodeAttempts >= 3 ||
+        (globals.tooManyAuthenticationAttempts &&
+            globals.lockedUntill >= currentTime)) {
+      if (!globals.tooManyAuthenticationAttempts) {
+        globals.tooManyAuthenticationAttempts = true;
+        globals.lockedUntill = currentTime + timeout;
+      }
+
+      dialog = CustomDialog(
+        title: "Too many attempts",
+        description: Text(
+            "Too many incorrect attempts, please wait ${((globals.lockedUntill - currentTime) / 1000).toStringAsFixed(0)} seconds"),
+      );
+    } else {
+      dialog = CustomDialog(
+        title: "Incorrect pin",
+        description: Text("Your pincode is incorrect."),
+      );
+    }
+
+    await dialog.show(context);
+
+    setState(() {
+      input.removeRange(0, 4);
+    });
   }
 
   void onClear() {

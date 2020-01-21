@@ -1,14 +1,11 @@
 import 'dart:collection';
 import 'dart:convert';
-import 'dart:io';
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:threebotlogin/Events/Events.dart';
 import 'package:threebotlogin/Events/PopAllLoginEvent.dart';
-import 'package:threebotlogin/services/fingerprintService.dart';
 import 'package:threebotlogin/services/toolsService.dart';
 import 'package:threebotlogin/widgets/ImageButton.dart';
-import 'package:threebotlogin/widgets/PinField.dart';
 import 'package:threebotlogin/services/userService.dart';
 import 'package:threebotlogin/services/cryptoService.dart';
 import 'package:threebotlogin/services/3botService.dart';
@@ -36,6 +33,7 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   String helperText = '';
+
   String scopeTextMobile =
       'Please select the data you want to share and press Accept';
   String scopeText =
@@ -48,7 +46,6 @@ class _LoginScreenState extends State<LoginScreen> {
   int correctImage = -1;
 
   bool cancelBtnVisible = false;
-  bool showPinfield = false;
   bool showScopeAndEmoji = false;
   bool isMobileCheck = false;
   String emitCode = randomString(10);
@@ -70,32 +67,21 @@ class _LoginScreenState extends State<LoginScreen> {
     isMobileCheck = checkMobile();
 
     makePermissionPrefs();
-
-    // Generate EmojiList
     generateEmojiImageList();
 
-    if (widget.autoLogin) {
-      sendIt(true);
-      return;
-    }
+    // if (widget.autoLogin) {
+    //   sendIt(true);
+    //   return;
+    // }
 
-    if (Platform.isIOS) {
-      goToPinfield();
-      checkFingerPrintActive();
-    } else {
-      checkFingerPrintActive();
-    }
-    // Events().onEvent(NewLoginEvent().runtimeType, _newLogin);
+    finishLogin();
   }
 
   void generateEmojiImageList() {
-    // Parse correct emoji image id that comes from our API.
     correctImage = parseImageId(widget.message['randomImageId']);
 
-    // Add it to the list
     imageList.add(correctImage);
 
-    // Generate 3 other random emoji image ids
     int generated = 1;
     var rng = new Random();
     while (generated <= 3) {
@@ -106,32 +92,8 @@ class _LoginScreenState extends State<LoginScreen> {
       }
     }
 
-    // Shuffle the list
     setState(() {
       imageList.shuffle();
-    });
-  }
-
-  checkFingerPrintActive() async {
-    bool isValue = await getFingerprint();
-
-    if (isValue) {
-      bool isAuthenticated = await authenticate();
-
-      if (isAuthenticated) {
-        // Show scopes + emmoji
-        return finishLogin();
-      }
-    }
-    // Show Pinfield
-    goToPinfield();
-  }
-
-  void goToPinfield() {
-    setState(() {
-      helperText = 'Enter your pincode to log in';
-      showPinfield = true;
-      cancelBtnVisible = true;
     });
   }
 
@@ -150,16 +112,16 @@ class _LoginScreenState extends State<LoginScreen> {
         scope['email'] = await getEmail();
       }
 
-      if (jsonDecode(widget.message['scope']).containsKey('derivedSeed')) {
-        scope['derivedSeed'] = await getDerivedSeed(widget.message['appId']);
-      }
+      // if (jsonDecode(widget.message['scope']).containsKey('derivedSeed')) {
+      //   scope['derivedSeed'] = await getDerivedSeed(widget.message['appId']);
+      // }
 
-      if (jsonDecode(widget.message['scope']).containsKey('trustedDevice')) {
-        var trustedDevice = {};
-        trustedDevice['trustedDevice'] =
-            json.decode(widget.message['scope'])['trustedDevice'];
-        scope['trustedDevice'] = trustedDevice;
-      }
+      // if (jsonDecode(widget.message['scope']).containsKey('trustedDevice')) {
+      //   var trustedDevice = {};
+      //   trustedDevice['trustedDevice'] =
+      //       json.decode(widget.message['scope'])['trustedDevice'];
+      //   scope['trustedDevice'] = trustedDevice;
+      // }
     }
 
     String scopePermissions = await getScopePermissions();
@@ -187,8 +149,8 @@ class _LoginScreenState extends State<LoginScreen> {
       List<String> permissions = [
         'doubleName',
         'email',
-        'derivedSeed',
-        'trustedDevice'
+        // 'derivedSeed',
+        // 'trustedDevice'
       ];
 
       permissions.forEach((var permission) {
@@ -206,9 +168,9 @@ class _LoginScreenState extends State<LoginScreen> {
 
   finishLogin() {
     cancelBtnVisible = true;
+
     setState(() {
       showScopeAndEmoji = true;
-      showPinfield = false;
     });
   }
 
@@ -301,22 +263,6 @@ class _LoginScreenState extends State<LoginScreen> {
         body: Column(
           children: <Widget>[
             Visibility(
-              visible: showPinfield,
-              child: Expanded(
-                flex: 2,
-                child: Center(child: Text(helperText)),
-              ),
-            ),
-            Visibility(
-              visible: showPinfield,
-              child: Expanded(
-                flex: 6,
-                child: showPinfield
-                    ? PinField(callback: (p) => pinFilledIn(p))
-                    : Container(),
-              ),
-            ),
-            Visibility(
               visible: showScopeAndEmoji,
               child: Expanded(flex: 6, child: scopeEmojiView()),
             ),
@@ -376,16 +322,6 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
-  pinFilledIn(p) async {
-    final pin = await getPin();
-    if (pin == p) {
-      return finishLogin();
-    } else {
-      _scaffoldKey.currentState.showSnackBar(
-          SnackBar(content: Text('Oops... you entered the wrong pin')));
-    }
-  }
-
   cancelIt() async {
     cancelLogin(await getDoubleName());
   }
@@ -414,18 +350,19 @@ class _LoginScreenState extends State<LoginScreen> {
 
     var data =
         await encrypt(jsonEncode(tmpScope), publicKey, await getPrivateKey());
+
     //push to backend with signed
     if (!includeData) {
-      await sendData(state, "", null, selectedImageId, null); // temp fix send empty data for regenerate emoji
+      await sendData(state, "", null, selectedImageId,
+          null); // temp fix send empty data for regenerate emoji
     } else {
-      await sendData(state, await signedHash, data, selectedImageId, signedRoom);
+      await sendData(
+          state, await signedHash, data, selectedImageId, signedRoom);
     }
 
-    if (scope['trustedDevice'] != null) {
-      // Save the trusted deviceid
-      saveTrustedDevice(
-          widget.message['appId'], scope['trustedDevice']['trustedDevice']);
-    }
+    // if (scope['trustedDevice'] != null) {
+    //   saveTrustedDevice(widget.message['appId'], scope['trustedDevice']['trustedDevice']);
+    // }
 
     if (selectedImageId == correctImage || isMobileCheck) {
       Navigator.pop(context, true);

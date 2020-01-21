@@ -3,6 +3,7 @@ import 'package:socket_io_client/socket_io_client.dart' as IO;
 import 'package:threebotlogin/Events/CloseSocketEvent.dart';
 import 'package:threebotlogin/Events/Events.dart';
 import 'package:threebotlogin/Events/NewLoginEvent.dart';
+import 'package:threebotlogin/screens/AuthenticationScreen.dart';
 import 'package:threebotlogin/screens/SuccessfulScreen.dart';
 import 'package:threebotlogin/services/toolsService.dart';
 import 'package:threebotlogin/services/userService.dart';
@@ -91,16 +92,27 @@ Future openLogin(context, data) async {
   }
 
   if (messageType == 'login' && mobile != true) {
-    var loggedIn = await Navigator.push(
-        context, MaterialPageRoute(builder: (context) => LoginScreen(data)));
+    var pin = await getPin();
 
-    if (loggedIn) {
-      await Navigator.push(
-          context,
-          MaterialPageRoute(
-              builder: (context) => SuccessfulScreen(
-                  title: "Logged in",
-                  text: "You are now logged in. Return to browser.")));
+    bool authenticated = await Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => AuthenticationScreen(
+              correctPin: pin, userMessage: "sign your attempt"),
+        ));
+
+    if (authenticated != null && authenticated) {
+      var loggedIn = await Navigator.push(
+          context, MaterialPageRoute(builder: (context) => LoginScreen(data)));
+
+      if (loggedIn != null && loggedIn) {
+        await Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => SuccessfulScreen(
+                    title: "Logged in",
+                    text: "You are now logged in. Return to browser.")));
+      }
     }
   } else if (messageType == 'email_verification') {
     getEmail().then((email) async {

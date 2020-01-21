@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:threebotlogin/Apps/FreeFlowPages/FfpEvents.dart';
 import 'package:threebotlogin/Events/Events.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 import '../AppConfig.dart';
 
@@ -26,14 +25,6 @@ class _RegisteredScreenState extends State<RegisteredScreen>
 
   bool showSettings = false;
   bool showPreference = false;
-
-  void _openIeoLink() async {
-    const url = 'https://www.liquid.com/?affiliate=kmOSQysu714987';
-
-    if (await canLaunch(url)) {
-      await launch(url);
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
