@@ -4,6 +4,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:threebotlogin/Events/Events.dart';
 import 'package:threebotlogin/Events/PopAllLoginEvent.dart';
+import 'package:threebotlogin/helpers/BlockAndRunMixin.dart';
 import 'package:threebotlogin/services/toolsService.dart';
 import 'package:threebotlogin/widgets/ImageButton.dart';
 import 'package:threebotlogin/services/userService.dart';
@@ -31,7 +32,7 @@ class LoginScreen extends StatefulWidget {
   _LoginScreenState createState() => _LoginScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _LoginScreenState extends State<LoginScreen> with BlockAndRunMixin {
   String helperText = '';
 
   String scopeTextMobile =
@@ -239,8 +240,8 @@ class _LoginScreenState extends State<LoginScreen> {
                     'Accept',
                     style: TextStyle(color: Colors.white, fontSize: 22),
                   ),
-                  onPressed: () {
-                    sendIt(true);
+                  onPressed: () async {
+                    await sendIt(true);
                   },
                 ),
               ),
@@ -298,28 +299,24 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   imageSelectedCallback(imageId) {
-    setState(() {
-      selectedImageId = imageId;
-    });
+    blockAndRun(() async {
+      setState(() {
+        selectedImageId = imageId; 
+      });
 
-    if (selectedImageId != -1) {
-      if (selectedImageId == correctImage) {
-        setState(() {
-          print('send it again');
-          sendIt(true);
-        });
+      if (selectedImageId != -1) {
+        if (selectedImageId == correctImage) {
+         await sendIt(true);
+        } else {
+          _scaffoldKey.currentState.showSnackBar(
+              SnackBar(content: Text('Oops... that\'s the wrong emoji')));
+          await sendIt(false);
+        }
       } else {
-        setState(() {
-          print('send it again');
-          sendIt(false);
-        });
-        _scaffoldKey.currentState.showSnackBar(
-            SnackBar(content: Text('Oops... that\'s the wrong emoji')));
+        _scaffoldKey.currentState
+            .showSnackBar(SnackBar(content: Text('Please select an emoji')));
       }
-    } else {
-      _scaffoldKey.currentState
-          .showSnackBar(SnackBar(content: Text('Please select an emoji')));
-    }
+    });
   }
 
   cancelIt() async {
