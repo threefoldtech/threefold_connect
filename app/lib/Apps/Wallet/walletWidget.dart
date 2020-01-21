@@ -1,4 +1,7 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:threebotlogin/Apps/Wallet/walletEvents.dart';
 import 'package:threebotlogin/Apps/Wallet/walletUserData.dart';
@@ -55,9 +58,7 @@ class _WalletState extends State<WalletWidget>
         onLoadStop: (InAppWebViewController controller, String url) async {
           if (url.contains('/init')) {
             initKeys();
-         
           }
-          
         },
         onProgressChanged: (InAppWebViewController controller, int progress) {
           setState(() {
@@ -82,14 +83,24 @@ class _WalletState extends State<WalletWidget>
     var importedWallets = await getImportedWallets();
     var appWallets = await getAppWallets();
 
-    var jsStartApp = "window.vueInstance.startWallet('$doubleName', '$seed', '$importedWallets', '$appWallets');";
+    var jsStartApp =
+        "window.vueInstance.startWallet('$doubleName', '$seed', '$importedWallets', '$appWallets');";
 
     webView.evaluateJavascript(source: jsStartApp);
   }
 
   scanQrCode(List<dynamic> params) async {
-    String result = await Navigator.push(
-        context, MaterialPageRoute(builder: (context) => ScanScreen()));
+    await SystemChannels.textInput.invokeMethod('TextInput.hide');
+
+    // QRCode scanner is black if we don't sleep here. 
+    bool slept = await Future.delayed(const Duration(milliseconds: 400), () => true);
+
+    String result;
+    if (slept) {
+      result = await Navigator.push(
+          context, MaterialPageRoute(builder: (context) => ScanScreen()));
+    }
+
     return result;
   }
 
