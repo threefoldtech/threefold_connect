@@ -28,15 +28,6 @@
           </v-toolbar>
           <v-form v-model="valid" @submit.prevent="login">
             <v-card-text>
-              <v-stepper v-if="firstvisit" class="elevation-0" flat>
-                <v-stepper-header class="elevation-0">
-                  <v-stepper-step color="accent" step="1">Personal info</v-stepper-step>
-                  <v-divider></v-divider>
-                  <v-stepper-step color="accent" step="2">Your key</v-stepper-step>
-                  <v-divider></v-divider>
-                  <v-stepper-step color="accent" step="3">Finishing</v-stepper-step>
-                </v-stepper-header>
-              </v-stepper>
               <p class="subheading pb-2" v-if="firstvisit">
                 <span class="font-weight-bold">{{appid}}</span><span v-if="!appid">You were redirected by a service
                   that</span> is using the 3bot application for decentralized login.
