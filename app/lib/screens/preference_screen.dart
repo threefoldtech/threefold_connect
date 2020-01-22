@@ -37,7 +37,7 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
   String version = '';
   String buildNumber = '';
 
-  var thiscolor = Colors.green;
+  MaterialColor thiscolor = Colors.green;
 
   setEmailVerified() {
     setState(() {
@@ -64,7 +64,7 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
   }
 
   showChangePin() async {
-    var pin = await getPin();
+    String pin = await getPin();
     Navigator.push(
         context,
         MaterialPageRoute(
@@ -347,7 +347,7 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
   }
 
   void _showPhrase() async {
-    var pin = await getPin();
+    String pin = await getPin();
 
     bool authenticated = await Navigator.push(
         context,
@@ -387,7 +387,7 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
   }
 
   void _toggleFingerprint(bool newFingerprintValue) async {
-    var pin = await getPin();
+    String pin = await getPin();
 
     bool authenticated = await Navigator.push(
       context,
@@ -407,7 +407,7 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
   }
 
   void _changePincode() async {
-    var pin = await getPin();
+    String pin = await getPin();
 
     bool authenticated = await Navigator.push(
       context,
@@ -456,7 +456,7 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
 
   void _showVersionInfo() {
     try {
-      var appConfig = AppConfig();
+      AppConfig appConfig = AppConfig();
 
       if (appConfig.environment != Environment.Production) {
         showDialog(

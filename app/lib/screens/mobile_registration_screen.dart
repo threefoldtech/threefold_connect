@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:http/http.dart';
 import 'package:threebotlogin/helpers/globals.dart';
 import 'package:threebotlogin/services/3bot_service.dart';
 import 'package:threebotlogin/services/open_kyc_service.dart';
@@ -73,9 +74,11 @@ class _MobileRegistrationScreenState extends State<MobileRegistrationScreen> {
     loadingDialog();
     if (doubleNameController.text != null || doubleNameController.text != '') {
       _registrationData.doubleName = doubleNameController.text + '.3bot';
-      var doubleNameValidation = validateDoubleName(doubleNameController.text);
+      String doubleNameValidation =
+          validateDoubleName(doubleNameController.text);
       if (doubleNameValidation == null) {
-        var userInfoResult = await getUserInfo(_registrationData.doubleName);
+        Response userInfoResult =
+            await getUserInfo(_registrationData.doubleName);
         if (userInfoResult.statusCode != 200) {
           setState(() {
             state = _State.Email;
@@ -122,7 +125,7 @@ class _MobileRegistrationScreenState extends State<MobileRegistrationScreen> {
 
   finish() async {
     loadingDialog();
-    var response = await finishRegistration(doubleNameController.text,
+    Response response = await finishRegistration(doubleNameController.text,
         emailController.text, 'random', _registrationData.keys['publicKey']);
     if (response.statusCode == 200) {
       saveRegistration();

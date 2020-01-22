@@ -72,7 +72,7 @@ class AppConfigProduction extends AppConfigImpl {
   }
 
   Map<String, String> circleUrls() {
-    var circleUrls = Map<String, String>();
+    Map<String, String> circleUrls = Map<String, String>();
 
     circleUrls['tftokens'] = 'https://freeflowpages.com/join/tf-tokens';
     circleUrls['tf-news'] = 'https://freeflowpages.com/join/threefoldfoundation/';
@@ -107,7 +107,7 @@ class AppConfigStaging extends AppConfigImpl {
   }
 
   Map<String, String> circleUrls() {
-    var circleUrls = Map<String, String>();
+    Map<String, String> circleUrls = Map<String, String>();
 
     circleUrls['tftokens'] = 'https://staging.freeflowpages.com/join/tf-tokens';
     circleUrls['tf-news'] = 'https://staging.freeflowpages.com/join/threefoldfoundation/';

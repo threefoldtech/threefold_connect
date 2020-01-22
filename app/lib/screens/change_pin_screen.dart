@@ -6,19 +6,19 @@ import 'package:threebotlogin/widgets/pin_field.dart';
 class ChangePinScreen extends StatefulWidget {
   final currentPin;
   final bool hideBackButton;
+
   ChangePinScreen({this.currentPin, this.hideBackButton});
-  _ChangePinScreenState createState() =>
-      _ChangePinScreenState(currentPin: currentPin);
+
+  _ChangePinScreenState createState() => _ChangePinScreenState();
 }
 
 enum _State { CurrentPin, CurrentPinWrong, NewPinWrong, NewPin, Confirm, Done }
 
 class _ChangePinScreenState extends State<ChangePinScreen> {
-  final currentPin;
-  var newPin;
-  var state;
+  String newPin;
+  _State state;
 
-  _ChangePinScreenState({this.currentPin}) {
+  _ChangePinScreenState() {
     state = _State.NewPin;
   }
 
@@ -30,6 +30,8 @@ class _ChangePinScreenState extends State<ChangePinScreen> {
         return "Please enter your new PIN";
       case _State.Confirm:
         return "Please confirm your new PIN";
+      default:
+        break;
     }
     return "";
   }
@@ -40,7 +42,7 @@ class _ChangePinScreenState extends State<ChangePinScreen> {
       child: Scaffold(
         appBar: new AppBar(
             backgroundColor: HexColor("#2d4052"),
-            title: currentPin == null
+            title: widget.currentPin == null
                 ? Text("Choose your pincode")
                 : Text("Change pincode"),
             elevation: 0.0,
@@ -71,7 +73,7 @@ class _ChangePinScreenState extends State<ChangePinScreen> {
     );
   }
 
-  Future<void> changePin(enteredPinCode) async {
+  Future<void> changePin(String enteredPinCode) async {
     setState(() {
       switch (state) {
         case _State.NewPinWrong:
@@ -85,6 +87,8 @@ class _ChangePinScreenState extends State<ChangePinScreen> {
           } else {
             state = _State.NewPinWrong;
           }
+          break;
+        default:
           break;
       }
     });

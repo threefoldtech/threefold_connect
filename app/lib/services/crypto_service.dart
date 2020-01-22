@@ -9,7 +9,7 @@ import 'package:threebotlogin/services/3bot_service.dart';
 import 'package:threebotlogin/services/user_service.dart';
 
 Future<Map<String, String>> generateKeyPair() async {
-  var keys = await Sodium.cryptoBoxKeypair();
+  Map<String, Uint8List> keys = await Sodium.cryptoBoxKeypair();
 
   return {
     'privateKey': base64.encode(keys['sk']),
@@ -21,8 +21,8 @@ Uint8List _toHex(String input) {
   double length = input.length / 2;
   Uint8List bytes = new Uint8List(length.ceil());
 
-  for (var i = 0; i < bytes.length; i++) {
-    var x = input.substring(i * 2, i * 2 + 2);
+  for (int i = 0; i < bytes.length; i++) {
+    String x = input.substring(i * 2, i * 2 + 2);
     bytes[i] = int.parse(x, radix: 16);
   }
 
@@ -41,8 +41,8 @@ Future<Map<String, String>> generateKeysFromSeedPhrase(seedPhrase) async {
 }
 
 Future<String> signData(String data, String sk) async {
-  var private = base64.decode(sk);
-  var signed =
+  Uint8List private = base64.decode(sk);
+  Uint8List signed =
       await Sodium.cryptoSign(Uint8List.fromList(data.codeUnits), private);
 
   return base64.encode(signed);
@@ -50,11 +50,12 @@ Future<String> signData(String data, String sk) async {
 
 Future<Map<String, String>> encrypt(
     String data, String publicKey, String sk) async {
-  var nonce = await CryptoBox.generateNonce();
-  var private = await Sodium.cryptoSignEd25519SkToCurve25519(base64.decode(sk));
-  var public = base64.decode(publicKey);
-  var message = Uint8List.fromList(data.codeUnits);
-  var encryptedData =
+  Uint8List nonce = await CryptoBox.generateNonce();
+  Uint8List private =
+      await Sodium.cryptoSignEd25519SkToCurve25519(base64.decode(sk));
+  Uint8List public = base64.decode(publicKey);
+  Uint8List message = Uint8List.fromList(data.codeUnits);
+  Uint8List encryptedData =
       await Sodium.cryptoBoxEasy(message, nonce, public, private);
 
   return {
@@ -80,7 +81,7 @@ Future<String> generateDerivedSeed(String appId) async {
 
 Future<Map<String, Object>> generateDerivedKeypair(
     String appId, String doubleName) async {
-  final prefs = await SharedPreferences.getInstance();
+  final SharedPreferences prefs = await SharedPreferences.getInstance();
 
   String derivedPublicKey = prefs.getString("${appId.toString()}.dpk");
   String derivedPrivateKey = prefs.getString("${appId.toString()}.dsk");
@@ -97,7 +98,7 @@ Future<Map<String, Object>> generateDerivedKeypair(
     derivedPublicKey = base64.encode(key['pk']);
     prefs.setString("${appId.toString()}.dpk", derivedPublicKey);
 
-    var data = {
+    Map<String, Object> data = {
       'doubleName': doubleName,
       'signedDerivedPublicKey': await signData(derivedPublicKey, privateKey),
       'signedAppId': await signData(appId, privateKey)

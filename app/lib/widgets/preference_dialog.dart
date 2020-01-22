@@ -29,14 +29,16 @@ class _PreferenceDialogState extends State<PreferenceDialog> {
     super.initState();
   }
 
+  //TODO: Properly assign types.
   Future<dynamic> getPermissions(app, scope) async {
-    var json = jsonDecode(await getScopePermissions());
+    Map<String, dynamic> json = jsonDecode(await getScopePermissions());
     var sc = scope[0];
     return json[app][sc];
   }
 
+  //TODO: Properly assign types.
   Future<dynamic> changePermission(app, scope, value) async {
-    var json = jsonDecode(await getScopePermissions());
+    Map<String, dynamic> json = jsonDecode(await getScopePermissions());
     var sc = scope[0];
     json[app][sc]['enabled'] = value;
     saveScopePermissions(jsonEncode(json));
@@ -110,11 +112,14 @@ class _PreferenceDialogState extends State<PreferenceDialog> {
       actions: (widget.type != 'login' || widget.type == null)
           ? <Widget>[
               FlatButton(
-                  child: Text("Cancel"),
-                  onPressed: (widget.cancel != null)
-                      ? widget.cancel
-                      : () => Navigator.popUntil(
-                          context, ModalRoute.withName('/'))),
+                child: Text("Cancel"),
+                onPressed: (widget.cancel != null)
+                    ? widget.cancel
+                    : () => Navigator.popUntil(
+                          context,
+                          ModalRoute.withName('/'),
+                        ),
+              ),
               FlatButton(
                 child: Text("Ok"),
                 onPressed: widget.callback,

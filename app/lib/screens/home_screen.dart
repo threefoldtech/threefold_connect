@@ -44,7 +44,7 @@ class _HomeScreenState extends State<HomeScreen>
   }
 
   void checkPin(int indexIfAuthIsSuccess) async {
-    var pin = await getPin();
+    String pin = await getPin();
 
     pinCheckOpen = true;
 
@@ -125,7 +125,7 @@ class _HomeScreenState extends State<HomeScreen>
         return;
       }
 
-      var timeSpendWithPausedApp =
+      int timeSpendWithPausedApp =
           new DateTime.now().millisecondsSinceEpoch - lastCheck;
 
       if (timeSpendWithPausedApp >= pinCheckTimeout) {

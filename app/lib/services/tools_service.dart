@@ -6,9 +6,11 @@ const chars = "abcdefghijklmnopqrstuvwxyz0123456789";
 String randomString(int strlen) {
   Random rnd = new Random(new DateTime.now().millisecondsSinceEpoch);
   String result = "";
-  for (var i = 0; i < strlen; i++) {
+
+  for (int i = 0; i < strlen; i++) {
     result += chars[rnd.nextInt(chars.length)];
   }
+
   return result;
 }
 
@@ -28,7 +30,7 @@ bool validateSeedWords(String seed, String confirmationWords) {
   // if lenght is not correct return already here
   if (words.length != 3) return false;
 
-  for (final word in words) {
+  for (final String word in words) {
     // check every word in list against the seed
     if (!seedWords.contains(word)) {
       return false;

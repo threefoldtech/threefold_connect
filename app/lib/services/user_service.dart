@@ -8,24 +8,24 @@ import 'package:threebotlogin/services/3bot_service.dart';
 import 'package:threebotlogin/services/crypto_service.dart';
 
 Future<void> savePin(pin) async {
-  final prefs = await SharedPreferences.getInstance();
+  final SharedPreferences prefs = await SharedPreferences.getInstance();
   prefs.remove('pin');
   prefs.setString('pin', pin);
 }
 
 Future<String> getPin() async {
-  final prefs = await SharedPreferences.getInstance();
+  final SharedPreferences prefs = await SharedPreferences.getInstance();
   return prefs.getString('pin');
 }
 
 Future<void> savePublicKey(key) async {
-  final prefs = await SharedPreferences.getInstance();
+  final SharedPreferences prefs = await SharedPreferences.getInstance();
   prefs.remove('publickey');
   prefs.setString('publickey', key);
 }
 
 Future<String> getPublicKey() async {
-  final prefs = await SharedPreferences.getInstance();
+  final SharedPreferences prefs = await SharedPreferences.getInstance();
 
   // Older applications don't have the publickey stored yet, let's retrieve it.
   if (prefs.getString('publickey') == null ||
@@ -49,47 +49,47 @@ Future<String> getPublicKey() async {
 }
 
 Future<void> savePrivateKey(key) async {
-  final prefs = await SharedPreferences.getInstance();
+  final SharedPreferences prefs = await SharedPreferences.getInstance();
   prefs.remove('privatekey');
   prefs.setString('privatekey', key);
 }
 
 Future<String> getPrivateKey() async {
-  final prefs = await SharedPreferences.getInstance();
+  final SharedPreferences prefs = await SharedPreferences.getInstance();
   return prefs.getString('privatekey');
 }
 
 Future<void> savePhrase(phrase) async {
-  final prefs = await SharedPreferences.getInstance();
+  final SharedPreferences prefs = await SharedPreferences.getInstance();
   prefs.remove('phrase');
   prefs.setString('phrase', phrase);
 }
 
 Future<String> getPhrase() async {
-  final prefs = await SharedPreferences.getInstance();
+  final SharedPreferences prefs = await SharedPreferences.getInstance();
   return prefs.getString('phrase');
 }
 
 Future<void> saveDoubleName(doubleName) async {
-  final prefs = await SharedPreferences.getInstance();
+  final SharedPreferences prefs = await SharedPreferences.getInstance();
   prefs.remove('doubleName');
   prefs.setString('doubleName', doubleName);
 }
 
 Future<String> getDoubleName() async {
-  final prefs = await SharedPreferences.getInstance();
+  final SharedPreferences prefs = await SharedPreferences.getInstance();
   return prefs.getString('doubleName');
 }
 
 Future<void> removeEmail() async {
-  final prefs = await SharedPreferences.getInstance();
+  final SharedPreferences prefs = await SharedPreferences.getInstance();
 
   prefs.remove('email');
   prefs.remove('emailVerified');
 }
 
 Future<void> saveEmail(String email, String signedEmailIdentifier) async {
-  final prefs = await SharedPreferences.getInstance();
+  final SharedPreferences prefs = await SharedPreferences.getInstance();
   prefs.remove('email');
   prefs.setString('email', email);
 
@@ -100,7 +100,7 @@ Future<void> saveEmail(String email, String signedEmailIdentifier) async {
 }
 
 Future<Map<String, Object>> getEmail() async {
-  final prefs = await SharedPreferences.getInstance();
+  final SharedPreferences prefs = await SharedPreferences.getInstance();
   return {
     'email': prefs.getString('email'),
     'verified': prefs.getString('signedEmailIdentifier')
@@ -116,13 +116,13 @@ Future<String> getDerivedSeed(String appId) async {
 }
 
 Future<void> saveFingerprint(fingerprint) async {
-  final prefs = await SharedPreferences.getInstance();
+  final SharedPreferences prefs = await SharedPreferences.getInstance();
   prefs.remove('fingerprint');
   prefs.setBool('fingerprint', fingerprint);
 }
 
 Future<bool> getFingerprint() async {
-  final prefs = await SharedPreferences.getInstance();
+  final SharedPreferences prefs = await SharedPreferences.getInstance();
   bool result = prefs.getBool('fingerprint');
 
   if (result == null) {
@@ -134,48 +134,48 @@ Future<bool> getFingerprint() async {
 }
 
 Future<void> saveLoginToken(loginToken) async {
-  final prefs = await SharedPreferences.getInstance();
+  final SharedPreferences prefs = await SharedPreferences.getInstance();
   prefs.remove('loginToken');
   prefs.setString('loginToken', loginToken);
 }
 
 Future<String> getLoginToken() async {
-  final prefs = await SharedPreferences.getInstance();
+  final SharedPreferences prefs = await SharedPreferences.getInstance();
   return prefs.getString('loginToken');
 }
 
 Future<void> saveScopePermissions(scopePermissions) async {
-  final prefs = await SharedPreferences.getInstance();
+  final SharedPreferences prefs = await SharedPreferences.getInstance();
   prefs.remove('scopePermissions');
   prefs.setString('scopePermissions', scopePermissions);
 }
 
 Future<String> getScopePermissions() async {
-  final prefs = await SharedPreferences.getInstance();
+  final SharedPreferences prefs = await SharedPreferences.getInstance();
   return prefs.getString('scopePermissions');
 }
 
 Future<bool> isTrustedDevice(String appId, String trustedDevice) async {
-  final prefs = await SharedPreferences.getInstance();
-  var trustedDeviceApp = prefs.getString('$appId-trusted');
+  final SharedPreferences prefs = await SharedPreferences.getInstance();
+  String trustedDeviceApp = prefs.getString('$appId-trusted');
   if (trustedDeviceApp == null) return false;
 
   return trustedDeviceApp == trustedDevice;
 }
 
 Future<void> saveTrustedDevice(String appId, String trustedDeviceId) async {
-  final prefs = await SharedPreferences.getInstance();
+  final SharedPreferences prefs = await SharedPreferences.getInstance();
   prefs.remove('$appId-trusted');
   prefs.setString('$appId-trusted', trustedDeviceId);
 }
 
 Future<void> saveInitDone() async {
-  final prefs = await SharedPreferences.getInstance();
+  final SharedPreferences prefs = await SharedPreferences.getInstance();
   prefs.setBool('initDone', true);
 }
 
 Future<bool> getInitDone() async {
-  final prefs = await SharedPreferences.getInstance();
+  final SharedPreferences prefs = await SharedPreferences.getInstance();
   bool initDone = prefs.getBool('initDone');
   if (initDone == null) {
     initDone = false;
@@ -184,8 +184,8 @@ Future<bool> getInitDone() async {
 }
 
 Future<bool> clearData() async {
-  final pref = await SharedPreferences.getInstance();
-  bool cleared = await pref.clear();
+  final SharedPreferences prefs = await SharedPreferences.getInstance();
+  bool cleared = await prefs.clear();
   saveInitDone();
   return cleared;
 }

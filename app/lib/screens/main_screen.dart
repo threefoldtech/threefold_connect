@@ -28,7 +28,6 @@ class MainScreen extends StatefulWidget {
 }
 
 class _AppState extends State<MainScreen> {
-  _AppState();
   StreamSubscription _sub;
   String initialLink;
   BackendConnection _backendConnection;
@@ -88,12 +87,12 @@ class _AppState extends State<MainScreen> {
 
   checkInternetConnection() async {
     try {
-      final result = await InternetAddress.lookup('google.com');
+      final List<InternetAddress> result = await InternetAddress.lookup('google.com');
       if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
         print('connected to the internet');
       }
     } on SocketException catch (_) {
-      var dialog = CustomDialog(
+      CustomDialog dialog = CustomDialog(
           title: "No internet connection available",
           description: Text(
             "Please enable your internet connection to use this app.",
@@ -108,12 +107,12 @@ class _AppState extends State<MainScreen> {
     if (AppConfig().environment != Environment.Local) {
       try {
         String baseUrl = AppConfig().baseUrl();
-        final result = await InternetAddress.lookup('$baseUrl');
+        final List<InternetAddress> result = await InternetAddress.lookup('$baseUrl');
         if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
           print('connected to the internet');
         }
       } on SocketException catch (_) {
-        var dialog = CustomDialog(
+        CustomDialog dialog = CustomDialog(
             title: "Oops",
             description: Text(
               "Something went wrong, please try again. Contact support if this issue persists.",
@@ -127,7 +126,7 @@ class _AppState extends State<MainScreen> {
 
   checkIfAppIsUpToDate() async {
     if (!await isAppUpToDate()) {
-      var dialog = CustomDialog(
+      CustomDialog dialog = CustomDialog(
           title: "Update required",
           description: Text(
             "The app is outdated. Please, update it to the latest version.",

@@ -11,7 +11,7 @@ class ErrorScreen extends StatefulWidget {
 }
 
 class _ErrorScreenState extends State<ErrorScreen> {
-  var version = '0.0.0';
+  String version = '0.0.0';
 
   @override
   void initState() {

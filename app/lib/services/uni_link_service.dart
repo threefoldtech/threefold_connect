@@ -13,16 +13,16 @@ class UniLinkService {
     BuildContext context = e.context;
 
     bool autoLogin = false;
-    var scope = jsonDecode(link.queryParameters['scope']);
+    Map<String, dynamic> scope = jsonDecode(link.queryParameters['scope']);
     if (scope['trustedDevice'] != null) {
-      var trustedDevice = scope['trustedDevice'];
+      String trustedDevice = scope['trustedDevice'];
       if (await isTrustedDevice(link.queryParameters['appId'], trustedDevice)) {
         print('you are logged in');
         autoLogin = true;
       }
     }
 
-    var pin = await getPin();
+    String pin = await getPin();
 
     bool authenticated = await Navigator.push(
         context,
@@ -32,7 +32,7 @@ class UniLinkService {
         ));
 
     if (authenticated != null && authenticated) {
-      var loggedIn = await Navigator.push(
+      bool loggedIn = await Navigator.push(
           context,
           MaterialPageRoute(
               builder: (context) =>

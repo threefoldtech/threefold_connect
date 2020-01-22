@@ -11,8 +11,6 @@ import 'package:threebotlogin/screens/login_screen.dart';
 import 'package:threebotlogin/screens/successful_screen.dart';
 import 'package:threebotlogin/services/tools_service.dart';
 import 'package:threebotlogin/services/user_service.dart';
-import 'package:threebotlogin/services/3bot_service.dart';
-import 'package:threebotlogin/services/crypto_service.dart';
 import 'package:threebotlogin/services/open_kyc_service.dart';
 import 'package:threebotlogin/widgets/custom_dialog.dart';
 
@@ -81,18 +79,9 @@ class BackendConnection {
 Future openLogin(context, data) async {
   String messageType = data["type"];
   var mobile = data["mobile"];
-  var loginToken = data["loginToken"];
-  var state = data['state'];
-  var publicKey = data['appPublicKey'];
-  var scope = data["scope"];
-  var appId = data['appId'];
-
-  if (loginToken != null) {
-    return await loginFromToken(loginToken, state, publicKey, appId, scope);
-  }
 
   if (messageType == 'login' && mobile != true) {
-    var pin = await getPin();
+    String pin = await getPin();
 
     bool authenticated = await Navigator.push(
         context,
@@ -102,32 +91,34 @@ Future openLogin(context, data) async {
         ));
 
     if (authenticated != null && authenticated) {
-      var loggedIn = await Navigator.push(
+      bool loggedIn = await Navigator.push(
           context, MaterialPageRoute(builder: (context) => LoginScreen(data)));
 
       if (loggedIn != null && loggedIn) {
         await Navigator.push(
             context,
             MaterialPageRoute(
-                builder: (context) => SuccessfulScreen(
-                    title: "Logged in",
-                    text: "You are now logged in. Return to browser.")));
+              builder: (context) => SuccessfulScreen(
+                  title: "Logged in",
+                  text: "You are now logged in. Return to browser."),
+            ));
       }
     }
   } else if (messageType == 'email_verification') {
     getEmail().then((email) async {
       if (email['email'] != null) {
-        var tmpDoubleName = (await getDoubleName()).toLowerCase();
+        String tmpDoubleName = (await getDoubleName()).toLowerCase();
 
         getSignedEmailIdentifierFromOpenKYC(tmpDoubleName)
             .then((response) async {
-          var body = jsonDecode(response.body);
+          Map<String, dynamic> body = jsonDecode(response.body);
 
-          var signedEmailIdentifier = body["signed_email_identifier"];
+          //TODO: Check if this always is a string.
+          dynamic signedEmailIdentifier = body["signed_email_identifier"];
 
           if (signedEmailIdentifier != null &&
               signedEmailIdentifier.isNotEmpty) {
-            var vsei = json.decode(
+            Map<String, dynamic> vsei = json.decode(
                 (await verifySignedEmailIdentifier(signedEmailIdentifier))
                     .body);
 
@@ -159,34 +150,5 @@ Future openLogin(context, data) async {
         });
       }
     });
-  }
-}
-
-Future<void> loginFromToken(String loginToken, String state, String publicKey,
-    String appId, String stringScope) async {
-  if (loginToken == await getLoginToken()) {
-    var privateKey = getPrivateKey();
-    var email = getEmail();
-    var keys = getKeys(appId, await getDoubleName());
-
-    var signedHash = signData(state, await privateKey);
-    var scope = {};
-    var dataToSend;
-
-    if (scope != null) {
-      if (stringScope.split(",").contains('user:email')) {
-        scope['email'] = await email;
-      }
-
-      if (stringScope.split(",").contains('user:keys')) {
-        scope['keys'] = await keys;
-      }
-    }
-
-    if (scope.isNotEmpty) {
-      dataToSend =
-          await encrypt(jsonEncode(scope), publicKey, await privateKey);
-    }
-    sendData(state, await signedHash, dataToSend, null, null);
   }
 }

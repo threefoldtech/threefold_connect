@@ -3,8 +3,8 @@ import 'package:threebotlogin/helpers/hex_color.dart';
 import 'package:threebotlogin/router.dart';
 
 class Globals {
-  static final isInDebugMode = true;
-  static final color = HexColor("#2d4052");
+  static final bool isInDebugMode = true;
+  static final HexColor color = HexColor("#2d4052");
   ValueNotifier<bool> emailVerified = ValueNotifier(false);
   final Router router = new Router();
 

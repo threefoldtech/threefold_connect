@@ -6,7 +6,6 @@ import 'package:threebotlogin/screens/main_screen.dart';
 import 'package:threebotlogin/services/logging_service.dart';
 import 'package:threebotlogin/services/user_service.dart';
 
-//List<CameraDescription> cameras;
 LoggingService logger;
 
 Future<void> main() async {
@@ -16,8 +15,7 @@ Future<void> main() async {
   bool initDone = await getInitDone();
   String doubleName = await getDoubleName();
 
-  var email = await getEmail();
-  // Email is now a tuple of address and the signedemail identifier, the bool is removed. But we need to migrate t. To be removed next version.
+  Map<String, Object> email = await getEmail();
 
   Globals().emailVerified.value = (email['verified'] != null);
   bool registered = doubleName != null;
@@ -35,10 +33,11 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-        theme: ThemeData(
-          primaryColor: HexColor("#2d4052"),
-          accentColor: HexColor("#16a085"),
-        ),
-        home: MainScreen(initDone: initDone, registered: registered));
+      theme: ThemeData(
+        primaryColor: HexColor("#2d4052"),
+        accentColor: HexColor("#16a085"),
+      ),
+      home: MainScreen(initDone: initDone, registered: registered),
+    );
   }
 }

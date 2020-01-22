@@ -17,7 +17,7 @@ _LoginScreenState lastState;
 class LoginScreen extends StatefulWidget {
   final Widget loginScreen;
   final Widget scopeList;
-  final message;
+  final Map<String, String> message;
   final bool closeWhenLoggedIn;
   final bool autoLogin;
 
@@ -41,6 +41,8 @@ class _LoginScreenState extends State<LoginScreen> with BlockAndRunMixin {
       'Please select the data you want to share and press the corresponding emoji';
 
   List<int> imageList = new List();
+
+  //TODO: We should specifiy what kind of map this is!
   Map scope = Map();
 
   int selectedImageId = -1;
@@ -50,7 +52,7 @@ class _LoginScreenState extends State<LoginScreen> with BlockAndRunMixin {
   bool showScopeAndEmoji = false;
   bool isMobileCheck = false;
   String emitCode = randomString(10);
-  final _scaffoldKey = GlobalKey<ScaffoldState>();
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   close(PopAllLoginEvent e) {
     if (e.emitCode == emitCode) {
@@ -70,11 +72,6 @@ class _LoginScreenState extends State<LoginScreen> with BlockAndRunMixin {
     makePermissionPrefs();
     generateEmojiImageList();
 
-    // if (widget.autoLogin) {
-    //   sendIt(true);
-    //   return;
-    // }
-
     finishLogin();
   }
 
@@ -84,9 +81,10 @@ class _LoginScreenState extends State<LoginScreen> with BlockAndRunMixin {
     imageList.add(correctImage);
 
     int generated = 1;
-    var rng = new Random();
+    Random rng = new Random();
+
     while (generated <= 3) {
-      var x = rng.nextInt(266) + 1;
+      int x = rng.nextInt(266) + 1;
       if (!imageList.contains(x)) {
         imageList.add(x);
         generated++;
@@ -98,7 +96,7 @@ class _LoginScreenState extends State<LoginScreen> with BlockAndRunMixin {
     });
   }
 
-  bool isRequired(value, givenScope) {
+  bool isRequired(value, String givenScope) {
     var decodedValue = jsonDecode(givenScope)[value];
     if (decodedValue == null) return false;
     if (decodedValue is String) {
@@ -112,17 +110,6 @@ class _LoginScreenState extends State<LoginScreen> with BlockAndRunMixin {
       if (jsonDecode(widget.message['scope']).containsKey('email')) {
         scope['email'] = await getEmail();
       }
-
-      // if (jsonDecode(widget.message['scope']).containsKey('derivedSeed')) {
-      //   scope['derivedSeed'] = await getDerivedSeed(widget.message['appId']);
-      // }
-
-      // if (jsonDecode(widget.message['scope']).containsKey('trustedDevice')) {
-      //   var trustedDevice = {};
-      //   trustedDevice['trustedDevice'] =
-      //       json.decode(widget.message['scope'])['trustedDevice'];
-      //   scope['trustedDevice'] = trustedDevice;
-      // }
     }
 
     String scopePermissions = await getScopePermissions();
@@ -131,10 +118,10 @@ class _LoginScreenState extends State<LoginScreen> with BlockAndRunMixin {
       scopePermissions = jsonEncode(scope);
     }
 
-    var initialPermissions = jsonDecode(scopePermissions);
+    dynamic initialPermissions = (scopePermissions);
 
     if (!initialPermissions.containsKey(widget.message['appId'])) {
-      var newHashMap = new HashMap();
+      HashMap newHashMap = new HashMap();
       initialPermissions[widget.message['appId']] = newHashMap;
 
       if (scope != null) {
@@ -147,14 +134,9 @@ class _LoginScreenState extends State<LoginScreen> with BlockAndRunMixin {
       }
       saveScopePermissions(jsonEncode(initialPermissions));
     } else {
-      List<String> permissions = [
-        'doubleName',
-        'email',
-        // 'derivedSeed',
-        // 'trustedDevice'
-      ];
+      List<String> permissions = ['doubleName', 'email'];
 
-      permissions.forEach((var permission) {
+      permissions.forEach((String permission) {
         if (!initialPermissions[widget.message['appId']]
             .containsKey(permission)) {
           initialPermissions[widget.message['appId']][permission] = {
@@ -163,6 +145,7 @@ class _LoginScreenState extends State<LoginScreen> with BlockAndRunMixin {
           };
         }
       });
+
       saveScopePermissions(jsonEncode(initialPermissions));
     }
   }
@@ -301,12 +284,12 @@ class _LoginScreenState extends State<LoginScreen> with BlockAndRunMixin {
   imageSelectedCallback(imageId) {
     blockAndRun(() async {
       setState(() {
-        selectedImageId = imageId; 
+        selectedImageId = imageId;
       });
 
       if (selectedImageId != -1) {
         if (selectedImageId == correctImage) {
-         await sendIt(true);
+          await sendIt(true);
         } else {
           _scaffoldKey.currentState.showSnackBar(
               SnackBar(content: Text('Oops... that\'s the wrong emoji')));
@@ -324,9 +307,10 @@ class _LoginScreenState extends State<LoginScreen> with BlockAndRunMixin {
   }
 
   sendIt(bool includeData) async {
-    var state = widget.message['state'];
-    var signedRoom = widget.message['signedRoom'];
-    var publicKey = widget.message['appPublicKey']?.replaceAll(" ", "+");
+    String state = widget.message['state'];
+    String signedRoom = widget.message['signedRoom'];
+    String publicKey = widget.message['appPublicKey']?.replaceAll(" ", "+");
+
     bool hashMatch = RegExp(r"[^A-Za-z0-9]+").hasMatch(state);
 
     if (hashMatch) {
@@ -336,8 +320,8 @@ class _LoginScreenState extends State<LoginScreen> with BlockAndRunMixin {
       return;
     }
 
-    var signedHash = signData(state, await getPrivateKey());
-    var tmpScope = Map();
+    String signedHash = await signData(state, await getPrivateKey());
+    Map tmpScope = Map();
 
     try {
       tmpScope = await buildScope();
@@ -345,7 +329,7 @@ class _LoginScreenState extends State<LoginScreen> with BlockAndRunMixin {
       print(exception);
     }
 
-    var data =
+    Map<String, String> data =
         await encrypt(jsonEncode(tmpScope), publicKey, await getPrivateKey());
 
     //push to backend with signed
@@ -354,12 +338,8 @@ class _LoginScreenState extends State<LoginScreen> with BlockAndRunMixin {
           null); // temp fix send empty data for regenerate emoji
     } else {
       await sendData(
-          state, await signedHash, data, selectedImageId, signedRoom);
+          state, signedHash, data, selectedImageId, signedRoom);
     }
-
-    // if (scope['trustedDevice'] != null) {
-    //   saveTrustedDevice(widget.message['appId'], scope['trustedDevice']['trustedDevice']);
-    // }
 
     if (selectedImageId == correctImage || isMobileCheck) {
       Navigator.pop(context, true);
@@ -370,6 +350,7 @@ class _LoginScreenState extends State<LoginScreen> with BlockAndRunMixin {
   dynamic buildScope() async {
     Map tmpScope = new Map.from(scope);
 
+    //TODO: Figure out these types and name them accordingly.
     var json = jsonDecode(await getScopePermissions());
     var permissions = json[widget.message['appId']];
     var keysOfPermissions = permissions.keys.toList();
@@ -383,8 +364,9 @@ class _LoginScreenState extends State<LoginScreen> with BlockAndRunMixin {
     return tmpScope;
   }
 
+  // Rework this ugly beast.
   bool checkMobile() {
-    var mobile = widget.message['mobile'];
+    String mobile = widget.message['mobile'];
     return mobile == true || mobile == 'true';
   }
 

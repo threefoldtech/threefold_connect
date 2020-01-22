@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'dart:convert';
 import 'package:crypto/crypto.dart';
+import 'package:http/http.dart';
 import 'package:threebotlogin/helpers/globals.dart';
 import 'package:threebotlogin/services/3bot_service.dart';
 import 'package:threebotlogin/services/crypto_service.dart';
@@ -16,11 +17,11 @@ class RecoverScreen extends StatefulWidget {
 }
 
 class _RecoverScreenState extends State<RecoverScreen> {
-  final doubleNameController = TextEditingController();
-  final emailController = TextEditingController();
-  final seedPhrasecontroller = TextEditingController();
+  final TextEditingController doubleNameController = TextEditingController();
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController seedPhrasecontroller = TextEditingController();
 
-  final _formKey = GlobalKey<FormState>();
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   bool _autoValidate = false;
   bool emailVerified = false;
@@ -29,9 +30,7 @@ class _RecoverScreenState extends State<RecoverScreen> {
   String doubleName = '';
   String emailFromForm = '';
   String seedPhrase = '';
-
   String error = '';
-
   String privateKey;
 
   String generateMd5(String input) {
@@ -40,19 +39,19 @@ class _RecoverScreenState extends State<RecoverScreen> {
 
   checkSeedPhrase(doubleName, seedPhrase) async {
     checkSeedLength(seedPhrase);
-    var keys = await generateKeysFromSeedPhrase(seedPhrase);
+    Map<String, String> keys = await generateKeysFromSeedPhrase(seedPhrase);
 
     setState(() {
       privateKey = keys['privateKey'];
     });
 
-    var userInfoResult = await getUserInfo(doubleName);
+    Response userInfoResult = await getUserInfo(doubleName);
 
     if (userInfoResult.statusCode != 200) {
       throw new Exception('User not found');
     }
 
-    var body = json.decode(userInfoResult.body);
+    Map<String, dynamic> body = json.decode(userInfoResult.body);
 
     if (body['publicKey'] != keys['publicKey']) {
       throw new Exception('Seed phrase does not correspond to given name');

@@ -20,8 +20,8 @@ class LoggingService {
   }
 
   String getDateTime() {
-    var now = new DateTime.now();
-    var formatter = new DateFormat('yyyy-MM-dd hh:mm:ss');
+    DateTime now = new DateTime.now();
+    DateFormat formatter = new DateFormat('yyyy-MM-dd hh:mm:ss');
     String formatted = formatter.format(now);
 
     return formatted;

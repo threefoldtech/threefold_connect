@@ -2,6 +2,7 @@ import 'dart:io';
 import 'dart:convert';
 
 import 'package:http/http.dart' as http;
+import 'package:http/http.dart';
 import 'package:package_info/package_info.dart';
 import 'package:threebotlogin/app_config.dart';
 import 'package:threebotlogin/services/crypto_service.dart';
@@ -11,7 +12,7 @@ import 'package:threebotlogin/services/user_service.dart';
 String threeBotApiUrl = AppConfig().threeBotApiUrl();
 Map<String, String> requestHeaders = {'Content-type': 'application/json'};
 
-Future sendData(String hash, String signedHash, data, selectedImageId,
+Future<Response> sendData(String hash, String signedHash, data, selectedImageId,
     String signedRoom) async {
   return http.post('$threeBotApiUrl/sign',
       body: json.encode({
@@ -25,7 +26,7 @@ Future sendData(String hash, String signedHash, data, selectedImageId,
       headers: requestHeaders);
 }
 
-Future sendPublicKey(Map<String, Object> data) async {
+Future<Response> sendPublicKey(Map<String, Object> data) async {
   String timestamp = new DateTime.now().millisecondsSinceEpoch.toString();
   String privatekey = await getPrivateKey();
 
@@ -51,8 +52,8 @@ Future<bool> isAppUpToDate() async {
     int currentBuildNumber = int.parse(packageInfo.buildNumber);
     int minimumBuildNumber = 0;
 
-    var jsonResponse = (await http.get('$threeBotApiUrl/minimumversion', headers: requestHeaders)).body;
-    var minimumVersion = json.decode(jsonResponse);
+    String jsonResponse = (await http.get('$threeBotApiUrl/minimumversion', headers: requestHeaders)).body;
+    Map<String, dynamic> minimumVersion = json.decode(jsonResponse);
 
     if (Platform.isAndroid) {
       minimumBuildNumber = minimumVersion['android'];
@@ -66,16 +67,16 @@ Future<bool> isAppUpToDate() async {
   }
 }
 
-Future cancelLogin(doubleName) {
+Future<Response> cancelLogin(doubleName) {
   return http.post('$threeBotApiUrl/users/$doubleName/cancel',
       body: null, headers: requestHeaders);
 }
 
-Future getUserInfo(doubleName) {
+Future<Response> getUserInfo(doubleName) {
   return http.get('$threeBotApiUrl/users/$doubleName', headers: requestHeaders);
 }
 
-Future<http.Response> finishRegistration(
+Future<Response> finishRegistration(
     String doubleName, String email, String sid, String publicKey) async {
   return http.post('$threeBotApiUrl/mobileregistration',
       body: json.encode({
@@ -87,7 +88,7 @@ Future<http.Response> finishRegistration(
       headers: requestHeaders);
 }
 
-Future sendRegisterSign(String doubleName) {
+Future<Response> sendRegisterSign(String doubleName) {
   return http.post('$threeBotApiUrl/signRegister',
       body: json.encode({
         'doubleName': doubleName,
@@ -95,6 +96,6 @@ Future sendRegisterSign(String doubleName) {
       headers: requestHeaders);
 }
 
-Future<http.Response> getShowApps() async {
+Future<Response> getShowApps() async {
   return http.get('$threeBotApiUrl/showapps', headers: requestHeaders);
 }
