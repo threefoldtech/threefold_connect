@@ -3,41 +3,36 @@ import 'package:flutter/material.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
 
 class ScanScreen extends StatefulWidget {
-  final Widget registrationScreen;
-  final GlobalKey qrKey = GlobalKey(debugLabel: 'QR');
-
-  ScanScreen({Key key, this.registrationScreen}) : super(key: key);
   _ScanScreenState createState() => _ScanScreenState();
 }
 
-class _ScanScreenState extends State<ScanScreen> with TickerProviderStateMixin {
+class _ScanScreenState extends State<ScanScreen> {
   String helperText = "Aim at QR code to scan";
-  AnimationController sliderAnimationController;
-  Animation<double> offset;
   bool popped = false;
-  final GlobalKey qrKey = GlobalKey(debugLabel: 'QR');
-  QRViewController controller;
 
-  String pin;
-  final _scaffoldKey = GlobalKey<ScaffoldState>();
-  var scope = Map();
-  var keys;
+  final GlobalKey qrKey = GlobalKey(debugLabel: 'QR');
 
   @override
   void initState() {
     super.initState();
-    sliderAnimationController =
-        AnimationController(vsync: this, duration: Duration(milliseconds: 1));
-    sliderAnimationController.addListener(() {
-      this.setState(() {});
-    });
+  }
 
-    offset = Tween<double>(begin: 0.0, end: 500.0).animate(CurvedAnimation(
-        parent: sliderAnimationController, curve: Curves.bounceOut));
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Stack(
+        children: [
+          QRView(
+            key: qrKey,
+            onQRViewCreated: _onQRViewCreated,
+          ),
+          Align(alignment: Alignment.bottomCenter, child: content()),
+        ],
+      ),
+    );
   }
 
   void _onQRViewCreated(QRViewController controller) {
-    this.controller = controller;
     controller.scannedDataStream.listen((scanData) {
       if (!popped) {
         popped = true;
@@ -82,7 +77,9 @@ class _ScanScreenState extends State<ScanScreen> with TickerProviderStateMixin {
                       fontWeight: FontWeight.bold,
                       fontSize: 21.0),
                 ),
-                SizedBox(width: 60.0,)
+                SizedBox(
+                  width: 60.0,
+                )
               ],
             ),
           ),
@@ -125,27 +122,5 @@ class _ScanScreenState extends State<ScanScreen> with TickerProviderStateMixin {
         )
       ],
     );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      key: _scaffoldKey,
-      body: Stack(
-        children: [
-          QRView(
-            key: qrKey,
-            onQRViewCreated: _onQRViewCreated,
-          ),
-          Align(alignment: Alignment.bottomCenter, child: content()),
-        ],
-      ),
-    );
-  }
-
-  showError() {
-    _scaffoldKey.currentState.showSnackBar(SnackBar(
-      content: Text('Something went wrong, please try again later.'),
-    ));
   }
 }
