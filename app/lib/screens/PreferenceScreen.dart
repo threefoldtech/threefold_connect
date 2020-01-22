@@ -14,7 +14,6 @@ import 'package:threebotlogin/services/openKYCService.dart';
 import 'package:threebotlogin/services/userService.dart';
 import 'package:threebotlogin/widgets/CustomDialog.dart';
 import 'package:threebotlogin/widgets/EmailVerificationNeeded.dart';
-import 'package:threebotlogin/widgets/PinField.dart';
 
 import 'MainScreen.dart';
 
@@ -282,37 +281,6 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
                           ));
                 }
               }),
-        ],
-      ),
-    );
-  }
-
-  void _showPinDialog(callbackParam) {
-    if (callbackParam == 'fingerprint') {
-      setState(() {
-        finger = true;
-      });
-    }
-
-    showDialog(
-      context: context,
-      builder: (BuildContext context) => CustomDialog(
-        image: Icons.dialpad,
-        title: "Please enter your pincode",
-        description: Container(
-          child: PinField(
-            callback: checkPin,
-            callbackParam: callbackParam,
-          ),
-        ),
-        actions: <Widget>[
-          FlatButton(
-            child: new Text("Cancel"),
-            onPressed: () {
-              Navigator.pop(context);
-              setState(() {});
-            },
-          ),
         ],
       ),
     );
