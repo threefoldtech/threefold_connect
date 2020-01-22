@@ -59,19 +59,16 @@ class _MobileRegistrationScreenState extends State<MobileRegistrationScreen> {
   checkEmail() async {
     bool emailValid = validateEmail(emailController.text);
     setState(() {
-      loadingDialog();
       if (emailValid) {
         _registrationData.email = emailController.text;
         state = _State.SeedPhrase;
       } else {
         errorStepperText = "Please enter a valid email.";
       }
-      Navigator.pop(context); // pop Loading
     });
   }
 
   checkDoubleName() async {
-    loadingDialog();
     if (doubleNameController.text != null || doubleNameController.text != '') {
       _registrationData.doubleName = doubleNameController.text + '.3bot';
       String doubleNameValidation =
@@ -98,7 +95,6 @@ class _MobileRegistrationScreenState extends State<MobileRegistrationScreen> {
         errorStepperText = 'Please choose a name.';
       });
     }
-    Navigator.pop(context);
   }
 
   generateKeys() async {
@@ -127,6 +123,7 @@ class _MobileRegistrationScreenState extends State<MobileRegistrationScreen> {
     loadingDialog();
     Response response = await finishRegistration(doubleNameController.text,
         emailController.text, 'random', _registrationData.keys['publicKey']);
+
     if (response.statusCode == 200) {
       saveRegistration();
 

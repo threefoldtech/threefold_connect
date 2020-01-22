@@ -13,12 +13,22 @@ class UniLinkService {
     BuildContext context = e.context;
 
     bool autoLogin = false;
-    Map<String, dynamic> scope = jsonDecode(link.queryParameters['scope']);
-    if (scope['trustedDevice'] != null) {
-      String trustedDevice = scope['trustedDevice'];
-      if (await isTrustedDevice(link.queryParameters['appId'], trustedDevice)) {
-        print('you are logged in');
-        autoLogin = true;
+
+    if (link != null) {
+      String queryParameters = link.queryParameters['scope'];
+
+      if (queryParameters != null) {
+        Map<String, dynamic> scope = jsonDecode(queryParameters);
+        if (scope != null && scope['trustedDevice'] != null) {
+          String trustedDevice = scope['trustedDevice'];
+          if (await isTrustedDevice(
+              link.queryParameters['appId'], trustedDevice)) {
+            print('you are logged in');
+            autoLogin = true;
+          }
+        }
+      } else {
+        return;
       }
     }
 
