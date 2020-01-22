@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:threebotlogin/helpers/Globals.dart';
-import 'package:threebotlogin/helpers/HexColor.dart';
-import 'package:threebotlogin/screens/MainScreen.dart';
-
-import 'package:threebotlogin/services/loggingService.dart';
-
-import 'package:threebotlogin/services/userService.dart';
+import 'package:threebotlogin/helpers/globals.dart';
+import 'package:threebotlogin/helpers/hex_color.dart';
+import 'package:threebotlogin/screens/main_screen.dart';
+import 'package:threebotlogin/services/logging_service.dart';
+import 'package:threebotlogin/services/user_service.dart';
 
 //List<CameraDescription> cameras;
 LoggingService logger;

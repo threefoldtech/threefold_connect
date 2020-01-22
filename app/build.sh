@@ -11,7 +11,7 @@ switchConfigs() {
     cp android/app/src/main/AndroidManifest_$1 android/app/src/debug/AndroidManifest.xml
     cp android/app/src/main/java/org/jimber/threebotlogin/MainActivity_$1 android/app/src/main/java/org/jimber/threebotlogin/MainActivity.java
     cp android/app/build_$1 android/app/build.gradle
-    cp lib/helpers/EnvConfig_$1.template lib/helpers/EnvConfig.dart
+    cp lib/helpers/env_config_$1.template lib/helpers/env_config.dart
 
     cp android/app/src/main/res/mipmap-hdpi/ic_launcher_$1.png android/app/src/main/res/mipmap-hdpi/ic_launcher.png
     cp android/app/src/main/res/mipmap-mdpi/ic_launcher_$1.png android/app/src/main/res/mipmap-mdpi/ic_launcher.png
@@ -21,8 +21,8 @@ switchConfigs() {
 }
 
 setConfigsAndBuild() {
-    sed -i -e "s/githashvalue/$githash/g" lib/helpers/EnvConfig.dart
-    sed -i -e "s/timevalue/$logcurrent_time/g" lib/helpers/EnvConfig.dart
+    sed -i -e "s/githashvalue/$githash/g" lib/helpers/env_config.dart
+    sed -i -e "s/timevalue/$logcurrent_time/g" lib/helpers/env_config.dart
 
     flutter build apk -t lib/main.dart --target-platform android-arm,android-arm64 --release
 }
@@ -57,8 +57,8 @@ then
     AndroidManifestMainPath=android/app/src/main/AndroidManifest.xml
     AndroidManifestDebugPath=android/app/src/debug/AndroidManifest.xml
 
-    EnvConfigFilePath=lib/helpers/EnvConfig.dart
-    AppConfigLocalFilePath=lib/AppConfigLocal.dart
+    env_configFilePath=lib/helpers/env_config.dart
+    AppConfigLocalFilePath=lib/app_config_local.dart
 
     MainActivityPath=android/app/src/main/java/org/jimber/threebotlogin/MainActivity.java
     BuildGradlePath=android/app/build.gradle
@@ -69,8 +69,8 @@ then
     LauncherImgPath4=android/app/src/main/res/mipmap-xxhdpi/ic_launcher.png
     LauncherImgPath5=android/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png
 
-    generateFile $EnvConfigFilePath lib/helpers/EnvConfig_local.template
-    generateFile $AppConfigLocalFilePath lib/AppConfigLocal.template
+    generateFile $env_configFilePath lib/helpers/env_config_local.template
+    generateFile $AppConfigLocalFilePath lib/app_config_local.template
 
     generateFile $MainActivityPath android/app/src/main/java/org/jimber/threebotlogin/MainActivity_local
     generateFile $BuildGradlePath android/app/build_local

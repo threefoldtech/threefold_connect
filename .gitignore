@@ -310,9 +310,9 @@ example/public/config.js
 openkyc/*
 Makefile
 *pubspec.lock
-app/lib/AppConfigLocal.dart
+app/lib/app_config_local.dart
 app/android/app/src/main/AndroidManifest.xml
-app/lib/helpers/EnvConfig.dart
+app/lib/helpers/env_config.dart
 *.dart-e
 *.DS_Store
 app/android/app/build.gradle
