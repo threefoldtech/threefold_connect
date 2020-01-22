@@ -86,8 +86,8 @@ class _PreferenceDialogState extends State<PreferenceDialog> {
                           },
                     title: Text(
                       (snapshot.data['required'])
-                          ? keys[index]?.toUpperCase() + ' *'
-                          : keys[index]?.toUpperCase(),
+                          ? keys[index].toUpperCase() + ' *'
+                          : keys[index].toUpperCase(),
                       style: TextStyle(
                           fontWeight: FontWeight.bold, color: Colors.black),
                     ),
