@@ -1,0 +1,8 @@
+import 'package:threebotlogin/helpers/environment.dart';
+
+abstract class EnvConfig {
+  Environment environment = Environment.Local;
+
+  String githash = "githashvalue";
+  String time = "timevalue";
+}

@@ -15,6 +15,17 @@ For help getting started with Flutter, view our
 [online documentation](https://flutter.io/docs), which offers tutorials, 
 samples, guidance on mobile development, and a full API reference.
 
+## Code convensions
+- Functions need to have a type, don't leave them empty.
+- Don't use var, use the explicit type, this will mitigate the errors found at runtime.
+- Filesnames should be lowercased with underscores to sepate words.
+- variables should be lowerCamelCase.
+
+Formatter: dartfmt
+
+Please read the documentation provided by dart: [here](https://dart.dev/guides/language/effective-dart/style)
+
+
 ## Build for ios
 Open terminal on this dir and run
 ```
