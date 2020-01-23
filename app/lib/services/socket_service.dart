@@ -71,7 +71,7 @@ class BackendConnection {
   }
 
   void socketLoginMobile(Map<String, dynamic> data) {
-    print('loging in');
+    print('logging in');
     return socket.emit('login', data);
   }
 }
@@ -84,15 +84,20 @@ Future openLogin(context, data) async {
     String pin = await getPin();
 
     bool authenticated = await Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => AuthenticationScreen(
-              correctPin: pin, userMessage: "sign your attempt"),
-        ));
+      context,
+      MaterialPageRoute(
+        builder: (context) => AuthenticationScreen(
+            correctPin: pin, userMessage: "sign your attempt"),
+      ),
+    );
 
     if (authenticated != null && authenticated) {
       bool loggedIn = await Navigator.push(
-          context, MaterialPageRoute(builder: (context) => LoginScreen(data)));
+        context,
+        MaterialPageRoute(
+          builder: (context) => LoginScreen(data),
+        ),
+      );
 
       if (loggedIn != null && loggedIn) {
         await Navigator.push(
@@ -111,14 +116,14 @@ Future openLogin(context, data) async {
 
         getSignedEmailIdentifierFromOpenKYC(tmpDoubleName)
             .then((response) async {
-          Map<String, dynamic> body = jsonDecode(response.body);
+          Map<String, String> body = jsonDecode(response.body);
 
           //TODO: Check if this always is a string.
           dynamic signedEmailIdentifier = body["signed_email_identifier"];
 
           if (signedEmailIdentifier != null &&
               signedEmailIdentifier.isNotEmpty) {
-            Map<String, dynamic> vsei = json.decode(
+            Map<String, String> vsei = json.decode(
                 (await verifySignedEmailIdentifier(signedEmailIdentifier))
                     .body);
 

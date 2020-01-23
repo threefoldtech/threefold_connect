@@ -15,7 +15,7 @@ Future getSignedEmailIdentifierFromOpenKYC(String doubleName) async {
   String timestamp = new DateTime.now().millisecondsSinceEpoch.toString();
   String privatekey = await getPrivateKey();
 
-  Map<String, dynamic> payload = {
+  Map<String, String> payload = {
     "timestamp": timestamp,
     "intention": "get-signedemailidentifier"
   };

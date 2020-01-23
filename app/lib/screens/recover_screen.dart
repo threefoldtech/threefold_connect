@@ -200,32 +200,12 @@ class _RecoverScreenState extends State<RecoverScreen> {
               ),
               color: Theme.of(context).primaryColor,
               onPressed: () async {
-                showDialog(
-                  context: context,
-                  barrierDismissible: false,
-                  builder: (BuildContext context) => Dialog(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        SizedBox(
-                          height: 10,
-                        ),
-                        new CircularProgressIndicator(),
-                        SizedBox(
-                          height: 10,
-                        ),
-                        new Text("Loading"),
-                        SizedBox(
-                          height: 10,
-                        ),
-                      ],
-                    ),
-                  ),
-                );
                 setState(() {
                   error = '';
                 });
+
                 FocusScope.of(context).requestFocus(new FocusNode());
+
                 setState(() {
                   _autoValidate = true;
                   doubleName = doubleNameController.text + '.3bot';
@@ -233,6 +213,7 @@ class _RecoverScreenState extends State<RecoverScreen> {
                   seedPhrase = seedPhrasecontroller.text;
                   validateEmail(emailFromForm);
                 });
+
                 try {
                   if (emailFromForm != null &&
                       emailFromForm.isNotEmpty &&
@@ -242,13 +223,10 @@ class _RecoverScreenState extends State<RecoverScreen> {
                   } else {
                     throw new Exception("");
                   }
-
                   Navigator.pop(context);
                   Navigator.pop(context, true);
                 } catch (e) {
-                  Navigator.pop(context, false);
                   setState(() {
-                    // error = e.message;
                     error =
                         'Please make sure everything is correctly filled in';
                   });

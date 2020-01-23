@@ -17,7 +17,7 @@ _LoginScreenState lastState;
 class LoginScreen extends StatefulWidget {
   final Widget loginScreen;
   final Widget scopeList;
-  final Map<String, String> message;
+  final Map<String, dynamic> message;
   final bool closeWhenLoggedIn;
   final bool autoLogin;
 
@@ -112,16 +112,16 @@ class _LoginScreenState extends State<LoginScreen> with BlockAndRunMixin {
       }
     }
 
-    String scopePermissions = await getScopePermissions();
+    var scopePermissions = await getScopePermissions();
     if (scopePermissions == null) {
       saveScopePermissions(jsonEncode(scope));
       scopePermissions = jsonEncode(scope);
     }
 
-    dynamic initialPermissions = (scopePermissions);
+   var initialPermissions = jsonDecode(scopePermissions);
 
     if (!initialPermissions.containsKey(widget.message['appId'])) {
-      HashMap newHashMap = new HashMap();
+      var newHashMap = new HashMap();
       initialPermissions[widget.message['appId']] = newHashMap;
 
       if (scope != null) {
@@ -134,7 +134,7 @@ class _LoginScreenState extends State<LoginScreen> with BlockAndRunMixin {
       }
       saveScopePermissions(jsonEncode(initialPermissions));
     } else {
-      List<String> permissions = ['doubleName', 'email'];
+      var permissions = ['doubleName', 'email'];
 
       permissions.forEach((String permission) {
         if (!initialPermissions[widget.message['appId']]
@@ -366,7 +366,7 @@ class _LoginScreenState extends State<LoginScreen> with BlockAndRunMixin {
 
   // Rework this ugly beast.
   bool checkMobile() {
-    String mobile = widget.message['mobile'];
+    var mobile = widget.message['mobile'];
     return mobile == true || mobile == 'true';
   }
 

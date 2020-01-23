@@ -15,10 +15,10 @@ class PreferenceDialog extends StatefulWidget {
       : super(key: key);
 
   final scope;
-  final appId;
+  final String appId;
   final callback;
   final cancel;
-  final type;
+  final String type;
 
   _PreferenceDialogState createState() => _PreferenceDialogState();
 }
@@ -29,19 +29,17 @@ class _PreferenceDialogState extends State<PreferenceDialog> {
     super.initState();
   }
 
-  //TODO: Properly assign types.
-  Future<dynamic> getPermissions(app, scope) async {
-    Map<String, dynamic> json = jsonDecode(await getScopePermissions());
+  Future<dynamic> getPermissions(String appId, scope) async {
+    var decodedScopePermissions = jsonDecode(await getScopePermissions());
     var sc = scope[0];
-    return json[app][sc];
+    return decodedScopePermissions[appId][sc];
   }
 
-  //TODO: Properly assign types.
-  Future<dynamic> changePermission(app, scope, value) async {
-    Map<String, dynamic> json = jsonDecode(await getScopePermissions());
+  Future<dynamic> changePermission(String appId, scope, value) async {
+    var decodedScopePermissions = jsonDecode(await getScopePermissions());
     var sc = scope[0];
-    json[app][sc]['enabled'] = value;
-    saveScopePermissions(jsonEncode(json));
+    decodedScopePermissions[appId][sc]['enabled'] = value;
+    saveScopePermissions(jsonEncode(decodedScopePermissions));
   }
 
   Widget scopeList(context, Map<dynamic, dynamic> scope) {

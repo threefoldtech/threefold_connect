@@ -30,7 +30,7 @@ Future<Response> sendPublicKey(Map<String, Object> data) async {
   String timestamp = new DateTime.now().millisecondsSinceEpoch.toString();
   String privatekey = await getPrivateKey();
 
-  Map<String, dynamic> headers = {
+  Map<String, String> headers = {
     "timestamp": timestamp,
     "intention": "post-savederivedpublickey"
   };
