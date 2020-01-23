@@ -12,12 +12,10 @@ import 'package:threebotlogin/services/3bot_service.dart';
 import 'package:threebotlogin/widgets/image_button.dart';
 import 'package:threebotlogin/widgets/preference_dialog.dart';
 
-_LoginScreenState lastState;
-
 class LoginScreen extends StatefulWidget {
   final Widget loginScreen;
   final Widget scopeList;
-  final Map<String, dynamic> message;
+  final message;
   final bool closeWhenLoggedIn;
   final bool autoLogin;
 
@@ -42,7 +40,6 @@ class _LoginScreenState extends State<LoginScreen> with BlockAndRunMixin {
 
   List<int> imageList = new List();
 
-  //TODO: We should specifiy what kind of map this is!
   Map scope = Map();
 
   int selectedImageId = -1;
@@ -51,7 +48,9 @@ class _LoginScreenState extends State<LoginScreen> with BlockAndRunMixin {
   bool cancelBtnVisible = false;
   bool showScopeAndEmoji = false;
   bool isMobileCheck = false;
+
   String emitCode = randomString(10);
+
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   close(PopAllLoginEvent e) {
@@ -113,12 +112,13 @@ class _LoginScreenState extends State<LoginScreen> with BlockAndRunMixin {
     }
 
     var scopePermissions = await getScopePermissions();
+
     if (scopePermissions == null) {
       saveScopePermissions(jsonEncode(scope));
       scopePermissions = jsonEncode(scope);
     }
 
-   var initialPermissions = jsonDecode(scopePermissions);
+    var initialPermissions = jsonDecode(scopePermissions);
 
     if (!initialPermissions.containsKey(widget.message['appId'])) {
       var newHashMap = new HashMap();
@@ -148,6 +148,8 @@ class _LoginScreenState extends State<LoginScreen> with BlockAndRunMixin {
 
       saveScopePermissions(jsonEncode(initialPermissions));
     }
+
+    setState(() {});
   }
 
   finishLogin() {
@@ -337,8 +339,7 @@ class _LoginScreenState extends State<LoginScreen> with BlockAndRunMixin {
       await sendData(state, "", null, selectedImageId,
           null); // temp fix send empty data for regenerate emoji
     } else {
-      await sendData(
-          state, signedHash, data, selectedImageId, signedRoom);
+      await sendData(state, signedHash, data, selectedImageId, signedRoom);
     }
 
     if (selectedImageId == correctImage || isMobileCheck) {

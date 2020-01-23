@@ -15,10 +15,10 @@ class PreferenceDialog extends StatefulWidget {
       : super(key: key);
 
   final scope;
-  final String appId;
+  final appId;
   final callback;
   final cancel;
-  final String type;
+  final type;
 
   _PreferenceDialogState createState() => _PreferenceDialogState();
 }
@@ -42,7 +42,7 @@ class _PreferenceDialogState extends State<PreferenceDialog> {
     saveScopePermissions(jsonEncode(decodedScopePermissions));
   }
 
-  Widget scopeList(context, Map<dynamic, dynamic> scope) {
+  Widget scopeList(context, scope) {
     var keys = scope.keys.toList();
 
     return Container(
