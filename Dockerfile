@@ -2,11 +2,11 @@ FROM node:12 as builder
 
 COPY frontend /frontend
 WORKDIR /frontend
-RUN npm i && npm run build
+RUN npm ci && npm run build
 
 COPY example /example
 WORKDIR /example
-RUN npm i && npm run build
+RUN npm ci && npm run build
 
 
 FROM nginx
