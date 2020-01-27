@@ -16,8 +16,9 @@ class UniLinkService {
 
     if (link != null) {
       String jsonScope = link.queryParameters['scope'];
+      String state = link.queryParameters['state'];
 
-      if (jsonScope == null) {
+      if (jsonScope == null && state == null) {
         return;
       }
     }
@@ -61,7 +62,9 @@ Login queryParametersToLogin(Map<String, dynamic> map) {
       state: map['state'],
       isMobile: true,
       signedRoom: map['signedRoom'],
-      scope: Scope.fromJson(jsonDecode(map['scope'] as String)),
+      scope: map['scope'] != null
+          ? Scope.fromJson(jsonDecode(map['scope'] as String))
+          : null,
       appId: map['appId'],
       appPublicKey: map['appPublicKey'],
       redirecturl: map['redirecturl']);
