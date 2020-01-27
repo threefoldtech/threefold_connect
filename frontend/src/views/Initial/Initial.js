@@ -57,7 +57,7 @@ export default {
       this.setAppId(this.$route.query.appid || null)
       this.setAppPublicKey(this.$route.query.publickey || null)
       if (this.$route.query.scope === undefined) {
-        this.setScope(JSON.stringify({ doubleName: true, email: false, keys: false }))
+        this.setScope(null)
       } else {
         this.setScope(this.$route.query.scope || null)
       }
@@ -110,7 +110,7 @@ export default {
       var roomToListenForSigned = Math.random().toString(32).substring(2)
       this.setSignedRoom(roomToListenForSigned)
 
-      var url = `threebot://login?state=${encodeURIComponent(this.hash)}&mobile=true&signedRoom=${roomToListenForSigned}`
+      var url = `threebot://login?state=${encodeURIComponent(this.hash)}&signedRoom=${roomToListenForSigned}`
       if (this.scope) url += `&scope=${encodeURIComponent(this.scope)}`
       if (this.appId) url += `&appId=${encodeURIComponent(this.appId)}`
       if (this.appPublicKey) url += `&appPublicKey=${encodeURIComponent(this.appPublicKey)}`
@@ -129,7 +129,7 @@ export default {
         firstTime: false
       })
       if (this.isMobile) {
-        var url = `threebot://login/?state=${encodeURIComponent(this.hash)}&mobile=true`
+        var url = `threebot://login/?state=${encodeURIComponent(this.hash)}`
         if (this.scope) url += `&scope=${encodeURIComponent(this.scope)}`
         if (this.appId) url += `&appId=${encodeURIComponent(this.appId)}`
         if (this.appPublicKey) url += `&appPublicKey=${encodeURIComponent(this.appPublicKey)}`

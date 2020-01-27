@@ -103,7 +103,8 @@ Future<Map<String, Object>> getEmail() async {
   final SharedPreferences prefs = await SharedPreferences.getInstance();
   return {
     'email': prefs.getString('email'),
-    'verified': prefs.getString('signedEmailIdentifier')
+    'verified': prefs.getString('signedEmailIdentifier'), // I'll leave this here for backwards compat with forums & ffp and other existing implementations. 
+    'sei': prefs.getString('signedEmailIdentifier')
   };
 }
 
@@ -153,6 +154,17 @@ Future<void> saveScopePermissions(scopePermissions) async {
 Future<String> getScopePermissions() async {
   final SharedPreferences prefs = await SharedPreferences.getInstance();
   return prefs.getString('scopePermissions');
+}
+
+Future<void> savePreviousScopePermissions(String appId, scopePermissions) async {
+  final SharedPreferences prefs = await SharedPreferences.getInstance();
+  prefs.remove('$appId-scopePreviousPermissions');
+  prefs.setString('$appId-scopePreviousPermissions', scopePermissions);
+}
+
+Future<String> getPreviousScopePermissions(String appId) async {
+  final SharedPreferences prefs = await SharedPreferences.getInstance();
+  return prefs.getString('$appId-scopePreviousPermissions');
 }
 
 Future<bool> isTrustedDevice(String appId, String trustedDevice) async {

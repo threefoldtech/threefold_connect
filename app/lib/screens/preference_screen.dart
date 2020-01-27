@@ -40,9 +40,11 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
   MaterialColor thiscolor = Colors.green;
 
   setEmailVerified() {
-    setState(() {
-      this.emailVerified = Globals().emailVerified.value;
-    });
+    if (mounted) {
+      setState(() {
+        this.emailVerified = Globals().emailVerified.value;
+      });
+    }
   }
 
   setVersion() {
