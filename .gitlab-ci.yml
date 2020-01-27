@@ -1,0 +1,14 @@
+stages:
+  - build
+
+staging_build:
+  stage: build
+  dependencies: []
+  only: 
+    - development
+  tags:
+    - builder
+  script:
+    - cp frontend/public/config.staging.js frontend/public/config.js
+    - cp example/public/config.staging.js example/public/config.js
+    - docker build -t jimber/3botlogin:staging .
