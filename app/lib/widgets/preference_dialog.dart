@@ -54,6 +54,7 @@ class _PreferenceDialogState extends State<PreferenceDialog> {
 
       if (!scopeIsEqual(scopeAsMap, previousScopePermissionsObject)) {
         previousScopePermissionsObject = widget.scope.toJson();
+        await savePreviousScopePermissions(widget.appId, jsonEncode(previousScopePermissionsObject));
       }
 
       previousSelectedScope = (previousScopePermissionsObject == null)
@@ -103,7 +104,7 @@ class _PreferenceDialogState extends State<PreferenceDialog> {
     return Container(
         child: Column(
       children: <Widget>[
-        widget.scope != null
+        widget.scope != null && widget.scope.email != null
             ? ListView.builder(
                 scrollDirection: Axis.vertical,
                 shrinkWrap: true,
@@ -146,6 +147,28 @@ class _PreferenceDialogState extends State<PreferenceDialog> {
                           },
                         );
                         break;
+                      // default:
+                      //   return FutureBuilder(
+                      //     future: getEmail(),
+                      //     builder:
+                      //         (BuildContext context, AsyncSnapshot snapshot) {
+                      //       if (snapshot.hasData) {
+                      //         return ListTile(
+                      //           title: Text(
+                      //             "${scopeItem.toUpperCase()}",
+                      //             style: TextStyle(
+                      //                 fontWeight: FontWeight.bold,
+                      //                 color: Colors.black,
+                      //                 decoration: TextDecoration.lineThrough),
+                      //           ),
+                      //           subtitle: Text("This scope will be ignored."),
+                      //           isThreeLine: true,
+                      //         );
+                      //       } else {
+                      //         return Container();
+                      //       }
+                      //     },
+                      //   );
                     }
                   }
                   return Container();

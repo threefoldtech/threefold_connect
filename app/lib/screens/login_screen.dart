@@ -236,7 +236,7 @@ class _LoginScreenState extends State<LoginScreen> with BlockAndRunMixin {
       var scopePermissionsDecoded = jsonDecode(scopePermissions);
 
       if (scopePermissions != null && scopePermissions != "") {
-        if (scopePermissionsDecoded['email']) {
+        if (scopePermissionsDecoded['email'] != null && scopePermissionsDecoded['email']) {
           scope['email'] = (await getEmail());
         }
       }
