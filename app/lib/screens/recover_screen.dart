@@ -48,13 +48,13 @@ class _RecoverScreenState extends State<RecoverScreen> {
     Response userInfoResult = await getUserInfo(doubleName);
 
     if (userInfoResult.statusCode != 200) {
-      throw new Exception('User not found');
+      throw new Exception('Name was not found.');
     }
 
     Map<String, dynamic> body = json.decode(userInfoResult.body);
 
     if (body['publicKey'] != keys['publicKey']) {
-      throw new Exception('Seed phrase does not correspond to given name');
+      throw new Exception('Seed phrase does not match with $doubleName');
     }
   }
 
@@ -200,8 +200,6 @@ class _RecoverScreenState extends State<RecoverScreen> {
               ),
               color: Theme.of(context).primaryColor,
               onPressed: () async {
-                showSpinner();
-
                 setState(() {
                   error = '';
                 });
@@ -220,18 +218,25 @@ class _RecoverScreenState extends State<RecoverScreen> {
                   if (emailFromForm != null &&
                       emailFromForm.isNotEmpty &&
                       emailCheck == true) {
+                    showSpinner();
+
                     await checkSeedPhrase(doubleName, seedPhrase);
                     await continueRecoverAccount();
+
+                    Navigator.pop(context); // To dismiss the spinner
+                    Navigator.pop(
+                        context, true); // to dismiss the recovery screen.
+
                   } else {
-                    throw new Exception("");
+                    setState(() {
+                      error =
+                          'Please make sure everything is correctly filled in';
+                    });
                   }
-                  Navigator.pop(context); // To dismiss the spinner 
-                  Navigator.pop(context, true); // to dismiss the recovery screen.
                 } catch (e) {
-                  Navigator.pop(context);
+                  Navigator.pop(context); // To dismiss the spinner
                   setState(() {
-                    error =
-                        'Please make sure everything is correctly filled in';
+                    error = e.message;
                   });
                 }
               },
