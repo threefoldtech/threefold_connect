@@ -37,7 +37,7 @@ export default {
     ]),
     openApp () {
       if (this.isMobile) {
-        var url = `threebot://login/?state=${encodeURIComponent(this.hash)}&mobile=true`
+        var url = `threebot://login/?state=${encodeURIComponent(this.hash)}`
         if (this.scope) url += `&scope=${encodeURIComponent(this.scope)}`
         if (this.appId) url += `&appId=${encodeURIComponent(this.appId)}`
         if (this.appPublicKey) url += `&appPublicKey=${encodeURIComponent(this.appPublicKey)}`

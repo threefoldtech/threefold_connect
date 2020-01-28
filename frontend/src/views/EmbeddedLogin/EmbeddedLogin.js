@@ -56,15 +56,6 @@ export default {
       'setAppPublicKey',
       'loginUser'
     ]),
-    // openApp() {
-    //   if (this.isMobile) {
-    //     var url = `threebot://login/?state=${encodeURIComponent(this.hash)}&mobile=true`
-    //     if (this.scope) url += `&scope=${encodeURIComponent(this.scope)}`
-    //     if (this.appId) url += `&appId=${encodeURIComponent(this.appId)}`
-    //     if (this.appPublicKey) url += `&appPublicKey=${encodeURIComponent(this.appPublicKey)}`
-    //     window.open(url)
-    //   }
-    // },
     requestLogin () {
       window.parent.postMessage({ type: '3botlogin-request-login-info' }, '*')
     },

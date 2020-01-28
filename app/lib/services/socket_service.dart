@@ -1,11 +1,13 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 import 'package:threebotlogin/app_config.dart';
 import 'package:threebotlogin/events/close_socket_event.dart';
 import 'package:threebotlogin/events/events.dart';
 import 'package:threebotlogin/events/new_login_event.dart';
+import 'package:threebotlogin/models/login.dart';
 import 'package:threebotlogin/screens/authentication_screen.dart';
 import 'package:threebotlogin/screens/login_screen.dart';
 import 'package:threebotlogin/screens/successful_screen.dart';
@@ -35,16 +37,20 @@ class BackendConnection {
       print('joined room');
     });
 
-    socket.on('signed', (data) {
+    socket.on('signed', (dynamic data) {
       print('---------signed-----------');
       print(data);
     });
 
-    socket.on('login', (data) {
+    socket.on('login', (dynamic data) {
+      Login loginData = Login.fromJson(data);
+      loginData.isMobile = false;
       print('---------login-----------');
-      print(data);
-      data['loginId'] = randomString(10);
-      Events().emit(NewLoginEvent(data: data, loginId: data['loginId']));
+      print(loginData);
+
+      loginData.loginId = randomString(10);
+      Events().emit(
+          NewLoginEvent(loginData: loginData, loginId: loginData.loginId));
     });
 
     socket.on('disconnect', (_) {
@@ -69,25 +75,19 @@ class BackendConnection {
     print('joining room....');
     socket.emit('join', {'room': doubleName, 'app': true});
   }
-
-  void socketLoginMobile(Map<String, dynamic> data) {
-    print('logging in');
-    return socket.emit('login', data);
-  }
 }
 
-Future openLogin(context, data) async {
-  String messageType = data["type"];
-  var mobile = data["mobile"];
+Future openLogin(BuildContext context, Login loginData) async {
+  String messageType = loginData.type;
 
-  if (messageType == 'login' && mobile != true) {
+  if (messageType == 'login' && !loginData.isMobile) {
     String pin = await getPin();
 
     bool authenticated = await Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => AuthenticationScreen(
-            correctPin: pin, userMessage: "sign your attempt"),
+            correctPin: pin, userMessage: "sign your attempt."),
       ),
     );
 
@@ -95,18 +95,19 @@ Future openLogin(context, data) async {
       bool loggedIn = await Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => LoginScreen(data),
+          builder: (context) => LoginScreen(loginData),
         ),
       );
 
       if (loggedIn != null && loggedIn) {
         await Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => SuccessfulScreen(
-                  title: "Logged in",
-                  text: "You are now logged in. Return to browser."),
-            ));
+          context,
+          MaterialPageRoute(
+            builder: (context) => SuccessfulScreen(
+                title: "Logged in",
+                text: "You are now logged in. Return to browser."),
+          ),
+        );
       }
     }
   } else if (messageType == 'email_verification') {
@@ -116,14 +117,13 @@ Future openLogin(context, data) async {
 
         getSignedEmailIdentifierFromOpenKYC(tmpDoubleName)
             .then((response) async {
-          Map<String, String> body = jsonDecode(response.body);
+          Map<String, dynamic> body = jsonDecode(response.body);
 
-          //TODO: Check if this always is a string.
           dynamic signedEmailIdentifier = body["signed_email_identifier"];
 
           if (signedEmailIdentifier != null &&
               signedEmailIdentifier.isNotEmpty) {
-            Map<String, String> vsei = json.decode(
+            Map<String, dynamic> vsei = jsonDecode(
                 (await verifySignedEmailIdentifier(signedEmailIdentifier))
                     .body);
 

@@ -98,7 +98,7 @@ class _RegisteredScreenState extends State<RegisteredScreen>
                     ),
                     Padding(
                       padding: EdgeInsets.all(5),
-                      child: Text("TF IEO"),
+                      child: Text("TF Tokens"),
                     ),
                   ],
                 ),

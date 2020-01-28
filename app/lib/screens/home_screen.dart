@@ -106,7 +106,7 @@ class _HomeScreenState extends State<HomeScreen>
 
     Events().onEvent(GoHomeEvent().runtimeType, close);
     Events().onEvent(NewLoginEvent().runtimeType, (NewLoginEvent event) {
-      openLogin(context, event.data);
+      openLogin(context, event.loginData);
     });
     WidgetsBinding.instance.addObserver(this);
   }

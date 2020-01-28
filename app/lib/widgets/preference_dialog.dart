@@ -1,129 +1,171 @@
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:threebotlogin/models/scope.dart';
 import 'package:threebotlogin/services/user_service.dart';
 import 'package:threebotlogin/widgets/custom_dialog.dart';
 
 class PreferenceDialog extends StatefulWidget {
-  PreferenceDialog(
-      {Key key,
-      @required this.scope,
-      @required this.appId,
-      this.callback,
-      this.cancel,
-      this.type})
-      : super(key: key);
+  final Scope scope;
+  final String appId;
+  final Function callback;
+  final String type;
 
-  final scope;
-  final appId;
-  final callback;
-  final cancel;
-  final type;
+  PreferenceDialog({this.scope, this.appId, this.callback, this.type});
 
   _PreferenceDialogState createState() => _PreferenceDialogState();
 }
 
 class _PreferenceDialogState extends State<PreferenceDialog> {
+  bool _canRender = false;
+
+  Map<String, dynamic> scopeAsMap;
+  Map<String, dynamic> previousSelectedScope;
+
   @override
   void initState() {
     super.initState();
+
+    _startup().then((value) {
+      setState(() {
+        _canRender = true;
+        print('Async done');
+      });
+    });
   }
 
-  Future<dynamic> getPermissions(String appId, scope) async {
-    var decodedScopePermissions = jsonDecode(await getScopePermissions());
-    var sc = scope[0];
-    return decodedScopePermissions[appId][sc];
+  Future _startup() async {
+    if (widget.scope != null) {
+      scopeAsMap = widget.scope
+          .toJson(); // Scope we received from the application the users wants to log into.
+
+      String previousScopePermissions = await getPreviousScopePermissions(
+          widget.appId); // Scope from our history based on the appId.
+      Map<String, dynamic> previousScopePermissionsObject;
+
+      if (previousScopePermissions != null) {
+        previousScopePermissionsObject = jsonDecode(previousScopePermissions);
+      } else {
+        previousScopePermissionsObject = widget.scope.toJson();
+        await savePreviousScopePermissions(
+            widget.appId, jsonEncode(previousScopePermissionsObject));
+      }
+
+      if (!scopeIsEqual(scopeAsMap, previousScopePermissionsObject)) {
+        previousScopePermissionsObject = widget.scope.toJson();
+      }
+
+      previousSelectedScope = (previousScopePermissionsObject == null)
+          ? scopeAsMap
+          : previousScopePermissionsObject;
+    } else {
+      await savePreviousScopePermissions(widget.appId, null);
+    }
   }
 
-  Future<dynamic> changePermission(String appId, scope, value) async {
-    var decodedScopePermissions = jsonDecode(await getScopePermissions());
-    var sc = scope[0];
-    decodedScopePermissions[appId][sc]['enabled'] = value;
-    saveScopePermissions(jsonEncode(decodedScopePermissions));
+  bool scopeIsEqual(
+      Map<String, dynamic> appScope, Map<String, dynamic> userScope) {
+    List<String> appScopeList = appScope.keys.toList();
+    List<String> userScopeList = userScope.keys.toList();
+
+    if (!listEquals(appScopeList, userScopeList)) {
+      return false;
+    }
+
+    for (int i = 0; i < appScopeList.length; i++) {
+      dynamic scopeValue1 = appScope[appScopeList[i]];
+      dynamic scopeValue2 = userScope[userScopeList[i]];
+
+      if (scopeValue1 == true &&
+          (scopeValue2 == false || scopeValue2 == null)) {
+        return false;
+      }
+
+      if (scopeValue1 == null &&
+          (scopeValue2 == true || scopeValue2 == false)) {
+        return false;
+      }
+    }
+
+    return true;
   }
 
-  Widget scopeList(context, scope) {
-    var keys = scope.keys.toList();
+  void toggleScope(String scopeItem, value) async {
+    previousSelectedScope[scopeItem] = value;
+    await savePreviousScopePermissions(
+        widget.appId, jsonEncode(previousSelectedScope));
 
+    setState(() {});
+  }
+
+  Widget scopeList(context) {
     return Container(
-      height: (MediaQuery.of(context).size.height < 450)
-          ? MediaQuery.of(context).size.height / 3.5
-          : null,
-      child: ListView.builder(
-          scrollDirection: Axis.vertical,
-          itemCount: scope.length,
-          shrinkWrap: true,
-          itemBuilder: (BuildContext ctxt, index) {
-            var val = scope[keys[index]];
-            if (keys[index] == 'email') {
-              val = scope[keys[index]]['email'];
-            } else if (keys[index] == 'derivedSeed') {
-              val = 'Cryptographic seed';
-            } else if (keys[index] == 'trustedDevice') {
-              val = 'Trusted Device';
-            }
+        child: Column(
+      children: <Widget>[
+        widget.scope != null
+            ? ListView.builder(
+                scrollDirection: Axis.vertical,
+                shrinkWrap: true,
+                itemCount: scopeAsMap.length,
+                itemBuilder: (BuildContext context, index) {
+                  var keyList = scopeAsMap.keys.toList();
+                  String scopeItem = keyList[index];
 
-            return FutureBuilder(
-              future: getPermissions(widget.appId, [keys[index]]),
-              builder: (BuildContext context, AsyncSnapshot snapshot) {
-                if (snapshot.hasData) {
-                  return SwitchListTile(
-                    value: (snapshot.data['required'])
-                        ? true
-                        : snapshot.data['enabled'],
-                    activeColor: (!snapshot.data['required'])
-                        ? Theme.of(context).primaryColor
-                        : Colors.grey,
-                    onChanged: (snapshot.data['required'])
-                        ? null
-                        : (bool val) {
-                            setState(() {
-                              if (!snapshot.data['required']) {
-                                changePermission(
-                                    widget.appId, [keys[index]], val);
-                              }
-                            });
+                  if (scopeAsMap[scopeItem] != null) {
+                    bool mandatory = scopeAsMap[scopeItem];
+
+                    switch (scopeItem) {
+                      case "email":
+                        return FutureBuilder(
+                          future: getEmail(),
+                          builder:
+                              (BuildContext context, AsyncSnapshot snapshot) {
+                            if (snapshot.hasData) {
+                              return CheckboxListTile(
+                                value: (mandatory)
+                                    ? mandatory
+                                    : previousSelectedScope[scopeItem],
+                                onChanged: (mandatory)
+                                    ? null
+                                    : (value) {
+                                        toggleScope(scopeItem, value);
+                                      },
+                                title: Text(
+                                  "${scopeItem.toUpperCase()}" +
+                                      (mandatory ? " *" : ""),
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.black),
+                                ),
+                                subtitle: Text("${snapshot.data['email']}"),
+                              );
+                            } else {
+                              return Container();
+                            }
                           },
-                    title: Text(
-                      (snapshot.data['required'])
-                          ? keys[index].toUpperCase() + ' *'
-                          : keys[index].toUpperCase(),
-                      style: TextStyle(
-                          fontWeight: FontWeight.bold, color: Colors.black),
-                    ),
-                    subtitle: Text(val),
-                  );
-                } else {
-                  return new Container();
-                }
-              },
-            );
-          }),
-    );
+                        );
+                        break;
+                    }
+                  }
+                  return Container();
+                },
+              )
+            : Text("No extra permissions needed."),
+      ],
+    ));
   }
 
   @override
   Widget build(BuildContext context) {
+    if (!_canRender) {
+      return new Container();
+    }
+
     return CustomDialog(
       title: '${widget.appId} \n would like to access',
-      description: scopeList(context, widget.scope),
-      actions: (widget.type != 'login' || widget.type == null)
-          ? <Widget>[
-              FlatButton(
-                child: Text("Cancel"),
-                onPressed: (widget.cancel != null)
-                    ? widget.cancel
-                    : () => Navigator.popUntil(
-                          context,
-                          ModalRoute.withName('/'),
-                        ),
-              ),
-              FlatButton(
-                child: Text("Ok"),
-                onPressed: widget.callback,
-              )
-            ]
-          : null,
+      description: scopeList(context),
+      actions: null,
     );
   }
 }

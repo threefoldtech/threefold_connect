@@ -1,7 +1,10 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:threebotlogin/events/uni_link_event.dart';
+import 'package:threebotlogin/models/login.dart';
+import 'package:threebotlogin/models/scope.dart';
 import 'package:threebotlogin/screens/authentication_screen.dart';
 import 'package:threebotlogin/screens/login_screen.dart';
 import 'package:threebotlogin/screens/successful_screen.dart';
@@ -12,22 +15,11 @@ class UniLinkService {
     Uri link = e.link;
     BuildContext context = e.context;
 
-    bool autoLogin = false;
-
     if (link != null) {
-      String queryParameters = link.queryParameters['scope'];
+      String jsonScope = link.queryParameters['scope'];
+      String state = link.queryParameters['state'];
 
-      if (queryParameters != null) {
-        Map<String, dynamic> scope = jsonDecode(queryParameters);
-        if (scope != null && scope['trustedDevice'] != null) {
-          String trustedDevice = scope['trustedDevice'];
-          if (await isTrustedDevice(
-              link.queryParameters['appId'], trustedDevice)) {
-            print('you are logged in');
-            autoLogin = true;
-          }
-        }
-      } else {
+      if (jsonScope == null && (state == null || state == "undefined")) {
         return;
       }
     }
@@ -35,27 +27,39 @@ class UniLinkService {
     String pin = await getPin();
 
     bool authenticated = await Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => AuthenticationScreen(
-              correctPin: pin, userMessage: "sign your attempt"),
-        ));
+      context,
+      MaterialPageRoute(
+        builder: (context) => AuthenticationScreen(
+            correctPin: pin, userMessage: "sign your attempt."),
+      ),
+    );
 
     if (authenticated != null && authenticated) {
-      bool loggedIn = await Navigator.push(
-          context,
-          MaterialPageRoute(
-              builder: (context) =>
-                  LoginScreen(link.queryParameters, autoLogin: autoLogin)));
+      Login login = queryParametersToLogin(link.queryParameters);
 
-      if (loggedIn) {
-        await Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) => SuccessfulScreen(
-                    title: "Logged in",
-                    text: "You are now logged in. Return to browser.")));
+      bool loggedIn = await Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => LoginScreen(login),
+        ),
+      );
+
+      if (loggedIn != null && loggedIn) {
+        SystemChannels.platform.invokeMethod('SystemNavigator.pop');
       }
     }
   }
+}
+
+Login queryParametersToLogin(Map<String, dynamic> map) {
+  return Login(
+      state: map['state'],
+      isMobile: true,
+      signedRoom: map['signedRoom'],
+      scope: map['scope'] != null
+          ? Scope.fromJson(jsonDecode(map['scope'] as String))
+          : null,
+      appId: map['appId'],
+      appPublicKey: map['appPublicKey'],
+      redirecturl: map['redirecturl']);
 }
