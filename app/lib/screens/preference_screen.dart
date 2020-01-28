@@ -410,16 +410,21 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
 
   void _changePincode() async {
     String pin = await getPin();
+    bool authenticated = false;
 
-    bool authenticated = await Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => AuthenticationScreen(
-          correctPin: pin,
-          userMessage: "change your pincode.",
+    if(pin == null || pin.isEmpty) {
+      authenticated = true; // In case the pin wasn't set.
+    } else {
+      authenticated = await Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => AuthenticationScreen(
+            correctPin: pin,
+            userMessage: "change your pincode.",
+          ),
         ),
-      ),
-    );
+      );
+    }
 
     if (authenticated != null && authenticated) {
       bool pinChanged = await Navigator.push(
