@@ -200,6 +200,8 @@ class _RecoverScreenState extends State<RecoverScreen> {
               ),
               color: Theme.of(context).primaryColor,
               onPressed: () async {
+                showSpinner();
+
                 setState(() {
                   error = '';
                 });
@@ -223,15 +225,41 @@ class _RecoverScreenState extends State<RecoverScreen> {
                   } else {
                     throw new Exception("");
                   }
-                  Navigator.pop(context);
-                  Navigator.pop(context, true);
+                  Navigator.pop(context); // To dismiss the spinner 
+                  Navigator.pop(context, true); // to dismiss the recovery screen.
                 } catch (e) {
+                  Navigator.pop(context);
                   setState(() {
                     error =
                         'Please make sure everything is correctly filled in';
                   });
                 }
               },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void showSpinner() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) => Dialog(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            SizedBox(
+              height: 10,
+            ),
+            new CircularProgressIndicator(),
+            SizedBox(
+              height: 10,
+            ),
+            new Text("Loading"),
+            SizedBox(
+              height: 10,
             ),
           ],
         ),

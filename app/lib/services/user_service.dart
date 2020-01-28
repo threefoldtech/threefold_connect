@@ -156,10 +156,10 @@ Future<String> getScopePermissions() async {
   return prefs.getString('scopePermissions');
 }
 
-Future<void> savePreviousScopePermissions(String appId, scopePermissions) async {
+Future<void> savePreviousScopePermissions(String appId, String scopePermissions) async {
   final SharedPreferences prefs = await SharedPreferences.getInstance();
-  prefs.remove('$appId-scopePreviousPermissions');
-  prefs.setString('$appId-scopePreviousPermissions', scopePermissions);
+  await prefs.remove('$appId-scopePreviousPermissions');
+  await prefs.setString('$appId-scopePreviousPermissions', scopePermissions);
 }
 
 Future<String> getPreviousScopePermissions(String appId) async {

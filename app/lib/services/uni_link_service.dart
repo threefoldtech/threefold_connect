@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:threebotlogin/events/uni_link_event.dart';
 import 'package:threebotlogin/models/login.dart';
 import 'package:threebotlogin/models/scope.dart';
@@ -18,7 +19,7 @@ class UniLinkService {
       String jsonScope = link.queryParameters['scope'];
       String state = link.queryParameters['state'];
 
-      if (jsonScope == null && state == null) {
+      if (jsonScope == null && (state == null || state == "undefined")) {
         return;
       }
     }
@@ -44,14 +45,7 @@ class UniLinkService {
       );
 
       if (loggedIn != null && loggedIn) {
-        await Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => SuccessfulScreen(
-                title: "Logged in",
-                text: "You are now logged in. Return to browser."),
-          ),
-        );
+        SystemChannels.platform.invokeMethod('SystemNavigator.pop');
       }
     }
   }
