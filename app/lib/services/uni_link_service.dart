@@ -1,13 +1,14 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:redirection/redirection.dart';
 import 'package:threebotlogin/events/uni_link_event.dart';
 import 'package:threebotlogin/models/login.dart';
 import 'package:threebotlogin/models/scope.dart';
 import 'package:threebotlogin/screens/authentication_screen.dart';
 import 'package:threebotlogin/screens/login_screen.dart';
-import 'package:threebotlogin/screens/successful_screen.dart';
 import 'package:threebotlogin/services/user_service.dart';
 
 class UniLinkService {
@@ -45,7 +46,13 @@ class UniLinkService {
       );
 
       if (loggedIn != null && loggedIn) {
-        SystemChannels.platform.invokeMethod('SystemNavigator.pop');
+        if (Platform.isAndroid) {
+          SystemNavigator.pop();
+        } else if (Platform.isIOS) {
+          //exit(1);
+          bool didRedirect = await Redirection.redirect();
+          print(didRedirect);
+        }
       }
     }
   }

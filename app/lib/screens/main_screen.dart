@@ -87,7 +87,8 @@ class _AppState extends State<MainScreen> {
 
   checkInternetConnection() async {
     try {
-      final List<InternetAddress> result = await InternetAddress.lookup('google.com');
+      final List<InternetAddress> result =
+          await InternetAddress.lookup('google.com');
       if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
         print('connected to the internet');
       }
@@ -99,7 +100,11 @@ class _AppState extends State<MainScreen> {
             textAlign: TextAlign.center,
           ));
       await dialog.show(context);
-      SystemNavigator.pop();
+      if (Platform.isAndroid) {
+        SystemNavigator.pop();
+      } else if (Platform.isIOS) {
+        exit(1);
+      }
     }
   }
 
@@ -107,7 +112,8 @@ class _AppState extends State<MainScreen> {
     if (AppConfig().environment != Environment.Local) {
       try {
         String baseUrl = AppConfig().baseUrl();
-        final List<InternetAddress> result = await InternetAddress.lookup('$baseUrl');
+        final List<InternetAddress> result =
+            await InternetAddress.lookup('$baseUrl');
         if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
           print('connected to the internet');
         }
@@ -119,7 +125,11 @@ class _AppState extends State<MainScreen> {
               textAlign: TextAlign.center,
             ));
         await dialog.show(context);
-        SystemNavigator.pop();
+        if (Platform.isAndroid) {
+          SystemNavigator.pop();
+        } else if (Platform.isIOS) {
+          exit(1);
+        }
       }
     }
   }
@@ -134,7 +144,11 @@ class _AppState extends State<MainScreen> {
           ));
 
       await dialog.show(context);
-      SystemNavigator.pop();
+      if (Platform.isAndroid) {
+        SystemNavigator.pop();
+      } else if (Platform.isIOS) {
+        exit(1);
+      }
     }
   }
 

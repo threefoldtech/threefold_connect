@@ -37,6 +37,9 @@ dependencies:
   community_material_icon:
   local_auth: 0.6.0
   url_launcher:
+  redirection:
+    git:
+      url: https://github.com/jimbertools/redirection
 
 
 dev_dependencies:
