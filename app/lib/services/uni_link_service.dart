@@ -47,9 +47,8 @@ class UniLinkService {
 
       if (loggedIn != null && loggedIn) {
         if (Platform.isAndroid) {
-          SystemNavigator.pop();
+          SystemChannels.platform.invokeMethod('SystemNavigator.pop');
         } else if (Platform.isIOS) {
-          //exit(1);
           bool didRedirect = await Redirection.redirect();
           print(didRedirect);
         }
