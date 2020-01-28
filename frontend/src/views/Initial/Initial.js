@@ -26,10 +26,19 @@ export default {
       rechecked: false,
       didLeavePage: false,
       nameCheckerTimeOut: null,
-      isMobile: /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
+      isMobile: /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent),
+      roomToListenForSigned: ''
     }
   },
   mounted () {
+    if (this.isMobile) {
+      this.roomToListenForSigned = window.localStorage.getItem('signedRoom')
+      if (!this.roomToListenForSigned) {
+        this.roomToListenForSigned = Math.random().toString(32).substring(2)
+        window.localStorage.setItem('signedRoom', this.roomToListenForSigned)
+      }
+      this.setSignedRoom(this.roomToListenForSigned)
+    }
     window.onblur = this.lostFocus
     window.onfocus = this.gotFocus
     this.appid = this.$route.query.appid
@@ -107,10 +116,9 @@ export default {
         mobile: this.isMobile,
         firstTime: false
       })
-      var roomToListenForSigned = Math.random().toString(32).substring(2)
-      this.setSignedRoom(roomToListenForSigned)
+      this.setSignedRoom(this.roomToListenForSigned)
 
-      var url = `threebot://login?state=${encodeURIComponent(this.hash)}&signedRoom=${roomToListenForSigned}`
+      var url = `threebot://login?state=${encodeURIComponent(this.hash)}&signedRoom=${this.roomToListenForSigned}`
       if (this.scope) url += `&scope=${encodeURIComponent(this.scope)}`
       if (this.appId) url += `&appId=${encodeURIComponent(this.appId)}`
       if (this.appPublicKey) url += `&appPublicKey=${encodeURIComponent(this.appPublicKey)}`
