@@ -36,7 +36,7 @@ class _AppState extends State<MainScreen> {
   void initState() {
     super.initState();
     Events().reset();
-    initUniLinks();
+
     WidgetsBinding.instance.addPostFrameCallback((_) => pushScreens());
   }
 
@@ -73,6 +73,9 @@ class _AppState extends State<MainScreen> {
 
     _backendConnection = BackendConnection(await getDoubleName());
     _backendConnection.init();
+
+    await initUniLinks();
+
     if (_sub != null) {
       _sub.cancel();
     }
@@ -155,6 +158,7 @@ class _AppState extends State<MainScreen> {
   Future<Null> initUniLinks() async {
     initialLink = await getInitialLink();
 
+    // Doesn't seem needed in this scenario. Might be removed in the future. 
     _sub = getLinksStream().listen((String incomingLink) {
       if (!mounted) {
         return;
