@@ -51,13 +51,15 @@ class UniLinkService {
       );
 
       if (loggedIn != null && loggedIn) {
-        savePreviousState(login.state);
+        bool stateSaved = await savePreviousState(login.state);
         
-        if (Platform.isAndroid) {
-          await SystemNavigator.pop();
-        } else if (Platform.isIOS) {
-          bool didRedirect = await Redirection.redirect();
-          print(didRedirect);
+        if (stateSaved) {
+          if (Platform.isAndroid) {
+            await SystemNavigator.pop();
+          } else if (Platform.isIOS) {
+            bool didRedirect = await Redirection.redirect();
+            print(didRedirect);
+          }
         }
       }
     }

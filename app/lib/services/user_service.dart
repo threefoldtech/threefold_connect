@@ -197,9 +197,9 @@ Future<bool> getInitDone() async {
   return initDone;
 }
 
-Future<void> savePreviousState(String state) async {
+Future<bool> savePreviousState(String state) async {
   final SharedPreferences prefs = await SharedPreferences.getInstance();
-  await prefs.setString("previousState", state);
+  return await prefs.setString("previousState", state);
 }
 
 Future<String> getPreviousState() async {
