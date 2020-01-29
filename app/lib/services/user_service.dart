@@ -103,7 +103,8 @@ Future<Map<String, Object>> getEmail() async {
   final SharedPreferences prefs = await SharedPreferences.getInstance();
   return {
     'email': prefs.getString('email'),
-    'verified': prefs.getString('signedEmailIdentifier'), // I'll leave this here for backwards compat with forums & ffp and other existing implementations. 
+    'verified': prefs.getString(
+        'signedEmailIdentifier'), // I'll leave this here for backwards compat with forums & ffp and other existing implementations.
     'sei': prefs.getString('signedEmailIdentifier')
   };
 }
@@ -156,7 +157,8 @@ Future<String> getScopePermissions() async {
   return prefs.getString('scopePermissions');
 }
 
-Future<void> savePreviousScopePermissions(String appId, String scopePermissions) async {
+Future<void> savePreviousScopePermissions(
+    String appId, String scopePermissions) async {
   final SharedPreferences prefs = await SharedPreferences.getInstance();
   await prefs.remove('$appId-scopePreviousPermissions');
   await prefs.setString('$appId-scopePreviousPermissions', scopePermissions);
@@ -193,6 +195,16 @@ Future<bool> getInitDone() async {
     initDone = false;
   }
   return initDone;
+}
+
+Future<void> savePreviousState(String state) async {
+  final SharedPreferences prefs = await SharedPreferences.getInstance();
+  await prefs.setString("previousState", state);
+}
+
+Future<String> getPreviousState() async {
+  final SharedPreferences prefs = await SharedPreferences.getInstance();
+  return prefs.getString("previousState");
 }
 
 Future<bool> clearData() async {

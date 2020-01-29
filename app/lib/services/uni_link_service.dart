@@ -25,6 +25,13 @@ class UniLinkService {
       }
     }
 
+    Login login = queryParametersToLogin(link.queryParameters);
+    String previousState = await getPreviousState();
+
+    if (login.state == previousState) {
+      return;
+    }
+
     String pin = await getPin();
 
     bool authenticated = await Navigator.push(
@@ -36,8 +43,6 @@ class UniLinkService {
     );
 
     if (authenticated != null && authenticated) {
-      Login login = queryParametersToLogin(link.queryParameters);
-
       bool loggedIn = await Navigator.push(
         context,
         MaterialPageRoute(
@@ -46,8 +51,10 @@ class UniLinkService {
       );
 
       if (loggedIn != null && loggedIn) {
+        savePreviousState(login.state);
+        
         if (Platform.isAndroid) {
-          SystemNavigator.pop();
+          await SystemNavigator.pop();
         } else if (Platform.isIOS) {
           bool didRedirect = await Redirection.redirect();
           print(didRedirect);
