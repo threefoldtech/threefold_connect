@@ -31,11 +31,14 @@ export default {
     }
   },
   mounted () {
-    if (document.referrer && window.location.href) {
+    if (document.referrer) {
       if (new URL(document.referrer).host !== new URL(window.location.href).host) {
         console.log('SET URL, ', document.referrer)
         window.localStorage.setItem('returnUrl', document.referrer)
       }
+    } else {
+      console.log('URL cleared')
+      window.localStorage.setItem('returnUrl', '')
     }
 
     if (this.isMobile) {
