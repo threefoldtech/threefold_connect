@@ -68,17 +68,6 @@ export default new Vuex.Store({
     },
     setScope (state, scope) {
       let parsedScope = JSON.parse(scope)
-      // if the trustedDevice scope is present get it out of the cookies and put the id on the scope to pass it to the app
-      if (parsedScope.trustedDevice) {
-        // get the cookie specific for this app id
-        const trustedAppDevice = localStorage.getItem(`td-${state.appId}`)
-        if (trustedAppDevice) {
-          parsedScope.trustedDevice = trustedAppDevice
-        } else {
-          parsedScope.trustedDevice = uuid.v4()
-          localStorage.setItem(`td-${state.appId}`, parsedScope.trustedDevice)
-        }
-      }
       state.scope = JSON.stringify(parsedScope)
     },
     setAppId (state, appId) {
