@@ -31,6 +31,13 @@ export default {
     }
   },
   mounted () {
+    if (document.referrer && window.location.href) {
+      if (new URL(document.referrer).host !== new URL(window.location.href).host) {
+        console.log('SET URL, ', document.referrer)
+        window.localStorage.setItem('returnUrl', document.referrer)
+      }
+    }
+
     if (this.isMobile) {
       this.roomToListenForSigned = window.localStorage.getItem('signedRoom')
       if (!this.roomToListenForSigned) {
@@ -44,7 +51,7 @@ export default {
     this.appid = this.$route.query.appid
     console.log(`this.$route.query.appid`, this.$route.query.appid)
     if (!this.appid) {
-      this.$router.push({ name: 'error' })
+      this.redirectOrError()
     }
     console.log(this.$route)
     this.setAttemptCanceled(false)
@@ -71,7 +78,7 @@ export default {
         this.setScope(this.$route.query.scope || null)
       }
     } else {
-      this.$router.push('error')
+      this.redirectOrError()
     }
   },
   computed: {
@@ -156,6 +163,19 @@ export default {
         this.nameCheckerTimeOut = setTimeout(() => {
           this.checkName(this.doubleName)
         }, 500)
+      }
+    },
+    redirectOrError () {
+      let returnUrl = window.localStorage.getItem('returnUrl')
+
+      if (returnUrl) {
+        if (/iPhone|iPad|iPod/i.test(navigator.userAgent)) {
+          window.location.replace(returnUrl)
+        } else {
+          window.location.href = returnUrl
+        }
+      } else {
+        this.$router.push({ name: 'error' })
       }
     }
   },
