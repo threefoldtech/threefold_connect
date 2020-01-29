@@ -32,8 +32,6 @@ class UniLinkService {
       return;
     }
 
-    savePreviousState(login.state);
-
     String pin = await getPin();
 
     bool authenticated = await Navigator.push(
@@ -53,6 +51,8 @@ class UniLinkService {
       );
 
       if (loggedIn != null && loggedIn) {
+        savePreviousState(login.state);
+        
         if (Platform.isAndroid) {
           await SystemNavigator.pop();
         } else if (Platform.isIOS) {
