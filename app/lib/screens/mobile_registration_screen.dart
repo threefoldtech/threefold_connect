@@ -405,7 +405,7 @@ class _MobileRegistrationScreenState extends State<MobileRegistrationScreen> {
                   Padding(
                     padding: const EdgeInsets.all(16.0),
                     child: Text(
-                      'Please check the data below, press next if it is correct. Otherwise click the pencil icon to edit them.',
+                      'Please check the data below, press finish if it is correct. Otherwise click the pencil icon to edit them.',
                       style: TextStyle(fontWeight: FontWeight.bold),
                     ),
                   ),
