@@ -37,11 +37,6 @@ class BackendConnection {
       print('joined room');
     });
 
-    socket.on('signed', (dynamic data) {
-      print('---------signed-----------');
-      print(data);
-    });
-
     socket.on('login', (dynamic data) {
       Login loginData = Login.fromJson(data);
       loginData.isMobile = false;
