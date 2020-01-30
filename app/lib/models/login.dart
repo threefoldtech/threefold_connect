@@ -31,7 +31,7 @@ class Login {
   Login.fromJson(Map<String, dynamic> json)
       : doubleName = json['doubleName'],
         state = json['state'],
-        scope = (json['scope'] != null && json['scope'] != "") ? Scope.fromJson(jsonDecode(json['scope'])) : null,
+        scope = (json['scope'] != null && json['scope'] != "" && json['scope'] != "null") ? Scope.fromJson(jsonDecode(json['scope'])) : null,
         appId = json['appId'],
         appPublicKey = json['appPublicKey'],
         randomImageId = json['randomImageId'],
@@ -44,7 +44,7 @@ class Login {
   Map<String, dynamic> toJson() => {
         'doubleName': doubleName,
         'state': state,
-        'scope': scope.toJson(),
+        'scope': scope != null ? scope.toJson() : "",
         'appId': appId,
         'appPublicKey': appPublicKey,
         'randomImageId': randomImageId,
