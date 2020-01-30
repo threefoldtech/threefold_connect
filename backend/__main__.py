@@ -124,7 +124,7 @@ def emitOrQueue(event, data, room, fromApp = True):
     logger.debug("from app, %s", fromApp)
 
     if "signed" in event and fromApp is True:
-        if usersInRoom[room] == 1:
+        if usersInRoom[room] > 0:
             if not room in messageQueue:
                 logger.debug("Room is not known yet in queue, creating %s", room)
                 messageQueue[room] = []
