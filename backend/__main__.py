@@ -159,7 +159,7 @@ def signRegisterHandler():
     user = db.getUserByName(conn, double_name)
 
     if user:
-        emitOrQueue(
+        sio.emit(
             "signed",
             {"data": body.get("data"), "doubleName": double_name},
             room=user[0],
@@ -181,7 +181,7 @@ def sign_handler():
     roomToSendTo = roomToSendTo.lower()
     logger.debug("roomToSendTo %s", roomToSendTo)
 
-    emitOrQueue(
+    sio.emit(
         "signed",
         {
             "signedHash": body.get("signedHash"),
@@ -241,7 +241,7 @@ def cancel_login_attempt(doublename):
     logger.debug("/cancel %s", doublename)
     user = db.getUserByName(conn, doublename.lower())
 
-    emitOrQueue("cancelLogin", {"scanned": True}, room=user[0])
+    sio.emit("cancelLogin", {"scanned": True}, room=user[0])
     return Response("Canceled by User")
 
 
