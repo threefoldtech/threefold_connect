@@ -54,7 +54,7 @@ def disconnect_handler():
         leave_room(room)
         if usersInRoom[room] > 0:
             usersInRoom[room] -= 1
-            logger.debug(
+            logger.debug( 
                 "User was removed from room, users left in room {}".format(
                     usersInRoom[room]
                 )
@@ -75,7 +75,7 @@ def on_join(data):
     if room in messageQueue:
         for message in messageQueue[room]:
             if "app" in data:
-                logger.debug("Sending to APP ", message[0])
+                logger.debug("Sending to APP %s", message[0])
                 sio.emit(message[0], message[1], room=message[2])
             else:
                 logger.debug("Sending to browser? %s", message[0])
@@ -115,21 +115,22 @@ messageQueue = {}
 socketRoom = {}  # room bound to a socket
 
 
-def emitOrQueue(event, data, room, fromApp = True):
+def emitOrQueue(event, data, room, foreceQueue = False):
     logger.debug("Emit or queue data %s", data)
     logger.debug("Event %s", event)
     logger.debug("usersInRoom %s", usersInRoom)
     logger.debug("messageQueue %s", messageQueue)   
 
-    logger.debug("from app, %s", fromApp)
+    logger.debug("foreceQueue, %s", foreceQueue)
 
-    if "signed" in event and fromApp is True:
-        if not room in usersInRoom or usersInRoom[room] > 0:
+    if "signed" in event and foreceQueue is True:
+        if not room in usersInRoom or usersInRoom[room] < 2:
             if not room in messageQueue:
                 logger.debug("Room is not known yet in queue, creating %s", room)
                 messageQueue[room] = []
             logger.debug("Lets us queue")
             messageQueue[room].append((event, data, room))
+            return
 
     if not room in usersInRoom or usersInRoom[room] == 0:
         logger.debug("Room is unknown or no users in room, so might queue for %s", room)
@@ -194,9 +195,7 @@ def sign_handler():
     logger.debug("/sign: %s", body)
     logger.debug("body.get('doubleName'): %s", body.get("doubleName"))
     roomToSendTo = body.get("signedRoom")
-    fromApp = True
     if roomToSendTo is None:
-        fromApp = False
         roomToSendTo = body.get("doubleName")
     roomToSendTo = roomToSendTo.lower()
     logger.debug("roomToSendTo %s", roomToSendTo)
@@ -206,7 +205,7 @@ def sign_handler():
             "doubleName": body.get("doubleName"),
             "data": body.get("data"),
             "selectedImageId": body.get("selectedImageId"),
-        }, roomToSendTo, fromApp)
+        }, roomToSendTo, True)
     return Response("Ok")
 
 
