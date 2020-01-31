@@ -54,7 +54,7 @@ def disconnect_handler():
         leave_room(room)
         if usersInRoom[room] > 0:
             usersInRoom[room] -= 1
-            logger.debug(
+            logger.debug( 
                 "User was removed from room, users left in room {}".format(
                     usersInRoom[room]
                 )
@@ -67,16 +67,22 @@ def on_join(data):
     room = data["room"].lower()
     join_room(room)
 
-    if "app" in data:
-        socketRoom[request.sid] = room
-        if not room in usersInRoom:
-            usersInRoom[room] = 1
-        else:
-            usersInRoom[room] += 1
-        if room in messageQueue:
-            for message in messageQueue[room]:
+    socketRoom[request.sid] = room
+    if not room in usersInRoom:
+        usersInRoom[room] = 1
+    else:
+        usersInRoom[room] += 1
+    if room in messageQueue:
+        for message in messageQueue[room]:
+            if "app" in data:
+                logger.debug("Sending to APP %s", message[0])
                 sio.emit(message[0], message[1], room=message[2])
-            messageQueue[room] = []
+            else:
+                logger.debug("Sending to browser? %s", message[0])
+                if "signed" in message[0]: # Messages that can be received by the browser.
+                    logger.debug("Sending to browser")
+                    sio.emit(message[0], message[1], room=message[2])
+        messageQueue[room] = []
 
 
 @sio.on("leave")
@@ -109,8 +115,23 @@ messageQueue = {}
 socketRoom = {}  # room bound to a socket
 
 
-def emitOrQueue(event, data, room):
+def emitOrQueue(event, data, room, foreceQueue = False):
     logger.debug("Emit or queue data %s", data)
+    logger.debug("Event %s", event)
+    logger.debug("usersInRoom %s", usersInRoom)
+    logger.debug("messageQueue %s", messageQueue)   
+
+    logger.debug("foreceQueue, %s", foreceQueue)
+
+    if "signed" in event and foreceQueue is True:
+        if not room in usersInRoom or usersInRoom[room] < 2:
+            if not room in messageQueue:
+                logger.debug("Room is not known yet in queue, creating %s", room)
+                messageQueue[room] = []
+            logger.debug("Lets us queue")
+            messageQueue[room].append((event, data, room))
+            return
+
     if not room in usersInRoom or usersInRoom[room] == 0:
         logger.debug("Room is unknown or no users in room, so might queue for %s", room)
         if not room in messageQueue:
@@ -120,8 +141,10 @@ def emitOrQueue(event, data, room):
         messageQueue[room].append((event, data, room))
     else:
         logger.debug("App is connected, sending to %s", room)
+        logger.debug("event %s", event)
+        logger.debug("data %s", data)
+        logger.debug("room %s", room)
         sio.emit(event, data, room=room)
-
 
 @sio.on("login")
 def login_handler(data):
@@ -159,11 +182,7 @@ def signRegisterHandler():
     user = db.getUserByName(conn, double_name)
 
     if user:
-        sio.emit(
-            "signed",
-            {"data": body.get("data"), "doubleName": double_name},
-            room=user[0],
-        )
+        emitOrQueue("signed", {"data": body.get("data"), "doubleName": double_name}, room=user[0])
         return Response("Ok")
     else:
         return Response("User not found", status=404)
@@ -180,18 +199,13 @@ def sign_handler():
         roomToSendTo = body.get("doubleName")
     roomToSendTo = roomToSendTo.lower()
     logger.debug("roomToSendTo %s", roomToSendTo)
-
-    sio.emit(
-        "signed",
-        {
+    
+    emitOrQueue("signed", {
             "signedHash": body.get("signedHash"),
             "doubleName": body.get("doubleName"),
             "data": body.get("data"),
             "selectedImageId": body.get("selectedImageId"),
-        },
-        room=roomToSendTo,
-    )
-
+        }, roomToSendTo, True)
     return Response("Ok")
 
 
@@ -241,7 +255,7 @@ def cancel_login_attempt(doublename):
     logger.debug("/cancel %s", doublename)
     user = db.getUserByName(conn, doublename.lower())
 
-    sio.emit("cancelLogin", {"scanned": True}, room=user[0])
+    emitOrQueue("cancelLogin", {"scanned": True}, room=user[0])
     return Response("Canceled by User")
 
 

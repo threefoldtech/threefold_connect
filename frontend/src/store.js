@@ -144,9 +144,14 @@ export default new Vuex.Store({
     },
     SOCKET_signed (context, data) {
       console.log('signed', data)
-      if (data.selectedImageId && !context.getters.firstTime && !context.getters.isMobile && data.selectedImageId !== context.getters.randomImageId) {
+      console.log('context.getters.firstTime', context.getters.firstTime)
+      console.log('context.getters.isMobile', context.getters.isMobile)
+      console.log('context.getters.randomImageId', context.getters.randomImageId)
+      if (data.selectedImageId && (context.getters.firstTime != null && !context.getters.firstTime) && !context.getters.isMobile && (context.getters.randomImageId != null && data.selectedImageId !== context.getters.randomImageId)) {
+        console.log('Resending notification!')
         context.dispatch('resendNotification')
       } else {
+        console.log('Setting signed!')
         context.commit('setSigned', data)
       }
     },

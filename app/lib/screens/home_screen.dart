@@ -147,7 +147,7 @@ class _HomeScreenState extends State<HomeScreen>
     Events().onEvent(
         UniLinkEvent(null, null).runtimeType, UniLinkService.handleUniLink);
     initialLink = widget.initialLink;
-
+      
     if (initialLink != null) {
       Events().emit(UniLinkEvent(Uri.parse(initialLink), context));
     }
