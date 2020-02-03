@@ -55,9 +55,9 @@ class _AppState extends State<MainScreen> {
   }
 
   pushScreens() async {
-    checkInternetConnection();
-    checkInternetConnectionWithOurServers();
-    checkIfAppIsUpToDate();
+    await checkInternetConnection();
+    await checkInternetConnectionWithOurServers();
+    await checkIfAppIsUpToDate();
 
     if (widget.initDone != null && !widget.initDone) {
       await Navigator.push(

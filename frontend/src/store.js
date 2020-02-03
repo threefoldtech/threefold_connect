@@ -147,7 +147,7 @@ export default new Vuex.Store({
       console.log('context.getters.firstTime', context.getters.firstTime)
       console.log('context.getters.isMobile', context.getters.isMobile)
       console.log('context.getters.randomImageId', context.getters.randomImageId)
-      if (data.selectedImageId && (context.getters.firstTime != null && !context.getters.firstTime) && !context.getters.isMobile && (context.getters.randomImageId != null && data.selectedImageId !== context.getters.randomImageId)) {
+      if (data.selectedImageId && !context.getters.firstTime && !context.getters.isMobile && data.selectedImageId !== context.getters.randomImageId) {
         console.log('Resending notification!')
         context.dispatch('resendNotification')
       } else {
