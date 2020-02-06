@@ -14,6 +14,7 @@ class Login {
   String signedRoom;
   String redirecturl;
   bool isMobile;
+  int created;
 
   Login(
       {this.doubleName,
@@ -26,7 +27,8 @@ class Login {
       this.loginId,
       this.signedRoom,
       this.redirecturl,
-      this.isMobile});
+      this.isMobile,
+      this.created});
 
   Login.fromJson(Map<String, dynamic> json)
       : doubleName = json['doubleName'],
@@ -39,7 +41,8 @@ class Login {
         loginId = json['loginId'],
         signedRoom = json['signedRoom'],
         redirecturl = json['redirecturl'],
-        isMobile = json['mobile'] as bool;
+        isMobile = json['mobile'] as bool,
+        created = json['created'];
 
   Map<String, dynamic> toJson() => {
         'doubleName': doubleName,
@@ -53,5 +56,6 @@ class Login {
         'signedRoom': signedRoom,
         'redirecturl': redirecturl,
         'mobile': isMobile,
+        'created': created,
       };
 }

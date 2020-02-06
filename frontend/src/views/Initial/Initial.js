@@ -110,16 +110,9 @@ export default {
       'clearCheckStatus',
       'setAttemptCanceled',
       'setSignedRoom'
-      // 'forceRefetchStatus',
-      // 'deleteLoginAttempt'
     ]),
     lostFocus () {
       this.didLeavePage = true
-    },
-    gotFocus () {
-      if (this.didLeavePage && this.isMobile) {
-        // this.forceRefetchStatus()
-      }
     },
     promptLoginToMobileUser () {
       this.loginUserMobile({
@@ -201,7 +194,6 @@ export default {
 
           console.log('signedHash: ', signedHash)
           console.log('!!!!data', data)
-          // this.deleteLoginAttempt()
 
           if (data && signedHash) {
             var union = '?'

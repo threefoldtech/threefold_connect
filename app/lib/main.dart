@@ -17,7 +17,7 @@ Future<void> main() async {
 
   Map<String, Object> email = await getEmail();
 
-  Globals().emailVerified.value = (email['verified'] != null);
+  Globals().emailVerified.value = (email['sei'] != null);
   bool registered = doubleName != null;
 
   runApp(MyApp(initDone: initDone, registered: registered));

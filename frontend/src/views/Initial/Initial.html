@@ -29,7 +29,8 @@
           <v-form v-model="valid" @submit.prevent="login">
             <v-card-text>
               <p class="subheading pb-2" v-if="firstvisit">
-                Welcome to 3Bot connect - a decentralized, two factor authentication app, enabling you to access the ThreeFold Network platforms and your fully private digital wallet.
+                Welcome to 3Bot connect - a decentralized, two factor authentication app, enabling you to access the
+                ThreeFold Network platforms and your fully private digital wallet.
                 Not a single person in the world will be able to login to your account (not even us).
                 Please choose a name, which will later be the address of your digital avatar on the web.
                 <br>
@@ -47,8 +48,7 @@
             </v-card-text>
             <v-card-actions>
               <v-layout column align-center>
-                <v-layout justify-end class="pb-3" style="width: 100%;"
-                  v-if="nameCheckStatus.checked">
+                <v-layout justify-end class="pb-3" style="width: 100%;" v-if="nameCheckStatus.checked">
                   <v-spacer></v-spacer>
                   <v-btn type="submit" flat :disabled="!nameCheckStatus.checking && nameCheckStatus.available">
                     Sign in</v-btn>

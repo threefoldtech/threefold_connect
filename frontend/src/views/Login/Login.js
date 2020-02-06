@@ -1,5 +1,4 @@
 import { mapGetters, mapActions } from 'vuex'
-// import config from '../../../public/config'
 
 export default {
   name: 'login',
@@ -11,7 +10,8 @@ export default {
       cancelLogin: false,
       didLeavePage: false,
       dialog: false,
-      loggedIn: false
+      loggedIn: false,
+      ref: undefined
     }
   },
   computed: {
@@ -25,16 +25,25 @@ export default {
       'hash',
       'scope',
       'appId',
-      'appPublicKey'
+      'appPublicKey',
+      'loginTimestamp',
+      'loginTimeleft',
+      'loginTimeout',
+      'loginInterval'
     ])
   },
   mounted () {
+    this.resetTimer()
+    this.ref = document.referrer
   },
   methods: {
     ...mapActions([
-      'resendNotification'
-      // 'deleteLoginAttempt'
+      'resendNotification',
+      'resetTimer'
     ]),
+    triggerResendNotification () {
+      this.resendNotification()
+    },
     openApp () {
       if (this.isMobile) {
         var url = `threebot://login/?state=${encodeURIComponent(this.hash)}`
@@ -58,6 +67,7 @@ export default {
           console.log(val)
 
           window.localStorage.setItem('username', this.doubleName)
+
           var signedHash = encodeURIComponent(val.signedHash)
           var data
 
@@ -66,8 +76,6 @@ export default {
           } else {
             data = encodeURIComponent(val.data)
           }
-
-          // this.deleteLoginAttempt()
 
           console.log('signedHash: ', signedHash)
           console.log('!!!!data', data)

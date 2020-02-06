@@ -328,7 +328,7 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
       setState(() {
         if (emailMap['email'] != null) {
           emailAdress = emailMap['email'];
-          emailVerified = (emailMap['verified'] != null);
+          emailVerified = (emailMap['sei'] != null);
         }
       });
     });

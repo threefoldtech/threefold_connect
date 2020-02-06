@@ -85,6 +85,7 @@ class _AppState extends State<MainScreen> {
         MaterialPageRoute(
             builder: (context) => HomeScreen(
                   initialLink: initialLink,
+                  backendConnection: _backendConnection
                 )));
   }
 

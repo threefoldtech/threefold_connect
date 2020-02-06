@@ -1,17 +1,20 @@
 import 'dart:convert';
+import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 import 'package:threebotlogin/app_config.dart';
+import 'package:threebotlogin/events/close_auth_event.dart';
 import 'package:threebotlogin/events/close_socket_event.dart';
 import 'package:threebotlogin/events/events.dart';
 import 'package:threebotlogin/events/new_login_event.dart';
 import 'package:threebotlogin/models/login.dart';
 import 'package:threebotlogin/screens/authentication_screen.dart';
+import 'package:threebotlogin/screens/home_screen.dart';
 import 'package:threebotlogin/screens/login_screen.dart';
 import 'package:threebotlogin/screens/successful_screen.dart';
 import 'package:threebotlogin/services/tools_service.dart';
+import 'package:threebotlogin/services/crypto_service.dart';
 import 'package:threebotlogin/services/user_service.dart';
 import 'package:threebotlogin/services/open_kyc_service.dart';
 import 'package:threebotlogin/widgets/custom_dialog.dart';
@@ -26,10 +29,12 @@ class BackendConnection {
 
   init() async {
     print('creating socket connection....');
+
     socket = IO.io(threeBotSocketUrl, <String, dynamic>{
       'transports': ['websocket'],
       'forceNew': true
     });
+
     socket.on('connect', (res) {
       print('connected');
       // once a client has connected, we let him join a room
@@ -37,15 +42,34 @@ class BackendConnection {
       print('joined room');
     });
 
-    socket.on('login', (dynamic data) {
-      Login loginData = Login.fromJson(data);
+    socket.on('login', (dynamic data) async {
+      print('[login]: Received data');
+      print(data);
+
+      Login loginData;
+
+      if(data['encryptedLoginAttempt'] != null) {
+        Uint8List decryptedLoginAttempt = await decrypt(data['encryptedLoginAttempt'], await getPublicKey(), await getPrivateKey());
+        data['encryptedLoginAttempt'] = new String.fromCharCodes(decryptedLoginAttempt);
+
+        var decryptedLoginAttemptMap = jsonDecode(data['encryptedLoginAttempt']);
+
+        decryptedLoginAttemptMap['type'] = data['type'];
+        decryptedLoginAttemptMap['created'] = data['created'];
+
+        loginData = Login.fromJson(decryptedLoginAttemptMap);
+      } else {
+        loginData = Login.fromJson(data);
+      }
+      
       loginData.isMobile = false;
-      print('---------login-----------');
-      print(loginData);
+      print('[login]: Decrypted data');
+      print(data);
 
       loginData.loginId = randomString(10);
-      Events().emit(
-          NewLoginEvent(loginData: loginData, loginId: loginData.loginId));
+
+      // We need home_screen's context to continue ... I feel like this could be done more efficiently. 
+      Events().emit(NewLoginEvent(loginData: loginData, loginId: loginData.loginId));
     });
 
     socket.on('disconnect', (_) {
@@ -66,27 +90,37 @@ class BackendConnection {
     socket.destroy();
   }
 
-  void joinRoom() {
-    print('joining room....');
-    socket.emit('join', {'room': doubleName, 'app': true});
+  void joinRoom(roomName) {
+    print('joining room....' + roomName);
+    socket.emit('join', {'room': roomName, 'app': true});
+  }
+
+  void leaveRoom(roomName) {
+    print('Leaving room....' + roomName);
+    socket.emit('leave', {'room': roomName});
   }
 }
 
-Future openLogin(BuildContext context, Login loginData) async {
+Future openLogin(BuildContext context, Login loginData, BackendConnection backendConnection) async {
   String messageType = loginData.type;
 
   if (messageType == 'login' && !loginData.isMobile) {
     String pin = await getPin();
 
+    Events().emit(CloseAuthEvent(close: true));
+
     bool authenticated = await Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => AuthenticationScreen(
-            correctPin: pin, userMessage: "sign your attempt."),
+            correctPin: pin, userMessage: "sign your attempt.", loginData: loginData),
       ),
     );
 
     if (authenticated != null && authenticated) {
+      backendConnection.leaveRoom(loginData.doubleName);
+      backendConnection.joinRoom(loginData.signedRoom);
+
       bool loggedIn = await Navigator.push(
         context,
         MaterialPageRoute(
@@ -95,6 +129,8 @@ Future openLogin(BuildContext context, Login loginData) async {
       );
 
       if (loggedIn != null && loggedIn) {
+        backendConnection.leaveRoom(loginData.signedRoom);
+        backendConnection.joinRoom(loginData.doubleName);
         await Navigator.push(
           context,
           MaterialPageRoute(
@@ -103,6 +139,9 @@ Future openLogin(BuildContext context, Login loginData) async {
                 text: "You are now logged in. Return to browser."),
           ),
         );
+      } else {
+        backendConnection.leaveRoom(loginData.signedRoom);
+        backendConnection.joinRoom(loginData.doubleName);
       }
     }
   } else if (messageType == 'email_verification') {

@@ -64,6 +64,14 @@ Future<Map<String, String>> encrypt(
   };
 }
 
+Future<Uint8List> decrypt(String encodedCipherText, String encodedPublicKey, String encodedSecretKey) async {
+  Uint8List cipherText = base64.decode(encodedCipherText);
+  Uint8List publicKey = await Sodium.cryptoSignEd25519PkToCurve25519(base64.decode(encodedPublicKey));
+  Uint8List secretKey = await Sodium.cryptoSignEd25519SkToCurve25519(base64.decode(encodedSecretKey));
+
+  return await Sodium.cryptoBoxSealOpen(cipherText, publicKey, secretKey);
+}
+
 Future<String> generateSeedPhrase() async {
   return bip39.generateMnemonic(strength: 256);
 }

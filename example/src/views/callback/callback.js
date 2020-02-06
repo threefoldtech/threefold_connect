@@ -4,54 +4,57 @@ import threebotService from '../../services/threebotService'
 
 export default {
   name: 'callback',
-  data () {
+  data() {
     return {
       username: null,
       verified: false,
       error: null
     }
   },
-  mounted () {
-    var url = new URL(window.location.href)
-    // Get all query params
-    this.error = url.searchParams.get('error')
-    var username = url.searchParams.get('username')
-    var signedhash = url.searchParams.get('signedhash')
-    this.username = username
+  async mounted() {
+    let url = new URL(window.location.href)
 
-    if(this.error) {
-      console.log("show some error", this.error)
+    let error = url.searchParams.get('error')
+
+    if (error) {
+      console.log('Error: ', error)
       return
     }
 
-    threebotService.getUserData(username).then(async (response) => {
-      var user = response.data
-      var hash = window.localStorage.getItem('state')
-      this.verified = await cryptoService.validateSignature(hash, signedhash, user.publicKey)
-      var profile = {
-        name: username
-      }
-      var data = JSON.parse(url.searchParams.get('data'))
+    let user = url.searchParams.get('username')
+    let signedState = url.searchParams.get('signedhash')
 
-      if (data) {
-        cryptoService.generateKeys(config.seedPhrase).then(async (keys) => {
-          var decrypted = await cryptoService.decrypt(data.ciphertext, data.nonce, keys.privateKey, user.publicKey)
-          if (decrypted) {
-            decrypted = JSON.parse(decrypted)
-            for (var k in decrypted) {
-              if (decrypted.hasOwnProperty(k)) {
-                profile[k] = decrypted[k]
-              }
-            }
-          }
-        }).then(x => {
-          window.localStorage.setItem('profile', JSON.stringify(profile))
-          this.$router.push({ name: 'profile' })
-        })
-      } else {
-        window.localStorage.setItem('profile', JSON.stringify(profile))
-        this.$router.push({ name: 'profile' })
+    let userPublicKey = (await threebotService.getUserData(user)).data.publicKey
+    let state = window.localStorage.getItem('state')
+
+    let verified = await cryptoService.validateSignature(state, signedState, userPublicKey)
+    if (!verified) {
+      console.log('The signedState could not be verified.')
+      return
+    }
+
+    let encryptedData = JSON.parse(url.searchParams.get('data'))
+
+    // Keys from the third party app itself, or a temp keyset if it is a front-end only third party app.
+    let keys = await cryptoService.generateKeys(config.seedPhrase)
+
+    let decryptedData = JSON.parse(await cryptoService.decrypt(encryptedData.ciphertext, encryptedData.nonce, keys.privateKey, userPublicKey))
+    decryptedData['name'] = user
+
+    // SEI = Signed Email Identifier, this is used to link the email to the doubleName and verify it. 
+    if (!decryptedData.email || !decryptedData.email.sei) {
+      console.log('No sei was given from the app, if your app requires email, the flow stops here.')
+    } else {
+      // To verify the SEI, you could use the function implemented by openKYC or verify it youself by requires their public key. 
+      let seiVerified = await threebotService.verifySignedEmailIdentifier(decryptedData.email.sei)
+      if (!seiVerified) {
+        console.log('sei could not be verified, something went wrong or someone is trying to forge his email verification.')
+        return
       }
-    })
+      console.log('We verified that ' + seiVerified.data.email + ' belongs to ' + seiVerified.data.identifier + ' and has a valid verification.')
+    }
+
+    window.localStorage.setItem('profile', JSON.stringify(decryptedData))
+    this.$router.push({ name: 'profile' })
   }
 }

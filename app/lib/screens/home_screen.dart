@@ -20,8 +20,9 @@ import 'package:uni_links/uni_links.dart';
 /* Screen shows tabbar and all pages defined in router.dart */
 class HomeScreen extends StatefulWidget {
   final String initialLink;
+  final BackendConnection backendConnection;
 
-  HomeScreen({this.initialLink});
+  HomeScreen({this.initialLink, this.backendConnection});
 
   _HomeScreenState createState() => _HomeScreenState();
 }
@@ -106,7 +107,7 @@ class _HomeScreenState extends State<HomeScreen>
 
     Events().onEvent(GoHomeEvent().runtimeType, close);
     Events().onEvent(NewLoginEvent().runtimeType, (NewLoginEvent event) {
-      openLogin(context, event.loginData);
+      openLogin(context, event.loginData, widget.backendConnection);
     });
     WidgetsBinding.instance.addObserver(this);
   }

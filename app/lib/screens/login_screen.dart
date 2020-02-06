@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:math';
 
@@ -10,6 +11,7 @@ import 'package:threebotlogin/services/tools_service.dart';
 import 'package:threebotlogin/services/user_service.dart';
 import 'package:threebotlogin/services/crypto_service.dart';
 import 'package:threebotlogin/services/3bot_service.dart';
+import 'package:threebotlogin/widgets/custom_dialog.dart';
 import 'package:threebotlogin/widgets/image_button.dart';
 import 'package:threebotlogin/widgets/preference_dialog.dart';
 
@@ -39,6 +41,11 @@ class _LoginScreenState extends State<LoginScreen> with BlockAndRunMixin {
 
   String emitCode = randomString(10);
 
+  Timer timer;
+  int timeout = 20;
+
+  int timeLeft = 20;
+
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
@@ -47,6 +54,46 @@ class _LoginScreenState extends State<LoginScreen> with BlockAndRunMixin {
     Events().onEvent(PopAllLoginEvent("").runtimeType, close);
     isMobileCheck = widget.loginData.isMobile;
     generateEmojiImageList();
+    
+    const oneSec = const Duration(seconds: 1);
+    print('Starting timer ... ');
+    timer = new Timer.periodic(oneSec, (Timer t) async {
+      timeoutTimer();
+    });
+  }
+
+  timeoutTimer() async { 
+    print('Tick: ' + timeLeft.toString());
+    int created = widget.loginData.created;
+    int currentTimestamp = new DateTime.now().millisecondsSinceEpoch;
+
+    setState(() {
+      timeLeft = timeout - ((currentTimestamp - created) / 1000).round();
+    });
+
+    if (created != null && ((currentTimestamp - created) / 1000) > timeout) {
+      timer.cancel();
+
+      await showDialog(
+        context: context,
+        builder: (BuildContext context) => CustomDialog(
+          image: Icons.timer,
+          title: 'Login attempt expired',
+          description: Text(
+              'Your login attempt has expired, please request a new one in your browser.'),
+          actions: <Widget>[
+            FlatButton(
+              child: Text('Ok'),
+              onPressed: () {
+                Navigator.pop(context);
+              },
+            )
+          ],
+        ),
+      );
+
+      Navigator.pop(context, false);
+    }
   }
 
   Widget scopeEmojiView() {
@@ -68,10 +115,22 @@ class _LoginScreenState extends State<LoginScreen> with BlockAndRunMixin {
                 ),
               ),
             ),
+            // Expanded(
+            //   flex: 1,
+            //   child: Center(
+            //     child: Padding(
+            //       padding: const EdgeInsets.only(right: 24.0, left: 24.0),
+            //       child: Text(
+            //         "Valid for another " + ((timeLeft >= 0) ? timeLeft.toString() : "0") + " second(s).",
+            //         style: TextStyle(fontSize: 18.0),
+            //         textAlign: TextAlign.center,
+            //       ),
+            //     ),
+            //   ),
+            // ),
             Expanded(
               flex: 7,
               child: SizedBox(
-                height: 200.0,
                 child: PreferenceDialog(
                   scope: widget.loginData.scope,
                   appId: widget.loginData.appId,
@@ -185,9 +244,26 @@ class _LoginScreenState extends State<LoginScreen> with BlockAndRunMixin {
         if (selectedImageId == correctImage) {
           await sendIt(true);
         } else {
-          _scaffoldKey.currentState.showSnackBar(
-              SnackBar(content: Text('Oops... that\'s the wrong emoji')));
           await sendIt(false);
+
+          await showDialog(
+            context: context,
+            builder: (BuildContext context) => CustomDialog(
+              image: Icons.warning,
+              title: 'Wrong emoji',
+              description: Text(
+                  'You selected the wrong emoji, please check your browser for the new one.'),
+              actions: <Widget>[
+                FlatButton(
+                  child: Text('Retry'),
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                )
+              ],
+            ),
+          );
+          Navigator.pop(context, false);
         }
       } else {
         _scaffoldKey.currentState
@@ -213,6 +289,34 @@ class _LoginScreenState extends State<LoginScreen> with BlockAndRunMixin {
   sendIt(bool includeData) async {
     String state = widget.loginData.state;
     String signedRoom = widget.loginData.signedRoom;
+    int created = widget.loginData.created;
+    int currentTimestamp = new DateTime.now().millisecondsSinceEpoch;
+
+    if (created != null && ((currentTimestamp - created) / 1000) > timeout) {
+      await showDialog(
+        context: context,
+        builder: (BuildContext context) => CustomDialog(
+          image: Icons.timer,
+          title: 'Login attempt expired',
+          description: Text(
+              'We cannot sign this login attempt because it has expired.'),
+          actions: <Widget>[
+            FlatButton(
+              child: Text('Ok'),
+              onPressed: () {
+                Navigator.pop(context);
+              },
+            )
+          ],
+        ),
+      );
+
+      await sendData(state, "", null, selectedImageId, null);
+
+      Navigator.pop(context, false);
+      return;
+    }
+
     String publicKey = widget.loginData.appPublicKey?.replaceAll(" ", "+");
 
     bool stateCheck = RegExp(r"[^A-Za-z0-9]+").hasMatch(state);
@@ -236,7 +340,8 @@ class _LoginScreenState extends State<LoginScreen> with BlockAndRunMixin {
       var scopePermissionsDecoded = jsonDecode(scopePermissions);
 
       if (scopePermissions != null && scopePermissions != "") {
-        if (scopePermissionsDecoded['email'] != null && scopePermissionsDecoded['email']) {
+        if (scopePermissionsDecoded['email'] != null &&
+            scopePermissionsDecoded['email']) {
           scope['email'] = (await getEmail());
         }
       }

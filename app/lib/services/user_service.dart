@@ -103,8 +103,6 @@ Future<Map<String, Object>> getEmail() async {
   final SharedPreferences prefs = await SharedPreferences.getInstance();
   return {
     'email': prefs.getString('email'),
-    'verified': prefs.getString(
-        'signedEmailIdentifier'), // I'll leave this here for backwards compat with forums & ffp and other existing implementations.
     'sei': prefs.getString('signedEmailIdentifier')
   };
 }

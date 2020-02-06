@@ -7,6 +7,7 @@ import struct
 import base64
 import database as db
 import logging
+import calendar
 
 from flask import Flask, Response, request, json, redirect
 from flask_socketio import SocketIO, emit, join_room, leave_room, send
@@ -81,8 +82,19 @@ def on_join(data):
 
 @sio.on("leave")
 def on_leave(data):
-    print("/leave ")
-    room = data["room"]
+    logger.debug("/leave.")
+    if request.sid in socketRoom:
+        room = socketRoom[request.sid].lower()
+        logger.debug("User left, user was known {}".format(room))
+        del socketRoom[request.sid]
+        leave_room(room)
+        if usersInRoom[room] > 0:
+            usersInRoom[room] -= 1
+            logger.debug(
+                "User was removed from room, users left in room {}".format(
+                    usersInRoom[room]
+                )
+            )
 
 
 @sio.on("checkname")
@@ -127,28 +139,26 @@ def emitOrQueue(event, data, room):
 def login_handler(data):
     logger.debug("/Login %s", data)
     double_name = data.get("doubleName").lower()
-    state = data.get("state")
 
     data["type"] = "login"
-    sid = request.sid
+    milli_sec = int(round(time.time() * 1000))
+    data["created"] = milli_sec
+    
     user = db.getUserByName(conn, double_name)
     if user:
-        logger.debug("User found %s", user[0])
-        update_sql = "UPDATE users SET sid=?  WHERE double_name=?;"
-        db.update_user(conn, update_sql, sid, user[0])
-
-    user = db.getUserByName(conn, double_name)
-    emitOrQueue("login", data, room=user[0])
-
+        logger.debug("[Login]: User found %s", user[0])
+        emitOrQueue("login", data, room=user[0])
 
 @sio.on("resend")
 def resend_handler(data):
     logger.debug("/resend %s", data)
-    user = data.get("doubleName").lower()
+    doubleName = data.get("doubleName").lower()
 
     data["type"] = "login"
-    emitOrQueue("login", data, room=user)
+    milli_sec = int(round(time.time() * 1000))
+    data["created"] = milli_sec
 
+    emitOrQueue("login", data, room=doubleName)
 
 @app.route("/api/signRegister", methods=["POST"])
 def signRegisterHandler():
