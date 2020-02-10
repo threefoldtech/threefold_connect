@@ -11,6 +11,7 @@ class Globals {
   int incorrectPincodeAttempts = 0;
   bool tooManyAuthenticationAttempts = false;
   int lockedUntill = 0;
+  int loginTimeout = 120;
 
   /* Singleton */
   static final Globals _singleton = new Globals._internal();

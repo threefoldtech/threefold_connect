@@ -9,7 +9,7 @@ emailVerificationDialog(context) {
     builder: (BuildContext context) => CustomDialog(
       image: Icons.error,
       title: "Please verify email",
-      description: new Text("Please verify email before using this app"),
+      description: "Please verify email before using this app",
       actions: <Widget>[
         FlatButton(
           child: new Text("Ok"),
@@ -37,7 +37,7 @@ emailResendedDialog(context) {
     builder: (BuildContext context) => CustomDialog(
       image: Icons.check,
       title: "Email has been resent.",
-      description: new Text("A new verification email has been sent."),
+      description: "A new verification email has been sent.",
       actions: <Widget>[
         FlatButton(
           child: new Text("Ok"),

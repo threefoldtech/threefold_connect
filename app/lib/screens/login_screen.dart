@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:threebotlogin/events/events.dart';
 import 'package:threebotlogin/events/pop_all_login_event.dart';
 import 'package:threebotlogin/helpers/block_and_run_mixin.dart';
+import 'package:threebotlogin/helpers/globals.dart';
 import 'package:threebotlogin/models/login.dart';
 import 'package:threebotlogin/services/tools_service.dart';
 import 'package:threebotlogin/services/user_service.dart';
@@ -42,9 +43,11 @@ class _LoginScreenState extends State<LoginScreen> with BlockAndRunMixin {
   String emitCode = randomString(10);
 
   Timer timer;
-  int timeout = 20;
 
-  int timeLeft = 20;
+  int timeLeft = Globals().loginTimeout;
+
+  int created;
+  int currentTimestamp;
 
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
@@ -54,24 +57,38 @@ class _LoginScreenState extends State<LoginScreen> with BlockAndRunMixin {
     Events().onEvent(PopAllLoginEvent("").runtimeType, close);
     isMobileCheck = widget.loginData.isMobile;
     generateEmojiImageList();
-    
-    const oneSec = const Duration(seconds: 1);
-    print('Starting timer ... ');
-    timer = new Timer.periodic(oneSec, (Timer t) async {
-      timeoutTimer();
-    });
+
+    if (widget.loginData != null && !widget.loginData.isMobile) {
+      const oneSec = const Duration(seconds: 1);
+      print('Starting timer ... ');
+
+      created = widget.loginData.created;
+      currentTimestamp = new DateTime.now().millisecondsSinceEpoch;
+
+      timeLeft = Globals().loginTimeout -
+          ((currentTimestamp - created) / 1000).round();
+
+      timer = new Timer.periodic(oneSec, (Timer t) async {
+        timeoutTimer();
+      });
+    }
   }
 
-  timeoutTimer() async { 
-    print('Tick: ' + timeLeft.toString());
-    int created = widget.loginData.created;
-    int currentTimestamp = new DateTime.now().millisecondsSinceEpoch;
+  timeoutTimer() async {
+    if (!mounted) {
+      timer.cancel();
+      return;
+    }
+
+    currentTimestamp = new DateTime.now().millisecondsSinceEpoch;
 
     setState(() {
-      timeLeft = timeout - ((currentTimestamp - created) / 1000).round();
+      timeLeft = Globals().loginTimeout -
+          ((currentTimestamp - created) / 1000).round();
     });
 
-    if (created != null && ((currentTimestamp - created) / 1000) > timeout) {
+    if (created != null &&
+        ((currentTimestamp - created) / 1000) > Globals().loginTimeout) {
       timer.cancel();
 
       await showDialog(
@@ -79,8 +96,8 @@ class _LoginScreenState extends State<LoginScreen> with BlockAndRunMixin {
         builder: (BuildContext context) => CustomDialog(
           image: Icons.timer,
           title: 'Login attempt expired',
-          description: Text(
-              'Your login attempt has expired, please request a new one in your browser.'),
+          description:
+              'Your login attempt has expired, please request a new one in your browser.',
           actions: <Widget>[
             FlatButton(
               child: Text('Ok'),
@@ -102,6 +119,23 @@ class _LoginScreenState extends State<LoginScreen> with BlockAndRunMixin {
         padding: const EdgeInsets.only(top: 8.0),
         child: Column(
           children: <Widget>[
+            Visibility(
+              visible: !widget.loginData.isMobile,
+              child: Expanded(
+                flex: 1,
+                child: Center(
+                  child: Padding(
+                    padding: const EdgeInsets.only(right: 24.0, left: 24.0),
+                    child: Text(
+                      "Attempt expires in " +
+                          ((timeLeft >= 0) ? timeLeft.toString() : "0") +
+                          " second(s).",
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                ),
+              ),
+            ),
             Expanded(
               flex: 1,
               child: Center(
@@ -115,19 +149,7 @@ class _LoginScreenState extends State<LoginScreen> with BlockAndRunMixin {
                 ),
               ),
             ),
-            // Expanded(
-            //   flex: 1,
-            //   child: Center(
-            //     child: Padding(
-            //       padding: const EdgeInsets.only(right: 24.0, left: 24.0),
-            //       child: Text(
-            //         "Valid for another " + ((timeLeft >= 0) ? timeLeft.toString() : "0") + " second(s).",
-            //         style: TextStyle(fontSize: 18.0),
-            //         textAlign: TextAlign.center,
-            //       ),
-            //     ),
-            //   ),
-            // ),
+            
             Expanded(
               flex: 7,
               child: SizedBox(
@@ -251,8 +273,8 @@ class _LoginScreenState extends State<LoginScreen> with BlockAndRunMixin {
             builder: (BuildContext context) => CustomDialog(
               image: Icons.warning,
               title: 'Wrong emoji',
-              description: Text(
-                  'You selected the wrong emoji, please check your browser for the new one.'),
+              description:
+                  'You selected the wrong emoji, please check your browser for the new one.',
               actions: <Widget>[
                 FlatButton(
                   child: Text('Retry'),
@@ -289,32 +311,36 @@ class _LoginScreenState extends State<LoginScreen> with BlockAndRunMixin {
   sendIt(bool includeData) async {
     String state = widget.loginData.state;
     String signedRoom = widget.loginData.signedRoom;
-    int created = widget.loginData.created;
-    int currentTimestamp = new DateTime.now().millisecondsSinceEpoch;
 
-    if (created != null && ((currentTimestamp - created) / 1000) > timeout) {
-      await showDialog(
-        context: context,
-        builder: (BuildContext context) => CustomDialog(
-          image: Icons.timer,
-          title: 'Login attempt expired',
-          description: Text(
-              'We cannot sign this login attempt because it has expired.'),
-          actions: <Widget>[
-            FlatButton(
-              child: Text('Ok'),
-              onPressed: () {
-                Navigator.pop(context);
-              },
-            )
-          ],
-        ),
-      );
+    if (widget.loginData != null && !widget.loginData.isMobile) {
+      int created = widget.loginData.created;
+      int currentTimestamp = new DateTime.now().millisecondsSinceEpoch;
 
-      await sendData(state, "", null, selectedImageId, null);
+      if (created != null &&
+          ((currentTimestamp - created) / 1000) > Globals().loginTimeout) {
+        await showDialog(
+          context: context,
+          builder: (BuildContext context) => CustomDialog(
+            image: Icons.timer,
+            title: 'Login attempt expired',
+            description:
+                'We cannot sign this login attempt because it has expired.',
+            actions: <Widget>[
+              FlatButton(
+                child: Text('Ok'),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              )
+            ],
+          ),
+        );
 
-      Navigator.pop(context, false);
-      return;
+        await sendData(state, "", null, selectedImageId, null);
+
+        Navigator.pop(context, false);
+        return;
+      }
     }
 
     String publicKey = widget.loginData.appPublicKey?.replaceAll(" ", "+");

@@ -188,7 +188,8 @@ class _PreferenceDialogState extends State<PreferenceDialog> {
 
     return CustomDialog(
       title: '${widget.appId} \n would like to access',
-      description: scopeList(context),
+      description: '',
+      widgetDescription: scopeList(context),
       actions: null,
     );
   }

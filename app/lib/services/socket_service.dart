@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
@@ -8,13 +7,11 @@ import 'package:threebotlogin/events/close_auth_event.dart';
 import 'package:threebotlogin/events/close_socket_event.dart';
 import 'package:threebotlogin/events/events.dart';
 import 'package:threebotlogin/events/new_login_event.dart';
+import 'package:threebotlogin/helpers/globals.dart';
 import 'package:threebotlogin/models/login.dart';
 import 'package:threebotlogin/screens/authentication_screen.dart';
-import 'package:threebotlogin/screens/home_screen.dart';
 import 'package:threebotlogin/screens/login_screen.dart';
-import 'package:threebotlogin/screens/successful_screen.dart';
-import 'package:threebotlogin/services/tools_service.dart';
-import 'package:threebotlogin/services/crypto_service.dart';
+import 'package:threebotlogin/screens/warning_screen.dart';
 import 'package:threebotlogin/services/user_service.dart';
 import 'package:threebotlogin/services/open_kyc_service.dart';
 import 'package:threebotlogin/widgets/custom_dialog.dart';
@@ -43,33 +40,17 @@ class BackendConnection {
     });
 
     socket.on('login', (dynamic data) async {
-      print('[login]: Received data');
-      print(data);
+      int currentTimestamp = new DateTime.now().millisecondsSinceEpoch;
 
-      Login loginData;
-
-      if(data['encryptedLoginAttempt'] != null) {
-        Uint8List decryptedLoginAttempt = await decrypt(data['encryptedLoginAttempt'], await getPublicKey(), await getPrivateKey());
-        data['encryptedLoginAttempt'] = new String.fromCharCodes(decryptedLoginAttempt);
-
-        var decryptedLoginAttemptMap = jsonDecode(data['encryptedLoginAttempt']);
-
-        decryptedLoginAttemptMap['type'] = data['type'];
-        decryptedLoginAttemptMap['created'] = data['created'];
-
-        loginData = Login.fromJson(decryptedLoginAttemptMap);
-      } else {
-        loginData = Login.fromJson(data);
+      if (data['created'] != null &&
+          ((currentTimestamp - data['created']) / 1000) >
+              Globals().loginTimeout) {
+        print('We received an expired login attempt, ignoring it.');
+        return;
       }
-      
-      loginData.isMobile = false;
-      print('[login]: Decrypted data');
-      print(data);
+      Login loginData = await Login.createAndDecryptLoginObject(data);
 
-      loginData.loginId = randomString(10);
-
-      // We need home_screen's context to continue ... I feel like this could be done more efficiently. 
-      Events().emit(NewLoginEvent(loginData: loginData, loginId: loginData.loginId));
+      Events().emit(NewLoginEvent(loginData: loginData));
     });
 
     socket.on('disconnect', (_) {
@@ -101,7 +82,8 @@ class BackendConnection {
   }
 }
 
-Future openLogin(BuildContext context, Login loginData, BackendConnection backendConnection) async {
+Future openLogin(BuildContext context, Login loginData,
+    BackendConnection backendConnection) async {
   String messageType = loginData.type;
 
   if (messageType == 'login' && !loginData.isMobile) {
@@ -113,11 +95,28 @@ Future openLogin(BuildContext context, Login loginData, BackendConnection backen
       context,
       MaterialPageRoute(
         builder: (context) => AuthenticationScreen(
-            correctPin: pin, userMessage: "sign your attempt.", loginData: loginData),
+            correctPin: pin,
+            userMessage: "sign your attempt.",
+            loginData: loginData),
       ),
     );
 
     if (authenticated != null && authenticated) {
+      if (loginData.showWarning) {
+        bool warningScreenCompleted = await Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => WarningScreen(),
+          ),
+        );
+
+        if (warningScreenCompleted == null || !warningScreenCompleted) {
+          return;
+        }
+
+        await saveLocationId(loginData.locationId);
+      }
+
       backendConnection.leaveRoom(loginData.doubleName);
       backendConnection.joinRoom(loginData.signedRoom);
 
@@ -131,12 +130,22 @@ Future openLogin(BuildContext context, Login loginData, BackendConnection backen
       if (loggedIn != null && loggedIn) {
         backendConnection.leaveRoom(loginData.signedRoom);
         backendConnection.joinRoom(loginData.doubleName);
-        await Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => SuccessfulScreen(
-                title: "Logged in",
-                text: "You are now logged in. Return to browser."),
+
+        await showDialog(
+          context: context,
+          builder: (BuildContext context) => CustomDialog(
+            image: Icons.check,
+            title: 'Logged in',
+            description:
+                'You are now logged in. Please return to your browser.',
+            actions: <Widget>[
+              FlatButton(
+                child: Text('Ok'),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              )
+            ],
           ),
         );
       } else {
@@ -171,7 +180,7 @@ Future openLogin(BuildContext context, Login loginData, BackendConnection backen
                 builder: (BuildContext context) => CustomDialog(
                   image: Icons.email,
                   title: "Email verified",
-                  description: new Text("Your email has been verified!"),
+                  description: "Your email has been verified!",
                   actions: <Widget>[
                     FlatButton(
                       child: new Text("Ok"),

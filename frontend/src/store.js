@@ -193,6 +193,15 @@ export default new Vuex.Store({
 
       let signedRoom = Math.random().toString(32).substring(2)
 
+      let locationId = window.localStorage.getItem('locationId')
+
+      if (locationId === null) {
+        locationId = generateUUID()
+        window.localStorage.setItem('locationId', locationId)
+      }
+
+      console.log('locationId UUID: ', locationId)
+
       let encryptedLoginAttempt = await cryptoService.encrypt(JSON.stringify({
         doubleName: context.getters.doubleName,
         state: context.getters.hash,
@@ -202,7 +211,7 @@ export default new Vuex.Store({
         signedRoom: signedRoom,
         appPublicKey: context.getters.appPublicKey,
         randomImageId: !data.firstTime ? context.getters.randomImageId.toString() : null,
-        logintoken: (data.logintoken || null)
+        locationId: locationId
       }), publicKey)
 
       console.log('Encrypted login attempt: ', encryptedLoginAttempt)
@@ -226,6 +235,15 @@ export default new Vuex.Store({
 
       let signedRoom = Math.random().toString(32).substring(2)
 
+      let locationId = window.localStorage.getItem('locationId')
+
+      if (locationId === null) {
+        locationId = generateUUID()
+        window.localStorage.setItem('locationId', locationId)
+      }
+
+      console.log('locationId UUID: ', locationId)
+
       let encryptedLoginAttempt = await cryptoService.encrypt(JSON.stringify({
         doubleName: context.getters.doubleName,
         signedRoom: signedRoom,
@@ -233,7 +251,8 @@ export default new Vuex.Store({
         scope: context.getters.scope,
         appId: context.getters.appId,
         appPublicKey: context.getters.appPublicKey,
-        randomImageId: context.getters.randomImageId.toString()
+        randomImageId: context.getters.randomImageId.toString(),
+        locationId: locationId
       }), publicKey)
 
       socketService.emit('leave', { 'room': context.getters.signedRoom })
@@ -338,3 +357,20 @@ export default new Vuex.Store({
     loginInterval: state => state.loginInterval
   }
 })
+
+function generateUUID () {
+  var d = new Date().getTime()
+  var d2 = (performance && performance.now && (performance.now() * 1000)) || 0
+
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+    var r = Math.random() * 16
+    if (d > 0) {
+      r = (d + r) % 16 | 0
+      d = Math.floor(d / 16)
+    } else {
+      r = (d2 + r) % 16 | 0
+      d2 = Math.floor(d2 / 16)
+    }
+    return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16)
+  })
+}

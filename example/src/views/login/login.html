@@ -2,50 +2,26 @@
   <v-layout>
     <v-flex>
       <v-layout column>
-        <v-btn large class="accent" @click="login">
-          Click here to authenticate
+        <v-btn class="accent" @click="login">
+          Authenticate
         </v-btn>
         <br />
-        <v-btn large class="accent" @click="loginToDesktop">
+        <v-btn class="accent" @click="loginToDesktop">
           Login to secure desktop
         </v-btn>
-        <v-btn large class="accent" @click="loginWithCustomScope({ doubleName : true, email : false})">
-          Click here to authenticate & get the users emailaddress
+        <v-btn class="accent" @click="loginWithCustomScope({ doubleName : true, email : false})">
+          Authenticate & get the users emailaddress
         </v-btn>
-        <v-btn large class="accent" @click="loginWithCustomScope({ doubleName : true, derivedSeed : false})">
-          Click here to authenticate & get the derived seed.
+        <v-btn class="accent" @click="loginWithCustomScope({ doubleName : true, derivedSeed : false})">
+          Authenticate & get the derived seed.
         </v-btn>
-        <v-btn large class="accent" @click="loginWithCustomScope({ doubleName : true, email : false, derivedSeed : false})">
-          Click here to authenticate & get the users emailaddress and derived seed.
+        <v-btn class="accent" @click="loginWithCustomScope({ doubleName : true, email : false, derivedSeed : false})">
+          Authenticate & get emailaddress and derived seed.
         </v-btn>
-        <v-btn large class="accent" @click="loginWithCustomScope({ trustedDevice: true, email : true })">
-          Click here to authenticate with trusted device scope.
+        <v-btn class="accent" @click="loginWithCustomScope({ trustedDevice: true, email : true })">
+          Authenticate with trusted device scope.
         </v-btn>
       </v-layout>
     </v-flex>
-    <!-- <v-flex md12 class="white pa-2">
-      <v-layout>
-        <v-flex>
-            <v-text-field box label="privateKey" v-model="privateKey"/>
-            <v-text-field box label="publicKey" v-model="publicKey"/>
-            <v-btn @click="generateKey">
-              Generate key
-            </v-btn>
-        </v-flex>
-        <v-flex>
-            <v-text-field box label="privateKey2" v-model="privateKey2"/>
-            <v-text-field box label="publicKey2" v-model="publicKey2"/>
-            <v-btn @click="generateKey2">
-              Generate key
-            </v-btn>
-        </v-flex>
-      </v-layout>
-      <v-text-field box label="Message" v-model="message"/>
-      <v-text-field box label="Encrypted" v-model="encrypted"/>
-      <v-text-field box label="Decrypted" v-model="decrypted"/>
-      <v-btn @click="encrypt">Encrypt</v-btn>
-      <v-btn @click="decrypt">Decrypt</v-btn>
-
-    </v-flex> -->
   </v-layout>
 </section>

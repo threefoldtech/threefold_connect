@@ -137,8 +137,7 @@ class _MobileRegistrationScreenState extends State<MobileRegistrationScreen> {
           builder: (BuildContext context) => CustomDialog(
                 image: Icons.error,
                 title: 'Error',
-                description: Text(
-                    'Something went wrong when trying to create your account.'),
+                description: 'Something went wrong when trying to create your account.',
                 actions: <Widget>[
                   FlatButton(
                     child: Text('Ok'),

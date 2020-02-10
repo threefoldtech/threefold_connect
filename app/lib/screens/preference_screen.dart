@@ -207,10 +207,7 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
       builder: (BuildContext context) => CustomDialog(
         image: Icons.error,
         title: "Disable Fingerprint",
-        description: new Text(
-          "Are you sure you want to deactivate fingerprint as authentication method?",
-          textAlign: TextAlign.center,
-        ),
+        description: "Are you sure you want to deactivate fingerprint as authentication method?",
         actions: <Widget>[
           FlatButton(
             child: new Text("Cancel"),
@@ -241,10 +238,7 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
       builder: (BuildContext context) => CustomDialog(
         image: Icons.error,
         title: "Are you sure?",
-        description: new Text(
-          "If you confirm, your account will be removed from this device. You can always recover your account with your doublename, email and phrase.",
-          textAlign: TextAlign.center,
-        ),
+        description: "If you confirm, your account will be removed from this device. You can always recover your account with your doublename, email and phrase.",
         actions: <Widget>[
           FlatButton(
             child: new Text("Cancel"),
@@ -269,8 +263,7 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
                       context: preferenceContext,
                       builder: (BuildContext context) => CustomDialog(
                             title: 'Error',
-                            description: Text(
-                                'Something went wrong when trying to remove your account.'),
+                            description: 'Something went wrong when trying to remove your account.',
                             actions: <Widget>[
                               FlatButton(
                                 child: Text('Ok'),
@@ -369,10 +362,7 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
           hiddenaction: copySeedPhrase,
           image: Icons.create,
           title: "Please write this down on a piece of paper",
-          description: Text(
-            phrase.toString(),
-            textAlign: TextAlign.center,
-          ),
+          description: phrase.toString(),
           actions: <Widget>[
             // usually buttons at the bottom of the dialog
             FlatButton(
@@ -443,10 +433,7 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
           builder: (BuildContext context) => CustomDialog(
             image: Icons.check,
             title: "Success",
-            description: new Text(
-              "Your pincode was successfully changed.",
-              textAlign: TextAlign.center,
-            ),
+            description: "Your pincode was successfully changed.",
             actions: <Widget>[
               FlatButton(
                 child: new Text("Ok"),
@@ -471,10 +458,7 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
           builder: (BuildContext context) => CustomDialog(
             image: Icons.perm_device_information,
             title: "Build information",
-            description: Container(
-              child: Text(
-                  "Type: ${appConfig.environment}\nGit hash: ${appConfig.githash}\nTime: ${appConfig.time}"),
-            ),
+            description: "Type: ${appConfig.environment}\nGit hash: ${appConfig.githash}\nTime: ${appConfig.time}",
             actions: <Widget>[
               FlatButton(
                 child: new Text("Ok"),

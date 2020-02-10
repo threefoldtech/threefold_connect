@@ -1,6 +1,9 @@
 import 'dart:convert';
+import 'dart:typed_data';
 
 import 'package:threebotlogin/models/scope.dart';
+import 'package:threebotlogin/services/crypto_service.dart';
+import 'package:threebotlogin/services/user_service.dart';
 
 class Login {
   String doubleName;
@@ -10,11 +13,12 @@ class Login {
   String appPublicKey;
   String randomImageId;
   String type;
-  String loginId;
   String signedRoom;
   String redirecturl;
   bool isMobile;
   int created;
+  String locationId;
+  bool showWarning;
 
   Login(
       {this.doubleName,
@@ -24,11 +28,11 @@ class Login {
       this.appPublicKey,
       this.randomImageId,
       this.type,
-      this.loginId,
       this.signedRoom,
       this.redirecturl,
       this.isMobile,
-      this.created});
+      this.created,
+      this.locationId});
 
   Login.fromJson(Map<String, dynamic> json)
       : doubleName = json['doubleName'],
@@ -38,11 +42,11 @@ class Login {
         appPublicKey = json['appPublicKey'],
         randomImageId = json['randomImageId'],
         type = json['type'],
-        loginId = json['loginId'],
         signedRoom = json['signedRoom'],
         redirecturl = json['redirecturl'],
         isMobile = json['mobile'] as bool,
-        created = json['created'];
+        created = json['created'],
+        locationId = json['locationId'];
 
   Map<String, dynamic> toJson() => {
         'doubleName': doubleName,
@@ -52,10 +56,41 @@ class Login {
         'appPublicKey': appPublicKey,
         'randomImageId': randomImageId,
         'type': type,
-        'loginId': loginId,
         'signedRoom': signedRoom,
         'redirecturl': redirecturl,
         'mobile': isMobile,
         'created': created,
+        'locationId': locationId
       };
+
+    static Future<Login> createAndDecryptLoginObject(dynamic data) async {
+      Login loginData;
+
+      if(data['encryptedLoginAttempt'] != null) {
+        Uint8List decryptedLoginAttempt = await decrypt(data['encryptedLoginAttempt'], await getPublicKey(), await getPrivateKey());
+        data['encryptedLoginAttempt'] = new String.fromCharCodes(decryptedLoginAttempt);
+
+        var decryptedLoginAttemptMap = jsonDecode(data['encryptedLoginAttempt']);
+
+        decryptedLoginAttemptMap['type'] = data['type'];
+        decryptedLoginAttemptMap['created'] = data['created'];
+
+        loginData = Login.fromJson(decryptedLoginAttemptMap);
+      } else {
+        loginData = Login.fromJson(data);
+      }
+      
+      loginData.isMobile = false;
+
+      List<dynamic> list = await getLocationIdList();
+
+      if(list.contains(loginData.locationId)) {
+        loginData.showWarning = false;
+      } else {
+        loginData.showWarning = true;
+      }
+
+      return loginData;
+    }
+
 }

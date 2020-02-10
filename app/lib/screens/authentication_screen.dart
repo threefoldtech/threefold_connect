@@ -26,7 +26,6 @@ class AuthenticationScreen extends StatefulWidget {
 
 class AuthenticationScreenState extends State<AuthenticationScreen> {
   int timeout = 30000;
-  int loginTimeout = 20;
   Globals globals = Globals();
   Timer timer;
 
@@ -37,7 +36,7 @@ class AuthenticationScreenState extends State<AuthenticationScreen> {
       close();
     });
 
-    if(widget.loginData != null) {
+    if(widget.loginData != null && !widget.loginData.isMobile) {
       const oneSec = const Duration(seconds: 1);
       
       print('Starting timer ... ');
@@ -49,11 +48,16 @@ class AuthenticationScreenState extends State<AuthenticationScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) => checkFingerprint());
   }
 
-  timeoutTimer() async {  
+  timeoutTimer() async { 
+    if(!mounted) {
+      timer.cancel();
+      return;
+    }
+
     int created = widget.loginData.created;
     int currentTimestamp = new DateTime.now().millisecondsSinceEpoch;
 
-    if (created != null && ((currentTimestamp - created) / 1000) > loginTimeout) {
+    if (created != null && ((currentTimestamp - created) / 1000) > Globals().loginTimeout) {
       timer.cancel();
 
       await showDialog(
@@ -61,8 +65,7 @@ class AuthenticationScreenState extends State<AuthenticationScreen> {
         builder: (BuildContext context) => CustomDialog(
           image: Icons.timer,
           title: 'Login attempt expired',
-          description: Text(
-              'Your login attempt has expired, please request a new one in your browser.'),
+          description: 'Your login attempt has expired, please request a new one in your browser.',
           actions: <Widget>[
             FlatButton(
               child: Text('Ok'),
@@ -272,13 +275,12 @@ class AuthenticationScreenState extends State<AuthenticationScreen> {
 
       dialog = CustomDialog(
         title: "Too many attempts",
-        description: Text(
-            "Too many incorrect attempts, please wait ${((globals.lockedUntill - currentTime) / 1000).toStringAsFixed(0)} seconds"),
+        description: "Too many incorrect attempts, please wait ${((globals.lockedUntill - currentTime) / 1000).toStringAsFixed(0)} seconds",
       );
     } else {
       dialog = CustomDialog(
         title: "Incorrect pin",
-        description: Text("Your pincode is incorrect."),
+        description: "Your pincode is incorrect.",
       );
     }
 

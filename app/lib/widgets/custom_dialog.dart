@@ -3,7 +3,8 @@ import 'package:flutter/material.dart';
 
 class CustomDialog extends StatelessWidget {
   //@todo this is used for everything, just seems like a very bad idea. Make dialogs for the seperate things. Maybe a popup dialog with info ok/cancel and other dialogs for eg pin entry
-  final Widget description;
+  final String description;
+  final Widget widgetDescription;
   final List<Widget> actions;
   final String title;
   final IconData image;
@@ -12,11 +13,12 @@ class CustomDialog extends StatelessWidget {
   CustomDialog({
     @required this.title,
     @required this.description,
+    this.widgetDescription,
     this.actions,
     this.image = Icons.person,
     this.hiddenaction,
   });
-  
+
   show(context) {
     return showDialog(
       context: context,
@@ -25,6 +27,7 @@ class CustomDialog extends StatelessWidget {
         image: Icons.error,
         title: this.title,
         description: this.description,
+        widgetDescription: this.widgetDescription,
         actions: <Widget>[
           //@todo make this configurable, ok;okcancel
           FlatButton(
@@ -108,8 +111,9 @@ class CustomDialog extends StatelessWidget {
             ),
           ],
         ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min, // To make the card compact
+        child: ListView(
+          shrinkWrap: true,
+          // mainAxisSize: MainAxisSize.min, // To make the card compact
           children: <Widget>[
             Container(
               padding: EdgeInsets.symmetric(horizontal: 20.0),
@@ -127,7 +131,12 @@ class CustomDialog extends StatelessWidget {
               constraints: const BoxConstraints(maxHeight: 300, maxWidth: 310),
               child: Container(
                 padding: EdgeInsets.symmetric(horizontal: 5.0),
-                child: description,
+                child: (widgetDescription == null)
+                    ? Text(
+                        description,
+                        textAlign: TextAlign.center,
+                      )
+                    : widgetDescription,
               ),
             ),
             SizedBox(height: 24.0),
