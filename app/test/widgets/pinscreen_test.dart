@@ -7,8 +7,11 @@ void main() {
       (WidgetTester tester) async {
     await tester.pumpWidget(MaterialApp(
         home: Scaffold(
-      body: AuthenticationScreen(userMessage: 'Hello test test',correctPin: "0000",),
-    )));   
+      body: AuthenticationScreen(
+        userMessage: 'Hello test test',
+        correctPin: "0000",
+      ),
+    )));
     // Validate pin input screen
     expect(find.text('Authentication'), findsOneWidget);
     expect(find.text('1'), findsOneWidget);
@@ -26,13 +29,15 @@ void main() {
     expect(find.text('Please authenticate to Hello test test'), findsOneWidget);
   });
 
-  
   testWidgets('entering the wrong pin should say that it is wrong',
       (WidgetTester tester) async {
     await tester.pumpWidget(MaterialApp(
         home: Scaffold(
-      body: AuthenticationScreen(userMessage: 'Hello test test',correctPin: "0000",),
-    )));   
+      body: AuthenticationScreen(
+        userMessage: 'Hello test test',
+        correctPin: "0000",
+      ),
+    )));
     // Validate pin input screen
     var nineButton = find.text('9');
     expect(nineButton, findsOneWidget);
