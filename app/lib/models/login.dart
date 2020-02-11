@@ -13,7 +13,7 @@ class Login {
   String appPublicKey;
   String randomImageId;
   String type;
-  String signedRoom;
+  String randomRoom;
   String redirecturl;
   bool isMobile;
   int created;
@@ -28,7 +28,7 @@ class Login {
       this.appPublicKey,
       this.randomImageId,
       this.type,
-      this.signedRoom,
+      this.randomRoom,
       this.redirecturl,
       this.isMobile,
       this.created,
@@ -42,7 +42,7 @@ class Login {
         appPublicKey = json['appPublicKey'],
         randomImageId = json['randomImageId'],
         type = json['type'],
-        signedRoom = json['signedRoom'],
+        randomRoom = json['randomRoom'],
         redirecturl = json['redirecturl'],
         isMobile = json['mobile'] as bool,
         created = json['created'],
@@ -56,7 +56,7 @@ class Login {
         'appPublicKey': appPublicKey,
         'randomImageId': randomImageId,
         'type': type,
-        'signedRoom': signedRoom,
+        'randomRoom': randomRoom,
         'redirecturl': redirecturl,
         'mobile': isMobile,
         'created': created,

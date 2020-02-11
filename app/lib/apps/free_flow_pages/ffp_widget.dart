@@ -111,7 +111,7 @@ class _FfpState extends State<FfpWidget> with AutomaticKeepAliveClientMixin {
     final state = Uri.decodeFull(url.split("&state=")[1]);
     final union = '?';
     final privateKey = await getPrivateKey();
-    final signedHash = signData(state, privateKey);
+    final signedState = signData(state, privateKey);
 
     final redirecturl =
         Uri.decodeFull(url.split("&redirecturl=")[1].split("&")[0]);
@@ -129,7 +129,7 @@ class _FfpState extends State<FfpWidget> with AutomaticKeepAliveClientMixin {
         (await encrypt(jsonEncode(scopeData), publickey, privateKey)));
     var data = Uri.encodeQueryComponent(jsonData); //Uri.encodeFull();
     var loadUrl =
-        'https://${config.appId()}$redirecturl${union}username=${await getDoubleName()}&signedhash=${Uri.encodeComponent(await signedHash)}&data=$data';
+        'https://${config.appId()}$redirecturl${union}username=${await getDoubleName()}&signedState=${Uri.encodeComponent(await signedState)}&data=$data';
 
     webView.loadUrl(url: loadUrl);
     switchToCircle = true;

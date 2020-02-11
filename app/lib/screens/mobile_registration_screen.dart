@@ -187,7 +187,6 @@ class _MobileRegistrationScreenState extends State<MobileRegistrationScreen> {
     saveDoubleName(_registrationData.doubleName);
     savePhrase(_registrationData.phrase);
 
-    await sendRegisterSign(_registrationData.doubleName);
     await sendVerificationEmail();
   }
 

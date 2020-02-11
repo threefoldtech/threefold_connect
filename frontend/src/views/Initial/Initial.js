@@ -27,7 +27,7 @@ export default {
       didLeavePage: false,
       nameCheckerTimeOut: null,
       isMobile: /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent),
-      roomToListenForSigned: ''
+      randomRoom: ''
     }
   },
   mounted () {
@@ -42,12 +42,12 @@ export default {
     }
 
     if (this.isMobile) {
-      this.roomToListenForSigned = window.localStorage.getItem('signedRoom')
-      if (!this.roomToListenForSigned) {
-        this.roomToListenForSigned = Math.random().toString(32).substring(2)
-        window.localStorage.setItem('signedRoom', this.roomToListenForSigned)
+      this.randomRoom = window.localStorage.getItem('randomRoom')
+      if (!this.randomRoom) {
+        this.randomRoom = generateUUID()
+        window.localStorage.setItem('randomRoom', this.randomRoom)
       }
-      this.setSignedRoom(this.roomToListenForSigned)
+      this.setrandomRoom(this.randomRoom)
     }
     window.onblur = this.lostFocus
     window.onfocus = this.gotFocus
@@ -70,7 +70,7 @@ export default {
     }
     if (this.$route.query) {
       this.$store.dispatch('saveState', {
-        hash: this.hash ? this.hash : this.$route.query.state,
+        _state: this._state ? this._state : this.$route.query.state,
         redirectUrl: this.$route.query.redirecturl
       })
       this.setAppId(this.$route.query.appid || null)
@@ -92,7 +92,7 @@ export default {
       'firstTime',
       'randomImageId',
       'cancelLoginUp',
-      'hash',
+      '_state',
       'scope',
       'appId',
       'appPublicKey'
@@ -109,7 +109,7 @@ export default {
       'checkName',
       'clearCheckStatus',
       'setAttemptCanceled',
-      'setSignedRoom'
+      'setrandomRoom'
     ]),
     lostFocus () {
       this.didLeavePage = true
@@ -119,9 +119,9 @@ export default {
         mobile: this.isMobile,
         firstTime: false
       })
-      this.setSignedRoom(this.roomToListenForSigned)
+      this.setrandomRoom(this.randomRoom)
 
-      var url = `threebot://login?state=${encodeURIComponent(this.hash)}&signedRoom=${this.roomToListenForSigned}`
+      var url = `threebot://login?state=${encodeURIComponent(this._state)}&randomRoom=${this.randomRoom}`
       if (this.scope) url += `&scope=${encodeURIComponent(this.scope)}`
       if (this.appId) url += `&appId=${encodeURIComponent(this.appId)}`
       if (this.appPublicKey) url += `&appPublicKey=${encodeURIComponent(this.appPublicKey)}`
@@ -140,7 +140,7 @@ export default {
         firstTime: false
       })
       if (this.isMobile) {
-        var url = `threebot://login/?state=${encodeURIComponent(this.hash)}`
+        var url = `threebot://login/?state=${encodeURIComponent(this._state)}`
         if (this.scope) url += `&scope=${encodeURIComponent(this.scope)}`
         if (this.appId) url += `&appId=${encodeURIComponent(this.appId)}`
         if (this.appPublicKey) url += `&appPublicKey=${encodeURIComponent(this.appPublicKey)}`
@@ -183,7 +183,7 @@ export default {
       try {
         if (val) {
           window.localStorage.setItem('username', val.doubleName)
-          var signedHash = encodeURIComponent(val.signedHash)
+          var signedState = encodeURIComponent(val.signedState)
           var data
 
           if (typeof val.data === 'object' && val.data !== null) {
@@ -192,10 +192,10 @@ export default {
             data = encodeURIComponent(val.data)
           }
 
-          console.log('signedHash: ', signedHash)
+          console.log('signedState: ', signedState)
           console.log('!!!!data', data)
 
-          if (data && signedHash) {
+          if (data && signedState) {
             var union = '?'
             if (this.redirectUrl.indexOf('?') >= 0) {
               union = '&'
@@ -210,14 +210,14 @@ export default {
               safeRedirectUri = '/' + this.redirectUrl
             }
 
-            var url = `//${this.appId}${safeRedirectUri}${union}username=${val.doubleName}&signedhash=${signedHash}&data=${data}`
+            var url = `//${this.appId}${safeRedirectUri}${union}username=${val.doubleName}&signedState=${signedState}&data=${data}`
             if (!this.isRedirecting) {
               this.isRedirecting = true
               console.log('Changing href: ', url)
               window.location.href = url
             }
           } else {
-            console.log('Missing data or signedHash')
+            console.log('Missing data or signedState')
           }
         } else {
           console.log('Val was null')
@@ -241,4 +241,21 @@ export default {
     var url = `//${this.appId}${safeRedirectUri}?error=CancelledByUser`
     window.location.href = url
   }
+}
+
+function generateUUID () {
+  var d = new Date().getTime()
+  var d2 = (performance && performance.now && (performance.now() * 1000)) || 0
+
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+    var r = Math.random() * 16
+    if (d > 0) {
+      r = (d + r) % 16 | 0
+      d = Math.floor(d / 16)
+    } else {
+      r = (d2 + r) % 16 | 0
+      d2 = Math.floor(d2 / 16)
+    }
+    return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16)
+  })
 }

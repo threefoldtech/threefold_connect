@@ -1,10 +1,12 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:http/http.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 import 'package:threebotlogin/app_config.dart';
 import 'package:threebotlogin/events/close_auth_event.dart';
 import 'package:threebotlogin/events/close_socket_event.dart';
+import 'package:threebotlogin/events/email_event.dart';
 import 'package:threebotlogin/events/events.dart';
 import 'package:threebotlogin/events/new_login_event.dart';
 import 'package:threebotlogin/helpers/globals.dart';
@@ -25,7 +27,7 @@ class BackendConnection {
   BackendConnection(this.doubleName);
 
   init() async {
-    print('creating socket connection....');
+    print('Creating socket connection');
 
     socket = IO.io(threeBotSocketUrl, <String, dynamic>{
       'transports': ['websocket'],
@@ -33,13 +35,18 @@ class BackendConnection {
     });
 
     socket.on('connect', (res) {
-      print('connected');
-      // once a client has connected, we let him join a room
+      print('[connect]');
+
       socket.emit('join', {'room': doubleName.toLowerCase(), 'app': true});
-      print('joined room');
+      print('Joined room: ' + doubleName.toLowerCase());
+    });
+
+    socket.on('email_verification', (_) {
+      Events().emit(EmailEvent());
     });
 
     socket.on('login', (dynamic data) async {
+      print('[login]');
       int currentTimestamp = new DateTime.now().millisecondsSinceEpoch;
 
       if (data['created'] != null &&
@@ -57,14 +64,15 @@ class BackendConnection {
       print('disconnect');
     });
 
-    socket.on('fromServer', (_) => print(_));
-    socket.on('connect_error', (err) => print(err));
     Events().onEvent(CloseSocketEvent().runtimeType, closeSocketConnection);
   }
 
   void closeSocketConnection(CloseSocketEvent event) {
-    print('closing socket connection....');
+    print('Closing socket connection');
+
+    print('Leaving room: ' + doubleName);
     socket.emit('leave', {'room': doubleName});
+
     socket.clearListeners();
     socket.disconnect();
     socket.close();
@@ -72,13 +80,55 @@ class BackendConnection {
   }
 
   void joinRoom(roomName) {
-    print('joining room....' + roomName);
+    print('Joining room: ' + roomName);
     socket.emit('join', {'room': roomName, 'app': true});
   }
 
   void leaveRoom(roomName) {
-    print('Leaving room....' + roomName);
+    print('Leaving room: ' + roomName);
     socket.emit('leave', {'room': roomName});
+  }
+}
+
+Future emailVerification(BuildContext context) async {
+  Map<String, Object> email = await getEmail();
+  if (email['email'] != null) {
+    String doubleName = (await getDoubleName()).toLowerCase();
+    Response response = await getSignedEmailIdentifierFromOpenKYC(doubleName);
+
+    if(response.statusCode != 200) {
+      return;
+    }
+
+    Map<String, dynamic> body = jsonDecode(response.body);
+
+    dynamic signedEmailIdentifier = body["signed_email_identifier"];
+
+    if (signedEmailIdentifier != null && signedEmailIdentifier.isNotEmpty) {
+      Map<String, dynamic> vsei = jsonDecode((await verifySignedEmailIdentifier(signedEmailIdentifier)).body);
+
+      if (vsei != null && vsei["email"] == email["email"] && vsei["identifier"] == doubleName) {
+        await saveEmail(vsei["email"], signedEmailIdentifier);
+        showDialog(
+          context: context,
+          builder: (BuildContext context) => CustomDialog(
+            image: Icons.email,
+            title: "Email verified",
+            description: "Your email has been verified!",
+            actions: <Widget>[
+              FlatButton(
+                child: new Text("Ok"),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              ),
+            ],
+          ),
+        );
+      } else {
+        await saveEmail(email["email"], null);
+      }
+    }
   }
 }
 
@@ -118,7 +168,7 @@ Future openLogin(BuildContext context, Login loginData,
       }
 
       backendConnection.leaveRoom(loginData.doubleName);
-      backendConnection.joinRoom(loginData.signedRoom);
+      backendConnection.joinRoom(loginData.randomRoom);
 
       bool loggedIn = await Navigator.push(
         context,
@@ -128,7 +178,7 @@ Future openLogin(BuildContext context, Login loginData,
       );
 
       if (loggedIn != null && loggedIn) {
-        backendConnection.leaveRoom(loginData.signedRoom);
+        backendConnection.leaveRoom(loginData.randomRoom);
         backendConnection.joinRoom(loginData.doubleName);
 
         await showDialog(
@@ -149,54 +199,9 @@ Future openLogin(BuildContext context, Login loginData,
           ),
         );
       } else {
-        backendConnection.leaveRoom(loginData.signedRoom);
+        backendConnection.leaveRoom(loginData.randomRoom);
         backendConnection.joinRoom(loginData.doubleName);
       }
     }
-  } else if (messageType == 'email_verification') {
-    getEmail().then((email) async {
-      if (email['email'] != null) {
-        String tmpDoubleName = (await getDoubleName()).toLowerCase();
-
-        getSignedEmailIdentifierFromOpenKYC(tmpDoubleName)
-            .then((response) async {
-          Map<String, dynamic> body = jsonDecode(response.body);
-
-          dynamic signedEmailIdentifier = body["signed_email_identifier"];
-
-          if (signedEmailIdentifier != null &&
-              signedEmailIdentifier.isNotEmpty) {
-            Map<String, dynamic> vsei = jsonDecode(
-                (await verifySignedEmailIdentifier(signedEmailIdentifier))
-                    .body);
-
-            if (vsei != null &&
-                vsei["email"] == email["email"] &&
-                vsei["identifier"] == tmpDoubleName) {
-              await saveEmail(vsei["email"], signedEmailIdentifier);
-
-              showDialog(
-                context: context,
-                builder: (BuildContext context) => CustomDialog(
-                  image: Icons.email,
-                  title: "Email verified",
-                  description: "Your email has been verified!",
-                  actions: <Widget>[
-                    FlatButton(
-                      child: new Text("Ok"),
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
-                    ),
-                  ],
-                ),
-              );
-            } else {
-              await saveEmail(email["email"], null);
-            }
-          }
-        });
-      }
-    });
   }
 }

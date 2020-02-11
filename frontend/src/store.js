@@ -10,7 +10,7 @@ Vue.use(Vuex)
 
 export default new Vuex.Store({
   state: {
-    hash: null,
+    _state: null,
     redirectUrl: null,
     keys: {},
     doubleName: null,
@@ -33,7 +33,7 @@ export default new Vuex.Store({
     appId: null,
     appPublicKey: null,
     randomImageId: null,
-    signedRoom: null,
+    randomRoom: null,
     loginTimestamp: 0,
     loginTimeleft: 120,
     loginTimeout: 120,
@@ -50,8 +50,8 @@ export default new Vuex.Store({
       console.log(`Setting doubleName to ${name}`)
       state.doubleName = name
     },
-    setHash (state, hash) {
-      state.hash = hash
+    setState (state, _state) {
+      state._state = _state
     },
     setRedirectUrl (state, redirectUrl) {
       state.redirectUrl = redirectUrl
@@ -87,8 +87,8 @@ export default new Vuex.Store({
     setIsMobile (state, isMobile) {
       state.isMobile = isMobile
     },
-    setSignedRoom (state, signedRoom) {
-      state.signedRoom = signedRoom
+    setrandomRoom (state, randomRoom) {
+      state.randomRoom = randomRoom
     },
     resetTimer (state) {
       if (state.loginInterval !== undefined) {
@@ -116,9 +116,9 @@ export default new Vuex.Store({
       context.commit('setDoubleName', doubleName)
       socketService.emit('join', { room: doubleName })
     },
-    setSignedRoom (context, signedRoom) {
-      context.commit('setSignedRoom', signedRoom)
-      socketService.emit('join', { room: signedRoom })
+    setrandomRoom (context, randomRoom) {
+      context.commit('setrandomRoom', randomRoom)
+      socketService.emit('join', { room: randomRoom })
     },
     setAttemptCanceled (context, payload) {
       context.commit('setCancelLoginUp', payload)
@@ -127,7 +127,7 @@ export default new Vuex.Store({
       console.log(`hi, connected with SOCKET_connect`)
     },
     saveState (context, payload) {
-      context.commit('setHash', payload.hash)
+      context.commit('setState', payload._state)
       context.commit('setRedirectUrl', payload.redirectUrl)
     },
     clearCheckStatus (context) {
@@ -191,7 +191,7 @@ export default new Vuex.Store({
       let publicKey = (await userService.getUserData(context.getters.doubleName)).data.publicKey
       console.log('Public key: ', publicKey)
 
-      let signedRoom = Math.random().toString(32).substring(2)
+      let randomRoom = generateUUID()
 
       let locationId = window.localStorage.getItem('locationId')
 
@@ -204,20 +204,21 @@ export default new Vuex.Store({
 
       let encryptedLoginAttempt = await cryptoService.encrypt(JSON.stringify({
         doubleName: context.getters.doubleName,
-        state: context.getters.hash,
+        state: context.getters._state,
         firstTime: data.firstTime,
         scope: context.getters.scope,
         appId: context.getters.appId,
-        signedRoom: signedRoom,
+        randomRoom: randomRoom,
         appPublicKey: context.getters.appPublicKey,
         randomImageId: !data.firstTime ? context.getters.randomImageId.toString() : null,
         locationId: locationId
       }), publicKey)
 
+      console.log('State: ', context.getters._state)
       console.log('Encrypted login attempt: ', encryptedLoginAttempt)
 
       socketService.emit('leave', { 'room': context.getters.doubleName })
-      context.dispatch('setSignedRoom', signedRoom)
+      context.dispatch('setrandomRoom', randomRoom)
 
       socketService.emit('login', { 'doubleName': context.getters.doubleName, 'encryptedLoginAttempt': encryptedLoginAttempt })
     },
@@ -233,7 +234,7 @@ export default new Vuex.Store({
       let publicKey = (await userService.getUserData(context.getters.doubleName)).data.publicKey
       console.log('Public key: ', publicKey)
 
-      let signedRoom = Math.random().toString(32).substring(2)
+      let randomRoom = generateUUID()
 
       let locationId = window.localStorage.getItem('locationId')
 
@@ -246,8 +247,8 @@ export default new Vuex.Store({
 
       let encryptedLoginAttempt = await cryptoService.encrypt(JSON.stringify({
         doubleName: context.getters.doubleName,
-        signedRoom: signedRoom,
-        state: context.getters.hash,
+        randomRoom: randomRoom,
+        state: context.getters._state,
         scope: context.getters.scope,
         appId: context.getters.appId,
         appPublicKey: context.getters.appPublicKey,
@@ -255,15 +256,15 @@ export default new Vuex.Store({
         locationId: locationId
       }), publicKey)
 
-      socketService.emit('leave', { 'room': context.getters.signedRoom })
-      context.dispatch('setSignedRoom', signedRoom)
+      socketService.emit('leave', { 'room': context.getters.randomRoom })
+      context.dispatch('setrandomRoom', randomRoom)
       context.dispatch('resetTimer')
-      socketService.emit('resend', { 'doubleName': context.getters.doubleName, 'encryptedLoginAttempt': encryptedLoginAttempt })
+      socketService.emit('login', { 'doubleName': context.getters.doubleName, 'encryptedLoginAttempt': encryptedLoginAttempt })
     },
     sendValidationEmail (context, data) {
       var callbackUrl = `${window.location.protocol}//${window.location.host}/verifyemail`
 
-      callbackUrl += `?hash=${context.getters.hash}`
+      callbackUrl += `?state=${context.getters._state}`
       callbackUrl += `&redirecturl=${window.btoa(context.getters.redirectUrl)}`
       callbackUrl += `&doublename=${context.getters.doubleName}`
 
@@ -330,15 +331,15 @@ export default new Vuex.Store({
     setAppPublicKey (context, appPublicKey) {
       context.commit('setAppPublicKey', appPublicKey)
     },
-    setHash (context, hash) {
-      context.commit('setHash', hash)
+    setState (context, _state) {
+      context.commit('setState', _state)
     }
   },
   getters: {
     doubleName: state => state.doubleName,
     nameCheckStatus: state => state.nameCheckStatus,
     keys: state => state.keys,
-    hash: state => state.hash,
+    _state: state => state._state,
     redirectUrl: state => state.redirectUrl,
     scannedFlagUp: state => state.scannedFlagUp,
     cancelLoginUp: state => state.cancelLoginUp,
@@ -350,7 +351,7 @@ export default new Vuex.Store({
     appPublicKey: state => state.appPublicKey,
     isMobile: state => state.isMobile,
     randomImageId: state => state.randomImageId,
-    signedRoom: state => state.signedRoom,
+    randomRoom: state => state.randomRoom,
     loginTimestamp: state => state.loginTimestamp,
     loginTimeleft: state => state.loginTimeleft,
     loginTimeout: state => state.loginTimeout,

@@ -310,7 +310,7 @@ class _LoginScreenState extends State<LoginScreen> with BlockAndRunMixin {
 
   sendIt(bool includeData) async {
     String state = widget.loginData.state;
-    String signedRoom = widget.loginData.signedRoom;
+    String randomRoom = widget.loginData.randomRoom;
 
     if (widget.loginData != null && !widget.loginData.isMobile) {
       int created = widget.loginData.created;
@@ -343,7 +343,7 @@ class _LoginScreenState extends State<LoginScreen> with BlockAndRunMixin {
       }
     }
 
-    String publicKey = widget.loginData.appPublicKey?.replaceAll(" ", "+");
+    String publicKey  = widget.loginData.appPublicKey?.replaceAll(" ", "+");
 
     bool stateCheck = RegExp(r"[^A-Za-z0-9]+").hasMatch(state);
 
@@ -382,7 +382,7 @@ class _LoginScreenState extends State<LoginScreen> with BlockAndRunMixin {
           null); // temp fix send empty data for regenerate emoji
     } else {
       await sendData(
-          state, signedState, encryptedScopeData, selectedImageId, signedRoom);
+          state, signedState, encryptedScopeData, selectedImageId, randomRoom);
     }
 
     if (selectedImageId == correctImage || isMobileCheck) {

@@ -22,7 +22,7 @@ export default {
       'firstTime',
       'randomImageId',
       'cancelLoginUp',
-      'hash',
+      '_state',
       'scope',
       'appId',
       'appPublicKey',
@@ -46,7 +46,7 @@ export default {
     },
     openApp () {
       if (this.isMobile) {
-        var url = `threebot://login/?state=${encodeURIComponent(this.hash)}`
+        var url = `threebot://login/?state=${encodeURIComponent(this._state)}`
         if (this.scope) url += `&scope=${encodeURIComponent(this.scope)}`
         if (this.appId) url += `&appId=${encodeURIComponent(this.appId)}`
         if (this.appPublicKey) url += `&appPublicKey=${encodeURIComponent(this.appPublicKey)}`
@@ -68,7 +68,7 @@ export default {
 
           window.localStorage.setItem('username', this.doubleName)
 
-          var signedHash = encodeURIComponent(val.signedHash)
+          var signedState = encodeURIComponent(val.signedState)
           var data
 
           if (typeof val.data === 'object' && val.data !== null) {
@@ -77,10 +77,10 @@ export default {
             data = encodeURIComponent(val.data)
           }
 
-          console.log('signedHash: ', signedHash)
+          console.log('signedState: ', signedState)
           console.log('!!!!data', data)
 
-          if (data && signedHash) {
+          if (data && signedState) {
             var union = '?'
             if (this.redirectUrl.indexOf('?') >= 0) {
               union = '&'
@@ -96,7 +96,7 @@ export default {
             }
 
             console.log('!!!! this.doubleName: ', this.doubleName)
-            var url = `//${this.appId}${safeRedirectUri}${union}username=${this.doubleName}&signedhash=${signedHash}&data=${data}`
+            var url = `//${this.appId}${safeRedirectUri}${union}username=${this.doubleName}&signedState=${signedState}&data=${data}`
 
             if (!this.isRedirecting) {
               this.isRedirecting = true
@@ -104,7 +104,7 @@ export default {
               window.location.href = url
             }
           } else {
-            console.log('Missing data or signedHash')
+            console.log('Missing data or signedState')
           }
         } else {
           console.log('Val was null')

@@ -12,16 +12,16 @@ import 'package:threebotlogin/services/user_service.dart';
 String threeBotApiUrl = AppConfig().threeBotApiUrl();
 Map<String, String> requestHeaders = {'Content-type': 'application/json'};
 
-Future<Response> sendData(String hash, String signedHash, data, selectedImageId,
-    String signedRoom) async {
+Future<Response> sendData(String state, String signedState, data, selectedImageId,
+    String randomRoom) async {
   return http.post('$threeBotApiUrl/sign',
       body: json.encode({
-        'hash': hash,
-        'signedHash': signedHash,
+        'state': state,
+        'signedState': signedState,
         'data': data,
         'selectedImageId': selectedImageId,
         'doubleName': await getDoubleName(),
-        'signedRoom': signedRoom
+        'randomRoom': randomRoom
       }),
       headers: requestHeaders);
 }
@@ -84,14 +84,6 @@ Future<Response> finishRegistration(
         'sid': sid,
         'email': email,
         'public_key': publicKey,
-      }),
-      headers: requestHeaders);
-}
-
-Future<Response> sendRegisterSign(String doubleName) {
-  return http.post('$threeBotApiUrl/signRegister',
-      body: json.encode({
-        'doubleName': doubleName,
       }),
       headers: requestHeaders);
 }

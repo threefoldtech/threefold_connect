@@ -70,7 +70,7 @@ Login queryParametersToLogin(Map<String, dynamic> map) {
   return Login(
       state: map['state'],
       isMobile: true,
-      signedRoom: map['signedRoom'],
+      randomRoom: map['randomRoom'],
       scope: map['scope'] != null && map['scope'] != 'null'
           ? Scope.fromJson(jsonDecode(map['scope'] as String))
           : null,

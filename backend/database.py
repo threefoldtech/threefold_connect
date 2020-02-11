@@ -106,10 +106,10 @@ def update_user(conn, update_sql, *params):
     except Error as e:
         logger.debug(e)
 
-def update_auth(conn, update_sql, singed_statehash, data, double_name):
+def update_auth(conn, update_sql, signed_state, data, double_name):
     try:
         c = conn.cursor()
-        c.execute(update_sql, (singed_statehash, data, double_name))
+        c.execute(update_sql, (signed_state, data, double_name))
         conn.commit()
     except Error as e:
         logger.debug(e)

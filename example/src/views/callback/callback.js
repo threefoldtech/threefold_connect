@@ -22,7 +22,7 @@ export default {
     }
 
     let user = url.searchParams.get('username')
-    let signedState = url.searchParams.get('signedhash')
+    let signedState = url.searchParams.get('signedState')
 
     let userPublicKey = (await threebotService.getUserData(user)).data.publicKey
     let state = window.localStorage.getItem('state')

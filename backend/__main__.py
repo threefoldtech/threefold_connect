@@ -137,46 +137,17 @@ def emitOrQueue(event, data, room):
 
 @sio.on("login")
 def login_handler(data):
-    logger.debug("/Login %s", data)
+    logger.debug("/login %s", data)
     double_name = data.get("doubleName").lower()
 
     data["type"] = "login"
     milli_sec = int(round(time.time() * 1000))
     data["created"] = milli_sec
-    
+
     user = db.getUserByName(conn, double_name)
     if user:
-        logger.debug("[Login]: User found %s", user[0])
+        logger.debug("[login]: User found %s", user[0])
         emitOrQueue("login", data, room=user[0])
-
-@sio.on("resend")
-def resend_handler(data):
-    logger.debug("/resend %s", data)
-    doubleName = data.get("doubleName").lower()
-
-    data["type"] = "login"
-    milli_sec = int(round(time.time() * 1000))
-    data["created"] = milli_sec
-
-    emitOrQueue("login", data, room=doubleName)
-
-@app.route("/api/signRegister", methods=["POST"])
-def signRegisterHandler():
-    body = request.get_json()
-    double_name = body.get("doubleName").lower()
-    logger.debug("/signRegister %s", body)
-
-    user = db.getUserByName(conn, double_name)
-
-    if user:
-        sio.emit(
-            "signed",
-            {"data": body.get("data"), "doubleName": double_name},
-            room=user[0],
-        )
-        return Response("Ok")
-    else:
-        return Response("User not found", status=404)
 
 
 @app.route("/api/sign", methods=["POST"])
@@ -185,7 +156,7 @@ def sign_handler():
 
     logger.debug("/sign: %s", body)
     logger.debug("body.get('doubleName'): %s", body.get("doubleName"))
-    roomToSendTo = body.get("signedRoom")
+    roomToSendTo = body.get("randomRoom")
     if roomToSendTo is None:
         roomToSendTo = body.get("doubleName")
     roomToSendTo = roomToSendTo.lower()
@@ -194,7 +165,7 @@ def sign_handler():
     sio.emit(
         "signed",
         {
-            "signedHash": body.get("signedHash"),
+            "signedState": body.get("signedState"),
             "doubleName": body.get("doubleName"),
             "data": body.get("data"),
             "selectedImageId": body.get("selectedImageId"),
@@ -220,7 +191,9 @@ def mobile_registration_handler():
         # Email validation should be added
 
         if len(double_name) > 55 and double_name.endswith(".3bot"):
-            return Response("doubleName exceeds length of 50 or does not contain .3bot", status=400)
+            return Response(
+                "doubleName exceeds length of 50 or does not contain .3bot", status=400
+            )
 
         user = db.getUserByName(conn, double_name)
         if user is None:
@@ -259,10 +232,11 @@ def cancel_login_attempt(doublename):
 def set_email_verified_handler(doublename):
     logger.debug("/emailverified from user %s", doublename.lower())
     user = db.getUserByName(conn, doublename.lower())
+
     logger.debug(user)
     logger.debug(user[4])
-    data = {"type": "email_verification"}
-    emitOrQueue("login", data, room=user[0].lower())
+
+    emitOrQueue("email_verification", "", room=user[0].lower())
     return Response("Ok")
 
 
