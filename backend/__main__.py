@@ -297,7 +297,7 @@ def save_derived_public_key():
 @app.route("/api/minimumversion", methods=["get"])
 def minimum_version_handler():
     response = app.response_class(
-        response=json.dumps({"android": 68, "ios": 68}), mimetype="application/json"
+        response=json.dumps({"android": 70, "ios": 70}), mimetype="application/json"
     )
     return response
 
