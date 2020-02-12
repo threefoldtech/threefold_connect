@@ -340,5 +340,4 @@ def emitOrQueue(event, data, room):
 # End helper functions.
 
 if __name__ == "__main__":
-    init()
     sio.run(app, host="0.0.0.0", port=5000)
