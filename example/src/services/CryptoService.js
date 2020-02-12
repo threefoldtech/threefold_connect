@@ -15,6 +15,26 @@ export default ({
       resolve(result)
     })
   },
+  validateSignedState (state, signedState, publicKey) {
+    return new Promise(async (resolve, reject) => {
+      await sodium.ready;
+
+      publicKey = decodeBase64(publicKey)
+      signedState = decodeBase64(signedState)
+
+      var signResult = sodium.crypto_sign_open(signedState, publicKey)
+
+      if(!signResult) {
+        reject('Invalid signature.')
+      }
+
+      if(state === signResult) {
+        resolve(result)
+      } else {
+        reject('State does not match signedState.')
+      }
+    })
+  },
   decrypt (message, nonce, privateKey, pubkey) {
     return new Promise(async (resolve, reject) => {
       message = decodeBase64(message)

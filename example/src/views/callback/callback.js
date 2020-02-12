@@ -27,12 +27,17 @@ export default {
     let userPublicKey = (await threebotService.getUserData(user)).data.publicKey
     let state = window.localStorage.getItem('state')
 
-    let verified = await cryptoService.validateSignature(state, signedState, userPublicKey)
-    if (!verified) {
-      console.log('The signedState could not be verified.')
-      return
-    }
+    try {
+      let verified = await cryptoService.validateSignedState(state, signedState, userPublicKey)
 
+      if (!verified) {
+        console.log('The signedState could not be verified.')
+        return
+      }
+    } catch(e) {
+      console.log('The signedState could not be verified.')
+    }
+    
     let encryptedData = JSON.parse(url.searchParams.get('data'))
 
     // Keys from the third party app itself, or a temp keyset if it is a front-end only third party app.
@@ -45,7 +50,7 @@ export default {
     if (!decryptedData.email || !decryptedData.email.sei) {
       console.log('No sei was given from the app, if your app requires email, the flow stops here.')
     } else {
-      // To verify the SEI, you could use the function implemented by openKYC or verify it youself by requires their public key. 
+      // To verify the SEI, you could use the function implemented by openKYC or verify it yourself using openKYC his publicKey.
       let seiVerified = await threebotService.verifySignedEmailIdentifier(decryptedData.email.sei)
       if (!seiVerified) {
         console.log('sei could not be verified, something went wrong or someone is trying to forge his email verification.')
