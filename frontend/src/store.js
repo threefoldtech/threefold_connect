@@ -26,7 +26,7 @@ export default new Vuex.Store({
     },
     scannedFlagUp: false,
     cancelLoginUp: false,
-    signed: null,
+    signedAttempt: null,
     firstTime: null,
     isMobile: false,
     scope: null,
@@ -62,8 +62,8 @@ export default new Vuex.Store({
     setCancelLoginUp (state, cancelLoginUp) {
       state.cancelLoginUp = cancelLoginUp
     },
-    setSigned (state, signed) {
-      state.signed = signed
+    setSignedAttempt (state, signedAttempt) {
+      state.signedAttempt = signedAttempt
     },
     setFirstTime (state, firstTime) {
       state.firstTime = firstTime
@@ -167,8 +167,8 @@ export default new Vuex.Store({
       console.log('f')
       context.commit('setCancelLoginUp', true)
     },
-    SOCKET_signed (context, data) {
-      console.log('signed', data)
+    SOCKET_signedAttempt (context, data) {
+      console.log('signedAttempt', data)
       console.log('context.getters.firstTime', context.getters.firstTime)
       console.log('context.getters.isMobile', context.getters.isMobile)
       console.log('context.getters.randomImageId', context.getters.randomImageId)
@@ -176,14 +176,14 @@ export default new Vuex.Store({
         console.log('Resending notification!')
         context.dispatch('resendNotification')
       } else {
-        console.log('Setting signed!')
-        context.commit('setSigned', data)
+        console.log('Setting signedAttempt!')
+        context.commit('setSignedAttempt', data)
       }
     },
     async loginUser (context, data) {
       console.log(`LoginUser`)
       context.dispatch('setDoubleName', data.doubleName)
-      context.commit('setSigned', null)
+      context.commit('setSignedAttempt', null)
       context.commit('setFirstTime', data.firstTime)
       context.commit('setRandomImageId')
       context.commit('setIsMobile', data.mobile)
@@ -223,7 +223,7 @@ export default new Vuex.Store({
       socketService.emit('login', { 'doubleName': context.getters.doubleName, 'encryptedLoginAttempt': encryptedLoginAttempt })
     },
     loginUserMobile (context, data) {
-      context.commit('setSigned', null)
+      context.commit('setSignedAttempt', null)
       context.commit('setFirstTime', data.firstTime)
       context.commit('setRandomImageId')
       context.commit('setIsMobile', data.mobile)
@@ -272,7 +272,7 @@ export default new Vuex.Store({
       if (context.getters.appPublicKey) callbackUrl += `&publickey=${context.getters.appPublicKey}`
       callbackUrl += (context.getters.appId) ? `&appid=${context.getters.appId}` : `&appid=${window.location.hostname}`
 
-      axios.post(`${config.openkycurl}users`, {
+      axios.post(`${config.openkycurl}verification/send-email`, {
         'user_id': context.getters.doubleName,
         'email': data.email,
         'callback_url': callbackUrl,
@@ -291,10 +291,11 @@ export default new Vuex.Store({
           checking: true,
           valid: false
         })
-        axios.post(`${config.openkycurl}users/${data.userId}/verify`, {
+        axios.post(`${config.openkycurl}verification/verify-email`, {
+          user_id: data.userId,
           verification_code: data.verificationCode
         }).then(message => {
-          axios.post(`${config.openkycurl}verify`, {
+          axios.post(`${config.openkycurl}verification/verify-sei`, {
             signedEmailIdentifier: message.data
           }).then(response => {
             if (response.data.identifier === data.userId) {
@@ -343,7 +344,7 @@ export default new Vuex.Store({
     redirectUrl: state => state.redirectUrl,
     scannedFlagUp: state => state.scannedFlagUp,
     cancelLoginUp: state => state.cancelLoginUp,
-    signed: state => state.signed,
+    signedAttempt: state => state.signedAttempt,
     firstTime: state => state.firstTime,
     emailVerificationStatus: state => state.emailVerificationStatus,
     scope: state => state.scope,

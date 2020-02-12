@@ -168,7 +168,6 @@ Future openLogin(BuildContext context, Login loginData,
       }
 
       backendConnection.leaveRoom(loginData.doubleName);
-      backendConnection.joinRoom(loginData.randomRoom);
 
       bool loggedIn = await Navigator.push(
         context,
@@ -178,7 +177,6 @@ Future openLogin(BuildContext context, Login loginData,
       );
 
       if (loggedIn != null && loggedIn) {
-        backendConnection.leaveRoom(loginData.randomRoom);
         backendConnection.joinRoom(loginData.doubleName);
 
         await showDialog(
@@ -199,7 +197,6 @@ Future openLogin(BuildContext context, Login loginData,
           ),
         );
       } else {
-        backendConnection.leaveRoom(loginData.randomRoom);
         backendConnection.joinRoom(loginData.doubleName);
       }
     }

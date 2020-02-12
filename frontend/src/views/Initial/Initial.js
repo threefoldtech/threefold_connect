@@ -87,7 +87,7 @@ export default {
   computed: {
     ...mapGetters([
       'nameCheckStatus',
-      'signed',
+      'signedAttempt',
       'redirectUrl',
       'firstTime',
       'randomImageId',
@@ -176,7 +176,7 @@ export default {
     }
   },
   watch: {
-    signed (val) {
+    signedAttempt (val) {
       console.log(`signed`, val)
       if (!this.isMobile) return
 

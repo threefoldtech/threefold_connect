@@ -16,7 +16,7 @@ export default {
   },
   computed: {
     ...mapGetters([
-      'signed',
+      'signedAttempt',
       'redirectUrl',
       'doubleName',
       'firstTime',
@@ -60,7 +60,7 @@ export default {
     }
   },
   watch: {
-    signed (val) {
+    signedAttempt (val) {
       try {
         if (val) {
           console.log('Val: ', JSON.stringify(val))

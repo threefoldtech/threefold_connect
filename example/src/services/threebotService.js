@@ -7,6 +7,6 @@ export default ({
   },
 
   verifySignedEmailIdentifier(sei) {
-    return Axios.post(`${config.kycBackend}/verify`, { signedEmailIdentifier: sei })
+    return Axios.post(`${config.kycBackend}/verification/verify-sei`, { signedEmailIdentifier: sei })
   }
 })

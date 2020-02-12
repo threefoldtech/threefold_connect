@@ -14,7 +14,7 @@ Map<String, String> requestHeaders = {'Content-type': 'application/json'};
 
 Future<Response> sendData(String state, String signedState, data, selectedImageId,
     String randomRoom) async {
-  return http.post('$threeBotApiUrl/sign',
+  return http.post('$threeBotApiUrl/signedAttempt',
       body: json.encode({
         'state': state,
         'signedState': signedState,
@@ -86,8 +86,4 @@ Future<Response> finishRegistration(
         'public_key': publicKey,
       }),
       headers: requestHeaders);
-}
-
-Future<Response> getShowApps() async {
-  return http.get('$threeBotApiUrl/showapps', headers: requestHeaders);
 }
