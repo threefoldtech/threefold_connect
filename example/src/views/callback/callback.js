@@ -52,10 +52,12 @@ export default {
     } else {
       // To verify the SEI, you could use the function implemented by openKYC or verify it yourself using openKYC his publicKey.
       let seiVerified = await threebotService.verifySignedEmailIdentifier(decryptedData.email.sei)
-      if (!seiVerified) {
+
+      if (!seiVerified || seiVerified.status !== 200) {
         console.log('sei could not be verified, something went wrong or someone is trying to forge his email verification.')
         return
       }
+
       console.log('We verified that ' + seiVerified.data.email + ' belongs to ' + seiVerified.data.identifier + ' and has a valid verification.')
     }
 
