@@ -8,20 +8,23 @@ import 'package:threebotlogin/app_config.dart';
 import 'package:threebotlogin/services/crypto_service.dart';
 import 'package:threebotlogin/services/user_service.dart';
 
-
 String threeBotApiUrl = AppConfig().threeBotApiUrl();
 Map<String, String> requestHeaders = {'Content-type': 'application/json'};
 
-Future<Response> sendData(String state, String signedState, data, selectedImageId,
-    String randomRoom) async {
+Future<Response> sendData(
+    String state, data, selectedImageId, String randomRoom) async {
   return http.post('$threeBotApiUrl/signedAttempt',
       body: json.encode({
-        'state': state,
-        'signedState': signedState,
-        'data': data,
-        'selectedImageId': selectedImageId,
-        'doubleName': await getDoubleName(),
-        'randomRoom': randomRoom
+        'signedAttempt': await signData(
+          json.encode({
+            'signedState': state,
+            'data': data,
+            'selectedImageId': selectedImageId,
+            'doubleName': await getDoubleName(),
+            'randomRoom': randomRoom
+          }),
+          await getPrivateKey()),
+          'doubleName': await getDoubleName()
       }),
       headers: requestHeaders);
 }
@@ -52,7 +55,9 @@ Future<bool> isAppUpToDate() async {
     int currentBuildNumber = int.parse(packageInfo.buildNumber);
     int minimumBuildNumber = 0;
 
-    String jsonResponse = (await http.get('$threeBotApiUrl/minimumversion', headers: requestHeaders)).body;
+    String jsonResponse = (await http.get('$threeBotApiUrl/minimumversion',
+            headers: requestHeaders))
+        .body;
     Map<String, dynamic> minimumVersion = json.decode(jsonResponse);
 
     if (Platform.isAndroid) {

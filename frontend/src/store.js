@@ -167,12 +167,22 @@ export default new Vuex.Store({
       console.log('f')
       context.commit('setCancelLoginUp', true)
     },
-    SOCKET_signedAttempt (context, data) {
-      console.log('signedAttempt', data)
+    async SOCKET_signedAttempt (context, data) {
+      console.log('signedAttempt', data.signedAttempt)
+      console.log('signedAttempt', data.doubleName)
       console.log('context.getters.firstTime', context.getters.firstTime)
       console.log('context.getters.isMobile', context.getters.isMobile)
       console.log('context.getters.randomImageId', context.getters.randomImageId)
-      if (data.selectedImageId && !context.getters.firstTime && !context.getters.isMobile && data.selectedImageId !== context.getters.randomImageId) {
+
+      let publicKey = (await userService.getUserData(data.doubleName)).data.publicKey
+      var signedAttempt = JSON.parse(new TextDecoder('utf-8').decode(await cryptoService.validateSignedAttempt(data.signedAttempt, publicKey)))
+
+      if (!signedAttempt) {
+        console.log('Something went wrong ... ')
+        return
+      }
+
+      if (signedAttempt.selectedImageId && !context.getters.firstTime && !context.getters.isMobile && signedAttempt.selectedImageId !== context.getters.randomImageId) {
         console.log('Resending notification!')
         context.dispatch('resendNotification')
       } else {

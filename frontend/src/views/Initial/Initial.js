@@ -177,25 +177,18 @@ export default {
   },
   watch: {
     signedAttempt (val) {
-      console.log(`signed`, val)
       if (!this.isMobile) return
 
       try {
         if (val) {
-          window.localStorage.setItem('username', val.doubleName)
-          var signedState = encodeURIComponent(val.signedState)
-          var data
+          console.log('signedAttemptObject: ', val)
+          console.log('signedAttemptObject: ', JSON.stringify(val))
+          window.localStorage.setItem('username', this.doubleName)
 
-          if (typeof val.data === 'object' && val.data !== null) {
-            data = encodeURIComponent(JSON.stringify(val.data))
-          } else {
-            data = encodeURIComponent(val.data)
-          }
+          var data = encodeURIComponent(JSON.stringify(val))
+          console.log('data', data)
 
-          console.log('signedState: ', signedState)
-          console.log('!!!!data', data)
-
-          if (data && signedState) {
+          if (data) {
             var union = '?'
             if (this.redirectUrl.indexOf('?') >= 0) {
               union = '&'
@@ -210,7 +203,9 @@ export default {
               safeRedirectUri = '/' + this.redirectUrl
             }
 
-            var url = `//${this.appId}${safeRedirectUri}${union}username=${val.doubleName}&signedState=${signedState}&data=${data}`
+            console.log('!!!! this.doubleName: ', this.doubleName)
+            var url = `//${this.appId}${safeRedirectUri}${union}signedAttempt=${data}`
+
             if (!this.isRedirecting) {
               this.isRedirecting = true
               console.log('Changing href: ', url)

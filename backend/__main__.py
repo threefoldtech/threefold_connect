@@ -139,27 +139,26 @@ def on_login(data):
 
 @app.route("/api/signedAttempt", methods=["POST"])
 def sign_attempt_handler():
-    body = request.get_json()
+    data = request.get_json()
+
+    double_name = data['doubleName']
+    verified_data = verify_signed_data(double_name, data['signedAttempt'])
+
+    if not verified_data:
+        return Response("Missing signature", status=400)
+
+    body = json.loads(verified_data)
 
     logger.debug("/sign: %s", body)
     logger.debug("body.get('doubleName'): %s", body.get("doubleName"))
+
     roomToSendTo = body.get("randomRoom")
     if roomToSendTo is None:
         roomToSendTo = body.get("doubleName")
     roomToSendTo = roomToSendTo.lower()
+
     logger.debug("roomToSendTo %s", roomToSendTo)
-
-    sio.emit(
-        "signedAttempt",
-        {
-            "signedState": body.get("signedState"),
-            "doubleName": body.get("doubleName"),
-            "data": body.get("data"),
-            "selectedImageId": body.get("selectedImageId"),
-        },
-        room=roomToSendTo,
-    )
-
+    sio.emit("signedAttempt", data, room=roomToSendTo)
     return Response("Ok")
 
 

@@ -21,24 +21,38 @@ export default {
       return
     }
 
-    let user = url.searchParams.get('username')
-    let signedState = url.searchParams.get('signedState')
+    let signedAttemptObject = JSON.parse(url.searchParams.get('signedAttempt'));
 
+    let user = signedAttemptObject['doubleName']
     let userPublicKey = (await threebotService.getUserData(user)).data.publicKey
-    let state = window.localStorage.getItem('state')
+
+    let verifiedSignedAttempt
 
     try {
-      let verified = await cryptoService.validateSignedState(state, signedState, userPublicKey)
+      verifiedSignedAttempt = JSON.parse(new TextDecoder("utf-8").decode(await cryptoService.validateSignedAttempt(signedAttemptObject['signedAttempt'], userPublicKey)))
 
-      if (!verified) {
-        console.log('The signedState could not be verified.')
+      if (!verifiedSignedAttempt) {
+        console.log('The signedAttempt could not be verified.')
         return
       }
-    } catch(e) {
-      console.log('The signedState could not be verified.')
+
+      let state = window.localStorage.getItem('state')
+
+      if (verifiedSignedAttempt['signedState'] !== state) {
+        console.log('The state cannot be matched.')
+        return
+      }
+
+      if (verifiedSignedAttempt['doubleName'] !== user) {
+        console.log('The name cannot be matched.')
+        return
+      }
+    } catch (e) {
+      console.log('The signedAttempt could not be verified.')
+      return
     }
-    
-    let encryptedData = JSON.parse(url.searchParams.get('data'))
+
+    let encryptedData = verifiedSignedAttempt['data']
 
     // Keys from the third party app itself, or a temp keyset if it is a front-end only third party app.
     let keys = await cryptoService.generateKeys(config.seedPhrase)

@@ -63,24 +63,14 @@ export default {
     signedAttempt (val) {
       try {
         if (val) {
-          console.log('Val: ', JSON.stringify(val))
-          console.log(val)
-
+          console.log('signedAttemptObject: ', val)
+          console.log('signedAttemptObject: ', JSON.stringify(val))
           window.localStorage.setItem('username', this.doubleName)
 
-          var signedState = encodeURIComponent(val.signedState)
-          var data
+          var data = encodeURIComponent(JSON.stringify(val))
+          console.log('data', data)
 
-          if (typeof val.data === 'object' && val.data !== null) {
-            data = encodeURIComponent(JSON.stringify(val.data))
-          } else {
-            data = encodeURIComponent(val.data)
-          }
-
-          console.log('signedState: ', signedState)
-          console.log('!!!!data', data)
-
-          if (data && signedState) {
+          if (data) {
             var union = '?'
             if (this.redirectUrl.indexOf('?') >= 0) {
               union = '&'
@@ -96,7 +86,7 @@ export default {
             }
 
             console.log('!!!! this.doubleName: ', this.doubleName)
-            var url = `//${this.appId}${safeRedirectUri}${union}username=${this.doubleName}&signedState=${signedState}&data=${data}`
+            var url = `//${this.appId}${safeRedirectUri}${union}signedAttempt=${data}`
 
             if (!this.isRedirecting) {
               this.isRedirecting = true
