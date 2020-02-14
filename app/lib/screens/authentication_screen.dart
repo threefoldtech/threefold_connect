@@ -33,7 +33,9 @@ class AuthenticationScreenState extends State<AuthenticationScreen> {
     super.initState();
 
     Events().onEvent(CloseAuthEvent().runtimeType, (CloseAuthEvent event) {
-      close();
+      if(mounted) {
+        close();
+      }
     });
 
     if(widget.loginData != null && !widget.loginData.isMobile) {
@@ -82,7 +84,7 @@ class AuthenticationScreenState extends State<AuthenticationScreen> {
   }
 
   close() {
-    if (mounted) {
+    if(Navigator.canPop(context)) {
       Navigator.pop(context, false);
     }
   }
