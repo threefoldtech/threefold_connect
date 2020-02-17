@@ -149,7 +149,6 @@ class _LoginScreenState extends State<LoginScreen> with BlockAndRunMixin {
                 ),
               ),
             ),
-            
             Expanded(
               flex: 7,
               child: SizedBox(
@@ -285,7 +284,10 @@ class _LoginScreenState extends State<LoginScreen> with BlockAndRunMixin {
               ],
             ),
           );
-          Navigator.pop(context, false);
+
+          if (Navigator.canPop(context)) {
+            Navigator.pop(context, false);
+          }
         }
       } else {
         _scaffoldKey.currentState
@@ -300,7 +302,9 @@ class _LoginScreenState extends State<LoginScreen> with BlockAndRunMixin {
     }
 
     if (mounted) {
-      Navigator.pop(context, false);
+      if (Navigator.canPop(context)) {
+        Navigator.pop(context, false);
+      }
     }
   }
 
@@ -338,12 +342,14 @@ class _LoginScreenState extends State<LoginScreen> with BlockAndRunMixin {
 
         await sendData(state, null, selectedImageId, null);
 
-        Navigator.pop(context, false);
+        if (Navigator.canPop(context)) {
+          Navigator.pop(context, false);
+        }
         return;
       }
     }
 
-    String publicKey  = widget.loginData.appPublicKey?.replaceAll(" ", "+");
+    String publicKey = widget.loginData.appPublicKey?.replaceAll(" ", "+");
 
     bool stateCheck = RegExp(r"[^A-Za-z0-9]+").hasMatch(state);
 
@@ -380,12 +386,14 @@ class _LoginScreenState extends State<LoginScreen> with BlockAndRunMixin {
       await sendData(state, null, selectedImageId,
           null); // temp fix send empty data for regenerate emoji
     } else {
-      await sendData(
-          state, encryptedScopeData, selectedImageId, randomRoom);
+      await sendData(state, encryptedScopeData, selectedImageId, randomRoom);
     }
 
     if (selectedImageId == correctImage || isMobileCheck) {
-      Navigator.pop(context, true);
+      if (Navigator.canPop(context)) {
+        Navigator.pop(context, true);
+      }
+
       Events().emit(PopAllLoginEvent(emitCode));
     }
   }
