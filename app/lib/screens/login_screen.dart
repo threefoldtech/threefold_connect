@@ -356,7 +356,6 @@ class _LoginScreenState extends State<LoginScreen> with BlockAndRunMixin {
       return;
     }
 
-    String signedState = await signData(state, await getPrivateKey());
     Map<String, dynamic> scope = Map<String, dynamic>();
 
     var scopePermissions =

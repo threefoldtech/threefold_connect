@@ -29,7 +29,42 @@ export default {
     let verifiedSignedAttempt
 
     try {
-      verifiedSignedAttempt = JSON.parse(new TextDecoder("utf-8").decode(await cryptoService.validateSignedAttempt(signedAttemptObject['signedAttempt'], userPublicKey)))
+
+      var utf8ArrayToStr = (function () {
+        var charCache = new Array(128)
+        var charFromCodePt = String.fromCodePoint || String.fromCharCode
+        var result = []
+
+        return function (array) {
+          var codePt, byte1
+          var buffLen = array.length
+
+          result.length = 0
+
+          for (var i = 0; i < buffLen;) {
+            byte1 = array[i++]
+
+            if (byte1 <= 0x7F) {
+              codePt = byte1
+            } else if (byte1 <= 0xDF) {
+              codePt = ((byte1 & 0x1F) << 6) | (array[i++] & 0x3F)
+            } else if (byte1 <= 0xEF) {
+              codePt = ((byte1 & 0x0F) << 12) | ((array[i++] & 0x3F) << 6) | (array[i++] & 0x3F)
+            } else if (String.fromCodePoint) {
+              codePt = ((byte1 & 0x07) << 18) | ((array[i++] & 0x3F) << 12) | ((array[i++] & 0x3F) << 6) | (array[i++] & 0x3F)
+            } else {
+              codePt = 63
+              i += 3
+            }
+
+            result.push(charCache[codePt] || (charCache[codePt] = charFromCodePt(codePt)))
+          }
+
+          return result.join('')
+        }
+      })()
+
+      verifiedSignedAttempt = JSON.parse(utf8ArrayToStr(await cryptoService.validateSignedAttempt(signedAttemptObject['signedAttempt'], userPublicKey)))
 
       if (!verifiedSignedAttempt) {
         console.log('The signedAttempt could not be verified.')

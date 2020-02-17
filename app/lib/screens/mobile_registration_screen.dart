@@ -285,7 +285,7 @@ class _MobileRegistrationScreenState extends State<MobileRegistrationScreen> {
                     Padding(
                       padding: const EdgeInsets.only(top: 8.5),
                       child: TextField(
-                        maxLength: 100,
+                        maxLength: 50,
                         autofocus: true,
                         keyboardType: TextInputType.text,
                         decoration: InputDecoration(
