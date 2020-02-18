@@ -4,6 +4,7 @@ class ReuseableTextFieldStep extends StatelessWidget {
   ReuseableTextFieldStep(
       {@required this.titleText,
       @required this.labelText,
+      @required this.focusNode,
       @required this.controller,
       @required this.typeText,
       @required this.errorStepperText,
@@ -12,9 +13,10 @@ class ReuseableTextFieldStep extends StatelessWidget {
   final String titleText;
   final String labelText;
   final String errorStepperText;
+  final FocusNode focusNode;
   final TextEditingController controller;
   final String suffixText;
-  final TextInputType typeText;
+  final TextInputType typeText; 
 
   @override
   Widget build(BuildContext context) {
@@ -30,7 +32,8 @@ class ReuseableTextFieldStep extends StatelessWidget {
         ),
         Padding(
           padding: const EdgeInsets.only(top: 8.5),
-          child: TextField(
+          child: TextFormField(
+            focusNode: focusNode,
             autofocus: true,
             keyboardType: typeText,
             decoration: InputDecoration(

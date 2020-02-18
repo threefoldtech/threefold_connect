@@ -7,27 +7,33 @@ import struct
 import base64
 import database as db
 import logging
+import calendar
 
 from flask import Flask, Response, request, json, redirect
 from flask_socketio import SocketIO, emit, join_room, leave_room, send
 from flask_cors import CORS
 from datetime import datetime, timedelta
 
-epoch = datetime.utcfromtimestamp(0)
-conn = db.create_connection("pythonsqlite.db")  # connection
-db.create_db(conn)  # create tables
+conn = db.create_connection("pythonsqlite.db")
+db.create_db(conn)
 
 app = Flask(__name__)
 sio = SocketIO(app, transports=["websocket"])
 
 CORS(app, resources={r"*": {"origins": ["*"]}})
 
-# Disables the default spam logging that's caused by flask / socketIO and engineIO.
+usersInRoom = {}
+messageQueue = {}
+socketRoom = {}
+
+epoch = datetime.utcfromtimestamp(0)
+
 logging.getLogger("werkzeug").setLevel(level=logging.ERROR)
 logging.getLogger("socketio").setLevel(level=logging.ERROR)
 logging.getLogger("engineio").setLevel(level=logging.ERROR)
 
 logger = logging.getLogger(__name__)
+
 logger.setLevel(level=logging.DEBUG)
 
 handler = logging.StreamHandler()
@@ -38,14 +44,16 @@ formatter = logging.Formatter(
 handler.setFormatter(formatter)
 logger.addHandler(handler)
 
+# Start socketIO functions.
+
 
 @sio.on("connect")
-def connect_handler():
+def on_connect():
     logger.debug("/Connect")
 
 
 @sio.on("disconnect")
-def disconnect_handler():
+def on_disconnect():
     logger.debug("/disconnected.")
     if request.sid in socketRoom:
         room = socketRoom[request.sid].lower()
@@ -81,12 +89,23 @@ def on_join(data):
 
 @sio.on("leave")
 def on_leave(data):
-    print("/leave ")
-    room = data["room"]
+    logger.debug("/leave.")
+    if request.sid in socketRoom:
+        room = socketRoom[request.sid].lower()
+        logger.debug("User left, user was known {}".format(room))
+        del socketRoom[request.sid]
+        leave_room(room)
+        if usersInRoom[room] > 0:
+            usersInRoom[room] -= 1
+            logger.debug(
+                "User was removed from room, users left in room {}".format(
+                    usersInRoom[room]
+                )
+            )
 
 
 @sio.on("checkname")
-def checkname_handler(data):
+def on_checkname(data):
     logger.debug("/checkname %s", data)
     user = db.getUserByName(conn, data.get("doubleName").lower())
 
@@ -98,100 +117,48 @@ def checkname_handler(data):
         emit("namenotknown")
 
 
-@sio.on("cancel")
-def cancel_handler(data):
-    print("")
-
-
-usersInRoom = {}  # users that are in a room
-# messaged queued for a room (only queued when room is empty)
-messageQueue = {}
-socketRoom = {}  # room bound to a socket
-
-
-def emitOrQueue(event, data, room):
-    logger.debug("Emit or queue data %s", data)
-    if not room in usersInRoom or usersInRoom[room] == 0:
-        logger.debug("Room is unknown or no users in room, so might queue for %s", room)
-        if not room in messageQueue:
-            logger.debug("Room is not known yet in queue, creating %s", room)
-            messageQueue[room] = []
-        logger.debug("Queueing in room %s", room)
-        messageQueue[room].append((event, data, room))
-    else:
-        logger.debug("App is connected, sending to %s", room)
-        sio.emit(event, data, room=room)
-
-
 @sio.on("login")
-def login_handler(data):
-    logger.debug("/Login %s", data)
+def on_login(data):
+    logger.debug("/login %s", data)
     double_name = data.get("doubleName").lower()
-    state = data.get("state")
 
     data["type"] = "login"
-    sid = request.sid
+    milli_sec = int(round(time.time() * 1000))
+    data["created"] = milli_sec
+
     user = db.getUserByName(conn, double_name)
     if user:
-        logger.debug("User found %s", user[0])
-        update_sql = "UPDATE users SET sid=?  WHERE double_name=?;"
-        db.update_user(conn, update_sql, sid, user[0])
-
-    user = db.getUserByName(conn, double_name)
-    emitOrQueue("login", data, room=user[0])
+        logger.debug("[login]: User found %s", user[0])
+        emitOrQueue("login", data, room=user[0])
 
 
-@sio.on("resend")
-def resend_handler(data):
-    logger.debug("/resend %s", data)
-    user = data.get("doubleName").lower()
+# End socketIO functions.
 
-    data["type"] = "login"
-    emitOrQueue("login", data, room=user)
+# Start flask API endpoints.
 
 
-@app.route("/api/signRegister", methods=["POST"])
-def signRegisterHandler():
-    body = request.get_json()
-    double_name = body.get("doubleName").lower()
-    logger.debug("/signRegister %s", body)
+@app.route("/api/signedAttempt", methods=["POST"])
+def sign_attempt_handler():
+    data = request.get_json()
 
-    user = db.getUserByName(conn, double_name)
+    double_name = data['doubleName']
+    verified_data = verify_signed_data(double_name, data['signedAttempt'])
 
-    if user:
-        sio.emit(
-            "signed",
-            {"data": body.get("data"), "doubleName": double_name},
-            room=user[0],
-        )
-        return Response("Ok")
-    else:
-        return Response("User not found", status=404)
+    if not verified_data:
+        return Response("Missing signature", status=400)
 
-
-@app.route("/api/sign", methods=["POST"])
-def sign_handler():
-    body = request.get_json()
+    body = json.loads(verified_data)
 
     logger.debug("/sign: %s", body)
     logger.debug("body.get('doubleName'): %s", body.get("doubleName"))
-    roomToSendTo = body.get("signedRoom")
+
+    roomToSendTo = body.get("randomRoom")
     if roomToSendTo is None:
         roomToSendTo = body.get("doubleName")
     roomToSendTo = roomToSendTo.lower()
+
     logger.debug("roomToSendTo %s", roomToSendTo)
-
-    sio.emit(
-        "signed",
-        {
-            "signedHash": body.get("signedHash"),
-            "doubleName": body.get("doubleName"),
-            "data": body.get("data"),
-            "selectedImageId": body.get("selectedImageId"),
-        },
-        room=roomToSendTo,
-    )
-
+    sio.emit("signedAttempt", data, room=roomToSendTo)
     return Response("Ok")
 
 
@@ -207,10 +174,10 @@ def mobile_registration_handler():
     if double_name == None or email == None or public_key == None or sid == None:
         return Response("Missing data", status=400)
     else:
-        # Email validation should be added
-
         if len(double_name) > 55 and double_name.endswith(".3bot"):
-            return Response("doubleName exceeds length of 50 or does not contain .3bot", status=400)
+            return Response(
+                "doubleName exceeds length of 50 or does not contain .3bot", status=400
+            )
 
         user = db.getUserByName(conn, double_name)
         if user is None:
@@ -249,10 +216,11 @@ def cancel_login_attempt(doublename):
 def set_email_verified_handler(doublename):
     logger.debug("/emailverified from user %s", doublename.lower())
     user = db.getUserByName(conn, doublename.lower())
+
     logger.debug(user)
     logger.debug(user[4])
-    data = {"type": "email_verification"}
-    emitOrQueue("login", data, room=user[0].lower())
+
+    emitOrQueue("email_verification", "", room=user[0].lower())
     return Response("Ok")
 
 
@@ -281,7 +249,6 @@ def save_derived_public_key():
                     )
                     difference = (int(timestamp) - int(current_timestamp)) / 1000
                     if difference < 30:
-                        # here code
                         derived_public_key = verify_signed_data(
                             double_name, body.get("signedDerivedPublicKey")
                         ).decode(encoding="utf-8")
@@ -326,48 +293,50 @@ def save_derived_public_key():
         return Response("something went wrong", status=400)
 
 
-@app.route("/api/showapps", methods=["get"])
-def show_apps_handler():
-    return Response("True")
-
-
-@app.route("/api/minversion", methods=["get"])
-def min_version_handler():
-    return Response("56")
-
-
 @app.route("/api/minimumversion", methods=["get"])
 def minimum_version_handler():
     response = app.response_class(
-        response=json.dumps({"android": 65, "ios": 57}), mimetype="application/json"
+        response=json.dumps({"android": 70, "ios": 70}), mimetype="application/json"
     )
-
     return response
 
 
+# End flask API endpoints.
+
+# Start helper functions.
+
+
 def verify_signed_data(double_name, data):
-    # print('/n### --- data verification --- ###')
-    # print("Verifying data: ", data)
     double_name = double_name.lower()
     decoded_data = base64.b64decode(data)
-    # print("Decoding data: ", decoded_data)
 
     bytes_data = bytes(decoded_data)
 
     public_key = base64.b64decode(db.getUserByName(conn, double_name)[3])
-    # print('Retrieving public key from: ', double_name)
 
     verify_key = nacl.signing.VerifyKey(
         public_key.hex(), encoder=nacl.encoding.HexEncoder
     )
-    # print('verify_key: ', verify_key)
 
     verified_signed_data = verify_key.verify(bytes_data)
-    # print('verified_signed_data: ', verified_signed_data)
-    # print('### --- END data verification --- ###/n')
-
     return verified_signed_data
 
+
+def emitOrQueue(event, data, room):
+    logger.debug("Emit or queue data %s", data)
+    if not room in usersInRoom or usersInRoom[room] == 0:
+        logger.debug("Room is unknown or no users in room, so might queue for %s", room)
+        if not room in messageQueue:
+            logger.debug("Room is not known yet in queue, creating %s", room)
+            messageQueue[room] = []
+        logger.debug("Queueing in room %s", room)
+        messageQueue[room].append((event, data, room))
+    else:
+        logger.debug("App is connected, sending to %s", room)
+        sio.emit(event, data, room=room)
+
+
+# End helper functions.
 
 if __name__ == "__main__":
     sio.run(app, host="0.0.0.0", port=5000)

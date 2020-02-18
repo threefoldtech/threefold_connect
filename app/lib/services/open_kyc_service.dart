@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:http/http.dart' as http;
+import 'package:http/http.dart';
 import 'package:threebotlogin/app_config.dart';
 import 'package:threebotlogin/services/crypto_service.dart';
 import 'package:threebotlogin/services/user_service.dart';
@@ -11,7 +12,7 @@ String threeBotFrontEndUrl = AppConfig().threeBotFrontEndUrl();
 
 Map<String, String> requestHeaders = {'Content-type': 'application/json'};
 
-Future getSignedEmailIdentifierFromOpenKYC(String doubleName) async {
+Future<Response> getSignedEmailIdentifierFromOpenKYC(String doubleName) async {
   String timestamp = new DateTime.now().millisecondsSinceEpoch.toString();
   String privatekey = await getPrivateKey();
 
@@ -26,26 +27,20 @@ Future getSignedEmailIdentifierFromOpenKYC(String doubleName) async {
     'Jimber-Authorization': signedPayload
   };
 
-  return http.get('$openKycApiUrl/users/$doubleName',
-      headers: loginRequestHeaders);
+  return http.get('$openKycApiUrl/verification/retrieve-sei/$doubleName', headers: loginRequestHeaders);
 }
 
-Future verifySignedEmailIdentifier(String signedEmailIdentifier) async {
-  return http.post('$openKycApiUrl/verify',
+Future<Response> verifySignedEmailIdentifier(String signedEmailIdentifier) async {
+  return http.post('$openKycApiUrl/verification/verify-sei',
       body: json.encode({"signedEmailIdentifier": signedEmailIdentifier}),
       headers: requestHeaders);
 }
 
-Future checkVerificationStatus(String doubleName) async {
-  return http.get('$openKycApiUrl/users/$doubleName', headers: requestHeaders);
-}
-
-Future<http.Response> sendVerificationEmail() async {
-  return http.post('$openKycApiUrl/users',
+Future<Response> sendVerificationEmail() async {
+  return http.post('$openKycApiUrl/verification/send-email',
       body: json.encode({
         'user_id': await getDoubleName(),
         'email': (await getEmail())['email'],
-        'callback_url': threeBotFrontEndUrl + "verifyemail",
         'public_key': await getPublicKey(),
       }),
       headers: requestHeaders);

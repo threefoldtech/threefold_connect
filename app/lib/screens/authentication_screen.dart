@@ -2,8 +2,11 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:threebotlogin/events/close_auth_event.dart';
+import 'package:threebotlogin/events/events.dart';
 import 'package:threebotlogin/helpers/globals.dart';
 import 'package:threebotlogin/helpers/hex_color.dart';
+import 'package:threebotlogin/models/login.dart';
 import 'package:threebotlogin/services/fingerprint_service.dart';
 import 'package:threebotlogin/services/user_service.dart';
 import 'package:threebotlogin/widgets/custom_dialog.dart';
@@ -12,9 +15,10 @@ class AuthenticationScreen extends StatefulWidget {
   final int pinLength = 4;
   final String correctPin;
   final String userMessage;
+  final Login loginData;
 
   @override
-  AuthenticationScreen({this.correctPin, this.userMessage});
+  AuthenticationScreen({this.correctPin, this.userMessage, this.loginData});
 
   @override
   AuthenticationScreenState createState() => AuthenticationScreenState();
@@ -23,10 +27,66 @@ class AuthenticationScreen extends StatefulWidget {
 class AuthenticationScreenState extends State<AuthenticationScreen> {
   int timeout = 30000;
   Globals globals = Globals();
+  Timer timer;
 
   void initState() {
     super.initState();
+
+    Events().onEvent(CloseAuthEvent().runtimeType, (CloseAuthEvent event) {
+      if(mounted) {
+        close();
+      }
+    });
+
+    if(widget.loginData != null && !widget.loginData.isMobile) {
+      const oneSec = const Duration(seconds: 1);
+      
+      print('Starting timer ... ');
+      timer = new Timer.periodic(oneSec, (Timer t) async {
+        timeoutTimer();
+      });
+    }
+
     WidgetsBinding.instance.addPostFrameCallback((_) => checkFingerprint());
+  }
+
+  timeoutTimer() async { 
+    if(!mounted) {
+      timer.cancel();
+      return;
+    }
+
+    int created = widget.loginData.created;
+    int currentTimestamp = new DateTime.now().millisecondsSinceEpoch;
+
+    if (created != null && ((currentTimestamp - created) / 1000) > Globals().loginTimeout) {
+      timer.cancel();
+
+      await showDialog(
+        context: context,
+        builder: (BuildContext context) => CustomDialog(
+          image: Icons.timer,
+          title: 'Login attempt expired',
+          description: 'Your login attempt has expired, please request a new one in your browser.',
+          actions: <Widget>[
+            FlatButton(
+              child: Text('Ok'),
+              onPressed: () {
+                Navigator.pop(context);
+              },
+            )
+          ],
+        ),
+      );
+
+      Navigator.pop(context, false);
+    }
+  }
+
+  close() {
+    if(Navigator.canPop(context)) {
+      Navigator.pop(context, false);
+    }
   }
 
   checkFingerprint() async {
@@ -217,13 +277,12 @@ class AuthenticationScreenState extends State<AuthenticationScreen> {
 
       dialog = CustomDialog(
         title: "Too many attempts",
-        description: Text(
-            "Too many incorrect attempts, please wait ${((globals.lockedUntill - currentTime) / 1000).toStringAsFixed(0)} seconds"),
+        description: "Too many incorrect attempts, please wait ${((globals.lockedUntill - currentTime) / 1000).toStringAsFixed(0)} seconds",
       );
     } else {
       dialog = CustomDialog(
         title: "Incorrect pin",
-        description: Text("Your pincode is incorrect."),
+        description: "Your pincode is incorrect.",
       );
     }
 

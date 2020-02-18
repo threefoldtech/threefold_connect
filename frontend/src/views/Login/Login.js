@@ -1,5 +1,4 @@
 import { mapGetters, mapActions } from 'vuex'
-// import config from '../../../public/config'
 
 export default {
   name: 'login',
@@ -11,33 +10,43 @@ export default {
       cancelLogin: false,
       didLeavePage: false,
       dialog: false,
-      loggedIn: false
+      loggedIn: false,
+      ref: undefined
     }
   },
   computed: {
     ...mapGetters([
-      'signed',
+      'signedAttempt',
       'redirectUrl',
       'doubleName',
       'firstTime',
       'randomImageId',
       'cancelLoginUp',
-      'hash',
+      '_state',
       'scope',
       'appId',
-      'appPublicKey'
+      'appPublicKey',
+      'loginTimestamp',
+      'loginTimeleft',
+      'loginTimeout',
+      'loginInterval'
     ])
   },
   mounted () {
+    this.resetTimer()
+    this.ref = document.referrer
   },
   methods: {
     ...mapActions([
-      'resendNotification'
-      // 'deleteLoginAttempt'
+      'resendNotification',
+      'resetTimer'
     ]),
+    triggerResendNotification () {
+      this.resendNotification()
+    },
     openApp () {
       if (this.isMobile) {
-        var url = `threebot://login/?state=${encodeURIComponent(this.hash)}`
+        var url = `threebot://login/?state=${encodeURIComponent(this._state)}`
         if (this.scope) url += `&scope=${encodeURIComponent(this.scope)}`
         if (this.appId) url += `&appId=${encodeURIComponent(this.appId)}`
         if (this.appPublicKey) url += `&appPublicKey=${encodeURIComponent(this.appPublicKey)}`
@@ -51,28 +60,17 @@ export default {
     }
   },
   watch: {
-    signed (val) {
+    signedAttempt (val) {
       try {
         if (val) {
-          console.log('Val: ', JSON.stringify(val))
-          console.log(val)
-
+          console.log('signedAttemptObject: ', val)
+          console.log('signedAttemptObject: ', JSON.stringify(val))
           window.localStorage.setItem('username', this.doubleName)
-          var signedHash = encodeURIComponent(val.signedHash)
-          var data
 
-          if (typeof val.data === 'object' && val.data !== null) {
-            data = encodeURIComponent(JSON.stringify(val.data))
-          } else {
-            data = encodeURIComponent(val.data)
-          }
+          var data = encodeURIComponent(JSON.stringify(val))
+          console.log('data', data)
 
-          // this.deleteLoginAttempt()
-
-          console.log('signedHash: ', signedHash)
-          console.log('!!!!data', data)
-
-          if (data && signedHash) {
+          if (data) {
             var union = '?'
             if (this.redirectUrl.indexOf('?') >= 0) {
               union = '&'
@@ -88,7 +86,7 @@ export default {
             }
 
             console.log('!!!! this.doubleName: ', this.doubleName)
-            var url = `//${this.appId}${safeRedirectUri}${union}username=${this.doubleName}&signedhash=${signedHash}&data=${data}`
+            var url = `//${this.appId}${safeRedirectUri}${union}signedAttempt=${data}`
 
             if (!this.isRedirecting) {
               this.isRedirecting = true
@@ -96,7 +94,7 @@ export default {
               window.location.href = url
             }
           } else {
-            console.log('Missing data or signedHash')
+            console.log('Missing data or signedState')
           }
         } else {
           console.log('Val was null')

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:threebotlogin/apps/free_flow_pages/ffp.dart';
 import 'package:threebotlogin/apps/free_flow_pages/ffp_events.dart';
+import 'package:threebotlogin/events/email_event.dart';
 import 'package:threebotlogin/events/events.dart';
 import 'package:threebotlogin/events/go_home_event.dart';
 import 'package:threebotlogin/events/new_login_event.dart';
@@ -20,8 +21,9 @@ import 'package:uni_links/uni_links.dart';
 /* Screen shows tabbar and all pages defined in router.dart */
 class HomeScreen extends StatefulWidget {
   final String initialLink;
+  final BackendConnection backendConnection;
 
-  HomeScreen({this.initialLink});
+  HomeScreen({this.initialLink, this.backendConnection});
 
   _HomeScreenState createState() => _HomeScreenState();
 }
@@ -105,9 +107,15 @@ class _HomeScreenState extends State<HomeScreen>
     initUniLinks();
 
     Events().onEvent(GoHomeEvent().runtimeType, close);
+
     Events().onEvent(NewLoginEvent().runtimeType, (NewLoginEvent event) {
-      openLogin(context, event.loginData);
+      openLogin(context, event.loginData, widget.backendConnection);
     });
+
+    Events().onEvent(EmailEvent().runtimeType, (EmailEvent event) {
+      emailVerification(context);
+    });
+
     WidgetsBinding.instance.addObserver(this);
   }
 

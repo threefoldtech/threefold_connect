@@ -85,6 +85,7 @@ class _AppState extends State<MainScreen> {
         MaterialPageRoute(
             builder: (context) => HomeScreen(
                   initialLink: initialLink,
+                  backendConnection: _backendConnection
                 )));
   }
 
@@ -98,10 +99,7 @@ class _AppState extends State<MainScreen> {
     } on SocketException catch (_) {
       CustomDialog dialog = CustomDialog(
           title: "No internet connection available",
-          description: Text(
-            "Please enable your internet connection to use this app.",
-            textAlign: TextAlign.center,
-          ));
+          description: "Please enable your internet connection to use this app.",);
       await dialog.show(context);
       if (Platform.isAndroid) {
         SystemNavigator.pop();
@@ -123,10 +121,7 @@ class _AppState extends State<MainScreen> {
       } on SocketException catch (_) {
         CustomDialog dialog = CustomDialog(
             title: "Oops",
-            description: Text(
-              "Something went wrong, please try again. Contact support if this issue persists.",
-              textAlign: TextAlign.center,
-            ));
+            description: "Something went wrong, please try again. Contact support if this issue persists.");
         await dialog.show(context);
         if (Platform.isAndroid) {
           SystemNavigator.pop();
@@ -141,10 +136,7 @@ class _AppState extends State<MainScreen> {
     if (!await isAppUpToDate()) {
       CustomDialog dialog = CustomDialog(
           title: "Update required",
-          description: Text(
-            "The app is outdated. Please, update it to the latest version.",
-            textAlign: TextAlign.center,
-          ));
+          description: "The app is outdated. Please, update it to the latest version.");
 
       await dialog.show(context);
       if (Platform.isAndroid) {

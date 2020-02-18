@@ -70,6 +70,33 @@ Future<String> getPhrase() async {
   return prefs.getString('phrase');
 }
 
+Future<void> saveLocationId(String locationId) async {
+  final SharedPreferences prefs = await SharedPreferences.getInstance();
+
+  List<dynamic> locationIdList = await getLocationIdList();
+
+  locationIdList.add(locationId);
+
+  String locationIdListAsJson = jsonEncode(locationIdList);
+
+  prefs.remove('locationIdList');
+  prefs.setString('locationIdList', locationIdListAsJson);
+}
+
+Future<List<dynamic>> getLocationIdList() async {
+  final SharedPreferences prefs = await SharedPreferences.getInstance();
+
+  try {
+    String locationIdListAsJson = prefs.getString('locationIdList');
+    List<dynamic> locationIdList = jsonDecode(locationIdListAsJson);
+
+    return locationIdList;
+  } catch(_) {
+    return new List<dynamic>();
+  }
+}
+
+
 Future<void> saveDoubleName(doubleName) async {
   final SharedPreferences prefs = await SharedPreferences.getInstance();
   prefs.remove('doubleName');
@@ -103,8 +130,6 @@ Future<Map<String, Object>> getEmail() async {
   final SharedPreferences prefs = await SharedPreferences.getInstance();
   return {
     'email': prefs.getString('email'),
-    'verified': prefs.getString(
-        'signedEmailIdentifier'), // I'll leave this here for backwards compat with forums & ffp and other existing implementations.
     'sei': prefs.getString('signedEmailIdentifier')
   };
 }
@@ -133,17 +158,6 @@ Future<bool> getFingerprint() async {
   }
 
   return result;
-}
-
-Future<void> saveLoginToken(loginToken) async {
-  final SharedPreferences prefs = await SharedPreferences.getInstance();
-  prefs.remove('loginToken');
-  prefs.setString('loginToken', loginToken);
-}
-
-Future<String> getLoginToken() async {
-  final SharedPreferences prefs = await SharedPreferences.getInstance();
-  return prefs.getString('loginToken');
 }
 
 Future<void> saveScopePermissions(scopePermissions) async {

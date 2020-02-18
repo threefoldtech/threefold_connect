@@ -8,20 +8,23 @@ import 'package:threebotlogin/app_config.dart';
 import 'package:threebotlogin/services/crypto_service.dart';
 import 'package:threebotlogin/services/user_service.dart';
 
-
 String threeBotApiUrl = AppConfig().threeBotApiUrl();
 Map<String, String> requestHeaders = {'Content-type': 'application/json'};
 
-Future<Response> sendData(String hash, String signedHash, data, selectedImageId,
-    String signedRoom) async {
-  return http.post('$threeBotApiUrl/sign',
+Future<Response> sendData(
+    String state, data, selectedImageId, String randomRoom) async {
+  return http.post('$threeBotApiUrl/signedAttempt',
       body: json.encode({
-        'hash': hash,
-        'signedHash': signedHash,
-        'data': data,
-        'selectedImageId': selectedImageId,
-        'doubleName': await getDoubleName(),
-        'signedRoom': signedRoom
+        'signedAttempt': await signData(
+          json.encode({
+            'signedState': state,
+            'data': data,
+            'selectedImageId': selectedImageId,
+            'doubleName': await getDoubleName(),
+            'randomRoom': randomRoom
+          }),
+          await getPrivateKey()),
+          'doubleName': await getDoubleName()
       }),
       headers: requestHeaders);
 }
@@ -52,7 +55,9 @@ Future<bool> isAppUpToDate() async {
     int currentBuildNumber = int.parse(packageInfo.buildNumber);
     int minimumBuildNumber = 0;
 
-    String jsonResponse = (await http.get('$threeBotApiUrl/minimumversion', headers: requestHeaders)).body;
+    String jsonResponse = (await http.get('$threeBotApiUrl/minimumversion',
+            headers: requestHeaders))
+        .body;
     Map<String, dynamic> minimumVersion = json.decode(jsonResponse);
 
     if (Platform.isAndroid) {
@@ -86,16 +91,4 @@ Future<Response> finishRegistration(
         'public_key': publicKey,
       }),
       headers: requestHeaders);
-}
-
-Future<Response> sendRegisterSign(String doubleName) {
-  return http.post('$threeBotApiUrl/signRegister',
-      body: json.encode({
-        'doubleName': doubleName,
-      }),
-      headers: requestHeaders);
-}
-
-Future<Response> getShowApps() async {
-  return http.get('$threeBotApiUrl/showapps', headers: requestHeaders);
 }

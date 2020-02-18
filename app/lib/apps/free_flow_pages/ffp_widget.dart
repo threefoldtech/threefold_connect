@@ -111,7 +111,6 @@ class _FfpState extends State<FfpWidget> with AutomaticKeepAliveClientMixin {
     final state = Uri.decodeFull(url.split("&state=")[1]);
     final union = '?';
     final privateKey = await getPrivateKey();
-    final signedHash = signData(state, privateKey);
 
     final redirecturl =
         Uri.decodeFull(url.split("&redirecturl=")[1].split("&")[0]);
@@ -125,11 +124,20 @@ class _FfpState extends State<FfpWidget> with AutomaticKeepAliveClientMixin {
       print("adding scope");
     }
 
-    var jsonData = jsonEncode(
-        (await encrypt(jsonEncode(scopeData), publickey, privateKey)));
-    var data = Uri.encodeQueryComponent(jsonData); //Uri.encodeFull();
-    var loadUrl =
-        'https://${config.appId()}$redirecturl${union}username=${await getDoubleName()}&signedhash=${Uri.encodeComponent(await signedHash)}&data=$data';
+    var data = (await encrypt(jsonEncode(scopeData), publickey, privateKey));
+
+    String signedAttempt = json.encode({
+        'signedAttempt': await signData(
+          json.encode({
+            'signedState': state,
+            'data': data,
+            'doubleName': await getDoubleName(),
+          }),
+          await getPrivateKey()),
+          'doubleName': await getDoubleName()
+      });
+
+    var loadUrl = 'https://${config.appId()}$redirecturl${union}signedAttempt=${Uri.encodeQueryComponent(signedAttempt)}';
 
     webView.loadUrl(url: loadUrl);
     switchToCircle = true;

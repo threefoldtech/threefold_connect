@@ -54,7 +54,8 @@ class _PreferenceDialogState extends State<PreferenceDialog> {
 
       if (!scopeIsEqual(scopeAsMap, previousScopePermissionsObject)) {
         previousScopePermissionsObject = widget.scope.toJson();
-        await savePreviousScopePermissions(widget.appId, jsonEncode(previousScopePermissionsObject));
+        await savePreviousScopePermissions(
+            widget.appId, jsonEncode(previousScopePermissionsObject));
       }
 
       previousSelectedScope = (previousScopePermissionsObject == null)
@@ -103,80 +104,80 @@ class _PreferenceDialogState extends State<PreferenceDialog> {
   Widget scopeList(context) {
     return Container(
         child: Column(
-      children: <Widget>[
-        widget.scope != null && widget.scope.email != null
-            ? ListView.builder(
-                scrollDirection: Axis.vertical,
-                shrinkWrap: true,
-                itemCount: scopeAsMap.length,
-                itemBuilder: (BuildContext context, index) {
-                  var keyList = scopeAsMap.keys.toList();
-                  String scopeItem = keyList[index];
+          children: <Widget>[
+            widget.scope != null && widget.scope.email != null
+                ? ListView.builder(
+                    scrollDirection: Axis.vertical,
+                    shrinkWrap: true,
+                    itemCount: scopeAsMap.length,
+                    itemBuilder: (BuildContext context, index) {
+                      var keyList = scopeAsMap.keys.toList();
+                      String scopeItem = keyList[index];
 
-                  if (scopeAsMap[scopeItem] != null) {
-                    bool mandatory = scopeAsMap[scopeItem];
+                      if (scopeAsMap[scopeItem] != null) {
+                        bool mandatory = scopeAsMap[scopeItem];
 
-                    switch (scopeItem) {
-                      case "email":
-                        return FutureBuilder(
-                          future: getEmail(),
-                          builder:
-                              (BuildContext context, AsyncSnapshot snapshot) {
-                            if (snapshot.hasData) {
-                              return CheckboxListTile(
-                                value: (mandatory)
-                                    ? mandatory
-                                    : previousSelectedScope[scopeItem],
-                                onChanged: (mandatory)
-                                    ? null
-                                    : (value) {
-                                        toggleScope(scopeItem, value);
-                                      },
-                                title: Text(
-                                  "${scopeItem.toUpperCase()}" +
-                                      (mandatory ? " *" : ""),
-                                  style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.black),
-                                ),
-                                subtitle: Text("${snapshot.data['email']}"),
-                              );
-                            } else {
-                              return Container();
-                            }
-                          },
-                        );
-                        break;
-                      // default:
-                      //   return FutureBuilder(
-                      //     future: getEmail(),
-                      //     builder:
-                      //         (BuildContext context, AsyncSnapshot snapshot) {
-                      //       if (snapshot.hasData) {
-                      //         return ListTile(
-                      //           title: Text(
-                      //             "${scopeItem.toUpperCase()}",
-                      //             style: TextStyle(
-                      //                 fontWeight: FontWeight.bold,
-                      //                 color: Colors.black,
-                      //                 decoration: TextDecoration.lineThrough),
-                      //           ),
-                      //           subtitle: Text("This scope will be ignored."),
-                      //           isThreeLine: true,
-                      //         );
-                      //       } else {
-                      //         return Container();
-                      //       }
-                      //     },
-                      //   );
-                    }
-                  }
-                  return Container();
-                },
-              )
-            : Text("No extra permissions needed."),
-      ],
-    ));
+                        switch (scopeItem) {
+                          case "email":
+                            return FutureBuilder(
+                              future: getEmail(),
+                              builder: (BuildContext context,
+                                  AsyncSnapshot snapshot) {
+                                if (snapshot.hasData) {
+                                  return CheckboxListTile(
+                                    value: (mandatory)
+                                        ? mandatory
+                                        : previousSelectedScope[scopeItem],
+                                    onChanged: (mandatory)
+                                        ? null
+                                        : (value) {
+                                            toggleScope(scopeItem, value);
+                                          },
+                                    title: Text(
+                                      "${scopeItem.toUpperCase()}" +
+                                          (mandatory ? " *" : ""),
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.black),
+                                    ),
+                                    subtitle: Text("${snapshot.data['email']}"),
+                                  );
+                                } else {
+                                  return SizedBox(width: 0, height: 0);
+                                }
+                              },
+                            );
+                            break;
+                          // default:
+                          //   return FutureBuilder(
+                          //     future: getEmail(),
+                          //     builder:
+                          //         (BuildContext context, AsyncSnapshot snapshot) {
+                          //       if (snapshot.hasData) {
+                          //         return ListTile(
+                          //           title: Text(
+                          //             "${scopeItem.toUpperCase()}",
+                          //             style: TextStyle(
+                          //                 fontWeight: FontWeight.bold,
+                          //                 color: Colors.black,
+                          //                 decoration: TextDecoration.lineThrough),
+                          //           ),
+                          //           subtitle: Text("This scope will be ignored."),
+                          //           isThreeLine: true,
+                          //         );
+                          //       } else {
+                          //         return Container();
+                          //       }
+                          //     },
+                          //   );
+                        }
+                      }
+                      return SizedBox(width: 0, height: 0);
+                    },
+                  )
+                : Text("No extra permissions needed."),
+          ],
+        ));
   }
 
   @override
@@ -187,7 +188,8 @@ class _PreferenceDialogState extends State<PreferenceDialog> {
 
     return CustomDialog(
       title: '${widget.appId} \n would like to access',
-      description: scopeList(context),
+      description: '',
+      widgetDescription: scopeList(context),
       actions: null,
     );
   }
