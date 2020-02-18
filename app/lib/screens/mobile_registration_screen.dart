@@ -260,7 +260,6 @@ class _MobileRegistrationScreenState extends State<MobileRegistrationScreen> {
                 children: <Widget>[
                   FlatButton(
                     onPressed: () {
-                      FocusScope.of(context).unfocus();
                       onStepCancel();
                     },
                     child: Text(
@@ -271,7 +270,6 @@ class _MobileRegistrationScreenState extends State<MobileRegistrationScreen> {
                   ),
                   FlatButton(
                     onPressed: () {
-                      FocusScope.of(context).unfocus();
                       onStepContinue();
                     },
                     child: Text(
@@ -474,6 +472,7 @@ class _MobileRegistrationScreenState extends State<MobileRegistrationScreen> {
           setState(() {
             state = _State.values[index];
           });
+          checkStepFocus(state);
         },
         onStepContinue: () {
           errorStepperText = '';
