@@ -40,6 +40,10 @@ class _MobileRegistrationScreenState extends State<MobileRegistrationScreen> {
   String phraseConfirmationWords = '';
   String errorStepperText = '';
 
+  final FocusNode nameFocus = FocusNode();
+  final FocusNode emailFocus = FocusNode();
+  final FocusNode seedFocus = FocusNode();
+
   RegistrationData _registrationData = RegistrationData();
 
   @override
@@ -137,7 +141,8 @@ class _MobileRegistrationScreenState extends State<MobileRegistrationScreen> {
           builder: (BuildContext context) => CustomDialog(
                 image: Icons.error,
                 title: 'Error',
-                description: 'Something went wrong when trying to create your account.',
+                description:
+                    'Something went wrong when trying to create your account.',
                 actions: <Widget>[
                   FlatButton(
                     child: Text('Ok'),
@@ -160,19 +165,42 @@ class _MobileRegistrationScreenState extends State<MobileRegistrationScreen> {
     switch (currentStep) {
       case _State.DoubleName:
         await checkDoubleName();
+        FocusScope.of(context).requestFocus(emailFocus);
         break;
       case _State.Email:
         await checkEmail();
         await initKeys();
+        FocusScope.of(context).unfocus();
         break;
       case _State.SeedPhrase:
         await generateKeys();
+        FocusScope.of(context).requestFocus(seedFocus);
         break;
       case _State.ConfirmSeedPhrase:
         await checkConfirm();
+        FocusScope.of(context).unfocus();
         break;
       case _State.Finish:
         finish();
+        break;
+      default:
+        break;
+    }
+  }
+
+  checkStepFocus(currentStep) async {
+    switch (currentStep) {
+      case _State.DoubleName:
+        FocusScope.of(context).requestFocus(nameFocus);
+        break;
+      case _State.Email:
+        FocusScope.of(context).requestFocus(emailFocus);
+        break;
+      case _State.SeedPhrase:
+        FocusScope.of(context).unfocus();
+        break;
+      case _State.ConfirmSeedPhrase:
+        FocusScope.of(context).requestFocus(seedFocus);
         break;
       default:
         break;
@@ -284,7 +312,8 @@ class _MobileRegistrationScreenState extends State<MobileRegistrationScreen> {
                     ),
                     Padding(
                       padding: const EdgeInsets.only(top: 8.5),
-                      child: TextField(
+                      child: TextFormField(
+                        focusNode: nameFocus,
                         maxLength: 50,
                         autofocus: true,
                         keyboardType: TextInputType.text,
@@ -335,6 +364,7 @@ class _MobileRegistrationScreenState extends State<MobileRegistrationScreen> {
               child: Padding(
                 padding: const EdgeInsets.all(16.0),
                 child: ReuseableTextFieldStep(
+                  focusNode: emailFocus,
                   titleText: 'What is your email?',
                   labelText: 'Email',
                   typeText: TextInputType.emailAddress,
@@ -376,6 +406,7 @@ class _MobileRegistrationScreenState extends State<MobileRegistrationScreen> {
               child: Padding(
                 padding: const EdgeInsets.all(16.0),
                 child: ReuseableTextFieldStep(
+                  focusNode: seedFocus,
                   titleText:
                       'Type 3 random words from your seed phrase, separated by a space.',
                   labelText: 'Seed phrase words',
@@ -418,6 +449,7 @@ class _MobileRegistrationScreenState extends State<MobileRegistrationScreen> {
                       trailing: Icon(Icons.edit),
                       onTap: () => setState(() {
                         state = _State.DoubleName;
+                        FocusScope.of(context).requestFocus(nameFocus);
                       }),
                     ),
                   ),
@@ -429,6 +461,7 @@ class _MobileRegistrationScreenState extends State<MobileRegistrationScreen> {
                         trailing: Icon(Icons.edit),
                         onTap: () => setState(() {
                               state = _State.Email;
+                              FocusScope.of(context).requestFocus(emailFocus);
                             })),
                   ),
                 ],
@@ -457,6 +490,7 @@ class _MobileRegistrationScreenState extends State<MobileRegistrationScreen> {
               }
             },
           );
+          checkStepFocus(state);
         },
       ),
     );
