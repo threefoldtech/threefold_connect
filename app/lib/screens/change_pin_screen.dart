@@ -25,7 +25,7 @@ class _ChangePinScreenState extends State<ChangePinScreen> {
   getText() {
     switch (state) {
       case _State.NewPinWrong:
-        return "Confirmation incorrect, Please enter your new PIN";
+        return "Confirmation incorrect, please enter your new PIN";
       case _State.NewPin:
         return "Please enter your new PIN";
       case _State.Confirm:
