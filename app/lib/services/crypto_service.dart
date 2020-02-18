@@ -1,10 +1,13 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:typed_data';
+import 'package:convert/convert.dart';
+
 import 'package:flutter_sodium/flutter_sodium.dart';
 import 'package:bip39/bip39.dart' as bip39;
 import 'package:password_hash/password_hash.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:threebotlogin/main.dart';
 import 'package:threebotlogin/services/3bot_service.dart';
 import 'package:threebotlogin/services/user_service.dart';
 
@@ -74,6 +77,19 @@ Future<Uint8List> decrypt(String encodedCipherText, String encodedPublicKey, Str
 
 Future<String> generateSeedPhrase() async {
   return bip39.generateMnemonic(strength: 256);
+}
+
+
+void testMe() {
+  String base64EncodedEntropy = "tllF+NHT24MLhLVfyCxMbtkoI/wdt+fkQHjELBW78BQ=";
+
+  Uint8List tmp = base64.decode(base64EncodedEntropy);
+
+  Uint8List bytes = new Uint8List.view(tmp.buffer);
+  String asHex = hex.encode(bytes);
+
+  String words = bip39.entropyToMnemonic(asHex);
+  logger.log(words);
 }
 
 Future<String> generateDerivedSeed(String appId) async {
