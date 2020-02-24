@@ -76,123 +76,124 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return ListView(
-      children: <Widget>[
-        Container(
-            child: AppBar(
-          automaticallyImplyLeading: false,
-          backgroundColor: HexColor("#2d4052"),
-          title: Text(
-            'Settings',
-          ),
-        )),
-        ListTile(
-          title: Text("Profile"),
+    return Scaffold(
+      appBar: AppBar(
+        automaticallyImplyLeading: false,
+        backgroundColor: HexColor("#2d4052"),
+        title: Text(
+          'Settings',
         ),
-        Material(
-          child: ListTile(
-            leading: Icon(Icons.person),
-            title: Text(doubleName),
+      ),
+      body: ListView(
+        children: <Widget>[
+          ListTile(
+            title: Text("Profile"),
           ),
-        ),
-        Material(
-          child: ListTile(
-              trailing: !emailVerified ? Icon(Icons.refresh) : null,
-              leading: Icon(Icons.mail),
-              title: Text(emailAdress.toLowerCase()),
-              subtitle: !emailVerified
-                  ? Text(
-                      "Unverified",
-                      style: TextStyle(color: Colors.grey),
-                    )
-                  : Text(
-                      "Verified",
-                      style: TextStyle(color: Colors.green),
+          Material(
+            child: ListTile(
+              leading: Icon(Icons.person),
+              title: Text(doubleName),
+            ),
+          ),
+          Material(
+            child: ListTile(
+                trailing: !emailVerified ? Icon(Icons.refresh) : null,
+                leading: Icon(Icons.mail),
+                title: Text(emailAdress.toLowerCase()),
+                subtitle: !emailVerified
+                    ? Text(
+                        "Unverified",
+                        style: TextStyle(color: Colors.grey),
+                      )
+                    : Text(
+                        "Verified",
+                        style: TextStyle(color: Colors.green),
+                      ),
+                onTap: () {
+                  if (!emailVerified) {
+                    sendVerificationEmail();
+                    emailResendedDialog(context);
+                  }
+                }),
+          ),
+          FutureBuilder(
+            future: getPhrase(),
+            builder: (context, snapshot) {
+              if (snapshot.hasData) {
+                return Material(
+                  child: ListTile(
+                    trailing: Padding(
+                      padding: new EdgeInsets.only(right: 7.5),
+                      child: Icon(Icons.visibility),
                     ),
-              onTap: () {
-                if (!emailVerified) {
-                  sendVerificationEmail();
-                  emailResendedDialog(context);
-                }
-              }),
-        ),
-        FutureBuilder(
-          future: getPhrase(),
-          builder: (context, snapshot) {
-            if (snapshot.hasData) {
-              return Material(
-                child: ListTile(
-                  trailing: Padding(
-                    padding: new EdgeInsets.only(right: 7.5),
-                    child: Icon(Icons.visibility),
+                    leading: Icon(Icons.vpn_key),
+                    title: Text("Show Phrase"),
+                    onTap: () async {
+                      _showPhrase();
+                    },
                   ),
-                  leading: Icon(Icons.vpn_key),
-                  title: Text("Show Phrase"),
-                  onTap: () async {
-                    _showPhrase();
-                  },
-                ),
-              );
-            } else {
-              return Container();
-            }
-          },
-        ),
-        Visibility(
-          visible: biometricsCheck,
-          child: Material(
-            child: CheckboxListTile(
-              secondary: Icon(Icons.fingerprint),
-              value: finger,
-              title: Text("Fingerprint"),
-              activeColor: Theme.of(context).accentColor,
-              onChanged: (bool newValue) async {
-                _toggleFingerprint(newValue);
+                );
+              } else {
+                return Container();
+              }
+            },
+          ),
+          Visibility(
+            visible: biometricsCheck,
+            child: Material(
+              child: CheckboxListTile(
+                secondary: Icon(Icons.fingerprint),
+                value: finger,
+                title: Text("Fingerprint"),
+                activeColor: Theme.of(context).accentColor,
+                onChanged: (bool newValue) async {
+                  _toggleFingerprint(newValue);
+                },
+              ),
+            ),
+          ),
+          Material(
+            child: ListTile(
+              leading: Icon(Icons.lock),
+              title: Text("Change pincode"),
+              onTap: () async {
+                _changePincode();
               },
             ),
           ),
-        ),
-        Material(
-          child: ListTile(
-            leading: Icon(Icons.lock),
-            title: Text("Change pincode"),
-            onTap: () async {
-              _changePincode();
-            },
-          ),
-        ),
-        Material(
-          child: ListTile(
-            leading: Icon(Icons.info_outline),
-            title: Text("Version: " + version + " - " + buildNumber),
-            onTap: () {
-              _showVersionInfo();
-            },
-          ),
-        ),
-        ExpansionTile(
-          title: Text(
-            "Advanced settings",
-            style: TextStyle(color: Colors.black),
-          ),
-          children: <Widget>[
-            Material(
-              child: ListTile(
-                leading: Icon(Icons.person),
-                title: Text(
-                  "Remove Account From Device",
-                  style: TextStyle(color: Colors.red),
-                ),
-                trailing: Icon(
-                  Icons.remove_circle,
-                  color: Colors.red,
-                ),
-                onTap: _showDialog,
-              ),
+          Material(
+            child: ListTile(
+              leading: Icon(Icons.info_outline),
+              title: Text("Version: " + version + " - " + buildNumber),
+              onTap: () {
+                _showVersionInfo();
+              },
             ),
-          ],
-        ),
-      ],
+          ),
+          ExpansionTile(
+            title: Text(
+              "Advanced settings",
+              style: TextStyle(color: Colors.black),
+            ),
+            children: <Widget>[
+              Material(
+                child: ListTile(
+                  leading: Icon(Icons.person),
+                  title: Text(
+                    "Remove Account From Device",
+                    style: TextStyle(color: Colors.red),
+                  ),
+                  trailing: Icon(
+                    Icons.remove_circle,
+                    color: Colors.red,
+                  ),
+                  onTap: _showDialog,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
     );
   }
 
@@ -207,7 +208,8 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
       builder: (BuildContext context) => CustomDialog(
         image: Icons.error,
         title: "Disable Fingerprint",
-        description: "Are you sure you want to deactivate fingerprint as authentication method?",
+        description:
+            "Are you sure you want to deactivate fingerprint as authentication method?",
         actions: <Widget>[
           FlatButton(
             child: new Text("Cancel"),
@@ -238,7 +240,8 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
       builder: (BuildContext context) => CustomDialog(
         image: Icons.error,
         title: "Are you sure?",
-        description: "If you confirm, your account will be removed from this device. You can always recover your account with your doublename, email and phrase.",
+        description:
+            "If you confirm, your account will be removed from this device. You can always recover your account with your doublename, email and phrase.",
         actions: <Widget>[
           FlatButton(
             child: new Text("Cancel"),
@@ -263,7 +266,8 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
                       context: preferenceContext,
                       builder: (BuildContext context) => CustomDialog(
                             title: 'Error',
-                            description: 'Something went wrong when trying to remove your account.',
+                            description:
+                                'Something went wrong when trying to remove your account.',
                             actions: <Widget>[
                               FlatButton(
                                 child: Text('Ok'),
@@ -402,7 +406,7 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
     String pin = await getPin();
     bool authenticated = false;
 
-    if(pin == null || pin.isEmpty) {
+    if (pin == null || pin.isEmpty) {
       authenticated = true; // In case the pin wasn't set.
     } else {
       authenticated = await Navigator.push(
@@ -458,7 +462,8 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
           builder: (BuildContext context) => CustomDialog(
             image: Icons.perm_device_information,
             title: "Build information",
-            description: "Type: ${appConfig.environment}\nGit hash: ${appConfig.githash}\nTime: ${appConfig.time}",
+            description:
+                "Type: ${appConfig.environment}\nGit hash: ${appConfig.githash}\nTime: ${appConfig.time}",
             actions: <Widget>[
               FlatButton(
                 child: new Text("Ok"),

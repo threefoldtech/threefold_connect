@@ -15,8 +15,9 @@ void addClipboardHack(InAppWebViewController webview) {
   if (Platform.isAndroid) {
     webview.injectJavascriptFileFromAsset(
         assetFilePath: 'assets/clipboardhack.js');
-    addClipboardHandlersOnly(webview);
   }
+
+  addClipboardHandlersOnly(webview);
 }
 
 void addClipboardHandlersOnly(InAppWebViewController webview) {

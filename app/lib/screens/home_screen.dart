@@ -155,7 +155,7 @@ class _HomeScreenState extends State<HomeScreen>
     Events().onEvent(
         UniLinkEvent(null, null).runtimeType, UniLinkService.handleUniLink);
     initialLink = widget.initialLink;
-      
+
     if (initialLink != null) {
       Events().emit(UniLinkEvent(Uri.parse(initialLink), context));
     }
@@ -169,33 +169,41 @@ class _HomeScreenState extends State<HomeScreen>
 
   @override
   Widget build(BuildContext context) {
-    return DefaultTabController(
-      length: Globals().router.routes.length,
-      child: WillPopScope(
-        child: Scaffold(
-          body: SafeArea(
-            child: TabBarView(
-              controller: _tabController,
-              physics: NeverScrollableScrollPhysics(),
-              children: Globals().router.getContent(),
+    return Scaffold(
+      appBar: PreferredSize(
+          child: new AppBar(
+            automaticallyImplyLeading: true,
+            backgroundColor: HexColor("#2d4052"),
+          ),
+          preferredSize: Size.fromHeight(0)),
+      body: DefaultTabController(
+        length: Globals().router.routes.length,
+        child: WillPopScope(
+          child: Scaffold(
+            body: SafeArea(
+              child: TabBarView(
+                controller: _tabController,
+                physics: NeverScrollableScrollPhysics(),
+                children: Globals().router.getContent(),
+              ),
+            ),
+            bottomNavigationBar: Container(
+              color: HexColor("#2d4052"), //@todo theme obj
+              padding: EdgeInsets.all(0.0),
+              height: 65,
+              margin: EdgeInsets.all(0.0),
+              child: TabBar(
+                controller: _tabController,
+                isScrollable: false,
+                indicatorSize: TabBarIndicatorSize.tab,
+                tabs: Globals().router.getAppButtons(),
+                labelPadding: EdgeInsets.all(0.0),
+                indicatorPadding: EdgeInsets.all(0.0),
+              ),
             ),
           ),
-          bottomNavigationBar: Container(
-            color: HexColor("#2d4052"), //@todo theme obj
-            padding: EdgeInsets.all(0.0),
-            height: 65,
-            margin: EdgeInsets.all(0.0),
-            child: TabBar(
-              controller: _tabController,
-              isScrollable: false,
-              indicatorSize: TabBarIndicatorSize.tab,
-              tabs: Globals().router.getAppButtons(),
-              labelPadding: EdgeInsets.all(0.0),
-              indicatorPadding: EdgeInsets.all(0.0),
-            ),
-          ),
+          onWillPop: onWillPop,
         ),
-        onWillPop: onWillPop,
       ),
     );
   }

@@ -33,14 +33,14 @@ class AuthenticationScreenState extends State<AuthenticationScreen> {
     super.initState();
 
     Events().onEvent(CloseAuthEvent().runtimeType, (CloseAuthEvent event) {
-      if(mounted) {
+      if (mounted) {
         close();
       }
     });
 
-    if(widget.loginData != null && !widget.loginData.isMobile) {
+    if (widget.loginData != null && !widget.loginData.isMobile) {
       const oneSec = const Duration(seconds: 1);
-      
+
       print('Starting timer ... ');
       timer = new Timer.periodic(oneSec, (Timer t) async {
         timeoutTimer();
@@ -50,8 +50,8 @@ class AuthenticationScreenState extends State<AuthenticationScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) => checkFingerprint());
   }
 
-  timeoutTimer() async { 
-    if(!mounted) {
+  timeoutTimer() async {
+    if (!mounted) {
       timer.cancel();
       return;
     }
@@ -59,7 +59,8 @@ class AuthenticationScreenState extends State<AuthenticationScreen> {
     int created = widget.loginData.created;
     int currentTimestamp = new DateTime.now().millisecondsSinceEpoch;
 
-    if (created != null && ((currentTimestamp - created) / 1000) > Globals().loginTimeout) {
+    if (created != null &&
+        ((currentTimestamp - created) / 1000) > Globals().loginTimeout) {
       timer.cancel();
 
       await showDialog(
@@ -67,7 +68,8 @@ class AuthenticationScreenState extends State<AuthenticationScreen> {
         builder: (BuildContext context) => CustomDialog(
           image: Icons.timer,
           title: 'Login attempt expired',
-          description: 'Your login attempt has expired, please request a new one in your browser.',
+          description:
+              'Your login attempt has expired, please request a new one in your browser.',
           actions: <Widget>[
             FlatButton(
               child: Text('Ok'),
@@ -84,7 +86,7 @@ class AuthenticationScreenState extends State<AuthenticationScreen> {
   }
 
   close() {
-    if(Navigator.canPop(context)) {
+    if (Navigator.canPop(context)) {
       Navigator.pop(context, false);
     }
   }
@@ -211,32 +213,36 @@ class AuthenticationScreenState extends State<AuthenticationScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: new AppBar(
-            backgroundColor: HexColor("#2d4052"),
-            title: Text("Authentication"),
-            elevation: 0.0,
-            automaticallyImplyLeading: true),
-        body: Container(
-          color: Colors.white,
-          child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: <Widget>[
-                Container(
-                  child: Text("Please authenticate to " + widget.userMessage),
-                  padding: const EdgeInsets.only(bottom: 50),
-                ),
-                Container(
-                  alignment: Alignment.center,
-                  color: Colors.white,
-                  child: Column(children: [
-                    generateTextFields(context),
-                    SizedBox(height: 25),
-                    generateNumbers(context),
-                  ]),
-                ),
-              ]),
-        ));
+      appBar: new AppBar(
+        automaticallyImplyLeading: true,
+        backgroundColor: HexColor("#2d4052"),
+        title: Text("Authentication"),
+      ),
+      body: Container(
+        color: Colors.white,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: <Widget>[
+            Container(
+              child: Text("Please authenticate to " + widget.userMessage),
+              padding: const EdgeInsets.only(bottom: 50),
+            ),
+            Container(
+              alignment: Alignment.center,
+              color: Colors.white,
+              child: Column(
+                children: [
+                  generateTextFields(context),
+                  SizedBox(height: 25),
+                  generateNumbers(context),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   Future<void> onOk() async {
@@ -277,7 +283,8 @@ class AuthenticationScreenState extends State<AuthenticationScreen> {
 
       dialog = CustomDialog(
         title: "Too many attempts",
-        description: "Too many incorrect attempts, please wait ${((globals.lockedUntill - currentTime) / 1000).toStringAsFixed(0)} seconds",
+        description:
+            "Too many incorrect attempts, please wait ${((globals.lockedUntill - currentTime) / 1000).toStringAsFixed(0)} seconds",
       );
     } else {
       dialog = CustomDialog(

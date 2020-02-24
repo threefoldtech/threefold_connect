@@ -49,7 +49,7 @@ class _WarningScreenState extends State<WarningScreen> {
                 direction: Axis.horizontal,
                 children: <Widget>[
                   Text(
-                    'Please check the URL bar in your browser and make sure it matches the image below.',
+                    'Please check the URL bar in your browser and make sure it matches on of the images below.',
                   ),
                 ],
               ),
@@ -58,6 +58,14 @@ class _WarningScreenState extends State<WarningScreen> {
                   Padding(
                     padding: const EdgeInsets.fromLTRB(0, 10, 0, 0),
                     child: Image.asset('assets/url_bar.png'),
+                  ),
+                ],
+              ),
+              Row(
+                children: <Widget>[
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(0, 10, 0, 0),
+                    child: Image.asset('assets/url_bar_ff.jpeg'),
                   )
                 ],
               ),
