@@ -49,7 +49,7 @@ class _WarningScreenState extends State<WarningScreen> {
                 direction: Axis.horizontal,
                 children: <Widget>[
                   Text(
-                    'Please check the URL bar in your browser and make sure it matches on of the images below.',
+                    'Please check the URL bar in your browser and make sure it matches one of the images below.',
                   ),
                 ],
               ),
