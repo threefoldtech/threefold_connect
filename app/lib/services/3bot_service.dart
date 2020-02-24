@@ -16,15 +16,15 @@ Future<Response> sendData(
   return http.post('$threeBotApiUrl/signedAttempt',
       body: json.encode({
         'signedAttempt': await signData(
-          json.encode({
-            'signedState': state,
-            'data': data,
-            'selectedImageId': selectedImageId,
-            'doubleName': await getDoubleName(),
-            'randomRoom': randomRoom
-          }),
-          await getPrivateKey()),
-          'doubleName': await getDoubleName()
+            json.encode({
+              'signedState': state,
+              'data': data,
+              'selectedImageId': selectedImageId,
+              'doubleName': await getDoubleName(),
+              'randomRoom': randomRoom
+            }),
+            await getPrivateKey()),
+        'doubleName': await getDoubleName()
       }),
       headers: requestHeaders);
 }
@@ -49,27 +49,24 @@ Future<Response> sendPublicKey(Map<String, Object> data) async {
 }
 
 Future<bool> isAppUpToDate() async {
-  try {
-    PackageInfo packageInfo = await PackageInfo.fromPlatform();
+  PackageInfo packageInfo = await PackageInfo.fromPlatform();
 
-    int currentBuildNumber = int.parse(packageInfo.buildNumber);
-    int minimumBuildNumber = 0;
+  int currentBuildNumber = int.parse(packageInfo.buildNumber);
+  int minimumBuildNumber = 0;
 
-    String jsonResponse = (await http.get('$threeBotApiUrl/minimumversion',
-            headers: requestHeaders))
-        .body;
-    Map<String, dynamic> minimumVersion = json.decode(jsonResponse);
+  String jsonResponse = (await http
+          .get('$threeBotApiUrl/minimumversion', headers: requestHeaders)
+          .timeout(const Duration(seconds: 3)))
+      .body;
+  Map<String, dynamic> minimumVersion = json.decode(jsonResponse);
 
-    if (Platform.isAndroid) {
-      minimumBuildNumber = minimumVersion['android'];
-    } else if (Platform.isIOS) {
-      minimumBuildNumber = minimumVersion['ios'];
-    }
-
-    return currentBuildNumber >= minimumBuildNumber;
-  } on Exception catch (_) {
-    return false;
+  if (Platform.isAndroid) {
+    minimumBuildNumber = minimumVersion['android'];
+  } else if (Platform.isIOS) {
+    minimumBuildNumber = minimumVersion['ios'];
   }
+
+  return currentBuildNumber >= minimumBuildNumber;
 }
 
 Future<Response> cancelLogin(doubleName) {

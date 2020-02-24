@@ -84,22 +84,34 @@ class _AppState extends State<MainScreen> {
         context,
         MaterialPageRoute(
             builder: (context) => HomeScreen(
-                  initialLink: initialLink,
-                  backendConnection: _backendConnection
-                )));
+                initialLink: initialLink,
+                backendConnection: _backendConnection)));
   }
 
   checkInternetConnection() async {
     try {
       final List<InternetAddress> result =
-          await InternetAddress.lookup('google.com');
+          await InternetAddress.lookup('google.com')
+              .timeout(const Duration(seconds: 3));
       if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
         print('connected to the internet');
       }
-    } on SocketException catch (_) {
+    } on TimeoutException catch (_) {
       CustomDialog dialog = CustomDialog(
-          title: "No internet connection available",
-          description: "Please enable your internet connection to use this app.",);
+        title: "No internet connection available",
+        description: "Please enable your internet connection to use this app.",
+      );
+      await dialog.show(context);
+      if (Platform.isAndroid) {
+        SystemNavigator.pop();
+      } else if (Platform.isIOS) {
+        exit(1);
+      }
+    } on Exception catch (_) {
+      CustomDialog dialog = CustomDialog(
+        title: "No internet connection available",
+        description: "Please enable your internet connection to use this app.",
+      );
       await dialog.show(context);
       if (Platform.isAndroid) {
         SystemNavigator.pop();
@@ -114,14 +126,27 @@ class _AppState extends State<MainScreen> {
       try {
         String baseUrl = AppConfig().baseUrl();
         final List<InternetAddress> result =
-            await InternetAddress.lookup('$baseUrl');
+            await InternetAddress.lookup('$baseUrl')
+                .timeout(const Duration(seconds: 3));
         if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
           print('connected to the internet');
         }
-      } on SocketException catch (_) {
+      } on TimeoutException catch (_) {
+        CustomDialog dialog = CustomDialog(
+            title: "Connection problem",
+            description:
+                "The connection to our servers has failed, please try again later.");
+        await dialog.show(context);
+        if (Platform.isAndroid) {
+          SystemNavigator.pop();
+        } else if (Platform.isIOS) {
+          exit(1);
+        }
+      } on Exception catch (_) {
         CustomDialog dialog = CustomDialog(
             title: "Oops",
-            description: "Something went wrong, please try again. Contact support if this issue persists.");
+            description:
+                "Something went wrong, please try again. Contact support if this issue persists.");
         await dialog.show(context);
         if (Platform.isAndroid) {
           SystemNavigator.pop();
@@ -133,11 +158,36 @@ class _AppState extends State<MainScreen> {
   }
 
   checkIfAppIsUpToDate() async {
-    if (!await isAppUpToDate()) {
-      CustomDialog dialog = CustomDialog(
-          title: "Update required",
-          description: "The app is outdated. Please, update it to the latest version.");
+    try {
+      if (!await isAppUpToDate()) {
+        CustomDialog dialog = CustomDialog(
+            title: "Update required",
+            description:
+                "The app is outdated. Please, update it to the latest version.");
 
+        await dialog.show(context);
+        if (Platform.isAndroid) {
+          SystemNavigator.pop();
+        } else if (Platform.isIOS) {
+          exit(1);
+        }
+      }
+    } on TimeoutException catch (_) {
+      CustomDialog dialog = CustomDialog(
+          title: "Connection problem",
+          description:
+              "The connection to our servers has failed, please try again later.");
+      await dialog.show(context);
+      if (Platform.isAndroid) {
+        SystemNavigator.pop();
+      } else if (Platform.isIOS) {
+        exit(1);
+      }
+    } on Exception catch (_) {
+      CustomDialog dialog = CustomDialog(
+          title: "Oops",
+          description:
+              "Something went wrong, please try again. Contact support if this issue persists.");
       await dialog.show(context);
       if (Platform.isAndroid) {
         SystemNavigator.pop();
@@ -150,7 +200,7 @@ class _AppState extends State<MainScreen> {
   Future<Null> initUniLinks() async {
     initialLink = await getInitialLink();
 
-    // Doesn't seem needed in this scenario. Might be removed in the future. 
+    // Doesn't seem needed in this scenario. Might be removed in the future.
     _sub = getLinksStream().listen((String incomingLink) {
       if (!mounted) {
         return;
