@@ -13,8 +13,6 @@ class Globals {
   int incorrectPincodeAttempts = 0;
   bool tooManyAuthenticationAttempts = false;
 
-  String cacheBuster = "";
-
   int lockedUntill = 0;
   int loginTimeout = 120;
 

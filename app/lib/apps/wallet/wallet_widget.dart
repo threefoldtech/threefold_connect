@@ -7,7 +7,6 @@ import 'package:threebotlogin/apps/wallet/wallet_user_data.dart';
 import 'package:threebotlogin/clipboard_hack/clipboard_hack.dart';
 import 'package:threebotlogin/events/events.dart';
 import 'package:threebotlogin/events/go_home_event.dart';
-import 'package:threebotlogin/helpers/globals.dart';
 import 'package:threebotlogin/screens/scan_screen.dart';
 import 'package:threebotlogin/services/user_service.dart';
 
@@ -39,7 +38,7 @@ class _WalletState extends State<WalletWidget>
   _WalletState() {
     iaWebView = InAppWebView(
       initialUrl: 'https://${config.appId()}/init?cache_buster=' +
-          Globals().cacheBuster,
+          new DateTime.now().millisecondsSinceEpoch.toString(),
       initialHeaders: {},
       initialOptions: InAppWebViewWidgetOptions(
         crossPlatform: InAppWebViewOptions(debuggingEnabled: true),
