@@ -171,11 +171,12 @@ class _HomeScreenState extends State<HomeScreen>
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: PreferredSize(
-          child: new AppBar(
-            automaticallyImplyLeading: true,
-            backgroundColor: HexColor("#2d4052"),
-          ),
-          preferredSize: Size.fromHeight(0)),
+        child: new AppBar(
+          automaticallyImplyLeading: true,
+          backgroundColor: HexColor("#2d4052"),
+        ),
+        preferredSize: Size.fromHeight(0),
+      ),
       body: DefaultTabController(
         length: Globals().router.routes.length,
         child: WillPopScope(
@@ -205,6 +206,7 @@ class _HomeScreenState extends State<HomeScreen>
           onWillPop: onWillPop,
         ),
       ),
+      resizeToAvoidBottomInset: false,
     );
   }
 
