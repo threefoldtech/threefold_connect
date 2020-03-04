@@ -7,6 +7,7 @@ import 'package:threebotlogin/apps/wallet/wallet_user_data.dart';
 import 'package:threebotlogin/clipboard_hack/clipboard_hack.dart';
 import 'package:threebotlogin/events/events.dart';
 import 'package:threebotlogin/events/go_home_event.dart';
+import 'package:threebotlogin/helpers/globals.dart';
 import 'package:threebotlogin/screens/scan_screen.dart';
 import 'package:threebotlogin/services/user_service.dart';
 
@@ -37,35 +38,40 @@ class _WalletState extends State<WalletWidget>
 
   _WalletState() {
     iaWebView = InAppWebView(
-        initialUrl: 'https://${config.appId()}/init',
-        initialHeaders: {},
-        initialOptions: InAppWebViewWidgetOptions(
-            crossPlatform: InAppWebViewOptions(debuggingEnabled: true),
-            android: AndroidInAppWebViewOptions(
-                supportMultipleWindows: true, thirdPartyCookiesEnabled: true)),
-        onWebViewCreated: (InAppWebViewController controller) {
-          webView = controller;
-          this.addHandler();
-        },
-        onCreateWindow:
-            (InAppWebViewController controller, OnCreateWindowRequest req) {},
-        onLoadStart: (InAppWebViewController controller, String url) {
-          addClipboardHack(controller);
-        },
-        onLoadStop: (InAppWebViewController controller, String url) async {
-          if (url.contains('/init')) {
-            initKeys();
-          }
-        },
-        onProgressChanged: (InAppWebViewController controller, int progress) {
-          setState(() {
-            this.progress = progress / 100;
-          });
-        },
-        onConsoleMessage:
-            (InAppWebViewController controller, ConsoleMessage consoleMessage) {
-          print("Wallet console: " + consoleMessage.message);
+      initialUrl: 'https://${config.appId()}/init?cache_buster=' +
+          Globals().cacheBuster,
+      initialHeaders: {},
+      initialOptions: InAppWebViewWidgetOptions(
+        crossPlatform: InAppWebViewOptions(debuggingEnabled: true),
+        android: AndroidInAppWebViewOptions(supportMultipleWindows: true, thirdPartyCookiesEnabled: true),
+        ios: IOSInAppWebViewOptions(
+              
+            )
+      ),
+      onWebViewCreated: (InAppWebViewController controller) {
+        webView = controller;
+        this.addHandler();
+      },
+      onCreateWindow:
+          (InAppWebViewController controller, OnCreateWindowRequest req) {},
+      onLoadStart: (InAppWebViewController controller, String url) {
+        addClipboardHack(controller);
+      },
+      onLoadStop: (InAppWebViewController controller, String url) async {
+        if (url.contains('/init')) {
+          initKeys();
+        }
+      },
+      onProgressChanged: (InAppWebViewController controller, int progress) {
+        setState(() {
+          this.progress = progress / 100;
         });
+      },
+      onConsoleMessage:
+          (InAppWebViewController controller, ConsoleMessage consoleMessage) {
+        print("Wallet console: " + consoleMessage.message);
+      },
+    );
     Events().onEvent(WalletBackEvent().runtimeType, _back);
   }
 

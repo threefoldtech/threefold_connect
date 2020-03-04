@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:threebotlogin/helpers/hex_color.dart';
 
 class WarningScreen extends StatefulWidget {
   WarningScreen();
@@ -19,6 +20,7 @@ class _WarningScreenState extends State<WarningScreen> {
       title: 'Login from a new location',
       home: Scaffold(
         appBar: AppBar(
+          backgroundColor: HexColor("#2d4052"),
           title: Text('Login from a new location'),
         ),
         body: Padding(
@@ -101,7 +103,7 @@ class _WarningScreenState extends State<WarningScreen> {
                         'Yes, it does',
                         style: TextStyle(color: Colors.white),
                       ),
-                      color: Colors.blueAccent,
+                      color: HexColor("#2d4052"),
                       onPressed: () {
                         Navigator.pop(context, true);
                       },

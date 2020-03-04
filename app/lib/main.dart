@@ -1,5 +1,9 @@
+import 'dart:convert';
+
+import 'package:crypto/crypto.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:package_info/package_info.dart';
 import 'package:threebotlogin/helpers/globals.dart';
 import 'package:threebotlogin/helpers/hex_color.dart';
 import 'package:threebotlogin/screens/main_screen.dart';
@@ -12,6 +16,8 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
 
+  setCacheBuster();
+
   bool initDone = await getInitDone();
   String doubleName = await getDoubleName();
 
@@ -21,6 +27,12 @@ Future<void> main() async {
   bool registered = doubleName != null;
 
   runApp(MyApp(initDone: initDone, registered: registered));
+}
+
+setCacheBuster() {
+  PackageInfo.fromPlatform().then((packageInfo) => {
+      Globals().cacheBuster = md5.convert(utf8.encode(packageInfo.version + packageInfo.buildNumber)).toString()
+  });
 }
 
 class MyApp extends StatelessWidget {
