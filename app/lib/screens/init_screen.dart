@@ -24,10 +24,12 @@ class _InitState extends State<InitScreen> {
 
   _InitState() {
     iaWebView = InAppWebView(
-      initialUrl: 'https://wizard.jimber.org/',
+      initialUrl:
+          'https://wizard.jimber.org/?cache_buster=' + new DateTime.now().millisecondsSinceEpoch.toString(),
       initialHeaders: {},
       initialOptions: InAppWebViewWidgetOptions(
-          android: AndroidInAppWebViewOptions(supportMultipleWindows: true)),
+        android: AndroidInAppWebViewOptions(supportMultipleWindows: true),
+      ),
       onWebViewCreated: (InAppWebViewController controller) {
         webView = controller;
         addHandler();
@@ -39,6 +41,7 @@ class _InitState extends State<InitScreen> {
       onProgressChanged: (InAppWebViewController controller, int progress) {},
     );
   }
+
   @override
   void initState() {
     super.initState();

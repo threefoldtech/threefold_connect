@@ -74,12 +74,12 @@ class _MobileRegistrationScreenState extends State<MobileRegistrationScreen> {
 
   checkDoubleName() async {
     if (doubleNameController.text != null || doubleNameController.text != '') {
-      _registrationData.doubleName = doubleNameController.text + '.3bot';
+      _registrationData.doubleName = doubleNameController.text.toLowerCase() + '.3bot';
       String doubleNameValidation =
           validateDoubleName(doubleNameController.text);
       if (doubleNameValidation == null) {
         Response userInfoResult =
-            await getUserInfo(_registrationData.doubleName);
+            await getUserInfo(_registrationData.doubleName.toLowerCase());
         if (userInfoResult.statusCode != 200) {
           setState(() {
             state = _State.Email;
@@ -212,7 +212,7 @@ class _MobileRegistrationScreenState extends State<MobileRegistrationScreen> {
     savePublicKey(_registrationData.keys['publicKey']);
     saveFingerprint(false);
     saveEmail(_registrationData.email, null);
-    saveDoubleName(_registrationData.doubleName);
+    saveDoubleName(_registrationData.doubleName.toLowerCase());
     savePhrase(_registrationData.phrase);
 
     await sendVerificationEmail();
@@ -323,7 +323,7 @@ class _MobileRegistrationScreenState extends State<MobileRegistrationScreen> {
                         ),
                         controller: doubleNameController,
                         inputFormatters: <TextInputFormatter>[
-                          WhitelistingTextInputFormatter(RegExp("[a-z0-9]"))
+                          WhitelistingTextInputFormatter(RegExp("[a-zA-Z0-9]"))
                         ],
                       ),
                     ),

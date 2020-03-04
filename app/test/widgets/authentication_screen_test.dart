@@ -1,8 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter/material.dart';
 import 'package:threebotlogin/screens/authentication_screen.dart';
-import 'package:threebotlogin/screens/change_pin_screen.dart';
-
 void main() {
   testWidgets('authentication screen should have certain text and buttons',
       (WidgetTester tester) async {

@@ -37,35 +37,40 @@ class _WalletState extends State<WalletWidget>
 
   _WalletState() {
     iaWebView = InAppWebView(
-        initialUrl: 'https://${config.appId()}/init',
-        initialHeaders: {},
-        initialOptions: InAppWebViewWidgetOptions(
-            crossPlatform: InAppWebViewOptions(debuggingEnabled: true),
-            android: AndroidInAppWebViewOptions(
-                supportMultipleWindows: true, thirdPartyCookiesEnabled: true)),
-        onWebViewCreated: (InAppWebViewController controller) {
-          webView = controller;
-          this.addHandler();
-        },
-        onCreateWindow:
-            (InAppWebViewController controller, OnCreateWindowRequest req) {},
-        onLoadStart: (InAppWebViewController controller, String url) {
-          addClipboardHack(controller);
-        },
-        onLoadStop: (InAppWebViewController controller, String url) async {
-          if (url.contains('/init')) {
-            initKeys();
-          }
-        },
-        onProgressChanged: (InAppWebViewController controller, int progress) {
-          setState(() {
-            this.progress = progress / 100;
-          });
-        },
-        onConsoleMessage:
-            (InAppWebViewController controller, ConsoleMessage consoleMessage) {
-          print("Wallet console: " + consoleMessage.message);
+      initialUrl: 'https://${config.appId()}/init?cache_buster=' +
+          new DateTime.now().millisecondsSinceEpoch.toString(),
+      initialHeaders: {},
+      initialOptions: InAppWebViewWidgetOptions(
+        crossPlatform: InAppWebViewOptions(debuggingEnabled: true),
+        android: AndroidInAppWebViewOptions(supportMultipleWindows: true, thirdPartyCookiesEnabled: true),
+        ios: IOSInAppWebViewOptions(
+              
+            )
+      ),
+      onWebViewCreated: (InAppWebViewController controller) {
+        webView = controller;
+        this.addHandler();
+      },
+      onCreateWindow:
+          (InAppWebViewController controller, OnCreateWindowRequest req) {},
+      onLoadStart: (InAppWebViewController controller, String url) {
+        addClipboardHack(controller);
+      },
+      onLoadStop: (InAppWebViewController controller, String url) async {
+        if (url.contains('/init')) {
+          initKeys();
+        }
+      },
+      onProgressChanged: (InAppWebViewController controller, int progress) {
+        setState(() {
+          this.progress = progress / 100;
         });
+      },
+      onConsoleMessage:
+          (InAppWebViewController controller, ConsoleMessage consoleMessage) {
+        print("Wallet console: " + consoleMessage.message);
+      },
+    );
     Events().onEvent(WalletBackEvent().runtimeType, _back);
   }
 

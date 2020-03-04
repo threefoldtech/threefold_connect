@@ -22,7 +22,7 @@ class _ChatbotState extends State<ChatbotWidget>
 
   _ChatbotState({this.email}) {
     iaWebview = InAppWebView(
-      initialUrl: '${config.url()}$email',
+      initialUrl: '${config.url()}$email&cache_buster=' + new DateTime.now().millisecondsSinceEpoch.toString(),
       initialHeaders: {},
       initialOptions: InAppWebViewWidgetOptions(
           crossPlatform: InAppWebViewOptions(useShouldOverrideUrlLoading: true),
@@ -69,6 +69,6 @@ class _ChatbotState extends State<ChatbotWidget>
   }
 
   @override
-  // TODO: implement wantKeepAlive
+
   bool get wantKeepAlive => true;
 }
