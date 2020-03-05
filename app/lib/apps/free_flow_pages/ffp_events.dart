@@ -6,3 +6,8 @@ class FfpBrowseEvent {
 class FfpBackEvent {
   FfpBackEvent();
 }
+
+
+class FfpClearCacheEvent {
+  FfpClearCacheEvent();
+}

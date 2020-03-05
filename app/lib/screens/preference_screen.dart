@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:package_info/package_info.dart';
 import 'package:threebotlogin/app_config.dart';
+import 'package:threebotlogin/apps/free_flow_pages/ffp_events.dart';
 import 'package:threebotlogin/events/close_socket_event.dart';
 import 'package:threebotlogin/events/events.dart';
 import 'package:threebotlogin/helpers/environment.dart';
@@ -253,6 +254,8 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
               child: new Text("Yes"),
               onPressed: () async {
                 Events().emit(CloseSocketEvent());
+                Events().emit(FfpClearCacheEvent());
+                
                 bool result = await clearData();
                 if (result) {
                   Navigator.pop(context);

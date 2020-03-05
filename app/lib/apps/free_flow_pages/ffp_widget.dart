@@ -33,7 +33,8 @@ class _FfpState extends State<FfpWidget> with AutomaticKeepAliveClientMixin {
       initialUrl: config.cookieUrl(),
       initialHeaders: {},
       initialOptions: InAppWebViewWidgetOptions(
-          android: AndroidInAppWebViewOptions(supportMultipleWindows: true)),
+        android: AndroidInAppWebViewOptions(supportMultipleWindows: true),
+      ),
       onLoadStart: (InAppWebViewController controller, String url) {
         webView = controller;
         if (url.contains('state')) {
@@ -76,6 +77,7 @@ class _FfpState extends State<FfpWidget> with AutomaticKeepAliveClientMixin {
 
     Events().onEvent(FfpBrowseEvent().runtimeType, _browseToUrl);
     Events().onEvent(FfpBackEvent().runtimeType, _browserBack);
+    Events().onEvent(FfpClearCacheEvent().runtimeType, _clearCache);
   }
 
   @override
@@ -86,6 +88,12 @@ class _FfpState extends State<FfpWidget> with AutomaticKeepAliveClientMixin {
   @override
   void dispose() {
     super.dispose();
+  }
+
+  _clearCache(FfpClearCacheEvent event) async {
+    if (webView != null) {
+      webView.clearCache();
+    }
   }
 
   bool closeNext = false;
@@ -127,21 +135,21 @@ class _FfpState extends State<FfpWidget> with AutomaticKeepAliveClientMixin {
     var data = (await encrypt(jsonEncode(scopeData), publickey, privateKey));
 
     String signedAttempt = json.encode({
-        'signedAttempt': await signData(
+      'signedAttempt': await signData(
           json.encode({
             'signedState': state,
             'data': data,
             'doubleName': await getDoubleName(),
           }),
           await getPrivateKey()),
-          'doubleName': await getDoubleName()
-      });
+      'doubleName': await getDoubleName()
+    });
 
-    var loadUrl = 'https://${config.appId()}$redirecturl${union}signedAttempt=${Uri.encodeQueryComponent(signedAttempt)}';
+    var loadUrl =
+        'https://${config.appId()}$redirecturl${union}signedAttempt=${Uri.encodeQueryComponent(signedAttempt)}';
 
     webView.loadUrl(url: loadUrl);
     switchToCircle = true;
-
   }
 
   @override
