@@ -1,14 +1,29 @@
-stages:
-  - build
-
 staging_build:
   stage: build
-  dependencies: []
-  only: 
-    - development
   tags:
-    - builder
+    - 3botconnect_staging_build
   script:
-    - cp frontend/public/config.staging.js frontend/public/config.js
-    - cp example/public/config.staging.js example/public/config.js
-    - docker build -t jimber/3botlogin:staging .
+    - echo "Building 3Bot Connect for staging"
+
+staging_deploy:
+  stage: deploy
+  tags:
+    - 3botconnect_staging_deploy
+  script:
+    - echo "Deploying 3Bot Connect for staging"
+
+production_build:
+  stage: build
+  tags:
+    - 3botconnect_production_build
+  script:
+    - echo "Building 3Bot Connect for production"
+
+production_deploy:
+  when: manual
+  stage: deploy
+  tags:
+    - 3botconnect_production_deploy
+  script:
+    - echo "Deploying 3Bot Connect for production"
+            
