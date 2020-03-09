@@ -29,6 +29,3 @@ production_deploy:
   script:
     - echo "Deploying 3Bot Connect for production"
             
-    // docker login --username singlecore
-    // 29ae6bdf-cc87-4631-b7e1-c3dd0867995c
-    29ae6bdf-cc87-4631-b7e1-c3dd0867995c
