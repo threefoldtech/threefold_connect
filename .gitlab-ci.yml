@@ -7,8 +7,8 @@ staging_build:
     - echo "Building 3Bot Connect for staging"
     - mv frontend/public/config.staging.js frontend/public/config.js
     - mv example/public/config.staging.js example/public/config.js
-    - docker build . -t jimber/3botlogin:staging
-    - docker push jimber/3botlogin:staging
+    - docker build . -t jimber/3botlogin:staging-$CI_COMMIT_TAG
+    - docker push jimber/3botlogin:staging-$CI_COMMIT_TAG
 
 staging_deploy:
   stage: deploy
@@ -18,8 +18,8 @@ staging_deploy:
     - docker login --username $DOCKER_USERNAME --password $DOCKER_TOKEN
     - echo "Deploying 3Bot Connect for staging"
     - docker rm -f 3botlogin
-    - docker pull jimber/3botlogin:staging
-    - docker run -d -it --network=jimber_proxy_net --name 3botlogin -v /opt/3botlogin/pythonsqlite.db:/usr/share/nginx/backend/pythonsqlite.db jimber/3botlogin:staging
+    - docker pull jimber/3botlogin:staging-$CI_COMMIT_TAG
+    - docker run -d -it --network=jimber_proxy_net --name 3botlogin -v /opt/3botlogin/pythonsqlite.db:/usr/share/nginx/backend/pythonsqlite.db jimber/3botlogin:staging-$CI_COMMIT_TAG
 
 production_build:
   stage: build
@@ -28,6 +28,10 @@ production_build:
   script:
     - docker login --username $DOCKER_USERNAME --password $DOCKER_TOKEN
     - echo "Building 3Bot Connect for production"
+    - mv frontend/public/config.prod.js frontend/public/config.js
+    - mv example/public/config.prod.js example/public/config.js
+    - docker build . -t jimber/3botlogin:production-$CI_COMMIT_TAG
+    - docker push jimber/3botlogin:production-$CI_COMMIT_TAG
 
 production_deploy:
   when: manual
@@ -35,4 +39,8 @@ production_deploy:
   tags:
     - 3botconnect_production_deploy
   script:
+    - docker login --username $DOCKER_USERNAME --password $DOCKER_TOKEN
     - echo "Deploying 3Bot Connect for production"
+    - docker rm -f 3botlogin
+    - docker pull jimber/3botlogin:production-$CI_COMMIT_TAG
+    - docker run -d -it --name 3botlogin -v /opt/3botlogin/db/pythonsqlite.db:/usr/share/nginx/backend/pythonsqlite.db --network=3proxynet jimber/3botlogin:production-$CI_COMMIT_TAG
