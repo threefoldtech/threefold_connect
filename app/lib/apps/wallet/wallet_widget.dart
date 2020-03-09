@@ -53,9 +53,6 @@ class _WalletState extends State<WalletWidget>
       },
       onCreateWindow:
           (InAppWebViewController controller, OnCreateWindowRequest req) {},
-      onLoadStart: (InAppWebViewController controller, String url) {
-        addClipboardHack(controller);
-      },
       onLoadStop: (InAppWebViewController controller, String url) async {
         if (url.contains('/init')) {
           initKeys();
