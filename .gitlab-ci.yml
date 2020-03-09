@@ -1,4 +1,6 @@
 staging_build:
+  only:
+    - /^v(\d+\.)?(\d+\.)?(\*|\d+)-rc\d*$/
   stage: build
   tags:
     - builder
@@ -11,6 +13,8 @@ staging_build:
     - docker push jimber/3botlogin:staging-$CI_COMMIT_TAG
 
 staging_deploy:
+  only:
+    - /^v(\d+\.)?(\d+\.)?(\*|\d+)-rc\d*$/
   stage: deploy
   tags:
     - 3botconnect_staging_deploy
@@ -22,6 +26,8 @@ staging_deploy:
     - docker run -d -it --network=jimber_proxy_net --name 3botlogin -v /opt/3botlogin/pythonsqlite.db:/usr/share/nginx/backend/pythonsqlite.db jimber/3botlogin:staging-$CI_COMMIT_TAG
 
 production_build:
+  only:
+    - /^v(\d+\.)?(\d+\.)?(\*|\d+)-rc\d*$/
   stage: build
   tags:
     - builder
@@ -34,6 +40,8 @@ production_build:
     - docker push jimber/3botlogin:production-$CI_COMMIT_TAG
 
 production_deploy:
+  only:
+    - /^v(\d+\.)?(\d+\.)?(\*|\d+)-rc\d*$/
   when: manual
   stage: deploy
   tags:
