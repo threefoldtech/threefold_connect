@@ -3,7 +3,7 @@ staging_build:
   tags:
     - builder
   script:
-    - docker login -u $DOCKER_USERNAME -p $DOCKER_TOKEN
+    - docker login --username $DOCKER_USERNAME --password $DOCKER_TOKEN
     - echo "Building 3Bot Connect for staging"
 
 staging_deploy:
@@ -18,7 +18,7 @@ production_build:
   tags:
     - builder
   script:
-    - docker login -u $DOCKER_USERNAME -p $DOCKER_TOKEN
+    - docker login --username $DOCKER_USERNAME --password $DOCKER_TOKEN
     - echo "Building 3Bot Connect for production"
 
 production_deploy:
