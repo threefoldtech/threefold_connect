@@ -27,7 +27,7 @@ staging_deploy:
 
 production_build:
   only:
-    - /^v(\d+\.)?(\d+\.)?(\*|\d+)-rc\d*$/
+    - /^v(\d+\.)?(\d+\.)?(\*|\d+)$/
   stage: build
   tags:
     - builder
@@ -41,7 +41,7 @@ production_build:
 
 production_deploy:
   only:
-    - /^v(\d+\.)?(\d+\.)?(\*|\d+)-rc\d*$/
+    - /^v(\d+\.)?(\d+\.)?(\*|\d+)$/
   when: manual
   stage: deploy
   tags:
