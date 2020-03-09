@@ -1,7 +1,7 @@
 staging_build:
   stage: build
   tags:
-    - 3botconnect_staging_build
+    - 3botConnect_builder
   script:
     - echo "Building 3Bot Connect for staging"
 
@@ -15,7 +15,7 @@ staging_deploy:
 production_build:
   stage: build
   tags:
-    - 3botconnect_production_build
+    - 3botConnect_builder
   script:
     - echo "Building 3Bot Connect for production"
 
