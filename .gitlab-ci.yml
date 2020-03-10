@@ -17,7 +17,7 @@ staging_deploy:
     - /^v(\d+\.)?(\d+\.)?(\*|\d+)-rc\d*$/
   stage: deploy
   tags:
-    - 3botconnect_staging_deploy
+    - 3botconnect_staging_deployer
   script:
     - docker login --username $DOCKER_USERNAME --password $DOCKER_TOKEN
     - echo "Deploying 3Bot Connect for staging"
@@ -45,7 +45,7 @@ production_deploy:
   when: manual
   stage: deploy
   tags:
-    - 3botconnect_production_deploy
+    - 3botconnect_production_deployer
   script:
     - docker login --username $DOCKER_USERNAME --password $DOCKER_TOKEN
     - echo "Deploying 3Bot Connect for production"
