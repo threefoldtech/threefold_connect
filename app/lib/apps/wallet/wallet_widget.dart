@@ -110,6 +110,7 @@ class _WalletState extends State<WalletWidget>
     webView.addJavaScriptHandler(
         handlerName: "ADD_APP_WALLET", callback: saveAppWallet);
     webView.addJavaScriptHandler(handlerName: "SCAN_QR", callback: scanQrCode);
+    webView.addJavaScriptHandler(handlerName: "VUE_INITIALIZED", callback: initKeys);
   }
 
   @override
