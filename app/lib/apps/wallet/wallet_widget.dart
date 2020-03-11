@@ -76,6 +76,10 @@ class _WalletState extends State<WalletWidget>
     super.dispose();
   }
 
+  vueInitialized(List<dynamic> params) async {
+    initKeys();
+  }
+
   initKeys() async {
     var seed = await getDerivedSeed(config.appId());
     var doubleName = await getDoubleName();
@@ -110,7 +114,7 @@ class _WalletState extends State<WalletWidget>
     webView.addJavaScriptHandler(
         handlerName: "ADD_APP_WALLET", callback: saveAppWallet);
     webView.addJavaScriptHandler(handlerName: "SCAN_QR", callback: scanQrCode);
-    webView.addJavaScriptHandler(handlerName: "VUE_INITIALIZED", callback: initKeys);
+    webView.addJavaScriptHandler(handlerName: "VUE_INITIALIZED", callback: vueInitialized);
   }
 
   @override
