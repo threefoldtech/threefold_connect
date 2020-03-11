@@ -124,7 +124,7 @@ def on_login(data):
 
     data["type"] = "login"
     milli_sec = int(round(time.time() * 1000))
-    data["created"] = milli_sec + (24 * 60 * 60 * 1000)
+    data["created"] = milli_sec
 
     user = db.getUserByName(conn, double_name)
     if user:
