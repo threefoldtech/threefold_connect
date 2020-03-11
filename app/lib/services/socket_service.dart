@@ -47,6 +47,7 @@ class BackendConnection {
 
     socket.on('login', (dynamic data) async {
       print('[login]');
+      // var d = new DateTime.fromMillisecondsSinceEpoch(ts, isUtc: true);
       int currentTimestamp = new DateTime.now().millisecondsSinceEpoch;
 
       if (data['created'] != null &&
