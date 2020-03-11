@@ -27,9 +27,7 @@ Future<void> savePublicKey(key) async {
 Future<String> getPublicKey() async {
   final SharedPreferences prefs = await SharedPreferences.getInstance();
 
-  // Older applications don't have the publickey stored yet, let's retrieve it.
-  if (prefs.getString('publickey') == null ||
-      prefs.getString('publickey').isEmpty) {
+  if(!(await getIsPublicKeyFixed())) {
     var userInfoResponse = await getUserInfo(await getDoubleName());
 
     if (userInfoResponse.statusCode != 200) {
@@ -37,15 +35,34 @@ Future<String> getPublicKey() async {
     }
 
     var userInfo = json.decode(userInfoResponse.body);
+    var done = await prefs.setString("publickey", userInfo['publicKey']);
 
-    if (userInfo['publicKey'] != null) {
-      throw new Exception('Seed phrase does not correspond to given name');
+    if (done && prefs.getString('publickey') == userInfo['publicKey']) {
+      setPublicKeyFixed();
     }
-
-    prefs.setString("publickey", userInfo['publicKey']);
   }
 
   return prefs.getString('publickey');
+}
+
+Future<void> setPublicKeyFixed() async {
+  final SharedPreferences prefs = await SharedPreferences.getInstance();
+  prefs.setBool('ispublickeyfixed', true);
+}
+
+Future<bool> getIsPublicKeyFixed() async {
+  try {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    if(prefs.getBool('ispublickeyfixed') == null) {
+      return false;
+    }
+
+    return prefs.getBool('ispublickeyfixed');
+  } catch (_) {
+    
+    return false;
+  }
 }
 
 Future<void> savePrivateKey(key) async {
@@ -91,11 +108,10 @@ Future<List<dynamic>> getLocationIdList() async {
     List<dynamic> locationIdList = jsonDecode(locationIdListAsJson);
 
     return locationIdList;
-  } catch(_) {
+  } catch (_) {
     return new List<dynamic>();
   }
 }
-
 
 Future<void> saveDoubleName(doubleName) async {
   final SharedPreferences prefs = await SharedPreferences.getInstance();
