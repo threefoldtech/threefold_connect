@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/services.dart';
@@ -11,10 +12,14 @@ Future<String> paste(List<dynamic> params) async {
   return (await Clipboard.getData('text/plain')).text.toString();
 }
 
-void addClipboardHack(InAppWebViewController webview) {
+Future<void> addClipboardHack(InAppWebViewController webview) async {
   if (Platform.isAndroid) {
-    webview.injectJavascriptFileFromAsset(
-        assetFilePath: 'assets/clipboardhack.js');
+    const oneSec = const Duration(seconds: 1);
+
+    new Timer.periodic(oneSec, (Timer t) async {
+      await webview.injectJavascriptFileFromAsset(
+          assetFilePath: 'assets/clipboardhack.js');
+    });
   }
 
   addClipboardHandlersOnly(webview);

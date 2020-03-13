@@ -40,7 +40,7 @@ class _ChatbotState extends State<ChatbotWidget>
       },
       onLoadStart: (InAppWebViewController controller, String url) {},
       onLoadStop: (InAppWebViewController controller, String url) async {
-        addClipboardHack(controller);
+        await addClipboardHack(controller);
       },
       onProgressChanged: (InAppWebViewController controller, int progress) {},
     );

@@ -9,52 +9,48 @@ function clamp(num, min, max) {
 }
 
 if (document.getElementById('webview_copy') == null) {
-  if (navigator.userAgent.toLowerCase().indexOf("iphone") !== -1) {
-    return;
-  }
-
   let cbh_css = `
-                  #cbh-custom-menu {
-                    user-select: none;
-                    all: initial;
-                    display: none;
-                    z-index: 9999999;
-                    position: fixed;
-                    background-color: #fff;
-                    border: 1px solid #ddd;
-                    overflow: hidden;
-                    vertical-align: center;
-                    white-space: nowrap;
-                    font-family: sans-serif;
-                    box-shadow: 2px 2px 7px 0px rgba(50, 50, 50, 0.5);
-                    user-select: none;
-                }
+      #cbh-custom-menu {
+        user-select: none;
+        all: initial;
+        display: none;
+        z-index: 9999999;
+        position: fixed;
+        background-color: #fff;
+        border: 1px solid #ddd;
+        overflow: hidden;
+        vertical-align: center;
+        white-space: nowrap;
+        font-family: sans-serif;
+        box-shadow: 2px 2px 7px 0px rgba(50, 50, 50, 0.5);
+        user-select: none;
+    }
 
-                #cbh-custom-menu li {
-                    height: 1.6em;
-                    text-align: center;
-                    vertical-align: middle;
-                    line-height: 1.6em;
-                    border-right: #00000021 solid 1px;
-                    display: inline-block;
-                    padding: 0.4em 1em;
-                }
+    #cbh-custom-menu li {
+        height: 2.2em;
+        text-align: center;
+        vertical-align: middle;
+        line-height: 1.6em;
+        border-right: #00000021 solid 1px;
+        display: inline-block;
+        padding: 0.4em 1em;
+    }
 
-                #cbh-custom-menu li:last-child {
-                    border-right: 0;
-                }
+    #cbh-custom-menu li:last-child {
+        border-right: 0;
+    }
 
-                #cbh-custom-menu li:hover {
-                    background-color: #4679BD;
-                    color: #fff;
-                    cursor: pointer;
-                }
+    #cbh-custom-menu li:hover {
+        background-color: #4679BD;
+        color: #fff;
+        cursor: pointer;
+    }
     `
   var cbh_html = `
-                <ul id='cbh-custom-menu'>
-                  <li id="webview_copy">Copy</li>
-                  <li id="webview_paste">Paste</li>
-                </ul>
+    <ul id='cbh-custom-menu'>
+      <li id="webview_copy">Copy</li>
+      <li id="webview_paste">Paste</li>
+    </ul>
     `
 
   let cbh_head = document.head || document.getElementsByTagName('head')[0]
