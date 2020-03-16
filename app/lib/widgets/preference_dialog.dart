@@ -125,13 +125,16 @@ class _PreferenceDialogState extends State<PreferenceDialog> {
                               (BuildContext context, AsyncSnapshot snapshot) {
                             if (snapshot.hasData) {
                               return CheckboxListTile(
-                                value: (previousSelectedScope[scopeItem] == null)
-                                    ? mandatory
-                                    : previousSelectedScope[scopeItem],
-                                onChanged: (value) {
-                                  print("toggle me: " + value.toString());
-                                  toggleScope(scopeItem, value);
-                                },
+                                value:
+                                    (previousSelectedScope[scopeItem] == null)
+                                        ? mandatory
+                                        : previousSelectedScope[scopeItem],
+                                onChanged:
+                                    ((mandatory == null || mandatory == true)
+                                        ? null
+                                        : (value) {
+                                            toggleScope(scopeItem, value);
+                                          }),
                                 title: Text(
                                   "${scopeItem.toUpperCase()}" +
                                       (mandatory ? " *" : ""),
@@ -154,13 +157,16 @@ class _PreferenceDialogState extends State<PreferenceDialog> {
                               (BuildContext context, AsyncSnapshot snapshot) {
                             if (snapshot.hasData) {
                               return CheckboxListTile(
-                                value: (previousSelectedScope[scopeItem] == null)
-                                    ? mandatory
-                                    : previousSelectedScope[scopeItem],
-                                onChanged: (value) {
-                                  print("toggle me: " + value.toString());
-                                  toggleScope(scopeItem, value);
-                                },
+                                value:
+                                    (previousSelectedScope[scopeItem] == null)
+                                        ? mandatory
+                                        : previousSelectedScope[scopeItem],
+                                onChanged:
+                                    ((mandatory == null || mandatory == true)
+                                        ? null
+                                        : (value) {
+                                            toggleScope(scopeItem, value);
+                                          }),
                                 title: Text(
                                   "${scopeItem.toUpperCase()}" +
                                       (mandatory ? " *" : ""),
