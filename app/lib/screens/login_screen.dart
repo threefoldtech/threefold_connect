@@ -375,6 +375,11 @@ class _LoginScreenState extends State<LoginScreen> with BlockAndRunMixin {
             scopePermissionsDecoded['email']) {
           scope['email'] = (await getEmail());
         }
+
+        if (scopePermissionsDecoded['derivedSeed'] != null &&
+            scopePermissionsDecoded['derivedSeed']) {
+          scope['derivedSeed'] = (await getDerivedSeed(widget.loginData.appId));
+        }
       }
     }
 
