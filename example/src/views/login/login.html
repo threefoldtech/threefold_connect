@@ -9,17 +9,24 @@
         <v-btn class="accent" @click="loginToDesktop">
           Login to secure desktop
         </v-btn>
-        <v-btn class="accent" @click="loginWithCustomScope({ doubleName : true, email : false})">
+        <v-btn class="accent" @click="loginWithCustomScope({email : false})">
           Authenticate & get the users emailaddress
         </v-btn>
-        <v-btn class="accent" @click="loginWithCustomScope({ doubleName : true, derivedSeed : false})">
+        <v-btn class="accent" @click="loginWithCustomScope({derivedSeed : false})">
           Authenticate & get the derived seed.
         </v-btn>
-        <v-btn class="accent" @click="loginWithCustomScope({ doubleName : true, email : false, derivedSeed : false})">
+        <v-btn class="accent" @click="loginWithCustomScope({email : false, derivedSeed : false})">
           Authenticate & get emailaddress and derived seed.
         </v-btn>
-        <v-btn class="accent" @click="loginWithCustomScope({ trustedDevice: true, email : true })">
-          Authenticate with trusted device scope.
+        <br />
+        <v-btn class="accent" @click="loginWithCustomScope({email : true})">
+          Authenticate & get the users emailaddress mandatory
+        </v-btn>
+        <v-btn class="accent" @click="loginWithCustomScope({derivedSeed : true})">
+          Authenticate & get the derived seed mandatory
+        </v-btn>
+        <v-btn class="accent" @click="loginWithCustomScope({email : true, derivedSeed : true})">
+          Authenticate & get emailaddress and derived seed mandatory
         </v-btn>
       </v-layout>
     </v-flex>
