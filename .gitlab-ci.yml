@@ -48,7 +48,7 @@ staging_deploy:
   script:
     - docker login --username $DOCKER_USERNAME --password $DOCKER_TOKEN
     - echo "Deploying 3Bot Connect for staging"
-    - docker rm -f 3botlogin
+    - docker rm -f 3botlogin || true
     - docker pull jimber/3botlogin:staging-$CI_COMMIT_TAG
     - docker run -d -it --network=jimber_proxy_net --name 3botlogin -v /opt/3botlogin/pythonsqlite.db:/usr/share/nginx/backend/pythonsqlite.db jimber/3botlogin:staging-$CI_COMMIT_TAG
 
