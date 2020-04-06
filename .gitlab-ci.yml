@@ -1,3 +1,30 @@
+testing_build:
+  only:
+    - /^v(\d+\.)?(\d+\.)?(\*|\d+)-test\d*$/
+  stage: build
+  tags:
+    - builder
+  script:
+    - docker login --username $DOCKER_USERNAME --password $DOCKER_TOKEN
+    - echo "Building 3Bot Connect for testing"
+    - mv frontend/public/config.testing.js frontend/public/config.js
+    - mv example/public/config.testing.js example/public/config.js
+    - docker build . -t jimber/3botlogin:testing-$CI_COMMIT_TAG
+    - docker push jimber/3botlogin:testing-$CI_COMMIT_TAG
+
+testing_deploy:
+  only:
+    - /^v(\d+\.)?(\d+\.)?(\*|\d+)-test\d*$/
+  stage: deploy
+  tags:
+    - 3botconnect_testing_deployer
+  script:
+    - docker login --username $DOCKER_USERNAME --password $DOCKER_TOKEN
+    - echo "Deploying 3Bot Connect for testing"
+    - docker rm -f 3botlogin
+    - docker pull jimber/3botlogin:testing-$CI_COMMIT_TAG
+    - docker run -d -it --network=jimber_proxy_net --name 3botlogin -v /opt/3botlogin/pythonsqlite.db:/usr/share/nginx/backend/pythonsqlite.db jimber/3botlogin:testing-$CI_COMMIT_TAG
+
 staging_build:
   only:
     - /^v(\d+\.)?(\d+\.)?(\*|\d+)-rc\d*$/
