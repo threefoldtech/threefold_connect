@@ -1,5 +1,5 @@
 <section class="profile">
-  <v-card style="min-width: 300px;">
+  <v-card>
     <v-toolbar class="primary">
       <h1 class="headline white--text text-xs-center fw">
         You are logged in
@@ -9,8 +9,12 @@
       <v-card-text>
         <v-layout column>
           <p>Hi {{user.name}}</p>
-          <p>{{user.email}}</p>
-          <p>{{user}}</p>
+          <br />
+          <p>Object: {{(user) ? user : "No object."}}</p>
+          <p>Email Object: {{(user.email) ? user.email : "No email object."}}</p>
+          <p>Email: {{(user.email && user.email.email) ? user.email.email : "No email."}}</p>
+          <p>SEI: {{(user.email && user.email.sei) ? user.email.sei : "No sei."}}</p>
+          <p>SEI Verified: {{(user.email && user.email.sei && seiResponse) ? seiResponse : "No email verification could be done."}}</p> 
         </v-layout>
       </v-card-text>
     </v-form>

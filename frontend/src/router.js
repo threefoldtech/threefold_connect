@@ -12,18 +12,10 @@ export default new Router({
     name: 'initial',
     component: initial
   }, {
-    path: '/register',
-    name: 'register',
-    component: () => import(/* webpackChunkName: "register-page" */ './views/Register')
-  }, {
     path: '/login',
     name: 'login',
     component: () => import(/* webpackChunkName: "login-page" */ './views/Login')
   }, {
-    // path: '/embeddedlogin',
-    // name: 'embeddedlogin',
-    // component: () => import(/* webpackChunkName: "login-page" */ './views/EmbeddedLogin')
-  // }, {
     path: '/verifyemail',
     name: 'verifyemail',
     component: () => import(/* webpackChunkName: "verifyemail-page" */ './views/VerifyEmail')
@@ -31,9 +23,5 @@ export default new Router({
     path: '/error',
     name: 'error',
     component: () => import(/* webpackChunkName: "error-page" */ './views/Errorpage')
-  }, {
-    path: '/recover',
-    name: 'recover',
-    component: () => import(/* webpackChunkName: "error-page" */ './views/Recover')
-  }]
+  } ]
 })

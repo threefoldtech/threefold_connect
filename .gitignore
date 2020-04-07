@@ -73,11 +73,6 @@ app/android/app-key\.keystore
 app/android/app/app-key.keystore
 
 app/android/key\.properties
-app/android/app/google-services-prod.json
-app/android/app/google-services-staging.json
-app/android/app/google-services-local.json
-app/android/app/google-services.json
-
 app/android/app/app-key.keystore
 
 
@@ -311,7 +306,22 @@ example/*.njsproj
 example/*.sln
 example/*.sw*
 example/public/config.js
-example/package.json
 
 openkyc/*
 Makefile
+*pubspec.lock
+app/lib/app_config_local.dart
+app/android/app/src/main/AndroidManifest.xml
+app/lib/helpers/env_config.dart
+*.dart-e
+*.DS_Store
+app/android/app/build.gradle
+app/android/app/src/main/java/org/jimber/threebotlogin/MainActivity.java
+app/android/app/src/main/res/mipmap-hdpi/ic_launcher.png
+app/android/app/src/main/res/mipmap-mdpi/ic_launcher.png
+app/android/app/src/main/res/mipmap-xhdpi/ic_launcher.png
+app/android/app/src/main/res/mipmap-xxhdpi/ic_launcher.png
+app/android/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png
+app/android/app/src/debug/AndroidManifest.xml
+app/ios/Flutter/flutter_export_environment.sh
+app/.flutter-plugins-dependencies

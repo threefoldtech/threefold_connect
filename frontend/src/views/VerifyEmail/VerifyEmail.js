@@ -33,7 +33,7 @@ export default {
     ]),
     openApp () {
       if (this.isMobile) {
-        var url = `threebot://login/?state=${encodeURIComponent(this.hash)}&mobile=true`
+        var url = `threebot://login/?state=${encodeURIComponent(this.state)}`
         if (this.scope) url += `&scope=${encodeURIComponent(this.scope)}`
         if (this.appId) url += `&appId=${encodeURIComponent(this.appId)}`
         if (this.appPublicKey) url += `&appPublicKey=${encodeURIComponent(this.appPublicKey)}`
@@ -48,7 +48,7 @@ export default {
       if (!val.checking && val.checked && val.valid) {
         console.log(`Log in`)
         this.saveState({
-          hash: this.$route.query.hash,
+          _state: this.$route.query.state,
           redirectUrl: window.atob(this.$route.query.redirecturl)
         })
 

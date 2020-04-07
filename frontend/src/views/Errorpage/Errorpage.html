@@ -1,36 +1,31 @@
-
 <section class="errorpage">
-    <v-layout justify-center>
-        <v-flex md8>
-          <v-card>
-            <v-toolbar class="primary">
-              <h1 class="headline white--text text-xs-center fw">
-                Oops... Something went wrong
-              </h1>
-            </v-toolbar>
-            <v-form>
-              <v-card-text>
-                <p>We didn't got a redirect url or state.</p>
-                <h2>How does this work?</h2>
-                <p>
-                  As seen in the flowchart below, a 3th party app needs to redirect to the 3botlogin with <span class="accent--text font-weight-bold">state</span> and <span class="accent--text font-weight-bold">redirecturl</span> as query parameter. When the authentication is successfully finished, the user is being reidrected to the <span class="accent--text font-weight-bold">redirecturl</span> with <span class="accent--text font-weight-bold">username</span> and <span class="accent--text font-weight-bold">signedhash</span> as query parameter.
-                  Then it's up to the 3th party site to verify if it was a valid loging. This can be done by an POST call to <span class="accent--text font-weight-bold">/API/verify</span> with <span class="accent--text font-weight-bold">username</span>, <span class="accent--text font-weight-bold">signedhash</span> and <span class="accent--text font-weight-bold">hash</span> in the body. 
-                </p>
-                <v-img src="//github.com/3botlogin/3botlogin/blob/master/docs/images/Scheme.png?raw=true"></v-img>
-                
-                <h3>Example</h3>
-                <p>Example.com wants to verify a user.</p>
-                <ol>
-                  <li>User is being redirect to <span class="accent--text font-weight-bold">{{url}}?state=abc123&redirecturl=https%3A%2F%2Fexample.com%2Fcallback</span></li>
-                  <li>The user needs to register/login </li>
-                  <li>The user is being redirected to <span class="accent--text font-weight-bold">https://example.com/callback?username=exampleman&signedhash=abc123+</span> </li>
-                  <li>To verify the login example.com makes a POST call to <span class="accent--text font-weight-bold">{{url}}/api/verify</span> with following body <span class="accent--text font-weight-bold"><pre>{ username:'exampleman', signedhash:'abc123+', hash: 'abc123'}</pre></span> </li>
-                  <li>The user is signed in </li>
-                </ol>
-              </v-card-text>
-            </v-form>
-          </v-card>
-        </v-flex>
-      </v-layout>
+  <v-layout justify-center>
+    <v-flex md8>
+      <v-card>
+        <v-toolbar class="primary">
+          <h1 class="headline white--text text-xs-center fw">
+            Oops... Something went wrong
+          </h1>
+        </v-toolbar>
+        <v-form>
+          <v-card-text>
+            <p>We didn't get the required parameters to make this work</p>
+            <p>You need to come from a 3th party app to use this.</p>
+            <p>If you want to register, you can do this from the 3bot Connect app.</p>
+          </v-card-text>
+        </v-form>
+      </v-card>
+    </v-flex>
+  </v-layout>
+  <v-layout column class="pt-5" align-center>
+    <v-layout row justify-center align-center>
+      <a md12 class="mx-2" href="https://play.google.com/store/apps/details?id=org.jimber.threebotlogin"
+        target="_blank">
+        <img src="googleplay.png" height="50" />
+      </a>
+      <a class="mx-2" href="https://itunes.apple.com/be/app/3bot-login/id1459845885?l=nl&mt=8" target="_blank">
+        <img src="applestore.png" height="50" />
+      </a>
+    </v-layout>
+  </v-layout>
 </section>
-

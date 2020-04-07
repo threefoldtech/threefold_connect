@@ -2,16 +2,15 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 import socketService from './services/socketService'
 import cryptoService from './services/cryptoService'
+import userService from './services/userService'
 import axios from 'axios'
 import config from '../public/config'
-import createPersistedState from 'vuex-persistedstate'
 
 Vue.use(Vuex)
 
 export default new Vuex.Store({
-  plugins: [createPersistedState()],
   state: {
-    hash: null,
+    _state: null,
     redirectUrl: null,
     keys: {},
     doubleName: null,
@@ -27,13 +26,18 @@ export default new Vuex.Store({
     },
     scannedFlagUp: false,
     cancelLoginUp: false,
-    signed: null,
+    signedAttempt: null,
     firstTime: null,
     isMobile: false,
     scope: null,
     appId: null,
     appPublicKey: null,
-    randomImageId: null
+    randomImageId: null,
+    randomRoom: null,
+    loginTimestamp: 0,
+    loginTimeleft: 120,
+    loginTimeout: 120,
+    loginInterval: null
   },
   mutations: {
     setNameCheckStatus (state, status) {
@@ -43,10 +47,11 @@ export default new Vuex.Store({
       state.keys = keys
     },
     setDoubleName (state, name) {
+      console.log(`Setting doubleName to ${name}`)
       state.doubleName = name
     },
-    setHash (state, hash) {
-      state.hash = hash
+    setState (state, _state) {
+      state._state = _state
     },
     setRedirectUrl (state, redirectUrl) {
       state.redirectUrl = redirectUrl
@@ -57,8 +62,8 @@ export default new Vuex.Store({
     setCancelLoginUp (state, cancelLoginUp) {
       state.cancelLoginUp = cancelLoginUp
     },
-    setSigned (state, signed) {
-      state.signed = signed
+    setSignedAttempt (state, signedAttempt) {
+      state.signedAttempt = signedAttempt
     },
     setFirstTime (state, firstTime) {
       state.firstTime = firstTime
@@ -67,7 +72,8 @@ export default new Vuex.Store({
       state.emailVerificationStatus = status
     },
     setScope (state, scope) {
-      state.scope = scope
+      let parsedScope = JSON.parse(scope)
+      state.scope = JSON.stringify(parsedScope)
     },
     setAppId (state, appId) {
       state.appId = appId
@@ -80,26 +86,48 @@ export default new Vuex.Store({
     },
     setIsMobile (state, isMobile) {
       state.isMobile = isMobile
+    },
+    setrandomRoom (state, randomRoom) {
+      state.randomRoom = randomRoom
+    },
+    resetTimer (state) {
+      if (state.loginInterval !== undefined) {
+        clearInterval(state.loginInterval)
+      }
+
+      state.loginTimestamp = Date.now()
+
+      state.loginInterval = setInterval(() => {
+        state.loginTimeleft = Math.round(state.loginTimeout - ((Date.now() - state.loginTimestamp) / 1000))
+        if (state.loginTimeleft <= 0) {
+          clearInterval(this.loginInterval)
+        }
+      }, 1000)
     }
   },
   actions: {
+    resetTimer (context) {
+      context.commit('resetTimer')
+    },
     setDoubleName (context, doubleName) {
-      var extension = '.3bot'
-      if (doubleName.indexOf(extension) >= 0) {
-        context.commit('setDoubleName', doubleName)
-      } else {
-        context.commit('setDoubleName', `${doubleName}.3bot`)
+      if (doubleName.indexOf('.3bot') < 0) {
+        doubleName = `${doubleName}.3bot`
       }
+      context.commit('setDoubleName', doubleName)
+      socketService.emit('join', { room: doubleName })
+    },
+    setrandomRoom (context, randomRoom) {
+      context.commit('setrandomRoom', randomRoom)
+      socketService.emit('join', { room: randomRoom })
     },
     setAttemptCanceled (context, payload) {
       context.commit('setCancelLoginUp', payload)
     },
     SOCKET_connect (context, payload) {
-      context.dispatch('forceRefetchStatus')
       console.log(`hi, connected with SOCKET_connect`)
     },
     saveState (context, payload) {
-      context.commit('setHash', payload.hash)
+      context.commit('setState', payload._state)
       context.commit('setRedirectUrl', payload.redirectUrl)
     },
     clearCheckStatus (context) {
@@ -135,72 +163,153 @@ export default new Vuex.Store({
     async generateKeys (context) {
       context.commit('setKeys', await cryptoService.generateKeys())
     },
-    registerUser (context, data) {
-      console.log(`Register user`)
-      socketService.emit('register', {
-        doubleName: context.getters.doubleName,
-        email: data.email,
-        publicKey: context.getters.keys.publicKey
-      })
-      context.dispatch('loginUser', { firstTime: true })
-    },
-    SOCKET_scannedFlag (context, data) {
-      context.commit('setScannedFlagUp', true)
-    },
     SOCKET_cancelLogin (context) {
       console.log('f')
       context.commit('setCancelLoginUp', true)
     },
-    SOCKET_signed (context, data) {
-      if (data.selectedImageId && !context.getters.firstTime && !context.getters.isMobile && data.selectedImageId !== context.getters.randomImageId) {
+    async SOCKET_signedAttempt (context, data) {
+      console.log('signedAttempt', data.signedAttempt)
+      console.log('signedAttempt', data.doubleName)
+      console.log('context.getters.firstTime', context.getters.firstTime)
+      console.log('context.getters.isMobile', context.getters.isMobile)
+      console.log('context.getters.randomImageId', context.getters.randomImageId)
+
+      let publicKey = (await userService.getUserData(data.doubleName)).data.publicKey
+
+      var utf8ArrayToStr = (function () {
+        var charCache = new Array(128)
+        var charFromCodePt = String.fromCodePoint || String.fromCharCode
+        var result = []
+
+        return function (array) {
+          var codePt, byte1
+          var buffLen = array.length
+
+          result.length = 0
+
+          for (var i = 0; i < buffLen;) {
+            byte1 = array[i++]
+
+            if (byte1 <= 0x7F) {
+              codePt = byte1
+            } else if (byte1 <= 0xDF) {
+              codePt = ((byte1 & 0x1F) << 6) | (array[i++] & 0x3F)
+            } else if (byte1 <= 0xEF) {
+              codePt = ((byte1 & 0x0F) << 12) | ((array[i++] & 0x3F) << 6) | (array[i++] & 0x3F)
+            } else if (String.fromCodePoint) {
+              codePt = ((byte1 & 0x07) << 18) | ((array[i++] & 0x3F) << 12) | ((array[i++] & 0x3F) << 6) | (array[i++] & 0x3F)
+            } else {
+              codePt = 63
+              i += 3
+            }
+
+            result.push(charCache[codePt] || (charCache[codePt] = charFromCodePt(codePt)))
+          }
+
+          return result.join('')
+        }
+      })()
+
+      var signedAttempt = JSON.parse(utf8ArrayToStr(await cryptoService.validateSignedAttempt(data.signedAttempt, publicKey)))
+
+      if (!signedAttempt) {
+        console.log('Something went wrong ... ')
+        return
+      }
+
+      if (signedAttempt.selectedImageId && !context.getters.firstTime && !context.getters.isMobile && signedAttempt.selectedImageId !== context.getters.randomImageId) {
+        console.log('Resending notification!')
         context.dispatch('resendNotification')
       } else {
-        context.commit('setSigned', data)
+        console.log('Setting signedAttempt!')
+        context.commit('setSignedAttempt', data)
       }
     },
-    loginUser (context, data) {
-      context.commit('setSigned', null)
+    async loginUser (context, data) {
+      console.log(`LoginUser`)
+      context.dispatch('setDoubleName', data.doubleName)
+      context.commit('setSignedAttempt', null)
       context.commit('setFirstTime', data.firstTime)
       context.commit('setRandomImageId')
       context.commit('setIsMobile', data.mobile)
-      socketService.emit('login', {
+
+      let publicKey = (await userService.getUserData(context.getters.doubleName)).data.publicKey
+      console.log('Public key: ', publicKey)
+
+      let randomRoom = generateUUID()
+
+      let locationId = window.localStorage.getItem('locationId')
+
+      if (locationId === null) {
+        locationId = generateUUID()
+        window.localStorage.setItem('locationId', locationId)
+      }
+
+      console.log('locationId UUID: ', locationId)
+
+      let encryptedLoginAttempt = await cryptoService.encrypt(JSON.stringify({
         doubleName: context.getters.doubleName,
-        state: context.getters.hash,
+        state: context.getters._state,
         firstTime: data.firstTime,
-        mobile: data.mobile,
         scope: context.getters.scope,
         appId: context.getters.appId,
+        randomRoom: randomRoom,
         appPublicKey: context.getters.appPublicKey,
         randomImageId: !data.firstTime ? context.getters.randomImageId.toString() : null,
-        logintoken: (data.logintoken || null)
-      })
+        locationId: locationId
+      }), publicKey)
+
+      console.log('State: ', context.getters._state)
+      console.log('Encrypted login attempt: ', encryptedLoginAttempt)
+
+      socketService.emit('leave', { 'room': context.getters.doubleName })
+      context.dispatch('setrandomRoom', randomRoom)
+
+      socketService.emit('login', { 'doubleName': context.getters.doubleName, 'encryptedLoginAttempt': encryptedLoginAttempt })
     },
-    resendNotification (context) {
+    loginUserMobile (context, data) {
+      context.commit('setSignedAttempt', null)
+      context.commit('setFirstTime', data.firstTime)
       context.commit('setRandomImageId')
-      socketService.emit('resend', {
+      context.commit('setIsMobile', data.mobile)
+    },
+    async resendNotification (context) {
+      context.commit('setRandomImageId')
+
+      let publicKey = (await userService.getUserData(context.getters.doubleName)).data.publicKey
+      console.log('Public key: ', publicKey)
+
+      let randomRoom = generateUUID()
+
+      let locationId = window.localStorage.getItem('locationId')
+
+      if (locationId === null) {
+        locationId = generateUUID()
+        window.localStorage.setItem('locationId', locationId)
+      }
+
+      console.log('locationId UUID: ', locationId)
+
+      let encryptedLoginAttempt = await cryptoService.encrypt(JSON.stringify({
         doubleName: context.getters.doubleName,
-        state: context.getters.hash,
+        randomRoom: randomRoom,
+        state: context.getters._state,
         scope: context.getters.scope,
         appId: context.getters.appId,
         appPublicKey: context.getters.appPublicKey,
-        randomImageId: context.getters.randomImageId.toString()
-      })
-    },
-    forceRefetchStatus (context) {
-      if (context.getters.hash && context.getters.doubleName) {
-        console.log(`Forcerefetching for ${context.getters.doubleName}`)
-        axios.get(`${config.apiurl}api/forcerefetch?hash=${context.getters.hash}&doublename=${context.getters.doubleName}`).then(response => {
-          if (response.data.scanned) context.commit('setScannedFlagUp', response.data.scanned)
-          if (response.data.signed) context.commit('setSigned', response.data.signed)
-        }).catch(e => {
-          alert(e)
-        })
-      }
+        randomImageId: context.getters.randomImageId.toString(),
+        locationId: locationId
+      }), publicKey)
+
+      socketService.emit('leave', { 'room': context.getters.randomRoom })
+      context.dispatch('setrandomRoom', randomRoom)
+      context.dispatch('resetTimer')
+      socketService.emit('login', { 'doubleName': context.getters.doubleName, 'encryptedLoginAttempt': encryptedLoginAttempt })
     },
     sendValidationEmail (context, data) {
       var callbackUrl = `${window.location.protocol}//${window.location.host}/verifyemail`
 
-      callbackUrl += `?hash=${context.getters.hash}`
+      callbackUrl += `?state=${context.getters._state}`
       callbackUrl += `&redirecturl=${window.btoa(context.getters.redirectUrl)}`
       callbackUrl += `&doublename=${context.getters.doubleName}`
 
@@ -208,7 +317,7 @@ export default new Vuex.Store({
       if (context.getters.appPublicKey) callbackUrl += `&publickey=${context.getters.appPublicKey}`
       callbackUrl += (context.getters.appId) ? `&appid=${context.getters.appId}` : `&appid=${window.location.hostname}`
 
-      axios.post(`${config.openkycurl}users`, {
+      axios.post(`${config.openkycurl}verification/send-email`, {
         'user_id': context.getters.doubleName,
         'email': data.email,
         'callback_url': callbackUrl,
@@ -227,10 +336,11 @@ export default new Vuex.Store({
           checking: true,
           valid: false
         })
-        axios.post(`${config.openkycurl}users/${data.userId}/verify`, {
+        axios.post(`${config.openkycurl}verification/verify-email`, {
+          user_id: data.userId,
           verification_code: data.verificationCode
         }).then(message => {
-          axios.post(`${config.openkycurl}verify`, {
+          axios.post(`${config.openkycurl}verification/verify-sei`, {
             signedEmailIdentifier: message.data
           }).then(response => {
             if (response.data.identifier === data.userId) {
@@ -242,29 +352,6 @@ export default new Vuex.Store({
               })
             }
           })
-          // axios.get(`${config.openkycurl}publickey`).then(async publickey => {
-          //   // console.log(`Validating signature`)
-          //   // cryptoService.validateSignature(message.data, message.data, publickey.data.public_key).then(() => {
-          //   //   axios.post(`${config.apiurl}api/users/${data.userId}/emailverified`)
-          //   //   context.commit('setEmailVerificationStatus', {
-          //   //     checked: true,
-          //   //     checking: false,
-          //   //     valid: true
-          //   //   })
-          //   // }).catch(e => {
-          //   //   context.commit('setEmailVerificationStatus', {
-          //   //     checked: true,
-          //   //     checking: false,
-          //   //     valid: false
-          //   //   })
-          //   // })
-          // }).catch(e => {
-          //   context.commit('setEmailVerificationStatus', {
-          //     checked: true,
-          //     checking: false,
-          //     valid: false
-          //   })
-          // })
         }).catch(e => {
           context.commit('setEmailVerificationStatus', {
             checked: true,
@@ -290,25 +377,47 @@ export default new Vuex.Store({
     setAppPublicKey (context, appPublicKey) {
       context.commit('setAppPublicKey', appPublicKey)
     },
-    setHash (context, hash) {
-      context.commit('setHash', hash)
+    setState (context, _state) {
+      context.commit('setState', _state)
     }
   },
   getters: {
     doubleName: state => state.doubleName,
     nameCheckStatus: state => state.nameCheckStatus,
     keys: state => state.keys,
-    hash: state => state.hash,
+    _state: state => state._state,
     redirectUrl: state => state.redirectUrl,
     scannedFlagUp: state => state.scannedFlagUp,
     cancelLoginUp: state => state.cancelLoginUp,
-    signed: state => state.signed,
+    signedAttempt: state => state.signedAttempt,
     firstTime: state => state.firstTime,
     emailVerificationStatus: state => state.emailVerificationStatus,
     scope: state => state.scope,
     appId: state => state.appId,
     appPublicKey: state => state.appPublicKey,
     isMobile: state => state.isMobile,
-    randomImageId: state => state.randomImageId
+    randomImageId: state => state.randomImageId,
+    randomRoom: state => state.randomRoom,
+    loginTimestamp: state => state.loginTimestamp,
+    loginTimeleft: state => state.loginTimeleft,
+    loginTimeout: state => state.loginTimeout,
+    loginInterval: state => state.loginInterval
   }
 })
+
+function generateUUID () {
+  var d = new Date().getTime()
+  var d2 = (performance && performance.now && (performance.now() * 1000)) || 0
+
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+    var r = Math.random() * 16
+    if (d > 0) {
+      r = (d + r) % 16 | 0
+      d = Math.floor(d / 16)
+    } else {
+      r = (d2 + r) % 16 | 0
+      d2 = Math.floor(d2 / 16)
+    }
+    return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16)
+  })
+}

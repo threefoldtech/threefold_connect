@@ -2,7 +2,7 @@ import {
   mapActions,
   mapGetters
 } from 'vuex'
-var cookies = require('vue-cookies')
+const cookies = require('vue-cookies')
 
 export default {
   name: 'initial',
@@ -21,134 +21,135 @@ export default {
         v => this.nameRegex.test(v) || 'Name can only contain alphanumeric characters.',
         v => v.length <= 50 || 'Name must be less than 50 characters.'
       ],
-      continueToLogin: false,
       url: '',
       spinner: false,
-      nameCheckerTimeOut: null
+      rechecked: false,
+      didLeavePage: false,
+      nameCheckerTimeOut: null,
+      isMobile: /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent),
+      randomRoom: ''
     }
   },
   mounted () {
+    if (document.referrer) {
+      if (new URL(document.referrer).host !== new URL(window.location.href).host) {
+        console.log('SET URL, ', document.referrer)
+        window.localStorage.setItem('returnUrl', document.referrer)
+      }
+    } else {
+      console.log('URL cleared')
+      window.localStorage.setItem('returnUrl', '')
+    }
+
+    if (this.isMobile) {
+      this.randomRoom = window.localStorage.getItem('randomRoom')
+      if (!this.randomRoom) {
+        this.randomRoom = generateUUID()
+        window.localStorage.setItem('randomRoom', this.randomRoom)
+      }
+      this.setrandomRoom(this.randomRoom)
+    }
+    window.onblur = this.lostFocus
+    window.onfocus = this.gotFocus
+    this.appid = this.$route.query.appid
+    console.log(`this.$route.query.appid`, this.$route.query.appid)
+    if (!this.appid) {
+      this.redirectOrError()
+    }
     console.log(this.$route)
     this.setAttemptCanceled(false)
     var tempName = localStorage.getItem('username')
     if (tempName) {
+      console.log(`Got tempName`, tempName)
       this.doubleName = tempName.split('.')[0]
       this.checkNameAvailability()
-    }
-    if (this.$route.query.logintoken && this.$route.query.doublename) {
-      this.doubleName = this.$route.query.doublename
-      this.setDoubleName(this.$route.query.doublename)
-      this.url = `${this.$route.query.doublename} && ${this.$route.query.logintoken}`
-      this.loginUser({
-        mobile: true,
-        firstTime: false,
-        logintoken: this.$route.query.logintoken
-      })
-    }
-    if (this.$route.query.logintoken) {
-      this.spinner = true
     }
     this.firstvisit = !cookies.get('firstvisit')
     if (this.firstvisit) {
       cookies.set('firstvisit', true)
     }
-    this.appid = this.$route.query.appid
     if (this.$route.query) {
-      console.log(this.$route.query.redirecturl)
       this.$store.dispatch('saveState', {
-        hash: this.$route.query.state,
+        _state: this._state ? this._state : this.$route.query.state,
         redirectUrl: this.$route.query.redirecturl
       })
-      if (this.$route.query.scope === undefined) this.setScope(JSON.stringify({ doubleName: true, email: false, keys: false }))
-      else this.setScope(this.$route.query.scope || null)
       this.setAppId(this.$route.query.appid || null)
       this.setAppPublicKey(this.$route.query.publickey || null)
+      if (this.$route.query.scope === undefined) {
+        this.setScope(null)
+      } else {
+        this.setScope(this.$route.query.scope || null)
+      }
     } else {
-      this.$router.push('error')
+      this.redirectOrError()
     }
   },
   computed: {
     ...mapGetters([
       'nameCheckStatus',
-      'hash',
+      'signedAttempt',
+      'redirectUrl',
+      'firstTime',
+      'randomImageId',
+      'cancelLoginUp',
+      '_state',
       'scope',
       'appId',
-      'appPublicKey',
-      'signed',
-      'redirectUrl'
+      'appPublicKey'
     ])
   },
   methods: {
     ...mapActions([
       'setDoubleName',
       'loginUser',
+      'loginUserMobile',
       'setScope',
       'setAppId',
       'setAppPublicKey',
       'checkName',
       'clearCheckStatus',
-      'setAttemptCanceled'
+      'setAttemptCanceled',
+      'setrandomRoom'
     ]),
-    registerOrLogin () {
-      // @click="isMobile() ? areYouSureDialog = true : register()"
-      console.log('This button?')
-      // if (this.actionBtnDisabled()) {
-      //   this.setDoubleName(this.doubleName)
-      //   if (this.nameCheckStatus.checked && this.nameCheckStatus.available) this.register()
-      //   else this.login()
-      // }
-      if (this.actionBtnDisabled()) {
-        this.setDoubleName(this.doubleName)
-
-        if (this.nameCheckStatus.checked && this.nameCheckStatus.available) {
-          if (this.isMobile()) {
-            this.areYouSureDialog = true
-          } else {
-            this.register()
-          }
-        } else {
-          this.login()
-        }
-      }
+    lostFocus () {
+      this.didLeavePage = true
     },
-    isMobile () {
-      return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
-    },
-    login () {
-      var isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
-      this.loginUser({
-        mobile: isMobile,
+    promptLoginToMobileUser () {
+      this.loginUserMobile({
+        mobile: this.isMobile,
         firstTime: false
       })
-      if (isMobile) {
-        var url = `threebot://login/?state=${encodeURIComponent(this.hash)}&mobile=true`
+      this.setrandomRoom(this.randomRoom)
+
+      var url = `threebot://login?state=${encodeURIComponent(this._state)}&randomRoom=${this.randomRoom}`
+      if (this.scope) url += `&scope=${encodeURIComponent(this.scope)}`
+      if (this.appId) url += `&appId=${encodeURIComponent(this.appId)}`
+      if (this.appPublicKey) url += `&appPublicKey=${encodeURIComponent(this.appPublicKey)}`
+      if (this.redirectUrl) url += `&redirecturl=${encodeURIComponent(this.redirectUrl)}`
+      console.log(url)
+      if (/iPhone|iPad|iPod/i.test(navigator.userAgent)) {
+        window.location.replace(url)
+      } else if (/Android|webOS|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+        window.location.href = url
+      }
+    },
+    login () {
+      this.loginUser({
+        doubleName: this.doubleName,
+        mobile: this.isMobile,
+        firstTime: false
+      })
+      if (this.isMobile) {
+        var url = `threebot://login/?state=${encodeURIComponent(this._state)}`
         if (this.scope) url += `&scope=${encodeURIComponent(this.scope)}`
         if (this.appId) url += `&appId=${encodeURIComponent(this.appId)}`
         if (this.appPublicKey) url += `&appPublicKey=${encodeURIComponent(this.appPublicKey)}`
-        if (this.$route.query.logintoken) url += `&logintoken=${encodeURIComponent(this.$route.query.logintoken)}`
+        if (this.redirectUrl) url += `&redirecturl=${encodeURIComponent(this.redirectUrl)}`
+
         window.open(url)
       }
       this.$router.push({
         name: 'login'
-      })
-    },
-    openAppToRegister () {
-      var isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
-
-      // window.open('https://google.be#' + isMobile)
-      if (isMobile) {
-        var url = `threebot://registerAccount/?doubleName=${encodeURIComponent(this.doubleName)}`
-
-        if (/iPhone|iPad|iPod/i.test(navigator.userAgent)) {
-          window.location.replace(url)
-        } else if (/Android|webOS|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
-          window.open(url)
-        }
-      }
-    },
-    register () {
-      this.$router.push({
-        name: 'register'
       })
     },
     checkNameAvailability () {
@@ -160,38 +161,96 @@ export default {
         }, 500)
       }
     },
-    hasAppid () {
-      return this.$route.query.appid !== undefined
-    },
-    actionBtnDisabled () {
-      if (!this.nameCheckStatus.available && !this.hasAppid()) return false // login and appid = btn disabled
-      return true // !(this.nameCheckStatus.checked && !this.nameCheckStatus.checking && this.valid)
+    redirectOrError () {
+      let returnUrl = window.localStorage.getItem('returnUrl')
+
+      if (returnUrl) {
+        if (/iPhone|iPad|iPod/i.test(navigator.userAgent)) {
+          window.location.replace(returnUrl)
+        } else {
+          window.location.href = returnUrl
+        }
+      } else {
+        this.$router.push({ name: 'error' })
+      }
     }
   },
   watch: {
-    signed (val) {
-      this.url = 'url'
-      console.log(`signed`)
-      if (val) {
-        console.log(`------`)
-        console.log(`------`)
-        console.log(`------`)
-        console.log(`------`)
-        console.log(`------`)
-        console.log(`Signed, continue`)
-        var signedHash = encodeURIComponent(val.signedHash)
-        var data = encodeURIComponent(JSON.stringify(val.data))
-        var union = '&'
-        if (this.redirectUrl.indexOf('?') >= 0) {
-          union = '&'
+    signedAttempt (val) {
+      if (!this.isMobile) return
+
+      try {
+        if (val) {
+          console.log('signedAttemptObject: ', val)
+          console.log('signedAttemptObject: ', JSON.stringify(val))
+          window.localStorage.setItem('username', this.doubleName)
+
+          var data = encodeURIComponent(JSON.stringify(val))
+          console.log('data', data)
+
+          if (data) {
+            var union = '?'
+            if (this.redirectUrl.indexOf('?') >= 0) {
+              union = '&'
+            }
+
+            var safeRedirectUri
+            // Otherwise evil app could do appid+redirecturl = wallet.com + .evil.com = wallet.com.evil.com
+            // Now its wallet.com/.evil.com
+            if (this.redirectUrl[0] === '/') {
+              safeRedirectUri = this.redirectUrl
+            } else {
+              safeRedirectUri = '/' + this.redirectUrl
+            }
+
+            console.log('!!!! this.doubleName: ', this.doubleName)
+            var url = `//${this.appId}${safeRedirectUri}${union}signedAttempt=${data}`
+
+            if (!this.isRedirecting) {
+              this.isRedirecting = true
+              console.log('Changing href: ', url)
+              window.location.href = url
+            }
+          } else {
+            console.log('Missing data or signedState')
+          }
         } else {
-          union = '?'
+          console.log('Val was null')
         }
-        var url = `${this.$route.query.redirecturl}${union}username=${this.doubleName}&signedhash=${signedHash}&data=${data}`
-        console.log(`Redirecting to ${url}`)
-        this.url = url
-        window.location.href = url
+      } catch (e) {
+        console.log('Something went wrong ... ', e)
       }
     }
+  },
+  cancelLoginUp (val) {
+    console.log(val)
+    this.cancelLogin = true
+
+    var safeRedirectUri
+    if (this.redirectUrl[0] === '/') {
+      safeRedirectUri = this.redirectUrl
+    } else {
+      safeRedirectUri = '/' + this.redirectUrl
+    }
+
+    var url = `//${this.appId}${safeRedirectUri}?error=CancelledByUser`
+    window.location.href = url
   }
+}
+
+function generateUUID () {
+  var d = new Date().getTime()
+  var d2 = (performance && performance.now && (performance.now() * 1000)) || 0
+
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+    var r = Math.random() * 16
+    if (d > 0) {
+      r = (d + r) % 16 | 0
+      d = Math.floor(d / 16)
+    } else {
+      r = (d2 + r) % 16 | 0
+      d2 = Math.floor(d2 / 16)
+    }
+    return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16)
+  })
 }
