@@ -1,1 +1,1 @@
-enum Environment { Staging, Production, Local }
+enum Environment { Staging, Production, Testing, Local }

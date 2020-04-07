@@ -47,7 +47,7 @@ generateFile () {
 
 if [[ $1 == "--help" ]]
 then
-    echo "Usage: ./build.sh --[run|build|switch] --[local|staging|production]"
+    echo "Usage: ./build.sh --[run|build|switch] --[local|testing|staging|production]"
     echo "Usage: ./build.sh --init"
     exit 1
 fi
@@ -109,6 +109,27 @@ then
     exit 0
 fi
 
+if [[ $2 == "--testing" ]]
+then
+    switchConfigs "testing"
+
+    if [[ $1 == "--run" ]]
+    then
+        echo "[Testing]: Running."
+        flutter run -t lib/main.dart
+    elif [[ $1 == "--switch" ]]
+    then
+        echo "[Testing]: Switched configs."
+    else
+        echo "[Testing]: Building apk."
+
+        setConfigsAndBuild
+        msgTelegram "Testing" $4
+    fi
+
+    exit 0
+fi
+
 if [[ $2 == "--staging" ]]
 then
     switchConfigs "staging"
@@ -152,6 +173,6 @@ then
 fi
 
 echo "Syntax error."
-echo "Usage: ./build.sh --[[run|build|switch]] --[[local|staging|production]]"
+echo "Usage: ./build.sh --[[run|build|switch]] --[[local|testing|staging|production]]"
 echo "Usage: ./build.sh --init"
 exit 1

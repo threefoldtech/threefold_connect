@@ -9,6 +9,8 @@ class ChatbotConfig extends EnvConfig {
       impl = ChatbotConfigStaging();
     } else if (environment == Environment.Production) {
       impl = ChatbotConfigProduction();
+    } else if (environment == Environment.Testing) {
+      impl = ChatbotConfigTesting();
     } else if (environment == Environment.Local) {
       impl = ChatbotConfigLocal();
     }
@@ -25,11 +27,17 @@ abstract class ChatbotConfigImpls {
 
 class ChatbotConfigStaging extends ChatbotConfigImpls {
   String url() {
-    return 'https://go.crisp.chat/chat/embed/?website_id=1a5a5241-91cb-4a41-8323-5ba5ec574da0&&user_email=';
+    return 'https://go.crisp.chat/chat/embed/?website_id=1a5a5241-91cb-4a41-8323-5ba5ec574da0&user_email=';
   }
 }
 
 class ChatbotConfigProduction extends ChatbotConfigImpls {
+  String url() {
+    return 'https://go.crisp.chat/chat/embed/?website_id=1a5a5241-91cb-4a41-8323-5ba5ec574da0&user_email=';
+  }
+}
+
+class ChatbotConfigTesting extends ChatbotConfigImpls {
   String url() {
     return 'https://go.crisp.chat/chat/embed/?website_id=1a5a5241-91cb-4a41-8323-5ba5ec574da0&user_email=';
   }

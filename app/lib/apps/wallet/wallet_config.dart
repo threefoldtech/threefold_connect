@@ -10,6 +10,8 @@ class WalletConfig extends EnvConfig {
       impl = WalletConfigStaging();
     } else if (environment == Environment.Production) {
       impl = WalletConfigProduction();
+    } else if (environment == Environment.Testing) {
+      impl = WalletConfigTesting();
     } else if (environment == Environment.Local) {
       impl = WalletConfigLocal();
     }
@@ -41,6 +43,16 @@ class WalletConfigStaging extends WalletConfigImpls {
 class WalletConfigProduction extends WalletConfigImpls {
   String appId() {
     return 'wallet.threefold.me';
+  }
+
+  String redirectUrl() {
+    return 'login';
+  }
+}
+
+class WalletConfigTesting extends WalletConfigImpls {
+  String appId() {
+    return 'wallet.testing.jimber.org';
   }
 
   String redirectUrl() {

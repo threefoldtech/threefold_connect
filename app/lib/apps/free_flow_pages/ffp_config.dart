@@ -9,6 +9,8 @@ class FfpConfig extends EnvConfig {
       impl = FfpConfigStaging();
     } else if (environment == Environment.Production) {
       impl = FfpConfigProduction();
+    } else if (environment == Environment.Testing) {
+      impl = FfpConfigTesting();
     } else if (environment == Environment.Local) {
       impl = FfpConfigLocal();
     }
@@ -57,6 +59,20 @@ class FfpConfigProduction extends FfpConfigImpls {
 
   String cookieUrl() {
     return 'https://freeflowpages.com/user/auth/external?authclient=3bot';
+  }
+}
+
+class FfpConfigTesting extends FfpConfigImpls {
+  String appId() {
+    return 'testing.freeflowpages.com';
+  }
+
+  String url() {
+    return 'https://testing.freeflowpages.com/';
+  }
+
+  String cookieUrl() {
+    return 'https://testing.freeflowpages.com/user/auth/external?authclient=3bot';
   }
 }
 
