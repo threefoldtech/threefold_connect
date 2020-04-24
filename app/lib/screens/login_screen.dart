@@ -340,7 +340,7 @@ class _LoginScreenState extends State<LoginScreen> with BlockAndRunMixin {
           ),
         );
 
-        await sendData(state, null, selectedImageId, null);
+        await sendData(state, null, selectedImageId, null, widget.loginData.appId);
 
         if (Navigator.canPop(context)) {
           Navigator.pop(context, false);
@@ -389,9 +389,9 @@ class _LoginScreenState extends State<LoginScreen> with BlockAndRunMixin {
     //push to backend with signed
     if (!includeData) {
       await sendData(state, null, selectedImageId,
-          null); // temp fix send empty data for regenerate emoji
+          null, widget.loginData.appId); // temp fix send empty data for regenerate emoji
     } else {
-      await sendData(state, encryptedScopeData, selectedImageId, randomRoom);
+      await sendData(state, encryptedScopeData, selectedImageId, randomRoom, widget.loginData.appId);
     }
 
     if (selectedImageId == correctImage || isMobileCheck) {
