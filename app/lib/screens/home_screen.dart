@@ -203,6 +203,7 @@ class _HomeScreenState extends State<HomeScreen>
               height: 70,
               child: Container(
                 margin: EdgeInsets.only(top: 7.0),
+                padding: EdgeInsets.only(top: 7.0),
                 color: Theme.of(context).primaryColor,
                 child: TabBar(
                   unselectedLabelColor: Colors.white60,

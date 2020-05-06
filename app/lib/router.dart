@@ -97,7 +97,7 @@ class Router {
               children: <Widget>[
                 Icon(
                   r.route.icon,
-                  size: 30,
+                  size: 25,
                 ),
                 Text(
                   r.route.name,
