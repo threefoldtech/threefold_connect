@@ -25,7 +25,7 @@ class _InitState extends State<InitScreen> {
   _InitState() {
     iaWebView = InAppWebView(
       initialUrl:
-          'https://wizard.jimber.org/?cache_buster=' + new DateTime.now().millisecondsSinceEpoch.toString(),
+          'https://wizard.staging.jimber.org/?cache_buster=' + new DateTime.now().millisecondsSinceEpoch.toString(),
       initialHeaders: {},
       initialOptions: InAppWebViewWidgetOptions(
         android: AndroidInAppWebViewOptions(supportMultipleWindows: true),
