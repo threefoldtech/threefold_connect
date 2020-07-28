@@ -15,12 +15,8 @@ String randomString(int strlen) {
 }
 
 bool validateEmail(String value) {
-  Pattern pattern = r'[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}';
-  RegExp regex = new RegExp(pattern);
-  if (!regex.hasMatch(value)) {
-    return false;
-  }
-  return true;
+  RegExp regex = new RegExp(r"^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,253}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,253}[a-zA-Z0-9])?)*$");
+  return regex.hasMatch(value);
 }
 
 bool validateSeedWords(String seed, String confirmationWords) {
