@@ -35,14 +35,6 @@ class Router {
           app: Wallet()),
       AppInfo(
           route: Route(
-            path: '/ffp',
-            name: 'Social',
-            icon: Icons.person,
-            view: await Ffp().widget(),
-          ),
-          app: Ffp()),
-      AppInfo(
-          route: Route(
             path: '/chatbot',
             name: 'Support',
             icon: Icons.chat,
