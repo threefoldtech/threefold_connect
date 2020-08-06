@@ -36,9 +36,9 @@ def insert_user(conn, insert_user_sql, *params):
     try:
         logger.debug("Inserting user")
         c = conn.cursor()
-        if len(params) == 4:
+        if len(params) == 5:
             c.execute(insert_user_sql,
-                      (params[0], params[1], params[2], params[3]))
+                      (params[0], params[1], params[2], params[3], params[4]))
             conn.commit()
     except Error as e:
         logger.debug(e)

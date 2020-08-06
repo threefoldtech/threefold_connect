@@ -5,6 +5,7 @@ import nacl.encoding
 import binascii
 import struct
 import base64
+import configparser
 import database as db
 import logging
 import calendar
@@ -13,9 +14,15 @@ from flask import Flask, Response, request, json, redirect
 from flask_socketio import SocketIO, emit, join_room, leave_room, send
 from flask_cors import CORS
 from datetime import datetime, timedelta
+from pyfcm import FCMNotification
 
 conn = db.create_connection("pythonsqlite.db")
 db.create_db(conn)
+
+config = configparser.ConfigParser()
+config.read('config.ini')
+
+push_service = FCMNotification(api_key=config['DEFAULT']['API_KEY'])
 
 app = Flask(__name__)
 sio = SocketIO(app, transports=["websocket"])
@@ -46,7 +53,7 @@ logger.addHandler(handler)
 
 # Start socketIO functions.
 
-
+logger.debug(config['DEFAULT']['API_KEY'])
 @sio.on("connect")
 def on_connect():
     logger.debug("/Connect")
@@ -128,6 +135,17 @@ def on_login(data):
 
     user = db.getUserByName(conn, double_name)
     if user:
+        # Check if user had a device id 
+        if user[4]:
+            # Try to send notification
+            try:
+                logger.debug(user[4])
+                push_service.notify_multiple_devices(registration_ids=json.loads(user[4]), message_title='Login',
+                                          message_body='Tap to login', data_message=data, click_action='FLUTTER_NOTIFICATION_CLICK', tag='testLogin', collapse_key='testLogin')
+            except Exception as e:
+                logger.error(e)
+                logger.debug("Could not send notification to %s", user[4])
+                pass
         logger.debug("[login]: User found %s", user[0])
         emitOrQueue("login", data, room=user[0])
 
@@ -170,7 +188,8 @@ def mobile_registration_handler():
     sid = body.get("sid")
     email = body.get("email").lower().strip()
     public_key = body.get("public_key")
-
+    signed_device_id = body.get("signed_device_id")
+    device_id = ""
     if double_name == None or email == None or public_key == None or sid == None:
         return Response("Missing data", status=400)
     else:
@@ -178,11 +197,18 @@ def mobile_registration_handler():
             return Response(
                 "doubleName exceeds length of 50 or does not contain .3bot", status=400
             )
-
+        # Only check device ID if it's send (backward compatibility)
+        if signed_device_id is not None:
+            try:
+                # Check if device id is signed with corresponding key and get the device id to store it in db
+                device_id = verify_signed_data_with_public_key(public_key, signed_device_id).decode("utf-8")
+                pass
+            except:
+                return Response("Signature does not match", status=403)
         user = db.getUserByName(conn, double_name)
         if user is None:
-            update_sql = "INSERT into users (double_name, sid, email, public_key) VALUES(?,?,?,?);"
-            db.insert_user(conn, update_sql, double_name, sid, email, public_key)
+            update_sql = "INSERT into users (double_name, sid, email, public_key, device_id) VALUES(?,?,?,?,?);"
+            db.insert_user(conn, update_sql, double_name, sid, email, public_key, json.dumps([device_id]))
         return Response("Succes", status=200)
 
 
@@ -192,7 +218,11 @@ def get_user_handler(doublename):
     logger.debug("/doublename user %s", doublename)
     user = db.getUserByName(conn, doublename)
     if user is not None:
-        data = {"doublename": doublename, "publicKey": user[3]}
+        device_id = ''
+        if user[4] is not None:
+            logger.debug(user[4])
+            device_id = json.loads(user[4])
+        data = {"doublename": doublename, "publicKey": user[3], "device_id": device_id}
         response = app.response_class(
             response=json.dumps(data), mimetype="application/json"
         )
@@ -300,24 +330,50 @@ def minimum_version_handler():
     )
     return response
 
+@app.route("/api/users/<doublename>/deviceid", methods=["post"])
+def set_device_id_handler(doublename):
+    logger.debug("/deviceid from user %s", doublename.lower())
+    # Get user
+    body = request.get_json()
+    user = db.getUserByName(conn, doublename.lower())
+    device_id = ''
+    if user is None:
+        logger.debug("User not found")
+        return Response("User not found", status=404)        
+    # Verify signature
+    try:
+        device_id = verify_signed_data_with_public_key(user[3], body['signed_device_id']).decode("utf-8")
+        pass
+    except:
+        return Response("Signature does not match", status=403)
+    # If valid, add or update device Id in db
+    # check if user already has deviceid's
+    if user[4]:
+        # If he does: add one to the array and update it
+        device_ids = json.loads(user[4])
+        device_ids.append(device_id)
+        db.update_deviceid(conn, json.dumps([device_ids]), doublename)
+    else:
+        # If he doesn't: add this one
+        db.update_deviceid(conn, json.dumps([device_id]), doublename)
 
 # End flask API endpoints.
 
 # Start helper functions.
 
-
 def verify_signed_data(double_name, data):
     double_name = double_name.lower()
+    public_key = db.getUserByName(conn, double_name)[3]
+    return verify_signed_data_with_public_key(public_key, data)
+
+
+def verify_signed_data_with_public_key(public_key, data):
     decoded_data = base64.b64decode(data)
-
     bytes_data = bytes(decoded_data)
-
-    public_key = base64.b64decode(db.getUserByName(conn, double_name)[3])
-
+    public_key = base64.b64decode(public_key)
     verify_key = nacl.signing.VerifyKey(
         public_key.hex(), encoder=nacl.encoding.HexEncoder
     )
-
     verified_signed_data = verify_key.verify(bytes_data)
     return verified_signed_data
 
