@@ -221,7 +221,11 @@ def get_user_handler(doublename):
         device_id = ''
         if user[4] is not None:
             logger.debug(user[4])
-            device_id = json.loads(user[4])
+            try:
+                device_id = json.loads(user[4])
+                pass
+            except:
+                pass
         data = {"doublename": doublename, "publicKey": user[3], "device_id": device_id}
         response = app.response_class(
             response=json.dumps(data), mimetype="application/json"
