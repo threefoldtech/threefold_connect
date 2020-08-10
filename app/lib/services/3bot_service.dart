@@ -11,8 +11,8 @@ import 'package:threebotlogin/services/user_service.dart';
 String threeBotApiUrl = AppConfig().threeBotApiUrl();
 Map<String, String> requestHeaders = {'Content-type': 'application/json'};
 
-Future<Response> sendData(
-    String state, data, selectedImageId, String randomRoom, String appId) async {
+Future<Response> sendData(String state, data, selectedImageId,
+    String randomRoom, String appId) async {
   return http.post('$threeBotApiUrl/signedAttempt',
       body: json.encode({
         'signedAttempt': await signData(
@@ -79,14 +79,26 @@ Future<Response> getUserInfo(doubleName) {
   return http.get('$threeBotApiUrl/users/$doubleName', headers: requestHeaders);
 }
 
-Future<Response> finishRegistration(
-    String doubleName, String email, String sid, String publicKey) async {
+Future<Response> updateDeviceID(String doubleName, String signedDeviceId) {
+  return http.post('$threeBotApiUrl/users/$doubleName.3bot/deviceid',
+      body: json.encode({'signed_device_id': signedDeviceId}),
+      headers: requestHeaders);
+}
+
+Future<Response> removeDeviceId(String deviceId) {
+  return http.delete('$threeBotApiUrl/deviceid/$deviceId',
+      headers: requestHeaders);
+}
+
+Future<Response> finishRegistration(String doubleName, String email, String sid,
+    String publicKey, String signedDeviceId) async {
   return http.post('$threeBotApiUrl/mobileregistration',
       body: json.encode({
         'doubleName': doubleName + '.3bot',
         'sid': sid,
         'email': email.toLowerCase().trim(),
         'public_key': publicKey,
+        'signed_device_id': signedDeviceId
       }),
       headers: requestHeaders);
 }

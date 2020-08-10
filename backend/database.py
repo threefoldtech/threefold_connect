@@ -74,7 +74,7 @@ def select_from_userapps(conn, statement, *params):
 
 def update_deviceid(conn, device_id, doublename):
     try:
-        logger.debug("Updating deviceid")
+        logger.debug("Updating deviceid for user %s", doublename)
         delete_sql = "UPDATE users SET device_id = ? WHERE double_name=?;"
         c = conn.cursor()
         c.execute(delete_sql, (device_id, doublename))
@@ -114,12 +114,28 @@ def update_auth(conn, update_sql, signed_state, data, double_name):
     except Error as e:
         logger.debug(e)
 
-def getUserByName(conn, double_name):
+def get_user_by_name(conn, double_name):
     find_statement = "SELECT * FROM users WHERE double_name=? LIMIT 1;"
     try:
         c = conn.cursor()
         c.execute(find_statement, (double_name,))
         return c.fetchone()
+    except Error as e:
+        logger.debug(e)
+
+def get_user_by_device_id(conn, device_id):
+    # TODO @single_core: is this safe?
+    find_statement = "SELECT * FROM users WHERE device_id like '%%%s%%';" %(device_id)
+    try:
+        c = conn.cursor()
+        c.execute(find_statement)
+
+        rows = c.fetchall()
+
+        for row in rows:
+            logger.debug(row)
+
+        return rows
     except Error as e:
         logger.debug(e)
 
