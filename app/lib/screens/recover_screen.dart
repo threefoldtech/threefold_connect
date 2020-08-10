@@ -135,7 +135,7 @@ class _RecoverScreenState extends State<RecoverScreen> {
                     suffixText: '.3bot',
                     suffixStyle: TextStyle(fontWeight: FontWeight.bold),
                   ),
-                  // controller: doubleNameController,
+                  controller: doubleNameController,
                   validator: (value) {
                     if (value.isEmpty) {
                       return 'Please enter your Name';
