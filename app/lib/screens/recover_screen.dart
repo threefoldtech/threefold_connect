@@ -231,10 +231,17 @@ class _RecoverScreenState extends State<RecoverScreen> {
                     });
                   }
                 } catch (e) {
-                  Navigator.pop(context); // To dismiss the spinner
-                  setState(() {
-                    error = e.message;
-                  });
+                  // To dismiss the spinner
+                  Navigator.pop(context);
+                  if (e.message != "") {
+                    setState(() {
+                      error = e.message;
+                    });
+                  } else {
+                    setState(() {
+                      error = "Someting went wrong";
+                    });
+                  }
                 }
               },
             ),
