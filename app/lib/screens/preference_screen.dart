@@ -258,8 +258,10 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
           FlatButton(
             child: new Text("Yes"),
             onPressed: () async {
-              String deviceID = await _listener.getToken();
-              removeDeviceId(deviceID);
+              try {
+                String deviceID = await _listener.getToken();
+                removeDeviceId(deviceID);
+              } catch (e) {}
               Events().emit(CloseSocketEvent());
               Events().emit(FfpClearCacheEvent());
 

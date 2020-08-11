@@ -80,7 +80,7 @@ Future<Response> getUserInfo(doubleName) {
 }
 
 Future<Response> updateDeviceID(String doubleName, String signedDeviceId) {
-  return http.post('$threeBotApiUrl/users/$doubleName.3bot/deviceid',
+  return http.post('$threeBotApiUrl/users/$doubleName/deviceid',
       body: json.encode({'signed_device_id': signedDeviceId}),
       headers: requestHeaders);
 }

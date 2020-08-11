@@ -210,7 +210,7 @@ def mobile_registration_handler():
         user = db.get_user_by_name(conn, double_name)
         if user is None:
             update_sql = "INSERT into users (double_name, sid, email, public_key, device_id) VALUES(?,?,?,?,?);"
-            db.insert_user(conn, update_sql, double_name, sid, email, public_key, json.dumps([device_id]))
+            db.insert_user(conn, update_sql, double_name, sid, email, public_key, "")
         return Response("Succes", status=200)
 
 
@@ -348,6 +348,7 @@ def set_device_id_handler(doublename):
         return Response("User not found", status=404)        
     # Verify signature
     try:
+        logger.debug("Verifying signatrue of device id" )
         device_id = verify_signed_data_with_public_key(user[3], body['signed_device_id']).decode("utf-8")
         pass
     except:
@@ -366,7 +367,7 @@ def set_device_id_handler(doublename):
             device_ids = []
             pass
         device_ids.append(device_id)
-        db.update_deviceid(conn, json.dumps([device_ids]), doublename)
+        db.update_deviceid(conn, json.dumps(device_ids), doublename)
     else:
         # If he doesn't: add this one
         db.update_deviceid(conn, json.dumps([device_id]), doublename)
@@ -382,6 +383,7 @@ def remove_device_id_handler(device_id):
 # Start helper functions.
 
 def check_and_delete_device_id_from_db(device_id):
+    logger.debug("Checking if someone already has %s", device_id)
     usersWithSameDeviceId = db.get_user_by_device_id(conn, device_id)
     logger.debug(usersWithSameDeviceId)
     # loop over response

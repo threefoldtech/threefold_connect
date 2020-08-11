@@ -5,6 +5,7 @@ import 'dart:convert';
 import 'package:crypto/crypto.dart';
 import 'package:http/http.dart';
 import 'package:threebotlogin/helpers/globals.dart';
+import 'package:threebotlogin/main.dart';
 import 'package:threebotlogin/services/3bot_service.dart';
 import 'package:threebotlogin/services/crypto_service.dart';
 import 'package:threebotlogin/services/open_kyc_service.dart';
@@ -62,15 +63,23 @@ class _RecoverScreenState extends State<RecoverScreen> {
   }
 
   continueRecoverAccount() async {
+    print('continueRecoverAccount');
     Map<String, String> keys = await generateKeysFromSeedPhrase(seedPhrase);
-
+    print('1');
     await savePrivateKey(keys['privateKey']);
+    print('2');
     await savePublicKey(keys['publicKey']);
+    print('3');
     await saveFingerprint(false);
+    print('4');
     await saveEmail(emailFromForm, null);
+    print('5');
     await saveDoubleName(doubleName);
+    print('6');
     await savePhrase(seedPhrase);
-    await sendVerificationEmail();
+    print('7');
+    // await sendVerificationEmail();
+    print('8');
   }
 
   checkSeedLength(seedPhrase) {
@@ -135,7 +144,7 @@ class _RecoverScreenState extends State<RecoverScreen> {
                     suffixText: '.3bot',
                     suffixStyle: TextStyle(fontWeight: FontWeight.bold),
                   ),
-                  // controller: doubleNameController,
+                  controller: doubleNameController,
                   validator: (value) {
                     if (value.isEmpty) {
                       return 'Please enter your Name';
@@ -232,9 +241,15 @@ class _RecoverScreenState extends State<RecoverScreen> {
                   }
                 } catch (e) {
                   Navigator.pop(context); // To dismiss the spinner
-                  setState(() {
-                    error = e.message;
-                  });
+                  if (e.message != "") {
+                    setState(() {
+                      error = e.message;
+                    });
+                  } else {
+                    setState(() {
+                      error = "Somethign went wrong";
+                    });
+                  }
                 }
               },
             ),

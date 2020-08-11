@@ -1,10 +1,13 @@
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:threebotlogin/main.dart';
+import 'logging_service.dart';
+
+LoggingService logger;
 
 class FirebaseNotificationListener {
-  FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
+  FirebaseMessaging _firebaseMessaging;
   String token;
   FirebaseNotificationListener() {
+    _firebaseMessaging = FirebaseMessaging();
     _firebaseMessaging.configure(
       onMessage: (Map<String, dynamic> message) async {
         logger.log('On message $message');

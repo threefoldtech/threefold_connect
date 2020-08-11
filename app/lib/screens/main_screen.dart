@@ -208,7 +208,7 @@ class _AppState extends State<MainScreen> {
     if (doubleName != null) {
       try {
         // Get user info
-        Response userInfoResult = await getUserInfo(await getDoubleName());
+        Response userInfoResult = await getUserInfo(doubleName);
         if (userInfoResult.statusCode != 200) {
           throw new Exception('User not found.');
         }
