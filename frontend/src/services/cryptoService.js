@@ -1,6 +1,5 @@
 import bip39 from 'bip39'
 import { encodeBase64, decodeBase64 } from 'tweetnacl-util'
-import userService from './userService'
 
 const sodium = require('libsodium-wrappers')
 
