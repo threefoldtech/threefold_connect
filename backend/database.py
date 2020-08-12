@@ -38,7 +38,7 @@ def insert_user(conn, insert_user_sql, *params):
         c = conn.cursor()
         if len(params) == 5:
             c.execute(insert_user_sql,
-                      (params[0], params[1], params[2], params[3], params[4]))
+                      (params[0].lower(), params[1].lower(), params[2].lower(), params[3].lower(), params[4]))
             conn.commit()
     except Error as e:
         logger.debug(e)
@@ -48,7 +48,7 @@ def insert_app_derived_public_key(conn, insert_user_sql, *params):
     try:
         c = conn.cursor()
         if len(params) == 3:
-            c.execute(insert_user_sql, (params[0], params[1], params[2]))
+            c.execute(insert_user_sql, (params[0].lower(), params[1].lower(), params[2].lower()))
             conn.commit()
     except Error as e:
         logger.debug(e)
@@ -67,7 +67,7 @@ def select_all(conn, select_all_users):
 def select_from_userapps(conn, statement, *params):
     try:
         c = conn.cursor()
-        c.execute(statement, (params[0], params[1]))
+        c.execute(statement, (params[0].lower(), params[1]))
         return c.fetchone()
     except Error as e:
         logger.debug(e)
@@ -98,10 +98,10 @@ def update_user(conn, update_sql, *params):
     try:
         c = conn.cursor()
         if len(params) == 2:
-            c.execute(update_sql, (params[0], params[1]))
+            c.execute(update_sql, (params[0].lower(), params[1].lower()))
             conn.commit()
         elif len(params) == 4:
-            c.execute(update_sql, (params[0], params[1], params[2], params[3]))
+            c.execute(update_sql, (params[0].lower(), params[1].lower(), params[2].lower(), params[3].lower()))
             conn.commit()
     except Error as e:
         logger.debug(e)
