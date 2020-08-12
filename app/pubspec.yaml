@@ -40,6 +40,7 @@ dependencies:
   redirection:
     git:
       url: https://github.com/jimbertools/redirection
+  firebase_messaging:
 
 
 dev_dependencies:

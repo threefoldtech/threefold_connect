@@ -1,8 +1,10 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:http/http.dart';
 import 'package:threebotlogin/app_config.dart';
 import 'package:threebotlogin/events/events.dart';
 import 'package:threebotlogin/helpers/environment.dart';
@@ -11,6 +13,8 @@ import 'package:threebotlogin/screens/home_screen.dart';
 import 'package:threebotlogin/screens/init_screen.dart';
 import 'package:threebotlogin/screens/unregistered_screen.dart';
 import 'package:threebotlogin/services/3bot_service.dart';
+import 'package:threebotlogin/services/crypto_service.dart';
+import 'package:threebotlogin/services/push_notifications_manager.dart';
 import 'package:threebotlogin/services/socket_service.dart';
 import 'package:threebotlogin/services/user_service.dart';
 import 'package:threebotlogin/widgets/custom_dialog.dart';
@@ -30,13 +34,14 @@ class MainScreen extends StatefulWidget {
 class _AppState extends State<MainScreen> {
   StreamSubscription _sub;
   String initialLink;
+  FirebaseNotificationListener _listener;
   BackendConnection _backendConnection;
 
   @override
   void initState() {
     super.initState();
     Events().reset();
-
+    _listener = FirebaseNotificationListener();
     WidgetsBinding.instance.addPostFrameCallback((_) => pushScreens());
   }
 
@@ -58,6 +63,7 @@ class _AppState extends State<MainScreen> {
     await checkInternetConnection();
     await checkInternetConnectionWithOurServers();
     await checkIfAppIsUpToDate();
+    await checkIfDeviceIdIsCorrect();
 
     if (widget.initDone != null && !widget.initDone) {
       await Navigator.push(
@@ -193,6 +199,38 @@ class _AppState extends State<MainScreen> {
         SystemNavigator.pop();
       } else if (Platform.isIOS) {
         exit(1);
+      }
+    }
+  }
+
+  checkIfDeviceIdIsCorrect() async {
+    var doubleName = await getDoubleName();
+    if (doubleName != null) {
+      try {
+        // Get user info
+        Response userInfoResult = await getUserInfo(doubleName);
+        if (userInfoResult.statusCode != 200) {
+          throw new Exception('User not found.');
+        }
+        Map<String, dynamic> body = json.decode(userInfoResult.body);
+
+        // Compare device id
+        if (body == null ||
+            body['device_id'] == null ||
+            !body['device_id'].contains(await _listener.getToken())) {
+          // If no match, update and recheck
+          updateDeviceID(
+              await getDoubleName(),
+              await signData(
+                  await _listener.getToken(), await getPrivateKey()));
+          checkIfDeviceIdIsCorrect();
+        }
+      } on Exception catch (_) {
+        CustomDialog dialog = CustomDialog(
+            title: "Oops",
+            description:
+                "Something went wrong, please try again. Contact support if this issue persists.");
+        await dialog.show(context);
       }
     }
   }

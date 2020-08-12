@@ -4,6 +4,7 @@ import 'package:http/http.dart';
 import 'package:threebotlogin/helpers/globals.dart';
 import 'package:threebotlogin/services/3bot_service.dart';
 import 'package:threebotlogin/services/open_kyc_service.dart';
+import 'package:threebotlogin/services/push_notifications_manager.dart';
 import 'package:threebotlogin/services/tools_service.dart';
 import 'package:threebotlogin/services/crypto_service.dart';
 import 'package:threebotlogin/services/user_service.dart';
@@ -34,6 +35,7 @@ class _MobileRegistrationScreenState extends State<MobileRegistrationScreen> {
   final emailController = TextEditingController();
   final seedConfirmationController = TextEditingController();
   _State state = _State.DoubleName;
+  FirebaseNotificationListener _listener;
 
   bool isVisible = false;
 
@@ -53,6 +55,7 @@ class _MobileRegistrationScreenState extends State<MobileRegistrationScreen> {
         doubleNameController.text = widget.doubleName;
       });
     }
+    _listener = FirebaseNotificationListener();
     super.initState();
   }
 
@@ -76,7 +79,8 @@ class _MobileRegistrationScreenState extends State<MobileRegistrationScreen> {
 
   checkDoubleName() async {
     if (doubleNameController.text != null || doubleNameController.text != '') {
-      _registrationData.doubleName = doubleNameController.text.toLowerCase() + '.3bot';
+      _registrationData.doubleName =
+          doubleNameController.text.toLowerCase() + '.3bot';
       String doubleNameValidation =
           validateDoubleName(doubleNameController.text);
       if (doubleNameValidation == null) {
@@ -127,8 +131,15 @@ class _MobileRegistrationScreenState extends State<MobileRegistrationScreen> {
 
   finish() async {
     loadingDialog();
-    Response response = await finishRegistration(doubleNameController.text,
-        emailController.text, 'random', _registrationData.keys['publicKey']);
+    String deviceId = await _listener.getToken();
+    String signedDeviceId =
+        await (signData(deviceId, _registrationData.keys['privateKey']));
+    Response response = await finishRegistration(
+        doubleNameController.text,
+        emailController.text,
+        'random',
+        _registrationData.keys['publicKey'],
+        signedDeviceId);
 
     if (response.statusCode == 200) {
       saveRegistration();
@@ -139,21 +150,22 @@ class _MobileRegistrationScreenState extends State<MobileRegistrationScreen> {
       Navigator.pop(context); // Remove loading screen
 
       showDialog(
-          context: context,
-          builder: (BuildContext context) => CustomDialog(
-                image: Icons.error,
-                title: 'Error',
-                description:
-                    'Something went wrong when trying to create your account.',
-                actions: <Widget>[
-                  FlatButton(
-                    child: Text('Ok'),
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
-                  )
-                ],
-              ));
+        context: context,
+        builder: (BuildContext context) => CustomDialog(
+          image: Icons.error,
+          title: 'Error',
+          description:
+              'Something went wrong when trying to create your account.',
+          actions: <Widget>[
+            FlatButton(
+              child: Text('Ok'),
+              onPressed: () {
+                Navigator.pop(context);
+              },
+            )
+          ],
+        ),
+      );
     }
   }
 

@@ -36,9 +36,9 @@ def insert_user(conn, insert_user_sql, *params):
     try:
         logger.debug("Inserting user")
         c = conn.cursor()
-        if len(params) == 4:
+        if len(params) == 5:
             c.execute(insert_user_sql,
-                      (params[0], params[1], params[2], params[3]))
+                      (params[0], params[1], params[2], params[3], params[4]))
             conn.commit()
     except Error as e:
         logger.debug(e)
@@ -74,7 +74,7 @@ def select_from_userapps(conn, statement, *params):
 
 def update_deviceid(conn, device_id, doublename):
     try:
-        logger.debug("Updating deviceid")
+        logger.debug("Updating deviceid for user %s", doublename)
         delete_sql = "UPDATE users SET device_id = ? WHERE double_name=?;"
         c = conn.cursor()
         c.execute(delete_sql, (device_id, doublename))
@@ -114,12 +114,23 @@ def update_auth(conn, update_sql, signed_state, data, double_name):
     except Error as e:
         logger.debug(e)
 
-def getUserByName(conn, double_name):
+def get_user_by_name(conn, double_name):
     find_statement = "SELECT * FROM users WHERE double_name=? LIMIT 1;"
     try:
         c = conn.cursor()
         c.execute(find_statement, (double_name,))
         return c.fetchone()
+    except Error as e:
+        logger.debug(e)
+
+def get_users_by_device_id(conn, device_id):
+    find_statement = "SELECT * FROM users WHERE device_id like ?;"
+    try:
+        c = conn.cursor()
+        search_device_id = "%" + device_id + "%"
+        c.execute(find_statement, (search_device_id,))
+        rows = c.fetchall()
+        return rows
     except Error as e:
         logger.debug(e)
 
