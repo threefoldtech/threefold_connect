@@ -123,18 +123,13 @@ def get_user_by_name(conn, double_name):
     except Error as e:
         logger.debug(e)
 
-def get_user_by_device_id(conn, device_id):
-    # TODO @single_core: is this safe?
-    find_statement = "SELECT * FROM users WHERE device_id like '%%%s%%';" %(device_id)
+def get_users_by_device_id(conn, device_id):
+    find_statement = "SELECT * FROM users WHERE device_id like ?;"
     try:
         c = conn.cursor()
-        c.execute(find_statement)
-
+        search_device_id = "%" + device_id + "%"
+        c.execute(find_statement, (search_device_id,))
         rows = c.fetchall()
-
-        for row in rows:
-            logger.debug(row)
-
         return rows
     except Error as e:
         logger.debug(e)

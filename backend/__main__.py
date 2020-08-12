@@ -53,7 +53,6 @@ logger.addHandler(handler)
 
 # Start socketIO functions.
 
-logger.debug(config['DEFAULT']['API_KEY'])
 @sio.on("connect")
 def on_connect():
     logger.debug("/Connect")
@@ -377,14 +376,14 @@ def remove_device_id_handler(device_id):
     logger.debug("removing device id %s from db", device_id)
     # Check if Device id is known in DB
     check_and_delete_device_id_from_db(device_id)
-    return "K"
+    return Response(status=204)
 # End flask API endpoints.
 
 # Start helper functions.
 
 def check_and_delete_device_id_from_db(device_id):
     logger.debug("Checking if someone already has %s", device_id)
-    usersWithSameDeviceId = db.get_user_by_device_id(conn, device_id)
+    usersWithSameDeviceId = db.get_users_by_device_id(conn, device_id)
     logger.debug(usersWithSameDeviceId)
     # loop over response
     for user in usersWithSameDeviceId:
