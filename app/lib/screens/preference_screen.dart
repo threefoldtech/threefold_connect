@@ -11,8 +11,11 @@ import 'package:threebotlogin/helpers/hex_color.dart';
 import 'package:threebotlogin/screens/authentication_screen.dart';
 import 'package:threebotlogin/screens/change_pin_screen.dart';
 import 'package:threebotlogin/screens/main_screen.dart';
+import 'package:threebotlogin/services/3bot_service.dart';
+import 'package:threebotlogin/services/crypto_service.dart';
 import 'package:threebotlogin/services/fingerprint_service.dart';
 import 'package:threebotlogin/services/open_kyc_service.dart';
+import 'package:threebotlogin/services/push_notifications_manager.dart';
 import 'package:threebotlogin/services/user_service.dart';
 import 'package:threebotlogin/widgets/custom_dialog.dart';
 import 'package:threebotlogin/widgets/email_verification_needed.dart';
@@ -24,6 +27,7 @@ class PreferenceScreen extends StatefulWidget {
 }
 
 class _PreferenceScreenState extends State<PreferenceScreen> {
+  FirebaseNotificationListener _listener;
   Map email;
   String doubleName = '';
   String phrase = '';
@@ -62,6 +66,7 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
     super.initState();
     getUserValues();
     checkBiometrics();
+    _listener = FirebaseNotificationListener();
     Globals().emailVerified.addListener(setEmailVerified);
     setVersion();
   }
@@ -251,37 +256,43 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
             },
           ),
           FlatButton(
-              child: new Text("Yes"),
-              onPressed: () async {
-                Events().emit(CloseSocketEvent());
-                Events().emit(FfpClearCacheEvent());
-                
-                bool result = await clearData();
-                if (result) {
-                  Navigator.pop(context);
-                  await Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) =>
-                              MainScreen(initDone: true, registered: false)));
-                } else {
-                  showDialog(
-                      context: preferenceContext,
-                      builder: (BuildContext context) => CustomDialog(
-                            title: 'Error',
-                            description:
-                                'Something went wrong when trying to remove your account.',
-                            actions: <Widget>[
-                              FlatButton(
-                                child: Text('Ok'),
-                                onPressed: () {
-                                  Navigator.pop(context);
-                                },
-                              )
-                            ],
-                          ));
-                }
-              }),
+            child: new Text("Yes"),
+            onPressed: () async {
+              try {
+                String deviceID = await _listener.getToken();
+                removeDeviceId(deviceID);
+              } catch (e) {}
+              Events().emit(CloseSocketEvent());
+              Events().emit(FfpClearCacheEvent());
+
+              bool result = await clearData();
+              if (result) {
+                Navigator.pop(context);
+                await Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) =>
+                            MainScreen(initDone: true, registered: false)));
+              } else {
+                showDialog(
+                  context: preferenceContext,
+                  builder: (BuildContext context) => CustomDialog(
+                    title: 'Error',
+                    description:
+                        'Something went wrong when trying to remove your account.',
+                    actions: <Widget>[
+                      FlatButton(
+                        child: Text('Ok'),
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                      )
+                    ],
+                  ),
+                );
+              }
+            },
+          ),
         ],
       ),
     );

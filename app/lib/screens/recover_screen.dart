@@ -5,6 +5,7 @@ import 'dart:convert';
 import 'package:crypto/crypto.dart';
 import 'package:http/http.dart';
 import 'package:threebotlogin/helpers/globals.dart';
+import 'package:threebotlogin/main.dart';
 import 'package:threebotlogin/services/3bot_service.dart';
 import 'package:threebotlogin/services/crypto_service.dart';
 import 'package:threebotlogin/services/open_kyc_service.dart';
@@ -63,7 +64,6 @@ class _RecoverScreenState extends State<RecoverScreen> {
 
   continueRecoverAccount() async {
     Map<String, String> keys = await generateKeysFromSeedPhrase(seedPhrase);
-
     await savePrivateKey(keys['privateKey']);
     await savePublicKey(keys['publicKey']);
     await saveFingerprint(false);
@@ -239,7 +239,7 @@ class _RecoverScreenState extends State<RecoverScreen> {
                     });
                   } else {
                     setState(() {
-                      error = "Someting went wrong";
+                      error = "Something went wrong";
                     });
                   }
                 }

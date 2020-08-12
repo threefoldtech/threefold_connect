@@ -11,7 +11,6 @@ LoggingService logger;
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
-
   bool initDone = await getInitDone();
   String doubleName = await getDoubleName();
 
