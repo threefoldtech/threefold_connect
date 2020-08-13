@@ -65,10 +65,10 @@ class _AppState extends State<MainScreen> {
     await checkIfAppIsUpToDate();
     await checkIfDeviceIdIsCorrect();
 
-    if (widget.initDone != null && !widget.initDone) {
-      await Navigator.push(
-          context, MaterialPageRoute(builder: (context) => InitScreen()));
-    }
+    // if (widget.initDone != null && !widget.initDone) {
+    //   await Navigator.push(
+    //       context, MaterialPageRoute(builder: (context) => InitScreen()));
+    // }
 
     if (!widget.registered) {
       await Navigator.push(context,
