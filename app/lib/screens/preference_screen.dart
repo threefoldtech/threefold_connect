@@ -12,7 +12,6 @@ import 'package:threebotlogin/screens/authentication_screen.dart';
 import 'package:threebotlogin/screens/change_pin_screen.dart';
 import 'package:threebotlogin/screens/main_screen.dart';
 import 'package:threebotlogin/services/3bot_service.dart';
-import 'package:threebotlogin/services/crypto_service.dart';
 import 'package:threebotlogin/services/fingerprint_service.dart';
 import 'package:threebotlogin/services/open_kyc_service.dart';
 import 'package:threebotlogin/services/push_notifications_manager.dart';
@@ -22,6 +21,7 @@ import 'package:threebotlogin/widgets/email_verification_needed.dart';
 
 class PreferenceScreen extends StatefulWidget {
   PreferenceScreen({Key key}) : super(key: key);
+
   @override
   _PreferenceScreenState createState() => _PreferenceScreenState();
 }

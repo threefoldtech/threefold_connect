@@ -44,15 +44,19 @@ class AppConfig extends EnvConfig {
 
 abstract class AppConfigImpl {
   String baseUrl();
+
   String openKycApiUrl();
+
   String threeBotApiUrl();
+
   String threeBotFrontEndUrl();
+
   String threeBotSocketUrl();
+
   Map<String, String> circleUrls();
 }
 
 class AppConfigProduction extends AppConfigImpl {
-
   String baseUrl() {
     return "login.threefold.me";
   }
@@ -77,9 +81,11 @@ class AppConfigProduction extends AppConfigImpl {
     Map<String, String> circleUrls = Map<String, String>();
 
     circleUrls['tftokens'] = 'https://freeflowpages.com/join/tf-tokens';
-    circleUrls['tf-news'] = 'https://freeflowpages.com/join/threefoldfoundation/';
+    circleUrls['tf-news'] =
+        'https://freeflowpages.com/join/threefoldfoundation/';
     circleUrls['tf-grid'] = 'https://freeflowpages.com/join/tf-grid';
-    circleUrls['freeflownation'] = 'https://freeflowpages.com/join/freeflownation';
+    circleUrls['freeflownation'] =
+        'https://freeflowpages.com/join/freeflownation';
     circleUrls['3bot'] = 'https://freeflowpages.com/join/3bot';
 
     return circleUrls;
@@ -87,7 +93,6 @@ class AppConfigProduction extends AppConfigImpl {
 }
 
 class AppConfigStaging extends AppConfigImpl {
-
   String baseUrl() {
     return "login.staging.jimber.org";
   }
@@ -112,9 +117,11 @@ class AppConfigStaging extends AppConfigImpl {
     Map<String, String> circleUrls = Map<String, String>();
 
     circleUrls['tftokens'] = 'https://staging.freeflowpages.com/join/tf-tokens';
-    circleUrls['tf-news'] = 'https://staging.freeflowpages.com/join/threefoldfoundation/';
+    circleUrls['tf-news'] =
+        'https://staging.freeflowpages.com/join/threefoldfoundation/';
     circleUrls['tf-grid'] = 'https://staging.freeflowpages.com/join/tf-grid';
-    circleUrls['freeflownation'] = 'https://staging.freeflowpages.com/join/freeflownation';
+    circleUrls['freeflownation'] =
+        'https://staging.freeflowpages.com/join/freeflownation';
     circleUrls['3bot'] = 'https://staging.freeflowpages.com/join/3bot';
 
     return circleUrls;
@@ -122,7 +129,6 @@ class AppConfigStaging extends AppConfigImpl {
 }
 
 class AppConfigTesting extends AppConfigImpl {
-
   String baseUrl() {
     return "login.testing.jimber.org";
   }
@@ -147,9 +153,11 @@ class AppConfigTesting extends AppConfigImpl {
     Map<String, String> circleUrls = Map<String, String>();
 
     circleUrls['tftokens'] = 'https://testing.freeflowpages.com/join/tf-tokens';
-    circleUrls['tf-news'] = 'https://testing.freeflowpages.com/join/threefoldfoundation/';
+    circleUrls['tf-news'] =
+        'https://testing.freeflowpages.com/join/threefoldfoundation/';
     circleUrls['tf-grid'] = 'https://testing.freeflowpages.com/join/tf-grid';
-    circleUrls['freeflownation'] = 'https://testing.freeflowpages.com/join/freeflownation';
+    circleUrls['freeflownation'] =
+        'https://testing.freeflowpages.com/join/freeflownation';
     circleUrls['3bot'] = 'https://testing.freeflowpages.com/join/3bot';
 
     return circleUrls;

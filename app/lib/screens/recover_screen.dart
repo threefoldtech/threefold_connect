@@ -1,11 +1,11 @@
+import 'dart:convert';
 import 'dart:core';
+
+import 'package:crypto/crypto.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'dart:convert';
-import 'package:crypto/crypto.dart';
 import 'package:http/http.dart';
 import 'package:threebotlogin/helpers/globals.dart';
-import 'package:threebotlogin/main.dart';
 import 'package:threebotlogin/services/3bot_service.dart';
 import 'package:threebotlogin/services/crypto_service.dart';
 import 'package:threebotlogin/services/open_kyc_service.dart';
@@ -14,7 +14,9 @@ import 'package:threebotlogin/services/user_service.dart';
 
 class RecoverScreen extends StatefulWidget {
   final Widget recoverScreen;
+
   RecoverScreen({Key key, this.recoverScreen}) : super(key: key);
+
   _RecoverScreenState createState() => _RecoverScreenState();
 }
 

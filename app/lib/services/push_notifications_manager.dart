@@ -1,4 +1,5 @@
 import 'package:firebase_messaging/firebase_messaging.dart';
+
 import 'logging_service.dart';
 
 LoggingService logger;
@@ -6,6 +7,7 @@ LoggingService logger;
 class FirebaseNotificationListener {
   FirebaseMessaging _firebaseMessaging;
   String token;
+
   FirebaseNotificationListener() {
     _firebaseMessaging = FirebaseMessaging();
     _firebaseMessaging.configure(
@@ -28,6 +30,7 @@ class FirebaseNotificationListener {
       logger.log("Settings registered: $settings");
     });
   }
+
   getToken() {
     return _firebaseMessaging.getToken();
   }

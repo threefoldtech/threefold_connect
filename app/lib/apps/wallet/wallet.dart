@@ -8,6 +8,7 @@ import 'package:threebotlogin/events/events.dart';
 class Wallet implements App {
   static final Wallet _singleton = new Wallet._internal();
   static final WalletWidget _walletWidget = WalletWidget();
+
   factory Wallet() {
     return _singleton;
   }

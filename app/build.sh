@@ -9,7 +9,7 @@ current_time=$(date "+%H.%M.%S-%d.%m.%Y")
 switchConfigs() {
     cp android/app/src/main/AndroidManifest_$1 android/app/src/main/AndroidManifest.xml
     cp android/app/src/main/AndroidManifest_$1 android/app/src/debug/AndroidManifest.xml
-    cp android/app/src/main/java/org/jimber/threebotlogin/MainActivity_$1 android/app/src/main/java/org/jimber/threebotlogin/MainActivity.java
+    # cp android/app/src/main/java/org/jimber/threebotlogin/MainActivity_$1 android/app/src/main/java/org/jimber/threebotlogin/MainActivity.java
     cp android/app/build_$1 android/app/build.gradle
     cp lib/helpers/env_config_$1.template lib/helpers/env_config.dart
 
@@ -60,7 +60,7 @@ then
     env_configFilePath=lib/helpers/env_config.dart
     AppConfigLocalFilePath=lib/app_config_local.dart
 
-    MainActivityPath=android/app/src/main/java/org/jimber/threebotlogin/MainActivity.java
+    # MainActivityPath=android/app/src/main/java/org/jimber/threebotlogin/MainActivity.java
     BuildGradlePath=android/app/build.gradle
 
     LauncherImgPath1=android/app/src/main/res/mipmap-hdpi/ic_launcher.png
@@ -72,7 +72,7 @@ then
     generateFile $env_configFilePath lib/helpers/env_config_local.template
     generateFile $AppConfigLocalFilePath lib/app_config_local.template
 
-    generateFile $MainActivityPath android/app/src/main/java/org/jimber/threebotlogin/MainActivity_local
+    # generateFile $MainActivityPath android/app/src/main/java/org/jimber/threebotlogin/MainActivity_local
     generateFile $BuildGradlePath android/app/build_local
     
     generateFile $LauncherImgPath1 android/app/src/main/res/mipmap-hdpi/ic_launcher_local.png

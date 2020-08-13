@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:threebotlogin/app_config.dart';
-import 'package:threebotlogin/apps/free_flow_pages/ffp_events.dart';
-import 'package:threebotlogin/events/events.dart';
 
 class RegisteredScreen extends StatefulWidget {
   static final RegisteredScreen _singleton = new RegisteredScreen._internal();

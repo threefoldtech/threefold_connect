@@ -52,7 +52,7 @@ class UniLinkService {
 
       if (loggedIn != null && loggedIn) {
         bool stateSaved = await savePreviousState(login.state);
-        
+
         if (stateSaved) {
           if (Platform.isAndroid) {
             await SystemNavigator.pop();

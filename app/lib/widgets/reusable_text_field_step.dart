@@ -16,7 +16,7 @@ class ReuseableTextFieldStep extends StatelessWidget {
   final FocusNode focusNode;
   final TextEditingController controller;
   final String suffixText;
-  final TextInputType typeText; 
+  final TextInputType typeText;
 
   @override
   Widget build(BuildContext context) {

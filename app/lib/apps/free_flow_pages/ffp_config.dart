@@ -15,6 +15,7 @@ class FfpConfig extends EnvConfig {
       impl = FfpConfigLocal();
     }
   }
+
   String appId() {
     return impl.appId();
   }
@@ -30,7 +31,9 @@ class FfpConfig extends EnvConfig {
 
 abstract class FfpConfigImpls {
   String appId();
+
   String url();
+
   String cookieUrl();
 }
 
