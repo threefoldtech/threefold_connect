@@ -87,10 +87,10 @@ def on_join(data):
             usersInRoom[room] = 1
         else:
             usersInRoom[room] += 1
-        if room in messageQueue:
-            for message in messageQueue[room]:
-                sio.emit(message[0], message[1], room=message[2])
-            messageQueue[room] = []
+    if room in messageQueue:
+        for message in messageQueue[room]:
+            sio.emit(message[0], message[1], room=message[2])
+        messageQueue[room] = []
 
 
 @sio.on("leave")
@@ -176,6 +176,7 @@ def sign_attempt_handler():
 
     logger.debug("roomToSendTo %s", roomToSendTo)
     sio.emit("signedAttempt", data, room=roomToSendTo)
+    emitOrQueue("signedAttempt", data, room=roomToSendTo)
     return Response("Ok")
 
 
