@@ -65,10 +65,10 @@ class _AppState extends State<MainScreen> {
     await checkIfAppIsUpToDate();
     await checkIfDeviceIdIsCorrect();
 
-    // if (widget.initDone != null && !widget.initDone) {
-    //   await Navigator.push(
-    //       context, MaterialPageRoute(builder: (context) => InitScreen()));
-    // }
+    if (widget.initDone != null && !widget.initDone) {
+      await Navigator.push(
+          context, MaterialPageRoute(builder: (context) => InitScreen()));
+    }
 
     if (!widget.registered) {
       await Navigator.push(context,
@@ -152,7 +152,7 @@ class _AppState extends State<MainScreen> {
         CustomDialog dialog = CustomDialog(
             title: "Oops",
             description:
-                "Something went wrong, please try again. Contact support if this issue persists.");
+                "Something went wrong when trying to connect to our servers, please try again. Contact support if this issue persists.");
         await dialog.show(context);
         if (Platform.isAndroid) {
           SystemNavigator.pop();
@@ -193,7 +193,7 @@ class _AppState extends State<MainScreen> {
       CustomDialog dialog = CustomDialog(
           title: "Oops",
           description:
-              "Something went wrong, please try again. Contact support if this issue persists.");
+              "Something went wrong when checking if the app is up-to-date, please try again. Contact support if this issue persists.");
       await dialog.show(context);
       if (Platform.isAndroid) {
         SystemNavigator.pop();
@@ -229,7 +229,7 @@ class _AppState extends State<MainScreen> {
         CustomDialog dialog = CustomDialog(
             title: "Oops",
             description:
-                "Something went wrong, please try again. Contact support if this issue persists.");
+                "Something went wrong when checking the deviceID, please try again. Contact support if this issue persists.");
         await dialog.show(context);
       }
     }
