@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "399226968341",
+    "firebase_url": "https://threebotlogin.firebaseio.com",
+    "project_id": "threebotlogin",
+    "storage_bucket": "threebotlogin.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:399226968341:android:95eb1acf46b3e9e6",
+        "android_client_info": {
+          "package_name": "org.jimber.threebotlogin"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "399226968341-7tlrt0lvjuqc62jd2idetkl0e27fq6a7.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCxEU23Xb-vgZdODqC2-wwluZ2TlAGj2Wg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "399226968341-7tlrt0lvjuqc62jd2idetkl0e27fq6a7.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "399226968341-hf8eptroon7e68fgm54pah1fp7kpentd.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "org.jimber.threebot"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
