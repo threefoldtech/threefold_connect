@@ -24,13 +24,14 @@ export default {
       url: '',
       spinner: false,
       rechecked: false,
-      didLeavePage: false,
       nameCheckerTimeOut: null,
       isMobile: /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent),
       randomRoom: ''
     }
   },
   mounted () {
+    window.onfocus = this.gotFocus
+
     if (document.referrer) {
       if (new URL(document.referrer).host !== new URL(window.location.href).host) {
         console.log('SET URL, ', document.referrer)
@@ -47,10 +48,9 @@ export default {
         this.randomRoom = generateUUID()
         window.localStorage.setItem('randomRoom', this.randomRoom)
       }
-      this.setrandomRoom(this.randomRoom)
+      alert(this.randomRoom)
+      this.setRandomRoom(this.randomRoom)
     }
-    window.onblur = this.lostFocus
-    window.onfocus = this.gotFocus
     this.appid = this.$route.query.appid
     console.log(`this.$route.query.appid`, this.$route.query.appid)
     if (!this.appid) {
@@ -109,17 +109,18 @@ export default {
       'checkName',
       'clearCheckStatus',
       'setAttemptCanceled',
-      'setrandomRoom'
+      'setRandomRoom'
     ]),
-    lostFocus () {
-      this.didLeavePage = true
+    gotFocus () {
+      this.randomRoom = window.localStorage.getItem('randomRoom')
+      this.setRandomRoom(this.randomRoom)
     },
     promptLoginToMobileUser () {
       this.loginUserMobile({
         mobile: this.isMobile,
         firstTime: false
       })
-      this.setrandomRoom(this.randomRoom)
+      this.setRandomRoom(this.randomRoom)
 
       var url = `threebot://login?state=${encodeURIComponent(this._state)}&randomRoom=${this.randomRoom}`
       if (this.scope) url += `&scope=${encodeURIComponent(this.scope)}`
