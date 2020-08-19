@@ -7,22 +7,22 @@ logcurrent_time=$(date "+%H:%M:%S %d.%m.%Y")
 current_time=$(date "+%H.%M.%S-%d.%m.%Y")
 
 compileAndUpload() {
-    if [[ $2 == "--$1" ]]
+    if [[ $2 == "--$5" ]]
     then
-        switchConfigs "$1"
+        switchConfigs "$5"
 
         if [[ $1 == "--run" ]]
         then
-            echo "[$1]: Running."
+            echo "[$5]: Running."
             flutter run -t lib/main.dart
         elif [[ $1 == "--switch" ]]
         then
-            echo "[$1]: Switched configs."
+            echo "[$5]: Switched configs."
         else
-            echo "[$1]: Building apk."
+            echo "[$5]: Building apk."
 
             setConfigsAndBuild
-            msgTelegram "$1" $4
+            msgTelegram "$5" $4
         fi
 
         exit 0
@@ -111,10 +111,10 @@ then
     exit 0
 fi
 
-compileAndUpload "local" $2 $3 $4
-compileAndUpload "testing" $2 $3 $4
-compileAndUpload "staging" $2 $3 $4
-compileAndUpload "production" $2 $3 $4
+compileAndUpload "$1" "$2" "$3" "$4" "local"
+compileAndUpload "$1" "$2" "$3" "$4" "testing"
+compileAndUpload "$1" "$2" "$3" "$4" "staging"
+compileAndUpload "$1" "$2" "$3" "$4" "production"
 
 echo "Syntax error."
 echo "Usage: ./build.sh --[[run|build|switch]] --[[local|testing|staging|production]]"
