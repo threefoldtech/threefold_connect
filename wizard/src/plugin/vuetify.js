@@ -1,10 +1,11 @@
 import Vue from 'vue'
-import Vuetify from 'vuetify'
-import 'vuetify/src/styles/main.sass'
-Vue.use(Vuetify)
+import Vuetify from 'vuetify/lib'
 
+Vue.use(Vuetify)
 export default new Vuetify({
-  iconfont: 'fa',
+  icons: {
+    iconfont: 'fa'
+  },
   theme: {
     themes: {
       light: {
