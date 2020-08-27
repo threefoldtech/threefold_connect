@@ -36,10 +36,6 @@ class AppConfig extends EnvConfig {
   String threeBotSocketUrl() {
     return appConfig.threeBotSocketUrl();
   }
-
-  Map<String, String> circleUrls() {
-    return appConfig.circleUrls();
-  }
 }
 
 abstract class AppConfigImpl {
@@ -52,8 +48,6 @@ abstract class AppConfigImpl {
   String threeBotFrontEndUrl();
 
   String threeBotSocketUrl();
-
-  Map<String, String> circleUrls();
 }
 
 class AppConfigProduction extends AppConfigImpl {
@@ -75,20 +69,6 @@ class AppConfigProduction extends AppConfigImpl {
 
   String threeBotSocketUrl() {
     return "wss://login.threefold.me";
-  }
-
-  Map<String, String> circleUrls() {
-    Map<String, String> circleUrls = Map<String, String>();
-
-    circleUrls['tftokens'] = 'https://freeflowpages.com/join/tf-tokens';
-    circleUrls['tf-news'] =
-        'https://freeflowpages.com/join/threefoldfoundation/';
-    circleUrls['tf-grid'] = 'https://freeflowpages.com/join/tf-grid';
-    circleUrls['freeflownation'] =
-        'https://freeflowpages.com/join/freeflownation';
-    circleUrls['3bot'] = 'https://freeflowpages.com/join/3bot';
-
-    return circleUrls;
   }
 }
 
@@ -112,20 +92,6 @@ class AppConfigStaging extends AppConfigImpl {
   String threeBotSocketUrl() {
     return "wss://login.staging.jimber.org";
   }
-
-  Map<String, String> circleUrls() {
-    Map<String, String> circleUrls = Map<String, String>();
-
-    circleUrls['tftokens'] = 'https://staging.freeflowpages.com/join/tf-tokens';
-    circleUrls['tf-news'] =
-        'https://staging.freeflowpages.com/join/threefoldfoundation/';
-    circleUrls['tf-grid'] = 'https://staging.freeflowpages.com/join/tf-grid';
-    circleUrls['freeflownation'] =
-        'https://staging.freeflowpages.com/join/freeflownation';
-    circleUrls['3bot'] = 'https://staging.freeflowpages.com/join/3bot';
-
-    return circleUrls;
-  }
 }
 
 class AppConfigTesting extends AppConfigImpl {
@@ -147,19 +113,5 @@ class AppConfigTesting extends AppConfigImpl {
 
   String threeBotSocketUrl() {
     return "wss://login.testing.jimber.org";
-  }
-
-  Map<String, String> circleUrls() {
-    Map<String, String> circleUrls = Map<String, String>();
-
-    circleUrls['tftokens'] = 'https://testing.freeflowpages.com/join/tf-tokens';
-    circleUrls['tf-news'] =
-        'https://testing.freeflowpages.com/join/threefoldfoundation/';
-    circleUrls['tf-grid'] = 'https://testing.freeflowpages.com/join/tf-grid';
-    circleUrls['freeflownation'] =
-        'https://testing.freeflowpages.com/join/freeflownation';
-    circleUrls['3bot'] = 'https://testing.freeflowpages.com/join/3bot';
-
-    return circleUrls;
   }
 }

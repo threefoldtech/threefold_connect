@@ -18,6 +18,7 @@ import 'package:threebotlogin/services/push_notifications_manager.dart';
 import 'package:threebotlogin/services/user_service.dart';
 import 'package:threebotlogin/widgets/custom_dialog.dart';
 import 'package:threebotlogin/widgets/email_verification_needed.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class PreferenceScreen extends StatefulWidget {
   PreferenceScreen({Key key}) : super(key: key);
@@ -169,11 +170,18 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
           ),
           Material(
             child: ListTile(
-              leading: Icon(Icons.info_outline),
+              leading: Icon(Icons.perm_device_information),
               title: Text("Version: " + version + " - " + buildNumber),
               onTap: () {
                 _showVersionInfo();
               },
+            ),
+          ),
+          Material(
+            child: ListTile(
+              leading: Icon(Icons.info_outline),
+              title: Text("Terms and conditions"),
+              onTap: _showTermsAndConds,
             ),
           ),
           ExpansionTile(
@@ -463,6 +471,15 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
           ),
         );
       }
+    }
+  }
+
+  void _showTermsAndConds() async {
+    const url = 'https://wiki.threefold.io/#/disclaimer';
+    if (await canLaunch(url)) {
+      await launch(url);
+    } else {
+      throw 'Could not launch $url';
     }
   }
 
