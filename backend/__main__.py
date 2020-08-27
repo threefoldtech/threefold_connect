@@ -27,7 +27,7 @@ push_service = FCMNotification(api_key=config['DEFAULT']['API_KEY'])
 app = Flask(__name__)
 sio = SocketIO(app, transports=["websocket"])
 
-CORS(app, resources={r"*": {"origins": ["*"]}})
+CORS(app, support_credentials=True, resources={r"*": {"origins": ["*"]}})
 
 usersInRoom = {}
 messageQueue = {}
