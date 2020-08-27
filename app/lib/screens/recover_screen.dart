@@ -202,12 +202,19 @@ class _RecoverScreenState extends State<RecoverScreen> {
 
                 FocusScope.of(context).requestFocus(new FocusNode());
 
-                String email = emailController.text?.toLowerCase()?.trim();
-                bool emailValid = validateEmail(email);
+                String doubleNameValue = doubleNameController.text?.toLowerCase()?.trim()?.replaceAll(new RegExp(r"\s+"), " ");
+                String emailValue = emailController.text?.toLowerCase()?.trim()?.replaceAll(new RegExp(r"\s+"), " ");
+                String seedPhraseValue = seedPhrasecontroller.text?.toLowerCase()?.trim()?.replaceAll(new RegExp(r"\s+"), " ");
+
+                bool emailValid = validateEmail(emailValue);
 
                 setState(() {
-                  emailController.text = email;
+                  doubleNameController.text = doubleNameValue;
+                  emailController.text = emailValue;
+                  seedPhrasecontroller.text = seedPhraseValue;
+
                   _autoValidate = true;
+                  
                   doubleName = doubleNameController.text + '.3bot';
                   emailFromForm = emailController.text;
                   seedPhrase = seedPhrasecontroller.text;

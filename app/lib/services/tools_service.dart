@@ -36,11 +36,13 @@ bool validateSeedWords(String seed, String confirmationWords) {
   return true;
 }
 
-String validateDoubleName(String value) {
+bool validateDoubleName(String value) {
   Pattern pattern = r'^[a-zA-Z0-9]+$';
   RegExp regex = new RegExp(pattern);
+
   if (!regex.hasMatch(value)) {
-    return 'Enter Valid Email';
+    return false;
   }
-  return null;
+  
+  return true;
 }

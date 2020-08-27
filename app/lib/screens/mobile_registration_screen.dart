@@ -64,12 +64,17 @@ class _MobileRegistrationScreenState extends State<MobileRegistrationScreen> {
   }
 
   checkEmail() async {
-    String email = emailController.text?.toLowerCase()?.trim();
-    bool emailValid = validateEmail(email);
+    String emailValue = emailController.text?.toLowerCase()?.trim()?.replaceAll(new RegExp(r"\s+"), " ");
+
     setState(() {
-      emailController.text = email;
+      emailController.text = emailValue;
+    });
+
+    bool emailValid = validateEmail(emailValue);
+
+    setState(() {
       if (emailValid) {
-        _registrationData.email = email;
+        _registrationData.email = emailValue;
         state = _State.SeedPhrase;
       } else {
         errorStepperText = "Please enter a valid email.";
@@ -78,14 +83,17 @@ class _MobileRegistrationScreenState extends State<MobileRegistrationScreen> {
   }
 
   checkDoubleName() async {
+    String doubleNameValue = doubleNameController.text?.toLowerCase()?.trim()?.replaceAll(new RegExp(r"\s+"), " ");
+
+    setState(() {
+      doubleNameController.text = doubleNameValue;
+    });
+
     if (doubleNameController.text != null || doubleNameController.text != '') {
-      _registrationData.doubleName =
-          doubleNameController.text.toLowerCase() + '.3bot';
-      String doubleNameValidation =
-          validateDoubleName(doubleNameController.text);
-      if (doubleNameValidation == null) {
-        Response userInfoResult =
-            await getUserInfo(_registrationData.doubleName.toLowerCase());
+      _registrationData.doubleName = doubleNameController.text + '.3bot';
+      bool doubleNameValidation = validateDoubleName(doubleNameController.text);
+      if (doubleNameValidation) {
+        Response userInfoResult = await getUserInfo(_registrationData.doubleName);
         if (userInfoResult.statusCode != 200) {
           setState(() {
             state = _State.Email;
@@ -116,8 +124,14 @@ class _MobileRegistrationScreenState extends State<MobileRegistrationScreen> {
   }
 
   checkConfirm() {
-    bool seedWordConfirmationValidation = validateSeedWords(
-        _registrationData.phrase, seedConfirmationController.text);
+    String seedCheckValue = seedConfirmationController.text?.toLowerCase()?.trim()?.replaceAll(new RegExp(r"\s+"), " ");
+
+    setState(() {
+      seedConfirmationController.text = seedCheckValue;
+    });
+
+    bool seedWordConfirmationValidation = validateSeedWords(_registrationData.phrase, seedConfirmationController.text);
+    
     if (seedWordConfirmationValidation) {
       setState(() {
         state = _State.Finish;
@@ -222,11 +236,15 @@ class _MobileRegistrationScreenState extends State<MobileRegistrationScreen> {
   }
 
   void saveRegistration() async {
+    // _registrationData.doubleName = _registrationData.doubleName?.toLowerCase()?.trim()?.replaceAll(new RegExp(r"\s+"), " ");
+    // _registrationData.email = _registrationData.email?.toLowerCase()?.trim()?.replaceAll(new RegExp(r"\s+"), " ");
+    // _registrationData.phrase = _registrationData.phrase?.toLowerCase()?.trim()?.replaceAll(new RegExp(r"\s+"), " ");
+
     savePrivateKey(_registrationData.keys['privateKey']);
     savePublicKey(_registrationData.keys['publicKey']);
     saveFingerprint(false);
     saveEmail(_registrationData.email, null);
-    saveDoubleName(_registrationData.doubleName.toLowerCase());
+    saveDoubleName(_registrationData.doubleName);
     savePhrase(_registrationData.phrase);
 
     await sendVerificationEmail();
