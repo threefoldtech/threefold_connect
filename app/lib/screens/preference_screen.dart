@@ -12,22 +12,23 @@ import 'package:threebotlogin/screens/authentication_screen.dart';
 import 'package:threebotlogin/screens/change_pin_screen.dart';
 import 'package:threebotlogin/screens/main_screen.dart';
 import 'package:threebotlogin/services/3bot_service.dart';
-import 'package:threebotlogin/services/crypto_service.dart';
 import 'package:threebotlogin/services/fingerprint_service.dart';
 import 'package:threebotlogin/services/open_kyc_service.dart';
-import 'package:threebotlogin/services/push_notifications_manager.dart';
+// import 'package:threebotlogin/services/push_notifications_manager.dart';
 import 'package:threebotlogin/services/user_service.dart';
 import 'package:threebotlogin/widgets/custom_dialog.dart';
 import 'package:threebotlogin/widgets/email_verification_needed.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class PreferenceScreen extends StatefulWidget {
   PreferenceScreen({Key key}) : super(key: key);
+
   @override
   _PreferenceScreenState createState() => _PreferenceScreenState();
 }
 
 class _PreferenceScreenState extends State<PreferenceScreen> {
-  FirebaseNotificationListener _listener;
+  // FirebaseNotificationListener _listener;
   Map email;
   String doubleName = '';
   String phrase = '';
@@ -66,7 +67,7 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
     super.initState();
     getUserValues();
     checkBiometrics();
-    _listener = FirebaseNotificationListener();
+    // _listener = FirebaseNotificationListener();
     Globals().emailVerified.addListener(setEmailVerified);
     setVersion();
   }
@@ -169,11 +170,18 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
           ),
           Material(
             child: ListTile(
-              leading: Icon(Icons.info_outline),
+              leading: Icon(Icons.perm_device_information),
               title: Text("Version: " + version + " - " + buildNumber),
               onTap: () {
                 _showVersionInfo();
               },
+            ),
+          ),
+          Material(
+            child: ListTile(
+              leading: Icon(Icons.info_outline),
+              title: Text("Terms and conditions"),
+              onTap: _showTermsAndConds,
             ),
           ),
           ExpansionTile(
@@ -258,10 +266,10 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
           FlatButton(
             child: new Text("Yes"),
             onPressed: () async {
-              try {
-                String deviceID = await _listener.getToken();
-                removeDeviceId(deviceID);
-              } catch (e) {}
+              // try {
+              //   String deviceID = await _listener.getToken();
+              //   removeDeviceId(deviceID);
+              // } catch (e) {}
               Events().emit(CloseSocketEvent());
               Events().emit(FfpClearCacheEvent());
 
@@ -463,6 +471,15 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
           ),
         );
       }
+    }
+  }
+
+  void _showTermsAndConds() async {
+    const url = 'https://wiki.threefold.io/#/disclaimer';
+    if (await canLaunch(url)) {
+      await launch(url);
+    } else {
+      throw 'Could not launch $url';
     }
   }
 

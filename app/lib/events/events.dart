@@ -1,8 +1,10 @@
 class Events {
   static final Events _singleton = new Events._internal();
+
   factory Events() {
     return _singleton;
   }
+
   Map<Type, dynamic> eventList = Map<Type, dynamic>();
 
   Events._internal(); // init here

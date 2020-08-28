@@ -1,6 +1,6 @@
 run:
 	tmux new-session \; split-window -d \; split-window -h \; select-pane -t 2 \; split-window -h \; select-pane -t 0 \; \
-		send-keys "cd \"./backend\" && python3 ." ENTER \; select-pane -t 1 \; \
-		send-keys "cd \"./openkyc\" && export PASSWORD="PASSWORD" && FLASK_APP=openkyc.py python3 -m flask run --reload --debugger --host=0.0.0.0 -p 5005" ENTER \; select-pane -t 2 \; \
-		send-keys "cd \"./frontend\" && npm run serve-mathias && exec bash" ENTER \; select-pane -t 3 \; \
-		send-keys "cd \"./example\" && npm run serve-mathias && exec bash" ENTER \;
+		send-keys "cd \"./backend\" && uwsgi --disable-logging --http :5000 --gevent 1000 --http-websockets --master --wsgi-file __main__.py --callable app -s 0.0.0.0:3030" ENTER \; select-pane -t 1 \; \
+		send-keys "cd .. && cd \"./openkyc\" && export URL=https://login.singlecore.be && export SEED=SEED_HERE && export PASSWORD=PASSWORD_HERE && FLASK_APP=openkyc.py python3 -m flask run --reload --debugger --host=0.0.0.0 -p 5051" ENTER \; select-pane -t 2 \; \
+		send-keys "cd \"./frontend\" && npm run serve-local" ENTER \; select-pane -t 3 \; \
+		send-keys "cd \"./example\" && npm run serve-local" ENTER \;

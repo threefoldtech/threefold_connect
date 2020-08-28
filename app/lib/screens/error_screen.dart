@@ -5,8 +5,10 @@ import 'package:threebotlogin/helpers/globals.dart';
 class ErrorScreen extends StatefulWidget {
   final Widget errorScreen;
   final String errorMessage;
+
   ErrorScreen({Key key, this.errorScreen, this.errorMessage = ''})
       : super(key: key);
+
   _ErrorScreenState createState() => _ErrorScreenState();
 }
 

@@ -23,6 +23,7 @@ app/**/doc/api/
 app/.dart_tool/
 app/.flutter-plugins
 app/.packages
+app/.metadata
 app/.pub-cache/
 app/.pub/
 app/build/

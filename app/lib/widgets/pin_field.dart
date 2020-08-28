@@ -6,12 +6,14 @@ class PinField extends StatefulWidget {
   final callback;
   final callbackParam;
   final Function callbackFunction;
+
   PinField(
       {Key key,
       @required this.callback,
       this.callbackParam,
       this.callbackFunction})
       : super(key: key);
+
   _PinFieldState createState() => _PinFieldState();
 }
 

@@ -1,11 +1,11 @@
+import 'dart:convert';
 import 'dart:core';
+
+import 'package:crypto/crypto.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'dart:convert';
-import 'package:crypto/crypto.dart';
 import 'package:http/http.dart';
 import 'package:threebotlogin/helpers/globals.dart';
-import 'package:threebotlogin/main.dart';
 import 'package:threebotlogin/services/3bot_service.dart';
 import 'package:threebotlogin/services/crypto_service.dart';
 import 'package:threebotlogin/services/open_kyc_service.dart';
@@ -14,7 +14,9 @@ import 'package:threebotlogin/services/user_service.dart';
 
 class RecoverScreen extends StatefulWidget {
   final Widget recoverScreen;
+
   RecoverScreen({Key key, this.recoverScreen}) : super(key: key);
+
   _RecoverScreenState createState() => _RecoverScreenState();
 }
 
@@ -200,12 +202,19 @@ class _RecoverScreenState extends State<RecoverScreen> {
 
                 FocusScope.of(context).requestFocus(new FocusNode());
 
-                String email = emailController.text?.toLowerCase()?.trim();
-                bool emailValid = validateEmail(email);
+                String doubleNameValue = doubleNameController.text?.toLowerCase()?.trim()?.replaceAll(new RegExp(r"\s+"), " ");
+                String emailValue = emailController.text?.toLowerCase()?.trim()?.replaceAll(new RegExp(r"\s+"), " ");
+                String seedPhraseValue = seedPhrasecontroller.text?.toLowerCase()?.trim()?.replaceAll(new RegExp(r"\s+"), " ");
+
+                bool emailValid = validateEmail(emailValue);
 
                 setState(() {
-                  emailController.text = email;
+                  doubleNameController.text = doubleNameValue;
+                  emailController.text = emailValue;
+                  seedPhrasecontroller.text = seedPhraseValue;
+
                   _autoValidate = true;
+                  
                   doubleName = doubleNameController.text + '.3bot';
                   emailFromForm = emailController.text;
                   seedPhrase = seedPhrasecontroller.text;

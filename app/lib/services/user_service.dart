@@ -27,7 +27,7 @@ Future<void> savePublicKey(key) async {
 Future<String> getPublicKey() async {
   final SharedPreferences prefs = await SharedPreferences.getInstance();
 
-  if(!(await getIsPublicKeyFixed())) {
+  if (!(await getIsPublicKeyFixed())) {
     var userInfoResponse = await getUserInfo(await getDoubleName());
 
     if (userInfoResponse.statusCode != 200) {
@@ -54,13 +54,12 @@ Future<bool> getIsPublicKeyFixed() async {
   try {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
 
-    if(prefs.getBool('ispublickeyfixed') == null) {
+    if (prefs.getBool('ispublickeyfixed') == null) {
       return false;
     }
 
     return prefs.getBool('ispublickeyfixed');
   } catch (_) {
-    
     return false;
   }
 }

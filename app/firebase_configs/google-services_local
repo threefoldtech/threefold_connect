@@ -1,0 +1,86 @@
+
+{
+  "project_info": {
+    "project_number": "1047213728155",
+    "firebase_url": "https://threebot-staging.firebaseio.com",
+    "project_id": "threebot-staging",
+    "storage_bucket": "threebot-staging.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1047213728155:android:40e3cf538c8669f72cc13e",
+        "android_client_info": {
+          "package_name": "org.jimber.threebotlogin.local"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1047213728155-ku9mv6omss5f8ou2e2dmmb0miatm8jq1.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC5DpdCu4_zpue06Q7v29GSpR8IEFUaMR8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1047213728155-ku9mv6omss5f8ou2e2dmmb0miatm8jq1.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "1047213728155-7oadtnh12fvjevrgqtbcvntldeq6bhn9.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "org.jimber.threebotlogin.staging",
+                "app_store_id": "1466938249"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1047213728155:android:e493b84513e284bd2cc13e",
+        "android_client_info": {
+          "package_name": "org.jimber.threebotlogin.staging"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1047213728155-ku9mv6omss5f8ou2e2dmmb0miatm8jq1.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC5DpdCu4_zpue06Q7v29GSpR8IEFUaMR8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1047213728155-ku9mv6omss5f8ou2e2dmmb0miatm8jq1.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "1047213728155-7oadtnh12fvjevrgqtbcvntldeq6bhn9.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "org.jimber.threebotlogin.staging",
+                "app_store_id": "1466938249"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

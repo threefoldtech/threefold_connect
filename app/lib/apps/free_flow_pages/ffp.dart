@@ -7,6 +7,7 @@ import 'package:threebotlogin/events/events.dart';
 class Ffp implements App {
   static final Ffp _singleton = new Ffp._internal();
   static final FfpWidget _ffpWidget = FfpWidget();
+
   factory Ffp() {
     return _singleton;
   }

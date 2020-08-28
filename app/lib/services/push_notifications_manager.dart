@@ -1,34 +1,37 @@
-import 'package:firebase_messaging/firebase_messaging.dart';
-import 'logging_service.dart';
+// import 'package:firebase_messaging/firebase_messaging.dart';
 
-LoggingService logger;
+// import 'logging_service.dart';
 
-class FirebaseNotificationListener {
-  FirebaseMessaging _firebaseMessaging;
-  String token;
-  FirebaseNotificationListener() {
-    _firebaseMessaging = FirebaseMessaging();
-    _firebaseMessaging.configure(
-      onMessage: (Map<String, dynamic> message) async {
-        logger.log('On message $message');
-      },
-      onLaunch: (Map<String, dynamic> message) async {
-        logger.log('On launch $message');
-      },
-      onResume: (Map<String, dynamic> message) async {
-        logger.log('On resume $message');
-      },
-    );
+// LoggingService logger;
 
-    _firebaseMessaging.requestNotificationPermissions(
-        const IosNotificationSettings(sound: true, badge: true, alert: true));
+// class FirebaseNotificationListener {
+//   FirebaseMessaging _firebaseMessaging;
+//   String token;
 
-    _firebaseMessaging.onIosSettingsRegistered
-        .listen((IosNotificationSettings settings) {
-      logger.log("Settings registered: $settings");
-    });
-  }
-  getToken() {
-    return _firebaseMessaging.getToken();
-  }
-}
+//   FirebaseNotificationListener() {
+//     _firebaseMessaging = FirebaseMessaging();
+//     _firebaseMessaging.configure(
+//       onMessage: (Map<String, dynamic> message) async {
+//         logger.log('On message $message');
+//       },
+//       onLaunch: (Map<String, dynamic> message) async {
+//         logger.log('On launch $message');
+//       },
+//       onResume: (Map<String, dynamic> message) async {
+//         logger.log('On resume $message');
+//       },
+//     );
+
+//     _firebaseMessaging.requestNotificationPermissions(
+//         const IosNotificationSettings(sound: true, badge: true, alert: true));
+
+//     _firebaseMessaging.onIosSettingsRegistered
+//         .listen((IosNotificationSettings settings) {
+//       logger.log("Settings registered: $settings");
+//     });
+//   }
+
+//   getToken() {
+//     return _firebaseMessaging.getToken();
+//   }
+// }

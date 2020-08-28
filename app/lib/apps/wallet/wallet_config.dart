@@ -1,4 +1,3 @@
-
 import 'package:threebotlogin/helpers/env_config.dart';
 import 'package:threebotlogin/helpers/environment.dart';
 
@@ -16,6 +15,7 @@ class WalletConfig extends EnvConfig {
       impl = WalletConfigLocal();
     }
   }
+
   String appId() {
     return impl.appId();
   }
@@ -27,6 +27,7 @@ class WalletConfig extends EnvConfig {
 
 abstract class WalletConfigImpls {
   String appId();
+
   String redirectUrl();
 }
 

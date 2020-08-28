@@ -1,10 +1,10 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:typed_data';
-import 'package:convert/convert.dart';
 
-import 'package:flutter_sodium/flutter_sodium.dart';
 import 'package:bip39/bip39.dart' as bip39;
+import 'package:convert/convert.dart';
+import 'package:flutter_sodium/flutter_sodium.dart';
 import 'package:password_hash/password_hash.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:threebotlogin/main.dart';
@@ -67,10 +67,13 @@ Future<Map<String, String>> encrypt(
   };
 }
 
-Future<Uint8List> decrypt(String encodedCipherText, String encodedPublicKey, String encodedSecretKey) async {
+Future<Uint8List> decrypt(String encodedCipherText, String encodedPublicKey,
+    String encodedSecretKey) async {
   Uint8List cipherText = base64.decode(encodedCipherText);
-  Uint8List publicKey = await Sodium.cryptoSignEd25519PkToCurve25519(base64.decode(encodedPublicKey));
-  Uint8List secretKey = await Sodium.cryptoSignEd25519SkToCurve25519(base64.decode(encodedSecretKey));
+  Uint8List publicKey = await Sodium.cryptoSignEd25519PkToCurve25519(
+      base64.decode(encodedPublicKey));
+  Uint8List secretKey = await Sodium.cryptoSignEd25519SkToCurve25519(
+      base64.decode(encodedSecretKey));
 
   return await Sodium.cryptoBoxSealOpen(cipherText, publicKey, secretKey);
 }
@@ -78,7 +81,6 @@ Future<Uint8List> decrypt(String encodedCipherText, String encodedPublicKey, Str
 Future<String> generateSeedPhrase() async {
   return bip39.generateMnemonic(strength: 256);
 }
-
 
 void testMe() {
   String base64EncodedEntropy = "tllF+NHT24MLhLVfyCxMbtkoI/wdt+fkQHjELBW78BQ=";
