@@ -35,7 +35,7 @@ class _MobileRegistrationScreenState extends State<MobileRegistrationScreen> {
   final emailController = TextEditingController();
   final seedConfirmationController = TextEditingController();
   _State state = _State.DoubleName;
-  FirebaseNotificationListener _listener;
+  // FirebaseNotificationListener _listener;
 
   bool isVisible = false;
 
@@ -55,7 +55,7 @@ class _MobileRegistrationScreenState extends State<MobileRegistrationScreen> {
         doubleNameController.text = widget.doubleName;
       });
     }
-    _listener = FirebaseNotificationListener();
+    // _listener = FirebaseNotificationListener();
     super.initState();
   }
 
@@ -145,15 +145,14 @@ class _MobileRegistrationScreenState extends State<MobileRegistrationScreen> {
 
   finish() async {
     loadingDialog();
-    String deviceId = await _listener.getToken();
-    String signedDeviceId =
-        await (signData(deviceId, _registrationData.keys['privateKey']));
+    // String deviceId = await _listener.getToken();
+    // String signedDeviceId =
+    //     await (signData(deviceId, _registrationData.keys['privateKey']));
     Response response = await finishRegistration(
         doubleNameController.text,
         emailController.text,
         'random',
-        _registrationData.keys['publicKey'],
-        signedDeviceId);
+        _registrationData.keys['publicKey']);
 
     if (response.statusCode == 200) {
       saveRegistration();

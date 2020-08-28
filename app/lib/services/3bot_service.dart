@@ -91,14 +91,13 @@ Future<Response> removeDeviceId(String deviceId) {
 }
 
 Future<Response> finishRegistration(String doubleName, String email, String sid,
-    String publicKey, String signedDeviceId) async {
+    String publicKey) async {
   return http.post('$threeBotApiUrl/mobileregistration',
       body: json.encode({
         'doubleName': doubleName + '.3bot',
         'sid': sid,
         'email': email.toLowerCase().trim(),
-        'public_key': publicKey,
-        'signed_device_id': signedDeviceId
+        'public_key': publicKey
       }),
       headers: requestHeaders);
 }

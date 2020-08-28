@@ -34,14 +34,14 @@ class MainScreen extends StatefulWidget {
 class _AppState extends State<MainScreen> {
   StreamSubscription _sub;
   String initialLink;
-  FirebaseNotificationListener _listener;
+  // FirebaseNotificationListener _listener;
   BackendConnection _backendConnection;
 
   @override
   void initState() {
     super.initState();
     Events().reset();
-    _listener = FirebaseNotificationListener();
+    // _listener = FirebaseNotificationListener();
     WidgetsBinding.instance.addPostFrameCallback((_) => pushScreens());
   }
 
@@ -203,37 +203,37 @@ class _AppState extends State<MainScreen> {
     }
   }
 
-  checkIfDeviceIdIsCorrect() async {
-    var doubleName = await getDoubleName();
-    if (doubleName != null) {
-      try {
-        // Get user info
-        Response userInfoResult = await getUserInfo(doubleName);
-        if (userInfoResult.statusCode != 200) {
-          throw new Exception('User not found.');
-        }
-        Map<String, dynamic> body = json.decode(userInfoResult.body);
+  // checkIfDeviceIdIsCorrect() async {
+  //   var doubleName = await getDoubleName();
+  //   if (doubleName != null) {
+  //     try {
+  //       // Get user info
+  //       Response userInfoResult = await getUserInfo(doubleName);
+  //       if (userInfoResult.statusCode != 200) {
+  //         throw new Exception('User not found.');
+  //       }
+  //       Map<String, dynamic> body = json.decode(userInfoResult.body);
 
-        // Compare device id
-        if (body == null ||
-            body['device_id'] == null ||
-            !body['device_id'].contains(await _listener.getToken())) {
-          // If no match, update and recheck
-          updateDeviceID(
-              await getDoubleName(),
-              await signData(
-                  await _listener.getToken(), await getPrivateKey()));
-          checkIfDeviceIdIsCorrect();
-        }
-      } on Exception catch (_) {
-        CustomDialog dialog = CustomDialog(
-            title: "Oops",
-            description:
-                "Something went wrong when checking the deviceID, please try again. Contact support if this issue persists.");
-        await dialog.show(context);
-      }
-    }
-  }
+  //       // Compare device id
+  //       if (body == null ||
+  //           body['device_id'] == null ||
+  //           !body['device_id'].contains(await _listener.getToken())) {
+  //         // If no match, update and recheck
+  //         updateDeviceID(
+  //             await getDoubleName(),
+  //             await signData(
+  //                 await _listener.getToken(), await getPrivateKey()));
+  //         checkIfDeviceIdIsCorrect();
+  //       }
+  //     } on Exception catch (_) {
+  //       CustomDialog dialog = CustomDialog(
+  //           title: "Oops",
+  //           description:
+  //               "Something went wrong when checking the deviceID, please try again. Contact support if this issue persists.");
+  //       await dialog.show(context);
+  //     }
+  //   }
+  // }
 
   Future<Null> initUniLinks() async {
     initialLink = await getInitialLink();

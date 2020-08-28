@@ -14,7 +14,7 @@ import 'package:threebotlogin/screens/main_screen.dart';
 import 'package:threebotlogin/services/3bot_service.dart';
 import 'package:threebotlogin/services/fingerprint_service.dart';
 import 'package:threebotlogin/services/open_kyc_service.dart';
-import 'package:threebotlogin/services/push_notifications_manager.dart';
+// import 'package:threebotlogin/services/push_notifications_manager.dart';
 import 'package:threebotlogin/services/user_service.dart';
 import 'package:threebotlogin/widgets/custom_dialog.dart';
 import 'package:threebotlogin/widgets/email_verification_needed.dart';
@@ -28,7 +28,7 @@ class PreferenceScreen extends StatefulWidget {
 }
 
 class _PreferenceScreenState extends State<PreferenceScreen> {
-  FirebaseNotificationListener _listener;
+  // FirebaseNotificationListener _listener;
   Map email;
   String doubleName = '';
   String phrase = '';
@@ -67,7 +67,7 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
     super.initState();
     getUserValues();
     checkBiometrics();
-    _listener = FirebaseNotificationListener();
+    // _listener = FirebaseNotificationListener();
     Globals().emailVerified.addListener(setEmailVerified);
     setVersion();
   }
@@ -266,10 +266,10 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
           FlatButton(
             child: new Text("Yes"),
             onPressed: () async {
-              try {
-                String deviceID = await _listener.getToken();
-                removeDeviceId(deviceID);
-              } catch (e) {}
+              // try {
+              //   String deviceID = await _listener.getToken();
+              //   removeDeviceId(deviceID);
+              // } catch (e) {}
               Events().emit(CloseSocketEvent());
               Events().emit(FfpClearCacheEvent());
 
