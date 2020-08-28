@@ -63,7 +63,7 @@ class _AppState extends State<MainScreen> {
     await checkInternetConnection();
     await checkInternetConnectionWithOurServers();
     await checkIfAppIsUpToDate();
-    await checkIfDeviceIdIsCorrect();
+    // await checkIfDeviceIdIsCorrect();
 
     if (widget.initDone != null && !widget.initDone) {
       await Navigator.push(

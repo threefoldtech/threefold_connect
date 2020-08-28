@@ -43,76 +43,68 @@ def insert_user(conn, insert_user_sql, *params):
     except Error as e:
         logger.debug(e)
 
-def insert_app_derived_public_key(conn, insert_user_sql, *params):
-    logger.debug("Inserting app derived public key")
-    try:
-        c = conn.cursor()
-        if len(params) == 3:
-            c.execute(insert_user_sql, (params[0], params[1], params[2]))
-            conn.commit()
-    except Error as e:
-        logger.debug(e)
+# def insert_app_derived_public_key(conn, insert_user_sql, *params):
+#     logger.debug("Inserting app derived public key")
+#     try:
+#         c = conn.cursor()
+#         if len(params) == 3:
+#             c.execute(insert_user_sql, (params[0], params[1], params[2]))
+#             conn.commit()
+#     except Error as e:
+#         logger.debug(e)
 
-def select_all(conn, select_all_users):
-    try:
-        c = conn.cursor()
-        c.execute(select_all_users)
-        rows = c.fetchall()
+# def select_all(conn, select_all_users):
+#     try:
+#         c = conn.cursor()
+#         c.execute(select_all_users)
+#         rows = c.fetchall()
 
-        for row in rows:
-            logger.debug(row)
-    except Error as e:
-        logger.debug(e)
+#         for row in rows:
+#             logger.debug(row)
+#     except Error as e:
+#         logger.debug(e)
 
-def select_from_userapps(conn, statement, *params):
-    try:
-        c = conn.cursor()
-        c.execute(statement, (params[0], params[1]))
-        return c.fetchone()
-    except Error as e:
-        logger.debug(e)
+# def update_deviceid(conn, device_id, doublename):
+#     try:
+#         logger.debug("Updating deviceid for user %s", doublename)
+#         delete_sql = "UPDATE users SET device_id = ? WHERE double_name=?;"
+#         c = conn.cursor()
+#         c.execute(delete_sql, (device_id, doublename))
+#         conn.commit()
+#     except Error as e:
+#         logger.debug(e)
 
-def update_deviceid(conn, device_id, doublename):
-    try:
-        logger.debug("Updating deviceid for user %s", doublename)
-        delete_sql = "UPDATE users SET device_id = ? WHERE double_name=?;"
-        c = conn.cursor()
-        c.execute(delete_sql, (device_id, doublename))
-        conn.commit()
-    except Error as e:
-        logger.debug(e)
+# def get_deviceid(conn, doublename):
+#     try:
+#         logger.debug("Getting deviceid for user %s", doublename)
+#         select_sql = "SELECT device_id FROM users where double_name=?;"
+#         c = conn.cursor()
+#         c.execute(select_sql, (doublename,))
+#         result = c.fetchone()
+#         logger.debug("deviceid %s", result)
+#         return result
+#     except Error as e:
+#         logger.debug(e)
 
-def get_deviceid(conn, doublename):
-    try:
-        logger.debug("Getting deviceid for user %s", doublename)
-        select_sql = "SELECT device_id FROM users where double_name=?;"
-        c = conn.cursor()
-        c.execute(select_sql, (doublename,))
-        result = c.fetchone()
-        logger.debug("deviceid %s", result)
-        return result
-    except Error as e:
-        logger.debug(e)
+# def update_user(conn, update_sql, *params):
+#     try:
+#         c = conn.cursor()
+#         if len(params) == 2:
+#             c.execute(update_sql, (params[0], params[1]))
+#             conn.commit()
+#         elif len(params) == 4:
+#             c.execute(update_sql, (params[0], params[1], params[2], params[3]))
+#             conn.commit()
+#     except Error as e:
+#         logger.debug(e)
 
-def update_user(conn, update_sql, *params):
-    try:
-        c = conn.cursor()
-        if len(params) == 2:
-            c.execute(update_sql, (params[0], params[1]))
-            conn.commit()
-        elif len(params) == 4:
-            c.execute(update_sql, (params[0], params[1], params[2], params[3]))
-            conn.commit()
-    except Error as e:
-        logger.debug(e)
-
-def update_auth(conn, update_sql, signed_state, data, double_name):
-    try:
-        c = conn.cursor()
-        c.execute(update_sql, (signed_state, data, double_name))
-        conn.commit()
-    except Error as e:
-        logger.debug(e)
+# def update_auth(conn, update_sql, signed_state, data, double_name):
+#     try:
+#         c = conn.cursor()
+#         c.execute(update_sql, (signed_state, data, double_name))
+#         conn.commit()
+#     except Error as e:
+#         logger.debug(e)
 
 def get_user_by_name(conn, double_name):
     find_statement = "SELECT * FROM users WHERE double_name=? LIMIT 1;"
@@ -123,16 +115,16 @@ def get_user_by_name(conn, double_name):
     except Error as e:
         logger.debug(e)
 
-def get_users_by_device_id(conn, device_id):
-    find_statement = "SELECT * FROM users WHERE device_id like ?;"
-    try:
-        c = conn.cursor()
-        search_device_id = "%" + device_id + "%"
-        c.execute(find_statement, (search_device_id,))
-        rows = c.fetchall()
-        return rows
-    except Error as e:
-        logger.debug(e)
+# def get_users_by_device_id(conn, device_id):
+#     find_statement = "SELECT * FROM users WHERE device_id like ?;"
+#     try:
+#         c = conn.cursor()
+#         search_device_id = "%" + device_id + "%"
+#         c.execute(find_statement, (search_device_id,))
+#         rows = c.fetchall()
+#         return rows
+#     except Error as e:
+#         logger.debug(e)
 
 def create_db(conn):
 
