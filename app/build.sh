@@ -34,6 +34,7 @@ switchConfigs() {
     cp android/app/src/main/AndroidManifest_$1 android/app/src/debug/AndroidManifest.xml
     cp android/app/build_$1 android/app/build.gradle
     cp lib/helpers/env_config_$1.template lib/helpers/env_config.dart
+    cp android/app/src/main/kotlin/org/jimber/threebotlogin/MainActivity_$1 android/app/src/main/kotlin/org/jimber/threebotlogin/MainActivity.kt 
 
     cp android/app/src/main/res/mipmap-hdpi/ic_launcher_$1.png android/app/src/main/res/mipmap-hdpi/ic_launcher.png
     cp android/app/src/main/res/mipmap-mdpi/ic_launcher_$1.png android/app/src/main/res/mipmap-mdpi/ic_launcher.png
