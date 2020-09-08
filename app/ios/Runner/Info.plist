@@ -45,5 +45,7 @@
 	<false/>
 	<key>io.flutter.embedded_views_preview</key>
 	<true/>
+	<key>NSFaceIDUsageDescription</key>
+	<string>3Bot Connect would like permission for using Face ID or Touch ID</string>
 </dict>
 </plist>

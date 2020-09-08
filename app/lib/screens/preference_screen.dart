@@ -42,6 +42,7 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
 
   String version = '';
   String buildNumber = '';
+  String biometricDeviceName = "";
 
   MaterialColor thiscolor = Colors.green;
 
@@ -70,6 +71,10 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
     // _listener = FirebaseNotificationListener();
     Globals().emailVerified.addListener(setEmailVerified);
     setVersion();
+
+    getBiometricDeviceName().then((_biometricDeviceName) => {
+      biometricDeviceName = _biometricDeviceName
+    });
   }
 
   showChangePin() async {
@@ -151,7 +156,7 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
               child: CheckboxListTile(
                 secondary: Icon(Icons.fingerprint),
                 value: finger,
-                title: Text("Fingerprint"),
+                title: Text(biometricDeviceName),
                 activeColor: Theme.of(context).accentColor,
                 onChanged: (bool newValue) async {
                   _toggleFingerprint(newValue);
@@ -412,7 +417,7 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
       MaterialPageRoute(
         builder: (context) => AuthenticationScreen(
           correctPin: pin,
-          userMessage: "toggle fingerprint.",
+          userMessage: "toggle " + biometricDeviceName + ".",
         ),
       ),
     );
@@ -475,7 +480,7 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
   }
 
   void _showTermsAndConds() async {
-    const url = 'https://wiki.threefold.io/#/disclaimer';
+    const url = 'https://wiki.threefold.io/#/legal';
     if (await canLaunch(url)) {
       await launch(url);
     } else {

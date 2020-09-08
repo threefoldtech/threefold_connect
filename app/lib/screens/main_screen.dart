@@ -62,6 +62,7 @@ class _AppState extends State<MainScreen> {
   pushScreens() async {
     await checkInternetConnection();
     await checkInternetConnectionWithOurServers();
+    await checkIfAppIsUnderMaintenance();
     await checkIfAppIsUpToDate();
     // await checkIfDeviceIdIsCorrect();
 
@@ -159,6 +160,45 @@ class _AppState extends State<MainScreen> {
         } else if (Platform.isIOS) {
           exit(1);
         }
+      }
+    }
+  }
+
+  checkIfAppIsUnderMaintenance() async {
+    try {
+      if (await isAppUnderMaintenance()) {
+        CustomDialog dialog = CustomDialog(
+            title: "App is being rolled out",
+            description:
+                "The new version of our app is being rolled out, please try again later.");
+        await dialog.show(context);
+        if (Platform.isAndroid) {
+          SystemNavigator.pop();
+        } else if (Platform.isIOS) {
+          exit(1);
+        }
+      }
+    } on TimeoutException catch (_) {
+      CustomDialog dialog = CustomDialog(
+          title: "Connection problem",
+          description:
+              "The connection to our servers has failed, please try again later.");
+      await dialog.show(context);
+      if (Platform.isAndroid) {
+        SystemNavigator.pop();
+      } else if (Platform.isIOS) {
+        exit(1);
+      }
+    } on Exception catch (_) {
+      CustomDialog dialog = CustomDialog(
+          title: "Oops",
+          description:
+              "Something went wrong. Please contact support if this issue persists.");
+      await dialog.show(context);
+      if (Platform.isAndroid) {
+        SystemNavigator.pop();
+      } else if (Platform.isIOS) {
+        exit(1);
       }
     }
   }

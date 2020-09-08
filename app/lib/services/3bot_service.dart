@@ -70,6 +70,19 @@ Future<bool> isAppUpToDate() async {
   return currentBuildNumber >= minimumBuildNumber;
 }
 
+Future<bool> isAppUnderMaintenance() async {
+  Response response = await http
+          .get('$threeBotApiUrl/maintenance', headers: requestHeaders)
+          .timeout(const Duration(seconds: 3));
+
+  if(response.statusCode != 200) {
+    return false;
+  }
+
+  Map<String, dynamic> mappedResponse = json.decode(response.body);
+  return mappedResponse['maintenance'] == 1;
+}
+
 Future<Response> cancelLogin(doubleName) {
   return http.post('$threeBotApiUrl/users/$doubleName/cancel',
       body: null, headers: requestHeaders);
