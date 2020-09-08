@@ -20,9 +20,8 @@ from pyfcm import FCMNotification
 # db.create_db(conn)
 
 config = configparser.ConfigParser()
-config.read('config.ini')
 
-push_service = FCMNotification(api_key=config['DEFAULT']['API_KEY'])
+# push_service = FCMNotification(api_key=config['DEFAULT']['API_KEY'])
 
 app = Flask(__name__)
 sio = SocketIO(app, transports=["websocket"])
@@ -327,6 +326,15 @@ def save_derived_public_key():
 def minimum_version_handler():
     response = app.response_class(
         response=json.dumps({"android": 70, "ios": 70}), mimetype="application/json"
+    )
+    return response
+
+@app.route("/api/maintenance", methods=["get"])
+def maintenance_handler():
+    config.read('config.ini')
+    
+    response = app.response_class(
+        response=json.dumps({"maintenance": int(config['DEFAULT']['UNDER_MAINTENANCE'])}), mimetype="application/json"
     )
     return response
 
