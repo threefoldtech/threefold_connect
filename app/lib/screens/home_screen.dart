@@ -189,7 +189,8 @@ class _HomeScreenState extends State<HomeScreen>
               ),
             ),
             bottomNavigationBar: Container(
-              color: HexColor("#2d4052"), //@todo theme obj
+              color: HexColor("#2d4052"),
+              //@todo theme obj
               padding: EdgeInsets.all(0.0),
               height: 65,
               margin: EdgeInsets.all(0.0),

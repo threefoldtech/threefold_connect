@@ -5,13 +5,14 @@ import 'package:threebotlogin/helpers/hex_color.dart';
 import 'package:threebotlogin/screens/main_screen.dart';
 import 'package:threebotlogin/services/logging_service.dart';
 import 'package:threebotlogin/services/user_service.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 LoggingService logger;
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  // SharedPreferences.setMockInitialValues({});
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
-
   bool initDone = await getInitDone();
   String doubleName = await getDoubleName();
 

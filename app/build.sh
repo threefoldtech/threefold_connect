@@ -6,18 +6,44 @@ githash=$(git log --pretty=format:'%h' -n 1)
 logcurrent_time=$(date "+%H:%M:%S %d.%m.%Y")
 current_time=$(date "+%H.%M.%S-%d.%m.%Y")
 
+compileAndUpload() {
+    if [[ $2 == "--$5" ]]
+    then
+        switchConfigs "$5"
+
+        if [[ $1 == "--run" ]]
+        then
+            echo "[$5]: Running."
+            flutter run -t lib/main.dart
+        elif [[ $1 == "--switch" ]]
+        then
+            echo "[$5]: Switched configs."
+        else
+            echo "[$5]: Building apk."
+
+            setConfigsAndBuild
+            msgTelegram "$5" $4
+        fi
+
+        exit 0
+    fi
+}
+
 switchConfigs() {
     cp android/app/src/main/AndroidManifest_$1 android/app/src/main/AndroidManifest.xml
     cp android/app/src/main/AndroidManifest_$1 android/app/src/debug/AndroidManifest.xml
-    cp android/app/src/main/java/org/jimber/threebotlogin/MainActivity_$1 android/app/src/main/java/org/jimber/threebotlogin/MainActivity.java
     cp android/app/build_$1 android/app/build.gradle
     cp lib/helpers/env_config_$1.template lib/helpers/env_config.dart
+    cp android/app/src/main/kotlin/org/jimber/threebotlogin/MainActivity_$1 android/app/src/main/kotlin/org/jimber/threebotlogin/MainActivity.kt 
 
     cp android/app/src/main/res/mipmap-hdpi/ic_launcher_$1.png android/app/src/main/res/mipmap-hdpi/ic_launcher.png
     cp android/app/src/main/res/mipmap-mdpi/ic_launcher_$1.png android/app/src/main/res/mipmap-mdpi/ic_launcher.png
     cp android/app/src/main/res/mipmap-xhdpi/ic_launcher_$1.png android/app/src/main/res/mipmap-xhdpi/ic_launcher.png
     cp android/app/src/main/res/mipmap-xxhdpi/ic_launcher_$1.png android/app/src/main/res/mipmap-xxhdpi/ic_launcher.png
     cp android/app/src/main/res/mipmap-xxxhdpi/ic_launcher_$1.png android/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png
+
+    # cp android/app/google-services_$1 android/app/google-services.json
+    # cp ios/Runner/GoogleService-Info_$1 ios/Runner/GoogleService-Info.plist
 }
 
 setConfigsAndBuild() {
@@ -60,7 +86,6 @@ then
     env_configFilePath=lib/helpers/env_config.dart
     AppConfigLocalFilePath=lib/app_config_local.dart
 
-    MainActivityPath=android/app/src/main/java/org/jimber/threebotlogin/MainActivity.java
     BuildGradlePath=android/app/build.gradle
 
     LauncherImgPath1=android/app/src/main/res/mipmap-hdpi/ic_launcher.png
@@ -72,7 +97,6 @@ then
     generateFile $env_configFilePath lib/helpers/env_config_local.template
     generateFile $AppConfigLocalFilePath lib/app_config_local.template
 
-    generateFile $MainActivityPath android/app/src/main/java/org/jimber/threebotlogin/MainActivity_local
     generateFile $BuildGradlePath android/app/build_local
     
     generateFile $LauncherImgPath1 android/app/src/main/res/mipmap-hdpi/ic_launcher_local.png
@@ -88,89 +112,10 @@ then
     exit 0
 fi
 
-if [[ $2 == "--local" ]]
-then
-    switchConfigs "local"
-
-    if [[ $1 == "--run" ]]
-    then
-        echo "[Local]: Running."
-        flutter run -t lib/main.dart
-    elif [[ $1 == "--switch" ]]
-    then
-        echo "[Local]: Switched configs."
-    else
-        echo "[Local]: Building apk."
-
-        setConfigsAndBuild
-        msgTelegram "Local" $4
-    fi
-
-    exit 0
-fi
-
-if [[ $2 == "--testing" ]]
-then
-    switchConfigs "testing"
-
-    if [[ $1 == "--run" ]]
-    then
-        echo "[Testing]: Running."
-        flutter run -t lib/main.dart
-    elif [[ $1 == "--switch" ]]
-    then
-        echo "[Testing]: Switched configs."
-    else
-        echo "[Testing]: Building apk."
-
-        setConfigsAndBuild
-        msgTelegram "Testing" $4
-    fi
-
-    exit 0
-fi
-
-if [[ $2 == "--staging" ]]
-then
-    switchConfigs "staging"
-
-    if [[ $1 == "--run" ]]
-    then
-        echo "[Staging]: Running."
-        flutter run -t lib/main.dart
-    elif [[ $1 == "--switch" ]]
-    then
-        echo "[Staging]: Switched configs."
-    else
-        echo "[Staging]: Building apk."
-
-        setConfigsAndBuild
-        msgTelegram "Staging" $4
-    fi
-
-    exit 0
-fi
-
-if [[ $2 == "--production" ]]
-then
-    switchConfigs "production"
-
-    if [[ $1 == "--run" ]]
-    then
-        echo "[Production]: Running."
-        flutter run -t lib/main.dart
-    elif [[ $1 == "--switch" ]]
-    then
-        echo "[Production]: Switched configs."
-    else
-        echo "[Production]: Building apk."
-
-        setConfigsAndBuild
-        msgTelegram "Production" $4
-    fi
-
-    exit 0
-fi
+compileAndUpload "$1" "$2" "$3" "$4" "local"
+compileAndUpload "$1" "$2" "$3" "$4" "testing"
+compileAndUpload "$1" "$2" "$3" "$4" "staging"
+compileAndUpload "$1" "$2" "$3" "$4" "production"
 
 echo "Syntax error."
 echo "Usage: ./build.sh --[[run|build|switch]] --[[local|testing|staging|production]]"

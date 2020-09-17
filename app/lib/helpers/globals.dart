@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:threebotlogin/helpers/hex_color.dart';
-import 'package:threebotlogin/router.dart';
+import 'package:threebotlogin/jrouter.dart';
 
 class Globals {
   static final bool isInDebugMode = true;
@@ -8,7 +8,7 @@ class Globals {
 
   ValueNotifier<bool> emailVerified = ValueNotifier(false);
 
-  final Router router = new Router();
+  final JRouter router = new JRouter();
 
   int incorrectPincodeAttempts = 0;
   bool tooManyAuthenticationAttempts = false;

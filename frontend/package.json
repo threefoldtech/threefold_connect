@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve",
-    "serve-mathias": "vue-cli-service serve --port 8081",
+    "serve-local": "vue-cli-service serve --port 8080",
     "serve-alex": "vue-cli-service serve --port 8080",
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint"

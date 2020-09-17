@@ -27,10 +27,12 @@ Future<Response> getSignedEmailIdentifierFromOpenKYC(String doubleName) async {
     'Jimber-Authorization': signedPayload
   };
 
-  return http.get('$openKycApiUrl/verification/retrieve-sei/$doubleName', headers: loginRequestHeaders);
+  return http.get('$openKycApiUrl/verification/retrieve-sei/$doubleName',
+      headers: loginRequestHeaders);
 }
 
-Future<Response> verifySignedEmailIdentifier(String signedEmailIdentifier) async {
+Future<Response> verifySignedEmailIdentifier(
+    String signedEmailIdentifier) async {
   return http.post('$openKycApiUrl/verification/verify-sei',
       body: json.encode({"signedEmailIdentifier": signedEmailIdentifier}),
       headers: requestHeaders);

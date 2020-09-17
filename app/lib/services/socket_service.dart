@@ -14,8 +14,8 @@ import 'package:threebotlogin/models/login.dart';
 import 'package:threebotlogin/screens/authentication_screen.dart';
 import 'package:threebotlogin/screens/login_screen.dart';
 import 'package:threebotlogin/screens/warning_screen.dart';
-import 'package:threebotlogin/services/user_service.dart';
 import 'package:threebotlogin/services/open_kyc_service.dart';
+import 'package:threebotlogin/services/user_service.dart';
 import 'package:threebotlogin/widgets/custom_dialog.dart';
 
 class BackendConnection {
@@ -27,7 +27,7 @@ class BackendConnection {
   BackendConnection(this.doubleName);
 
   init() async {
-    print('Creating socket connection');
+    print('Creating socket connection with $threeBotSocketUrl for $doubleName');
 
     socket = IO.io(threeBotSocketUrl, <String, dynamic>{
       'transports': ['websocket'],
@@ -97,7 +97,7 @@ Future emailVerification(BuildContext context) async {
     String doubleName = (await getDoubleName()).toLowerCase();
     Response response = await getSignedEmailIdentifierFromOpenKYC(doubleName);
 
-    if(response.statusCode != 200) {
+    if (response.statusCode != 200) {
       return;
     }
 
@@ -106,9 +106,12 @@ Future emailVerification(BuildContext context) async {
     dynamic signedEmailIdentifier = body["signed_email_identifier"];
 
     if (signedEmailIdentifier != null && signedEmailIdentifier.isNotEmpty) {
-      Map<String, dynamic> vsei = jsonDecode((await verifySignedEmailIdentifier(signedEmailIdentifier)).body);
+      Map<String, dynamic> vsei = jsonDecode(
+          (await verifySignedEmailIdentifier(signedEmailIdentifier)).body);
 
-      if (vsei != null && vsei["email"] == email["email"] && vsei["identifier"] == doubleName) {
+      if (vsei != null &&
+          vsei["email"] == email["email"] &&
+          vsei["identifier"] == doubleName) {
         await saveEmail(vsei["email"], signedEmailIdentifier);
         showDialog(
           context: context,

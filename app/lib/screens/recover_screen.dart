@@ -1,18 +1,22 @@
+import 'dart:convert';
 import 'dart:core';
+
+import 'package:crypto/crypto.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'dart:convert';
-import 'package:crypto/crypto.dart';
 import 'package:http/http.dart';
 import 'package:threebotlogin/helpers/globals.dart';
 import 'package:threebotlogin/services/3bot_service.dart';
 import 'package:threebotlogin/services/crypto_service.dart';
 import 'package:threebotlogin/services/open_kyc_service.dart';
+import 'package:threebotlogin/services/tools_service.dart';
 import 'package:threebotlogin/services/user_service.dart';
 
 class RecoverScreen extends StatefulWidget {
   final Widget recoverScreen;
+
   RecoverScreen({Key key, this.recoverScreen}) : super(key: key);
+
   _RecoverScreenState createState() => _RecoverScreenState();
 }
 
@@ -32,6 +36,8 @@ class _RecoverScreenState extends State<RecoverScreen> {
   String seedPhrase = '';
   String error = '';
   String privateKey;
+
+  String errorStepperText = '';
 
   String generateMd5(String input) {
     return md5.convert(utf8.encode(input)).toString();
@@ -60,7 +66,6 @@ class _RecoverScreenState extends State<RecoverScreen> {
 
   continueRecoverAccount() async {
     Map<String, String> keys = await generateKeysFromSeedPhrase(seedPhrase);
-
     await savePrivateKey(keys['privateKey']);
     await savePublicKey(keys['publicKey']);
     await saveFingerprint(false);
@@ -77,17 +82,6 @@ class _RecoverScreenState extends State<RecoverScreen> {
     } else if (seedLength > 24) {
       throw new Exception('Seed phrase is too long');
     }
-  }
-
-  String validateEmail(String value) {
-    Pattern pattern = r'[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}';
-    RegExp regex = new RegExp(pattern);
-    if (!regex.hasMatch(value)) {
-      emailCheck = false;
-      return 'Enter valid e-mail';
-    }
-    emailCheck = true;
-    return null;
   }
 
   void initState() {
@@ -156,10 +150,12 @@ class _RecoverScreenState extends State<RecoverScreen> {
               child: TextFormField(
                 keyboardType: TextInputType.emailAddress,
                 decoration: InputDecoration(
-                    border: OutlineInputBorder(), labelText: 'Email'),
+                  border: OutlineInputBorder(),
+                  labelText: 'Email',
+                ),
                 validator: (value) {
-                  if (value.isEmpty) {
-                    return 'Please enter your Email';
+                  if (value.isEmpty || !validateEmail(value)) {
+                    return 'Please enter a valid Email';
                   }
                   return null;
                 },
@@ -206,18 +202,28 @@ class _RecoverScreenState extends State<RecoverScreen> {
 
                 FocusScope.of(context).requestFocus(new FocusNode());
 
+                String doubleNameValue = doubleNameController.text?.toLowerCase()?.trim()?.replaceAll(new RegExp(r"\s+"), " ");
+                String emailValue = emailController.text?.toLowerCase()?.trim()?.replaceAll(new RegExp(r"\s+"), " ");
+                String seedPhraseValue = seedPhrasecontroller.text?.toLowerCase()?.trim()?.replaceAll(new RegExp(r"\s+"), " ");
+
+                bool emailValid = validateEmail(emailValue);
+
                 setState(() {
+                  doubleNameController.text = doubleNameValue;
+                  emailController.text = emailValue;
+                  seedPhrasecontroller.text = seedPhraseValue;
+
                   _autoValidate = true;
+                  
                   doubleName = doubleNameController.text + '.3bot';
                   emailFromForm = emailController.text;
                   seedPhrase = seedPhrasecontroller.text;
-                  validateEmail(emailFromForm);
                 });
 
                 try {
                   if (emailFromForm != null &&
                       emailFromForm.isNotEmpty &&
-                      emailCheck == true) {
+                      emailValid == true) {
                     showSpinner();
 
                     await checkSeedPhrase(doubleName, seedPhrase);
@@ -234,10 +240,17 @@ class _RecoverScreenState extends State<RecoverScreen> {
                     });
                   }
                 } catch (e) {
-                  Navigator.pop(context); // To dismiss the spinner
-                  setState(() {
-                    error = e.message;
-                  });
+                  // To dismiss the spinner
+                  Navigator.pop(context);
+                  if (e.message != "") {
+                    setState(() {
+                      error = e.message;
+                    });
+                  } else {
+                    setState(() {
+                      error = "Something went wrong";
+                    });
+                  }
                 }
               },
             ),

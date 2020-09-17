@@ -1,5 +1,5 @@
-import 'dart:io';
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:http/http.dart' as http;
 import 'package:http/http.dart';
@@ -11,8 +11,8 @@ import 'package:threebotlogin/services/user_service.dart';
 String threeBotApiUrl = AppConfig().threeBotApiUrl();
 Map<String, String> requestHeaders = {'Content-type': 'application/json'};
 
-Future<Response> sendData(
-    String state, data, selectedImageId, String randomRoom, String appId) async {
+Future<Response> sendData(String state, data, selectedImageId,
+    String randomRoom, String appId) async {
   return http.post('$threeBotApiUrl/signedAttempt',
       body: json.encode({
         'signedAttempt': await signData(
@@ -70,6 +70,19 @@ Future<bool> isAppUpToDate() async {
   return currentBuildNumber >= minimumBuildNumber;
 }
 
+Future<bool> isAppUnderMaintenance() async {
+  Response response = await http
+          .get('$threeBotApiUrl/maintenance', headers: requestHeaders)
+          .timeout(const Duration(seconds: 3));
+
+  if(response.statusCode != 200) {
+    return false;
+  }
+
+  Map<String, dynamic> mappedResponse = json.decode(response.body);
+  return mappedResponse['maintenance'] == 1;
+}
+
 Future<Response> cancelLogin(doubleName) {
   return http.post('$threeBotApiUrl/users/$doubleName/cancel',
       body: null, headers: requestHeaders);
@@ -79,14 +92,25 @@ Future<Response> getUserInfo(doubleName) {
   return http.get('$threeBotApiUrl/users/$doubleName', headers: requestHeaders);
 }
 
-Future<Response> finishRegistration(
-    String doubleName, String email, String sid, String publicKey) async {
+Future<Response> updateDeviceID(String doubleName, String signedDeviceId) {
+  return http.post('$threeBotApiUrl/users/$doubleName/deviceid',
+      body: json.encode({'signed_device_id': signedDeviceId}),
+      headers: requestHeaders);
+}
+
+Future<Response> removeDeviceId(String deviceId) {
+  return http.delete('$threeBotApiUrl/deviceid/$deviceId',
+      headers: requestHeaders);
+}
+
+Future<Response> finishRegistration(String doubleName, String email, String sid,
+    String publicKey) async {
   return http.post('$threeBotApiUrl/mobileregistration',
       body: json.encode({
         'doubleName': doubleName + '.3bot',
         'sid': sid,
-        'email': email,
-        'public_key': publicKey,
+        'email': email.toLowerCase().trim(),
+        'public_key': publicKey
       }),
       headers: requestHeaders);
 }

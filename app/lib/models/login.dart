@@ -37,7 +37,11 @@ class Login {
   Login.fromJson(Map<String, dynamic> json)
       : doubleName = json['doubleName'],
         state = json['state'],
-        scope = (json['scope'] != null && json['scope'] != "" && json['scope'] != "null") ? Scope.fromJson(jsonDecode(json['scope'])) : null,
+        scope = (json['scope'] != null &&
+                json['scope'] != "" &&
+                json['scope'] != "null")
+            ? Scope.fromJson(jsonDecode(json['scope']))
+            : null,
         appId = json['appId'],
         appPublicKey = json['appPublicKey'],
         randomImageId = json['randomImageId'],
@@ -63,34 +67,37 @@ class Login {
         'locationId': locationId
       };
 
-    static Future<Login> createAndDecryptLoginObject(dynamic data) async {
-      Login loginData;
+  static Future<Login> createAndDecryptLoginObject(dynamic data) async {
+    Login loginData;
 
-      if(data['encryptedLoginAttempt'] != null) {
-        Uint8List decryptedLoginAttempt = await decrypt(data['encryptedLoginAttempt'], await getPublicKey(), await getPrivateKey());
-        data['encryptedLoginAttempt'] = new String.fromCharCodes(decryptedLoginAttempt);
+    if (data['encryptedLoginAttempt'] != null) {
+      Uint8List decryptedLoginAttempt = await decrypt(
+          data['encryptedLoginAttempt'],
+          await getPublicKey(),
+          await getPrivateKey());
+      data['encryptedLoginAttempt'] =
+          new String.fromCharCodes(decryptedLoginAttempt);
 
-        var decryptedLoginAttemptMap = jsonDecode(data['encryptedLoginAttempt']);
+      var decryptedLoginAttemptMap = jsonDecode(data['encryptedLoginAttempt']);
 
-        decryptedLoginAttemptMap['type'] = data['type'];
-        decryptedLoginAttemptMap['created'] = data['created'];
+      decryptedLoginAttemptMap['type'] = data['type'];
+      decryptedLoginAttemptMap['created'] = data['created'];
 
-        loginData = Login.fromJson(decryptedLoginAttemptMap);
-      } else {
-        loginData = Login.fromJson(data);
-      }
-      
-      loginData.isMobile = false;
-
-      List<dynamic> list = await getLocationIdList();
-
-      if(list.contains(loginData.locationId)) {
-        loginData.showWarning = false;
-      } else {
-        loginData.showWarning = true;
-      }
-
-      return loginData;
+      loginData = Login.fromJson(decryptedLoginAttemptMap);
+    } else {
+      loginData = Login.fromJson(data);
     }
 
+    loginData.isMobile = false;
+
+    List<dynamic> list = await getLocationIdList();
+
+    if (list.contains(loginData.locationId)) {
+      loginData.showWarning = false;
+    } else {
+      loginData.showWarning = true;
+    }
+
+    return loginData;
+  }
 }

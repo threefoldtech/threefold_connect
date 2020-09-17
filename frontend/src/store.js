@@ -47,7 +47,6 @@ export default new Vuex.Store({
       state.keys = keys
     },
     setDoubleName (state, name) {
-      console.log(`Setting doubleName to ${name}`)
       state.doubleName = name
     },
     setState (state, _state) {
@@ -87,7 +86,7 @@ export default new Vuex.Store({
     setIsMobile (state, isMobile) {
       state.isMobile = isMobile
     },
-    setrandomRoom (state, randomRoom) {
+    setRandomRoom (state, randomRoom) {
       state.randomRoom = randomRoom
     },
     resetTimer (state) {
@@ -116,8 +115,9 @@ export default new Vuex.Store({
       context.commit('setDoubleName', doubleName)
       socketService.emit('join', { room: doubleName })
     },
-    setrandomRoom (context, randomRoom) {
-      context.commit('setrandomRoom', randomRoom)
+    setRandomRoom (context, randomRoom) {
+      context.commit('setRandomRoom', randomRoom)
+      console.log(`joining ${randomRoom}`)
       socketService.emit('join', { room: randomRoom })
     },
     setAttemptCanceled (context, payload) {
@@ -263,7 +263,7 @@ export default new Vuex.Store({
       console.log('Encrypted login attempt: ', encryptedLoginAttempt)
 
       socketService.emit('leave', { 'room': context.getters.doubleName })
-      context.dispatch('setrandomRoom', randomRoom)
+      context.dispatch('setRandomRoom', randomRoom)
 
       socketService.emit('login', { 'doubleName': context.getters.doubleName, 'encryptedLoginAttempt': encryptedLoginAttempt })
     },
@@ -302,7 +302,7 @@ export default new Vuex.Store({
       }), publicKey)
 
       socketService.emit('leave', { 'room': context.getters.randomRoom })
-      context.dispatch('setrandomRoom', randomRoom)
+      context.dispatch('setRandomRoom', randomRoom)
       context.dispatch('resetTimer')
       socketService.emit('login', { 'doubleName': context.getters.doubleName, 'encryptedLoginAttempt': encryptedLoginAttempt })
     },

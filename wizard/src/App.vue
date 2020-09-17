@@ -1,20 +1,16 @@
 
 <template>
   <v-app>
-    <v-content fill-height>
-      <v-btn
-      id="skip"
-        onclick="window.flutter_inappwebview.callHandler('FINISH')"
-        class="mt-5"
-        absolute
-        top
-        right
-        text
-      >Skip</v-btn>
-      <v-carousel :continuous="false" class="pt-5" height="100%" delimiter-icon="fas fa-circle" next-icon="fas fa-chevron-right" prev-icon="fas fa-chevron-left">
-        <v-col justify="center" class="fill-height">
-          <v-carousel-item class="fill-height">
-            <v-col class="fill-height">
+    <v-main fill-height>
+      <v-btn id="skip" @click="showDisclaimerBeforeSkip" class="mt-5" absolute top right text>Skip</v-btn>
+      <v-carousel
+        light
+        :continuous="false"
+        class="pt-5"
+        height="100%"
+      >
+          <v-carousel-item>
+            <v-col>
               <v-row justify="center" class="mb-5">
                 <v-img
                   src="3Bot_Original.png"
@@ -25,7 +21,7 @@
                 ></v-img>
               </v-row>
               <v-row class="ma-3" justify="center">
-                <div class="black--text text-center">
+                <div class="text-center">
                   <h3 class="mb-3">3Bot Connect</h3>
                   <p
                     class="subtitle-1 textCentered"
@@ -35,7 +31,7 @@
             </v-col>
           </v-carousel-item>
           <v-carousel-item height="100%">
-            <v-col color="white" align="center" justify="center" height="100%">
+            <v-col  height="100%">
               <v-row justify="center" class="mb-5">
                 <v-img
                   src="3Bot_Original.png"
@@ -46,7 +42,7 @@
                 ></v-img>
               </v-row>
               <v-row class="ma-3" justify="center">
-                <div class="black--text text-center">
+                <div class="text-center">
                   <h3 class="mb-3">Meet 3Bot's Vision</h3>
                   <p class="subtitle-1 textCentered">
                     A revolutionary digital avatar that executes your digital needs. With
@@ -58,7 +54,7 @@
             </v-col>
           </v-carousel-item>
           <v-carousel-item>
-            <v-col color="white" height="100%">
+            <v-col height="100%" >
               <v-row justify="center" class="mb-5">
                 <v-img
                   src="3Bot_Social.png"
@@ -69,7 +65,7 @@
                 ></v-img>
               </v-row>
               <v-row class="ma-3" justify="center">
-                <div class="black--text text-center">
+                <div class="text-center">
                   <h3 class="mb-3">You are at the centre</h3>
                   <p class="subtitle-1 textCentered">
                     Enter a decentralised, private social space where you own and control your privacy & personal data.
@@ -80,7 +76,7 @@
             </v-col>
           </v-carousel-item>
           <v-carousel-item>
-            <v-col color="white" height="100%">
+            <v-col height="100%" >
               <v-row justify="center" class="mb-5">
                 <v-img
                   src="3Bot_Wallet.png"
@@ -91,7 +87,7 @@
                 ></v-img>
               </v-row>
               <v-row class="ma-3" justify="center">
-                <div class="black--text text-center">
+                <div class="text-center">
                   <h3 class="mb-3">Be your own bank</h3>
                   <p class="subtitle-1 textCentered">
                     3Bot is equipped with its own digital wallet, giving you access to a
@@ -103,7 +99,7 @@
           </v-carousel-item>
 
           <v-carousel-item>
-            <v-col color="white" height="100%">
+            <v-col height="100%" >
               <v-row justify="center" class="mb-5">
                 <v-img
                   src="3Bot_Assistance.png"
@@ -114,7 +110,7 @@
                 ></v-img>
               </v-row>
               <v-row class="ma-3" justify="center">
-                <div class="black--text text-center">
+                <div class="text-center">
                   <h3 class="mb-3">What's coming next?</h3>
                   <p class="subtitle-1 textCentered">
                     Have your own personal assistant, social media, messaging and video conferencing, office suite,
@@ -128,42 +124,99 @@
             </v-col>
           </v-carousel-item>
           <v-carousel-item>
-            <v-col color="white" height="100%">
+            <v-col height="100%" >
               <v-row justify="center" class="mb-5">
                 <v-img
                   src="3Bot_Original.png"
-                  class="mb-5"
                   aspect-ratio="1"
                   contain
                   max-width="270"
                   max-height="300"
                 ></v-img>
               </v-row>
-              <v-row class="ma-3 mt-5" justify="center">
-                <div class="text-center mt-5">
+              <v-row class="ma-3" justify="center">
+                <div class="text-center">
+                  <h3 class="mb-3">Get started</h3>
+                  <p class="subtitle-1 textCentered">
+                    Before you can start using the app, you must accept the
+                    <v-btn
+                    text
+                    small
+                    @click="showDisclaimer = true"
+                  >Terms and conditions</v-btn>
+                  </p>
+                  <v-row justify="center">
+                    <v-checkbox v-model="acceptedTT" label="I Accept the terms and conditions"></v-checkbox>
+                  </v-row>
                   <v-btn
                     color="primary"
-                    onclick="window.flutter_inappwebview.callHandler('FINISH')"
+                    :disabled="!acceptedTT"
+                    @click="window.flutter_inappwebview.callHandler('FINISH')"
                   >Get started!</v-btn>
                 </div>
               </v-row>
             </v-col>
           </v-carousel-item>
-        </v-col>
       </v-carousel>
-    </v-content>
+    </v-main>
+    <v-dialog v-model="showDialog" width="500">
+      <v-card>
+        <v-card-title>Accept the terms and conditions?</v-card-title>
+        <v-card-text>
+          <p>
+            Before you can start using the app, you must accept the
+            <v-btn
+              text
+              small
+              @click="showDisclaimer = true"
+            >Terms and conditions</v-btn>
+          </p>
+          <v-checkbox v-model="acceptedTT" label="I Accept the terms and conditions"></v-checkbox>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn :disabled="!acceptedTT" text @click="window.flutter_inappwebview.callHandler('FINISH')">continue</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+    <v-dialog v-model="showDisclaimer" fullscreen>
+      <v-card>
+        <v-card-title>
+          <v-row>
+            Terms & conditions
+            <v-spacer></v-spacer>
+            <v-btn icon @click="showDisclaimer = false">
+              <v-icon>fas fa-times</v-icon>
+            </v-btn>
+          </v-row>
+        </v-card-title>
+          <iframe style="height:calc(100vh - 62px); width: 100%" src="https://wiki.threefold.io/#/disclaimer" frameborder="0"></iframe>
+      </v-card>
+    </v-dialog>
   </v-app>
 </template>
 
 <script>
 export default {
-  name: 'App'
+  name: 'App',
+  data () {
+    return {
+      acceptedTT: false,
+      showDisclaimer: false,
+      showDialog: false
+    }
+  },
+  methods: {
+    showDisclaimerBeforeSkip () {
+      this.showDialog = true
+    }
+  }
 }
 </script>
 <style>
 #app {
 }
-#skip{
-  z-index: 1000;
+#skip {
+  z-index: 2;
 }
 </style>

@@ -1,15 +1,15 @@
 import 'dart:convert';
 import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
+import 'package:threebotlogin/apps/free_flow_pages/ffp.dart';
 import 'package:threebotlogin/apps/free_flow_pages/ffp_config.dart';
 import 'package:threebotlogin/apps/free_flow_pages/ffp_events.dart';
-import 'package:threebotlogin/apps/free_flow_pages/ffp.dart';
 import 'package:threebotlogin/browser.dart';
 import 'package:threebotlogin/clipboard_hack/clipboard_hack.dart';
 import 'package:threebotlogin/events/events.dart';
 import 'package:threebotlogin/events/go_home_event.dart';
-
 import 'package:threebotlogin/services/crypto_service.dart';
 import 'package:threebotlogin/services/user_service.dart';
 
@@ -28,6 +28,7 @@ class _FfpState extends State<FfpWidget> with AutomaticKeepAliveClientMixin {
   InAppWebView iaWebview;
 
   bool finalDestinationLoading = false;
+
   _FfpState() {
     iaWebview = new InAppWebView(
       initialUrl: config.cookieUrl(),
@@ -97,6 +98,7 @@ class _FfpState extends State<FfpWidget> with AutomaticKeepAliveClientMixin {
   }
 
   bool closeNext = false;
+
   _browserBack(FfpBackEvent event) async {
     String url = await webView.getUrl();
     if (url.endsWith('/dashboard')) {

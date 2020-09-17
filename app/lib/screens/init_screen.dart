@@ -13,6 +13,7 @@ class _InitState extends State<InitScreen> {
   InAppWebViewController webView;
 
   InAppWebView iaWebView;
+
   finish(List<dynamic> params) async {
     saveInitDone();
     Navigator.pop(context);
@@ -24,8 +25,8 @@ class _InitState extends State<InitScreen> {
 
   _InitState() {
     iaWebView = InAppWebView(
-      initialUrl:
-          'https://wizard.jimber.org/?cache_buster=' + new DateTime.now().millisecondsSinceEpoch.toString(),
+      initialUrl: 'https://wizard.jimber.org/?cache_buster=' +
+          new DateTime.now().millisecondsSinceEpoch.toString(),
       initialHeaders: {},
       initialOptions: InAppWebViewWidgetOptions(
         android: AndroidInAppWebViewOptions(supportMultipleWindows: true),

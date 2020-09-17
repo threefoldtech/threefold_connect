@@ -8,10 +8,10 @@ import 'package:threebotlogin/events/pop_all_login_event.dart';
 import 'package:threebotlogin/helpers/block_and_run_mixin.dart';
 import 'package:threebotlogin/helpers/globals.dart';
 import 'package:threebotlogin/models/login.dart';
+import 'package:threebotlogin/services/3bot_service.dart';
+import 'package:threebotlogin/services/crypto_service.dart';
 import 'package:threebotlogin/services/tools_service.dart';
 import 'package:threebotlogin/services/user_service.dart';
-import 'package:threebotlogin/services/crypto_service.dart';
-import 'package:threebotlogin/services/3bot_service.dart';
 import 'package:threebotlogin/widgets/custom_dialog.dart';
 import 'package:threebotlogin/widgets/image_button.dart';
 import 'package:threebotlogin/widgets/preference_dialog.dart';
@@ -340,7 +340,8 @@ class _LoginScreenState extends State<LoginScreen> with BlockAndRunMixin {
           ),
         );
 
-        await sendData(state, null, selectedImageId, null, widget.loginData.appId);
+        await sendData(
+            state, null, selectedImageId, null, widget.loginData.appId);
 
         if (Navigator.canPop(context)) {
           Navigator.pop(context, false);
@@ -388,10 +389,16 @@ class _LoginScreenState extends State<LoginScreen> with BlockAndRunMixin {
 
     //push to backend with signed
     if (!includeData) {
-      await sendData(state, null, selectedImageId,
-          null, widget.loginData.appId); // temp fix send empty data for regenerate emoji
+      await sendData(
+          state,
+          null,
+          selectedImageId,
+          null,
+          widget.loginData
+              .appId); // temp fix send empty data for regenerate emoji
     } else {
-      await sendData(state, encryptedScopeData, selectedImageId, randomRoom, widget.loginData.appId);
+      await sendData(state, encryptedScopeData, selectedImageId, randomRoom,
+          widget.loginData.appId);
     }
 
     if (selectedImageId == correctImage || isMobileCheck) {
