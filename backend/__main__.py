@@ -6,9 +6,9 @@ import binascii
 import struct
 import base64
 import configparser
-import explorer_api
 import logging
 import calendar
+import database as db
 
 from flask import Flask, Response, request, json, redirect
 from flask_socketio import SocketIO, emit, join_room, leave_room, send
@@ -16,12 +16,10 @@ from flask_cors import CORS
 from datetime import datetime, timedelta
 from pyfcm import FCMNotification
 
-# conn = db.create_connection("pythonsqlite.db")
-# db.create_db(conn)
+conn = db.create_connection("pythonsqlite.db")
+db.create_db(conn)
 
 config = configparser.ConfigParser()
-
-# push_service = FCMNotification(api_key=config['DEFAULT']['API_KEY'])
 
 app = Flask(__name__)
 sio = SocketIO(app, transports=["websocket"])
@@ -50,7 +48,6 @@ formatter = logging.Formatter(
 handler.setFormatter(formatter)
 logger.addHandler(handler)
 
-# Start socketIO functions.
 
 @sio.on("connect")
 def on_connect():
@@ -116,11 +113,11 @@ def on_leave(data):
 @sio.on("checkname")
 def on_checkname(data):
     logger.debug("/checkname %s", data)
-    doublename = data.get("doubleName").lower()
-    user = explorer_api.get_user_by_double_name(doublename)
+    doublename = data.get("doubleName")
+    user = db.get_user_by_double_name(conn, doublename)
 
     if user:
-        logger.debug("user %s", user['name'])
+        logger.debug("user %s", user["double_name"])
         emit("nameknown")
     else:
         logger.debug("user %s was not found", doublename)
@@ -130,40 +127,24 @@ def on_checkname(data):
 @sio.on("login")
 def on_login(data):
     logger.debug("/login %s", data)
-    double_name = data.get("doubleName").lower()
+    double_name = data.get("doubleName")
 
     data["type"] = "login"
     milli_sec = int(round(time.time() * 1000))
     data["created"] = milli_sec
 
-    user = explorer_api.get_user_by_double_name(double_name)
+    user = db.get_user_by_double_name(conn, double_name)
     if user:
-        # Check if user had a device id 
-        #if user[4]:
-        #    # Try to send notification
-        #    try:
-        #        logger.debug(user[4])
-        #        push_service.notify_multiple_devices(registration_ids=json.loads(user[4]), message_title='Login',
-        #                                  message_body='Tap to login', data_message=data, click_action='FLUTTER_NOTIFICATION_CLICK', tag='testLogin', collapse_key='testLogin')
-        #    except Exception as e:
-        #        logger.error(e)
-        #        logger.debug("Could not send notification to %s", user[4])
-        #        pass
-        logger.debug("[login]: User found %s", user['name'])
-        emitOrQueue("login", data, room=user['name'].lower())
-
-
-# End socketIO functions.
-
-# Start flask API endpoints.
+        logger.debug("[login]: User found %s", user["double_name"])
+        emitOrQueue("login", data, room=user["double_name"])
 
 
 @app.route("/api/signedAttempt", methods=["POST"])
 def sign_attempt_handler():
     data = request.get_json()
 
-    double_name = data['doubleName']
-    verified_data = verify_signed_data(double_name, data['signedAttempt'])
+    double_name = data["doubleName"].lower()
+    verified_data = verify_signed_data(double_name, data["signedAttempt"])
 
     if not verified_data:
         return Response("Missing signature", status=400)
@@ -189,11 +170,8 @@ def mobile_registration_handler():
     logger.debug("/mobile_registration_handler ")
     body = request.get_json()
     double_name = body.get("doubleName").lower()
-    # sid = body.get("sid")
     email = body.get("email").lower().strip()
     public_key = body.get("public_key")
-    # signed_device_id = body.get("signed_device_id")
-    # device_id = ""
     if double_name == None or email == None or public_key == None:
         return Response("Missing data", status=400)
     else:
@@ -201,42 +179,21 @@ def mobile_registration_handler():
             return Response(
                 "doubleName exceeds length of 50 or does not contain .3bot", status=400
             )
-        # Only check device ID if it's send (backward compatibility)
-        #if signed_device_id is not None:
-        #    try:
-        #        # Check if device id is signed with corresponding key and get the device id to store it in db
-        #        device_id = verify_signed_data_with_public_key(public_key, signed_device_id).decode("utf-8")
-        #        # Check and delete  device ID from db
-        #        # check_and_delete_device_id_from_db(device_id)
-        #        pass
-        #    except:
-        #        return Response("Signature does not match", status=403)
-        user = explorer_api.get_user_by_double_name(double_name)
+        user = db.get_user_by_double_name(conn, double_name)
         if user is None:
-            # update_sql = "INSERT into users (double_name, sid, email, public_key, device_id) VALUES(?,?,?,?,?);"
-            # db.insert_user(conn, update_sql, double_name, sid, email, public_key, "")
-            explorer_api.create_user(double_name, email, public_key)
+            update_sql = "INSERT into users (double_name, sid, email, public_key, device_id) VALUES(?,?,?,?,?);"
+            db.insert_user(conn, update_sql, double_name, "", email, public_key, "")
         return Response("Succes", status=200)
 
 
 @app.route("/api/users/<doublename>", methods=["GET"])
 def get_user_handler(doublename):
-    doublename = doublename.lower()
     logger.debug("/doublename user %s", doublename)
-    user = explorer_api.get_user_by_double_name(doublename)
+    user = db.get_user_by_double_name(conn, doublename)
     if user is not None:
-        # device_id = ''
         
-        # if user[4] is not None:
-        #    logger.debug(user[4])
-        #    try:
-        #        device_id = json.loads(user[4])
-        #        pass
-        #    except:
-        #        pass
-
-        # data = {"doublename": doublename, "publicKey": user['pubkey'], "device_id": device_id}
-        data = {"doublename": doublename, "publicKey": user['pubkey']}
+        logger.debug("DB /api/users/: %s", user)
+        data = {"doublename": user["double_name"], "publicKey": user["public_key"]}
 
         response = app.response_class(
             response=json.dumps(data), mimetype="application/json"
@@ -252,20 +209,20 @@ def get_user_handler(doublename):
 @app.route("/api/users/<doublename>/cancel", methods=["POST"])
 def cancel_login_attempt(doublename):
     logger.debug("/cancel %s", doublename)
-    user = explorer_api.get_user_by_double_name(doublename.lower())
+    user = db.get_user_by_double_name(conn, doublename)
 
-    sio.emit("cancelLogin", {"scanned": True}, room=user['name'].lower())
+    sio.emit("cancelLogin", {"scanned": True}, room=user["double_name"])
     return Response("Canceled by User")
 
 
 @app.route("/api/users/<doublename>/emailverified", methods=["post"])
 def set_email_verified_handler(doublename):
-    logger.debug("/emailverified from user %s", doublename.lower())
-    user = explorer_api.get_user_by_double_name(doublename.lower())
+    logger.debug("/emailverified from user %s", doublename)
+    user = db.get_user_by_double_name(conn, doublename)
 
     logger.debug(user)
 
-    emitOrQueue("email_verification", "", room=user['name'].lower())
+    emitOrQueue("email_verification", "", room=user["double_name"])
     return Response("Ok")
 
 
@@ -329,86 +286,23 @@ def minimum_version_handler():
     )
     return response
 
+
 @app.route("/api/maintenance", methods=["get"])
 def maintenance_handler():
-    config.read('config.ini')
-    
+    config.read("config.ini")
+
     response = app.response_class(
-        response=json.dumps({"maintenance": int(config['DEFAULT']['UNDER_MAINTENANCE'])}), mimetype="application/json"
+        response=json.dumps(
+            {"maintenance": int(config["DEFAULT"]["UNDER_MAINTENANCE"])}
+        ),
+        mimetype="application/json",
     )
     return response
 
-# @app.route("/api/users/<doublename>/deviceid", methods=["post"])
-# def set_device_id_handler(doublename):
-#     logger.debug("/deviceid from user %s", doublename.lower())
-#     # Get user
-#     body = request.get_json()
-#     user = explorer_api.get_user_by_double_name(doublename.lower())
-#     device_id = ''
-#     if user is None:
-#         logger.debug("User not found")
-#         return Response("User not found", status=404)        
-#     # Verify signature
-#     try:
-#         logger.debug("Verifying signatrue of device id" )
-#         device_id = verify_signed_data_with_public_key(user['pubkey'], body['signed_device_id']).decode("utf-8")
-#         pass
-#     except:
-#         return Response("Signature does not match", status=403)
-#     # Remove this id from db
-#     # check_and_delete_device_id_from_db(device_id)
-#     # If valid, add or update device Id in db
-#     # check if user already has deviceid's
-#     if user[4]:
-#         # If he does: add one to the array and update it
-#         try:
-#             device_ids = json.loads(user[4])
-#             pass
-#         except:
-#             # If it cannot load, it's probably a string from way back and can be removed
-#             device_ids = []
-#             pass
-#         device_ids.append(device_id)
-#         # db.update_deviceid(conn, json.dumps(device_ids), doublename)
-#     # else:
-#         # If he doesn't: add this one
-#         # db.update_deviceid(conn, json.dumps([device_id]), doublename)
-
-@app.route("/api/deviceid/<device_id>", methods=["delete"])
-def remove_device_id_handler(device_id):
-    logger.debug("removing device id %s from db", device_id)
-    # Check if Device id is known in DB
-    # check_and_delete_device_id_from_db(device_id)
-    return Response(status=204)
-# End flask API endpoints.
-
-# Start helper functions.
-
-def check_and_delete_device_id_from_db(device_id):
-    logger.debug("Checking if someone already has %s", device_id)
-    # usersWithSameDeviceId = db.get_users_by_device_id(conn, device_id)
-    # logger.debug(usersWithSameDeviceId)
-    # loop over response
-    # for user in usersWithSameDeviceId:
-    #    logger.debug(user)
-        # Try to load JSON device id
-    #    new_device_id = ''
-    #    try:
-    #        devices = json.loads(user[4])
-            # Remove device id from array
-    #        devices.remove(device_id)
-    #        pass
-    #    except:
-            # If it cannot load, it's probably a string from way back, so just removing it
-    #        pass
-        # Update user
-        # db.update_deviceid(conn, new_device_id, user[0])
-            
 
 def verify_signed_data(double_name, data):
-    double_name = double_name.lower()
-    user = explorer_api.get_user_by_double_name(double_name)
-    return verify_signed_data_with_public_key(user['pubkey'], data)
+    user = db.get_user_by_double_name(conn, double_name)
+    return verify_signed_data_with_public_key(user["public_key"], data)
 
 
 def verify_signed_data_with_public_key(public_key, data):
@@ -435,8 +329,6 @@ def emitOrQueue(event, data, room):
         logger.debug("App is connected, sending to %s", room)
         sio.emit(event, data, room=room)
 
-
-# End helper functions.
 
 if __name__ == "__main__":
     sio.run(app, host="0.0.0.0", port=5000)
