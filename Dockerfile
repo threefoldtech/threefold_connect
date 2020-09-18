@@ -2,11 +2,11 @@ FROM node:12 as builder
 
 COPY frontend /frontend
 WORKDIR /frontend
-RUN npm ci && npm run build
+RUN yarn install --frozen-lockfile && yarn build
 
 COPY example /example
 WORKDIR /example
-RUN npm ci && npm run build
+RUN yarn install --frozen-lockfile && yarn build
 
 
 FROM nginx
