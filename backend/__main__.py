@@ -161,7 +161,6 @@ def sign_attempt_handler():
 
     logger.debug("roomToSendTo %s", roomToSendTo)
     sio.emit("signedAttempt", data, room=roomToSendTo)
-    emitOrQueue("signedAttempt", data, room=roomToSendTo)
     return Response("Ok")
 
 

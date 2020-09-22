@@ -48,7 +48,6 @@ export default {
         this.randomRoom = generateUUID()
         window.localStorage.setItem('randomRoom', this.randomRoom)
       }
-      alert(this.randomRoom)
       this.setRandomRoom(this.randomRoom)
     }
     this.appid = this.$route.query.appid
