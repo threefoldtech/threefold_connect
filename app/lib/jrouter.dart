@@ -5,6 +5,8 @@ import 'package:threebotlogin/apps/wallet/wallet.dart';
 import 'package:threebotlogin/screens/preference_screen.dart';
 import 'package:threebotlogin/screens/registered_screen.dart';
 
+import 'apps/news/news.dart';
+
 class AppInfo {
   Route route;
   App app;
@@ -43,8 +45,16 @@ class JRouter {
           app: Chatbot()),
       AppInfo(
           route: Route(
+            path: '/news',
+            name: 'News',
+            icon: Icons.article,
+            view: await News().widget(),
+          ),
+          app: News()),
+      AppInfo(
+          route: Route(
             path: '/settings',
-            name: 'Settings',
+            name: 'Testr',
             icon: Icons.settings,
             view: PreferenceScreen(),
           ),
