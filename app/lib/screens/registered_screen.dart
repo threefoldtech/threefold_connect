@@ -45,14 +45,10 @@ class _RegisteredScreenState extends State<RegisteredScreen>
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
-                Image.asset(
-                  'assets/newLogo.png',
-                  height: 40,
-                ),
                 Padding(
                   padding: const EdgeInsets.only(left: 8.0),
                   child: Text(
-                    "Bot Connect",
+                    "Threefold Connect",
                     style: TextStyle(fontSize: 40, fontWeight: FontWeight.bold),
                     textAlign: TextAlign.center,
                   ),
@@ -65,13 +61,6 @@ class _RegisteredScreenState extends State<RegisteredScreen>
           children: <Widget>[
             Column(
               children: <Widget>[
-                Padding(
-                  padding: EdgeInsets.all(5),
-                  child: Text(
-                    "More functionality will be added soon.",
-                    style: TextStyle(fontSize: 14, color: Colors.grey),
-                  ),
-                ),
               ],
             ),
           ],

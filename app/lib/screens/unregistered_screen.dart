@@ -84,14 +84,10 @@ class _UnregisteredScreenState extends State<UnregisteredScreen>
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: <Widget>[
-                        Image.asset(
-                          'assets/newLogo.png',
-                          height: 40,
-                        ),
                         Padding(
                           padding: const EdgeInsets.only(left: 8.0),
                           child: Text(
-                            "Bot Connect",
+                            "Threefold Connect",
                             style: TextStyle(
                                 fontSize: 40,
                                 fontWeight: FontWeight.bold,
@@ -107,7 +103,7 @@ class _UnregisteredScreenState extends State<UnregisteredScreen>
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: <Widget>[
-                      Text('Welcome to 3Bot Connect.',
+                      Text('Welcome to Threefold Connect.',
                           style: TextStyle(fontSize: 24, color: Colors.black)),
                       SizedBox(height: 10),
                       RaisedButton(
