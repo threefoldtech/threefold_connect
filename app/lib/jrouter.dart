@@ -54,7 +54,7 @@ class JRouter {
       AppInfo(
           route: Route(
             path: '/settings',
-            name: 'Testr',
+            name: 'Settings',
             icon: Icons.settings,
             view: PreferenceScreen(),
           ),
