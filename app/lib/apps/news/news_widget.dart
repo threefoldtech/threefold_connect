@@ -36,8 +36,8 @@ class _NewsState extends State<NewsWidget>
 
   _NewsState() {
     iaWebView = InAppWebView(
-      //@todo: change url of news
-      initialUrl: 'https://threefold.io/news.html',
+      initialUrl: 'https://news.threefoldconnect.jimber.org?cache_buster=' +
+          new DateTime.now().millisecondsSinceEpoch.toString(),
       initialHeaders: {},
       initialOptions: InAppWebViewWidgetOptions(
           crossPlatform: InAppWebViewOptions(debuggingEnabled: true),
