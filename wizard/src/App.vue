@@ -22,7 +22,7 @@
               </v-row>
               <v-row class="ma-3" justify="center">
                 <div class="text-center">
-                  <h3 class="mb-3">3Bot Connect</h3>
+                  <h3 class="mb-3">threefold Connect</h3>
                   <p
                     class="subtitle-1 textCentered"
                   >Designed for you to connect and engage with your 3Bot.</p>

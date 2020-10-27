@@ -5,7 +5,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
-	<string>3Bot Connect</string>
+	<string>Threefold Connect</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -40,7 +40,7 @@
 	<key>NSCameraUsageDescription</key>
 	<string>App requires access to your camera to allow you to scan QR codes.</string>
 	<key>NSFaceIDUsageDescription</key>
-	<string>3Bot Connect would like permission for using Face ID or Touch ID</string>
+	<string>Threefold Connect would like permission for using Face ID or Touch ID</string>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UIMainStoryboardFile</key>
