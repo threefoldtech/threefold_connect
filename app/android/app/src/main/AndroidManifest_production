@@ -18,7 +18,7 @@
 
     <application
         android:name="io.flutter.app.FlutterApplication"
-        android:label="Threefold Connect"
+        android:label="ThreeFold Connect"
         android:icon="@mipmap/ic_launcher"
         android:usesCleartextTraffic="true">
         <activity
