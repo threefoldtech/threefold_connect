@@ -548,7 +548,7 @@ class _MobileRegistrationScreenState extends State<MobileRegistrationScreen> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Globals.color,
-        title: Text('Threefold Connect - Registration'),
+        title: Text('ThreeFold Connect - Registration'),
       ),
       body: registrationStepper(),
     );

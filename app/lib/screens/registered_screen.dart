@@ -48,7 +48,7 @@ class _RegisteredScreenState extends State<RegisteredScreen>
                 Padding(
                   padding: const EdgeInsets.only(left: 8.0),
                   child: Text(
-                    "Threefold Connect",
+                    "ThreeFold Connect",
                     style: TextStyle(fontSize: 40, fontWeight: FontWeight.bold),
                     textAlign: TextAlign.center,
                   ),
