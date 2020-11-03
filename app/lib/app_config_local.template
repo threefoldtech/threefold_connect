@@ -21,4 +21,8 @@ class AppConfigLocal extends AppConfigImpl {
   String threeBotSocketUrl() {
     return "ws://192.168.0.0:5000";
   }
+
+  String wizardUrl() {
+    return 'https://wizard.jimber.org/';
+  }
 }

@@ -36,6 +36,10 @@ class AppConfig extends EnvConfig {
   String threeBotSocketUrl() {
     return appConfig.threeBotSocketUrl();
   }
+
+  String wizardUrl() {
+    return appConfig.wizardUrl();
+  }
 }
 
 abstract class AppConfigImpl {
@@ -48,6 +52,8 @@ abstract class AppConfigImpl {
   String threeBotFrontEndUrl();
 
   String threeBotSocketUrl();
+
+  String wizardUrl();
 }
 
 class AppConfigProduction extends AppConfigImpl {
@@ -69,6 +75,10 @@ class AppConfigProduction extends AppConfigImpl {
 
   String threeBotSocketUrl() {
     return "wss://login.threefold.me";
+  }
+
+  String wizardUrl() {
+    return 'https://wizard.jimber.org/';
   }
 }
 
@@ -92,6 +102,10 @@ class AppConfigStaging extends AppConfigImpl {
   String threeBotSocketUrl() {
     return "wss://login.staging.jimber.org";
   }
+
+  String wizardUrl() {
+    return 'https://wizard.staging.jimber.org/';
+  }
 }
 
 class AppConfigTesting extends AppConfigImpl {
@@ -113,5 +127,9 @@ class AppConfigTesting extends AppConfigImpl {
 
   String threeBotSocketUrl() {
     return "wss://login.testing.jimber.org";
+  }
+
+  String wizardUrl() {
+    return 'https://wizard.staging.jimber.org/';
   }
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
+import 'package:threebotlogin/app_config.dart';
 import 'package:threebotlogin/services/user_service.dart';
 
 class InitScreen extends StatefulWidget {
@@ -25,8 +26,7 @@ class _InitState extends State<InitScreen> {
 
   _InitState() {
     iaWebView = InAppWebView(
-      initialUrl: 'https://wizard.jimber.org/?cache_buster=' +
-          new DateTime.now().millisecondsSinceEpoch.toString(),
+      initialUrl: AppConfig().wizardUrl() + '?cache_buster=' + new DateTime.now().millisecondsSinceEpoch.toString(),
       initialHeaders: {},
       initialOptions: InAppWebViewWidgetOptions(
         android: AndroidInAppWebViewOptions(supportMultipleWindows: true),
