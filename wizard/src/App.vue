@@ -26,7 +26,7 @@
                   <h3 class="mb-3">ThreeFold Connect</h3>
                   <p
                     class="subtitle-1 textCentered"
-                  >Designed for you to connect and engage with your 3Bot.</p>
+                  >Designed for you to connect and engage with the Threefold network.</p>
                 </div>
               </v-row>
             </v-col>
@@ -46,9 +46,8 @@
                 <div class="text-center">
                   <h3 class="mb-3">Meet 3Bot's Vision</h3>
                   <p class="subtitle-1 textCentered">
-                    A revolutionary digital avatar that executes your digital needs. With
-                    3Bot, everything changes: move from an app-centric to a you-centric digital world. Start your journey
-                    towards digital freedom.
+                    A revolutionary digital network that executes your digital needs.
+                    With Threefold, everything changes: move from an app-centric to a you-centric digital world. Start your journey towards digital freedom.
                   </p>
                 </div>
               </v-row>
@@ -91,8 +90,8 @@
                 <div class="text-center">
                   <h3 class="mb-3">Be your own bank</h3>
                   <p class="subtitle-1 textCentered">
-                    3Bot is equipped with its own digital wallet, giving you access to a
-                    global market of currencies and assets.
+                    ThreeFold Connect is equipped with its own digital wallet,
+                    giving you access to a global market of currencies and assets.
                   </p>
                 </div>
               </v-row>
@@ -114,10 +113,9 @@
                 <div class="text-center">
                   <h3 class="mb-3">What's coming next?</h3>
                   <p class="subtitle-1 textCentered">
-                    Have your own personal assistant, social media, messaging and video conferencing, office suite,
-                    browser,
-                    website publisher, circles, and more – all in one place.
-                    Any application or service can live on 3Bot.
+                    Have your own personal assistant, social media, messaging and video conferencing,
+                    office suite, browser, website publisher, circles, and more – all in one place.
+                    Any application or service can live on the grid.
                     <br />Turn your imagination into a reality..
                   </p>
                 </div>
