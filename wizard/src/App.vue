@@ -151,7 +151,7 @@
                   <v-btn
                     color="primary"
                     :disabled="!acceptedTT"
-                    @click="window.flutter_inappwebview.callHandler('FINISH')"
+                    @click="finish"
                   >Get started!</v-btn>
                 </div>
               </v-row>
@@ -175,7 +175,7 @@
         </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn :disabled="!acceptedTT" text @click="window.flutter_inappwebview.callHandler('FINISH')">continue</v-btn>
+          <v-btn :disabled="!acceptedTT" text @click="finish">continue</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -190,7 +190,7 @@
             </v-btn>
           </v-row>
         </v-card-title>
-          <iframe style="height:calc(100vh - 62px); width: 100%" src="https://wiki.threefold.io/#/disclaimer" frameborder="0"></iframe>
+          <iframe style="height:calc(100vh - 62px); width: 100%" src="https://wiki.threefold.io/#/legal" frameborder="0"></iframe>
       </v-card>
     </v-dialog>
   </v-app>
@@ -209,6 +209,9 @@ export default {
   methods: {
     showDisclaimerBeforeSkip () {
       this.showDialog = true
+    },
+    finish () {
+      window.flutter_inappwebview.callHandler('FINISH')
     }
   }
 }
