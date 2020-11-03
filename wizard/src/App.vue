@@ -8,6 +8,7 @@
         :continuous="false"
         class="pt-5"
         height="100%"
+        hide-delimiter-background
       >
           <v-carousel-item>
             <v-col>
@@ -221,5 +222,8 @@ export default {
 }
 #skip {
   z-index: 2;
+}
+.v-window__prev, .v-window__next {
+  background-color: rgba(0, 0, 0, 0) !important;
 }
 </style>
