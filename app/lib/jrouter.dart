@@ -29,6 +29,14 @@ class JRouter {
           app: null),
       AppInfo(
           route: Route(
+            path: '/news',
+            name: 'News',
+            icon: Icons.article,
+            view: await News().widget(),
+          ),
+          app: News()),
+      AppInfo(
+          route: Route(
             path: '/wallet',
             name: 'Wallet',
             icon: Icons.account_balance_wallet,
@@ -43,14 +51,7 @@ class JRouter {
             view: await Chatbot().widget(),
           ),
           app: Chatbot()),
-      AppInfo(
-          route: Route(
-            path: '/news',
-            name: 'News',
-            icon: Icons.article,
-            view: await News().widget(),
-          ),
-          app: News()),
+
       AppInfo(
           route: Route(
             path: '/settings',
