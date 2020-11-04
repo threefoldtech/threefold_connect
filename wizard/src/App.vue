@@ -26,7 +26,7 @@
                   <h3 class="mb-3">ThreeFold Connect</h3>
                   <p
                     class="subtitle-1 textCentered"
-                  >Designed for you to connect and engage with the Threefold network.</p>
+                  >Designed for you to connect and engage with the ThreeFold network.</p>
                 </div>
               </v-row>
             </v-col>
@@ -44,10 +44,10 @@
               </v-row>
               <v-row class="ma-3" justify="center">
                 <div class="text-center">
-                  <h3 class="mb-3">Meet 3Bot's Vision</h3>
+                  <h3 class="mb-3">Meet ThreeFold's Vision</h3>
                   <p class="subtitle-1 textCentered">
                     A revolutionary digital network that executes your digital needs.
-                    With Threefold, everything changes: move from an app-centric to a you-centric digital world. Start your journey towards digital freedom.
+                    With ThreeFold, everything changes: move from an app-centric to a you-centric digital world. Start your journey towards digital freedom.
                   </p>
                 </div>
               </v-row>
