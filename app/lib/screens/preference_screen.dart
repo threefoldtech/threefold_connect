@@ -11,10 +11,8 @@ import 'package:threebotlogin/helpers/hex_color.dart';
 import 'package:threebotlogin/screens/authentication_screen.dart';
 import 'package:threebotlogin/screens/change_pin_screen.dart';
 import 'package:threebotlogin/screens/main_screen.dart';
-import 'package:threebotlogin/services/3bot_service.dart';
 import 'package:threebotlogin/services/fingerprint_service.dart';
 import 'package:threebotlogin/services/open_kyc_service.dart';
-// import 'package:threebotlogin/services/push_notifications_manager.dart';
 import 'package:threebotlogin/services/user_service.dart';
 import 'package:threebotlogin/widgets/custom_dialog.dart';
 import 'package:threebotlogin/widgets/email_verification_needed.dart';
@@ -54,27 +52,22 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
     }
   }
 
-  setVersion() {
+  @override
+  void initState() {
+    super.initState();
+
+    // checkBiometrics().then((result) => {biometricsCheck = result});
+
     PackageInfo.fromPlatform().then((packageInfo) => {
           setState(() {
             version = packageInfo.version;
             buildNumber = packageInfo.buildNumber;
           })
         });
-  }
 
-  @override
-  void initState() {
-    super.initState();
-    getUserValues();
-    checkBiometrics();
-    // _listener = FirebaseNotificationListener();
     Globals().emailVerified.addListener(setEmailVerified);
-    setVersion();
 
-    getBiometricDeviceName().then((_biometricDeviceName) => {
-      biometricDeviceName = _biometricDeviceName
-    });
+    getUserValues();
   }
 
   showChangePin() async {
@@ -150,20 +143,41 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
               }
             },
           ),
-          Visibility(
-            visible: biometricsCheck,
-            child: Material(
-              child: CheckboxListTile(
-                secondary: Icon(Icons.fingerprint),
-                value: finger,
-                title: Text(biometricDeviceName),
-                activeColor: Theme.of(context).accentColor,
-                onChanged: (bool newValue) async {
-                  _toggleFingerprint(newValue);
-                },
-              ),
-            ),
-          ),
+          FutureBuilder(
+              future: checkBiometrics(),
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  if (snapshot.data == true) {
+                    return FutureBuilder(
+                        future: getBiometricDeviceName(),
+                        builder: (context, snapshot) {
+                          if (snapshot.hasData) {
+                            if(snapshot.data == "Not found") {
+                              return Container();
+                            }
+
+                            biometricDeviceName = snapshot.data;
+
+                            return Material(
+                              child: CheckboxListTile(
+                                secondary: Icon(Icons.fingerprint),
+                                value: finger,
+                                title: Text(snapshot.data),
+                                activeColor: Theme.of(context).accentColor,
+                                onChanged: (bool newValue) async {
+                                  _toggleFingerprint(newValue);
+                                },
+                              ),
+                            );
+                          } else {
+                            return Container();
+                          }
+                        });
+                  }
+                } else {
+                  return Container();
+                }
+              }),
           Material(
             child: ListTile(
               leading: Icon(Icons.lock),
@@ -217,8 +231,7 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
   }
 
   checkBiometrics() async {
-    biometricsCheck = await checkBiometricsAvailable();
-    return biometricsCheck;
+    return await checkBiometricsAvailable();
   }
 
   void _showDisableFingerprint() {
