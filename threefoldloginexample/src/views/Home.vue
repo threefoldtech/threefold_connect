@@ -1,6 +1,6 @@
 <template>
   <div class="home">
-    <p>Threefold login example, please choose a type of login</p>
+    <p>ThreeFold login example, please choose a type of login</p>
     <div class="buttons">
       <button @click="loginWithCustomScope({email: false})">Authenticate and get the users email.</button>
       <button @click="loginWithCustomScope({derivedSeed: false})">Authenticate and get the derived seed.</button>
@@ -67,7 +67,7 @@
     window.localStorage.setItem("state", state)
     const loginUrl = login.generateLoginUrl(state, extraParams);
 
-    const popup = popupCenter(loginUrl, 'Threefold login', 800, 550);
+    const popup = popupCenter(loginUrl, 'ThreeFold login', 800, 550);
 
     window.onmessage = function (e: MessageEvent) {
       if (e.data.message === 'threefoldLoginRedirectSuccess') {
