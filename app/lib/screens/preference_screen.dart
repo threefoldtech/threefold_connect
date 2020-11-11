@@ -152,7 +152,7 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
                         future: getBiometricDeviceName(),
                         builder: (context, snapshot) {
                           if (snapshot.hasData) {
-                            if(snapshot.data == "Not found") {
+                            if (snapshot.data == "Not found") {
                               return Container();
                             }
 
@@ -200,7 +200,7 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
             child: ListTile(
               leading: Icon(Icons.info_outline),
               title: Text("Terms and conditions"),
-              onTap: _showTermsAndConds,
+              onTap: () async => {await _showTermsAndConds()},
             ),
           ),
           ExpansionTile(
@@ -492,13 +492,10 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
     }
   }
 
-  void _showTermsAndConds() async {
+  Future<void> _showTermsAndConds() async {
     const url = 'https://wiki.threefold.io/#/legal';
-    if (await canLaunch(url)) {
-      await launch(url);
-    } else {
-      throw 'Could not launch $url';
-    }
+
+    await launch(url);
   }
 
   void _showVersionInfo() {
