@@ -1,10 +1,8 @@
 import 'dart:async';
-import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:http/http.dart';
 import 'package:threebotlogin/app_config.dart';
 import 'package:threebotlogin/events/events.dart';
 import 'package:threebotlogin/helpers/environment.dart';
@@ -13,8 +11,6 @@ import 'package:threebotlogin/screens/home_screen.dart';
 import 'package:threebotlogin/screens/init_screen.dart';
 import 'package:threebotlogin/screens/unregistered_screen.dart';
 import 'package:threebotlogin/services/3bot_service.dart';
-import 'package:threebotlogin/services/crypto_service.dart';
-import 'package:threebotlogin/services/push_notifications_manager.dart';
 import 'package:threebotlogin/services/socket_service.dart';
 import 'package:threebotlogin/services/user_service.dart';
 import 'package:threebotlogin/widgets/custom_dialog.dart';
