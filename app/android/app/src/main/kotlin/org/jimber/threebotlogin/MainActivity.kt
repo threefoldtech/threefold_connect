@@ -1,4 +1,4 @@
-package org.jimber.threebotlogin.staging
+package org.jimber.threebotlogin
 
 import android.os.Bundle
 import io.flutter.app.FlutterFragmentActivity
