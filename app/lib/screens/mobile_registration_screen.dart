@@ -5,7 +5,6 @@ import 'package:threebotlogin/helpers/globals.dart';
 import 'package:threebotlogin/services/3bot_service.dart';
 import 'package:threebotlogin/services/crypto_service.dart';
 import 'package:threebotlogin/services/open_kyc_service.dart';
-import 'package:threebotlogin/services/push_notifications_manager.dart';
 import 'package:threebotlogin/services/tools_service.dart';
 import 'package:threebotlogin/services/user_service.dart';
 import 'package:threebotlogin/widgets/custom_dialog.dart';
@@ -356,6 +355,7 @@ class _MobileRegistrationScreenState extends State<MobileRegistrationScreen> {
                         inputFormatters: <TextInputFormatter>[
                           WhitelistingTextInputFormatter(RegExp("[a-zA-Z0-9]"))
                         ],
+                        enableSuggestions: false,
                       ),
                     ),
                     Row(
