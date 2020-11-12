@@ -89,7 +89,7 @@ class _UnregisteredScreenState extends State<UnregisteredScreen>
                           child: Text(
                             "ThreeFold Connect",
                             style: TextStyle(
-                                fontSize: 36,
+                                fontSize: 32,
                                 fontWeight: FontWeight.bold,
                                 color: Colors.black),
                             textAlign: TextAlign.center,
