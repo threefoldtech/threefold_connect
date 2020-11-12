@@ -6,7 +6,7 @@ testing_build:
     - builder
   script:
     - docker login --username $DOCKER_USERNAME --password $DOCKER_TOKEN
-    - echo "Building 3Bot Connect for testing"
+    - echo "Building ThreeFold Connect for testing"
     - mv frontend/public/config.testing.js frontend/public/config.js
     - mv example/public/config.testing.js example/public/config.js
     - docker build . -t jimber/3botlogin:testing-$CI_COMMIT_TAG
@@ -20,7 +20,7 @@ testing_deploy:
     - 3botconnect_testing_deployer
   script:
     - docker login --username $DOCKER_USERNAME --password $DOCKER_TOKEN
-    - echo "Deploying 3Bot Connect for testing"
+    - echo "Deploying ThreeFold Connect for testing"
     - docker rm -f 3botlogin || true
     - docker pull jimber/3botlogin:testing-$CI_COMMIT_TAG
     - docker run -d -it --network=jimber_proxy_net --name 3botlogin -v /opt/3botlogin/pythonsqlite.db:/usr/share/nginx/backend/pythonsqlite.db jimber/3botlogin:testing-$CI_COMMIT_TAG
@@ -33,7 +33,7 @@ staging_build:
     - builder
   script:
     - docker login --username $DOCKER_USERNAME --password $DOCKER_TOKEN
-    - echo "Building 3Bot Connect for staging"
+    - echo "Building ThreeFold Connect for staging"
     - mv frontend/public/config.staging.js frontend/public/config.js
     - mv example/public/config.staging.js example/public/config.js
     - docker build . -t jimber/3botlogin:staging-$CI_COMMIT_TAG
@@ -47,7 +47,7 @@ staging_deploy:
     - 3botconnect_staging_deployer
   script:
     - docker login --username $DOCKER_USERNAME --password $DOCKER_TOKEN
-    - echo "Deploying 3Bot Connect for staging"
+    - echo "Deploying ThreeFold Connect for staging"
     - docker rm -f 3botlogin || true
     - docker pull jimber/3botlogin:staging-$CI_COMMIT_TAG
     - docker run -d -it --network=jimber_proxy_net --name 3botlogin -v /opt/3botlogin/pythonsqlite.db:/usr/share/nginx/backend/pythonsqlite.db -v /opt/3botlogin/config.ini:/usr/share/nginx/backend/config.ini jimber/3botlogin:staging-$CI_COMMIT_TAG
@@ -60,7 +60,7 @@ production_build:
     - builder
   script:
     - docker login --username $DOCKER_USERNAME --password $DOCKER_TOKEN
-    - echo "Building 3Bot Connect for production"
+    - echo "Building ThreeFold Connect for production"
     - mv frontend/public/config.prod.js frontend/public/config.js
     - mv example/public/config.prod.js example/public/config.js
     - docker build . -t jimber/3botlogin:production-$CI_COMMIT_TAG
@@ -75,7 +75,7 @@ production_deploy:
     - 3botconnect_production_deployer
   script:
     - docker login --username $DOCKER_USERNAME --password $DOCKER_TOKEN
-    - echo "Deploying 3Bot Connect for production"
+    - echo "Deploying ThreeFold Connect for production"
     - docker rm -f 3botlogin
     - docker pull jimber/3botlogin:production-$CI_COMMIT_TAG
     - docker run -d -it --name 3botlogin -v /opt/3botlogin/db/pythonsqlite.db:/usr/share/nginx/backend/pythonsqlite.db -v /opt/3botlogin/config.ini:/usr/share/nginx/backend/config.ini --network=3proxynet jimber/3botlogin:production-$CI_COMMIT_TAG
