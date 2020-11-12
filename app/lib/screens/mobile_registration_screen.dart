@@ -417,7 +417,7 @@ class _MobileRegistrationScreenState extends State<MobileRegistrationScreen> {
                 padding: const EdgeInsets.all(16.0),
                 child: ReuseableTextStep(
                   titleText:
-                      'Please write this on a piece of paper and keep it in a secure place.',
+                      'Please write this seed phrase and your 3bot name on a piece of paper and keep it in a secure place.',
                   extraText: _registrationData.phrase,
                   errorStepperText: errorStepperText,
                 ),

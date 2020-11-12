@@ -63,7 +63,7 @@ class ReuseableTextStep extends StatelessWidget {
               size: 22.0,
             ),
             Text(
-              "Seed phrase is needed to recover.",
+              "Seed phrase and 3bot name is needed to recover.",
               style: TextStyle(fontSize: 13),
             ),
           ],
