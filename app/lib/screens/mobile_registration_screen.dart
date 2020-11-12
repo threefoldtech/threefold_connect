@@ -356,6 +356,7 @@ class _MobileRegistrationScreenState extends State<MobileRegistrationScreen> {
                           WhitelistingTextInputFormatter(RegExp("[a-zA-Z0-9]"))
                         ],
                         enableSuggestions: false,
+                        autocorrect: false,
                       ),
                     ),
                     Row(
