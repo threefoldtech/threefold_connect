@@ -2,5 +2,7 @@ module.exports = {
   transpileDependencies: [
     'vuetify'
   ],
-  publicpath: '/wizard/'
+  css: {
+    sourceMap: true
+  }
 }

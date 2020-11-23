@@ -1,161 +1,84 @@
-
 <template>
-  <v-app>
+  <v-app class="transparent">
     <v-main fill-height>
-      <v-btn id="skip" @click="showDisclaimerBeforeSkip" class="mt-5" absolute top right text>Skip</v-btn>
+<!--      <v-btn id="skip" @click="showDisclaimerBeforeSkip" class="mt-5" absolute top right text>Skip</v-btn>-->
       <v-carousel
         light
         :continuous="false"
-        class="pt-5"
         height="100%"
         hide-delimiter-background
       >
-          <v-carousel-item>
-            <v-col>
-              <v-row justify="center" class="mb-5">
-                <v-img
-                  src="3Bot_Original.png"
-                  aspect-ratio="1"
-                  contain
-                  max-width="270"
-                  max-height="300"
-                ></v-img>
-              </v-row>
-              <v-row class="ma-3" justify="center">
-                <div class="text-center">
-                  <h3 class="mb-3">ThreeFold Connect</h3>
-                  <p
-                    class="subtitle-1 textCentered"
-                  >Designed for you to connect and engage with the ThreeFold network.</p>
+        <v-carousel-item>
+          <header>
+            <h2>Welcome to</h2>
+            <img class="logo" src="threefold_connect_logo.svg" alt="threefold connect">
+          </header>
+          <main>
+            <p>
+              ThreeFold Connect is your main access point to the ThreeFold Grid and more. Please allow us to quickly
+              show you around!
+            </p>
+          </main>
+        </v-carousel-item>
+        <v-carousel-item>
+          <header>
+            <h1>MAXIMUM <br> <b>SECURITY</b></h1>
+            <img class="finger-print" src="fingerprint.svg" alt="threefold connect">
+          </header>
+          <main>
+            <p>
+              The app provides a secure authentication mechanism that protects your identity on the ThreeFold Grid.
+            </p>
+          </main>
+        </v-carousel-item>
+        <v-carousel-item>
+          <header>
+            <h1 style="font-size: 39px;">THREEFOLD <br> <b style="font-size: 58px;">WALLET</b></h1>
+            <img style="width: 170px;height: 170.95px;position: absolute;top: 24vh;" src="TFT.svg"
+                 alt="threefold connect">
+          </header>
+          <main>
+            <p>
+              Access your ThreeFold Wallet and your ThreeFold Tokens (TFT). More currencies are to be added in the
+              future.
+            </p>
+          </main>
+        </v-carousel-item>
+        <v-carousel-item>
+          <header>
+            <h1 style="font-size: 32px;">THREEFOLD <br> <b style="font-size: 64px;">NEWS</b></h1>
+            <img style="width: 200px;height: 355.56px;position: absolute;top: 15vh;" src="news.svg"
+                 alt="threefold connect">
+          </header>
+          <main>
+            <p>
+              Stay updated with ThreeFold’s latest updates via the News section within the app.
+            </p>
+          </main>
+        </v-carousel-item>
+        <v-carousel-item>
+          <div class="journey">
+            <img style="width: 200px;height: 355.56px;" src="journey.svg" alt="threefold connect">
+            <h1 class="pt-8 pb-4" style="font-size: 38px;">START YOUR <br> <b style="font-size: 39px;">THREEFOLD</b> <br> <i style="font-size: 49px;">JOURNEY</i>
+            </h1>
+            <v-btn @click="finish" color="#57BE8E" dark elevation="0">GET STARTED</v-btn>
+            <v-checkbox v-model="acceptedTT" style="width: 70vw; font-size: 11px;">
+              <template v-slot:label>
+                <div>
+                  By clicking ‘Get Started’, I agree to Threefold’s
+                  <a
+                    target="_blank"
+                    href="http://vuetifyjs.com"
+                    style="text-decoration: underline"
+                  >
+                    Terms and conditions
+                  </a>
                 </div>
-              </v-row>
-            </v-col>
-          </v-carousel-item>
-          <v-carousel-item height="100%">
-            <v-col  height="100%">
-              <v-row justify="center" class="mb-5">
-                <v-img
-                  src="3Bot_Original.png"
-                  aspect-ratio="1"
-                  contain
-                  max-width="270"
-                  max-height="300"
-                ></v-img>
-              </v-row>
-              <v-row class="ma-3" justify="center">
-                <div class="text-center">
-                  <h3 class="mb-3">Meet ThreeFold's Vision</h3>
-                  <p class="subtitle-1 textCentered">
-                    A revolutionary digital network that executes your digital needs.
-                    With ThreeFold, everything changes: move from an app-centric to a you-centric digital world. Start your journey towards digital freedom.
-                  </p>
-                </div>
-              </v-row>
-            </v-col>
-          </v-carousel-item>
-          <v-carousel-item>
-            <v-col height="100%" >
-              <v-row justify="center" class="mb-5">
-                <v-img
-                  src="3Bot_Social.png"
-                  aspect-ratio="1"
-                  contain
-                  max-width="270"
-                  max-height="300"
-                ></v-img>
-              </v-row>
-              <v-row class="ma-3" justify="center">
-                <div class="text-center">
-                  <h3 class="mb-3">You are at the centre</h3>
-                  <p class="subtitle-1 textCentered">
-                    Enter a decentralised, private social space where you own and control your privacy & personal data.
-                    <br />No Ads. No fake news. No gimmicks.
-                  </p>
-                </div>
-              </v-row>
-            </v-col>
-          </v-carousel-item>
-          <v-carousel-item>
-            <v-col height="100%" >
-              <v-row justify="center" class="mb-5">
-                <v-img
-                  src="3Bot_Wallet.png"
-                  aspect-ratio="1"
-                  contain
-                  max-width="270"
-                  max-height="300"
-                ></v-img>
-              </v-row>
-              <v-row class="ma-3" justify="center">
-                <div class="text-center">
-                  <h3 class="mb-3">Be your own bank</h3>
-                  <p class="subtitle-1 textCentered">
-                    ThreeFold Connect is equipped with its own digital wallet,
-                    giving you access to a global market of currencies and assets.
-                  </p>
-                </div>
-              </v-row>
-            </v-col>
-          </v-carousel-item>
-
-          <v-carousel-item>
-            <v-col height="100%" >
-              <v-row justify="center" class="mb-5">
-                <v-img
-                  src="3Bot_Assistance.png"
-                  aspect-ratio="1"
-                  contain
-                  max-width="270"
-                  max-height="300"
-                ></v-img>
-              </v-row>
-              <v-row class="ma-3" justify="center">
-                <div class="text-center">
-                  <h3 class="mb-3">What's coming next?</h3>
-                  <p class="subtitle-1 textCentered">
-                    Have your own personal assistant, social media, messaging and video conferencing,
-                    office suite, browser, website publisher, circles, and more – all in one place.
-                    Any application or service can live on the grid.
-                    <br />Turn your imagination into a reality..
-                  </p>
-                </div>
-              </v-row>
-            </v-col>
-          </v-carousel-item>
-          <v-carousel-item>
-            <v-col height="100%" >
-              <v-row justify="center" class="mb-5">
-                <v-img
-                  src="3Bot_Original.png"
-                  aspect-ratio="1"
-                  contain
-                  max-width="270"
-                  max-height="300"
-                ></v-img>
-              </v-row>
-              <v-row class="ma-3" justify="center">
-                <div class="text-center">
-                  <h3 class="mb-3">Get started</h3>
-                  <p class="subtitle-1 textCentered">
-                    Before you can start using the app, you must accept the
-                    <v-btn
-                    text
-                    small
-                    @click="showDisclaimer = true"
-                  >Terms and conditions</v-btn>
-                  </p>
-                  <v-row justify="center">
-                    <v-checkbox v-model="acceptedTT" label="I Accept the terms and conditions"></v-checkbox>
-                  </v-row>
-                  <v-btn
-                    color="primary"
-                    :disabled="!acceptedTT"
-                    @click="finish"
-                  >Get started!</v-btn>
-                </div>
-              </v-row>
-            </v-col>
-          </v-carousel-item>
+              </template>
+            </v-checkbox>
+            <div class="spacer"></div>
+          </div>
+        </v-carousel-item>
       </v-carousel>
     </v-main>
     <v-dialog v-model="showDialog" width="500">
@@ -168,7 +91,8 @@
               text
               small
               @click="showDisclaimer = true"
-            >Terms and conditions</v-btn>
+            >Terms and conditions
+            </v-btn>
           </p>
           <v-checkbox v-model="acceptedTT" label="I Accept the terms and conditions"></v-checkbox>
         </v-card-text>
@@ -189,7 +113,8 @@
             </v-btn>
           </v-row>
         </v-card-title>
-          <iframe style="height:calc(100vh - 62px); width: 100%" src="https://wiki.threefold.io/#/legal" frameborder="0"></iframe>
+        <iframe style="height:calc(100vh - 62px); width: 100%" src="https://wiki.threefold.io/#/legal"
+                frameborder="0"></iframe>
       </v-card>
     </v-dialog>
   </v-app>
@@ -210,18 +135,155 @@ export default {
       this.showDialog = true
     },
     finish () {
+      this.acceptedTT = true
       window.flutter_inappwebview.callHandler('FINISH')
     }
   }
 }
 </script>
-<style>
-#app {
+<style lang="scss">
+@import url('https://fonts.googleapis.com/css2?family=Lato&display=swap');
+@import url('https://use.fontawesome.com/releases/v5.6.3/css/all.css');
+
+*, .v-application, .v-application * {
+  font-family: 'Lato', serif !important;
 }
-#skip {
-  z-index: 2;
+
+h2 {
+  font-weight: bold;
+  font-size: 30px;
 }
-.v-window__prev, .v-window__next {
-  background-color: rgba(0, 0, 0, 0) !important;
+
+.v-application--wrap {
+  background: url("/bg.svg");
+  background-size: cover;
+  background-position: left;
+}
+
+.v-responsive__content {
+  display: flex;
+  width: 100%;
+  flex-flow: column;
+  justify-content: center;
+
+  header {
+    display: flex;
+    flex-flow: column;
+    justify-content: center;
+    text-align: center;
+    align-items: center;
+    height: 30%;
+
+    h1 {
+      font-weight: 800;
+      text-align: center;
+      font-size: 46px;
+      line-height: 52px;
+      letter-spacing: 0.03em;
+
+      b {
+        color: #57BE8E;
+        font-size: 50px;
+      }
+    }
+
+    .logo {
+      width: 77.77%;
+      max-width: 700px;
+    }
+
+    .finger-print {
+      position: absolute;
+      top: 22vh;
+      width: 140px;
+      height: 248.89px;
+    }
+  }
+
+  main {
+    display: flex;
+    flex-flow: column;
+    justify-content: center;
+    text-align: center;
+    align-items: center;
+    flex-grow: 1;
+    height: 70%;
+
+    p {
+      font-size: 20px;
+      width: 77.77%;
+      text-align: center;
+
+    }
+  }
+}
+
+.v-carousel__controls {
+  bottom: 15vh !important;
+  width: 55vw !important;
+  position: fixed !important;
+  left: calc(50% - (55vw / 2)) !important;
+  height: 5vw !important;
+
+  .v-item-group {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    button {
+      height: 4.5vw !important;
+      width: 4.5vw !important;
+      background: #1272B8;
+
+      * {
+        display: none;
+      }
+
+      &.v-btn--active {
+        height: 5vw !important;
+        width: 5vw !important;
+        background: #57BE8E;
+      }
+    }
+  }
+}
+
+.v-window__next, .v-window__prev {
+  display: none !important;
+}
+
+.journey {
+  height: 100vh;
+  display: flex;
+  flex-flow: column;
+  justify-content: space-between;
+  align-items: center;
+  h1 {
+    line-height: 33px;
+    b {
+      color: #57BE8E;
+    }
+    i {
+      font-style: normal;
+      line-height: 40px;
+      color: #1272b8;
+    }
+  }
+  .v-btn {
+    width: 230px;
+    height: 39px;
+    border-radius: 80px;
+    background: #57BE8E;
+  }
+  .v-btn--disabled{
+
+  }
+  .spacer {
+    height: 20vh;
+    width: 100%;
+  }
+}
+.v-input--selection-controls__ripple, .v-icon{
+  font-family: 'Font Awesome 5 Free' !important;
 }
 </style>
