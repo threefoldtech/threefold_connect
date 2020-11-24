@@ -36,7 +36,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       theme: ThemeData(
         primaryColor: HexColor("#2d4052"),
-        accentColor: HexColor("#16a085"),
+        accentColor: HexColor("#57BE8E"),
       ),
       home: MainScreen(initDone: initDone, registered: registered),
     );

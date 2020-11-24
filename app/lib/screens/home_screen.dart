@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:threebotlogin/apps/free_flow_pages/ffp.dart';
 import 'package:threebotlogin/apps/free_flow_pages/ffp_events.dart';
 import 'package:threebotlogin/events/email_event.dart';
@@ -181,18 +182,30 @@ class _HomeScreenState extends State<HomeScreen>
         length: Globals().router.routes.length,
         child: WillPopScope(
           child: Scaffold(
-            body: SafeArea(
-              child: TabBarView(
-                controller: _tabController,
-                physics: NeverScrollableScrollPhysics(),
-                children: Globals().router.getContent(),
-              ),
+            body: Stack(
+              children: <Widget>[
+                SvgPicture.asset(
+                  'assets/bg.svg',
+                  alignment: Alignment.center,
+                  width: MediaQuery.of(context).size.width,
+                  height: MediaQuery.of(context).size.height,
+                ),
+                Container(
+                  child: SafeArea(
+                    child: TabBarView(
+                      controller: _tabController,
+                      physics: NeverScrollableScrollPhysics(),
+                      children: Globals().router.getContent(),
+                    ),
+                  ),
+                ),
+              ],
             ),
             bottomNavigationBar: Container(
-              color: HexColor("#2d4052"),
+              color: HexColor("#0A73B8"),
               //@todo theme obj
               padding: EdgeInsets.all(0.0),
-              height: 65,
+              height: 80,
               margin: EdgeInsets.all(0.0),
               child: TabBar(
                 controller: _tabController,

@@ -93,11 +93,10 @@ class JRouter {
     List<Container> iconButtons = [];
     routes.forEach((r) {
       iconButtons.add(Container(
-          padding: EdgeInsets.all(0.0),
           child: Tab(
             icon: Icon(
               r.route.icon,
-              size: 20,
+              size: 40,
             ),
             text: r.route.name,
           )));
