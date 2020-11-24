@@ -32,28 +32,21 @@ class _RegisteredScreenState extends State<RegisteredScreen>
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             Container(
-              width: 200.0,
-              height: 200.0,
+              width: 360.0,
+              height: 108.0,
               decoration: BoxDecoration(
-                color: Theme.of(context).primaryColor,
-                shape: BoxShape.circle,
                 image: DecorationImage(
                     fit: BoxFit.fill, image: AssetImage('assets/logo.png')),
               ),
             ),
-            SizedBox(height: 10.0),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                Padding(
-                  padding: const EdgeInsets.only(left: 8.0),
-                  child: Text(
-                    "ThreeFold Connect",
-                    style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
-                    textAlign: TextAlign.center,
-                  ),
-                ),
-              ],
+            SizedBox(height: 80),
+            Container(
+              width: 200.0,
+              height: 200.0,
+              decoration: BoxDecoration(
+                image: DecorationImage(
+                    fit: BoxFit.fill, image: AssetImage('assets/threefold_registered.png')),
+              ),
             ),
           ],
         ),
