@@ -4,7 +4,7 @@ import 'package:threebotlogin/jrouter.dart';
 
 class Globals {
   static final bool isInDebugMode = true;
-  static final HexColor color = HexColor("#2d4052");
+  static final HexColor color = HexColor("#0a73b8");
 
   ValueNotifier<bool> emailVerified = ValueNotifier(false);
 

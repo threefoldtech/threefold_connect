@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:package_info/package_info.dart';
 import 'package:threebotlogin/app_config.dart';
 import 'package:threebotlogin/apps/free_flow_pages/ffp_events.dart';
@@ -84,148 +85,144 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
-        backgroundColor: HexColor("#2d4052"),
+        backgroundColor: HexColor("#0a73b8"),
         title: Text(
           'Settings',
         ),
       ),
-      body: ListView(
-        children: <Widget>[
-          ListTile(
-            title: Text("Profile"),
-          ),
-          Material(
-            child: ListTile(
-              leading: Icon(Icons.person),
-              title: Text(doubleName),
+      body: Scaffold(
+        body: Stack(
+          children: <Widget>[
+            SvgPicture.asset(
+              'assets/bg.svg',
+              alignment: Alignment.center,
+              width: MediaQuery.of(context).size.width,
+              height: MediaQuery.of(context).size.height,
             ),
-          ),
-          Material(
-            child: ListTile(
-                trailing: !emailVerified ? Icon(Icons.refresh) : null,
-                leading: Icon(Icons.mail),
-                title: Text(emailAdress.toLowerCase()),
-                subtitle: !emailVerified
-                    ? Text(
-                        "Unverified",
-                        style: TextStyle(color: Colors.grey),
-                      )
-                    : Text(
-                        "Verified",
-                        style: TextStyle(color: Colors.green),
-                      ),
-                onTap: () {
-                  if (!emailVerified) {
-                    sendVerificationEmail();
-                    emailResendedDialog(context);
-                  }
-                }),
-          ),
-          FutureBuilder(
-            future: getPhrase(),
-            builder: (context, snapshot) {
-              if (snapshot.hasData) {
-                return Material(
-                  child: ListTile(
-                    trailing: Padding(
-                      padding: new EdgeInsets.only(right: 7.5),
-                      child: Icon(Icons.visibility),
-                    ),
-                    leading: Icon(Icons.vpn_key),
-                    title: Text("Show Phrase"),
-                    onTap: () async {
-                      _showPhrase();
-                    },
-                  ),
-                );
-              } else {
-                return Container();
-              }
-            },
-          ),
-          FutureBuilder(
-              future: checkBiometrics(),
-              builder: (context, snapshot) {
-                if (snapshot.hasData) {
-                  if (snapshot.data == true) {
-                    return FutureBuilder(
-                        future: getBiometricDeviceName(),
-                        builder: (context, snapshot) {
-                          if (snapshot.hasData) {
-                            if (snapshot.data == "Not found") {
-                              return Container();
-                            }
-
-                            biometricDeviceName = snapshot.data;
-
-                            return Material(
-                              child: CheckboxListTile(
-                                secondary: Icon(Icons.fingerprint),
-                                value: finger,
-                                title: Text(snapshot.data),
-                                activeColor: Theme.of(context).accentColor,
-                                onChanged: (bool newValue) async {
-                                  _toggleFingerprint(newValue);
-                                },
-                              ),
-                            );
-                          } else {
-                            return Container();
-                          }
-                        });
-                  }
-                } else {
-                  return Container();
-                }
-              }),
-          Material(
-            child: ListTile(
-              leading: Icon(Icons.lock),
-              title: Text("Change pincode"),
-              onTap: () async {
-                _changePincode();
-              },
-            ),
-          ),
-          Material(
-            child: ListTile(
-              leading: Icon(Icons.perm_device_information),
-              title: Text("Version: " + version + " - " + buildNumber),
-              onTap: () {
-                _showVersionInfo();
-              },
-            ),
-          ),
-          Material(
-            child: ListTile(
-              leading: Icon(Icons.info_outline),
-              title: Text("Terms and conditions"),
-              onTap: () async => {await _showTermsAndConds()},
-            ),
-          ),
-          ExpansionTile(
-            title: Text(
-              "Advanced settings",
-              style: TextStyle(color: Colors.black),
-            ),
-            children: <Widget>[
-              Material(
-                child: ListTile(
-                  leading: Icon(Icons.person),
-                  title: Text(
-                    "Remove Account From Device",
-                    style: TextStyle(color: Colors.red),
-                  ),
-                  trailing: Icon(
-                    Icons.remove_circle,
-                    color: Colors.red,
-                  ),
-                  onTap: _showDialog,
+            ListView(
+              children: <Widget>[
+                ListTile(
+                  title: Text("Profile"),
                 ),
-              ),
-            ],
-          ),
-        ],
+                ListTile(
+                  leading: Icon(Icons.person),
+                  title: Text(doubleName),
+                ),
+                ListTile(
+                    trailing: !emailVerified ? Icon(Icons.refresh) : null,
+                    leading: Icon(Icons.mail),
+                    title: Text(emailAdress.toLowerCase()),
+                    subtitle: !emailVerified
+                        ? Text(
+                            "Unverified",
+                            style: TextStyle(color: Colors.grey),
+                          )
+                        : Text(
+                            "Verified",
+                            style: TextStyle(color: Colors.green),
+                          ),
+                    onTap: () {
+                      if (!emailVerified) {
+                        sendVerificationEmail();
+                        emailResendedDialog(context);
+                      }
+                    }),
+                FutureBuilder(
+                  future: getPhrase(),
+                  builder: (context, snapshot) {
+                    if (snapshot.hasData) {
+                      return ListTile(
+                        trailing: Padding(
+                          padding: new EdgeInsets.only(right: 7.5),
+                          child: Icon(Icons.visibility),
+                        ),
+                        leading: Icon(Icons.vpn_key),
+                        title: Text("Show Phrase"),
+                        onTap: () async {
+                          _showPhrase();
+                        },
+                      );
+                    } else {
+                      return Container();
+                    }
+                  },
+                ),
+                FutureBuilder(
+                    future: checkBiometrics(),
+                    builder: (context, snapshot) {
+                      if (snapshot.hasData) {
+                        if (snapshot.data == true) {
+                          return FutureBuilder(
+                              future: getBiometricDeviceName(),
+                              builder: (context, snapshot) {
+                                if (snapshot.hasData) {
+                                  if (snapshot.data == "Not found") {
+                                    return Container();
+                                  }
+
+                                  biometricDeviceName = snapshot.data;
+
+                                  return CheckboxListTile(
+                                    secondary: Icon(Icons.fingerprint),
+                                    value: finger,
+                                    title: Text(snapshot.data),
+                                    activeColor: Theme.of(context).accentColor,
+                                    onChanged: (bool newValue) async {
+                                      _toggleFingerprint(newValue);
+                                    },
+                                  );
+                                } else {
+                                  return Container();
+                                }
+                              });
+                        }
+                      } else {
+                        return Container();
+                      }
+                    }),
+                ListTile(
+                  leading: Icon(Icons.lock),
+                  title: Text("Change pincode"),
+                  onTap: () async {
+                    _changePincode();
+                  },
+                ),
+                ListTile(
+                  leading: Icon(Icons.perm_device_information),
+                  title: Text("Version: " + version + " - " + buildNumber),
+                  onTap: () {
+                    _showVersionInfo();
+                  },
+                ),
+                ListTile(
+                  leading: Icon(Icons.info_outline),
+                  title: Text("Terms and conditions"),
+                  onTap: () async => {await _showTermsAndConds()},
+                ),
+                ExpansionTile(
+                  title: Text(
+                    "Advanced settings",
+                    style: TextStyle(color: Colors.black),
+                  ),
+                  children: <Widget>[
+                    ListTile(
+                      leading: Icon(Icons.person),
+                      title: Text(
+                        "Remove Account From Device",
+                        style: TextStyle(color: Colors.red),
+                      ),
+                      trailing: Icon(
+                        Icons.remove_circle,
+                        color: Colors.red,
+                      ),
+                      onTap: _showDialog,
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }

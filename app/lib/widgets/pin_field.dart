@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:threebotlogin/helpers/hex_color.dart';
 
 class PinField extends StatefulWidget {
   final int pinLength = 4;
@@ -92,7 +93,7 @@ class _PinFieldState extends State<PinField> {
                 ? Colors.green[600]
                 : Colors.green[100]);
       else
-        return buildNumberPin(possibleInput[i], context);
+        return buildNumberPin(possibleInput[i], context,  backgroundColor: HexColor("#0a73b8"));
     });
     return Container(
       width: double.infinity,
