@@ -43,7 +43,7 @@ class MyApp extends StatelessWidget {
     var textStyle = GoogleFonts.lato();
     return MaterialApp(
       theme: ThemeData(
-        primaryColor: HexColor("#2d4052"),
+        primaryColor: HexColor("#0a73b8"),
         accentColor: HexColor("#57BE8E"),
         textTheme: textTheme,
         tabBarTheme: TabBarTheme(
