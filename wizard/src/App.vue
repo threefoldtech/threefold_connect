@@ -67,8 +67,9 @@
                   By clicking ‘Get Started’, I agree to Threefold’s
                   <a
                     target="_blank"
-                    href="http://vuetifyjs.com"
+                    href="https://wiki.threefold.io/#/legal"
                     style="text-decoration: underline"
+                    @click.stop
                   >
                     Terms and conditions
                   </a>
