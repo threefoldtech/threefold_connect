@@ -1,7 +1,6 @@
 <template>
   <v-app class="transparent">
     <v-main fill-height>
-<!--      <v-btn id="skip" @click="showDisclaimerBeforeSkip" class="mt-5" absolute top right text>Skip</v-btn>-->
       <v-carousel
         light
         :continuous="false"
@@ -80,6 +79,7 @@
           </div>
         </v-carousel-item>
       </v-carousel>
+      <v-btn id="skip" @click="showDisclaimerBeforeSkip" class="mt-5" absolute top right text>Skip</v-btn>
     </v-main>
     <v-dialog v-model="showDialog" width="500">
       <v-card>
