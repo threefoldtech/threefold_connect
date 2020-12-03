@@ -5,6 +5,7 @@ import 'package:threebotlogin/helpers/hex_color.dart';
 import 'package:threebotlogin/screens/main_screen.dart';
 import 'package:threebotlogin/services/logging_service.dart';
 import 'package:threebotlogin/services/user_service.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 LoggingService logger;
@@ -33,10 +34,23 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    var textTheme = GoogleFonts.latoTextTheme(
+      Theme.of(context).textTheme,
+    );
+    var accentTextTheme = GoogleFonts.latoTextTheme(
+      Theme.of(context).accentTextTheme,
+    );
+    var textStyle = GoogleFonts.lato();
     return MaterialApp(
       theme: ThemeData(
         primaryColor: HexColor("#2d4052"),
         accentColor: HexColor("#57BE8E"),
+        textTheme: textTheme,
+        tabBarTheme: TabBarTheme(
+          labelStyle: textStyle,
+          unselectedLabelStyle: textStyle
+        ),
+        appBarTheme: AppBarTheme(textTheme: accentTextTheme),
       ),
       home: MainScreen(initDone: initDone, registered: registered),
     );
