@@ -3,7 +3,7 @@ description: A decentralized login application
 
 publish_to: 'none'
 
-version: 2.1.0+109
+version: 2.2.0+111
 
 environment:
   sdk: ">=2.7.0 <3.0.0"
