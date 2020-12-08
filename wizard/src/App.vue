@@ -220,7 +220,7 @@ h2 {
 }
 
 .v-carousel__controls {
-  bottom: 15vh !important;
+  bottom: min(5vh) !important;
   width: 55vw !important;
   position: fixed !important;
   left: calc(50% - (55vw / 2)) !important;
