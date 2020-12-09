@@ -65,14 +65,12 @@
               <template v-slot:label>
                 <div>
                   By clicking ‘Get Started’, I agree to Threefold’s
-                  <a
-                    target="_blank"
-                    href="https://wiki.threefold.io/#/legal"
+                  <button
                     style="text-decoration: underline"
-                    @click.stop
+                    @click="showDisclaimer = true"
                   >
                     Terms and conditions
-                  </a>
+                  </button>
                 </div>
               </template>
             </v-checkbox>
