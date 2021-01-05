@@ -10,7 +10,7 @@
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
-    "axios": "^0.18.0",
+    "axios": "^0.21.1",
     "bip39": "^2.5.0",
     "libsodium": "^0.7.6",
     "libsodium-wrappers": "^0.7.6",
