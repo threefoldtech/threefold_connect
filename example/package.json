@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "arraybuffer-to-string": "^1.0.2",
-    "axios": "^0.18.0",
+    "axios": "^0.21.1",
     "bip39": "^3.0.1",
     "ed2curve": "^0.2.1",
     "libsodium": "^0.7.6",
