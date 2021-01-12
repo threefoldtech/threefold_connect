@@ -6,6 +6,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:threebotlogin/apps/free_flow_pages/ffp.dart';
 import 'package:threebotlogin/apps/free_flow_pages/ffp_events.dart';
 import 'package:threebotlogin/events/email_event.dart';
+import 'package:threebotlogin/events/phone_event.dart';
 import 'package:threebotlogin/events/events.dart';
 import 'package:threebotlogin/events/go_home_event.dart';
 import 'package:threebotlogin/events/new_login_event.dart';
@@ -115,6 +116,9 @@ class _HomeScreenState extends State<HomeScreen>
 
     Events().onEvent(EmailEvent().runtimeType, (EmailEvent event) {
       emailVerification(context);
+    });    
+    Events().onEvent(PhoneEvent().runtimeType, (PhoneEvent event) {
+      phoneVerification(context);
     });
 
     WidgetsBinding.instance.addObserver(this);

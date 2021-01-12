@@ -7,6 +7,7 @@ class Globals {
   static final HexColor color = HexColor("#0a73b8");
 
   ValueNotifier<bool> emailVerified = ValueNotifier(false);
+  ValueNotifier<bool> phoneVerified = ValueNotifier(false);
 
   final JRouter router = new JRouter();
 

@@ -32,9 +32,11 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
   String doubleName = '';
   String phrase = '';
   bool emailVerified = false;
+  bool phoneVerified = false;
   bool showAdvancedOptions = false;
   Icon showAdvancedOptionsIcon = Icon(Icons.keyboard_arrow_down);
   String emailAdress = '';
+  String phoneAdress = '';
   BuildContext preferenceContext;
   bool biometricsCheck = false;
   bool finger = false;
@@ -49,6 +51,13 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
     if (mounted) {
       setState(() {
         this.emailVerified = Globals().emailVerified.value;
+      });
+    }
+  }
+  setPhoneVerified() {
+    if (mounted) {
+      setState(() {
+        this.phoneVerified = Globals().phoneVerified.value;
       });
     }
   }
@@ -67,6 +76,7 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
         });
 
     Globals().emailVerified.addListener(setEmailVerified);
+    Globals().phoneVerified.addListener(setPhoneVerified);
 
     getUserValues();
   }
@@ -125,6 +135,45 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
                       if (!emailVerified) {
                         sendVerificationEmail();
                         emailResendedDialog(context);
+                      }
+                    }),
+                ListTile(
+                    trailing: !phoneVerified && phoneAdress.isNotEmpty ? Icon(Icons.refresh) : null,
+                    leading: Icon(Icons.phone),
+                    title: phoneAdress.isEmpty
+                        ? Text("Add phone number")
+                        : Text(
+                            phoneAdress,
+                            style: phoneVerified
+                                ? TextStyle(color: Colors.green)
+                                : TextStyle(color: Colors.deepOrangeAccent),
+                          ),
+                    subtitle: !phoneVerified
+                        ? Text(
+                            "Unverified",
+                            style: TextStyle(color: Colors.grey),
+                          )
+                        : Text(
+                            "Verified",
+                            style: TextStyle(color: Colors.green),
+                          ),
+                    onTap: () async {
+                      if (phoneAdress.isEmpty) {
+                        await addPhoneNumberDialog(context);
+                        var pn = (await getPhone())['phone'];
+                        setState(() {
+                          phoneAdress = pn;
+                        });
+
+                        print(pn);
+                        if (phoneAdress.isEmpty) {
+                          return;
+                        }
+                      }
+
+                      if (!phoneVerified) {
+                        sendVerificationSms();
+                        phoneSendDialog(context);
                       }
                     }),
                 FutureBuilder(
@@ -363,6 +412,14 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
         if (emailMap['email'] != null) {
           emailAdress = emailMap['email'];
           emailVerified = (emailMap['sei'] != null);
+        }
+      });
+    });
+    getPhone().then((phoneMap) {
+      setState(() {
+        if (phoneMap['phone'] != null) {
+          phoneAdress = phoneMap['phone'];
+          phoneVerified = (phoneMap['spi'] != null);
         }
       });
     });
