@@ -72,18 +72,12 @@ phoneSendDialog(context) {
   );
 }
 
-
 addPhoneNumberDialog(context) async {
-  var phoneIsoCode;
-  bool valid = false;
-
   await showDialog(
     context: context,
     barrierDismissible: false,
     builder: (BuildContext context) => PhoneAlertDialog(),
   );
-  
-  print('tset');
 }
 
 class PhoneAlertDialog extends StatefulWidget {
@@ -94,38 +88,38 @@ class PhoneAlertDialog extends StatefulWidget {
 }
 
 class PhoneAlertDialogState extends State<PhoneAlertDialog> {
-  bool valid = false;
-  String phoneNumber = "";
+  bool valid;
+  String verificationPhoneNumber;
+
+  @override
+  void initState() {
+    valid = false;
+    verificationPhoneNumber = "";
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-        // image: Icons.check,
-        // title: "Add your phone number",
-        // description: "A valid phone number and an verification sms will be send`.",
-        content: new Row(
-          children: <Widget>[
-            new Expanded(
-              child: InternationalPhoneInputText(
-                onValidPhoneNumber: (String number,
-                        String internationalizedPhoneNumber, String isoCode) =>
-                    {
-
-                  setState(() {
-                    phoneNumber = internationalizedPhoneNumber;
-                    valid = true;
-                  })
-                },
-                labelText: "Phone Number",
+        content: SizedBox(
+          height: 100,
+          child: Row(
+            children: <Widget>[
+              Expanded(
+                child: InternationalPhoneInput(
+                  // initialSelection: initial ? initial['phoneCode'] : '',
+                  onPhoneNumberChange: onNumberChange,
+                  labelText: "Phone Number",
+                ),
               ),
-            )
-          ],
+            ],
+          ),
         ),
         actions: <Widget>[
           new FlatButton(
               child: const Text(
                 'CANCEL',
-                style: TextStyle(color: Colors.grey),
+                style: TextStyle(color: Colors.redAccent),
               ),
               onPressed: () {
                 Navigator.pop(context);
@@ -133,11 +127,24 @@ class PhoneAlertDialogState extends State<PhoneAlertDialog> {
           new RaisedButton(
               color: valid ? Colors.green : Colors.grey,
               child: const Text('VERIFY'),
-              onPressed: () {
-                savePhone(phoneNumber, null);
-                Navigator.pop(context);
-              })
+              onPressed: verifyButton)
         ]);
+  }
+
+  void verifyButton() {
+    if (!valid) {
+      return;
+    }
+    savePhone(verificationPhoneNumber, null);
+    Navigator.pop(context);
+  }
+
+  void onNumberChange(
+      String phoneNumber, String internationalizedPhoneNumber, String isoCode) {
+    setState(() {
+      valid = internationalizedPhoneNumber.isNotEmpty;
+      verificationPhoneNumber = internationalizedPhoneNumber;
+    });
   }
 }
 

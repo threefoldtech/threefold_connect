@@ -54,6 +54,7 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
       });
     }
   }
+
   setPhoneVerified() {
     if (mounted) {
       setState(() {
@@ -138,20 +139,20 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
                       }
                     }),
                 ListTile(
-                    trailing: !phoneVerified && phoneAdress.isNotEmpty ? Icon(Icons.refresh) : null,
+                    trailing: !phoneVerified && phoneAdress.isNotEmpty
+                        ? Icon(Icons.refresh)
+                        : null,
                     leading: Icon(Icons.phone),
                     title: phoneAdress.isEmpty
-                        ? Text("Add phone number")
+                        ? Text("Add phone number", style: TextStyle(color: Theme.of(context).primaryColorDark, fontWeight: FontWeight.bold))
                         : Text(
                             phoneAdress,
-                            style: phoneVerified
-                                ? TextStyle(color: Colors.green)
-                                : TextStyle(color: Colors.deepOrangeAccent),
                           ),
-                    subtitle: !phoneVerified
+                    subtitle: phoneAdress.isEmpty
+                        ? null : !phoneVerified
                         ? Text(
                             "Unverified",
-                            style: TextStyle(color: Colors.grey),
+                            style: TextStyle(color: Colors.deepOrangeAccent),
                           )
                         : Text(
                             "Verified",
