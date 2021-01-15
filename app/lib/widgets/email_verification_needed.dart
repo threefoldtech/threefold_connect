@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:international_phone_input/international_phone_input.dart';
+import 'package:intl_phone_field/intl_phone_field.dart';
+import 'package:intl_phone_field/phone_number.dart';
 import 'package:threebotlogin/services/open_kyc_service.dart';
 import 'package:threebotlogin/services/user_service.dart';
 import 'package:threebotlogin/widgets/custom_dialog.dart';
@@ -105,11 +107,31 @@ class PhoneAlertDialogState extends State<PhoneAlertDialog> {
           height: 100,
           child: Row(
             children: <Widget>[
+              // Expanded(
+              //   child: InternationalPhoneInput(
+              //     // initialSelection: initial ? initial['phoneCode'] : '',
+              //     onPhoneNumberChange: onNumberChange,
+              //     labelText: "Phone Number",
+              //   ),
+              // ),
               Expanded(
-                child: InternationalPhoneInput(
-                  // initialSelection: initial ? initial['phoneCode'] : '',
-                  onPhoneNumberChange: onNumberChange,
-                  labelText: "Phone Number",
+                child: IntlPhoneField(
+                  decoration: InputDecoration(
+                    labelText: 'Phone Number',
+                    border: OutlineInputBorder(
+                      borderSide: BorderSide(),
+                    ),
+                  ),
+                  initialCountryCode: Localizations.localeOf(context).countryCode,
+                  onChanged: (phone) {
+                    PhoneNumber p = phone as PhoneNumber;
+                    print(p.completeNumber);
+
+                    setState(() {
+                      valid = p.completeNumber.isNotEmpty;
+                      verificationPhoneNumber = p.completeNumber;
+                    });
+                  },
                 ),
               ),
             ],

@@ -159,6 +159,8 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
                             style: TextStyle(color: Colors.green),
                           ),
                     onTap: () async {
+                      await addPhoneNumberDialog(context);
+                      return;
                       if (phoneAdress.isEmpty) {
                         await addPhoneNumberDialog(context);
                         var pn = (await getPhone())['phone'];
