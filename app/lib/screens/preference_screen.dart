@@ -45,6 +45,8 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
   String buildNumber = '';
   String biometricDeviceName = "";
 
+  Globals globals = Globals();
+
   MaterialColor thiscolor = Colors.green;
 
   setEmailVerified() {
@@ -144,23 +146,30 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
                         : null,
                     leading: Icon(Icons.phone),
                     title: phoneAdress.isEmpty
-                        ? Text("Add phone number", style: TextStyle(color: Theme.of(context).primaryColorDark, fontWeight: FontWeight.bold))
+                        ? Text("Add phone number",
+                            style: TextStyle(
+                                color: Theme.of(context).primaryColorDark,
+                                fontWeight: FontWeight.bold))
                         : Text(
                             phoneAdress,
                           ),
                     subtitle: phoneAdress.isEmpty
-                        ? null : !phoneVerified
-                        ? Text(
-                            "Unverified",
-                            style: TextStyle(color: Colors.deepOrangeAccent),
-                          )
-                        : Text(
-                            "Verified",
-                            style: TextStyle(color: Colors.green),
-                          ),
+                        ? null
+                        : !phoneVerified
+                            ? Text(
+                                "Unverified",
+                                style:
+                                    TextStyle(color: Colors.deepOrangeAccent),
+                              )
+                            : Text(
+                                "Verified",
+                                style: TextStyle(color: Colors.green),
+                              ),
                     onTap: () async {
-                      await addPhoneNumberDialog(context);
-                      return;
+                      if (phoneVerified) {
+                        return;
+                      }
+
                       if (phoneAdress.isEmpty) {
                         await addPhoneNumberDialog(context);
                         var pn = (await getPhone())['phone'];
@@ -174,10 +183,66 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
                         }
                       }
 
-                      if (!phoneVerified) {
-                        sendVerificationSms();
-                        phoneSendDialog(context);
+                      int currentTime =
+                          new DateTime.now().millisecondsSinceEpoch;
+
+                      if (globals.tooManySmsAttempts &&
+                          globals.lockedSmsUntill > currentTime) {
+                        globals.sendSmsAttempts = 0;
+                        showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return AlertDialog(
+                              title: new Text('Too many attemts please wait ' +
+                                  ((globals.lockedSmsUntill - currentTime) /
+                                          1000)
+                                      .round()
+                                      .toString() +
+                                  ' seconds.'),
+                              actions: <Widget>[
+                                FlatButton(
+                                  child: new Text("OK"),
+                                  onPressed: () {
+                                    Navigator.of(context).pop();
+                                  },
+                                ),
+                              ],
+                            );
+                          },
+                        );
+                        return;
                       }
+
+                      globals.tooManySmsAttempts = false;
+
+                      if (globals.sendSmsAttempts >= 3) {
+                        globals.tooManySmsAttempts = true;
+                        globals.lockedSmsUntill = currentTime + 60000;
+
+                        showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return AlertDialog(
+                              title: new Text(
+                                  'Too many attemts please wait one minute.'),
+                              actions: <Widget>[
+                                FlatButton(
+                                  child: new Text("OK"),
+                                  onPressed: () {
+                                    Navigator.of(context).pop();
+                                  },
+                                ),
+                              ],
+                            );
+                          },
+                        );
+                        return;
+                      }
+
+                      globals.sendSmsAttempts++;
+
+                      sendVerificationSms();
+                      phoneSendDialog(context);
                     }),
                 FutureBuilder(
                   future: getPhrase(),

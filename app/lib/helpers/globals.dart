@@ -12,9 +12,12 @@ class Globals {
   final JRouter router = new JRouter();
 
   int incorrectPincodeAttempts = 0;
+  int sendSmsAttempts = 0;
   bool tooManyAuthenticationAttempts = false;
+  bool tooManySmsAttempts = false;
 
   int lockedUntill = 0;
+  int lockedSmsUntill = 0;
   int loginTimeout = 120;
 
   static final Globals _singleton = new Globals._internal();
