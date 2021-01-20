@@ -1,4 +1,7 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:intl_phone_field/intl_phone_field.dart';
 import 'package:intl_phone_field/phone_number.dart';
 import 'package:threebotlogin/services/open_kyc_service.dart';
@@ -74,14 +77,24 @@ phoneSendDialog(context) {
 }
 
 addPhoneNumberDialog(context) async {
+  // https://api.ipgeolocationapi.com/geolocate
+
+  var response = await http.get('https://ipinfo.io/country');
+
+  var countryCode = response.body.replaceAll("\n", "");
+
   await showDialog(
     context: context,
     barrierDismissible: false,
-    builder: (BuildContext context) => PhoneAlertDialog(),
+    builder: (BuildContext context) => PhoneAlertDialog(defaultCountryCode: countryCode ),
   );
 }
 
 class PhoneAlertDialog extends StatefulWidget {
+  final String defaultCountryCode;
+
+  const PhoneAlertDialog({Key key, this.defaultCountryCode}) : super(key: key);
+
   @override
   State<StatefulWidget> createState() {
     return new PhoneAlertDialogState();
@@ -119,20 +132,25 @@ class PhoneAlertDialogState extends State<PhoneAlertDialog> {
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   child: IntlPhoneField(
+                    initialCountryCode: widget.defaultCountryCode,
                     decoration: InputDecoration(
                       labelText: 'Phone Number',
                       border: OutlineInputBorder(
                         borderSide: BorderSide(),
                       ),
                     ),
-                    initialCountryCode:
-                        Localizations.localeOf(context).countryCode,
                     onChanged: (phone) {
                       PhoneNumber p = phone as PhoneNumber;
                       print(p.completeNumber);
 
+                      RegExp regExp = new RegExp(
+                        r"^(\+[0-9]{1,3}|0)[0-9]{3}( ){0,1}[0-9]{7,8}\b",
+                        caseSensitive: false,
+                        multiLine: false,
+                      );
+
                       setState(() {
-                        valid = p.completeNumber.isNotEmpty;
+                        valid = regExp.hasMatch(p.completeNumber);
                         verificationPhoneNumber = p.completeNumber;
                       });
                     },
