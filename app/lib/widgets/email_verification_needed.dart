@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:international_phone_input/international_phone_input.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
 import 'package:intl_phone_field/phone_number.dart';
 import 'package:threebotlogin/services/open_kyc_service.dart';
@@ -61,7 +60,7 @@ phoneSendDialog(context) {
     builder: (BuildContext context) => CustomDialog(
       image: Icons.check,
       title: "Sms has been sent.",
-      description: "An verification sms has been sent.",
+      description: "A verification sms has been sent.",
       actions: <Widget>[
         FlatButton(
           child: new Text("Ok"),
@@ -102,8 +101,10 @@ class PhoneAlertDialogState extends State<PhoneAlertDialog> {
 
   @override
   Widget build(BuildContext context) {
-    return AlertDialog(
-        content: SizedBox(
+    return CustomDialog(
+        image: Icons.phone,
+        title: "Add phone number",
+        widgetDescription: SizedBox(
           height: 100,
           child: Row(
             children: <Widget>[
@@ -115,23 +116,27 @@ class PhoneAlertDialogState extends State<PhoneAlertDialog> {
               //   ),
               // ),
               Expanded(
-                child: IntlPhoneField(
-                  decoration: InputDecoration(
-                    labelText: 'Phone Number',
-                    border: OutlineInputBorder(
-                      borderSide: BorderSide(),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: IntlPhoneField(
+                    decoration: InputDecoration(
+                      labelText: 'Phone Number',
+                      border: OutlineInputBorder(
+                        borderSide: BorderSide(),
+                      ),
                     ),
-                  ),
-                  initialCountryCode: Localizations.localeOf(context).countryCode,
-                  onChanged: (phone) {
-                    PhoneNumber p = phone as PhoneNumber;
-                    print(p.completeNumber);
+                    initialCountryCode:
+                        Localizations.localeOf(context).countryCode,
+                    onChanged: (phone) {
+                      PhoneNumber p = phone as PhoneNumber;
+                      print(p.completeNumber);
 
-                    setState(() {
-                      valid = p.completeNumber.isNotEmpty;
-                      verificationPhoneNumber = p.completeNumber;
-                    });
-                  },
+                      setState(() {
+                        valid = p.completeNumber.isNotEmpty;
+                        verificationPhoneNumber = p.completeNumber;
+                      });
+                    },
+                  ),
                 ),
               ),
             ],
@@ -146,7 +151,7 @@ class PhoneAlertDialogState extends State<PhoneAlertDialog> {
               onPressed: () {
                 Navigator.pop(context);
               }),
-          new RaisedButton(
+          new FlatButton(
               color: valid ? Colors.green : Colors.grey,
               child: const Text('VERIFY'),
               onPressed: verifyButton)
