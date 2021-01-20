@@ -144,13 +144,13 @@ class PhoneAlertDialogState extends State<PhoneAlertDialog> {
                       print(p.completeNumber);
 
                       RegExp regExp = new RegExp(
-                        r"^(\+[0-9]{1,3}|0)[0-9]{3}( ){0,1}[0-9]{7,8}\b",
+                        r"^(\+[0-9]{1,3}|0)[0-9]{3}( ){0,1}[0-9]{7,8}\b$",
                         caseSensitive: false,
                         multiLine: false,
                       );
 
                       setState(() {
-                        valid = regExp.hasMatch(p.completeNumber);
+                        valid = regExp.hasMatch(p.completeNumber.replaceAll('\n', ''));
                         verificationPhoneNumber = p.completeNumber;
                       });
                     },

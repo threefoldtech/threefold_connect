@@ -173,15 +173,19 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
                       if (phoneAdress.isEmpty) {
                         await addPhoneNumberDialog(context);
                         var phoneMap = (await getPhone());
-                        if(phoneMap.isEmpty || !phoneMap.containsKey('phone')){
+                        if (phoneMap.isEmpty ||
+                            !phoneMap.containsKey('phone')) {
                           return;
                         }
                         var pn = phoneMap['phone'];
+                        if (pn == null) {
+                          return;
+                        }
+
                         setState(() {
                           phoneAdress = pn;
                         });
 
-                        print(pn);
                         if (phoneAdress.isEmpty) {
                           return;
                         }
