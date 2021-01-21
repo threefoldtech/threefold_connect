@@ -7,10 +7,16 @@ PODS:
   - keyboard_visibility (0.5.0):
     - Flutter
     - Reachability
+  - libphonenumber (0.0.1):
+    - Flutter
+    - libPhoneNumber-iOS
+  - libPhoneNumber-iOS (0.9.15)
   - local_auth (0.0.1):
     - Flutter
   - MTBBarcodeScanner (5.0.11)
   - package_info (0.0.1):
+    - Flutter
+  - path_provider (0.0.1):
     - Flutter
   - qr_code_scanner (0.0.2):
     - Flutter
@@ -30,8 +36,10 @@ DEPENDENCIES:
   - flutter_inappwebview (from `.symlinks/plugins/flutter_inappwebview/ios`)
   - flutter_sodium (from `.symlinks/plugins/flutter_sodium/ios`)
   - keyboard_visibility (from `.symlinks/plugins/keyboard_visibility/ios`)
+  - libphonenumber (from `.symlinks/plugins/libphonenumber/ios`)
   - local_auth (from `.symlinks/plugins/local_auth/ios`)
   - package_info (from `.symlinks/plugins/package_info/ios`)
+  - path_provider (from `.symlinks/plugins/path_provider/ios`)
   - qr_code_scanner (from `.symlinks/plugins/qr_code_scanner/ios`)
   - redirection (from `.symlinks/plugins/redirection/ios`)
   - shared_preferences (from `.symlinks/plugins/shared_preferences/ios`)
@@ -40,6 +48,7 @@ DEPENDENCIES:
 
 SPEC REPOS:
   trunk:
+    - libPhoneNumber-iOS
     - MTBBarcodeScanner
     - Reachability
 
@@ -52,10 +61,14 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/flutter_sodium/ios"
   keyboard_visibility:
     :path: ".symlinks/plugins/keyboard_visibility/ios"
+  libphonenumber:
+    :path: ".symlinks/plugins/libphonenumber/ios"
   local_auth:
     :path: ".symlinks/plugins/local_auth/ios"
   package_info:
     :path: ".symlinks/plugins/package_info/ios"
+  path_provider:
+    :path: ".symlinks/plugins/path_provider/ios"
   qr_code_scanner:
     :path: ".symlinks/plugins/qr_code_scanner/ios"
   redirection:
@@ -72,9 +85,12 @@ SPEC CHECKSUMS:
   flutter_inappwebview: 239198123453705522ba6c4f78d3d7468215f248
   flutter_sodium: 562e27775421e43bfe223c3a1565f2ad14aea6fa
   keyboard_visibility: 96a24de806fe6823c3ad956c01ba2ec6d056616f
+  libphonenumber: bd14d5abfc5939ab0b0767234e2d8e2593af258e
+  libPhoneNumber-iOS: 0a32a9525cf8744fe02c5206eb30d571e38f7d75
   local_auth: 25938960984c3a7f6e3253e3f8d962fdd16852bd
   MTBBarcodeScanner: f453b33c4b7dfe545d8c6484ed744d55671788cb
   package_info: 873975fc26034f0b863a300ad47e7f1ac6c7ec62
+  path_provider: abfe2b5c733d04e238b0d8691db0cfd63a27a93c
   qr_code_scanner: 16107718bdad7d708cdf6a5eacdca24b56cdf471
   Reachability: 33e18b67625424e47b6cde6d202dce689ad7af96
   redirection: 86a0674fdc4d10643d0a2b45d2b73a9aba1363b8
@@ -84,4 +100,4 @@ SPEC CHECKSUMS:
 
 PODFILE CHECKSUM: a75497545d4391e2d394c3668e20cfb1c2bbd4aa
 
-COCOAPODS: 1.10.0.beta.1
+COCOAPODS: 1.9.3
