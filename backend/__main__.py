@@ -225,6 +225,17 @@ def set_email_verified_handler(doublename):
     return Response("Ok")
 
 
+@app.route("/api/users/<doublename>/smsverified", methods=["post"])
+def set_phone_verified_handler(doublename):
+    logger.debug("/smsverified from user %s", doublename)
+    user = db.get_user_by_double_name(conn, doublename)
+
+    logger.debug(user)
+
+    emitOrQueue("sms_verification", "", room=user["double_name"])
+    return Response("Ok")
+
+
 @app.route("/api/savederivedpublickey", methods=["POST"])
 def save_derived_public_key():
     body = request.get_json()

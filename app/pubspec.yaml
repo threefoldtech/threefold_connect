@@ -46,6 +46,8 @@ dependencies:
 #  community_material_icon: ^5.3.45
   cupertino_icons: ^0.1.3
   google_fonts: ^1.1.1
+  international_phone_input: ^1.0.4
+  intl_phone_field: ^1.4.2
 
 dev_dependencies:
   flutter_test:

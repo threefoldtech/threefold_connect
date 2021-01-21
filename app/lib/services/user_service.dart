@@ -149,6 +149,32 @@ Future<Map<String, Object>> getEmail() async {
   };
 }
 
+Future<void> removePhone() async {
+  final SharedPreferences prefs = await SharedPreferences.getInstance();
+
+  prefs.remove('phone');
+  prefs.remove('phoneVerified');
+}
+
+Future<void> savePhone(String phone, String signedPhoneIdentifier) async {
+  final SharedPreferences prefs = await SharedPreferences.getInstance();
+  prefs.remove('phone');
+  prefs.setString('phone', phone);
+
+  prefs.remove('phoneVerified');
+  prefs.setString('signedPhoneIdentifier', signedPhoneIdentifier);
+
+  Globals().phoneVerified.value = (signedPhoneIdentifier != null);
+}
+
+Future<Map<String, Object>> getPhone() async {
+  final SharedPreferences prefs = await SharedPreferences.getInstance();
+  return {
+    'phone': prefs.getString('phone'),
+    'spi': prefs.getString('signedPhoneIdentifier')
+  };
+}
+
 Future<Map<String, Object>> getKeys(String appId, String doubleName) async {
   return await generateDerivedKeypair(appId, doubleName);
 }

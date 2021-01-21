@@ -126,15 +126,15 @@ class _PreferenceDialogState extends State<PreferenceDialog> {
                             if (snapshot.hasData) {
                               return CheckboxListTile(
                                 value:
-                                    (previousSelectedScope[scopeItem] == null)
-                                        ? mandatory
-                                        : previousSelectedScope[scopeItem],
+                                (previousSelectedScope[scopeItem] == null)
+                                    ? mandatory
+                                    : previousSelectedScope[scopeItem],
                                 onChanged:
-                                    ((mandatory == null || mandatory == true)
-                                        ? null
-                                        : (value) {
-                                            toggleScope(scopeItem, value);
-                                          }),
+                                ((mandatory == null || mandatory == true)
+                                    ? null
+                                    : (value) {
+                                  toggleScope(scopeItem, value);
+                                }),
                                 title: Text(
                                   "${scopeItem.toUpperCase()}" +
                                       (mandatory ? " *" : ""),
@@ -143,6 +143,37 @@ class _PreferenceDialogState extends State<PreferenceDialog> {
                                       color: Colors.black),
                                 ),
                                 subtitle: Text("${snapshot.data['email']}"),
+                              );
+                            } else {
+                              return SizedBox(width: 0, height: 0);
+                            }
+                          },
+                        );
+                        break;
+                      case "phone":
+                        return FutureBuilder(
+                          future: getPhone(),
+                          builder:
+                              (BuildContext context, AsyncSnapshot snapshot) {
+                            if (snapshot.hasData) {
+                              return CheckboxListTile(
+                                value:
+                                (previousSelectedScope[scopeItem] == null)
+                                    ? mandatory
+                                    : previousSelectedScope[scopeItem],
+                                onChanged:
+                                ((mandatory == null || mandatory == true)
+                                    ? null
+                                    : (value) {
+                                  toggleScope(scopeItem, value);
+                                }),
+                                title: Text(
+                                  "PHONE NUMBER" + (mandatory ? " *" : ""),
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.black),
+                                ),
+                                subtitle: Text("${snapshot.data['phone']}"),
                               );
                             } else {
                               return SizedBox(width: 0, height: 0);

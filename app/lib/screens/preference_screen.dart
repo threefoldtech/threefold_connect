@@ -32,9 +32,11 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
   String doubleName = '';
   String phrase = '';
   bool emailVerified = false;
+  bool phoneVerified = false;
   bool showAdvancedOptions = false;
   Icon showAdvancedOptionsIcon = Icon(Icons.keyboard_arrow_down);
   String emailAdress = '';
+  String phoneAdress = '';
   BuildContext preferenceContext;
   bool biometricsCheck = false;
   bool finger = false;
@@ -43,12 +45,22 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
   String buildNumber = '';
   String biometricDeviceName = "";
 
+  Globals globals = Globals();
+
   MaterialColor thiscolor = Colors.green;
 
   setEmailVerified() {
     if (mounted) {
       setState(() {
         this.emailVerified = Globals().emailVerified.value;
+      });
+    }
+  }
+
+  setPhoneVerified() {
+    if (mounted) {
+      setState(() {
+        this.phoneVerified = Globals().phoneVerified.value;
       });
     }
   }
@@ -67,6 +79,7 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
         });
 
     Globals().emailVerified.addListener(setEmailVerified);
+    Globals().phoneVerified.addListener(setPhoneVerified);
 
     getUserValues();
   }
@@ -126,6 +139,118 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
                         sendVerificationEmail();
                         emailResendedDialog(context);
                       }
+                    }),
+                ListTile(
+                    trailing: !phoneVerified && phoneAdress.isNotEmpty
+                        ? Icon(Icons.refresh)
+                        : null,
+                    leading: Icon(Icons.phone),
+                    title: phoneAdress.isEmpty
+                        ? Text("Add phone number",
+                            style: TextStyle(
+                                color: Theme.of(context).primaryColorDark,
+                                fontWeight: FontWeight.bold))
+                        : Text(
+                            phoneAdress,
+                          ),
+                    subtitle: phoneAdress.isEmpty
+                        ? null
+                        : !phoneVerified
+                            ? Text(
+                                "Unverified",
+                                style:
+                                    TextStyle(color: Colors.deepOrangeAccent),
+                              )
+                            : Text(
+                                "Verified",
+                                style: TextStyle(color: Colors.green),
+                              ),
+                    onTap: () async {
+                      if (phoneVerified) {
+                        return;
+                      }
+
+                      if (phoneAdress.isEmpty) {
+                        await addPhoneNumberDialog(context);
+                        var phoneMap = (await getPhone());
+                        if (phoneMap.isEmpty ||
+                            !phoneMap.containsKey('phone')) {
+                          return;
+                        }
+                        var pn = phoneMap['phone'];
+                        if (pn == null) {
+                          return;
+                        }
+
+                        setState(() {
+                          phoneAdress = pn;
+                        });
+
+                        if (phoneAdress.isEmpty) {
+                          return;
+                        }
+                      }
+
+                      int currentTime =
+                          new DateTime.now().millisecondsSinceEpoch;
+
+                      if (globals.tooManySmsAttempts &&
+                          globals.lockedSmsUntill > currentTime) {
+                        globals.sendSmsAttempts = 0;
+                        showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return AlertDialog(
+                              title: new Text('Too many attemts please wait ' +
+                                  ((globals.lockedSmsUntill - currentTime) /
+                                          1000)
+                                      .round()
+                                      .toString() +
+                                  ' seconds.'),
+                              actions: <Widget>[
+                                FlatButton(
+                                  child: new Text("OK"),
+                                  onPressed: () {
+                                    Navigator.of(context).pop();
+                                  },
+                                ),
+                              ],
+                            );
+                          },
+                        );
+                        return;
+                      }
+
+                      globals.tooManySmsAttempts = false;
+
+                      if (globals.sendSmsAttempts >= 3) {
+                        globals.tooManySmsAttempts = true;
+                        globals.lockedSmsUntill = currentTime + 60000;
+
+                        showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return AlertDialog(
+                              title: new Text(
+                                  'Too many attemts please wait one minute.'),
+                              actions: <Widget>[
+                                FlatButton(
+                                  child: new Text("OK"),
+                                  onPressed: () {
+                                    Navigator.of(context).pop();
+                                  },
+                                ),
+                              ],
+                            );
+                          },
+                        );
+                        return;
+                      }
+
+                      globals.sendSmsAttempts++;
+
+                      sendVerificationSms();
+                      phoneSendDialog(context);
                     }),
                 FutureBuilder(
                   future: getPhrase(),
@@ -363,6 +488,14 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
         if (emailMap['email'] != null) {
           emailAdress = emailMap['email'];
           emailVerified = (emailMap['sei'] != null);
+        }
+      });
+    });
+    getPhone().then((phoneMap) {
+      setState(() {
+        if (phoneMap['phone'] != null) {
+          phoneAdress = phoneMap['phone'];
+          phoneVerified = (phoneMap['spi'] != null);
         }
       });
     });

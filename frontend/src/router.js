@@ -20,6 +20,10 @@ export default new Router({
     name: 'verifyemail',
     component: () => import(/* webpackChunkName: "verifyemail-page" */ './views/VerifyEmail')
   }, {
+    path: '/verifysms',
+    name: 'verifysms',
+    component: () => import(/* webpackChunkName: "verifysms-page" */ './views/VerifySms')
+  }, {
     path: '/error',
     name: 'error',
     component: () => import(/* webpackChunkName: "error-page" */ './views/Errorpage')

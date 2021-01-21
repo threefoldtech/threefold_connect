@@ -24,6 +24,11 @@ export default new Vuex.Store({
       checking: false,
       valid: false
     },
+    smsVerificationStatus: {
+      checked: false,
+      checking: false,
+      valid: false
+    },
     scannedFlagUp: false,
     cancelLoginUp: false,
     signedAttempt: null,
@@ -69,6 +74,9 @@ export default new Vuex.Store({
     },
     setEmailVerificationStatus (state, status) {
       state.emailVerificationStatus = status
+    },
+    setSmsVerificationStatus (state, status) {
+      state.smsVerificationStatus = status
     },
     setScope (state, scope) {
       let parsedScope = JSON.parse(scope)
@@ -328,6 +336,28 @@ export default new Vuex.Store({
         alert(e)
       })
     },
+    sendValidationSms (context, data) {
+      var callbackUrl = `${window.location.protocol}//${window.location.host}/verifysms`
+
+      callbackUrl += `?state=${context.getters._state}`
+      callbackUrl += `&redirecturl=${window.btoa(context.getters.redirectUrl)}`
+      callbackUrl += `&doublename=${context.getters.doubleName}`
+
+      if (context.getters.scope) callbackUrl += `&scope=${encodeURIComponent(context.getters.scope)}`
+      if (context.getters.appPublicKey) callbackUrl += `&publickey=${context.getters.appPublicKey}`
+      callbackUrl += (context.getters.appId) ? `&appid=${context.getters.appId}` : `&appid=${window.location.hostname}`
+
+      axios.post(`${config.openkycurl}verification/send-sms`, {
+        'user_id': context.getters.doubleName,
+        'phone': data.phone,
+        'callback_url': callbackUrl,
+        'public_key': context.getters.keys.publicKey
+      }).then(x => {
+        console.log(`sms has been sent`)
+      }).catch(e => {
+        alert(e)
+      })
+    },
     validateEmail (context, data) {
       console.log(`Validating email`, data)
       if (data && data.userId && data.verificationCode) {
@@ -361,6 +391,45 @@ export default new Vuex.Store({
         })
       }
     },
+    validateSms (context, data) {
+      if (data && data.userId && data.verificationCode) {
+        context.commit('setSmsVerificationStatus', {
+          checked: false,
+          checking: true,
+          valid: false
+        })
+        axios.post(`${config.openkycurl}verification/verify-sms`, {
+          user_id: data.userId,
+          verification_code: data.verificationCode
+        }).then(message => {
+          axios.post(`${config.openkycurl}verification/verify-spi`, {
+            signedPhoneIdentifier: message.data
+          }).then(response => {
+            if (response.data.identifier === data.userId) {
+              axios.post(`${config.apiurl}api/users/${data.userId}/smsverified`)
+              context.commit('setSmsVerificationStatus', {
+                checked: true,
+                checking: false,
+                valid: true
+              })
+            }
+          })
+        }).catch(e => {
+          context.commit('setSmsVerificationStatus', {
+            checked: true,
+            checking: false,
+            valid: false
+          })
+        })
+      }
+    },
+    SOCKET_phoneverified (context) {
+      context.commit('setSmsVerificationStatus', {
+        checked: true,
+        checking: false,
+        valid: true
+      })
+    },
     SOCKET_emailverified (context) {
       context.commit('setEmailVerificationStatus', {
         checked: true,
@@ -392,6 +461,7 @@ export default new Vuex.Store({
     signedAttempt: state => state.signedAttempt,
     firstTime: state => state.firstTime,
     emailVerificationStatus: state => state.emailVerificationStatus,
+    smsVerificationStatus: state => state.smsVerificationStatus,
     scope: state => state.scope,
     appId: state => state.appId,
     appPublicKey: state => state.appPublicKey,
