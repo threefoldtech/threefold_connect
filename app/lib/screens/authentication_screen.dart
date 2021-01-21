@@ -170,7 +170,7 @@ class AuthenticationScreenState extends State<AuthenticationScreen> {
                 ? Colors.green[600]
                 : Colors.green[100]);
       else
-        return buildNumberPin(possibleInput[i], context);
+        return buildNumberPin(possibleInput[i], context, backgroundColor: HexColor("#0a73b8"));
     });
     return Container(
       width: double.infinity,
@@ -215,7 +215,7 @@ class AuthenticationScreenState extends State<AuthenticationScreen> {
     return Scaffold(
       appBar: new AppBar(
         automaticallyImplyLeading: true,
-        backgroundColor: HexColor("#2d4052"),
+        backgroundColor: HexColor("#0a73b8"),
         title: Text("Authentication"),
       ),
       body: Container(

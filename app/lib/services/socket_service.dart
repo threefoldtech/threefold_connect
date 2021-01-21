@@ -9,6 +9,7 @@ import 'package:threebotlogin/events/close_socket_event.dart';
 import 'package:threebotlogin/events/email_event.dart';
 import 'package:threebotlogin/events/events.dart';
 import 'package:threebotlogin/events/new_login_event.dart';
+import 'package:threebotlogin/events/phone_event.dart';
 import 'package:threebotlogin/helpers/globals.dart';
 import 'package:threebotlogin/models/login.dart';
 import 'package:threebotlogin/screens/authentication_screen.dart';
@@ -43,6 +44,9 @@ class BackendConnection {
 
     socket.on('email_verification', (_) {
       Events().emit(EmailEvent());
+    });
+    socket.on('sms_verification', (_) {
+      Events().emit(PhoneEvent());
     });
 
     socket.on('login', (dynamic data) async {
@@ -131,6 +135,51 @@ Future emailVerification(BuildContext context) async {
         );
       } else {
         await saveEmail(email["email"], null);
+      }
+    }
+  }
+}
+
+Future phoneVerification(BuildContext context) async {
+  Map<String, Object> phone = await getPhone();
+  if (phone['phone'] != null) {
+    String doubleName = (await getDoubleName()).toLowerCase();
+    Response response = await getSignedPhoneIdentifierFromOpenKYC(doubleName);
+
+    if (response.statusCode != 200) {
+      return;
+    }
+
+    Map<String, dynamic> body = jsonDecode(response.body);
+
+    dynamic signedPhoneIdentifier = body["signed_phone_identifier"];
+
+    if (signedPhoneIdentifier != null && signedPhoneIdentifier.isNotEmpty) {
+      Map<String, dynamic> vspi = jsonDecode(
+          (await verifySignedPhoneIdentifier(signedPhoneIdentifier)).body);
+
+      if (vspi != null &&
+          vspi["phone"] == phone["phone"] &&
+          vspi["identifier"] == doubleName) {
+        await savePhone(vspi["phone"], signedPhoneIdentifier);
+        showDialog(
+          context: context,
+          builder: (BuildContext context) => CustomDialog(
+            image: Icons.phone_android,
+            title: "Phone verified",
+            description: "Your phone has been verified!",
+            actions: <Widget>[
+              FlatButton(
+                child: new Text("Ok"),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              ),
+            ],
+          ),
+        );
+      } else {
+        await savePhone(phone["phone"], null);
       }
     }
   }

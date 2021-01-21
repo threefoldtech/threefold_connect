@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
-class CustomDialog extends StatelessWidget {
+class CustomDialog extends StatefulWidget {
   //@todo this is used for everything, just seems like a very bad idea. Make dialogs for the seperate things. Maybe a popup dialog with info ok/cancel and other dialogs for eg pin entry
   final String description;
   final Widget widgetDescription;
@@ -20,14 +20,23 @@ class CustomDialog extends StatelessWidget {
   });
 
   show(context) {
+    show(context);
+  }
+
+  @override
+  _CustomDialogState createState() => _CustomDialogState();
+}
+
+class _CustomDialogState extends State<CustomDialog> {
+  show(context) {
     return showDialog(
       context: context,
       barrierDismissible: false,
       builder: (BuildContext context) => CustomDialog(
         image: Icons.error,
-        title: this.title,
-        description: this.description,
-        widgetDescription: this.widgetDescription,
+        title: this.widget.title,
+        description: this.widget.description,
+        widgetDescription: this.widget.widgetDescription,
         actions: <Widget>[
           //@todo make this configurable, ok;okcancel
           FlatButton(
@@ -69,12 +78,12 @@ class CustomDialog extends StatelessWidget {
         splashColor: Colors.transparent,
         highlightColor: Colors.transparent,
         onPressed: () {
-          if (hiddenaction != null) {
+          if (widget.hiddenaction != null) {
             timesPressed++;
             // logger.log('= ' + hiddenaction.toString());
             // logger.log('--------------+++++++++ ' + timesPressed.toString());
             if (timesPressed >= timesPressedToReveal) {
-              hiddenaction();
+              widget.hiddenaction();
               timesPressed = 0;
             }
           }
@@ -83,7 +92,7 @@ class CustomDialog extends StatelessWidget {
           backgroundColor: Theme.of(context).primaryColor,
           radius: 30.0,
           child: Icon(
-            image,
+            widget.image,
             size: 42.0,
             color: Colors.white,
           ),
@@ -118,7 +127,7 @@ class CustomDialog extends StatelessWidget {
             Container(
               padding: EdgeInsets.symmetric(horizontal: 20.0),
               child: Text(
-                title,
+                widget.title,
                 style: TextStyle(
                   fontSize: 20.0,
                   fontWeight: FontWeight.bold,
@@ -131,16 +140,16 @@ class CustomDialog extends StatelessWidget {
               constraints: const BoxConstraints(maxHeight: 300, maxWidth: 310),
               child: Container(
                 padding: EdgeInsets.symmetric(horizontal: 5.0),
-                child: (widgetDescription == null)
+                child: (widget.widgetDescription == null)
                     ? Text(
-                        description,
+                        widget.description,
                         textAlign: TextAlign.center,
                       )
-                    : widgetDescription,
+                    : widget.widgetDescription,
               ),
             ),
             SizedBox(height: 24.0),
-            actions != null && actions.length > 0
+            widget.actions != null && widget.actions.length > 0
                 ? Container(
                     decoration: new BoxDecoration(
                       color: Theme.of(context).scaffoldBackgroundColor,
@@ -158,7 +167,7 @@ class CustomDialog extends StatelessWidget {
                     ),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: actions,
+                      children: widget.actions,
                     ),
                   )
                 : Container()

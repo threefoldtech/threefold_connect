@@ -323,7 +323,7 @@ class _MobileRegistrationScreenState extends State<MobileRegistrationScreen> {
                 : state == _State.DoubleName
                     ? StepState.editing
                     : StepState.disabled,
-            title: Text('3Bot name'),
+            title: Text('ThreeFold Connect Id.'),
             subtitle: state.index > 0 ? Text(doubleNameController.text) : null,
             content: Card(
               child: Padding(
@@ -332,7 +332,7 @@ class _MobileRegistrationScreenState extends State<MobileRegistrationScreen> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
                     Text(
-                      'Hi, please choose a 3Bot name.',
+                      'Hi, please choose a ThreeFold Connect Id.',
                       style: TextStyle(fontWeight: FontWeight.bold),
                     ),
                     Divider(

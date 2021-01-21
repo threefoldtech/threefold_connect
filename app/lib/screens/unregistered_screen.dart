@@ -1,6 +1,7 @@
 //import 'package:community_material_icon/community_material_icon.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:threebotlogin/screens/change_pin_screen.dart';
 import 'package:threebotlogin/screens/mobile_registration_screen.dart';
 import 'package:threebotlogin/screens/recover_screen.dart';
@@ -53,119 +54,102 @@ class _UnregisteredScreenState extends State<UnregisteredScreen>
   @override
   Widget build(BuildContext context) {
     return Material(
-      child: WillPopScope(
-        child: Container(
-          decoration: BoxDecoration(color: Colors.white),
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(
-                maxHeight: double.infinity,
-                maxWidth: double.infinity,
-                minHeight: 250,
-                minWidth: 250),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: <Widget>[
-                Container(),
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    Container(
-                      width: 200.0,
-                      height: 200.0,
-                      decoration: BoxDecoration(
-                        color: Theme.of(context).primaryColor,
-                        shape: BoxShape.circle,
-                        image: DecorationImage(
-                            fit: BoxFit.fill,
-                            image: AssetImage('assets/logo.png')),
-                      ),
-                    ),
-                    SizedBox(height: 10.0),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: <Widget>[
-                        Padding(
-                          padding: const EdgeInsets.only(left: 8.0),
-                          child: Text(
-                            "ThreeFold Connect",
-                            style: TextStyle(
-                                fontSize: 36,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black),
-                            textAlign: TextAlign.center,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-                IntrinsicWidth(
+        child: Scaffold(
+      body: Stack(
+        children: <Widget>[
+          SvgPicture.asset(
+            'assets/bg.svg',
+            alignment: Alignment.center,
+            width: MediaQuery.of(context).size.width,
+            height: MediaQuery.of(context).size.height,
+          ),
+          Container(
+            child: WillPopScope(
+              child: Container(
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(
+                      maxHeight: double.infinity,
+                      maxWidth: double.infinity,
+                      minHeight: 250,
+                      minWidth: 250),
                   child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: <Widget>[
-                      Text('Welcome to ThreeFold Connect.',
-                          style: TextStyle(fontSize: 24, color: Colors.black)),
-                      SizedBox(height: 10),
-                      RaisedButton(
-                        shape: new RoundedRectangleBorder(
-                          borderRadius: new BorderRadius.circular(30),
-                        ),
-                        color: Theme.of(context).primaryColor,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: <Widget>[
-                            new Icon(
-//                              CommunityMaterialIcons.account_edit,
-                              Icons.mode_edit,
-                              color: Colors.white,
+                      Container(),
+                      Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          Container(
+                            width: 360.0,
+                            height: 108.0,
+                            decoration: BoxDecoration(
+                              image: DecorationImage(
+                                  fit: BoxFit.cover,
+                                  image: AssetImage('assets/logo.png')),
                             ),
-                            SizedBox(width: 10.0),
-                            Text(
-                              'Register now',
-                              style: TextStyle(color: Colors.white),
+                          ),
+                          SizedBox(height: 10.0),
+                        ],
+                      ),
+                      SizedBox(
+                        width: 250,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: <Widget>[
+                            RaisedButton(
+                              shape: new RoundedRectangleBorder(
+                                borderRadius: new BorderRadius.circular(30),
+                              ),
+                              color: Theme.of(context).accentColor,
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: <Widget>[
+                                  Text(
+                                    'SIGN UP',
+                                    style: TextStyle(
+                                        color: Colors.white, fontSize: 16),
+                                  ),
+                                ],
+                              ),
+                              onPressed: () {
+                                startRegistration();
+                              },
+                            ),
+                            SizedBox(height: 20),
+                            RaisedButton(
+                              shape: new RoundedRectangleBorder(
+                                borderRadius: new BorderRadius.circular(30),
+                              ),
+                              color: Theme.of(context).accentColor,
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: <Widget>[
+                                  Text(
+                                    'RECOVER ACCOUNT',
+                                    style: TextStyle(
+                                        color: Colors.white, fontSize: 16),
+                                  ),
+                                ],
+                              ),
+                              onPressed: () {
+                                startRecovery();
+                              },
                             ),
                           ],
                         ),
-                        onPressed: () {
-                          startRegistration();
-                        },
                       ),
-                      RaisedButton(
-                        shape: new RoundedRectangleBorder(
-                          borderRadius: new BorderRadius.circular(30),
-                        ),
-                        color: Theme.of(context).primaryColor,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: <Widget>[
-                            new Icon(
-//                              CommunityMaterialIcons.backup_restore,
-                              Icons.settings_backup_restore,
-                              color: Colors.white,
-                            ),
-                            SizedBox(width: 10.0),
-                            Text(
-                              'Recover account',
-                              style: TextStyle(color: Colors.white),
-                            ),
-                          ],
-                        ),
-                        onPressed: () {
-                          startRecovery();
-                        },
-                      ),
+                      Container(),
                     ],
                   ),
                 ),
-                Container(),
-              ],
+              ),
+              onWillPop: () {
+                return Future.value(false);
+              },
             ),
           ),
-        ),
-        onWillPop: () {
-          return Future.value(false);
-        },
+        ],
       ),
-    );
+    ));
   }
 }

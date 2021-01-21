@@ -133,7 +133,7 @@ class _RecoverScreenState extends State<RecoverScreen> {
                   keyboardType: TextInputType.text,
                   decoration: InputDecoration(
                     border: OutlineInputBorder(),
-                    labelText: 'Name',
+                    labelText: 'NAME',
                     suffixText: '.3bot',
                     suffixStyle: TextStyle(fontWeight: FontWeight.bold),
                   ),
@@ -151,7 +151,7 @@ class _RecoverScreenState extends State<RecoverScreen> {
                 keyboardType: TextInputType.emailAddress,
                 decoration: InputDecoration(
                   border: OutlineInputBorder(),
-                  labelText: 'Email',
+                  labelText: 'EMAIL',
                 ),
                 validator: (value) {
                   if (value.isEmpty || !validateEmail(value)) {
@@ -168,7 +168,7 @@ class _RecoverScreenState extends State<RecoverScreen> {
                 keyboardType: TextInputType.multiline,
                 maxLines: null,
                 decoration: InputDecoration(
-                    border: OutlineInputBorder(), labelText: 'Seed phrase'),
+                    border: OutlineInputBorder(), labelText: 'SEED PHRASE'),
                 controller: seedPhrasecontroller,
                 validator: (value) {
                   if (value.isEmpty) {

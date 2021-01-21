@@ -3,6 +3,7 @@ class Scope {
   bool user;
   bool email;
   bool derivedSeed;
+  bool phone;
 
   Scope({this.doubleName, this.email});
 
@@ -10,8 +11,13 @@ class Scope {
       : doubleName = json['doubleName'] as bool,
         user = json['user'] as bool,
         email = json['email'] as bool,
-        derivedSeed = json['derivedSeed'] as bool;
+        derivedSeed = json['derivedSeed'] as bool,
+        phone = json['phone'] as bool;
 
-  Map<String, dynamic> toJson() =>
-      {'doubleName': doubleName, 'email': email, 'derivedSeed': derivedSeed};
+  Map<String, dynamic> toJson() => {
+        'doubleName': doubleName,
+        'email': email,
+        'derivedSeed': derivedSeed,
+        'phone': phone
+      };
 }
