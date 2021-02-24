@@ -105,20 +105,19 @@
             <v-btn @click="finish" color="#57BE8E" dark elevation="0">GET STARTED</v-btn>
             <v-checkbox
               v-model="acceptedTT"
-              style="width: 70vw; font-size: 11px"
-            >
+              style="width: 70vw; font-size: 11px; color:red;" color="red" background-color="green">
               <template v-slot:label>
                 <div  :class="{'red--text':getStartedClicked}">
                    I agree to Threefold’s
-                  <button
+                </div>
+              </template>
+            </v-checkbox>
+             <button
                     style="text-decoration: underline"
                     @click="showDisclaimer = true"
                   >
                     Terms and conditions
                   </button>
-                </div>
-              </template>
-            </v-checkbox>
             <div class="spacer"></div>
           </div>
         </v-carousel-item>
