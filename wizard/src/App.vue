@@ -103,28 +103,21 @@
               <i style="font-size: 49px">JOURNEY</i>
             </h1>
             <v-btn @click="finish" color="#57BE8E" dark elevation="0">GET STARTED</v-btn>
-            <div>
-              <div style="display:inline-block; width:20%">
                 <v-checkbox
                   v-model="acceptedTT"
-                  style="width: 70vw; font-size: 11px; color:red;"
+                  style="width: 70vw; font-size: 11px; color:red; padding-left:2rem"
                   >
                   <template v-slot:label>
                     <div  :class="{'red--text':getStartedClicked && !acceptedTT, 'black--text':!getStartedClicked || !acceptedTT}" class="mr-3">
-                      I agree to Threefold’s
+                      I agree to Threefold’s <br><button
+                      style="text-decoration: underline; display:inline-block; margin-top: 1rem"
+                      @click.stop.prevent="showDisclaimer = true"
+                    >
+                      Terms and conditions
+                    </button>
                     </div>
                   </template>
                 </v-checkbox>
-              </div>
-              <div style="display:inline-block;">
-                <button
-                    style="text-decoration: underline; display:inline-block;"
-                    @click="showDisclaimer = true"
-                  >
-                    Terms and conditions
-                  </button>
-              </div>
-            </div>
             <div class="spacer"></div>
           </div>
         </v-carousel-item>
