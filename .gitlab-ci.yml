@@ -23,7 +23,7 @@ testing_deploy:
     - echo "Deploying ThreeFold Connect for testing"
     - docker rm -f 3botlogin || true
     - docker pull jimber/3botlogin:testing-$CI_COMMIT_TAG
-    - docker run -d -it --network=jimber_proxy_net --name 3botlogin -v /opt/3botlogin/pythonsqlite.db:/usr/share/nginx/backend/pythonsqlite.db jimber/3botlogin:testing-$CI_COMMIT_TAG
+    - docker run -d -it --restart=unless-stopped --network=jimber_proxy_net --name 3botlogin -v /opt/3botlogin/pythonsqlite.db:/usr/share/nginx/backend/pythonsqlite.db jimber/3botlogin:testing-$CI_COMMIT_TAG
 
 staging_build:
   only:
@@ -50,7 +50,7 @@ staging_deploy:
     - echo "Deploying ThreeFold Connect for staging"
     - docker rm -f 3botlogin || true
     - docker pull jimber/3botlogin:staging-$CI_COMMIT_TAG
-    - docker run -d -it --network=jimber_proxy_net --name 3botlogin -v /opt/3botlogin/pythonsqlite.db:/usr/share/nginx/backend/pythonsqlite.db -v /opt/3botlogin/config.ini:/usr/share/nginx/backend/config.ini jimber/3botlogin:staging-$CI_COMMIT_TAG
+    - docker run -d -it --restart=unless-stopped --network=jimber_proxy_net --name 3botlogin -v /opt/3botlogin/pythonsqlite.db:/usr/share/nginx/backend/pythonsqlite.db -v /opt/3botlogin/config.ini:/usr/share/nginx/backend/config.ini jimber/3botlogin:staging-$CI_COMMIT_TAG
 
 production_build:
   only:
@@ -78,4 +78,4 @@ production_deploy:
     - echo "Deploying ThreeFold Connect for production"
     - docker rm -f 3botlogin
     - docker pull jimber/3botlogin:production-$CI_COMMIT_TAG
-    - docker run -d -it --name 3botlogin -v /opt/3botlogin/db/pythonsqlite.db:/usr/share/nginx/backend/pythonsqlite.db -v /opt/3botlogin/config.ini:/usr/share/nginx/backend/config.ini --network=3proxynet jimber/3botlogin:production-$CI_COMMIT_TAG
+    - docker run -d -it --restart=unless-stopped --name 3botlogin -v /opt/3botlogin/db/pythonsqlite.db:/usr/share/nginx/backend/pythonsqlite.db -v /opt/3botlogin/config.ini:/usr/share/nginx/backend/config.ini --network=3proxynet jimber/3botlogin:production-$CI_COMMIT_TAG
