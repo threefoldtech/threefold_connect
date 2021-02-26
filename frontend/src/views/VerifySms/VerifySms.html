@@ -15,10 +15,10 @@
             </v-layout>
             <v-layout column align-center v-if="smsVerificationStatus.checked && smsVerificationStatus.valid">
               <v-icon :size="100" color="accent">check_circle</v-icon>
-              <p class="subheading pt-3">phone validated</p>
+              <p class="subheading pt-3">Phone Validated</p>
               <div v-if="isMobile">
                 <v-btn class="accent" @click="openApp">
-                  Open 3Bot app
+                  Open ThreeFold Connect app
                 </v-btn>
               </div>
             </v-layout>

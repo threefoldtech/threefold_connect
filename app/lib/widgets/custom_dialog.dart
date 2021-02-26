@@ -18,9 +18,26 @@ class CustomDialog extends StatefulWidget {
     this.image = Icons.person,
     this.hiddenaction,
   });
-
   show(context) {
-    show(context);
+    return showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) => CustomDialog(
+        image: Icons.error,
+        title: this.title,
+        description: this.description,
+        widgetDescription: this.widgetDescription,
+        actions: <Widget>[
+          //@todo make this configurable, ok;okcancel
+          FlatButton(
+            child: new Text("Ok"),
+            onPressed: () {
+              Navigator.pop(context);
+            },
+          )
+        ],
+      ),
+    );
   }
 
   @override

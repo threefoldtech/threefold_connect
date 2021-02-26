@@ -16,8 +16,9 @@ class _InitState extends State<InitScreen> {
   InAppWebView iaWebView;
 
   finish(List<dynamic> params) async {
+    print("**** LOAD DONE ");
     saveInitDone();
-    Navigator.pop(context);
+    Navigator.pop(context, true);
   }
 
   addHandler() {

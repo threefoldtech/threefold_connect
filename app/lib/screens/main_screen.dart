@@ -56,6 +56,7 @@ class _AppState extends State<MainScreen> {
   }
 
   pushScreens() async {
+    print("checking internet connection now");
     await checkInternetConnection();
     await checkInternetConnectionWithOurServers();
     await checkIfAppIsUnderMaintenance();
@@ -63,8 +64,12 @@ class _AppState extends State<MainScreen> {
     // await checkIfDeviceIdIsCorrect();
 
     if (widget.initDone != null && !widget.initDone) {
-      await Navigator.push(
-          context, MaterialPageRoute(builder: (context) => InitScreen()));
+      InitScreen init = InitScreen();
+      bool accepted = false;
+      while (!accepted) {
+        accepted = !(await Navigator.push(
+            context, MaterialPageRoute(builder: (context) => init)) == null);
+      }
     }
 
     if (!widget.registered) {
