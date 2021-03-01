@@ -1,13 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:threebotlogin/apps/news/news_config.dart';
 import 'package:threebotlogin/apps/news/news_events.dart';
 import 'package:threebotlogin/clipboard_hack/clipboard_hack.dart';
 import 'package:threebotlogin/events/events.dart';
 import 'package:threebotlogin/events/go_home_event.dart';
-import 'package:threebotlogin/screens/scan_screen.dart';
-import 'package:threebotlogin/services/user_service.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 bool created = false;
 
@@ -48,7 +46,9 @@ class _NewsState extends State<NewsWidget>
         webView = controller;
       },
       onCreateWindow:
-          (InAppWebViewController controller, OnCreateWindowRequest req) {},
+          (InAppWebViewController controller, OnCreateWindowRequest req) async {
+        await launch(req.url);
+      },
       onLoadStop: (InAppWebViewController controller, String url) async {
         addClipboardHandlersOnly(controller);
       },
