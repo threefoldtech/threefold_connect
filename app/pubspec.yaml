@@ -3,12 +3,13 @@ description: A decentralized login application
 
 publish_to: 'none'
 
-version: 2.3.1+113
+version: 2.5.0+114
 
 environment:
   sdk: ">=2.7.0 <3.0.0"
 
 dependencies:
+  gson: ^0.1.4
   flutter:
     sdk: flutter
   qr_code_scanner:
@@ -20,9 +21,7 @@ dependencies:
   uni_links:
     git:
       url: https://github.com/jimbertools/uni_links
-  flutter_inappwebview:
-    git:
-      url: https://github.com/jimbertools/flutter_inappwebview
+  flutter_inappwebview: ^4.0.0+4
   keyboard_visibility:
     git:
       url: https://github.com/jimbertools/flutter_keyboard_visibility

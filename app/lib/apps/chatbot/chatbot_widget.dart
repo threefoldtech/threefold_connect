@@ -26,15 +26,16 @@ class _ChatbotState extends State<ChatbotWidget>
       initialUrl: '${config.url()}$email&cache_buster=' +
           new DateTime.now().millisecondsSinceEpoch.toString(),
       initialHeaders: {},
-      initialOptions: InAppWebViewWidgetOptions(
+      initialOptions: InAppWebViewGroupOptions(
           crossPlatform: InAppWebViewOptions(useShouldOverrideUrlLoading: true),
           android: AndroidInAppWebViewOptions(supportMultipleWindows: true)),
       onWebViewCreated: (InAppWebViewController controller) {
         webView = controller;
       },
       onCreateWindow:
-          (InAppWebViewController controller, OnCreateWindowRequest req) {
-        inAppBrowser.open(url: req.url, options: InAppBrowserClassOptions());
+          (InAppWebViewController controller, CreateWindowRequest req) {
+        inAppBrowser.openUrl(url: req.url, options: InAppBrowserClassOptions());
+
       },
       onConsoleMessage:
           (InAppWebViewController controller, ConsoleMessage consoleMessage) {
@@ -42,7 +43,7 @@ class _ChatbotState extends State<ChatbotWidget>
       },
       onLoadStart: (InAppWebViewController controller, String url) {},
       onLoadStop: (InAppWebViewController controller, String url) async {
-        await addClipboardHack(controller);
+       // await addClipboardHack(controller);
       },
       onProgressChanged: (InAppWebViewController controller, int progress) {},
     );

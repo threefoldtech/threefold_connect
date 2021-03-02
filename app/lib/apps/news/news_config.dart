@@ -33,7 +33,7 @@ abstract class NewsConfigImpls {
 
 class NewsConfigStaging extends NewsConfigImpls {
   String appId() {
-    return 'news.staging.jimber.org';
+    return 'news.threefoldconnect.jimber.org';
   }
 
   String redirectUrl() {
@@ -43,7 +43,7 @@ class NewsConfigStaging extends NewsConfigImpls {
 
 class NewsConfigProduction extends NewsConfigImpls {
   String appId() {
-    return 'news.threefold.me';
+    return 'news.threefoldconnect.jimber.org';
   }
 
   String redirectUrl() {

@@ -24,7 +24,8 @@ class _NewsState extends State<NewsWidget>
 
   _back(NewsBackEvent event) async {
     String url = await webView.getUrl();
-    String endsWith = config.appId() + '/';
+    String endsWith = 'news.threefoldconnect.jimber.org/';
+    print(url);
     if (url.endsWith(endsWith)) {
       Events().emit(GoHomeEvent());
       return;
@@ -37,7 +38,7 @@ class _NewsState extends State<NewsWidget>
       initialUrl: 'https://news.threefoldconnect.jimber.org?cache_buster=' +
           new DateTime.now().millisecondsSinceEpoch.toString(),
       initialHeaders: {},
-      initialOptions: InAppWebViewWidgetOptions(
+      initialOptions: InAppWebViewGroupOptions(
           crossPlatform: InAppWebViewOptions(debuggingEnabled: true),
           android: AndroidInAppWebViewOptions(
               supportMultipleWindows: true, thirdPartyCookiesEnabled: true),
@@ -46,7 +47,7 @@ class _NewsState extends State<NewsWidget>
         webView = controller;
       },
       onCreateWindow:
-          (InAppWebViewController controller, OnCreateWindowRequest req) async {
+          (InAppWebViewController controller, CreateWindowRequest req) async {
         await launch(req.url);
       },
       onLoadStop: (InAppWebViewController controller, String url) async {

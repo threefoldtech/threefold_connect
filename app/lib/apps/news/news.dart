@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:threebotlogin/app.dart';
 import 'package:threebotlogin/apps/news/news_widget.dart';
 import 'package:threebotlogin/events/events.dart';
-import 'package:threebotlogin/events/go_home_event.dart';
+import 'package:threebotlogin/apps/news/news_events.dart';
 
 class News implements App {
   static final News _singleton = new News._internal();
@@ -32,6 +32,6 @@ class News implements App {
 
   @override
   void back() {
-    Events().emit(GoHomeEvent());
+    Events().emit(NewsBackEvent());
   }
 }

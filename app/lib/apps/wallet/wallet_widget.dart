@@ -40,7 +40,7 @@ class _WalletState extends State<WalletWidget>
       initialUrl: 'https://${config.appId()}/init?cache_buster=' +
           new DateTime.now().millisecondsSinceEpoch.toString(),
       initialHeaders: {},
-      initialOptions: InAppWebViewWidgetOptions(
+      initialOptions: InAppWebViewGroupOptions(
           crossPlatform: InAppWebViewOptions(debuggingEnabled: true),
           android: AndroidInAppWebViewOptions(
               supportMultipleWindows: true, thirdPartyCookiesEnabled: true),
@@ -50,7 +50,7 @@ class _WalletState extends State<WalletWidget>
         this.addHandler();
       },
       onCreateWindow:
-          (InAppWebViewController controller, OnCreateWindowRequest req) {},
+          (InAppWebViewController controller, CreateWindowRequest req) {},
       onLoadStop: (InAppWebViewController controller, String url) async {
         addClipboardHandlersOnly(controller);
         if (url.contains('/init')) {

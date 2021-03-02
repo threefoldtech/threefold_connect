@@ -29,7 +29,7 @@ class _InitState extends State<InitScreen> {
     iaWebView = InAppWebView(
       initialUrl: AppConfig().wizardUrl() + '?cache_buster=' + new DateTime.now().millisecondsSinceEpoch.toString(),
       initialHeaders: {},
-      initialOptions: InAppWebViewWidgetOptions(
+      initialOptions: InAppWebViewGroupOptions(
         android: AndroidInAppWebViewOptions(supportMultipleWindows: true),
       ),
       onWebViewCreated: (InAppWebViewController controller) {
@@ -37,7 +37,7 @@ class _InitState extends State<InitScreen> {
         addHandler();
       },
       onCreateWindow:
-          (InAppWebViewController controller, OnCreateWindowRequest req) {},
+          (InAppWebViewController controller, CreateWindowRequest req) {},
       onLoadStart: (InAppWebViewController controller, String url) {},
       onLoadStop: (InAppWebViewController controller, String url) async {},
       onProgressChanged: (InAppWebViewController controller, int progress) {},

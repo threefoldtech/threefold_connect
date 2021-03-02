@@ -33,7 +33,7 @@ class _FfpState extends State<FfpWidget> with AutomaticKeepAliveClientMixin {
     iaWebview = new InAppWebView(
       initialUrl: config.cookieUrl(),
       initialHeaders: {},
-      initialOptions: InAppWebViewWidgetOptions(
+      initialOptions: InAppWebViewGroupOptions(
         android: AndroidInAppWebViewOptions(supportMultipleWindows: true),
       ),
       onLoadStart: (InAppWebViewController controller, String url) {
@@ -56,12 +56,12 @@ class _FfpState extends State<FfpWidget> with AutomaticKeepAliveClientMixin {
         }
       },
       onCreateWindow:
-          (InAppWebViewController controller, OnCreateWindowRequest req) {
+          (InAppWebViewController controller, CreateWindowRequest req) {
         if (req.url.contains("freeflowpages.com/")) {
           controller.loadUrl(url: req.url);
           return;
         }
-        inAppBrowser.open(url: req.url, options: InAppBrowserClassOptions());
+        inAppBrowser.openUrl(url: req.url, options: InAppBrowserClassOptions());
       },
       onProgressChanged: (InAppWebViewController controller, int progress) {
         if (!finalDestinationLoading) {
