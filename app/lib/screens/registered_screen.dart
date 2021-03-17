@@ -1,5 +1,11 @@
+import 'dart:ffi';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:threebotlogin/helpers/globals.dart';
+import 'package:threebotlogin/helpers/vpn_state.dart';
+import 'package:yggdrasil_plugin/yggdrasil_plugin.dart';
+import 'package:flutter/services.dart';
 
 class RegisteredScreen extends StatefulWidget {
   static final RegisteredScreen _singleton = new RegisteredScreen._internal();
@@ -22,11 +28,114 @@ class _RegisteredScreenState extends State<RegisteredScreen>
   bool showSettings = false;
   bool showPreference = false;
 
+  VpnState _vpnState = new VpnState();
+  Text _ipText;
+  Text _connectText;
+  bool _vpnTimeoutRunning = false;
+
+  void reportIp(String ip) {
+    setState(() {
+      _vpnState.ipAddress = ip;
+      _vpnState.ipText = ip;
+      _ipText = new Text("IP Address: " + _vpnState.ipText);
+    });
+  }
+
+  _RegisteredScreenState() {
+    _vpnState = Globals().vpnState;
+    _vpnState.plugin.setOnReportIp(reportIp);
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    setState(() {
+      if (_vpnState.vpnConnected) {
+        _ipText = new Text("IP Address: " + _vpnState.ipText);
+        _connectText = new Text("Disconnect");
+        return;
+      }
+      _ipText = new Text("");
+      _connectText = new Text("Connect");
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: <Widget>[
+        Padding(
+            padding: EdgeInsets.all(8.0),
+            child: Column(children: [
+              Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
+                new Text("Planetary network connection"),
+                new FlatButton(
+                  child: _connectText,
+                  color: Theme.of(context).primaryColor,
+                  onPressed: _vpnTimeoutRunning
+                      ? null
+                      : () {
+                          setState(() {
+                            _vpnTimeoutRunning = true;
+                            _connectText = new Text("Working..");
+                          });
+
+                          if (!_vpnState.vpnConnected) {
+                            _vpnState.plugin.startVpn();
+
+                            Future.delayed(const Duration(milliseconds: 5000),
+                                () {
+                              setState(() {
+                                _connectText = new Text("Disconnect");
+                                _vpnTimeoutRunning = false;
+                              });
+                            });
+                            setState(() {});
+                            _vpnState.vpnConnected = true;
+                            return;
+                          }
+                          _vpnState.plugin.stopVpn();
+                          _vpnState.ipAddress = "";
+                          _vpnState.vpnConnected = false;
+
+                          _vpnState.plugin = new YggdrasilPlugin();
+                          setState(() {
+                            Future.delayed(const Duration(milliseconds: 7000),
+                                () {
+                              setState(() {
+                                _connectText = new Text("Connect");
+                                _vpnTimeoutRunning = false;
+                              });
+                              _vpnState.ipAddress = "";
+                              _ipText = new Text("");
+                            });
+                          });
+                        },
+                )
+              ]),
+              new GestureDetector(
+                onTap: () async {
+                  print("beforetap");
+                  if (_vpnState.ipAddress != "") {
+                    print("tap");
+                    Clipboard.setData(
+                        new ClipboardData(text: _vpnState.ipAddress));
+                    var backup = _ipText;
+                    setState(() {
+                      _ipText = new Text("Address copied to clipboard");
+                    });
+
+                    await Future.delayed(const Duration(seconds: 3));
+                    setState(() {
+                      _ipText = backup;
+                    });
+                  }
+                },
+                child: _ipText,
+              )
+            ])),
         SizedBox(height: 10.0),
         Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -45,7 +154,8 @@ class _RegisteredScreenState extends State<RegisteredScreen>
               height: 200.0,
               decoration: BoxDecoration(
                 image: DecorationImage(
-                    fit: BoxFit.fill, image: AssetImage('assets/threefold_registered.png')),
+                    fit: BoxFit.fill,
+                    image: AssetImage('assets/threefold_registered.png')),
               ),
             ),
           ],
@@ -53,8 +163,7 @@ class _RegisteredScreenState extends State<RegisteredScreen>
         Column(
           children: <Widget>[
             Column(
-              children: <Widget>[
-              ],
+              children: <Widget>[],
             ),
           ],
         ),

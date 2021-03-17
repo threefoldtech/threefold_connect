@@ -8,6 +8,7 @@ import 'package:threebotlogin/services/user_service.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+
 LoggingService logger;
 
 Future<void> main() async {
@@ -34,6 +35,7 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
     var textTheme = GoogleFonts.latoTextTheme(
       Theme.of(context).textTheme,
     );
