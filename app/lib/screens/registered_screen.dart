@@ -31,6 +31,7 @@ class _RegisteredScreenState extends State<RegisteredScreen>
   VpnState _vpnState = new VpnState();
   Text _ipText;
   Text _connectText;
+  Text _planetaryText;
   bool _vpnTimeoutRunning = false;
 
   void reportIp(String ip) {
@@ -53,11 +54,13 @@ class _RegisteredScreenState extends State<RegisteredScreen>
     setState(() {
       if (_vpnState.vpnConnected) {
         _ipText = new Text("IP Address: " + _vpnState.ipText);
-        _connectText = new Text("Disconnect");
+        _connectText = new Text("Disconnect", style: TextStyle(color: Colors.white));
+         _planetaryText = new Text("Connected to the planetary network");
         return;
       }
+       _planetaryText = new Text("Not connected to the planetary network");
       _ipText = new Text("");
-      _connectText = new Text("Connect");
+      _connectText = new Text("Connect", style: TextStyle(color: Colors.white));
     });
   }
 
@@ -70,25 +73,31 @@ class _RegisteredScreenState extends State<RegisteredScreen>
             padding: EdgeInsets.all(8.0),
             child: Column(children: [
               Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
-                new Text("Planetary network connection"),
+                _planetaryText,
                 new FlatButton(
                   child: _connectText,
                   color: Theme.of(context).primaryColor,
                   onPressed: _vpnTimeoutRunning
                       ? null
-                      : () {
-                          setState(() {
-                            _vpnTimeoutRunning = true;
-                            _connectText = new Text("Working..");
-                          });
-
+                      : () async {
                           if (!_vpnState.vpnConnected) {
-                            _vpnState.plugin.startVpn();
-
+                            bool started = await _vpnState.plugin.startVpn();
+                            if (!started) {
+                              setState(() {
+                                _ipText = new Text(
+                                    "Please click connect again after accepting VPN permissions.");
+                              });
+                              return;
+                            }
+                            setState(() {
+                              _vpnTimeoutRunning = true;
+                              _connectText = new Text("Working..", style: TextStyle(color: Colors.black));
+                            });
                             Future.delayed(const Duration(milliseconds: 5000),
                                 () {
                               setState(() {
-                                _connectText = new Text("Disconnect");
+                                _connectText = new Text("Disconnect", style: TextStyle(color: Colors.white));
+                                _planetaryText = new Text("Connected to the planetary network");
                                 _vpnTimeoutRunning = false;
                               });
                             });
@@ -96,6 +105,11 @@ class _RegisteredScreenState extends State<RegisteredScreen>
                             _vpnState.vpnConnected = true;
                             return;
                           }
+
+                          setState(() {
+                              _vpnTimeoutRunning = true;
+                              _connectText = new Text("Working..", style: TextStyle(color: Colors.black));
+                            });
                           _vpnState.plugin.stopVpn();
                           _vpnState.ipAddress = "";
                           _vpnState.vpnConnected = false;
@@ -105,8 +119,9 @@ class _RegisteredScreenState extends State<RegisteredScreen>
                             Future.delayed(const Duration(milliseconds: 7000),
                                 () {
                               setState(() {
-                                _connectText = new Text("Connect");
+                                _connectText = new Text("Connect", style: TextStyle(color: Colors.white));
                                 _vpnTimeoutRunning = false;
+                                _planetaryText = new Text("Not connected to the planetary network");
                               });
                               _vpnState.ipAddress = "";
                               _ipText = new Text("");
