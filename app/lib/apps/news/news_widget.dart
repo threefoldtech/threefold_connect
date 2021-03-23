@@ -23,10 +23,10 @@ class _NewsState extends State<NewsWidget>
   InAppWebView iaWebView;
 
   _back(NewsBackEvent event) async {
-    String url = await webView.getUrl();
+    Uri url = await webView.getUrl();
     String endsWith = 'news.threefoldconnect.jimber.org/';
-    print(url);
-    if (url.endsWith(endsWith)) {
+
+    if (url.toString().endsWith(endsWith)) {
       Events().emit(GoHomeEvent());
       return;
     }
@@ -35,11 +35,11 @@ class _NewsState extends State<NewsWidget>
 
   _NewsState() {
     iaWebView = InAppWebView(
-      initialUrl: 'https://news.threefoldconnect.jimber.org?cache_buster=' +
-          new DateTime.now().millisecondsSinceEpoch.toString(),
-      initialHeaders: {},
+      initialUrlRequest: URLRequest(url:Uri.parse('https://news.threefoldconnect.jimber.org?cache_buster=' +
+          new DateTime.now().millisecondsSinceEpoch.toString())),
+
       initialOptions: InAppWebViewGroupOptions(
-          crossPlatform: InAppWebViewOptions(debuggingEnabled: true),
+          crossPlatform: InAppWebViewOptions(),
           android: AndroidInAppWebViewOptions(
               supportMultipleWindows: true, thirdPartyCookiesEnabled: true),
           ios: IOSInAppWebViewOptions()),
@@ -47,10 +47,10 @@ class _NewsState extends State<NewsWidget>
         webView = controller;
       },
       onCreateWindow:
-          (InAppWebViewController controller, CreateWindowRequest req) async {
-        await launch(req.url);
+          (InAppWebViewController controller, CreateWindowAction req) async {
+        await launch(req.request.url.toString());
       },
-      onLoadStop: (InAppWebViewController controller, String url) async {
+      onLoadStop: (InAppWebViewController controller, Uri url) async {
         addClipboardHandlersOnly(controller);
       },
       onProgressChanged: (InAppWebViewController controller, int progress) {

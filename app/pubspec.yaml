@@ -21,14 +21,14 @@ dependencies:
   uni_links:
     git:
       url: https://github.com/jimbertools/uni_links
-  flutter_inappwebview: ^4.0.0+4
+  flutter_inappwebview: ^5.2.0
   keyboard_visibility:
     git:
       url: https://github.com/jimbertools/flutter_keyboard_visibility
   redirection:
     git:
       url: https://github.com/jimbertools/redirection
-  flutter_svg:
+  flutter_svg: ^0.19.3
   crypto: ^2.1.5
   bip39: ^1.0.3
   uuid: ^2.2.0
