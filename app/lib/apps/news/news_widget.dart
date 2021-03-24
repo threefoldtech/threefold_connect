@@ -49,7 +49,8 @@ class _NewsState extends State<NewsWidget>
       onCreateWindow:
           (InAppWebViewController controller, CreateWindowAction req) async {
         await launch(req.request.url.toString());
-        return false;
+
+        return true;
       },
       onLoadStop: (InAppWebViewController controller, Uri url) async {
         addClipboardHandlersOnly(controller);
