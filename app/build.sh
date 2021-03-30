@@ -22,7 +22,7 @@ compileAndUpload() {
             echo "[$5]: Building apk."
 
             setConfigsAndBuild
-            msgTelegram "$5" $4
+            #msgTelegram "$5" $4
         fi
 
         exit 0
