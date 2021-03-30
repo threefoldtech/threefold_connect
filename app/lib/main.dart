@@ -52,7 +52,8 @@ class MyApp extends StatelessWidget {
           labelStyle: textStyle,
           unselectedLabelStyle: textStyle
         ),
-        appBarTheme: AppBarTheme(textTheme: accentTextTheme),
+        
+        appBarTheme: AppBarTheme(color: Colors.white ,textTheme: accentTextTheme, brightness: Brightness.dark),
       ),
       home: MainScreen(initDone: initDone, registered: registered),
     );
