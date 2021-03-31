@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:threebotlogin/helpers/globals.dart';
 import 'package:threebotlogin/helpers/vpn_state.dart';
+import 'package:threebotlogin/services/user_service.dart';
 import 'package:yggdrasil_plugin/yggdrasil_plugin.dart';
 import 'package:flutter/services.dart';
 
@@ -81,7 +82,8 @@ class _RegisteredScreenState extends State<RegisteredScreen>
                       ? null
                       : () async {
                           if (!_vpnState.vpnConnected) {
-                            bool started = await _vpnState.plugin.startVpn();
+                            
+                            bool started = await _vpnState.plugin.startVpn(await getEdCurveKeys());
                             if (!started) {
                               setState(() {
                                 _ipText = new Text(
@@ -113,7 +115,7 @@ class _RegisteredScreenState extends State<RegisteredScreen>
                           _vpnState.plugin.stopVpn();
                           _vpnState.ipAddress = "";
                           _vpnState.vpnConnected = false;
-
+                          
                           _vpnState.plugin = new YggdrasilPlugin();
                           setState(() {
                             Future.delayed(const Duration(milliseconds: 7000),
@@ -132,9 +134,7 @@ class _RegisteredScreenState extends State<RegisteredScreen>
               ]),
               new GestureDetector(
                 onTap: () async {
-                  print("beforetap");
                   if (_vpnState.ipAddress != "") {
-                    print("tap");
                     Clipboard.setData(
                         new ClipboardData(text: _vpnState.ipAddress));
                     var backup = _ipText;
