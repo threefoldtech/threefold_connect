@@ -623,7 +623,7 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
   }
 
   Future<void> _showTermsAndConds() async {
-    const url = 'https://wiki.threefold.io/#/legal';
+    const url = 'https://wiki.threefold.io/#/legal__legal';
 
     await launch(url);
   }
