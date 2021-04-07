@@ -167,7 +167,7 @@
         </v-card-title>
         <iframe
           style="height: calc(100vh - 62px); width: 100%"
-          src="https://wiki.threefold.io/#/legal"
+          src="https://wiki.threefold.io/#/legal__legal"
           frameborder="0"
         ></iframe>
       </v-card>
