@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+
 import 'package:flutter/widgets.dart';
 import 'package:flutter_svg/svg.dart';
 //import 'package:threebotlogin/apps/free_flow_pages/ffp.dart';
@@ -19,6 +20,7 @@ import 'package:threebotlogin/services/uni_link_service.dart';
 import 'package:threebotlogin/services/user_service.dart';
 import 'package:threebotlogin/widgets/email_verification_needed.dart';
 import 'package:uni_links/uni_links.dart';
+
 
 /* Screen shows tabbar and all pages defined in router.dart */
 class HomeScreen extends StatefulWidget {
@@ -103,6 +105,7 @@ class _HomeScreenState extends State<HomeScreen>
     _tabController.animateTo(homeTab);
   }
 
+
   @override
   void initState() {
     super.initState();
@@ -116,12 +119,13 @@ class _HomeScreenState extends State<HomeScreen>
 
     Events().onEvent(EmailEvent().runtimeType, (EmailEvent event) {
       emailVerification(context);
-    });    
+    });
     Events().onEvent(PhoneEvent().runtimeType, (PhoneEvent event) {
       phoneVerification(context);
     });
 
     WidgetsBinding.instance.addObserver(this);
+
   }
 
   @override
@@ -194,15 +198,13 @@ class _HomeScreenState extends State<HomeScreen>
                   width: MediaQuery.of(context).size.width,
                   height: MediaQuery.of(context).size.height,
                 ),
-                Container(
-                  child: SafeArea(
+                SafeArea(
                     child: TabBarView(
-                      controller: _tabController,
-                      physics: NeverScrollableScrollPhysics(),
-                      children: Globals().router.getContent(),
-                    ),
-                  ),
-                ),
+                  controller: _tabController,
+                  physics: NeverScrollableScrollPhysics(),
+                  children: Globals().router.getContent(),
+                )),
+               
               ],
             ),
             bottomNavigationBar: Container(

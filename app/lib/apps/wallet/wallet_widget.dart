@@ -20,13 +20,14 @@ class WalletWidget extends StatefulWidget {
 class _WalletState extends State<WalletWidget>
     with AutomaticKeepAliveClientMixin {
   InAppWebViewController webView;
-  String url = "";
+
   double progress = 0;
   var config = WalletConfig();
   InAppWebView iaWebView;
 
   _back(WalletBackEvent event) async {
     Uri url = await webView.getUrl();
+    print(url.toString());
     String endsWith = config.appId() + '/';
     if (url.toString().endsWith(endsWith)) {
       Events().emit(GoHomeEvent());
@@ -37,9 +38,9 @@ class _WalletState extends State<WalletWidget>
 
   _WalletState() {
     iaWebView = InAppWebView(
-      initialUrlRequest: URLRequest(url:Uri.parse('https://${config.appId()}/init?cache_buster=' +
-          new DateTime.now().millisecondsSinceEpoch.toString())),
-
+      initialUrlRequest: URLRequest(
+          url: Uri.parse('https://${config.appId()}/init?cache_buster=' +
+              new DateTime.now().millisecondsSinceEpoch.toString())),
       initialOptions: InAppWebViewGroupOptions(
           crossPlatform: InAppWebViewOptions(),
           android: AndroidInAppWebViewOptions(
