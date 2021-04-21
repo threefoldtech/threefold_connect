@@ -2,6 +2,8 @@ import 'dart:ffi';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:threebotlogin/events/close_vpn_event.dart';
+import 'package:threebotlogin/events/events.dart';
 import 'package:threebotlogin/helpers/globals.dart';
 import 'package:threebotlogin/helpers/vpn_state.dart';
 import 'package:threebotlogin/services/user_service.dart';
@@ -43,9 +45,19 @@ class _RegisteredScreenState extends State<RegisteredScreen>
     });
   }
 
+  _closeVpn(CloseVpnEvent event) {
+    if (_vpnState.vpnConnected) {
+      _vpnState.plugin.stopVpn();
+      _vpnState.ipAddress = "";
+      _vpnState.vpnConnected = false;
+    }
+  }
+
   _RegisteredScreenState() {
     _vpnState = Globals().vpnState;
     _vpnState.plugin.setOnReportIp(reportIp);
+
+    Events().onEvent(CloseVpnEvent().runtimeType, _closeVpn);
   }
 
   @override
@@ -55,11 +67,12 @@ class _RegisteredScreenState extends State<RegisteredScreen>
     setState(() {
       if (_vpnState.vpnConnected) {
         _ipText = new Text("IP Address: " + _vpnState.ipText);
-        _connectText = new Text("Disconnect", style: TextStyle(color: Colors.white));
-         _planetaryText = new Text("Connected to the planetary network");
+        _connectText =
+            new Text("Disconnect", style: TextStyle(color: Colors.white));
+        _planetaryText = new Text("Connected to the planetary network");
         return;
       }
-       _planetaryText = new Text("Not connected to the planetary network");
+      _planetaryText = new Text("Not connected to the planetary network");
       _ipText = new Text("");
       _connectText = new Text("Connect", style: TextStyle(color: Colors.white));
     });
@@ -82,8 +95,8 @@ class _RegisteredScreenState extends State<RegisteredScreen>
                       ? null
                       : () async {
                           if (!_vpnState.vpnConnected) {
-                            
-                            bool started = await _vpnState.plugin.startVpn(await getEdCurveKeys());
+                            bool started = await _vpnState.plugin
+                                .startVpn(await getEdCurveKeys());
                             if (!started) {
                               setState(() {
                                 _ipText = new Text(
@@ -93,13 +106,16 @@ class _RegisteredScreenState extends State<RegisteredScreen>
                             }
                             setState(() {
                               _vpnTimeoutRunning = true;
-                              _connectText = new Text("Working..", style: TextStyle(color: Colors.black));
+                              _connectText = new Text("Working..",
+                                  style: TextStyle(color: Colors.black));
                             });
                             Future.delayed(const Duration(milliseconds: 5000),
                                 () {
                               setState(() {
-                                _connectText = new Text("Disconnect", style: TextStyle(color: Colors.white));
-                                _planetaryText = new Text("Connected to the planetary network");
+                                _connectText = new Text("Disconnect",
+                                    style: TextStyle(color: Colors.white));
+                                _planetaryText = new Text(
+                                    "Connected to the planetary network");
                                 _vpnTimeoutRunning = false;
                               });
                             });
@@ -109,21 +125,24 @@ class _RegisteredScreenState extends State<RegisteredScreen>
                           }
 
                           setState(() {
-                              _vpnTimeoutRunning = true;
-                              _connectText = new Text("Working..", style: TextStyle(color: Colors.black));
-                            });
+                            _vpnTimeoutRunning = true;
+                            _connectText = new Text("Working..",
+                                style: TextStyle(color: Colors.black));
+                          });
                           _vpnState.plugin.stopVpn();
                           _vpnState.ipAddress = "";
                           _vpnState.vpnConnected = false;
-                          
+
                           _vpnState.plugin = new YggdrasilPlugin();
                           setState(() {
                             Future.delayed(const Duration(milliseconds: 7000),
                                 () {
                               setState(() {
-                                _connectText = new Text("Connect", style: TextStyle(color: Colors.white));
+                                _connectText = new Text("Connect",
+                                    style: TextStyle(color: Colors.white));
                                 _vpnTimeoutRunning = false;
-                                _planetaryText = new Text("Not connected to the planetary network");
+                                _planetaryText = new Text(
+                                    "Not connected to the planetary network");
                               });
                               _vpnState.ipAddress = "";
                               _ipText = new Text("");
