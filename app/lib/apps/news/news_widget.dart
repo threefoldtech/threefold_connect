@@ -18,15 +18,15 @@ class _NewsState extends State<NewsWidget>
     with AutomaticKeepAliveClientMixin {
   InAppWebViewController webView;
   String url = "";
+  String initialEndsWith= "";
   double progress = 0;
   var config = NewsConfig();
   InAppWebView iaWebView;
 
   _back(NewsBackEvent event) async {
     Uri url = await webView.getUrl();
-    String endsWith = 'news.threefoldconnect.jimber.org/';
-
-    if (url.toString().endsWith(endsWith)) {
+    print("URL: " + url.toString());
+    if (url.toString().endsWith(initialEndsWith)) {
       Events().emit(GoHomeEvent());
       return;
     }
@@ -34,9 +34,10 @@ class _NewsState extends State<NewsWidget>
   }
 
   _NewsState() {
+    this.initialEndsWith =  new DateTime.now().millisecondsSinceEpoch.toString();
     iaWebView = InAppWebView(
-      initialUrlRequest: URLRequest(url:Uri.parse('https://news.threefoldconnect.jimber.org?cache_buster=' +
-          new DateTime.now().millisecondsSinceEpoch.toString())),
+      initialUrlRequest: URLRequest(url:Uri.parse('https://news.threefoldconnect.jimber.org?cache_buster=' + initialEndsWith
+         )),
 
       initialOptions: InAppWebViewGroupOptions(
           crossPlatform: InAppWebViewOptions(),
