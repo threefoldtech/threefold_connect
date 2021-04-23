@@ -4,6 +4,7 @@ import 'package:threebotlogin/apps/chatbot/chatbot.dart';
 import 'package:threebotlogin/apps/wallet/wallet.dart';
 import 'package:threebotlogin/screens/preference_screen.dart';
 import 'package:threebotlogin/screens/registered_screen.dart';
+import 'package:threebotlogin/screens/reservation_screen.dart';
 
 import 'apps/news/news.dart';
 
@@ -51,13 +52,20 @@ class JRouter {
             view: await Chatbot().widget(),
           ),
           app: Chatbot()),
-
       AppInfo(
           route: Route(
             path: '/settings',
             name: 'Settings',
             icon: Icons.settings,
             view: PreferenceScreen(),
+          ),
+          app: null),
+      AppInfo(
+          route: Route(
+            path: '/reservations',
+            name: 'Reservations',
+            icon: Icons.book_online,
+            view: ReservationScreen(),
           ),
           app: null),
     ];
@@ -94,12 +102,12 @@ class JRouter {
     routes.forEach((r) {
       iconButtons.add(Container(
           child: Tab(
-            icon: Icon(
-              r.route.icon,
-              size: 40,
-            ),
-            text: r.route.name,
-          )));
+        icon: Icon(
+          r.route.icon,
+          size: 40,
+        ),
+        text: r.route.name,
+      )));
     });
     return iconButtons;
   }

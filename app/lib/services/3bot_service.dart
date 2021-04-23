@@ -72,10 +72,10 @@ Future<bool> isAppUpToDate() async {
 
 Future<bool> isAppUnderMaintenance() async {
   Response response = await http
-          .get('$threeBotApiUrl/maintenance', headers: requestHeaders)
-          .timeout(const Duration(seconds: 3));
+      .get('$threeBotApiUrl/maintenance', headers: requestHeaders)
+      .timeout(const Duration(seconds: 3));
 
-  if(response.statusCode != 200) {
+  if (response.statusCode != 200) {
     return false;
   }
 
@@ -103,8 +103,8 @@ Future<Response> removeDeviceId(String deviceId) {
       headers: requestHeaders);
 }
 
-Future<Response> finishRegistration(String doubleName, String email, String sid,
-    String publicKey) async {
+Future<Response> finishRegistration(
+    String doubleName, String email, String sid, String publicKey) async {
   return http.post('$threeBotApiUrl/mobileregistration',
       body: json.encode({
         'doubleName': doubleName + '.3bot',
@@ -113,4 +113,24 @@ Future<Response> finishRegistration(String doubleName, String email, String sid,
         'public_key': publicKey
       }),
       headers: requestHeaders);
+}
+
+Future<Response> getReservations(String doubleName) {
+  // TODO remove next line
+  threeBotApiUrl = 'https://6080ff9673292b0017cdc5a2.mockapi.io/api';
+  print('$threeBotApiUrl/digitaltwin/$doubleName/reservations');
+  return http.get('$threeBotApiUrl/digitaltwin/$doubleName/reservations',
+      headers: requestHeaders);
+}
+
+// TODO Please remove this function, it's only for testing
+Future<Response> postReservations(String doubleName, String reservingFor) {
+  threeBotApiUrl = 'https://6080ff9673292b0017cdc5a2.mockapi.io/api';
+  print('$threeBotApiUrl/digitaltwin/$doubleName/reservations');
+  return http.post('$threeBotApiUrl/digitaltwin/$doubleName/reservations',
+      body: {
+        'tx': 'bla',
+        'ReservingUser': doubleName,
+        'ReservedDigitaltwin': reservingFor
+      });
 }
