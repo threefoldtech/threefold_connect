@@ -7,7 +7,7 @@ Click==7.0
 cryptography==2.6.1
 entrypoints==0.3
 Flask==1.0.2
-Flask-Cors==3.0.7
+Flask-Cors==3.0.9
 Flask-RESTful==0.3.6
 Flask-SocketIO==3.3.2
 gevent==1.4.0
