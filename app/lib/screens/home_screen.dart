@@ -1,10 +1,11 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+
 import 'package:flutter/widgets.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:threebotlogin/apps/free_flow_pages/ffp.dart';
-import 'package:threebotlogin/apps/free_flow_pages/ffp_events.dart';
+//import 'package:threebotlogin/apps/free_flow_pages/ffp.dart';
+//import 'package:threebotlogin/apps/free_flow_pages/ffp_events.dart';
 import 'package:threebotlogin/events/email_event.dart';
 import 'package:threebotlogin/events/phone_event.dart';
 import 'package:threebotlogin/events/events.dart';
@@ -19,6 +20,7 @@ import 'package:threebotlogin/services/uni_link_service.dart';
 import 'package:threebotlogin/services/user_service.dart';
 import 'package:threebotlogin/widgets/email_verification_needed.dart';
 import 'package:uni_links/uni_links.dart';
+
 
 /* Screen shows tabbar and all pages defined in router.dart */
 class HomeScreen extends StatefulWidget {
@@ -43,7 +45,7 @@ class _HomeScreenState extends State<HomeScreen>
   _HomeScreenState() {
     _tabController = TabController(
         initialIndex: 0, length: Globals().router.routes.length, vsync: this);
-    Events().onEvent(FfpBrowseEvent().runtimeType, activateFfpTab);
+    //Events().onEvent(FfpBrowseEvent().runtimeType, activateFfpTab);
     _tabController.addListener(_handleTabSelection);
   }
 
@@ -90,18 +92,19 @@ class _HomeScreenState extends State<HomeScreen>
     }
   }
 
-  activateFfpTab(FfpBrowseEvent event) {
-    int ffpTab = 2;
-    Ffp().firstUrlToLoad = event.url;
-    setState(() {
-      _tabController.animateTo(ffpTab);
-    });
-  }
+  // activateFfpTab(FfpBrowseEvent event) {
+  //   int ffpTab = 2;
+  //   Ffp().firstUrlToLoad = event.url;
+  //   setState(() {
+  //     _tabController.animateTo(ffpTab);
+  //   });
+  // }
 
   close(GoHomeEvent e) {
     int homeTab = 0; //@todo can we do some indexoff on routes
     _tabController.animateTo(homeTab);
   }
+
 
   @override
   void initState() {
@@ -116,12 +119,13 @@ class _HomeScreenState extends State<HomeScreen>
 
     Events().onEvent(EmailEvent().runtimeType, (EmailEvent event) {
       emailVerification(context);
-    });    
+    });
     Events().onEvent(PhoneEvent().runtimeType, (PhoneEvent event) {
       phoneVerification(context);
     });
 
     WidgetsBinding.instance.addObserver(this);
+
   }
 
   @override
@@ -194,15 +198,13 @@ class _HomeScreenState extends State<HomeScreen>
                   width: MediaQuery.of(context).size.width,
                   height: MediaQuery.of(context).size.height,
                 ),
-                Container(
-                  child: SafeArea(
+                SafeArea(
                     child: TabBarView(
-                      controller: _tabController,
-                      physics: NeverScrollableScrollPhysics(),
-                      children: Globals().router.getContent(),
-                    ),
-                  ),
-                ),
+                  controller: _tabController,
+                  physics: NeverScrollableScrollPhysics(),
+                  children: Globals().router.getContent(),
+                )),
+               
               ],
             ),
             bottomNavigationBar: Container(

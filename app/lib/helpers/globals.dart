@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:threebotlogin/helpers/hex_color.dart';
+import 'package:threebotlogin/helpers/vpn_state.dart';
 import 'package:threebotlogin/jrouter.dart';
 
 class Globals {
@@ -20,6 +21,7 @@ class Globals {
   int lockedSmsUntill = 0;
   int loginTimeout = 120;
 
+  VpnState vpnState = new VpnState();
   static final Globals _singleton = new Globals._internal();
 
   factory Globals() {

@@ -23,9 +23,9 @@ class _ChatbotState extends State<ChatbotWidget>
 
   _ChatbotState({this.email}) {
     iaWebview = InAppWebView(
-      initialUrl: '${config.url()}$email&cache_buster=' +
-          new DateTime.now().millisecondsSinceEpoch.toString(),
-      initialHeaders: {},
+      initialUrlRequest: URLRequest(url:Uri.parse('${config.url()}$email&cache_buster=' +
+          new DateTime.now().millisecondsSinceEpoch.toString())),
+
       initialOptions: InAppWebViewGroupOptions(
           crossPlatform: InAppWebViewOptions(useShouldOverrideUrlLoading: true),
           android: AndroidInAppWebViewOptions(supportMultipleWindows: true)),
@@ -33,18 +33,17 @@ class _ChatbotState extends State<ChatbotWidget>
         webView = controller;
       },
       onCreateWindow:
-          (InAppWebViewController controller, CreateWindowRequest req) {
-        inAppBrowser.openUrl(url: req.url, options: InAppBrowserClassOptions());
+           (InAppWebViewController controller, CreateWindowAction req) {
+
+        inAppBrowser.openUrlRequest(urlRequest: req.request, options: InAppBrowserClassOptions());
 
       },
       onConsoleMessage:
           (InAppWebViewController controller, ConsoleMessage consoleMessage) {
         print("CB console: " + consoleMessage.message);
       },
-      onLoadStart: (InAppWebViewController controller, String url) {},
-      onLoadStop: (InAppWebViewController controller, String url) async {
-       // await addClipboardHack(controller);
-      },
+      onLoadStart: (InAppWebViewController controller, Uri url) {},
+      onLoadStop: (InAppWebViewController controller, Uri url) async {},
       onProgressChanged: (InAppWebViewController controller, int progress) {},
     );
   }

@@ -20,15 +20,16 @@ class WalletWidget extends StatefulWidget {
 class _WalletState extends State<WalletWidget>
     with AutomaticKeepAliveClientMixin {
   InAppWebViewController webView;
-  String url = "";
+
   double progress = 0;
   var config = WalletConfig();
   InAppWebView iaWebView;
 
   _back(WalletBackEvent event) async {
-    String url = await webView.getUrl();
+    Uri url = await webView.getUrl();
+    print(url.toString());
     String endsWith = config.appId() + '/';
-    if (url.endsWith(endsWith)) {
+    if (url.toString().endsWith(endsWith)) {
       Events().emit(GoHomeEvent());
       return;
     }
@@ -37,11 +38,11 @@ class _WalletState extends State<WalletWidget>
 
   _WalletState() {
     iaWebView = InAppWebView(
-      initialUrl: 'https://${config.appId()}/init?cache_buster=' +
-          new DateTime.now().millisecondsSinceEpoch.toString(),
-      initialHeaders: {},
+      initialUrlRequest: URLRequest(
+          url: Uri.parse('https://${config.appId()}/init?cache_buster=' +
+              new DateTime.now().millisecondsSinceEpoch.toString())),
       initialOptions: InAppWebViewGroupOptions(
-          crossPlatform: InAppWebViewOptions(debuggingEnabled: true),
+          crossPlatform: InAppWebViewOptions(),
           android: AndroidInAppWebViewOptions(
               supportMultipleWindows: true, thirdPartyCookiesEnabled: true),
           ios: IOSInAppWebViewOptions()),
@@ -50,10 +51,10 @@ class _WalletState extends State<WalletWidget>
         this.addHandler();
       },
       onCreateWindow:
-          (InAppWebViewController controller, CreateWindowRequest req) {},
-      onLoadStop: (InAppWebViewController controller, String url) async {
+          (InAppWebViewController controller, CreateWindowAction req) {},
+      onLoadStop: (InAppWebViewController controller, Uri url) async {
         addClipboardHandlersOnly(controller);
-        if (url.contains('/init')) {
+        if (url.toString().contains('/init')) {
           initKeys();
         }
       },
