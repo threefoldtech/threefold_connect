@@ -11,7 +11,8 @@ logger.setLevel(level=logging.DEBUG)
 
 handler = logging.StreamHandler()
 
-formatter = logging.Formatter("[%(asctime)s][%(filename)s:%(lineno)s - %(funcName)s()]: %(message)s", "%Y-%m-%d %H:%M:%S")
+formatter = logging.Formatter("[%(asctime)s][%(filename)s:%(lineno)s - %(funcName)s()]: %(message)s",
+                              "%Y-%m-%d %H:%M:%S")
 handler.setFormatter(formatter)
 
 logger.addHandler(handler)
@@ -21,11 +22,14 @@ config.read('config.ini')
 
 base_api_url = config['DEFAULT']['BASE_API_URL']
 
+
 def convert_base64_to_hex(data):
     return base64.b64decode(data).hex()
 
+
 def convert_hex_to_base64(data):
     return codecs.encode(codecs.decode(data, 'hex'), 'base64').decode().rstrip()
+
 
 def create_user(double_name, email, public_key):
     public_key = convert_base64_to_hex(public_key)
@@ -55,6 +59,7 @@ def create_user(double_name, email, public_key):
 
     return response.json()
 
+
 # 0            1    2      3           4
 # double_name, sid, email, public_key, device_id
 def get_user_by_double_name(double_name):
@@ -77,7 +82,6 @@ def get_user_by_double_name(double_name):
 
     response[0]['pubkey'] = convert_hex_to_base64(response[0]['pubkey'])
     return response[0]
-
 
 # print(get_user_by_double_name("zaibon.3bot"))
 # print(insert_user("test_jimber_006.3bot", "test006@jimber.org", "fr7P6X1GwWnvRl6ZaOqd4UqVElGyLtzPHPSwCR36y6g="))
