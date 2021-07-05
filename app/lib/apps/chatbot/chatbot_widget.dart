@@ -3,6 +3,7 @@ import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:threebotlogin/apps/chatbot/chatbot_config.dart';
 import 'package:threebotlogin/browser.dart';
 import 'package:threebotlogin/clipboard_hack/clipboard_hack.dart';
+import 'package:threebotlogin/widgets/layout_drawer.dart';
 
 class ChatbotWidget extends StatefulWidget {
   final String email;
@@ -61,13 +62,13 @@ class _ChatbotState extends State<ChatbotWidget>
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    return Column(
+    return LayoutDrawer(titleText: 'Support', content: Column(
       children: <Widget>[
         Expanded(
           child: Container(child: iaWebview),
         ),
       ],
-    );
+    ));
   }
 
   @override
