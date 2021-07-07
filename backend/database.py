@@ -4,6 +4,8 @@ import sqlite3
 from functools import cmp_to_key
 from sqlite3 import Error
 
+from services.digitaltwin import activate_digitaltwin
+
 sql_create_user_table = """
     CREATE TABLE IF NOT EXISTS users (
         double_name text NOT NULL,
@@ -168,10 +170,35 @@ def activate_payment_request(hash, closing_transaction_hash):
     except Error as e:
         logger.debug(e)
 
+def insert_valid_reservations():
+    #TODO: SPLIT THIS UP
+    insert_valid_reservations = """ select key, payment_requests.request_by from `productkeys`  
+      inner join payment_requests on productkeys.payment_request_id = payment_requests.id
+    where  `productkeys`.`status` = 1 and productkeys.activated_directly = 1
+        and `productkeys`.`payment_request_id` in (
+            select id from payment_requests where status = 1
+        ) 
+        and `productkeys`.key NOT IN (select product_key_id from digitaltwin_reservations)
+        """
 
-def insert_productkey(key, payment_request_id):
+    try:
+        c = conn.cursor()
+        c.execute(insert_valid_reservations)
+        records = c.fetchall()
+
+        for row in records:
+            product_key = row[0]
+            doublename = row[1]
+
+            activate_digitaltwin(doublename, product_key)
+
+    except Error as e:
+        logger.debug(e)
+
+def insert_productkey(key, payment_request_id, activated_directly):
     insert_sql = """
-    INSERT INTO `productkeys` (key,payment_request_id) VALUES (
+    INSERT INTO `productkeys` (key,payment_request_id, activated_directly) VALUES (
+        ?,
         ?,
         ?
     ); 
@@ -181,7 +208,7 @@ def insert_productkey(key, payment_request_id):
         logger.info("Inserting productkey")
         c = conn.cursor()
         c.execute(
-                insert_sql, (key, payment_request_id)
+                insert_sql, (key, payment_request_id, activated_directly)
         )
         conn.commit()
     except Error as e:
@@ -291,7 +318,7 @@ def get_payment_request_by_doublename(doublename):
     SELECT `productkeys`.* 
     FROM `productkeys` 
     INNER JOIN `payment_requests` ON `productkeys`.`payment_request_id` = `payment_requests`.`id`
-    WHERE `payment_requests`.`request_by` = ?
+    WHERE `payment_requests`.`request_by` = ? and productkeys.status = 1
     ;
     """
 
@@ -350,6 +377,34 @@ def is_reservation_active(double_name):
         logger.debug(e)
 
 
+def get_reservation_details(double_name):
+    find_statement = """
+        SELECT product_key_id, double_name
+        FROM digitaltwin_reservations 
+        WHERE 
+            double_name = ? 
+        """
+
+    try:
+        cursor = conn.cursor()
+        cursor.execute(find_statement, (double_name,))
+        reservation_response = cursor.fetchone()
+
+        if reservation_response == None or len(reservation_response) == 0:
+            return { 'details': None}
+
+        return {
+            'details':
+            {
+                'key': reservation_response[0],
+                'double_name': reservation_response[1]
+            }
+        }
+
+    except Error as e:
+        logger.debug(e)
+
+
 def activate_reservation_by_hash(hash, transaction_hash):
     update_statement = """
     UPDATE reservations SET 
@@ -373,6 +428,15 @@ def activate_reservation_by_hash(hash, transaction_hash):
 
 
 def activate_productkeys():
+    get_productkeys = """ select key from productkeys"""
+
+    cursor = conn.cursor()
+    cursor.execute(get_productkeys)
+
+    items = cursor.fetchall()
+
+    if(len(items) == 0): return
+
     update_statement = """
     update `productkeys`
         set    `status` = 1
@@ -387,9 +451,28 @@ def activate_productkeys():
 
     try:
         conn.commit()
+
     except Error:
         pass
 
+
+def activate_personal_keys():
+    update_statement = """
+    update `productkeys`
+        set    `status` = 2
+    where  `productkeys`.`activated_directly` = 1
+        and `productkeys`.`payment_request_id` in (
+            select id from payment_requests where status = 1
+        )
+    """
+    cursor = conn.cursor()
+    cursor.execute(update_statement)
+
+    try:
+        conn.commit()
+
+    except Error:
+        pass
 
 def use_productkey(key):
     update_statement = """

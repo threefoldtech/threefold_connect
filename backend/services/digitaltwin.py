@@ -20,7 +20,10 @@ def activate_digitaltwin(doublename, key):
     if not productkey.get('status') == 1: return False
 
     dt = has_digitaltwin(key)
-    if not dt: return False
+
+    #TODO: STILL CHECK THIS
+    if dt: return False
+    # if not dt: return False
 
     db.insert_reservation(doublename, key)
     use_productkey(key)
@@ -29,3 +32,6 @@ def activate_digitaltwin(doublename, key):
 
 def has_digitaltwin(doublename):
     return db.is_reservation_active(doublename)
+
+def insert_valid_reservations():
+    return db.insert_valid_reservations()
