@@ -11,16 +11,18 @@ logger.setLevel(level=logging.DEBUG)
 
 handler = logging.StreamHandler()
 
-formatter = logging.Formatter("[%(asctime)s][%(filename)s:%(lineno)s - %(funcName)s()]: %(message)s",
-                              "%Y-%m-%d %H:%M:%S")
+formatter = logging.Formatter(
+    "[%(asctime)s][%(filename)s:%(lineno)s - %(funcName)s()]: %(message)s",
+    "%Y-%m-%d %H:%M:%S",
+)
 handler.setFormatter(formatter)
 
 logger.addHandler(handler)
 
 config = configparser.ConfigParser()
-config.read('config.ini')
+config.read("config.ini")
 
-base_api_url = config['DEFAULT']['BASE_API_URL']
+base_api_url = config["DEFAULT"]["BASE_API_URL"]
 
 
 def convert_base64_to_hex(data):
@@ -28,7 +30,7 @@ def convert_base64_to_hex(data):
 
 
 def convert_hex_to_base64(data):
-    return codecs.encode(codecs.decode(data, 'hex'), 'base64').decode().rstrip()
+    return codecs.encode(codecs.decode(data, "hex"), "base64").decode().rstrip()
 
 
 def create_user(double_name, email, public_key):
@@ -44,7 +46,7 @@ def create_user(double_name, email, public_key):
         "pubkey": public_key,
         "host": "",
         "description": "",
-        "signature": ""
+        "signature": "",
     }
 
     logger.info("Data: %s", json.dumps(user))
@@ -75,13 +77,16 @@ def get_user_by_double_name(double_name):
 
     response = response.json()
     if not len(response) == 1:
-        logger.error("Did not expect more or less then one object in the array: %s", response)
+        logger.error(
+            "Did not expect more or less then one object in the array: %s", response
+        )
         return None
 
     logger.info("Response: %s", json.dumps(response))
 
-    response[0]['pubkey'] = convert_hex_to_base64(response[0]['pubkey'])
+    response[0]["pubkey"] = convert_hex_to_base64(response[0]["pubkey"])
     return response[0]
+
 
 # print(get_user_by_double_name("zaibon.3bot"))
 # print(insert_user("test_jimber_006.3bot", "test006@jimber.org", "fr7P6X1GwWnvRl6ZaOqd4UqVElGyLtzPHPSwCR36y6g="))
