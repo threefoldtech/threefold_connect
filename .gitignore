@@ -345,3 +345,6 @@ backend/services/__pycache__/logger.cpython-39.pyc
 backend/services/__pycache__/payment.cpython-39.pyc
 backend/services/__pycache__/productkeys.cpython-39.pyc
 backend/services/__pycache__/socket.cpython-39.pyc
+
+*.pyc
+.vscode

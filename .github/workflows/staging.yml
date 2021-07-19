@@ -1,0 +1,33 @@
+name: staging
+
+on:
+  push:
+    tags:
+      - "v[0-9]+.[0-9]+.[0-9]+-rc[0-9]+"
+jobs:
+  build:
+    runs-on: self-hosted
+    steps:
+      - uses: actions/checkout@v2
+      - uses: satackey/action-docker-layer-caching@v0.0.11
+        continue-on-error: true
+      - name: Login to docker hub
+        run: docker login --username ${{ secrets.DOCKER_USERNAME }} --password ${{ secrets.DOCKER_TOKEN }}
+      - name: Set config
+        run: mv frontend/public/config.prod.js frontend/public/config.js && mv example/public/config.staging.js example/public/config.js
+      - name: Build the Docker image
+        run: docker build . --file Dockerfile --tag jimber/3botlogin:staging-:${{ github.sha }}
+      - name: Push the Docker image
+        run: docker push jimber/3botlogin:staging-:${{ github.sha }}
+  deploy:
+    needs: build
+    runs-on: misc
+    steps:
+      - name: Login to docker hub
+        run: docker login --username ${{ secrets.DOCKER_USERNAME }} --password ${{ secrets.DOCKER_TOKEN }}
+      - name: kill old docker
+        run: docker rm -f jimber_authenticator || true
+      - name: Pull Image
+        run: docker pull jimber/3botlogin:staging-:${{ github.sha }}
+      - name: Run new docker
+        run: docker run -d -it --restart=unless-stopped --name jimber_authenticator -v /opt/authenticator/db/pythonsqlite.db:/usr/share/nginx/backend/pythonsqlite.db -v /opt/authenticator/config.ini:/usr/share/nginx/backend/config.ini --network=proxy registry.gitlab.com/jimber/authenticator:${{ github.sha }}
