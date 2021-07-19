@@ -30,4 +30,4 @@ jobs:
       - name: Pull Image
         run: docker pull jimber/3botlogin:staging-${{ github.sha }}
       - name: Run new docker
-        run: docker run -d -it --restart=unless-stopped --name jimber_authenticator -v /opt/authenticator/db/pythonsqlite.db:/usr/share/nginx/backend/pythonsqlite.db -v /opt/authenticator/config.ini:/usr/share/nginx/backend/config.ini --network=proxy registry.gitlab.com/jimber/authenticator:${{ github.sha }}
+        run: docker run -d -it --restart=unless-stopped --name jimber_authenticator -v /opt/authenticator/db/pythonsqlite.db:/usr/share/nginx/backend/pythonsqlite.db -v /opt/authenticator/config.ini:/usr/share/nginx/backend/config.ini --network=proxy jimber/3botlogin:staging-${{ github.sha }}
