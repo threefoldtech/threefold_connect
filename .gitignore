@@ -131,6 +131,10 @@ backend/__pycache__/
 backend/*.py[cod]
 backend/*$py.class
 
+
+# Pyc files
+*.pyc
+
 # C extensions
 backend/*.so
 
