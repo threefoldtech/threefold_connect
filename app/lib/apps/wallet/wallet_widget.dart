@@ -7,8 +7,11 @@ import 'package:threebotlogin/apps/wallet/wallet_user_data.dart';
 import 'package:threebotlogin/clipboard_hack/clipboard_hack.dart';
 import 'package:threebotlogin/events/events.dart';
 import 'package:threebotlogin/events/go_home_event.dart';
+import 'package:threebotlogin/helpers/globals.dart';
 import 'package:threebotlogin/screens/scan_screen.dart';
+import 'package:threebotlogin/services/3bot_service.dart';
 import 'package:threebotlogin/services/user_service.dart';
+import 'package:threebotlogin/widgets/layout_drawer.dart';
 
 bool created = false;
 
@@ -89,6 +92,18 @@ class _WalletState extends State<WalletWidget>
     var jsStartApp =
         "window.vueInstance.startWallet('$doubleName', '$seed', '$importedWallets', '$appWallets');";
 
+
+    if (Globals().paymentRequest != null) {
+      String paymentRequestString = Globals().paymentRequest.toString();
+
+      print('PAYMENTREQUEST');
+      print(paymentRequestString);
+
+      Globals().paymentRequest = null;
+      jsStartApp =
+      "window.vueInstance.startWallet('$doubleName', '$seed', '$importedWallets', '$appWallets', $paymentRequestString);";
+    }
+
     webView.evaluateJavascript(source: jsStartApp);
   }
 
@@ -97,7 +112,7 @@ class _WalletState extends State<WalletWidget>
 
     // QRCode scanner is black if we don't sleep here.
     bool slept =
-        await Future.delayed(const Duration(milliseconds: 400), () => true);
+    await Future.delayed(const Duration(milliseconds: 400), () => true);
 
     String result;
     if (slept) {
@@ -121,15 +136,15 @@ class _WalletState extends State<WalletWidget>
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    return Column(
+    return LayoutDrawer(titleText: 'Wallet', content: Column(
       children: <Widget>[
         Expanded(
           child: Container(child: iaWebView),
         ),
       ],
-    );
+    ));
   }
 
   @override
-  bool get wantKeepAlive => true;
+  bool get wantKeepAlive => false;
 }
