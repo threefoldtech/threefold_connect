@@ -1,4 +1,4 @@
-package org.jimber.threebotlogin
+package org.jimber.threebotlogin.production
 
 import io.flutter.embedding.android.FlutterActivity;
 
