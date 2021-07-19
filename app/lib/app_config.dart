@@ -92,7 +92,7 @@ class AppConfigStaging extends AppConfigImpl {
   }
 
   String threeBotApiUrl() {
-    return "http://192.168.2.174:5000/api";
+    return "https://login.staging.jimber.org/api";
   }
 
   String threeBotFrontEndUrl() {
@@ -104,7 +104,7 @@ class AppConfigStaging extends AppConfigImpl {
   }
 
   String wizardUrl() {
-    return 'https://wizard.jimber.org/';
+    return 'https://wizard.staging.jimber.org/';
   }
 }
 
