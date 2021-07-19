@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:threebotlogin/app.dart';
 import 'package:threebotlogin/apps/chatbot/chatbot.dart';
 import 'package:threebotlogin/apps/wallet/wallet.dart';
+import 'package:threebotlogin/screens/planetary_network_screen.dart';
 import 'package:threebotlogin/screens/preference_screen.dart';
 import 'package:threebotlogin/screens/registered_screen.dart';
 import 'package:threebotlogin/screens/reservation_screen.dart';
@@ -54,18 +55,26 @@ class JRouter {
           app: Chatbot()),
       AppInfo(
           route: Route(
-            path: '/settings',
-            name: 'Settings',
-            icon: Icons.settings,
-            view: PreferenceScreen(),
-          ),
-          app: null),
-      AppInfo(
-          route: Route(
             path: '/reservations',
             name: 'Reservations',
             icon: Icons.book_online,
             view: ReservationScreen(),
+          ),
+          app: null),
+      AppInfo(
+          route: Route(
+            path: '/planetary',
+            name: 'Planetary Network',
+            icon: Icons.network_check,
+            view: PlanetaryNetworkScreen(),
+          ),
+          app: null),
+      AppInfo(
+          route: Route(
+            path: '/settings',
+            name: 'Settings',
+            icon: Icons.settings,
+            view: PreferenceScreen(),
           ),
           app: null),
     ];

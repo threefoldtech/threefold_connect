@@ -7,9 +7,9 @@ from stellar_sdk.client.simple_requests_client import SimpleRequestsClient
 
 import database as db
 from services.crypt import verify_signed_data
-from services.digitaltwin import activate_digitaltwin
+from services.digitaltwin import activate_digitaltwin, insert_valid_reservations
 from services.payment import check_blockchain
-from services.productkeys import get_productkey_for_name, init_productkey, activate_productkeys
+from services.productkeys import get_productkey_for_name, activate_productkeys, activate_personal_keys, init_productkey
 
 last_payment_checked_cursor = None
 
@@ -23,6 +23,8 @@ def before_request():
     check_blockchain()
     activate_productkeys()
 
+    #Activates product keys with parameter activated_directly on True
+    insert_valid_reservations()
 
 @api_digitaltwin.route("/productkey", methods=["put"])
 def reserve_productkey_handler():
@@ -35,8 +37,9 @@ def reserve_productkey_handler():
 
     data = json.loads(encoded_data.decode("utf-8"))
     reservation_by = data.get("doubleName")
+    activated_directly = data.get("activated_directly")
 
-    payment_request = init_productkey(reservation_by)
+    payment_request = init_productkey(reservation_by, activated_directly)
 
     response = Response(
             response=json.dumps(
@@ -49,20 +52,9 @@ def reserve_productkey_handler():
     return response
 
 
-@api_digitaltwin.route("/productkey", methods=["get"])
-def status_productkey_handler():
-    config.read("config.ini")
-    body = request.get_json()
-
-    encoded_data = verify_signed_data(body.get('doubleName'), body.get('data'))
-
-    if not encoded_data: return
-
-    data = json.loads(encoded_data.decode("utf-8"))
-    double_name = data.get("doubleName")
-
+@api_digitaltwin.route("/productkey/<double_name>", methods=["get"])
+def status_productkey_handler(double_name):
     productkeys = get_productkey_for_name(double_name)
-
     response = Response(
             response=json.dumps(
                     {
@@ -104,5 +96,14 @@ def check_reserve_handler(double_name):
 
     return Response(
             response=json.dumps({"active": bool(reservation_by)}),
+            mimetype="application/json"
+    )
+
+@api_digitaltwin.route("/reservation_details/<double_name>", methods=["get"])
+def get_reservation_details(double_name):
+    reservation_by = db.get_reservation_details(double_name)
+
+    return Response(
+            response=json.dumps(reservation_by),
             mimetype="application/json"
     )

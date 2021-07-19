@@ -11,8 +11,9 @@ CREATE TABLE `productkeys` (
         `id` INTEGER PRIMARY KEY AUTOINCREMENT,
         `key` varchar(100) NOT NULL,
         `payment_request_id` integer NOT NULL,
-        `status` integer  NOT NULL default 0
+        `status` integer  NOT NULL default 0,
+        `activated_directly` boolean default false
     )
 """
 
-create_table( sql_create_table)
+create_table(sql_create_table)

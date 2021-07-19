@@ -5,6 +5,7 @@ import 'package:threebotlogin/apps/news/news_events.dart';
 import 'package:threebotlogin/clipboard_hack/clipboard_hack.dart';
 import 'package:threebotlogin/events/events.dart';
 import 'package:threebotlogin/events/go_home_event.dart';
+import 'package:threebotlogin/widgets/layout_drawer.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 bool created = false;
@@ -77,13 +78,14 @@ class _NewsState extends State<NewsWidget>
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    return Column(
+    return LayoutDrawer(titleText: 'News', content:
+    Column(
       children: <Widget>[
         Expanded(
           child: Container(child: iaWebView),
         ),
       ],
-    );
+    ));
   }
 
   @override
