@@ -9,7 +9,7 @@ from routes.digitaltwin import api_digitaltwin
 from routes.payment import api_payment
 from routes.misc import api_misc
 from routes.users import api_users
-from services.payment import check_blockchain
+# from services.payment import check_blockchain
 from services.socket import sio
 
 conn = db.create_connection("pythonsqlite.db")
@@ -28,7 +28,7 @@ logging.getLogger("werkzeug").setLevel(level=logging.ERROR)
 logging.getLogger("socketio").setLevel(level=logging.ERROR)
 logging.getLogger("engineio").setLevel(level=logging.ERROR)
 
-check_blockchain()
+# check_blockchain()
 
 if __name__ == "__main__":
     sio.init_app(app)
