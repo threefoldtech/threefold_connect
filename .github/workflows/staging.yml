@@ -12,7 +12,7 @@ jobs:
       - name: Login to docker hub
         run: docker login --username ${{ secrets.DOCKER_USERNAME }} --password ${{ secrets.DOCKER_TOKEN }}
       - name: Set config
-        run: mv frontend/public/config.prod.js frontend/public/config.js && mv example/public/config.staging.js example/public/config.js
+        run: mv frontend/public/config.staging.js frontend/public/config.js && mv example/public/config.staging.js example/public/config.js
       - name: Build the Docker image
         run: docker build . --file Dockerfile --tag jimber/3botlogin:staging-${{ github.sha }}
       - name: Push the Docker image
