@@ -29,7 +29,8 @@ logging.getLogger("socketio").setLevel(level=logging.ERROR)
 logging.getLogger("engineio").setLevel(level=logging.ERROR)
 
 # check_blockchain()
+sio.init_app(app)
 
 if __name__ == "__main__":
-    sio.init_app(app)
+    
     sio.run(app, host="0.0.0.0", port=5000)
