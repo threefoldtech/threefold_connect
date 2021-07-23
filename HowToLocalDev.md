@@ -10,7 +10,7 @@
 export default {
   botFrontEnd: "http://192.168.1.2:8080",
   botBackend: "http://192.168.1.2:5000",
-  kycBackend: "http://openkyc.staging.jimber.org",
+  kycBackend: "https://openkyc.staging.jimber.org",
   redirect_url: `/callback`,
   appId: window.location.host,
   seedPhrase:
