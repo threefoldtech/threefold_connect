@@ -9,6 +9,7 @@ from routes.digitaltwin import api_digitaltwin
 from routes.payment import api_payment
 from routes.misc import api_misc
 from routes.users import api_users
+
 # from services.payment import check_blockchain
 from services.socket import sio
 
@@ -29,8 +30,8 @@ logging.getLogger("socketio").setLevel(level=logging.ERROR)
 logging.getLogger("engineio").setLevel(level=logging.ERROR)
 
 # check_blockchain()
-sio.init_app(app)
+sio.init_app(app, cors_allowed_origins="*")
 
 if __name__ == "__main__":
-    
+
     sio.run(app, host="0.0.0.0", port=5000)
