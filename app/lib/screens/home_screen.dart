@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 import 'package:flutter/widgets.dart';
 import 'package:flutter_svg/svg.dart';
+
 //import 'package:threebotlogin/apps/free_flow_pages/ffp.dart';
 //import 'package:threebotlogin/apps/free_flow_pages/ffp_events.dart';
 import 'package:threebotlogin/events/email_event.dart';
@@ -25,7 +26,6 @@ import 'package:threebotlogin/services/uni_link_service.dart';
 import 'package:threebotlogin/services/user_service.dart';
 import 'package:threebotlogin/widgets/email_verification_needed.dart';
 import 'package:uni_links/uni_links.dart';
-
 
 /* Screen shows tabbar and all pages defined in router.dart */
 class HomeScreen extends StatefulWidget {
@@ -94,6 +94,18 @@ class _HomeScreenState extends State<HomeScreen>
         globals.tabController.animateTo(globals.tabController.previousIndex);
         await emailVerificationDialog(context);
       }
+
+      if (globals.tabController.index != 2 &&
+          Globals().paymentRequest != null) {
+        Globals().paymentRequest = null;
+        Globals().paymentRequestIsUsed = false;
+      }
+
+      if (globals.tabController.previousIndex == 2 &&
+          Globals().paymentRequest != null &&
+          Globals().paymentRequestIsUsed == true) {
+        Globals().paymentRequest = null;
+      }
     }
   }
 
@@ -109,7 +121,6 @@ class _HomeScreenState extends State<HomeScreen>
     int homeTab = 0; //@todo can we do some indexoff on routes
     globals.tabController.animateTo(homeTab);
   }
-
 
   @override
   void initState() {
@@ -138,7 +149,8 @@ class _HomeScreenState extends State<HomeScreen>
       globals.tabController.animateTo(4, duration: Duration(seconds: 0));
     });
 
-    Events().onEvent(GoReservationsEvent().runtimeType, (GoReservationsEvent event) {
+    Events().onEvent(GoReservationsEvent().runtimeType,
+        (GoReservationsEvent event) {
       globals.tabController.animateTo(5, duration: Duration(seconds: 0));
     });
 
@@ -154,7 +166,6 @@ class _HomeScreenState extends State<HomeScreen>
     });
 
     WidgetsBinding.instance.addObserver(this);
-
   }
 
   @override
@@ -233,7 +244,6 @@ class _HomeScreenState extends State<HomeScreen>
                   physics: NeverScrollableScrollPhysics(),
                   children: Globals().router.getContent(),
                 )),
-
               ],
             ),
             // bottomNavigationBar: Container(

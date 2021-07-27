@@ -99,11 +99,10 @@ class _WalletState extends State<WalletWidget>
       print('PAYMENTREQUEST');
       print(paymentRequestString);
 
-      Globals().paymentRequest = null;
+      Globals().paymentRequestIsUsed = true;
       jsStartApp =
       "window.vueInstance.startWallet('$doubleName', '$seed', '$importedWallets', '$appWallets', $paymentRequestString);";
     }
-
     webView.evaluateJavascript(source: jsStartApp);
   }
 

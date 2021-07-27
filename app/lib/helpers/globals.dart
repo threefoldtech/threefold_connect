@@ -41,6 +41,7 @@ class Globals {
   int lockedSmsUntill = 0;
   int loginTimeout = 120;
   PaymentRequest paymentRequest;
+  bool paymentRequestIsUsed = false;
 
   VpnState vpnState = new VpnState();
   static final Globals _singleton = new Globals._internal();
