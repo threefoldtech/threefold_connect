@@ -33,6 +33,7 @@ class _LayoutDrawerState extends State<LayoutDrawer> {
         title: Text(widget.titleText),
         backgroundColor: Theme.of(context).primaryColor,
         iconTheme: IconThemeData(color: Colors.white),
+        toolbarHeight: 60,
       ),
       body: widget.content,
       drawer: Drawer(
@@ -46,11 +47,11 @@ class _LayoutDrawerState extends State<LayoutDrawer> {
               width: 200,
               height: 100,
               child: Padding(
-                padding: const EdgeInsets.all(10),
+                padding: const EdgeInsets.all(20),
                 child: DrawerHeader(
                     decoration: BoxDecoration(
                       image: new DecorationImage(
-                        alignment: Alignment.bottomCenter,
+                        alignment: Alignment.center,
                         image: AssetImage("assets/logo.png"),
                         fit: BoxFit.contain,
                       ),
@@ -60,9 +61,11 @@ class _LayoutDrawerState extends State<LayoutDrawer> {
               ),
             ),
             ListTile(
+              minLeadingWidth : 10,
               leading: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
+                  Padding(padding: const EdgeInsets.only(left: 30)),
                   Icon(Icons.home, color: Colors.black, size: 18)
                 ],
               ),
@@ -73,9 +76,11 @@ class _LayoutDrawerState extends State<LayoutDrawer> {
               },
             ),
             ListTile(
+              minLeadingWidth : 10,
               leading: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
+                  Padding(padding: const EdgeInsets.only(left: 30)),
                   Icon(Icons.article, color: Colors.black, size: 18)
                 ],
               ),
@@ -86,9 +91,11 @@ class _LayoutDrawerState extends State<LayoutDrawer> {
               },
             ),
             ListTile(
+              minLeadingWidth : 10,
               leading: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
+                  Padding(padding: const EdgeInsets.only(left: 30)),
                   Icon(Icons.account_balance_wallet, color: Colors.black, size: 18)
                 ],
               ),
@@ -99,9 +106,11 @@ class _LayoutDrawerState extends State<LayoutDrawer> {
               },
             ),
             ListTile(
+              minLeadingWidth : 10,
               leading: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
+                  Padding(padding: const EdgeInsets.only(left: 30)),
                   Icon(Icons.chat, color: Colors.black, size: 18)
                 ],
               ),
@@ -112,22 +121,26 @@ class _LayoutDrawerState extends State<LayoutDrawer> {
               },
             ),
             ListTile(
+              minLeadingWidth : 10,
               leading: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
+                  Padding(padding: const EdgeInsets.only(left: 30)),
                   Icon(Icons.book_online, color: Colors.black, size: 18)
                 ],
               ),
-              title: Text('Reserve DigitalTwin'),
+              title: Text('Reserve Digital Twin'),
               onTap: () {
                 Navigator.pop(context);
                 globals.tabController.animateTo(4);
               },
             ),
             ListTile(
+              minLeadingWidth : 10,
               leading: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
+                  Padding(padding: const EdgeInsets.only(left: 30)),
                   Icon(Icons.network_check, color: Colors.black, size: 18)
                 ],
               ),
@@ -138,9 +151,11 @@ class _LayoutDrawerState extends State<LayoutDrawer> {
               },
             ),
             ListTile(
+              minLeadingWidth : 10,
               leading: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
+                    Padding(padding: const EdgeInsets.only(left: 30)),
                     Icon(Icons.settings, color: Colors.black, size: 18)
                   ],
               ),

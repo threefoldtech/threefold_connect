@@ -63,7 +63,7 @@ class WalletConfigTesting extends WalletConfigImpls {
 
 class WalletConfigLocal extends WalletConfigImpls {
   String appId() {
-    return 'localhost:8080';
+    return 'wallet.staging.jimber.org';
   }
 
   String redirectUrl() {

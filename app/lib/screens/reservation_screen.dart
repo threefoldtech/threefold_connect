@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
@@ -14,6 +15,7 @@ import 'package:threebotlogin/services/3bot_service.dart';
 import 'package:threebotlogin/services/user_service.dart';
 import 'package:threebotlogin/widgets/custom_dialog.dart';
 import 'package:threebotlogin/widgets/layout_drawer.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class ReservationScreen extends StatefulWidget {
   ReservationScreen({Key key}) : super(key: key);
@@ -28,7 +30,7 @@ class _ReservationScreenState extends State<ReservationScreen> {
   Map<String, Object> _productKeys;
   TextEditingController productKeyController = TextEditingController();
   bool _isValid = false;
-  bool _layoutValid = true;
+  bool _layoutInputValid = true;
   bool _isDigitalTwinActive = true;
 
   Future _getReservationDetails() async {
@@ -52,7 +54,6 @@ class _ReservationScreenState extends State<ReservationScreen> {
   }
 
   Future _checkReservations() async {
-    print('LADEN');
     if (doubleName.isEmpty) {
       String value = await getDoubleName();
       doubleName = value;
@@ -68,7 +69,6 @@ class _ReservationScreenState extends State<ReservationScreen> {
     }
 
     Response reservationsResult = await getReservations(doubleName);
-    print('RESULTAAT');
     print(reservationsResult);
     if (_isLoading) {
       Navigator.pop(context); // Remove loading screen
@@ -101,7 +101,6 @@ class _ReservationScreenState extends State<ReservationScreen> {
 
     if (productKeys == null) {
       // There are no product keys available
-      print("There are no product keys available");
       return;
     }
 
@@ -115,7 +114,6 @@ class _ReservationScreenState extends State<ReservationScreen> {
     if (!isValid) {
       // Double check to be sure the key is valid
       // For some reason, the given product key is not valid
-      print('Given product key is not valid');
       return;
     }
 
@@ -124,6 +122,11 @@ class _ReservationScreenState extends State<ReservationScreen> {
     _successDialog();
 
     productKeyController.text = '';
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
   }
 
   @override
@@ -182,8 +185,33 @@ class _ReservationScreenState extends State<ReservationScreen> {
       title: 'Reserve your digital twin for life',
       body: Column(
         children: [
-          Text(
-              'With Digital Twin seamless experiences, grant yourself with a lifetime digital freedom and frivacy for only 1000 TFT'),
+          RichText(text: TextSpan(
+            style: new TextStyle(
+              fontSize: 14.0,
+              color: Colors.black,
+            ),
+            children:  <TextSpan>[
+              TextSpan(text: 'With Digital Twin seamless experiences, grant yourself with a lifetime digital freedom and privacy for only 1000 TFT. \n \n',),
+              TextSpan(text: 'Visit '),
+              TextSpan(
+                style: new TextStyle(
+                  color: Theme.of(context).primaryColor,
+                ),
+                text: 'Digital Twin website',
+                recognizer: TapGestureRecognizer()
+                  ..onTap = () async {
+                    final url = 'https://mydigitaltwin.io/';
+                    if (await canLaunch(url)) {
+                      await launch(
+                        url,
+                        forceSafariVC: false,
+                      );
+                    }
+                  },
+              ),
+              TextSpan(text: ' for more info. '),
+            ],
+          )),
           SizedBox(
             height: 10,
           ),
@@ -192,7 +220,7 @@ class _ReservationScreenState extends State<ReservationScreen> {
               onPressed: () {
                 redirectToWallet(activatedDirectly: true);
               },
-              child: Text('Reserve now'),
+              child: Text('Reserve Now'),
             ),
           ]),
         ],
@@ -232,12 +260,38 @@ class _ReservationScreenState extends State<ReservationScreen> {
 
   Widget _reserveForLovedOnes() {
     return _card(
-      title: "Reserve Digital Twin for Life for your loved ones",
+      title: "Reserve Digital Twin for Life for Your Loved Ones",
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-              'Grant a Digital Twin for Life to your Loved ones for only 1000 TFT. All you need is their 3Bot ID.'),
+          RichText(text: TextSpan(
+            style: new TextStyle(
+              fontSize: 14.0,
+              color: Colors.black,
+            ),
+            children:  [
+              TextSpan(text: 'Grant a Digital Twin for Life to your loved ones for only 1000 TFT. All you need is their 3Bot ID. \n \n',),
+              TextSpan(text: 'Visit '),
+              TextSpan(
+                style: new TextStyle(
+                  color: Theme.of(context).primaryColor,
+                ),
+                text: 'Digital Twin website',
+                recognizer: TapGestureRecognizer()
+                  ..onTap = () async {
+                    final url = 'https://mydigitaltwin.io/';
+                    print(await canLaunch(url));
+                    if (await canLaunch(url)) {
+                      await launch(
+                        url,
+                        forceSafariVC: false,
+                      );
+                    }
+                  },
+              ),
+              TextSpan(text: ' for more info. '),
+            ],
+          )),
           SizedBox(
             height: 10,
           ),
@@ -249,7 +303,7 @@ class _ReservationScreenState extends State<ReservationScreen> {
                   redirectToWallet(
                       reservingFor: 'loved.3bot', activatedDirectly: false);
                 },
-                child: Text('Buy productkey'),
+                child: Text('Buy Product Key'),
               )
             ],
           ),
@@ -329,10 +383,10 @@ class _ReservationScreenState extends State<ReservationScreen> {
                             decoration: InputDecoration(
                               border: UnderlineInputBorder(),
                               labelText: 'Enter product key',
-                              errorText: _layoutValid
+                              errorText: _layoutInputValid
                                   ? ''
                                   : 'Enter a valid product key',
-                              errorBorder: _layoutValid
+                              errorBorder: _layoutInputValid
                                   ? new OutlineInputBorder(
                                       borderSide: new BorderSide(
                                           color: Colors.transparent,
@@ -346,9 +400,11 @@ class _ReservationScreenState extends State<ReservationScreen> {
                         )),
                         ElevatedButton(
                           onPressed: () {
-                            setState(() => _isValid = _checkIfProductKeyIsValid(
-                                productKeyController.text));
-                            _layoutValid = _isValid;
+                            setState(() =>
+                            _isValid = _checkIfProductKeyIsValid(productKeyController.text));
+                            _layoutInputValid = _isValid;
+
+                            print(_isValid);
                             if (!_isValid) return;
 
                             _activateProductKey(productKeyController.text);

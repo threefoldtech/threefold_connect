@@ -36,36 +36,53 @@ class _RegisteredScreenState extends State<RegisteredScreen>
      Column(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: <Widget>[
-        SizedBox(height: 10.0),
-        Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Container(
-              width: 360.0,
-              height: 108.0,
-              decoration: BoxDecoration(
-                image: DecorationImage(
-                    fit: BoxFit.fill, image: AssetImage('assets/logo.png')),
+        Container(
+          height: MediaQuery.of(context).size.height * 0.8,
+          width: MediaQuery.of(context).size.width,
+          child:  Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              Container(
+                width: 300.0,
+                height: 90.0,
+                decoration: BoxDecoration(
+                  image: DecorationImage(
+                      fit: BoxFit.fill, image: AssetImage('assets/logo.png')),
+                ),
               ),
-            ),
-            SizedBox(height: 80),
-            Container(
-              width: 200.0,
-              height: 200.0,
-              decoration: BoxDecoration(
-                image: DecorationImage(
-                    fit: BoxFit.fill,
-                    image: AssetImage('assets/threefold_registered.png')),
+              SizedBox(height: 30),
+              Container(
+                width: 200.0,
+                height: 200.0,
+                decoration: BoxDecoration(
+                  image: DecorationImage(
+                      fit: BoxFit.fill,
+                      image: AssetImage('assets/threefold_registered.png')),
+                ),
               ),
-            ),
-          ],
-        ),
-        Column(
-          children: <Widget>[
-            Column(
-              children: <Widget>[],
-            ),
-          ],
+              SizedBox(height: 30),
+              Container(
+                  width: MediaQuery.of(context).size.width / 1.75,
+                  child: RichText(
+                    textAlign: TextAlign.center,
+                    text: new TextSpan(
+                        style: new TextStyle(
+                          fontSize: 18.0,
+                          color: Colors.black,
+                        ),
+                      children: <TextSpan>[
+                        new TextSpan(text: 'Welcome to \n'),
+                        new TextSpan(text: 'ThreeFold Connect App! \n', style: new TextStyle(fontWeight: FontWeight.bold)),
+                        new TextSpan(text: 'Click on the '),
+                        new TextSpan(text: 'menu ', style: new TextStyle(fontWeight: FontWeight.bold)),
+                        new TextSpan(text: 'icon \n to get started'),
+
+                      ]
+                    ),
+                  ),
+              ),
+            ],
+          ),
         ),
       ],
     ));
