@@ -65,6 +65,13 @@ def create_table(create_table_sql):
     except Error as e:
         logger.debug(e)
 
+def update_table(update_sql):
+    try:
+        logger.info("Updating table")
+        c = conn.cursor()
+        c.executescript(update_sql)
+    except Error as e:
+        logger.debug(e)
 
 def insert_user(insert_user_sql, double_name, sid, email, public_key, device_id):
     try:
