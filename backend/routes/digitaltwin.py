@@ -9,7 +9,7 @@ import database as db
 from services.crypt import verify_signed_data
 from services.digitaltwin import activate_digitaltwin, insert_valid_reservations
 from services.payment import check_blockchain
-from services.productkeys import get_productkey_for_name, activate_productkeys, activate_personal_keys, init_productkey
+from services.productkeys import get_productkey_for_name, activate_productkeys, get_productkeys, init_productkey
 
 last_payment_checked_cursor = None
 
@@ -46,6 +46,19 @@ def reserve_productkey_handler():
                     {
                         "message": payment_request['hash'], "address": config["DIGITALTWIN_RESERVE"]["ADDRESS"],
                         "amount": float(payment_request['amount'])
+                    }),
+            mimetype="application/json"
+    )
+    return response
+
+
+@api_digitaltwin.route("/productkeys", methods=["get"])
+def get_list_productkeys():
+    productkeys = get_productkeys()
+    response = Response(
+            response=json.dumps(
+                    {
+                        "productkeys": productkeys
                     }),
             mimetype="application/json"
     )

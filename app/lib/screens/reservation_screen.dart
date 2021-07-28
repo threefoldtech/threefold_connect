@@ -28,7 +28,8 @@ class ReservationScreen extends StatefulWidget {
 class _ReservationScreenState extends State<ReservationScreen> {
   String doubleName = '';
   bool _isLoading = false;
-  Map<String, Object> _productKeys;
+
+  Map<String, Object> _allProductKeys;
 
   List _activatedProductKeys = [];
   List _unActivatedProductKeys = [];
@@ -37,6 +38,7 @@ class _ReservationScreenState extends State<ReservationScreen> {
   bool _isValid = false;
   bool _layoutInputValid = true;
   bool _isDigitalTwinActive = true;
+
 
   Future _getReservationDetails() async {
     if (doubleName.isEmpty) {
@@ -85,6 +87,10 @@ class _ReservationScreenState extends State<ReservationScreen> {
 
     _isDigitalTwinActive = jsonDecode(reservationsResult.body)['active'];
 
+    Response allProductKeysResult = await getAllProductKeys();
+    Map<String, Object> allProductKeys = jsonDecode(allProductKeysResult.body);
+    _allProductKeys = allProductKeys;
+
     if (_isLoading) {
       Navigator.pop(context); // Remove loading screen
       setState(() {
@@ -93,11 +99,11 @@ class _ReservationScreenState extends State<ReservationScreen> {
     }
   }
 
-  bool _checkIfProductKeyIsValid(String productKey) {
-    if (_productKeys.isEmpty) return false;
-    if (_productKeys['productkeys'] == null) return false;
+  Future<bool> _checkIfProductKeyIsValid(String productKey) async {
+    if (_allProductKeys.isEmpty) return false;
+    if (_allProductKeys['productkeys'] == null) return false;
 
-    for (var item in _productKeys['productkeys']) {
+    for (var item in _allProductKeys['productkeys']) {
       if (item['key'] == productKey) return true;
     }
     return false;
@@ -115,9 +121,8 @@ class _ReservationScreenState extends State<ReservationScreen> {
       return;
     }
 
-    _productKeys = productKeys;
-
     if (productKeys['productkeys'] == null) return [];
+
 
     for (var item in productKeys['productkeys']) {
       if (item['status'] == 1) {
@@ -139,18 +144,14 @@ class _ReservationScreenState extends State<ReservationScreen> {
   }
 
   _activateProductKey(String productKey) async {
-    bool isValid = _checkIfProductKeyIsValid(productKey);
+    bool isValid = await _checkIfProductKeyIsValid(productKey);
 
-    if (!isValid) {
-      // Double check to be sure the key is valid
-      // For some reason, the given product key is not valid
+    if (isValid == false) {
       return;
     }
 
     activateDigitalTwin(doubleName, productKey);
-
     _successDialog();
-
     productKeyController.text = '';
   }
 
@@ -548,13 +549,12 @@ class _ReservationScreenState extends State<ReservationScreen> {
                           ),
                         )),
                         ElevatedButton(
-                          onPressed: () {
-                            setState(() => _isValid = _checkIfProductKeyIsValid(
-                                productKeyController.text));
-                            _layoutInputValid = _isValid;
+                          onPressed: () async {
+                            bool isValidated = await _checkIfProductKeyIsValid(productKeyController.text);
+                            setState(() =>
+                            _layoutInputValid = isValidated);
 
-                            if (!_isValid) return;
-
+                            if (!_layoutInputValid) return;
                             _activateProductKey(productKeyController.text);
                           },
                           child: Text('Activate'),

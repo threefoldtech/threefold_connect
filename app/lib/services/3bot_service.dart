@@ -144,6 +144,12 @@ Future<Response> getReservationDetails(String doubleName) {
       headers: requestHeaders);
 }
 
+Future<Response> getAllProductKeys() {
+  print('$threeBotApiUrl/digitaltwin/productkeys');
+  return http.get('$threeBotApiUrl/digitaltwin/productkeys',
+      headers: requestHeaders);
+}
+
 Future<Response> activateDigitalTwin(String doubleName, String productKey) async{
   Object jsonObject = {'doubleName' : doubleName, 'productKey': productKey};
   String privateKey = await getPrivateKey();

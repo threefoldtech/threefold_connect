@@ -34,6 +34,8 @@ def get_productkey_by_payment(hash):
 def get_productkey_for_name(doublename):
     return db.get_payment_request_by_doublename(doublename)
 
+def get_productkeys():
+    return db.get_productkeys()
 
 def get_productkey_for_key(key):
     return db.get_productkey_for_key(key)

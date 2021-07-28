@@ -320,6 +320,30 @@ def get_productkey_for_key(key):
         logger.debug(e)
 
 
+def get_productkeys():
+    find_statement = """
+      SELECT `productkeys`.key
+      FROM `productkeys` 
+      WHERE `productkeys`.status = 1
+      """
+
+    try:
+        cursor = conn.cursor()
+        cursor.execute(find_statement)
+        key_response = cursor.fetchall()
+
+        if key_response is None or len(key_response) == 0:
+            return None
+
+        results = []
+        for row in key_response:
+            results.append(dict(zip(row.keys(), row)))
+
+        return results
+    except Error as e:
+        logger.debug(e)
+
+
 def get_payment_request_by_doublename(doublename):
     find_statement = """
     SELECT `productkeys`.key, `productkeys`.status,  `digitaltwin_reservations`.double_name
