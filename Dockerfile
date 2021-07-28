@@ -17,7 +17,7 @@ RUN CFLAGS="-I/usr/local/opt/openssl/include" LDFLAGS="-L/usr/local/opt/openssl/
   UWSGI_PROFILE_OVERRIDE=ssl=true pip3 install uwsgi==2.0.19.1 -Iv
 # RUN pip3 install flask flask_socketio flask_cors pyfcm pynacl
 RUN pip3 install --upgrade pip
-RUN pip3 install -r requirements.txt
+RUN pip3 install -r requirements.txt --ignore-installed
 RUN pip3 install gevent
 
 COPY --from=builder /frontend/dist /var/www/html/frontend
