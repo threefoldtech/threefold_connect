@@ -91,7 +91,6 @@ class _ReservationScreenState extends State<ReservationScreen> {
         _isLoading = false;
       });
     }
-
   }
 
   bool _checkIfProductKeyIsValid(String productKey) {
@@ -104,7 +103,7 @@ class _ReservationScreenState extends State<ReservationScreen> {
     return false;
   }
 
-   _fillProductKeys() async {
+  _fillProductKeys() async {
     Response productKeysResult = await getProductKeys(doubleName);
     Map<String, Object> productKeys = jsonDecode(productKeysResult.body);
 
@@ -117,6 +116,8 @@ class _ReservationScreenState extends State<ReservationScreen> {
     }
 
     _productKeys = productKeys;
+
+    if (productKeys['productkeys'] == null) return [];
 
     for (var item in productKeys['productkeys']) {
       if (item['status'] == 1) {
@@ -160,7 +161,7 @@ class _ReservationScreenState extends State<ReservationScreen> {
 
   @override
   Widget build(BuildContext context) {
-    if(!_isLoading){
+    if (!_isLoading) {
       return LayoutDrawer(
         titleText: 'Reservations',
         content: Stack(
@@ -177,10 +178,12 @@ class _ReservationScreenState extends State<ReservationScreen> {
                 children: [
                   FutureBuilder(
                     future: _checkReservations(),
-                    builder:
-                        (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+                    builder: (BuildContext context,
+                        AsyncSnapshot<dynamic> snapshot) {
                       Widget box = Container();
-                      box = _isDigitalTwinActive ? _reserved() : _notReservedYet();
+                      box = _isDigitalTwinActive
+                          ? _reserved()
+                          : _notReservedYet();
 
                       return Container(
                         padding: EdgeInsets.all(25.0),
@@ -278,9 +281,16 @@ class _ReservationScreenState extends State<ReservationScreen> {
           SizedBox(
             height: 25.0,
           ),
-          // https://t.me/joinchat/JnJfqY9tfAU1NTY0
           TextButton.icon(
-            onPressed: () {},
+            onPressed: () async {
+              final url = 'https://t.me/joinchat/JnJfqY9tfAU1NTY0';
+              if (await canLaunch(url)) {
+                await launch(
+                  url,
+                  forceSafariVC: false,
+                );
+              }
+            },
             label: Text('Check Telegram channel'),
             icon: Icon(Icons.open_in_new),
           ),
@@ -295,60 +305,60 @@ class _ReservationScreenState extends State<ReservationScreen> {
   }
 
   Widget _reserveForLovedOnes() {
-      return _card(
-        title: "Reserve Digital Twin for Life for Your Loved Ones",
-        body: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            RichText(
-                text: TextSpan(
-                  style: new TextStyle(
-                    fontSize: 14.0,
-                    color: Colors.black,
-                  ),
-                  children: [
-                    TextSpan(
-                      text:
-                      'Grant a Digital Twin for Life to your loved ones for only 1000 TFT. All you need is their 3Bot ID. \n \n',
-                    ),
-                    TextSpan(text: 'Visit '),
-                    TextSpan(
-                      style: new TextStyle(
-                        color: Theme.of(context).primaryColor,
-                      ),
-                      text: 'Digital Twin website',
-                      recognizer: TapGestureRecognizer()
-                        ..onTap = () async {
-                          final url = 'https://mydigitaltwin.io/';
-                          if (await canLaunch(url)) {
-                            await launch(
-                              url,
-                              forceSafariVC: false,
-                            );
-                          }
-                        },
-                    ),
-                    TextSpan(text: ' for more info. '),
-                  ],
-                )),
-            SizedBox(
-              height: 10,
+    return _card(
+      title: "Reserve Digital Twin for Life for Your Loved Ones",
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          RichText(
+              text: TextSpan(
+            style: new TextStyle(
+              fontSize: 14.0,
+              color: Colors.black,
             ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                ElevatedButton(
-                  onPressed: () {
-                    redirectToWallet(
-                        reservingFor: 'loved.3bot', activatedDirectly: false);
+            children: [
+              TextSpan(
+                text:
+                    'Grant a Digital Twin for Life to your loved ones for only 1000 TFT. All you need is their 3Bot ID. \n \n',
+              ),
+              TextSpan(text: 'Visit '),
+              TextSpan(
+                style: new TextStyle(
+                  color: Theme.of(context).primaryColor,
+                ),
+                text: 'Digital Twin website',
+                recognizer: TapGestureRecognizer()
+                  ..onTap = () async {
+                    final url = 'https://mydigitaltwin.io/';
+                    if (await canLaunch(url)) {
+                      await launch(
+                        url,
+                        forceSafariVC: false,
+                      );
+                    }
                   },
-                  child: Text('Buy Product Key'),
-                )
-              ],
-            ),
-          ],
-        ),
-      );
+              ),
+              TextSpan(text: ' for more info. '),
+            ],
+          )),
+          SizedBox(
+            height: 10,
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              ElevatedButton(
+                onPressed: () {
+                  redirectToWallet(
+                      reservingFor: 'loved.3bot', activatedDirectly: false);
+                },
+                child: Text('Buy Product Key'),
+              )
+            ],
+          ),
+        ],
+      ),
+    );
   }
 
   // TODO: make this code more performant
@@ -435,8 +445,8 @@ class _ReservationScreenState extends State<ReservationScreen> {
                   } else {
                     return Padding(
                       padding: const EdgeInsets.only(top: 8.0),
-                      child: Container(
-                          child: Text('No product keys available')),
+                      child:
+                          Container(child: Text('No product keys available')),
                     );
                   }
                 },
