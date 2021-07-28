@@ -1,5 +1,7 @@
 import 'dart:convert';
+import 'dart:ffi';
 
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
@@ -14,6 +16,7 @@ import 'package:threebotlogin/services/3bot_service.dart';
 import 'package:threebotlogin/services/user_service.dart';
 import 'package:threebotlogin/widgets/custom_dialog.dart';
 import 'package:threebotlogin/widgets/layout_drawer.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class ReservationScreen extends StatefulWidget {
   ReservationScreen({Key key}) : super(key: key);
@@ -26,9 +29,13 @@ class _ReservationScreenState extends State<ReservationScreen> {
   String doubleName = '';
   bool _isLoading = false;
   Map<String, Object> _productKeys;
+
+  List _activatedProductKeys = [];
+  List _unActivatedProductKeys = [];
+
   TextEditingController productKeyController = TextEditingController();
   bool _isValid = false;
-  bool _layoutValid = true;
+  bool _layoutInputValid = true;
   bool _isDigitalTwinActive = true;
 
   Future _getReservationDetails() async {
@@ -40,19 +47,18 @@ class _ReservationScreenState extends State<ReservationScreen> {
       });
     }
 
-      Response reservationDetailsResult = await getReservationDetails(doubleName);
-      Map<String, Object> reservationDetails = jsonDecode(reservationDetailsResult.body);
+    Response reservationDetailsResult = await getReservationDetails(doubleName);
+    Map<String, Object> reservationDetails =
+        jsonDecode(reservationDetailsResult.body);
 
-
-      if(reservationDetails['details'] == null){
-        return;
-      }
+    if (reservationDetails['details'] == null) {
+      return;
+    }
 
     return reservationDetails['details'];
   }
 
   Future _checkReservations() async {
-    print('LADEN');
     if (doubleName.isEmpty) {
       String value = await getDoubleName();
       doubleName = value;
@@ -68,21 +74,23 @@ class _ReservationScreenState extends State<ReservationScreen> {
     }
 
     Response reservationsResult = await getReservations(doubleName);
-    print('RESULTAAT');
-    print(reservationsResult);
-    if (_isLoading) {
-      Navigator.pop(context); // Remove loading screen
-      setState(() {
-        _isLoading = false;
-      });
-    }
+
     if (reservationsResult.statusCode != 200) {
       // TODO let user know there was an error
       _isDigitalTwinActive = false;
       return {"active": false};
     }
 
+    await _fillProductKeys();
+
     _isDigitalTwinActive = jsonDecode(reservationsResult.body)['active'];
+
+    if (_isLoading) {
+      Navigator.pop(context); // Remove loading screen
+      setState(() {
+        _isLoading = false;
+      });
+    }
   }
 
   bool _checkIfProductKeyIsValid(String productKey) {
@@ -95,18 +103,39 @@ class _ReservationScreenState extends State<ReservationScreen> {
     return false;
   }
 
-  Future _fillProductKeys() async {
+  _fillProductKeys() async {
     Response productKeysResult = await getProductKeys(doubleName);
     Map<String, Object> productKeys = jsonDecode(productKeysResult.body);
 
+    _unActivatedProductKeys = [];
+    _activatedProductKeys = [];
+
     if (productKeys == null) {
       // There are no product keys available
-      print("There are no product keys available");
       return;
     }
 
     _productKeys = productKeys;
+
+    if (productKeys['productkeys'] == null) return [];
+
+    for (var item in productKeys['productkeys']) {
+      if (item['status'] == 1) {
+        _unActivatedProductKeys.add(item);
+      } else {
+        _activatedProductKeys.add(item);
+      }
+    }
+
     return productKeys['productkeys'];
+  }
+
+  Future _showActivatedKeys() async {
+    return _activatedProductKeys;
+  }
+
+  Future _showUnActivatedKeys() async {
+    return _unActivatedProductKeys;
   }
 
   _activateProductKey(String productKey) async {
@@ -115,7 +144,6 @@ class _ReservationScreenState extends State<ReservationScreen> {
     if (!isValid) {
       // Double check to be sure the key is valid
       // For some reason, the given product key is not valid
-      print('Given product key is not valid');
       return;
     }
 
@@ -127,54 +155,63 @@ class _ReservationScreenState extends State<ReservationScreen> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return LayoutDrawer(
-      titleText: 'Reservations',
-      content: Stack(
-        children: [
-          SvgPicture.asset(
-            'assets/bg.svg',
-            alignment: Alignment.center,
-            width: MediaQuery.of(context).size.width,
-            height: MediaQuery.of(context).size.height,
-          ),
-          SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.max,
-              children: [
-                FutureBuilder(
-                  future: _checkReservations(),
-                  builder:
-                      (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
-                    Widget box = Container();
-                    box =
-                        _isDigitalTwinActive ? _reserved() : _notReservedYet();
+  void dispose() {
+    super.dispose();
+  }
 
-                    return Container(
-                      padding: EdgeInsets.all(25.0),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          box,
-                          SizedBox(
-                            height: 50.0,
-                          ),
-                          _reserveForLovedOnes(),
-                          SizedBox(
-                            height: 50.0,
-                          ),
-                          _productKeysItem(),
-                        ],
-                      ),
-                    );
-                  },
-                ),
-              ],
+  @override
+  Widget build(BuildContext context) {
+    if (!_isLoading) {
+      return LayoutDrawer(
+        titleText: 'Reservations',
+        content: Stack(
+          children: [
+            SvgPicture.asset(
+              'assets/bg.svg',
+              alignment: Alignment.center,
+              width: MediaQuery.of(context).size.width,
+              height: MediaQuery.of(context).size.height,
             ),
-          ),
-        ],
-      ),
-    );
+            SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.max,
+                children: [
+                  FutureBuilder(
+                    future: _checkReservations(),
+                    builder: (BuildContext context,
+                        AsyncSnapshot<dynamic> snapshot) {
+                      Widget box = Container();
+                      box = _isDigitalTwinActive
+                          ? _reserved()
+                          : _notReservedYet();
+
+                      return Container(
+                        padding: EdgeInsets.all(25.0),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            box,
+                            SizedBox(
+                              height: 50.0,
+                            ),
+                            _reserveForLovedOnes(),
+                            SizedBox(
+                              height: 50.0,
+                            ),
+                            _productKeysItem(),
+                          ],
+                        ),
+                      );
+                    },
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+    return Container();
   }
 
   Widget _notReservedYet() {
@@ -182,8 +219,37 @@ class _ReservationScreenState extends State<ReservationScreen> {
       title: 'Reserve your digital twin for life',
       body: Column(
         children: [
-          Text(
-              'With Digital Twin seamless experiences, grant yourself with a lifetime digital freedom and frivacy for only 1000 TFT'),
+          RichText(
+              text: TextSpan(
+            style: new TextStyle(
+              fontSize: 14.0,
+              color: Colors.black,
+            ),
+            children: <TextSpan>[
+              TextSpan(
+                text:
+                    'With Digital Twin seamless experiences, grant yourself with a lifetime digital freedom and privacy for only 1000 TFT. \n \n',
+              ),
+              TextSpan(text: 'Visit '),
+              TextSpan(
+                style: new TextStyle(
+                  color: Theme.of(context).primaryColor,
+                ),
+                text: 'Digital Twin website',
+                recognizer: TapGestureRecognizer()
+                  ..onTap = () async {
+                    final url = 'https://mydigitaltwin.io/';
+                    if (await canLaunch(url)) {
+                      await launch(
+                        url,
+                        forceSafariVC: false,
+                      );
+                    }
+                  },
+              ),
+              TextSpan(text: ' for more info. '),
+            ],
+          )),
           SizedBox(
             height: 10,
           ),
@@ -192,7 +258,7 @@ class _ReservationScreenState extends State<ReservationScreen> {
               onPressed: () {
                 redirectToWallet(activatedDirectly: true);
               },
-              child: Text('Reserve now'),
+              child: Text('Reserve Now'),
             ),
           ]),
         ],
@@ -215,16 +281,24 @@ class _ReservationScreenState extends State<ReservationScreen> {
           SizedBox(
             height: 25.0,
           ),
-          // https://t.me/joinchat/JnJfqY9tfAU1NTY0
           TextButton.icon(
-            onPressed: () {},
+            onPressed: () async {
+              final url = 'https://t.me/joinchat/JnJfqY9tfAU1NTY0';
+              if (await canLaunch(url)) {
+                await launch(
+                  url,
+                  forceSafariVC: false,
+                );
+              }
+            },
             label: Text('Check Telegram channel'),
             icon: Icon(Icons.open_in_new),
           ),
           ElevatedButton(
               onPressed: () {
                 _showReservation();
-              }, child: Text('Check your reservation'))
+              },
+              child: Text('Check your reservation'))
         ],
       ),
     );
@@ -232,12 +306,41 @@ class _ReservationScreenState extends State<ReservationScreen> {
 
   Widget _reserveForLovedOnes() {
     return _card(
-      title: "Reserve Digital Twin for Life for your loved ones",
+      title: "Reserve Digital Twin for Life for Your Loved Ones",
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-              'Grant a Digital Twin for Life to your Loved ones for only 1000 TFT. All you need is their 3Bot ID.'),
+          RichText(
+              text: TextSpan(
+            style: new TextStyle(
+              fontSize: 14.0,
+              color: Colors.black,
+            ),
+            children: [
+              TextSpan(
+                text:
+                    'Grant a Digital Twin for Life to your loved ones for only 1000 TFT. All you need is their 3Bot ID. \n \n',
+              ),
+              TextSpan(text: 'Visit '),
+              TextSpan(
+                style: new TextStyle(
+                  color: Theme.of(context).primaryColor,
+                ),
+                text: 'Digital Twin website',
+                recognizer: TapGestureRecognizer()
+                  ..onTap = () async {
+                    final url = 'https://mydigitaltwin.io/';
+                    if (await canLaunch(url)) {
+                      await launch(
+                        url,
+                        forceSafariVC: false,
+                      );
+                    }
+                  },
+              ),
+              TextSpan(text: ' for more info. '),
+            ],
+          )),
           SizedBox(
             height: 10,
           ),
@@ -249,7 +352,7 @@ class _ReservationScreenState extends State<ReservationScreen> {
                   redirectToWallet(
                       reservingFor: 'loved.3bot', activatedDirectly: false);
                 },
-                child: Text('Buy productkey'),
+                child: Text('Buy Product Key'),
               )
             ],
           ),
@@ -258,57 +361,157 @@ class _ReservationScreenState extends State<ReservationScreen> {
     );
   }
 
+  // TODO: make this code more performant
   Widget _productKeysItem() {
     return _card(
       title: "Product keys",
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          FutureBuilder(
-            builder: (context, snapshot) {
-              if (ConnectionState.done != null && snapshot.hasError) {
-                return Center(child: Text('Something went wrong'));
-              }
+          // FutureBuilder(
+          //     future: _fillProductKeys(),
+          //     builder: (context, snapshot) {
+          //       return Container();
+          //     }),
+          Row(
+            children: [
+              Text('Unclaimed',
+                  style:
+                      new TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                  textAlign: TextAlign.left)
+            ],
+          ),
+          Row(
+            children: [
+              FutureBuilder(
+                future: _showUnActivatedKeys(),
+                builder: (context, snapshot) {
+                  if (snapshot.hasData && snapshot.data.length > 0) {
+                    return Expanded(
+                        child: ListView.builder(
+                            shrinkWrap: true,
+                            itemCount: _unActivatedProductKeys.length,
+                            itemBuilder: (context, index) {
+                              return Column(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  children: [
+                                    _unActivatedProductKeys.length <= 0
+                                        ? Container()
+                                        : Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              Padding(
+                                                padding: const EdgeInsets.only(
+                                                    top: 8,
+                                                    right: 8,
+                                                    bottom: 8),
+                                                child: Text('Product key ' +
+                                                    (index + 1).toString() +
+                                                    ': ' +
+                                                    _unActivatedProductKeys[
+                                                            index]['key']
+                                                        .toString()),
+                                              ),
+                                              new GestureDetector(
+                                                onTap: () async {
+                                                  if (snapshot.hasData) {
+                                                    Clipboard.setData(
+                                                        new ClipboardData(
+                                                            text: snapshot
+                                                                .data[index]
+                                                                    ['key']
+                                                                .toString()));
 
-              if (!snapshot.hasData) {
-                return Text('No product keys available');
-              }
+                                                    final snackBar = SnackBar(
+                                                      content: Text(
+                                                          'Product key copied to clipboard'),
+                                                    );
 
-              return ListView.builder(
-                shrinkWrap: true,
-                itemCount: snapshot.data.length,
-                itemBuilder: (context, index) {
-                  return Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.only(top: 8, right: 8, bottom: 8),
-                        child: Text('Product key ' +
-                            (index + 1).toString() +
-                            ': ' +
-                            snapshot.data[index]['key'].toString()),
-                      ),
-                      new GestureDetector(
-                        onTap: () async {
-                          if (snapshot.hasData) {
-                            Clipboard.setData(new ClipboardData(text: snapshot.data[index]['key'].toString()));
-
-                            final snackBar = SnackBar(
-                              content: Text('Product key copied to clipboard'),
-                            );
-
-                            ScaffoldMessenger.of(context).showSnackBar(snackBar);
-                          }
-                        },
-                        child: Icon(Icons.content_copy, size: 14,),
-                      ),
-
-                    ],
-                  );
+                                                    ScaffoldMessenger.of(
+                                                            context)
+                                                        .showSnackBar(snackBar);
+                                                  }
+                                                },
+                                                child: Icon(
+                                                  Icons.content_copy,
+                                                  size: 14,
+                                                ),
+                                              ),
+                                            ],
+                                          )
+                                  ]);
+                            }));
+                  } else {
+                    return Padding(
+                      padding: const EdgeInsets.only(top: 8.0),
+                      child:
+                          Container(child: Text('No product keys available')),
+                    );
+                  }
                 },
-              );
-            },
-            future: _fillProductKeys(),
+              ),
+            ],
+          ),
+          SizedBox(
+            height: 10,
+          ),
+          Row(
+            children: [
+              Text('Activated',
+                  style:
+                      new TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                  textAlign: TextAlign.left)
+            ],
+          ),
+          Row(
+            children: [
+              FutureBuilder(
+                future: _showActivatedKeys(),
+                builder: (context, snapshot) {
+                  if (snapshot.hasData && snapshot.data.length > 0) {
+                    return Expanded(
+                        child: ListView.builder(
+                            shrinkWrap: true,
+                            itemCount: _activatedProductKeys.length,
+                            itemBuilder: (context, index) {
+                              return Column(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  children: [
+                                    _activatedProductKeys.length <= 0
+                                        ? Container()
+                                        : Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              Padding(
+                                                padding: const EdgeInsets.only(
+                                                    top: 8, right: 8),
+                                                child: Text(
+                                                    _activatedProductKeys[index]
+                                                            ['double_name']
+                                                        .toString()),
+                                              ),
+                                              Text(
+                                                'Activated',
+                                                style: TextStyle(
+                                                    color: Colors.green,
+                                                    fontWeight:
+                                                        FontWeight.bold),
+                                              )
+                                            ],
+                                          )
+                                  ]);
+                            }));
+                  } else {
+                    return Padding(
+                      padding: const EdgeInsets.only(top: 8.0),
+                      child: Container(child: Text('No users activated')),
+                    );
+                  }
+                },
+              ),
+            ],
           ),
           SizedBox(
             height: 10,
@@ -316,7 +519,7 @@ class _ReservationScreenState extends State<ReservationScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
-              _isDigitalTwinActive || _productKeys['productkeys'] == null
+              _isDigitalTwinActive
                   ? Container()
                   : Flexible(
                       child: Row(
@@ -329,10 +532,10 @@ class _ReservationScreenState extends State<ReservationScreen> {
                             decoration: InputDecoration(
                               border: UnderlineInputBorder(),
                               labelText: 'Enter product key',
-                              errorText: _layoutValid
+                              errorText: _layoutInputValid
                                   ? ''
                                   : 'Enter a valid product key',
-                              errorBorder: _layoutValid
+                              errorBorder: _layoutInputValid
                                   ? new OutlineInputBorder(
                                       borderSide: new BorderSide(
                                           color: Colors.transparent,
@@ -348,7 +551,8 @@ class _ReservationScreenState extends State<ReservationScreen> {
                           onPressed: () {
                             setState(() => _isValid = _checkIfProductKeyIsValid(
                                 productKeyController.text));
-                            _layoutValid = _isValid;
+                            _layoutInputValid = _isValid;
+
                             if (!_isValid) return;
 
                             _activateProductKey(productKeyController.text);
@@ -381,6 +585,7 @@ class _ReservationScreenState extends State<ReservationScreen> {
     Map<String, dynamic> decode = json.decode(res.body);
 
     Globals().paymentRequest = PaymentRequest.fromJson(decode);
+    Globals().paymentRequestIsUsed = false;
 
     Events().emit(GoWalletEvent());
   }
@@ -422,7 +627,7 @@ class _ReservationScreenState extends State<ReservationScreen> {
                   child: new Text("Ok"),
                   onPressed: () {
                     Navigator.pop(context);
-                    setState((){});
+                    setState(() {});
                   },
                 ),
               ],
@@ -433,18 +638,23 @@ class _ReservationScreenState extends State<ReservationScreen> {
     return showDialog(
         context: context,
         builder: (BuildContext context) => Dialog(
-          child: FutureBuilder(
-            future: _getReservationDetails(),
-            builder:
-                (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
-                  if(!snapshot.hasData) {
+              child: FutureBuilder(
+                future: _getReservationDetails(),
+                builder:
+                    (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+                  if (!snapshot.hasData) {
                     return Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         SizedBox(
                           height: 10,
                         ),
-                        new Text('Reservation information',  style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold), textAlign: TextAlign.center,),
+                        new Text(
+                          'Reservation information',
+                          style: TextStyle(
+                              fontSize: 20.0, fontWeight: FontWeight.bold),
+                          textAlign: TextAlign.center,
+                        ),
                         new Column(
                           mainAxisSize: MainAxisSize.min,
                           children: [
@@ -470,17 +680,22 @@ class _ReservationScreenState extends State<ReservationScreen> {
                       SizedBox(
                         height: 10,
                       ),
-                      new Text('Reservation information',  style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold), textAlign: TextAlign.center,),
+                      new Text(
+                        'Reservation information',
+                        style: TextStyle(
+                            fontSize: 20.0, fontWeight: FontWeight.bold),
+                        textAlign: TextAlign.center,
+                      ),
                       SizedBox(
                         height: 10,
                       ),
-
                       Padding(
                         padding: const EdgeInsets.all(16.0),
                         child: new Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            new Text('Reserved for:', style: TextStyle(fontWeight: FontWeight.bold)),
+                            new Text('Reserved for:',
+                                style: TextStyle(fontWeight: FontWeight.bold)),
                             new Text(snapshot.data['double_name'])
                           ],
                         ),
@@ -490,7 +705,8 @@ class _ReservationScreenState extends State<ReservationScreen> {
                         child: new Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            new Text('Product key:', style: TextStyle(fontWeight: FontWeight.bold)),
+                            new Text('Product key:',
+                                style: TextStyle(fontWeight: FontWeight.bold)),
                             new Text(snapshot.data['key'])
                           ],
                         ),
@@ -500,23 +716,28 @@ class _ReservationScreenState extends State<ReservationScreen> {
                         child: new Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            new Text('Status:', style: TextStyle(fontWeight: FontWeight.bold)),
-                            new Text('Activated', style: TextStyle(color: Colors.green, fontWeight: FontWeight.bold))
+                            new Text('Status:',
+                                style: TextStyle(fontWeight: FontWeight.bold)),
+                            new Text('Activated',
+                                style: TextStyle(
+                                    color: Colors.green,
+                                    fontWeight: FontWeight.bold))
                           ],
                         ),
                       ),
-                      new ElevatedButton(onPressed: (){
-                        Navigator.pop(context, true);
-
-                      }, child: Text('OK')),
+                      new ElevatedButton(
+                          onPressed: () {
+                            Navigator.pop(context, true);
+                          },
+                          child: Text('OK')),
                       SizedBox(
                         height: 10,
                       ),
                     ],
                   );
-            },
-          ),
-        ));
+                },
+              ),
+            ));
   }
 
   Widget _card({String title, Widget body}) {

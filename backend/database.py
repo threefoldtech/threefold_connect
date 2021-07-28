@@ -315,11 +315,11 @@ def get_productkey_for_key(key):
 
 def get_payment_request_by_doublename(doublename):
     find_statement = """
-    SELECT `productkeys`.* 
+    SELECT `productkeys`.key, `productkeys`.status,  `digitaltwin_reservations`.double_name
     FROM `productkeys` 
-    INNER JOIN `payment_requests` ON `productkeys`.`payment_request_id` = `payment_requests`.`id`
-    WHERE `payment_requests`.`request_by` = ? and productkeys.status = 1
-    ;
+    LEFT JOIN `payment_requests` ON `productkeys`.`payment_request_id` = `payment_requests`.`id`
+    LEFT JOIN `digitaltwin_reservations` ON `productkeys`.`key` = `digitaltwin_reservations`.`product_key_id`
+    WHERE `payment_requests`.`request_by` = ? and productkeys.status IN ('1', '2');
     """
 
     try:
