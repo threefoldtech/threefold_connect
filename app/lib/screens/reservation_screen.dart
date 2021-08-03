@@ -269,18 +269,46 @@ class _ReservationScreenState extends State<ReservationScreen> {
 
   Widget _reserved() {
     return _card(
-      title: 'Already reserved for yourself',
+      title: 'You Have Reserved Your Digital Twin',
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Wrap(
             children: [
-              Text(
-                  'Digital Twin for Life is coming soon. Stay tuned and subscribes to our Telegram Channel for News and Updates'),
+              RichText(
+                  text: TextSpan(
+                    style: new TextStyle(
+                      fontSize: 14.0,
+                      color: Colors.black,
+                    ),
+                    children: [
+                      TextSpan(
+                        text:
+                        'Digital Twin for Life is coming soon. Go to \n',
+                      ),
+                      TextSpan(
+                        style: new TextStyle(
+                          color: Theme.of(context).primaryColor,
+                        ),
+                        text: 'Digital Twin Website',
+                        recognizer: TapGestureRecognizer()
+                          ..onTap = () async {
+                            final url = 'https://mydigitaltwin.io/';
+                            if (await canLaunch(url)) {
+                              await launch(
+                                url,
+                                forceSafariVC: false,
+                              );
+                            }
+                          },
+                      ),
+                      TextSpan(text: ' and subscribe to our Telegram Channel for news and updates.'),
+                    ],
+                  )),
             ],
           ),
           SizedBox(
-            height: 25.0,
+            height: 10.0,
           ),
           TextButton.icon(
             onPressed: () async {
@@ -292,14 +320,14 @@ class _ReservationScreenState extends State<ReservationScreen> {
                 );
               }
             },
-            label: Text('Check Telegram channel'),
+            label: Text('Digital Twin Telegram Channel'),
             icon: Icon(Icons.open_in_new),
           ),
           ElevatedButton(
               onPressed: () {
                 _showReservation();
               },
-              child: Text('Check your reservation'))
+              child: Text('My Digital Twin Reservation'))
         ],
       ),
     );
@@ -650,7 +678,7 @@ class _ReservationScreenState extends State<ReservationScreen> {
                           height: 10,
                         ),
                         new Text(
-                          'Reservation information',
+                          'My Digital Twin',
                           style: TextStyle(
                               fontSize: 20.0, fontWeight: FontWeight.bold),
                           textAlign: TextAlign.center,
@@ -681,7 +709,7 @@ class _ReservationScreenState extends State<ReservationScreen> {
                         height: 10,
                       ),
                       new Text(
-                        'Reservation information',
+                        'My Digital Twin',
                         style: TextStyle(
                             fontSize: 20.0, fontWeight: FontWeight.bold),
                         textAlign: TextAlign.center,
@@ -705,7 +733,7 @@ class _ReservationScreenState extends State<ReservationScreen> {
                         child: new Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            new Text('Product key:',
+                            new Text('Product Key:',
                                 style: TextStyle(fontWeight: FontWeight.bold)),
                             new Text(snapshot.data['key'])
                           ],
