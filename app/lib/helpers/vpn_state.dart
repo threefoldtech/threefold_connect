@@ -1,12 +1,12 @@
-import 'package:yggdrasil_plugin/yggdrasil_plugin.dart';
+// import 'package:yggdrasil_plugin/yggdrasil_plugin.dart';
 
-class VpnState {
-  VpnState(){
-    plugin = new YggdrasilPlugin();
-  }
-  YggdrasilPlugin plugin;
-  String ipText;
+// class VpnState {
+//   VpnState(){
+//     plugin = new YggdrasilPlugin();
+//   }
+//   YggdrasilPlugin plugin;
+//   String ipText;
 
-  bool vpnConnected = false;
-  String ipAddress = "";
-}
+//   bool vpnConnected = false;
+//   String ipAddress = "";
+// }

@@ -10,9 +10,7 @@ import 'package:threebotlogin/events/go_wallet_event.dart';
 import 'package:threebotlogin/helpers/globals.dart';
 
 class LayoutDrawer extends StatefulWidget {
-  LayoutDrawer(
-      { @required this.titleText,
-        @required this.content});
+  LayoutDrawer({@required this.titleText, @required this.content});
 
   final String titleText;
   final Widget content;
@@ -47,8 +45,8 @@ class _LayoutDrawerState extends State<LayoutDrawer> {
               width: 200,
               height: 100,
               child: Padding(
-                padding: const EdgeInsets.all(20),
-                child: DrawerHeader(
+                  padding: const EdgeInsets.all(20),
+                  child: DrawerHeader(
                     decoration: BoxDecoration(
                       image: new DecorationImage(
                         alignment: Alignment.center,
@@ -57,11 +55,10 @@ class _LayoutDrawerState extends State<LayoutDrawer> {
                       ),
                     ),
                     child: Text(''),
-              )
-              ),
+                  )),
             ),
             ListTile(
-              minLeadingWidth : 10,
+              minLeadingWidth: 10,
               leading: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
@@ -76,7 +73,7 @@ class _LayoutDrawerState extends State<LayoutDrawer> {
               },
             ),
             ListTile(
-              minLeadingWidth : 10,
+              minLeadingWidth: 10,
               leading: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
@@ -91,12 +88,13 @@ class _LayoutDrawerState extends State<LayoutDrawer> {
               },
             ),
             ListTile(
-              minLeadingWidth : 10,
+              minLeadingWidth: 10,
               leading: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
                   Padding(padding: const EdgeInsets.only(left: 30)),
-                  Icon(Icons.account_balance_wallet, color: Colors.black, size: 18)
+                  Icon(Icons.account_balance_wallet,
+                      color: Colors.black, size: 18)
                 ],
               ),
               title: Text('Wallet'),
@@ -106,7 +104,7 @@ class _LayoutDrawerState extends State<LayoutDrawer> {
               },
             ),
             ListTile(
-              minLeadingWidth : 10,
+              minLeadingWidth: 10,
               leading: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
@@ -121,7 +119,7 @@ class _LayoutDrawerState extends State<LayoutDrawer> {
               },
             ),
             ListTile(
-              minLeadingWidth : 10,
+              minLeadingWidth: 10,
               leading: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
@@ -135,34 +133,34 @@ class _LayoutDrawerState extends State<LayoutDrawer> {
                 globals.tabController.animateTo(4);
               },
             ),
+            // ListTile(
+            //   minLeadingWidth : 10,
+            //   leading: Column(
+            //     mainAxisAlignment: MainAxisAlignment.center,
+            //     children: <Widget>[
+            //       Padding(padding: const EdgeInsets.only(left: 30)),
+            //       Icon(Icons.network_check, color: Colors.black, size: 18)
+            //     ],
+            //   ),
+            //   title: Text('Planetary Network'),
+            //   onTap: () {
+            //     Navigator.pop(context);
+            //     globals.tabController.animateTo(5);
+            //   },
+            // ),
             ListTile(
-              minLeadingWidth : 10,
+              minLeadingWidth: 10,
               leading: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
                   Padding(padding: const EdgeInsets.only(left: 30)),
-                  Icon(Icons.network_check, color: Colors.black, size: 18)
+                  Icon(Icons.settings, color: Colors.black, size: 18)
                 ],
-              ),
-              title: Text('Planetary Network'),
-              onTap: () {
-                Navigator.pop(context);
-                globals.tabController.animateTo(5);
-              },
-            ),
-            ListTile(
-              minLeadingWidth : 10,
-              leading: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    Padding(padding: const EdgeInsets.only(left: 30)),
-                    Icon(Icons.settings, color: Colors.black, size: 18)
-                  ],
               ),
               title: Text('Settings'),
               onTap: () {
                 Navigator.pop(context);
-                globals.tabController.animateTo(6);
+                globals.tabController.animateTo(5);
               },
             ),
           ],
