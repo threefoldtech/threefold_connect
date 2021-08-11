@@ -38,7 +38,7 @@ class _ReservationScreenState extends State<ReservationScreen> {
   bool _isValid = false;
   bool _layoutInputValid = true;
   bool _isDigitalTwinActive = true;
-
+  bool disableReserveNowButton = false;
 
   Future _getReservationDetails() async {
     if (doubleName.isEmpty) {
@@ -122,7 +122,6 @@ class _ReservationScreenState extends State<ReservationScreen> {
     }
 
     if (productKeys['productkeys'] == null) return [];
-
 
     for (var item in productKeys['productkeys']) {
       if (item['status'] == 1) {
@@ -256,9 +255,11 @@ class _ReservationScreenState extends State<ReservationScreen> {
           ),
           Row(mainAxisAlignment: MainAxisAlignment.end, children: [
             ElevatedButton(
-              onPressed: () {
-                redirectToWallet(activatedDirectly: true);
-              },
+              onPressed: disableReserveNowButton
+                  ? null
+                  : () {
+                      redirectToWallet(activatedDirectly: true);
+                    },
               child: Text('Reserve Now'),
             ),
           ]),
@@ -277,34 +278,35 @@ class _ReservationScreenState extends State<ReservationScreen> {
             children: [
               RichText(
                   text: TextSpan(
+                style: new TextStyle(
+                  fontSize: 14.0,
+                  color: Colors.black,
+                ),
+                children: [
+                  TextSpan(
+                    text: 'Digital Twin for Life is coming soon. Go to \n',
+                  ),
+                  TextSpan(
                     style: new TextStyle(
-                      fontSize: 14.0,
-                      color: Colors.black,
+                      color: Theme.of(context).primaryColor,
                     ),
-                    children: [
-                      TextSpan(
-                        text:
-                        'Digital Twin for Life is coming soon. Go to \n',
-                      ),
-                      TextSpan(
-                        style: new TextStyle(
-                          color: Theme.of(context).primaryColor,
-                        ),
-                        text: 'Digital Twin Website',
-                        recognizer: TapGestureRecognizer()
-                          ..onTap = () async {
-                            final url = 'https://mydigitaltwin.io/';
-                            if (await canLaunch(url)) {
-                              await launch(
-                                url,
-                                forceSafariVC: false,
-                              );
-                            }
-                          },
-                      ),
-                      TextSpan(text: ' and subscribe to our Telegram Channel for news and updates.'),
-                    ],
-                  )),
+                    text: 'Digital Twin Website',
+                    recognizer: TapGestureRecognizer()
+                      ..onTap = () async {
+                        final url = 'https://mydigitaltwin.io/';
+                        if (await canLaunch(url)) {
+                          await launch(
+                            url,
+                            forceSafariVC: false,
+                          );
+                        }
+                      },
+                  ),
+                  TextSpan(
+                      text:
+                          ' and subscribe to our Telegram Channel for news and updates.'),
+                ],
+              )),
             ],
           ),
           SizedBox(
@@ -578,9 +580,9 @@ class _ReservationScreenState extends State<ReservationScreen> {
                         )),
                         ElevatedButton(
                           onPressed: () async {
-                            bool isValidated = await _checkIfProductKeyIsValid(productKeyController.text);
-                            setState(() =>
-                            _layoutInputValid = isValidated);
+                            bool isValidated = await _checkIfProductKeyIsValid(
+                                productKeyController.text);
+                            setState(() => _layoutInputValid = isValidated);
 
                             if (!_layoutInputValid) return;
                             _activateProductKey(productKeyController.text);
@@ -598,6 +600,10 @@ class _ReservationScreenState extends State<ReservationScreen> {
 
   Future<void> redirectToWallet(
       {String reservingFor, bool activatedDirectly}) async {
+    setState(() {
+      disableReserveNowButton = true;
+    });
+
     if (reservingFor == null) {
       reservingFor = doubleName;
     }
@@ -616,30 +622,39 @@ class _ReservationScreenState extends State<ReservationScreen> {
     Globals().paymentRequestIsUsed = false;
 
     Events().emit(GoWalletEvent());
+
+    setState(() {
+      disableReserveNowButton = false;
+    });
   }
 
   Future _loadingDialog() {
     return showDialog(
-      context: context,
       barrierDismissible: false,
-      builder: (BuildContext context) => Dialog(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            SizedBox(
-              height: 10,
+      context: context,
+      builder: (BuildContext context) {
+        return WillPopScope(
+          onWillPop: () => Future.value(false),
+          child: Dialog(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                SizedBox(
+                  height: 10,
+                ),
+                new CircularProgressIndicator(),
+                SizedBox(
+                  height: 10,
+                ),
+                new Text("One moment please"),
+                SizedBox(
+                  height: 10,
+                ),
+              ],
             ),
-            new CircularProgressIndicator(),
-            SizedBox(
-              height: 10,
-            ),
-            new Text("One moment please"),
-            SizedBox(
-              height: 10,
-            ),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 

@@ -54,7 +54,7 @@ class _HomeScreenState extends State<HomeScreen>
     globals.tabController.addListener(_handleTabSelection);
   }
 
-  void checkPin(int indexIfAuthIsSuccess) async {
+  void checkPinAndNavigateIfSuccess(int indexIfAuthIsSuccess) async {
     String pin = await getPin();
 
     pinCheckOpen = true;
@@ -79,46 +79,39 @@ class _HomeScreenState extends State<HomeScreen>
   }
 
   _handleTabSelection() async {
-    if (globals.tabController.indexIsChanging) {
-      if (Globals().router.pinRequired(globals.tabController.index) &&
-          timeoutExpiredInBackground &&
-          !pinCheckOpen) {
-        int authenticatedAppIndex = globals.tabController.index;
-        globals.tabController.animateTo(globals.tabController.previousIndex);
+    if (!globals.tabController.indexIsChanging) {
+      return;
+    }
 
-        checkPin(authenticatedAppIndex);
-      }
+    if (Globals().router.pinRequired(globals.tabController.index) &&
+        timeoutExpiredInBackground &&
+        !pinCheckOpen) {
+      int authenticatedAppIndex = globals.tabController.index;
+      globals.tabController.animateTo(globals.tabController.previousIndex);
 
-      if (Globals().router.emailMustBeVerified(globals.tabController.index) &&
-          !Globals().emailVerified.value) {
-        globals.tabController.animateTo(globals.tabController.previousIndex);
-        await emailVerificationDialog(context);
-      }
+      checkPinAndNavigateIfSuccess(authenticatedAppIndex);
+    }
 
-      if (globals.tabController.index != 2 &&
-          Globals().paymentRequest != null) {
-        Globals().paymentRequest = null;
-        Globals().paymentRequestIsUsed = false;
-      }
+    if (Globals().router.emailMustBeVerified(globals.tabController.index) &&
+        !Globals().emailVerified.value) {
+      globals.tabController.animateTo(globals.tabController.previousIndex);
+      await emailVerificationDialog(context);
+    }
 
-      if (globals.tabController.previousIndex == 2 &&
-          Globals().paymentRequest != null &&
-          Globals().paymentRequestIsUsed == true) {
-        Globals().paymentRequest = null;
-      }
+    if (globals.tabController.index != 2 && Globals().paymentRequest != null) {
+      Globals().paymentRequest = null;
+      Globals().paymentRequestIsUsed = false;
+    }
+
+    if (globals.tabController.previousIndex == 2 &&
+        Globals().paymentRequest != null &&
+        Globals().paymentRequestIsUsed == true) {
+      Globals().paymentRequest = null;
     }
   }
 
-  // activateFfpTab(FfpBrowseEvent event) {
-  //   int ffpTab = 2;
-  //   Ffp().firstUrlToLoad = event.url;
-  //   setState(() {
-  //     _tabController.animateTo(ffpTab);
-  //   });
-  // }
-
   close(GoHomeEvent e) {
-    int homeTab = 0; //@todo can we do some indexoff on routes
+    int homeTab = 0;
     globals.tabController.animateTo(homeTab);
   }
 
@@ -137,8 +130,17 @@ class _HomeScreenState extends State<HomeScreen>
       globals.tabController.animateTo(1, duration: Duration(seconds: 0));
     });
 
+    // Needed to hardcode this to prevent double tapping and gaining access without knowing the pincode with the current logic that was implemented.
     Events().onEvent(GoWalletEvent().runtimeType, (GoWalletEvent event) {
-      globals.tabController.animateTo(2, duration: Duration(seconds: 0));
+      if (pinCheckOpen) {
+        return;
+      }
+
+      int tabIndex = 2;
+
+      if (Globals().router.pinRequired(tabIndex)) {
+        checkPinAndNavigateIfSuccess(tabIndex);
+      }
     });
 
     Events().onEvent(GoSupportEvent().runtimeType, (GoSupportEvent event) {
