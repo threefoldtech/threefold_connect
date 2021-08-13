@@ -25,9 +25,9 @@ class _SuccessfulScreenState extends State<SuccessfulScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.title),
-        elevation: 0.0,
+      appBar: new AppBar(
+        backgroundColor: Theme.of(context).primaryColor,
+        title: new Text("Recovered"),
       ),
       body: Container(
         padding: EdgeInsets.only(top: 24.0, bottom: 38.0),
