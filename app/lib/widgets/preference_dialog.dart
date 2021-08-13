@@ -126,15 +126,15 @@ class _PreferenceDialogState extends State<PreferenceDialog> {
                             if (snapshot.hasData) {
                               return CheckboxListTile(
                                 value:
-                                (previousSelectedScope[scopeItem] == null)
-                                    ? mandatory
-                                    : previousSelectedScope[scopeItem],
+                                    (previousSelectedScope[scopeItem] == null)
+                                        ? mandatory
+                                        : previousSelectedScope[scopeItem],
                                 onChanged:
-                                ((mandatory == null || mandatory == true)
-                                    ? null
-                                    : (value) {
-                                  toggleScope(scopeItem, value);
-                                }),
+                                    ((mandatory == null || mandatory == true)
+                                        ? null
+                                        : (value) {
+                                            toggleScope(scopeItem, value);
+                                          }),
                                 title: Text(
                                   "${scopeItem.toUpperCase()}" +
                                       (mandatory ? " *" : ""),
@@ -150,6 +150,26 @@ class _PreferenceDialogState extends State<PreferenceDialog> {
                           },
                         );
                         break;
+                      case "digitalTwin":
+                        return CheckboxListTile(
+                          value: (previousSelectedScope[scopeItem] == null)
+                              ? mandatory
+                              : previousSelectedScope[scopeItem],
+                          onChanged: ((mandatory == null || mandatory == true)
+                              ? null
+                              : (value) {
+                                  toggleScope(scopeItem, value);
+                                }),
+                          title: Text(
+                            "${scopeItem.toUpperCase()}" +
+                                (mandatory ? " *" : ""),
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black),
+                          ),
+                          subtitle: Text("Links this DigitalTwin to this app."),
+                        );
+                        break;
                       case "phone":
                         return FutureBuilder(
                           future: getPhone(),
@@ -158,15 +178,15 @@ class _PreferenceDialogState extends State<PreferenceDialog> {
                             if (snapshot.hasData) {
                               return CheckboxListTile(
                                 value:
-                                (previousSelectedScope[scopeItem] == null)
-                                    ? mandatory
-                                    : previousSelectedScope[scopeItem],
+                                    (previousSelectedScope[scopeItem] == null)
+                                        ? mandatory
+                                        : previousSelectedScope[scopeItem],
                                 onChanged:
-                                ((mandatory == null || mandatory == true)
-                                    ? null
-                                    : (value) {
-                                  toggleScope(scopeItem, value);
-                                }),
+                                    ((mandatory == null || mandatory == true)
+                                        ? null
+                                        : (value) {
+                                            toggleScope(scopeItem, value);
+                                          }),
                                 title: Text(
                                   "PHONE NUMBER" + (mandatory ? " *" : ""),
                                   style: TextStyle(

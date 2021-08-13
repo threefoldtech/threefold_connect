@@ -1,6 +1,9 @@
 run:
-	gnome-terminal --window -e 'tmux new-session \; split-window -d \; split-window -h \; select-pane -t 2 \; split-window -h \; select-pane -t 0 \; \
-		send-keys "cd ./backend && python3 ." ENTER \; select-pane -t 1 \; \
-		send-keys "cd ./openkyc && export PASSWORD="PASSWORD" && FLASK_APP=openkyc.py python3 -m flask run --reload --debugger --host=0.0.0.0 -p 5005" ENTER \; select-pane -t 2 \; \
-		send-keys "cd ./frontend && npm run serve-mathias && exec bash" ENTER \; select-pane -t 3 \; \
-		send-keys "cd ./example && npm run serve-mathias && exec bash" ENTER \;'
+	gnome-terminal --window -e 'tmux new-session \; \
+		send-keys "cd ./backend && uwsgi --http :5000 --gevent 1000 --http-websockets --master --wsgi-file __main__.py --callable app -s 0.0.0.0:3030" C-m \; \
+		split-window -v \; \
+		send-keys "cd ./frontend && yarn && yarn run serve" C-m \; \
+		select-pane -t 1 \; \
+		split-window -h \; \
+		send-keys "cd ./example && yarn && yarn run serve" C-m \; \
+		select-pane -t 4 \;'

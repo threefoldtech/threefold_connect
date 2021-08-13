@@ -1,4 +1,4 @@
-package org.jimber.threebotlogin.staging
+package org.jimber.threebotlogin.local
 
 import io.flutter.embedding.android.FlutterFragmentActivity
 import io.flutter.embedding.engine.FlutterEngine

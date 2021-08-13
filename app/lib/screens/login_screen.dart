@@ -214,9 +214,10 @@ class _LoginScreenState extends State<LoginScreen> with BlockAndRunMixin {
     return WillPopScope(
       child: new Scaffold(
         key: _scaffoldKey,
-        appBar: AppBar(
-          title: Text('Login'),
-          elevation: 0.0,
+        appBar: new AppBar(
+          // automaticallyImplyLeading: false,
+          backgroundColor: Theme.of(context).primaryColor,
+          title: new Text("Login"),
         ),
         body: Column(
           children: <Widget>[
