@@ -36,8 +36,6 @@ PODS:
     - Flutter
   - url_launcher (0.0.1):
     - Flutter
-  - yggdrasil_plugin (0.0.1):
-    - Flutter
 
 DEPENDENCIES:
   - Flutter (from `Flutter`)
@@ -53,7 +51,6 @@ DEPENDENCIES:
   - shared_preferences (from `.symlinks/plugins/shared_preferences/ios`)
   - uni_links (from `.symlinks/plugins/uni_links/ios`)
   - url_launcher (from `.symlinks/plugins/url_launcher/ios`)
-  - yggdrasil_plugin (from `.symlinks/plugins/yggdrasil_plugin/ios`)
 
 SPEC REPOS:
   trunk:
@@ -89,8 +86,6 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/uni_links/ios"
   url_launcher:
     :path: ".symlinks/plugins/url_launcher/ios"
-  yggdrasil_plugin:
-    :path: ".symlinks/plugins/yggdrasil_plugin/ios"
 
 SPEC CHECKSUMS:
   Flutter: 434fef37c0980e73bb6479ef766c45957d4b510c
@@ -110,7 +105,6 @@ SPEC CHECKSUMS:
   shared_preferences: af6bfa751691cdc24be3045c43ec037377ada40d
   uni_links: d97da20c7701486ba192624d99bffaaffcfc298a
   url_launcher: 6fef411d543ceb26efce54b05a0a40bfd74cbbef
-  yggdrasil_plugin: 40e0da64d134bc867463e5315a20c4e909bfff7e
 
 PODFILE CHECKSUM: a75497545d4391e2d394c3668e20cfb1c2bbd4aa
 
