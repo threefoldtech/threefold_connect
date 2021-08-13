@@ -56,6 +56,8 @@ export default {
 ---
 
 - cd backend/
+- sudo apt install python3-testresources
+- pip3 install -r requirements.txt
 - uwsgi --http :5000 --gevent 1000 --http-websockets --master --wsgi-file **main**.py --callable app -s 0.0.0.0:3030
 
 ### flutter
