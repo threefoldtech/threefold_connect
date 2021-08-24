@@ -2,11 +2,11 @@ from database import create_table
 
 sql_create_table = """
 CREATE TABLE `digitaltwin_dns` (
-        `id` INTEGER PRIMARY KEY AUTOINCREMENT,
         `name` varchar(100) NOT NULL,
         `public_key` varchar(100) NOT NULL,
         `app_id` varchar(100) NOT NULL,
-        `ip` varchar(100) NULL
+        `ip` varchar(100) NULL,
+        PRIMARY KEY (name, app_id)
     );
 """
 

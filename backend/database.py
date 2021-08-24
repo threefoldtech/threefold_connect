@@ -1,5 +1,6 @@
 import logging
 import os
+import json
 import sqlite3
 from functools import cmp_to_key
 from sqlite3 import Error
@@ -18,7 +19,7 @@ sql_create_user_table = """
 sql_create_userapp_table = """
     CREATE TABLE IF NOT EXISTS userapps (
         double_name text NOT NULL,
-        user_app_id text NOT NULL, 
+        user_app_id text NOT NULL,
         user_app_derived_pk text NOT NULL)
 """
 
@@ -107,7 +108,21 @@ def get_user_by_double_name(double_name):
         logger.debug(e)
 
 
-def get_digitaltwin_user_by_double_name(name, app_id):
+def get_digitaltwin_user_by_double_name(name):
+    find_statement = "SELECT * FROM digitaltwin_dns WHERE name=?;"
+    user = {}
+    try:
+        logger.info("Getting digitaltwin_dns")
+        cursor = conn.cursor()
+        cursor.execute(find_statement, (name.lower(),))
+        user_response = cursor.fetchall()
+
+        return json.dumps([dict(ix) for ix in user_response])
+    except Error as e:
+        logger.debug(e)
+
+
+def get_digitaltwin_user_by_double_name_and_app_id(name, app_id):
     find_statement = "SELECT * FROM digitaltwin_dns WHERE name=? AND app_id=? LIMIT 1;"
     user = {}
     try:
@@ -133,7 +148,7 @@ def set_digitaltwin_user(name, public_key, app_id):
         ?,
         ?,
         ?
-    ); 
+    );
     """
 
     try:
@@ -143,8 +158,11 @@ def set_digitaltwin_user(name, public_key, app_id):
             insert_reservation_sql, (name.lower(), public_key, app_id.lower(),)
         )
         conn.commit()
+        return True
     except Error as e:
         logger.debug(e)
+        # logger.debug(isinstance(e, sqlite3.IntegrityError))
+        return e
 
 
 def update_digitaltwin_user(ip, name, app_id):
@@ -159,8 +177,10 @@ def update_digitaltwin_user(ip, name, app_id):
             insert_reservation_sql, (ip.lower(), name.lower(), app_id.lower(),)
         )
         conn.commit()
+        return True
     except Error as e:
         logger.debug(e)
+        return e
 
 
 def insert_reservation(double_name, product_key_id):
@@ -168,7 +188,7 @@ def insert_reservation(double_name, product_key_id):
     INSERT INTO `digitaltwin_reservations` (double_name, product_key_id) VALUES (
         ?,
         ?
-    ); 
+    );
     """
 
     try:
@@ -189,7 +209,7 @@ def insert_payment_request(hash, amount, request_by, notes, ):
             hash,
             notes,
             request_by
-            )    
+            )
         values (
             ?,
             ?,
@@ -214,10 +234,10 @@ def insert_payment_request(hash, amount, request_by, notes, ):
 
 def activate_payment_request(hash, closing_transaction_hash):
     update_statement = """
-    UPDATE payment_requests SET 
+    UPDATE payment_requests SET
         status=1,
         closing_transaction_hash=?
-    WHERE hash=? and status=0;  
+    WHERE hash=? and status=0;
     """
     try:
         cursor = conn.cursor()
@@ -239,12 +259,12 @@ def activate_payment_request(hash, closing_transaction_hash):
 
 def insert_valid_reservations():
     # TODO: SPLIT THIS UP
-    insert_valid_reservations = """ select key, payment_requests.request_by from `productkeys`  
+    insert_valid_reservations = """ select key, payment_requests.request_by from `productkeys`
       inner join payment_requests on productkeys.payment_request_id = payment_requests.id
     where  `productkeys`.`status` = 1 and productkeys.activated_directly = 1
         and `productkeys`.`payment_request_id` in (
             select id from payment_requests where status = 1
-        ) 
+        )
         and `productkeys`.key NOT IN (select product_key_id from digitaltwin_reservations)
         """
 
@@ -269,7 +289,7 @@ def insert_productkey(key, payment_request_id, activated_directly):
         ?,
         ?,
         ?
-    ); 
+    );
     """
 
     try:
@@ -303,10 +323,10 @@ def get_productkey_by_hash(hash):
 
 def is_productkey_active(key):
     find_statement = """
-        SELECT `reservation_by` 
-        FROM `productkeys` 
-        WHERE 
-            `name` = ? 
+        SELECT `reservation_by`
+        FROM `productkeys`
+        WHERE
+            `name` = ?
             and `is_activated` = 1;
         """
 
@@ -327,10 +347,10 @@ def is_productkey_active(key):
 
 def is_productkey_used(key):
     find_statement = """
-        SELECT `reservation_by` 
-        FROM `productkeys` 
-        WHERE 
-            `name` = ? 
+        SELECT `reservation_by`
+        FROM `productkeys`
+        WHERE
+            `name` = ?
             and `is_used` = 1;
         """
 
@@ -384,7 +404,7 @@ def get_productkey_for_key(key):
 def get_productkeys():
     find_statement = """
       SELECT `productkeys`.key
-      FROM `productkeys` 
+      FROM `productkeys`
       WHERE `productkeys`.status = 1
       """
 
@@ -408,7 +428,7 @@ def get_productkeys():
 def get_payment_request_by_doublename(doublename):
     find_statement = """
     SELECT `productkeys`.key, `productkeys`.status,  `digitaltwin_reservations`.double_name
-    FROM `productkeys` 
+    FROM `productkeys`
     LEFT JOIN `payment_requests` ON `productkeys`.`payment_request_id` = `payment_requests`.`id`
     LEFT JOIN `digitaltwin_reservations` ON `productkeys`.`key` = `digitaltwin_reservations`.`product_key_id`
     WHERE `payment_requests`.`request_by` = ? and productkeys.status IN ('1', '2');
@@ -451,10 +471,10 @@ def get_reservation_by_hash(hash):
 
 def is_reservation_active(double_name):
     find_statement = """
-        SELECT product_key_id 
-        FROM digitaltwin_reservations 
-        WHERE 
-            double_name = ? 
+        SELECT product_key_id
+        FROM digitaltwin_reservations
+        WHERE
+            double_name = ?
         """
 
     try:
@@ -472,9 +492,9 @@ def is_reservation_active(double_name):
 def get_reservation_details(double_name):
     find_statement = """
         SELECT product_key_id, double_name
-        FROM digitaltwin_reservations 
-        WHERE 
-            double_name = ? 
+        FROM digitaltwin_reservations
+        WHERE
+            double_name = ?
         """
 
     try:
@@ -499,10 +519,10 @@ def get_reservation_details(double_name):
 
 def activate_reservation_by_hash(hash, transaction_hash):
     update_statement = """
-    UPDATE reservations SET 
+    UPDATE reservations SET
         is_activated=1,
         closing_transaction_hash=?
-    WHERE hash=?; 
+    WHERE hash=?;
     """
 
     try:
