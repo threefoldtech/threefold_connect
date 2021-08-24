@@ -30,6 +30,14 @@ Future<Response> sendData(String state, data, selectedImageId,
       headers: requestHeaders);
 }
 
+Future<Response> addDigitalTwinDerivedPublicKeyToBackend(
+    name, publicKey, appId) async {
+  return http.post('$threeBotApiUrl/users/digitaltwin/$name',
+      body:
+          json.encode({'name': name, 'public_key': publicKey, 'app_id': appId}),
+      headers: requestHeaders);
+}
+
 Future<Response> sendPublicKey(Map<String, Object> data) async {
   String timestamp = new DateTime.now().millisecondsSinceEpoch.toString();
   String privatekey = await getPrivateKey();
@@ -150,8 +158,9 @@ Future<Response> getAllProductKeys() {
       headers: requestHeaders);
 }
 
-Future<Response> activateDigitalTwin(String doubleName, String productKey) async{
-  Object jsonObject = {'doubleName' : doubleName, 'productKey': productKey};
+Future<Response> activateDigitalTwin(
+    String doubleName, String productKey) async {
+  Object jsonObject = {'doubleName': doubleName, 'productKey': productKey};
   String privateKey = await getPrivateKey();
   String signedData = await signData(jsonEncode(jsonObject), privateKey);
 

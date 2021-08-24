@@ -387,6 +387,12 @@ class _LoginScreenState extends State<LoginScreen> with BlockAndRunMixin {
             scopePermissionsDecoded['derivedSeed']) {
           scope['derivedSeed'] = (await getDerivedSeed(widget.loginData.appId));
         }
+
+        if (scopePermissionsDecoded['digitalTwin'] != null &&
+            scopePermissionsDecoded['digitalTwin']) {
+          scope['digitalTwin'] = 'ok';
+          // TODO: Call backend to update database.
+        }
       }
     }
 

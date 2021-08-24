@@ -12,20 +12,39 @@
         <v-btn class="accent" @click="loginWithCustomScope({email : false})">
           Authenticate & get the users emailaddress
         </v-btn>
-        <v-btn class="accent" @click="loginWithCustomScope({derivedSeed : false})">
+        <v-btn
+          class="accent"
+          @click="loginWithCustomScope({derivedSeed : false})"
+        >
           Authenticate & get the derived seed.
         </v-btn>
-        <v-btn class="accent" @click="loginWithCustomScope({email : false, derivedSeed : false})">
+        <v-btn
+          class="accent"
+          @click="loginWithCustomScope({email : false, derivedSeed : false})"
+        >
           Authenticate & get emailaddress and derived seed.
+        </v-btn>
+
+        <v-btn
+          class="accent"
+          @click="loginWithCustomScope({email : false, derivedSeed : true, digitalTwin: true})"
+        >
+          Authenticate & derived seed & trust digital twin (DT login Simulation)
         </v-btn>
         <br />
         <v-btn class="accent" @click="loginWithCustomScope({email : true})">
           Authenticate & get the users emailaddress mandatory
         </v-btn>
-        <v-btn class="accent" @click="loginWithCustomScope({derivedSeed : true})">
+        <v-btn
+          class="accent"
+          @click="loginWithCustomScope({derivedSeed : true})"
+        >
           Authenticate & get the derived seed mandatory
         </v-btn>
-        <v-btn class="accent" @click="loginWithCustomScope({email : true, derivedSeed : true})">
+        <v-btn
+          class="accent"
+          @click="loginWithCustomScope({email : true, derivedSeed : true})"
+        >
           Authenticate & get emailaddress and derived seed mandatory
         </v-btn>
       </v-layout>

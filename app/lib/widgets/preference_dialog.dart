@@ -167,7 +167,7 @@ class _PreferenceDialogState extends State<PreferenceDialog> {
                                 fontWeight: FontWeight.bold,
                                 color: Colors.black),
                           ),
-                          subtitle: Text("Links this DigitalTwin to this app."),
+                          subtitle: Text("Trusts and links this DigitalTwin."),
                         );
                         break;
                       case "phone":
