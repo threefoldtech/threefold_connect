@@ -1,4 +1,4 @@
-from database import  create_table
+from database import create_table
 
 sql_create_table = """
 CREATE TABLE `digitaltwin_dns` (
@@ -7,7 +7,7 @@ CREATE TABLE `digitaltwin_dns` (
         `public_key` varchar(100) NOT NULL,
         `app_id` varchar(100) NOT NULL,
         `ip` varchar(100) NULL
-    )
+    );
 """
 
 create_table(sql_create_table)

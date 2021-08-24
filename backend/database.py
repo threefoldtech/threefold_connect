@@ -34,8 +34,8 @@ logger.setLevel(level=logging.DEBUG)
 
 handler = logging.StreamHandler()
 formatter = logging.Formatter(
-        "[%(asctime)s][%(filename)s:%(lineno)s - %(funcName)s()]: %(message)s",
-        "%Y-%m-%d %H:%M:%S",
+    "[%(asctime)s][%(filename)s:%(lineno)s - %(funcName)s()]: %(message)s",
+    "%Y-%m-%d %H:%M:%S",
 )
 handler.setFormatter(formatter)
 
@@ -65,6 +65,7 @@ def create_table(create_table_sql):
     except Error as e:
         logger.debug(e)
 
+
 def update_table(update_sql):
     try:
         logger.info("Updating table")
@@ -73,12 +74,14 @@ def update_table(update_sql):
     except Error as e:
         logger.debug(e)
 
+
 def insert_user(insert_user_sql, double_name, sid, email, public_key, device_id):
     try:
         logger.info("Inserting user")
         c = conn.cursor()
         c.execute(
-                insert_user_sql, (double_name.lower(), sid, email, public_key, device_id)
+            insert_user_sql, (double_name.lower(), sid,
+                              email, public_key, device_id)
         )
         conn.commit()
     except Error as e:
@@ -104,6 +107,62 @@ def get_user_by_double_name(double_name):
         logger.debug(e)
 
 
+def get_digitaltwin_user_by_double_name(name, app_id):
+    find_statement = "SELECT * FROM digitaltwin_dns WHERE name=? AND app_id=? LIMIT 1;"
+    user = {}
+    try:
+        logger.info("Getting digitaltwin_dns")
+        cursor = conn.cursor()
+        cursor.execute(find_statement, (name.lower(), app_id.lower(),))
+        user_response = cursor.fetchone()
+
+        if user_response == None or len(user_response) == 0:
+            return None
+
+        for index in range(len(cursor.description)):
+            user[cursor.description[index][0]] = str(user_response[index])
+
+        return user
+    except Error as e:
+        logger.debug(e)
+
+
+def set_digitaltwin_user(name, public_key, app_id):
+    insert_reservation_sql = """
+    INSERT INTO `digitaltwin_dns` (name, public_key, app_id) VALUES (
+        ?,
+        ?,
+        ?
+    ); 
+    """
+
+    try:
+        logger.info("Inserting digitaltwin_dns")
+        c = conn.cursor()
+        c.execute(
+            insert_reservation_sql, (name.lower(), public_key, app_id.lower(),)
+        )
+        conn.commit()
+    except Error as e:
+        logger.debug(e)
+
+
+def update_digitaltwin_user(ip, name, app_id):
+    insert_reservation_sql = """
+    UPDATE `digitaltwin_dns` SET ip=? WHERE name=? AND app_id=?;
+    """
+
+    try:
+        logger.info("Updating digitaltwin_dns")
+        c = conn.cursor()
+        c.execute(
+            insert_reservation_sql, (ip.lower(), name.lower(), app_id.lower(),)
+        )
+        conn.commit()
+    except Error as e:
+        logger.debug(e)
+
+
 def insert_reservation(double_name, product_key_id):
     insert_reservation_sql = """
     INSERT INTO `digitaltwin_reservations` (double_name, product_key_id) VALUES (
@@ -116,7 +175,7 @@ def insert_reservation(double_name, product_key_id):
         logger.info("Inserting reservation")
         c = conn.cursor()
         c.execute(
-                insert_reservation_sql, (double_name.lower(), product_key_id)
+            insert_reservation_sql, (double_name.lower(), product_key_id)
         )
         conn.commit()
     except Error as e:
@@ -143,7 +202,7 @@ def insert_payment_request(hash, amount, request_by, notes, ):
         logger.info("Inserting payment_request")
         c = conn.cursor()
         c.execute(
-                insert_sql, (amount, hash, notes, request_by)
+            insert_sql, (amount, hash, notes, request_by)
         )
         try:
             conn.commit()
@@ -177,8 +236,9 @@ def activate_payment_request(hash, closing_transaction_hash):
     except Error as e:
         logger.debug(e)
 
+
 def insert_valid_reservations():
-    #TODO: SPLIT THIS UP
+    # TODO: SPLIT THIS UP
     insert_valid_reservations = """ select key, payment_requests.request_by from `productkeys`  
       inner join payment_requests on productkeys.payment_request_id = payment_requests.id
     where  `productkeys`.`status` = 1 and productkeys.activated_directly = 1
@@ -202,6 +262,7 @@ def insert_valid_reservations():
     except Error as e:
         logger.debug(e)
 
+
 def insert_productkey(key, payment_request_id, activated_directly):
     insert_sql = """
     INSERT INTO `productkeys` (key,payment_request_id, activated_directly) VALUES (
@@ -215,7 +276,7 @@ def insert_productkey(key, payment_request_id, activated_directly):
         logger.info("Inserting productkey")
         c = conn.cursor()
         c.execute(
-                insert_sql, (key, payment_request_id, activated_directly)
+            insert_sql, (key, payment_request_id, activated_directly)
         )
         conn.commit()
     except Error as e:
@@ -422,7 +483,7 @@ def get_reservation_details(double_name):
         reservation_response = cursor.fetchone()
 
         if reservation_response == None or len(reservation_response) == 0:
-            return { 'details': None}
+            return {'details': None}
 
         return {
             'details':
@@ -466,7 +527,8 @@ def activate_productkeys():
 
     items = cursor.fetchall()
 
-    if(len(items) == 0): return
+    if(len(items) == 0):
+        return
 
     update_statement = """
     update `productkeys`
@@ -504,6 +566,7 @@ def activate_personal_keys():
 
     except Error:
         pass
+
 
 def use_productkey(key):
     update_statement = """
@@ -544,7 +607,8 @@ def create_db(conn):
             try:
                 run('./migrations/%s' % item)
                 logging.info('Running %s' % item)
-                sql = """INSERT INTO migrations(id, migration) VALUES ('%i', '%s')""" % (int(item.split('-')[0]), item)
+                sql = """INSERT INTO migrations(id, migration) VALUES ('%i', '%s')""" % (
+                    int(item.split('-')[0]), item)
                 print(sql)
                 c.execute(sql)
                 conn.commit()

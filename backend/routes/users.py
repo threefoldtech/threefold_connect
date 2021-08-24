@@ -1,6 +1,7 @@
-from flask import Blueprint, json, Response
+from flask import request, Blueprint, json, Response
 
 import database as db
+import base64
 from services.logger import logger
 from services.socket import sio, emitOrQueue
 
@@ -14,10 +15,62 @@ def get_user_handler(doublename):
     if user is not None:
 
         logger.debug("DB /api/users/: %s", user)
-        data = {"doublename": user["double_name"], "publicKey": user["public_key"]}
+        data = {"doublename": user["double_name"],
+                "publicKey": user["public_key"]}
 
         response = Response(
-                response=json.dumps(data), mimetype="application/json"
+            response=json.dumps(data), mimetype="application/json"
+        )
+
+        logger.debug("User found")
+        return response
+    else:
+        logger.debug("User not found")
+        return Response("User not found", status=404)
+
+
+@api_users.route("/digitaltwin/<doublename>", methods=["GET"])
+def get_digitaltwin_user_handler(doublename):
+    logger.debug("/digitaltwin/doublename user %s", doublename)
+    user = db.get_user_by_double_name(doublename)
+    if user is not None:
+
+        logger.debug("DB /api/users/: %s", user)
+        data = {"doublename": user["double_name"],
+                "publicKey": user["public_key"]}
+
+        response = Response(
+            response=json.dumps(data), mimetype="application/json"
+        )
+
+        logger.debug("User found")
+        return response
+    else:
+        logger.debug("User not found")
+        return Response("User not found", status=404)
+
+
+@api_users.route("/digitaltwin/<doublename>", methods=["POST"])
+def set_digitaltwin_user_handler(doublename):
+    body = request.get_data()
+    logger.debug("Data: %s", body.decode())
+    logger.debug("Decoded: %s", base64.b64decode(body.decode()))
+    return Response("ok", status=200)
+# zK6M2fZIot0zUNWbyTVUCtsSMZZuGSqGv2HP54uZwe01bK9GC+AzvlzIcTikbMWlX+bSm59FJ2W4YN9/mTxNC3sibmFtZSI6ICJzaW5nbGVjb3JlMi4zYm90IiwicHVibGljX2tleSI6ICJhYmMxMjMiLCJhcHBfaWQiOiAic2luZ2xlY29yZTIuZGlnaXRhbHR3aW4uYmUifQ==
+
+
+@api_users.route("/digitaltwin/<doublename>", methods=["POST"])
+def set_digitaltwin_user_yggdrasil_ip_handler(doublename):
+    logger.debug("/digitaltwin/doublename user %s", doublename)
+    user = db.get_user_by_double_name(doublename)
+    if user is not None:
+
+        logger.debug("DB /api/users/: %s", user)
+        data = {"doublename": user["double_name"],
+                "publicKey": user["public_key"]}
+
+        response = Response(
+            response=json.dumps(data), mimetype="application/json"
         )
 
         logger.debug("User found")

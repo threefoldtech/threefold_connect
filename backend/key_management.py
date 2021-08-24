@@ -7,22 +7,24 @@ import nacl.secret
 from nacl.signing import VerifyKey
 from mnemonic import Mnemonic
 
+
 def print_info_about_seed_phrase(entropy_bytes):
     entropy_hex = entropy_bytes.hex()
     entropy_base64 = base64.b64encode(entropy_bytes).decode()
 
-    public_key_bytes, secret_key_bytes = nacl.bindings.crypto_box_seed_keypair(entropy_bytes)
+    public_key_bytes, secret_key_bytes = nacl.bindings.crypto_box_seed_keypair(
+        entropy_bytes)
     public_key_hex = public_key_bytes.hex()
     public_key_base64 = base64.b64encode(public_key_bytes).decode()
     secret_key_hex = secret_key_bytes.hex()
     secret_key_base64 = base64.b64encode(secret_key_bytes).decode()
 
     signing_key = nacl.signing.SigningKey(entropy_bytes)
-    signing_key_bytes = bytes(signing_key.to_curve25519_private_key())
+    signing_key_bytes = bytes(signing_key)
     signing_key_hex = signing_key_bytes.hex()
     signing_key_base64 = base64.b64encode(signing_key_bytes).decode()
 
-    verify_key_bytes = bytes(signing_key.verify_key.to_curve25519_public_key())
+    verify_key_bytes = bytes(signing_key.verify_key)
     verify_key_hex = verify_key_bytes.hex()
     verify_key_base64 = base64.b64encode(verify_key_bytes).decode()
 
@@ -48,10 +50,11 @@ def print_info_about_seed_phrase(entropy_bytes):
     print('')
     print('')
 
+
 def sign_and_verify_sign(entropy_bytes):
     signing_key = nacl.signing.SigningKey(entropy_bytes)
 
-    to_sign = b"Hello world!"
+    to_sign = b'{"name": "singlecore2.3bot","public_key": "abc123","app_id": "singlecore2.digitaltwin.be"}'
     signed = signing_key.sign(to_sign)
     signed_base64 = base64.b64encode(signed).decode()
     signed_hex = signed.hex()
@@ -65,6 +68,7 @@ def sign_and_verify_sign(entropy_bytes):
     # verify_key = VerifyKey(verify_key_bytes)
     result = verify_key.verify(signed)
     return result
+
 
 def encrypt_and_decrypt(key):
     box = nacl.secret.SecretBox(key)
@@ -85,11 +89,14 @@ def encrypt_and_decrypt(key):
 
     return plaintext
 
+
 def generate_new_seed_phrase():
     return mnemo.generate(strength=256)
 
+
 def seed_phrase_to_bytes(seed_phrase):
     return bytes(mnemo.to_entropy(seed_phrase))
+
 
 print('')
 print("============================================")
@@ -100,7 +107,9 @@ print('')
 mnemo = Mnemonic("english")
 
 # seed_phrase = generate_new_seed_phrase()
-seed_phrase = "erosion company asset chimney gun uncle vendor grit fit board spoon mushroom argue length notable canal fringe entire basic denial behave eagle spring diet"
+# seed_phrase = "erosion company asset chimney gun uncle vendor grit fit board spoon mushroom argue length notable canal fringe entire basic denial behave eagle spring diet"
+# seed_phrase = "forest broom force patient pen rely liar equal leg digital deposit ball scout impact garlic deposit long blade arrange brick tone describe endless slight"
+seed_phrase = "lumber monster ship voice parade pig ill grief wool tiny soon ancient feature ticket muscle birth endorse produce bring armed clean target umbrella sword"
 entropy_bytes = seed_phrase_to_bytes(seed_phrase)
 
 print_info_about_seed_phrase(entropy_bytes)
@@ -113,7 +122,8 @@ print('')
 
 result = sign_and_verify_sign(entropy_bytes)
 print("------------------------------------------------")
-print(" - [Signing] Sign was successfully validated and returned: ", result.decode())
+print(" - [Signing] Sign was successfully validated and returned: ",
+      result.decode())
 
 print('')
 print("============================================")
