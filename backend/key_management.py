@@ -110,8 +110,10 @@ mnemo = Mnemonic("english")
 # seed_phrase = "erosion company asset chimney gun uncle vendor grit fit board spoon mushroom argue length notable canal fringe entire basic denial behave eagle spring diet"
 # seed_phrase = "forest broom force patient pen rely liar equal leg digital deposit ball scout impact garlic deposit long blade arrange brick tone describe endless slight"
 # seed_phrase = "lumber monster ship voice parade pig ill grief wool tiny soon ancient feature ticket muscle birth endorse produce bring armed clean target umbrella sword"
-seed_phrase = "vessel emotion gain fee door face entire artefact badge invite brown hamster puppy guide dune kitten brown video armed close differ sure much reflect"
-entropy_bytes = seed_phrase_to_bytes(seed_phrase)
+# seed_phrase = "vessel emotion gain fee door face entire artefact badge invite brown hamster puppy guide dune kitten brown video armed close differ sure much reflect"
+base64_encoded_entropy = "oyWgJ9ti0XI/FMbc5pXigoS26ARMYb3YMB7fMvu/HqM="
+entropy_bytes = base64.b64decode(base64_encoded_entropy)
+# entropy_bytes = seed_phrase_to_bytes(seed_phrase)
 
 print_info_about_seed_phrase(entropy_bytes)
 

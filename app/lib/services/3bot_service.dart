@@ -30,11 +30,23 @@ Future<Response> sendData(String state, data, selectedImageId,
       headers: requestHeaders);
 }
 
+// Future<Map<String, String>> generateKeysFromSeedPhrase(seedPhrase) async {
+//   String entropy = bip39.mnemonicToEntropy(seedPhrase);
+//   Map<String, Uint8List> key =
+//       await Sodium.cryptoSignSeedKeypair(_toHex(entropy));
+
+//   return {
+//     'publicKey': base64.encode(key['pk']).toString(),
+//     'privateKey': base64.encode(key['sk']).toString()
+//   };
+// }
+
 Future<Response> addDigitalTwinDerivedPublicKeyToBackend(
     name, publicKey, appId) async {
   return http.post('$threeBotApiUrl/users/digitaltwin/$name',
-      body:
+      body: await signData(
           json.encode({'name': name, 'public_key': publicKey, 'app_id': appId}),
+          await getPrivateKey()),
       headers: requestHeaders);
 }
 

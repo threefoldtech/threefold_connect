@@ -383,15 +383,25 @@ class _LoginScreenState extends State<LoginScreen> with BlockAndRunMixin {
           scope['phone'] = (await getPhone());
         }
 
+        var derivedSeed = (await getDerivedSeed(widget.loginData.appId));
+
         if (scopePermissionsDecoded['derivedSeed'] != null &&
             scopePermissionsDecoded['derivedSeed']) {
-          scope['derivedSeed'] = (await getDerivedSeed(widget.loginData.appId));
+          scope['derivedSeed'] = derivedSeed;
         }
 
         if (scopePermissionsDecoded['digitalTwin'] != null &&
             scopePermissionsDecoded['digitalTwin']) {
           scope['digitalTwin'] = 'ok';
-          // TODO: Call backend to update database.
+          print("derivedSeed: " + derivedSeed);
+          var name = await getDoubleName();
+          var digitalTwinDerivedPublicKey =
+              await generatePublicKeyFromEntropy(derivedSeed);
+
+          print("name: " + name);
+          print("publicKey: " + digitalTwinDerivedPublicKey);
+          addDigitalTwinDerivedPublicKeyToBackend(
+              name, digitalTwinDerivedPublicKey, widget.loginData.appId);
         }
       }
     }

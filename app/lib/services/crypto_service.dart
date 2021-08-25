@@ -43,6 +43,13 @@ Future<Map<String, String>> generateKeysFromSeedPhrase(seedPhrase) async {
   };
 }
 
+Future<String> generatePublicKeyFromEntropy(encodedEntropy) async {
+  Uint8List entropy = base64.decode(encodedEntropy);
+  Map<String, Uint8List> key = await Sodium.cryptoSignSeedKeypair(entropy);
+
+  return base64.encode(key['pk']).toString();
+}
+
 Future<String> signData(String data, String sk) async {
   Uint8List private = base64.decode(sk);
   Uint8List signed =
