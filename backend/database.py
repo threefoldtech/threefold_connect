@@ -109,7 +109,7 @@ def get_user_by_double_name(double_name):
 
 
 def get_digitaltwin_users():
-    find_statement = "SELECT SUBSTR(name, 0, LENGTH(name) - 4) as id, ip as location FROM digitaltwin_dns;"
+    find_statement = "SELECT SUBSTR(name, 0, LENGTH(name) - 4) as id, ip as location FROM digitaltwin_dns WHERE ip IS NOT NULL;"
     user = {}
     try:
         logger.info("Getting digitaltwin_dns users.")
