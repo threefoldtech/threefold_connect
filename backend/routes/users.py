@@ -11,6 +11,21 @@ import sqlite3
 api_users = Blueprint('api_users', __name__, url_prefix="/api/users")
 
 
+@api_users.route("/digitaltwin", methods=["GET"])
+def get_digitaltwin_users_handler():
+    users = db.get_digitaltwin_users()
+
+    if users is None:
+        logger.debug("No users found")
+        return Response("No users found", status=404)
+
+    response = Response(
+        response=users, mimetype="application/json"
+    )
+
+    return response
+
+
 @api_users.route("/<doublename>", methods=["GET"])
 def get_user_handler(doublename):
     logger.debug("/doublename user %s", doublename)

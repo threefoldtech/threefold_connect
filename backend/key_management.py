@@ -54,7 +54,7 @@ def print_info_about_seed_phrase(entropy_bytes):
 def sign_and_verify_sign(entropy_bytes):
     signing_key = nacl.signing.SigningKey(entropy_bytes)
 
-    to_sign = b'2001:db8:3333:4444:9999:6666:7777:8888'
+    to_sign = b'2001:db8:1234:4444:9999:6666:7777:9876'
     signed = signing_key.sign(to_sign)
     signed_base64 = base64.b64encode(signed).decode()
     signed_hex = signed.hex()
@@ -111,7 +111,8 @@ mnemo = Mnemonic("english")
 # seed_phrase = "forest broom force patient pen rely liar equal leg digital deposit ball scout impact garlic deposit long blade arrange brick tone describe endless slight"
 # seed_phrase = "lumber monster ship voice parade pig ill grief wool tiny soon ancient feature ticket muscle birth endorse produce bring armed clean target umbrella sword"
 # seed_phrase = "vessel emotion gain fee door face entire artefact badge invite brown hamster puppy guide dune kitten brown video armed close differ sure much reflect"
-base64_encoded_entropy = "oyWgJ9ti0XI/FMbc5pXigoS26ARMYb3YMB7fMvu/HqM="
+# base64_encoded_entropy = "oyWgJ9ti0XI/FMbc5pXigoS26ARMYb3YMB7fMvu/HqM="
+base64_encoded_entropy = "ZQnIFchAX7j4zSXZhsXCYQLoPEvSGRcuw3DscGC95Uc="
 entropy_bytes = base64.b64decode(base64_encoded_entropy)
 # entropy_bytes = seed_phrase_to_bytes(seed_phrase)
 

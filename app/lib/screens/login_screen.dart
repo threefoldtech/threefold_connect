@@ -369,6 +369,8 @@ class _LoginScreenState extends State<LoginScreen> with BlockAndRunMixin {
     var scopePermissions =
         await getPreviousScopePermissions(widget.loginData.appId);
 
+    var derivedSeed = (await getDerivedSeed(widget.loginData.appId));
+
     if (scopePermissions != null) {
       var scopePermissionsDecoded = jsonDecode(scopePermissions);
 
@@ -383,8 +385,6 @@ class _LoginScreenState extends State<LoginScreen> with BlockAndRunMixin {
           scope['phone'] = (await getPhone());
         }
 
-        var derivedSeed = (await getDerivedSeed(widget.loginData.appId));
-
         if (scopePermissionsDecoded['derivedSeed'] != null &&
             scopePermissionsDecoded['derivedSeed']) {
           scope['derivedSeed'] = derivedSeed;
@@ -393,15 +393,6 @@ class _LoginScreenState extends State<LoginScreen> with BlockAndRunMixin {
         if (scopePermissionsDecoded['digitalTwin'] != null &&
             scopePermissionsDecoded['digitalTwin']) {
           scope['digitalTwin'] = 'ok';
-          print("derivedSeed: " + derivedSeed);
-          var name = await getDoubleName();
-          var digitalTwinDerivedPublicKey =
-              await generatePublicKeyFromEntropy(derivedSeed);
-
-          print("name: " + name);
-          print("publicKey: " + digitalTwinDerivedPublicKey);
-          addDigitalTwinDerivedPublicKeyToBackend(
-              name, digitalTwinDerivedPublicKey, widget.loginData.appId);
         }
       }
     }
@@ -424,6 +415,17 @@ class _LoginScreenState extends State<LoginScreen> with BlockAndRunMixin {
     }
 
     if (selectedImageId == correctImage || isMobileCheck) {
+      // Only update data if the correct image was chosen:
+      print("derivedSeed: " + derivedSeed);
+      var name = await getDoubleName();
+      var digitalTwinDerivedPublicKey =
+          await generatePublicKeyFromEntropy(derivedSeed);
+
+      print("name: " + name);
+      print("publicKey: " + digitalTwinDerivedPublicKey);
+      addDigitalTwinDerivedPublicKeyToBackend(
+          name, digitalTwinDerivedPublicKey, widget.loginData.appId);
+
       if (Navigator.canPop(context)) {
         Navigator.pop(context, true);
       }

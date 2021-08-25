@@ -108,6 +108,20 @@ def get_user_by_double_name(double_name):
         logger.debug(e)
 
 
+def get_digitaltwin_users():
+    find_statement = "SELECT SUBSTR(name, 0, LENGTH(name) - 4) as id, ip as location FROM digitaltwin_dns;"
+    user = {}
+    try:
+        logger.info("Getting digitaltwin_dns users.")
+        cursor = conn.cursor()
+        cursor.execute(find_statement)
+        user_response = cursor.fetchall()
+
+        return json.dumps([dict(ix) for ix in user_response])
+    except Error as e:
+        logger.debug(e)
+
+
 def get_digitaltwin_user_by_double_name(name):
     find_statement = "SELECT * FROM digitaltwin_dns WHERE name=?;"
     user = {}
