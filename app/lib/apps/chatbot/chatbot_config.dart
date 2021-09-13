@@ -45,6 +45,6 @@ class ChatbotConfigTesting extends ChatbotConfigImpls {
 
 class ChatbotConfigLocal extends ChatbotConfigImpls {
   String url() {
-    return 'https://go.crisp.chat/chat/embed/?website_id=1a5a5241-91cb-4a41-8323-5ba5ec574da0';
+    return 'https://go.crisp.chat/chat/embed/?website_id=1a5a5241-91cb-4a41-8323-5ba5ec574da0&user_email=';
   }
 }

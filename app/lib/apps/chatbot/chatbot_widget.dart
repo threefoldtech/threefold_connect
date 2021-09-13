@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:threebotlogin/apps/chatbot/chatbot_config.dart';
 import 'package:threebotlogin/browser.dart';
-import 'package:threebotlogin/clipboard_hack/clipboard_hack.dart';
 import 'package:threebotlogin/widgets/layout_drawer.dart';
 
 class ChatbotWidget extends StatefulWidget {
@@ -24,9 +23,9 @@ class _ChatbotState extends State<ChatbotWidget>
 
   _ChatbotState({this.email}) {
     iaWebview = InAppWebView(
-      initialUrlRequest: URLRequest(url:Uri.parse('${config.url()}$email&cache_buster=' +
-          new DateTime.now().millisecondsSinceEpoch.toString())),
-
+      initialUrlRequest: URLRequest(
+          url: Uri.parse('${config.url()}$email&cache_buster=' +
+              new DateTime.now().millisecondsSinceEpoch.toString())),
       initialOptions: InAppWebViewGroupOptions(
           crossPlatform: InAppWebViewOptions(useShouldOverrideUrlLoading: true),
           android: AndroidInAppWebViewOptions(supportMultipleWindows: true)),
@@ -34,17 +33,42 @@ class _ChatbotState extends State<ChatbotWidget>
         webView = controller;
       },
       onCreateWindow:
-           (InAppWebViewController controller, CreateWindowAction req) {
-
-        inAppBrowser.openUrlRequest(urlRequest: req.request, options: InAppBrowserClassOptions());
-
+          (InAppWebViewController controller, CreateWindowAction req) {
+        inAppBrowser.openUrlRequest(
+            urlRequest: req.request, options: InAppBrowserClassOptions());
       },
       onConsoleMessage:
           (InAppWebViewController controller, ConsoleMessage consoleMessage) {
         print("CB console: " + consoleMessage.message);
       },
-      onLoadStart: (InAppWebViewController controller, Uri url) {},
-      onLoadStop: (InAppWebViewController controller, Uri url) async {},
+      onLoadStart: (InAppWebViewController controller, Uri url) {
+        webView = controller;
+      },
+      onLoadStop: (InAppWebViewController controller, Uri url) {
+        controller.evaluateJavascript(source: """
+          function waitForElm(selector) {
+          return new Promise(resolve => {
+              if (document.querySelector(selector)) {
+                  return resolve(document.querySelector(selector));
+              }
+      
+              const observer = new MutationObserver(mutations => {
+                  if (document.querySelector(selector)) {
+                      resolve(document.querySelector(selector));
+                      observer.disconnect();
+                  }
+              });
+      
+              observer.observe(document.body, {
+                  childList: true,
+                  subtree: true
+              });
+          });
+      }
+      
+      waitForElm('.cc-4xbu').then(elm => document.querySelector(`.cc-4xbu`).style.cssText = 'display: none !important' )
+        """);
+      },
       onProgressChanged: (InAppWebViewController controller, int progress) {},
     );
   }
@@ -62,13 +86,15 @@ class _ChatbotState extends State<ChatbotWidget>
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    return LayoutDrawer(titleText: 'Support', content: Column(
-      children: <Widget>[
-        Expanded(
-          child: Container(child: iaWebview),
-        ),
-      ],
-    ));
+    return LayoutDrawer(
+        titleText: 'Support',
+        content: Column(
+          children: <Widget>[
+            Expanded(
+              child: Container(child: iaWebview),
+            ),
+          ],
+        ));
   }
 
   @override
