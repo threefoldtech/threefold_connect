@@ -27,6 +27,7 @@ class Globals {
 
   ValueNotifier<bool> emailVerified = ValueNotifier(false);
   ValueNotifier<bool> phoneVerified = ValueNotifier(false);
+  ValueNotifier<bool> identityVerified = ValueNotifier(false);
 
   final JRouter router = new JRouter();
 

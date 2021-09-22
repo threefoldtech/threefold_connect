@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:core';
 import 'package:convert/convert.dart';
+import 'package:flutter/services.dart';
 
 import 'package:flutter_sodium/flutter_sodium.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -170,6 +171,25 @@ Future<Map<String, Object>> getEmail() async {
     'sei': prefs.getString('signedEmailIdentifier')
   };
 }
+
+Future<Map<String, Object>> getIdentity() async {
+  final SharedPreferences prefs = await SharedPreferences.getInstance();
+  return {
+    'identity': prefs.getString('identity'),
+  };
+}
+
+Future<void> saveIdentity(String identity) async {
+  final SharedPreferences prefs = await SharedPreferences.getInstance();
+  prefs.remove('identity');
+  prefs.setString('identity', identity);
+
+  prefs.remove('identityVerified');
+
+  Globals().identityVerified.value = (identity != null);
+}
+
+
 
 Future<void> removePhone() async {
   final SharedPreferences prefs = await SharedPreferences.getInstance();

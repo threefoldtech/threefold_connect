@@ -21,6 +21,8 @@ import 'package:threebotlogin/widgets/email_verification_needed.dart';
 import 'package:threebotlogin/widgets/layout_drawer.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import 'ask_identity_screen.dart';
+
 class PreferenceScreen extends StatefulWidget {
   PreferenceScreen({Key key}) : super(key: key);
 
@@ -35,10 +37,14 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
   String phrase = '';
   bool emailVerified = false;
   bool phoneVerified = false;
+  bool identityVerified = false;
   bool showAdvancedOptions = false;
   Icon showAdvancedOptionsIcon = Icon(Icons.keyboard_arrow_down);
+
   String emailAdress = '';
   String phoneAdress = '';
+  String identity = '';
+
   BuildContext preferenceContext;
   bool biometricsCheck = false;
   bool finger = false;
@@ -97,251 +103,264 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return LayoutDrawer(titleText: 'Settings', content:
-    Stack(
-      children: <Widget>[
-        SvgPicture.asset(
-          'assets/bg.svg',
-          alignment: Alignment.center,
-          width: MediaQuery.of(context).size.width,
-          height: MediaQuery.of(context).size.height,
-        ),
-        ListView(
-          children: <Widget>[
-            ListTile(
-              title: Text("Profile"),
-            ),
-            ListTile(
-              leading: Icon(Icons.person),
-              title: Text(doubleName),
-            ),
-            ListTile(
-                trailing: !emailVerified ? Icon(Icons.refresh) : null,
-                leading: Icon(Icons.mail),
-                title: Text(emailAdress.toLowerCase()),
-                subtitle: !emailVerified
-                    ? Text(
-                  "Unverified",
-                  style: TextStyle(color: Colors.grey),
-                )
-                    : Text(
-                  "Verified",
-                  style: TextStyle(color: Colors.green),
-                ),
-                onTap: () {
-                  if (!emailVerified) {
-                    sendVerificationEmail();
-                    emailResendedDialog(context);
-                  }
-                }),
-            ListTile(
-                trailing: !phoneVerified && phoneAdress.isNotEmpty
-                    ? Icon(Icons.refresh)
-                    : null,
-                leading: Icon(Icons.phone),
-                title: phoneAdress.isEmpty
-                    ? Text("Add phone number",
-                    style: TextStyle(
-                        color: Theme.of(context).primaryColorDark,
-                        fontWeight: FontWeight.bold))
-                    : Text(
-                  phoneAdress,
-                ),
-                subtitle: phoneAdress.isEmpty
-                    ? null
-                    : !phoneVerified
-                    ? Text(
-                  "Unverified",
-                  style:
-                  TextStyle(color: Colors.deepOrangeAccent),
-                )
-                    : Text(
-                  "Verified",
-                  style: TextStyle(color: Colors.green),
-                ),
-                onTap: () async {
-                  if (phoneVerified) {
-                    return;
-                  }
-
-                  if (phoneAdress.isEmpty) {
-                    await addPhoneNumberDialog(context);
-                    var phoneMap = (await getPhone());
-                    if (phoneMap.isEmpty ||
-                        !phoneMap.containsKey('phone')) {
+    return LayoutDrawer(
+      titleText: 'Settings',
+      content: Stack(
+        children: <Widget>[
+          SvgPicture.asset(
+            'assets/bg.svg',
+            alignment: Alignment.center,
+            width: MediaQuery.of(context).size.width,
+            height: MediaQuery.of(context).size.height,
+          ),
+          ListView(
+            children: <Widget>[
+              ListTile(
+                title: Text("Profile"),
+              ),
+              ListTile(
+                leading: Icon(Icons.person),
+                title: Text(doubleName),
+              ),
+              ListTile(
+                  trailing: !emailVerified ? Icon(Icons.refresh) : null,
+                  leading: Icon(Icons.mail),
+                  title: Text(emailAdress.toLowerCase()),
+                  subtitle: !emailVerified
+                      ? Text(
+                          "Unverified",
+                          style: TextStyle(color: Colors.grey),
+                        )
+                      : Text(
+                          "Verified",
+                          style: TextStyle(color: Colors.green),
+                        ),
+                  onTap: () {
+                    if (!emailVerified) {
+                      sendVerificationEmail();
+                      emailResendedDialog(context);
+                    }
+                  }),
+              ListTile(
+                  trailing: !phoneVerified && phoneAdress.isNotEmpty
+                      ? Icon(Icons.refresh)
+                      : null,
+                  leading: Icon(Icons.phone),
+                  title: phoneAdress.isEmpty
+                      ? Text("Add phone number",
+                          style: TextStyle(
+                              color: Theme.of(context).primaryColorDark,
+                              fontWeight: FontWeight.bold))
+                      : Text(
+                          phoneAdress,
+                        ),
+                  subtitle: phoneAdress.isEmpty
+                      ? null
+                      : !phoneVerified
+                          ? Text(
+                              "Unverified",
+                              style: TextStyle(color: Colors.deepOrangeAccent),
+                            )
+                          : Text(
+                              "Verified",
+                              style: TextStyle(color: Colors.green),
+                            ),
+                  onTap: () async {
+                    if (phoneVerified) {
                       return;
                     }
-                    var pn = phoneMap['phone'];
-                    if (pn == null) {
-                      return;
-                    }
-
-                    setState(() {
-                      phoneAdress = pn;
-                    });
 
                     if (phoneAdress.isEmpty) {
+                      await addPhoneNumberDialog(context);
+                      var phoneMap = (await getPhone());
+                      if (phoneMap.isEmpty || !phoneMap.containsKey('phone')) {
+                        return;
+                      }
+                      var pn = phoneMap['phone'];
+                      if (pn == null) {
+                        return;
+                      }
+
+                      setState(() {
+                        phoneAdress = pn;
+                      });
+
+                      if (phoneAdress.isEmpty) {
+                        return;
+                      }
+                    }
+
+                    int currentTime = new DateTime.now().millisecondsSinceEpoch;
+
+                    if (globals.tooManySmsAttempts &&
+                        globals.lockedSmsUntill > currentTime) {
+                      globals.sendSmsAttempts = 0;
+                      showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return AlertDialog(
+                            title: new Text('Too many attemts please wait ' +
+                                ((globals.lockedSmsUntill - currentTime) / 1000)
+                                    .round()
+                                    .toString() +
+                                ' seconds.'),
+                            actions: <Widget>[
+                              FlatButton(
+                                child: new Text("OK"),
+                                onPressed: () {
+                                  Navigator.of(context).pop();
+                                },
+                              ),
+                            ],
+                          );
+                        },
+                      );
                       return;
                     }
-                  }
 
-                  int currentTime =
-                      new DateTime.now().millisecondsSinceEpoch;
+                    globals.tooManySmsAttempts = false;
 
-                  if (globals.tooManySmsAttempts &&
-                      globals.lockedSmsUntill > currentTime) {
-                    globals.sendSmsAttempts = 0;
-                    showDialog(
-                      context: context,
-                      builder: (BuildContext context) {
-                        return AlertDialog(
-                          title: new Text('Too many attemts please wait ' +
-                              ((globals.lockedSmsUntill - currentTime) /
-                                  1000)
-                                  .round()
-                                  .toString() +
-                              ' seconds.'),
-                          actions: <Widget>[
-                            FlatButton(
-                              child: new Text("OK"),
-                              onPressed: () {
-                                Navigator.of(context).pop();
-                              },
-                            ),
-                          ],
-                        );
-                      },
-                    );
-                    return;
-                  }
+                    if (globals.sendSmsAttempts >= 3) {
+                      globals.tooManySmsAttempts = true;
+                      globals.lockedSmsUntill = currentTime + 60000;
 
-                  globals.tooManySmsAttempts = false;
+                      showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return AlertDialog(
+                            title: new Text(
+                                'Too many attemts please wait one minute.'),
+                            actions: <Widget>[
+                              FlatButton(
+                                child: new Text("OK"),
+                                onPressed: () {
+                                  Navigator.of(context).pop();
+                                },
+                              ),
+                            ],
+                          );
+                        },
+                      );
+                      return;
+                    }
 
-                  if (globals.sendSmsAttempts >= 3) {
-                    globals.tooManySmsAttempts = true;
-                    globals.lockedSmsUntill = currentTime + 60000;
+                    globals.sendSmsAttempts++;
 
-                    showDialog(
-                      context: context,
-                      builder: (BuildContext context) {
-                        return AlertDialog(
-                          title: new Text(
-                              'Too many attemts please wait one minute.'),
-                          actions: <Widget>[
-                            FlatButton(
-                              child: new Text("OK"),
-                              onPressed: () {
-                                Navigator.of(context).pop();
-                              },
-                            ),
-                          ],
-                        );
-                      },
-                    );
-                    return;
-                  }
-
-                  globals.sendSmsAttempts++;
-
-                  sendVerificationSms();
-                  phoneSendDialog(context);
-                }),
-            FutureBuilder(
-              future: getPhrase(),
-              builder: (context, snapshot) {
-                if (snapshot.hasData) {
-                  return ListTile(
-                    trailing: Padding(
-                      padding: new EdgeInsets.only(right: 7.5),
-                      child: Icon(Icons.visibility),
-                    ),
-                    leading: Icon(Icons.vpn_key),
-                    title: Text("Show Phrase"),
-                    onTap: () async {
-                      _showPhrase();
-                    },
-                  );
-                } else {
-                  return Container();
-                }
-              },
-            ),
-            FutureBuilder(
-                future: checkBiometrics(),
+                    sendVerificationSms();
+                    phoneSendDialog(context);
+                  }),
+              ListTile(
+                leading: Icon(Icons.person_outlined),
+                title: identity.isEmpty
+                    ? Text("Validate your identity",
+                        style: TextStyle(
+                            color: Theme.of(context).primaryColorDark,
+                            fontWeight: FontWeight.bold))
+                    : Text('Check your identity',
+                        style: TextStyle(
+                            color: Theme.of(context).primaryColorDark,
+                            fontWeight: FontWeight.bold)),
+                onTap: () async {
+                  identity.isEmpty ? _askIdentity() : _showIdentity();
+                },
+              ),
+              FutureBuilder(
+                future: getPhrase(),
                 builder: (context, snapshot) {
                   if (snapshot.hasData) {
-                    if (snapshot.data == true) {
-                      return FutureBuilder(
-                          future: getBiometricDeviceName(),
-                          builder: (context, snapshot) {
-                            if (snapshot.hasData) {
-                              if (snapshot.data == "Not found") {
-                                return Container();
-                              }
-
-                              biometricDeviceName = snapshot.data;
-
-                              return CheckboxListTile(
-                                secondary: Icon(Icons.fingerprint),
-                                value: finger,
-                                title: Text(snapshot.data),
-                                activeColor: Theme.of(context).accentColor,
-                                onChanged: (bool newValue) async {
-                                  _toggleFingerprint(newValue);
-                                },
-                              );
-                            } else {
-                              return Container();
-                            }
-                          });
-                    }
+                    return ListTile(
+                      trailing: Padding(
+                        padding: new EdgeInsets.only(right: 7.5),
+                        child: Icon(Icons.visibility),
+                      ),
+                      leading: Icon(Icons.vpn_key),
+                      title: Text("Show Phrase"),
+                      onTap: () async {
+                        _showPhrase();
+                      },
+                    );
                   } else {
                     return Container();
                   }
-                }),
-            ListTile(
-              leading: Icon(Icons.lock),
-              title: Text("Change pincode"),
-              onTap: () async {
-                _changePincode();
-              },
-            ),
-            ListTile(
-              leading: Icon(Icons.perm_device_information),
-              title: Text("Version: " + version + " - " + buildNumber),
-              onTap: () {
-                _showVersionInfo();
-              },
-            ),
-            ListTile(
-              leading: Icon(Icons.info_outline),
-              title: Text("Terms and conditions"),
-              onTap: () async => {await _showTermsAndConds()},
-            ),
-            ExpansionTile(
-              title: Text(
-                "Advanced settings",
-                style: TextStyle(color: Colors.black),
+                },
               ),
-              children: <Widget>[
-                ListTile(
-                  leading: Icon(Icons.person),
-                  title: Text(
-                    "Remove Account From Device",
-                    style: TextStyle(color: Colors.red),
-                  ),
-                  trailing: Icon(
-                    Icons.remove_circle,
-                    color: Colors.red,
-                  ),
-                  onTap: _showDialog,
+              FutureBuilder(
+                  future: checkBiometrics(),
+                  builder: (context, snapshot) {
+                    if (snapshot.hasData) {
+                      if (snapshot.data == true) {
+                        return FutureBuilder(
+                            future: getBiometricDeviceName(),
+                            builder: (context, snapshot) {
+                              if (snapshot.hasData) {
+                                if (snapshot.data == "Not found") {
+                                  return Container();
+                                }
+
+                                biometricDeviceName = snapshot.data;
+
+                                return CheckboxListTile(
+                                  secondary: Icon(Icons.fingerprint),
+                                  value: finger,
+                                  title: Text(snapshot.data),
+                                  activeColor: Theme.of(context).accentColor,
+                                  onChanged: (bool newValue) async {
+                                    _toggleFingerprint(newValue);
+                                  },
+                                );
+                              } else {
+                                return Container();
+                              }
+                            });
+                      }
+                    } else {
+                      return Container();
+                    }
+                  }),
+              ListTile(
+                leading: Icon(Icons.lock),
+                title: Text("Change pincode"),
+                onTap: () async {
+                  _changePincode();
+                },
+              ),
+              ListTile(
+                leading: Icon(Icons.perm_device_information),
+                title: Text("Version: " + version + " - " + buildNumber),
+                onTap: () {
+                  _showVersionInfo();
+                },
+              ),
+              ListTile(
+                leading: Icon(Icons.info_outline),
+                title: Text("Terms and conditions"),
+                onTap: () async => {await _showTermsAndConds()},
+              ),
+              ExpansionTile(
+                title: Text(
+                  "Advanced settings",
+                  style: TextStyle(color: Colors.black),
                 ),
-              ],
-            ),
-          ],
-        ),
-      ],
-    ),);
+                children: <Widget>[
+                  ListTile(
+                    leading: Icon(Icons.person),
+                    title: Text(
+                      "Remove Account From Device",
+                      style: TextStyle(color: Colors.red),
+                    ),
+                    trailing: Icon(
+                      Icons.remove_circle,
+                      color: Colors.red,
+                    ),
+                    onTap: _showDialog,
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
   }
 
   checkBiometrics() async {
@@ -355,7 +374,7 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
         image: Icons.error,
         title: "Disable Fingerprint",
         description:
-        "Are you sure you want to deactivate fingerprint as authentication method?",
+            "Are you sure you want to deactivate fingerprint as authentication method?",
         actions: <Widget>[
           FlatButton(
             child: new Text("Cancel"),
@@ -387,7 +406,7 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
         image: Icons.error,
         title: "Are you sure?",
         description:
-        "If you confirm, your account will be removed from this device. You can always recover your account with your doublename, email and phrase.",
+            "If you confirm, your account will be removed from this device. You can always recover your account with your doublename, email and phrase.",
         actions: <Widget>[
           FlatButton(
             child: new Text("Cancel"),
@@ -419,7 +438,7 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
                   builder: (BuildContext context) => CustomDialog(
                     title: 'Error',
                     description:
-                    'Something went wrong when trying to remove your account.',
+                        'Something went wrong when trying to remove your account.',
                     actions: <Widget>[
                       FlatButton(
                         child: Text('Ok'),
@@ -491,6 +510,14 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
         }
       });
     });
+    getIdentity().then((identityMap) {
+      setState(() {
+        if (identityMap['identity'] != null) {
+          phoneAdress = identityMap['identity'];
+          phoneVerified = (identityMap['identity'] != null);
+        }
+      });
+    });
     getPhrase().then((seedPhrase) {
       setState(() {
         phrase = seedPhrase;
@@ -505,6 +532,27 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
         }
       });
     });
+  }
+
+  void _askIdentity() async {
+    String pin = await getPin();
+
+    bool authenticated = await Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => AuthenticationScreen(
+            correctPin: pin,
+            userMessage: "show your phrase.",
+          ),
+        ));
+
+    if (authenticated != null && authenticated) {
+      await Navigator.push(
+          context, MaterialPageRoute(builder: (context) => AskIdentityScreen()));
+    }
+  }
+
+  void _showIdentity() async {
   }
 
   void _showPhrase() async {
@@ -631,7 +679,7 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
             image: Icons.perm_device_information,
             title: "Build information",
             description:
-            "Type: ${appConfig.environment}\nGit hash: ${appConfig.githash}\nTime: ${appConfig.time}",
+                "Type: ${appConfig.environment}\nGit hash: ${appConfig.githash}\nTime: ${appConfig.time}",
             actions: <Widget>[
               FlatButton(
                 child: new Text("Ok"),

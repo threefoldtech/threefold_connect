@@ -6,6 +6,7 @@ import 'package:threebotlogin/screens/main_screen.dart';
 import 'package:threebotlogin/services/logging_service.dart';
 import 'package:threebotlogin/services/user_service.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 
@@ -23,6 +24,7 @@ Future<void> main() async {
   Globals().emailVerified.value = (email['sei'] != null);
   bool registered = doubleName != null;
 
+  await dotenv.load(fileName: ".env");
   runApp(MyApp(initDone: initDone, registered: registered));
 }
 
