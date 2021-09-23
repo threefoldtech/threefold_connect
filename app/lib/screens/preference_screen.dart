@@ -65,6 +65,14 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
     }
   }
 
+  setIdentityVerified() {
+    if (mounted) {
+      setState(() {
+        this.identityVerified = Globals().identityVerified.value;
+      });
+    }
+  }
+
   setPhoneVerified() {
     if (mounted) {
       setState(() {
@@ -88,6 +96,7 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
 
     Globals().emailVerified.addListener(setEmailVerified);
     Globals().phoneVerified.addListener(setPhoneVerified);
+    Globals().identityVerified.addListener(setIdentityVerified);
 
     getUserValues();
   }
@@ -141,6 +150,18 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
                       emailResendedDialog(context);
                     }
                   }),
+              ListTile(
+                leading: Icon(Icons.person_outlined),
+                title: identity.isEmpty
+                    ? Text("Validate your identity",
+                    style: TextStyle(
+                        color: Theme.of(context).primaryColorDark,
+                        fontWeight: FontWeight.bold))
+                    : Text('Identity information'),
+                onTap: () async {
+                  identity.isEmpty ? _askIdentity() : _showIdentity();
+                },
+              ),
               ListTile(
                   trailing: !phoneVerified && phoneAdress.isNotEmpty
                       ? Icon(Icons.refresh)
@@ -249,21 +270,6 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
                     sendVerificationSms();
                     phoneSendDialog(context);
                   }),
-              ListTile(
-                leading: Icon(Icons.person_outlined),
-                title: identity.isEmpty
-                    ? Text("Validate your identity",
-                        style: TextStyle(
-                            color: Theme.of(context).primaryColorDark,
-                            fontWeight: FontWeight.bold))
-                    : Text('Check your identity',
-                        style: TextStyle(
-                            color: Theme.of(context).primaryColorDark,
-                            fontWeight: FontWeight.bold)),
-                onTap: () async {
-                  identity.isEmpty ? _askIdentity() : _showIdentity();
-                },
-              ),
               FutureBuilder(
                 future: getPhrase(),
                 builder: (context, snapshot) {
@@ -513,8 +519,10 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
     getIdentity().then((identityMap) {
       setState(() {
         if (identityMap['identity'] != null) {
-          phoneAdress = identityMap['identity'];
-          phoneVerified = (identityMap['identity'] != null);
+          identity = identityMap['identity'];
+          print('IDENTITY MAP');
+          print(identity);
+          identityVerified = (identityMap['identityVerified'] != null);
         }
       });
     });
@@ -553,6 +561,23 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
   }
 
   void _showIdentity() async {
+    var identityData = await getIdentity();
+    return await showDialog(
+      context: context,
+      builder: (BuildContext context) => CustomDialog(
+        image: Icons.info,
+        title: 'Identity details',
+        description: identityData['identity'],
+        actions: <Widget>[
+          FlatButton(
+            child: Text('Ok'),
+            onPressed: () {
+              Navigator.pop(context);
+            },
+          )
+        ],
+      ),
+    );
   }
 
   void _showPhrase() async {

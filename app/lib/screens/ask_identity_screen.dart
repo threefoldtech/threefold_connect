@@ -3,11 +3,13 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:threebotlogin/helpers/globals.dart';
+import 'package:threebotlogin/screens/preference_screen.dart';
 import 'package:threebotlogin/services/user_service.dart';
+import 'package:threebotlogin/widgets/custom_dialog.dart';
 import 'package:threebotlogin/widgets/layout_drawer.dart';
 import 'package:shuftipro_flutter_sdk/ShuftiPro.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-
 
 class AskIdentityScreen extends StatefulWidget {
   @override
@@ -20,12 +22,14 @@ class _AskIdentityScreenState extends State<AskIdentityScreen> {
   bool isDoc = true;
   bool isFace = true;
 
+  // Create authentication object to have access to the API
   var authObject = {
     "auth_type": "basic_auth",
     "client_id": dotenv.env['SHUFTI_CLIENT_ID'],
     "secret_key": dotenv.env['SHUFTI_CLIENT_SECRET'],
   };
 
+  // Default values for accessing the Shufti API
   Map<String, Object> createdPayload = {
     "country": "",
     "language": "EN",
@@ -38,6 +42,7 @@ class _AskIdentityScreenState extends State<AskIdentityScreen> {
     "open_webView": false,
   };
 
+  // Template for Shufti API verification object
   Map<String, Object> verificationObj = {
     "face": {},
     "background_checks": {},
@@ -94,26 +99,35 @@ class _AskIdentityScreenState extends State<AskIdentityScreen> {
     },
   };
 
+  // Set isVerified to true + save the data
+  Future<void> _executeAcceptedVerification(data) async {
+    Globals().identityVerified.value = true;
+    await saveIdentity(data);
+  }
 
   @override
   void initState() {
     super.initState();
 
-    setState(() async {
-      createdPayload["document"] = verificationObj['document'];
+    setState(() {
+      // Here we can choose the different types of verification:
+      // Possibilities:
+
       // createdPayload["face"] = verificationObj['face'];
+      // createdPayload["document"] = verificationObj['document'];
+      // createdPayload["document_two"] = verificationObj['document_two'];
+      // createdPayload["address"] = verificationObj['address'];
+      // createdPayload["consent"] = verificationObj['consent'];
+      // createdPayload["background_checks"] = verificationObj['background_checks'];
+      // createdPayload["phone"] = verificationObj['phone'];
+
+      createdPayload["document"] = verificationObj['document'];
+
       createdPayload["verification_mode"] = "image_only";
 
-
-      var v = DateTime.now();
-      var reference = "ShuftiPro_Flutter_$v";
+      var dt = DateTime.now();
+      var reference = "kyc-attempt-$dt";
       createdPayload["reference"] = reference;
-
-      var email = await getEmail();
-      createdPayload['email'] = email;
-
-
-
     });
   }
 
@@ -144,11 +158,9 @@ class _AskIdentityScreenState extends State<AskIdentityScreen> {
                                         authObject: authObject,
                                         createdPayload: createdPayload,
                                         async: false,
-                                        callback: (res) {
-                                          Map<String, dynamic> data = jsonDecode(res);
-
-                                          // print("\n\nResponse: " +
-                                          //     res.toString());
+                                        callback: (res) async {
+                                          Map<String, dynamic> data =
+                                              jsonDecode(res);
 
 
                                           print('EVENT');
@@ -158,14 +170,62 @@ class _AskIdentityScreenState extends State<AskIdentityScreen> {
                                           print('VERIFICATION DATA');
                                           print(data['verification_data']);
 
+                                          if (data['event'] ==
+                                              'verification.accepted') {
+                                            await _executeAcceptedVerification(data.toString());
+                                            await Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        PreferenceScreen()));
 
-                                          if(data['event'] == 'verification.accepted') {
-                                            // TODO: SET VARIABLE IN GLOBALS ON TRUE
+                                            return showDialog(
+                                              context: context,
+                                              barrierDismissible: false,
+                                              builder: (BuildContext context) =>
+                                                  CustomDialog(
+                                                image: Icons.check,
+                                                title:
+                                                    "Identity has been verified",
+                                                description:
+                                                    "Your identity has been verified",
+                                                actions: <Widget>[
+                                                  FlatButton(
+                                                    child: new Text("Ok"),
+                                                    onPressed: () {
+                                                      Navigator.pop(context);
+                                                    },
+                                                  ),
+                                                ],
+                                              ),
+                                            );
                                           }
 
-                                        //  TODO: GIVE INVALID VERIFICATION
+                                          await Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      PreferenceScreen()));
 
-
+                                          return showDialog(
+                                              context: context,
+                                              barrierDismissible: false,
+                                              builder: (BuildContext context) =>
+                                                  CustomDialog(
+                                                    image: Icons.error,
+                                                    title: "Verified failed",
+                                                    description:
+                                                        "Verify has failed",
+                                                    actions: <Widget>[
+                                                      FlatButton(
+                                                        child: new Text("Ok"),
+                                                        onPressed: () {
+                                                          Navigator.pop(
+                                                              context);
+                                                        },
+                                                      ),
+                                                    ],
+                                                  ));
                                         },
                                         homeClass: AskIdentityScreen())));
                           },

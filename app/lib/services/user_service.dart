@@ -174,11 +174,14 @@ Future<Map<String, Object>> getEmail() async {
 
 Future<Map<String, Object>> getIdentity() async {
   final SharedPreferences prefs = await SharedPreferences.getInstance();
+  prefs.setString('identity', null);
+  print('DONE');
   return {
     'identity': prefs.getString('identity'),
   };
 }
 
+// Only can contain String as type, so we need to save our JSON into String format
 Future<void> saveIdentity(String identity) async {
   final SharedPreferences prefs = await SharedPreferences.getInstance();
   prefs.remove('identity');
