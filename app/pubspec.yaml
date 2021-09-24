@@ -28,6 +28,9 @@ dependencies:
   redirection:
     git:
       url: https://github.com/jimbertools/redirection
+  shuftipro_flutter_sdk:
+    git:
+      url: git@github.com:jimbertools/shufti-jimber.git
   # yggdrasil_plugin:
   #   git:
   #     url: https://github.com/threefoldtech/yggdrasil_flutter
@@ -47,7 +50,6 @@ dependencies:
   google_fonts: ^1.1.1
   international_phone_input: ^1.0.4
   intl_phone_field: ^1.4.2
-  shuftipro_flutter_sdk: ^1.0.0
   flutter_dotenv: ^5.0.2
 
 dev_dependencies:
