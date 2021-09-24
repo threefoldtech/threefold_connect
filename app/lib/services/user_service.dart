@@ -172,6 +172,12 @@ Future<Map<String, Object>> getKYCLevel() async {
   };
 }
 
+Future<void> saveKYCLevel(int level) async {
+  final SharedPreferences prefs = await SharedPreferences.getInstance();
+  prefs.remove('kycLevel');
+  prefs.setInt('kycLevel', level);
+}
+
 Future<Map<String, Object>> getEmail() async {
   final SharedPreferences prefs = await SharedPreferences.getInstance();
   return {
