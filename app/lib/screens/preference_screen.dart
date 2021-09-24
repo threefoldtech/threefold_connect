@@ -151,18 +151,6 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
                     }
                   }),
               ListTile(
-                leading: Icon(Icons.person_outlined),
-                title: identity.isEmpty
-                    ? Text("Validate your identity",
-                    style: TextStyle(
-                        color: Theme.of(context).primaryColorDark,
-                        fontWeight: FontWeight.bold))
-                    : Text('Identity information'),
-                onTap: () async {
-                  identity.isEmpty ? _askIdentity() : _showIdentity();
-                },
-              ),
-              ListTile(
                   trailing: !phoneVerified && phoneAdress.isNotEmpty
                       ? Icon(Icons.refresh)
                       : null,
@@ -516,16 +504,7 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
         }
       });
     });
-    getIdentity().then((identityMap) {
-      setState(() {
-        if (identityMap['identity'] != null) {
-          identity = identityMap['identity'];
-          print('IDENTITY MAP');
-          print(identity);
-          identityVerified = (identityMap['identityVerified'] != null);
-        }
-      });
-    });
+
     getPhrase().then((seedPhrase) {
       setState(() {
         phrase = seedPhrase;
@@ -542,43 +521,6 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
     });
   }
 
-  void _askIdentity() async {
-    String pin = await getPin();
-
-    bool authenticated = await Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => AuthenticationScreen(
-            correctPin: pin,
-            userMessage: "show your phrase.",
-          ),
-        ));
-
-    if (authenticated != null && authenticated) {
-      await Navigator.push(
-          context, MaterialPageRoute(builder: (context) => AskIdentityScreen()));
-    }
-  }
-
-  void _showIdentity() async {
-    var identityData = await getIdentity();
-    return await showDialog(
-      context: context,
-      builder: (BuildContext context) => CustomDialog(
-        image: Icons.info,
-        title: 'Identity details',
-        description: identityData['identity'],
-        actions: <Widget>[
-          FlatButton(
-            child: Text('Ok'),
-            onPressed: () {
-              Navigator.pop(context);
-            },
-          )
-        ],
-      ),
-    );
-  }
 
   void _showPhrase() async {
     String pin = await getPin();
@@ -689,7 +631,6 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
 
   Future<void> _showTermsAndConds() async {
     const url = 'https://wiki.threefold.io/#/legal__legal';
-
     await launch(url);
   }
 

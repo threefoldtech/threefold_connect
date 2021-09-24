@@ -99,11 +99,6 @@ class _AskIdentityScreenState extends State<AskIdentityScreen> {
     },
   };
 
-  // Set isVerified to true + save the data
-  Future<void> _executeAcceptedVerification(data) async {
-    Globals().identityVerified.value = true;
-    await saveIdentity(data);
-  }
 
   @override
   void initState() {
@@ -172,7 +167,6 @@ class _AskIdentityScreenState extends State<AskIdentityScreen> {
 
                                           if (data['event'] ==
                                               'verification.accepted') {
-                                            await _executeAcceptedVerification(data.toString());
                                             await Navigator.push(
                                                 context,
                                                 MaterialPageRoute(

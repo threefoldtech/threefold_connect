@@ -164,6 +164,14 @@ Future<void> saveEmail(String email, String signedEmailIdentifier) async {
   Globals().emailVerified.value = (signedEmailIdentifier != null);
 }
 
+
+Future<Map<String, Object>> getKYCLevel() async {
+  final SharedPreferences prefs = await SharedPreferences.getInstance();
+  return {
+    'kycLevel': prefs.getInt('kycLevel'),
+  };
+}
+
 Future<Map<String, Object>> getEmail() async {
   final SharedPreferences prefs = await SharedPreferences.getInstance();
   return {
@@ -171,27 +179,6 @@ Future<Map<String, Object>> getEmail() async {
     'sei': prefs.getString('signedEmailIdentifier')
   };
 }
-
-Future<Map<String, Object>> getIdentity() async {
-  final SharedPreferences prefs = await SharedPreferences.getInstance();
-  prefs.setString('identity', null);
-  print('DONE');
-  return {
-    'identity': prefs.getString('identity'),
-  };
-}
-
-// Only can contain String as type, so we need to save our JSON into String format
-Future<void> saveIdentity(String identity) async {
-  final SharedPreferences prefs = await SharedPreferences.getInstance();
-  prefs.remove('identity');
-  prefs.setString('identity', identity);
-
-  prefs.remove('identityVerified');
-
-  Globals().identityVerified.value = (identity != null);
-}
-
 
 
 Future<void> removePhone() async {
