@@ -88,7 +88,9 @@ class AppConfigStaging extends AppConfigImpl {
   }
 
   String openKycApiUrl() {
-    return "https://openkyc.staging.jimber.org";
+    // TODO: undo this -- testing purposes
+    return 'http://192.168.2.174:5005';
+      return "https://openkyc.staging.jimber.org";
   }
 
   String threeBotApiUrl() {
