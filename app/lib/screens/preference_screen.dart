@@ -20,13 +20,12 @@ import 'package:threebotlogin/screens/change_pin_screen.dart';
 import 'package:threebotlogin/screens/main_screen.dart';
 import 'package:threebotlogin/services/fingerprint_service.dart';
 import 'package:threebotlogin/services/open_kyc_service.dart';
+import 'package:threebotlogin/services/socket_service.dart';
 import 'package:threebotlogin/services/user_service.dart';
 import 'package:threebotlogin/widgets/custom_dialog.dart';
 import 'package:threebotlogin/widgets/email_verification_needed.dart';
 import 'package:threebotlogin/widgets/layout_drawer.dart';
 import 'package:url_launcher/url_launcher.dart';
-
-import 'ask_identity_screen.dart';
 
 class PreferenceScreen extends StatefulWidget {
   PreferenceScreen({Key key}) : super(key: key);
@@ -138,19 +137,10 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
     },
   };
 
-
   setEmailVerified() {
     if (mounted) {
       setState(() {
         this.emailVerified = Globals().emailVerified.value;
-      });
-    }
-  }
-
-  setIdentityVerified() {
-    if (mounted) {
-      setState(() {
-        this.identityVerified = Globals().identityVerified.value;
       });
     }
   }
@@ -166,7 +156,6 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
   @override
   void initState() {
     super.initState();
-
 
     setState(() {
       // Here we can choose the different types of verification:
@@ -184,20 +173,17 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
       createdPayload["verification_mode"] = "image_only";
     });
 
-
     // checkBiometrics().then((result) => {biometricsCheck = result});
 
-    PackageInfo.fromPlatform().then((packageInfo) =>
-    {
-      setState(() {
-        version = packageInfo.version;
-        buildNumber = packageInfo.buildNumber;
-      })
-    });
+    PackageInfo.fromPlatform().then((packageInfo) => {
+          setState(() {
+            version = packageInfo.version;
+            buildNumber = packageInfo.buildNumber;
+          })
+        });
 
     Globals().emailVerified.addListener(setEmailVerified);
     Globals().phoneVerified.addListener(setPhoneVerified);
-    Globals().identityVerified.addListener(setIdentityVerified);
 
     getUserValues();
   }
@@ -220,14 +206,8 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
           SvgPicture.asset(
             'assets/bg.svg',
             alignment: Alignment.center,
-            width: MediaQuery
-                .of(context)
-                .size
-                .width,
-            height: MediaQuery
-                .of(context)
-                .size
-                .height,
+            width: MediaQuery.of(context).size.width,
+            height: MediaQuery.of(context).size.height,
           ),
           ListView(
             children: <Widget>[
@@ -243,21 +223,20 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
                   title: Text('Testing'),
                   onTap: () async {
                     await _warningVerifyIdentity();
-                  }
-              ),
+                  }),
               ListTile(
                   trailing: !emailVerified ? Icon(Icons.refresh) : null,
                   leading: Icon(Icons.mail),
                   title: Text(emailAdress.toLowerCase()),
                   subtitle: !emailVerified
                       ? Text(
-                    "Unverified",
-                    style: TextStyle(color: Colors.grey),
-                  )
+                          "Unverified",
+                          style: TextStyle(color: Colors.grey),
+                        )
                       : Text(
-                    "Verified",
-                    style: TextStyle(color: Colors.green),
-                  ),
+                          "Verified",
+                          style: TextStyle(color: Colors.green),
+                        ),
                   onTap: () {
                     if (!emailVerified) {
                       sendVerificationEmail();
@@ -271,25 +250,23 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
                   leading: Icon(Icons.phone),
                   title: phoneAdress.isEmpty
                       ? Text("Add phone number",
-                      style: TextStyle(
-                          color: Theme
-                              .of(context)
-                              .primaryColorDark,
-                          fontWeight: FontWeight.bold))
+                          style: TextStyle(
+                              color: Theme.of(context).primaryColorDark,
+                              fontWeight: FontWeight.bold))
                       : Text(
-                    phoneAdress,
-                  ),
+                          phoneAdress,
+                        ),
                   subtitle: phoneAdress.isEmpty
                       ? null
                       : !phoneVerified
-                      ? Text(
-                    "Unverified",
-                    style: TextStyle(color: Colors.deepOrangeAccent),
-                  )
-                      : Text(
-                    "Verified",
-                    style: TextStyle(color: Colors.green),
-                  ),
+                          ? Text(
+                              "Unverified",
+                              style: TextStyle(color: Colors.deepOrangeAccent),
+                            )
+                          : Text(
+                              "Verified",
+                              style: TextStyle(color: Colors.green),
+                            ),
                   onTap: () async {
                     if (phoneVerified) {
                       return;
@@ -413,9 +390,7 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
                                   secondary: Icon(Icons.fingerprint),
                                   value: finger,
                                   title: Text(snapshot.data),
-                                  activeColor: Theme
-                                      .of(context)
-                                      .accentColor,
+                                  activeColor: Theme.of(context).accentColor,
                                   onChanged: (bool newValue) async {
                                     _toggleFingerprint(newValue);
                                   },
@@ -482,93 +457,90 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
   void _showDisableFingerprint() {
     showDialog(
       context: context,
-      builder: (BuildContext context) =>
-          CustomDialog(
-            image: Icons.error,
-            title: "Disable Fingerprint",
-            description:
+      builder: (BuildContext context) => CustomDialog(
+        image: Icons.error,
+        title: "Disable Fingerprint",
+        description:
             "Are you sure you want to deactivate fingerprint as authentication method?",
-            actions: <Widget>[
-              FlatButton(
-                child: new Text("Cancel"),
-                onPressed: () async {
-                  Navigator.pop(context);
-                  finger = true;
-                  await saveFingerprint(true);
-                  setState(() {});
-                },
-              ),
-              FlatButton(
-                child: new Text("Yes"),
-                onPressed: () async {
-                  Navigator.pop(context);
-                  finger = false;
-                  await saveFingerprint(false);
-                  setState(() {});
-                },
-              ),
-            ],
+        actions: <Widget>[
+          FlatButton(
+            child: new Text("Cancel"),
+            onPressed: () async {
+              Navigator.pop(context);
+              finger = true;
+              await saveFingerprint(true);
+              setState(() {});
+            },
           ),
+          FlatButton(
+            child: new Text("Yes"),
+            onPressed: () async {
+              Navigator.pop(context);
+              finger = false;
+              await saveFingerprint(false);
+              setState(() {});
+            },
+          ),
+        ],
+      ),
     );
   }
 
   void _showDialog() {
     showDialog(
       context: context,
-      builder: (BuildContext context) =>
-          CustomDialog(
-            image: Icons.error,
-            title: "Are you sure?",
-            description:
+      builder: (BuildContext context) => CustomDialog(
+        image: Icons.error,
+        title: "Are you sure?",
+        description:
             "If you confirm, your account will be removed from this device. You can always recover your account with your doublename, email and phrase.",
-            actions: <Widget>[
-              FlatButton(
-                child: new Text("Cancel"),
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-              ),
-              FlatButton(
-                child: new Text("Yes"),
-                onPressed: () async {
-                  // try {
-                  //   String deviceID = await _listener.getToken();
-                  //   removeDeviceId(deviceID);
-                  // } catch (e) {}
-                  Events().emit(CloseSocketEvent());
-                  Events().emit(FfpClearCacheEvent());
-                  Events().emit(CloseVpnEvent());
-                  bool result = await clearData();
-                  if (result) {
-                    Navigator.pop(context);
-                    await Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) =>
-                                MainScreen(initDone: true, registered: false)));
-                  } else {
-                    showDialog(
-                      context: preferenceContext,
-                      builder: (BuildContext context) =>
-                          CustomDialog(
-                            title: 'Error',
-                            description:
-                            'Something went wrong when trying to remove your account.',
-                            actions: <Widget>[
-                              FlatButton(
-                                child: Text('Ok'),
-                                onPressed: () {
-                                  Navigator.pop(context);
-                                },
-                              )
-                            ],
-                          ),
-                    );
-                  }
-                },
-              ),
-            ],
+        actions: <Widget>[
+          FlatButton(
+            child: new Text("Cancel"),
+            onPressed: () {
+              Navigator.pop(context);
+            },
           ),
+          FlatButton(
+            child: new Text("Yes"),
+            onPressed: () async {
+              // try {
+              //   String deviceID = await _listener.getToken();
+              //   removeDeviceId(deviceID);
+              // } catch (e) {}
+              Events().emit(CloseSocketEvent());
+              Events().emit(FfpClearCacheEvent());
+              Events().emit(CloseVpnEvent());
+              bool result = await clearData();
+              if (result) {
+                Navigator.pop(context);
+                await Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) =>
+                            MainScreen(initDone: true, registered: false)));
+              } else {
+                showDialog(
+                  context: preferenceContext,
+                  builder: (BuildContext context) => CustomDialog(
+                    title: 'Error',
+                    description:
+                        'Something went wrong when trying to remove your account.',
+                    actions: <Widget>[
+                      FlatButton(
+                        child: Text('Ok'),
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                      )
+                    ],
+                  ),
+                );
+              }
+            },
+          ),
+        ],
+      ),
     );
   }
 
@@ -625,7 +597,14 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
         }
       });
     });
-
+    getIdentity().then((identityMap) {
+      setState(() {
+        if (identityMap['identity'] != null) {
+          identity = identityMap['identity'];
+          identityVerified = (identityMap['sii'] != null);
+        }
+      });
+    });
     getPhrase().then((seedPhrase) {
       setState(() {
         phrase = seedPhrase;
@@ -642,18 +621,16 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
     });
   }
 
-
   void _showPhrase() async {
     String pin = await getPin();
 
     bool authenticated = await Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) =>
-              AuthenticationScreen(
-                correctPin: pin,
-                userMessage: "show your phrase.",
-              ),
+          builder: (context) => AuthenticationScreen(
+            correctPin: pin,
+            userMessage: "show your phrase.",
+          ),
         ));
 
     if (authenticated != null && authenticated) {
@@ -661,23 +638,22 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
 
       showDialog(
         context: context,
-        builder: (BuildContext context) =>
-            CustomDialog(
-              hiddenaction: copySeedPhrase,
-              image: Icons.create,
-              title: "Please write this down on a piece of paper",
-              description: phrase.toString(),
-              actions: <Widget>[
-                // usually buttons at the bottom of the dialog
-                FlatButton(
-                  child: new Text("Close"),
-                  onPressed: () {
-                    Navigator.pop(context);
-                    setState(() {});
-                  },
-                ),
-              ],
+        builder: (BuildContext context) => CustomDialog(
+          hiddenaction: copySeedPhrase,
+          image: Icons.create,
+          title: "Please write this down on a piece of paper",
+          description: phrase.toString(),
+          actions: <Widget>[
+            // usually buttons at the bottom of the dialog
+            FlatButton(
+              child: new Text("Close"),
+              onPressed: () {
+                Navigator.pop(context);
+                setState(() {});
+              },
             ),
+          ],
+        ),
       );
     }
   }
@@ -688,11 +664,10 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
     bool authenticated = await Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) =>
-            AuthenticationScreen(
-              correctPin: pin,
-              userMessage: "toggle " + biometricDeviceName + ".",
-            ),
+        builder: (context) => AuthenticationScreen(
+          correctPin: pin,
+          userMessage: "toggle " + biometricDeviceName + ".",
+        ),
       ),
     );
 
@@ -703,63 +678,101 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
     }
   }
 
-
   Future<void> _warningVerifyIdentity() async {
     await showDialog(
       context: context,
-      builder: (BuildContext context) =>
-          CustomDialog(
-            image: Icons.info,
-            title: 'Are you sure?',
-            description:
-            'Are you sure you want to verify your identity?',
-            actions: <Widget>[
-              FlatButton(
-                child: Text('No'),
-                onPressed: () {
-                  Navigator.pop(context);
+      builder: (BuildContext context) => CustomDialog(
+        image: Icons.info,
+        title: 'Are you sure?',
+        description: 'Are you sure you want to verify your identity?',
+        actions: <Widget>[
+          FlatButton(
+            child: Text('No'),
+            onPressed: () {
+              Navigator.pop(context);
+            },
+          ),
+          FlatButton(
+            child: Text('Yes'),
+            onPressed: () async {
+              Navigator.pop(context);
 
-                },
-              ),
-              FlatButton(
-                child: Text('Yes'),
-                onPressed: () async {
-                  Response identityResponse = await sendVerificationIdentity();
-                  Map<String, Object> identityDetails =
+              Response identityResponse = await sendVerificationIdentity();
+
+              if(identityResponse.statusCode != 200) {
+                // TODO implement this
+                return;
+              }
+
+              Map<String, Object> identityDetails =
                   jsonDecode(identityResponse.body);
 
-                  String verificationCode = identityDetails['verification_code'];
+              String verificationCode = identityDetails['verification_code'];
+              var reference = verificationCode;
+              createdPayload["reference"] = reference;
+              createdPayload["document"] = verificationObj['document'];
+              createdPayload["verification_mode"] = "image_only";
 
-                  var reference = verificationCode;
-                  createdPayload["reference"] = reference;
-                  createdPayload["document"] = verificationObj['document'];
-                  createdPayload["verification_mode"] = "image_only";
 
-                  Navigator.pop(context);
+              Navigator.push(
+                  context,
+                  new MaterialPageRoute(
+                      builder: (context) => new ShuftiPro(
+                          authObject: authObject,
+                          createdPayload: createdPayload,
+                          async: false,
+                          callback: (res) async {
+                            Map<String, dynamic> data = jsonDecode(res);
+                            if(data['event'] == 'verification.unauthorized') {
+                              // TODO
+                              return;
+                            }
 
-                  Navigator.push(
-                      context,
-                      new MaterialPageRoute(
-                          builder: (context) =>
-                          new ShuftiPro(
-                              authObject: authObject,
-                              createdPayload: createdPayload,
-                              async: false,
-                              callback: (res) async {
-                                Map<String, dynamic> data = jsonDecode(res);
-                                print(data);
-                                if(data['event'] == 'verfication.accepted') {
+                            print(reference);
+                            if (data['event'] == 'verification.accepted') {
+                              Response result = await verifyIdentity(reference);
+                              if (result.statusCode != 200) {
+                                print('Error in verifyIdentity');
+                                print(result.statusCode);
+                                // TODO
+                                // CUSTOM MESSAGE NEEDS TO BE PROVIDED
+                                return;
+                              }
 
-                                }
-                              },
-                              homeClass: PreferenceScreen())));
-                },
-              )
-            ],
-          ),
+                              // String doubleName =  await getDoubleName();
+                              // Response identifierResult =  await getSignedIdentityIdentifierFromOpenKYC(doubleName);
+                              //
+                              // if(identifierResult.statusCode != 200) {
+                              //   print('Error in getSignedIdentifier');
+                              //   // TODO
+                              //   // CUSTOM MESSAGE NEEDS TO BE PROVIDED
+                              //   return;
+                              // }
+                              //
+                              // String signedIdentityIdentifier = jsonDecode(identifierResult.body)['signed_identity_identifier'];
+                              // Response identityResult = await verifySignedIdentityIdentifier(signedIdentityIdentifier);
+                              //
+                              // if(identityResult.statusCode != 200) {
+                              //   print('Error in verifySignedIdentifier');
+                              //   // TODO
+                              //   // CUSTOM MESSAGE NEEDS TO BE PROVIDED
+                              //   return;
+                              // }
+                              //
+                              // print('COMPLETED');
+                              // print(identityResult.body);
+
+                              await identityVerification(context, reference);
+
+                            }
+                          },
+                          homeClass: PreferenceScreen())));
+            },
+          )
+        ],
+      ),
     );
   }
-
 
   void _changePincode() async {
     String pin = await getPin();
@@ -771,11 +784,10 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
       authenticated = await Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) =>
-              AuthenticationScreen(
-                correctPin: pin,
-                userMessage: "change your pincode.",
-              ),
+          builder: (context) => AuthenticationScreen(
+            correctPin: pin,
+            userMessage: "change your pincode.",
+          ),
         ),
       );
     }
@@ -784,31 +796,29 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
       bool pinChanged = await Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) =>
-              ChangePinScreen(
-                currentPin: pin,
-                hideBackButton: false,
-              ),
+          builder: (context) => ChangePinScreen(
+            currentPin: pin,
+            hideBackButton: false,
+          ),
         ),
       );
 
       if (pinChanged != null && pinChanged) {
         showDialog(
           context: context,
-          builder: (BuildContext context) =>
-              CustomDialog(
-                image: Icons.check,
-                title: "Success",
-                description: "Your pincode was successfully changed.",
-                actions: <Widget>[
-                  FlatButton(
-                    child: new Text("Ok"),
-                    onPressed: () async {
-                      Navigator.pop(context);
-                    },
-                  ),
-                ],
+          builder: (BuildContext context) => CustomDialog(
+            image: Icons.check,
+            title: "Success",
+            description: "Your pincode was successfully changed.",
+            actions: <Widget>[
+              FlatButton(
+                child: new Text("Ok"),
+                onPressed: () async {
+                  Navigator.pop(context);
+                },
               ),
+            ],
+          ),
         );
       }
     }
@@ -826,23 +836,21 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
       if (appConfig.environment != Environment.Production) {
         showDialog(
           context: context,
-          builder: (BuildContext context) =>
-              CustomDialog(
-                image: Icons.perm_device_information,
-                title: "Build information",
-                description:
-                "Type: ${appConfig.environment}\nGit hash: ${appConfig
-                    .githash}\nTime: ${appConfig.time}",
-                actions: <Widget>[
-                  FlatButton(
-                    child: new Text("Ok"),
-                    onPressed: () {
-                      Navigator.pop(context);
-                      setState(() {});
-                    },
-                  ),
-                ],
+          builder: (BuildContext context) => CustomDialog(
+            image: Icons.perm_device_information,
+            title: "Build information",
+            description:
+                "Type: ${appConfig.environment}\nGit hash: ${appConfig.githash}\nTime: ${appConfig.time}",
+            actions: <Widget>[
+              FlatButton(
+                child: new Text("Ok"),
+                onPressed: () {
+                  Navigator.pop(context);
+                  setState(() {});
+                },
               ),
+            ],
+          ),
         );
       }
     } catch (Exception) {

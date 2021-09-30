@@ -8,6 +8,7 @@ import 'package:flutter_svg/svg.dart';
 //import 'package:threebotlogin/apps/free_flow_pages/ffp.dart';
 //import 'package:threebotlogin/apps/free_flow_pages/ffp_events.dart';
 import 'package:threebotlogin/events/email_event.dart';
+import 'package:threebotlogin/events/go_identification_verification_event.dart';
 import 'package:threebotlogin/events/go_news_event.dart';
 import 'package:threebotlogin/events/go_reservations_event.dart';
 import 'package:threebotlogin/events/go_settings_event.dart';
@@ -154,6 +155,10 @@ class _HomeScreenState extends State<HomeScreen>
     Events().onEvent(GoReservationsEvent().runtimeType,
         (GoReservationsEvent event) {
       globals.tabController.animateTo(5, duration: Duration(seconds: 0));
+    });
+
+    Events().onEvent(GoIdentificationVerificationEvent().runtimeType, (GoIdentificationVerificationEvent event) {
+      globals.tabController.animateTo(6, duration: Duration(seconds: 0));
     });
 
     Events().onEvent(NewLoginEvent().runtimeType, (NewLoginEvent event) {

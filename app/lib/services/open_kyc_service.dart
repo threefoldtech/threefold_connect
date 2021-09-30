@@ -50,24 +50,26 @@ Future<Response> getSignedPhoneIdentifierFromOpenKYC(String doubleName) async {
       headers: loginRequestHeaders);
 }
 
-// Future<Response> getSignedIdentityIdentifierFromOpenKYC(String doubleName) async {
-//   String timestamp = new DateTime.now().millisecondsSinceEpoch.toString();
-//   String privatekey = await getPrivateKey();
-//
-//   Map<String, String> payload = {
-//     "timestamp": timestamp,
-//     "intention": "get-signedphoneidentifier"
-//   };
-//   String signedPayload = await signData(jsonEncode(payload), privatekey);
-//
-//   Map<String, String> loginRequestHeaders = {
-//     'Content-type': 'application/json',
-//     'Jimber-Authorization': signedPayload
-//   };
-//
-//   return http.get('$openKycApiUrl/verification/retrieve-spi/$doubleName',
-//       headers: loginRequestHeaders);
-// }
+Future<Response> getSignedIdentityIdentifierFromOpenKYC(
+    String doubleName) async {
+  String timestamp = new DateTime.now().millisecondsSinceEpoch.toString();
+  String privateKey = await getPrivateKey();
+
+  Map<String, String> payload = {
+    "timestamp": timestamp,
+    "intention": "get-identity-kyc-data-identifiers"
+  };
+
+  String signedPayload = await signData(jsonEncode(payload), privateKey);
+
+  Map<String, String> loginRequestHeaders = {
+    'Content-type': 'application/json',
+    'Jimber-Authorization': signedPayload
+  };
+
+  return http.get('$openKycApiUrl/verification/retrieve-sii/$doubleName',
+      headers: loginRequestHeaders);
+}
 
 Future<Response> verifySignedEmailIdentifier(
     String signedEmailIdentifier) async {
@@ -80,6 +82,25 @@ Future<Response> verifySignedPhoneIdentifier(
     String signedPhoneIdentifier) async {
   return http.post('$openKycApiUrl/verification/verify-spi',
       body: json.encode({"signedPhoneIdentifier": signedPhoneIdentifier}),
+      headers: requestHeaders);
+}
+
+Future<Response> verifySignedIdentityIdentifier(
+    String signedIdentityNameIdentifier,
+    String signedIdentityCountryIdentifier,
+    String signedIdentityDOBIdentifier,
+    String signedIdentityDocumentMetaIdentifier,
+    String signedIdentityGenderIdentifier,
+    String reference) async {
+  return http.post('$openKycApiUrl/verification/verify-sii',
+      body: json.encode({
+        "signedIdentityNameIdentifier": signedIdentityNameIdentifier,
+        "signedIdentityCountryIdentifier": signedIdentityCountryIdentifier,
+        "signedIdentityDOBIdentifier": signedIdentityDOBIdentifier,
+        "signedIdentityDocumentMetaIdentifier": signedIdentityDocumentMetaIdentifier,
+        "signedIdentityGenderIdentifier": signedIdentityGenderIdentifier,
+        "reference": reference
+      }),
       headers: requestHeaders);
 }
 
@@ -113,6 +134,18 @@ Future<Response> sendVerificationIdentity() async {
         'user_id': await getDoubleName(),
         'kycLevel': (await getKYCLevel()),
         'public_key': await getPublicKey(),
+      }),
+      headers: requestHeaders);
+}
+
+Future<Response> verifyIdentity(String reference) async {
+  print('Verify Identity');
+  print('$openKycApiUrl/verification/verify-identity');
+  return http.post('$openKycApiUrl/verification/verify-identity',
+      body: json.encode({
+        'user_id': await getDoubleName(),
+        'kycLevel': json.encode(await getKYCLevel()),
+        'reference': reference,
       }),
       headers: requestHeaders);
 }

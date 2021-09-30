@@ -7,37 +7,37 @@
 // import 'package:threebotlogin/services/user_service.dart';
 // import 'package:threebotlogin/widgets/layout_drawer.dart';
 // import 'package:yggdrasil_plugin/yggdrasil_plugin.dart';
-
+//
 // class PlanetaryNetworkScreen extends StatefulWidget {
 //   @override
 //   _PlanetaryNetworkScreenState createState() => _PlanetaryNetworkScreenState();
 // }
-
+//
 // class _PlanetaryNetworkScreenState extends State<PlanetaryNetworkScreen> {
-
+//
 //   VpnState _vpnState = new VpnState();
 //   bool _vpnTimeoutRunning = false;
-
+//
 //   Text _ipText;
 //   Text _statusMessage = Text('');
-
+//
 //   bool _isSwitched = Globals().vpnState.vpnConnected;
-
+//
 //   void reportIp(String ip) {
 //     setState(() {
 //       _vpnState.ipAddress = ip;
 //     });
 //   }
-
+//
 //   _PlanetaryNetworkScreenState() {
 //     _vpnState = Globals().vpnState;
 //     _vpnState.plugin.setOnReportIp(reportIp);
 //   }
-
+//
 //   @override
 //   void initState() {
 //     super.initState();
-
+//
 //     setState(() {
 //       if (_vpnState.vpnConnected) {
 //         _ipText = new Text("IP Address: " + _vpnState.ipText);
@@ -48,7 +48,7 @@
 //       _statusMessage = new Text('Not Connected', style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold, fontSize: 16));
 //     });
 //   }
-
+//
 //   @override
 //   Widget build(BuildContext context) {
 //     return LayoutDrawer(
@@ -89,24 +89,24 @@
 //                       value: _isSwitched,
 //                       // If the user spams the button, the application would crash => use a timeout
 //                       onChanged: _vpnTimeoutRunning ? null : (value) async {
-
+//
 //                         // When the user is not connected yet
 //                         if (!_vpnState.vpnConnected){
 //                           bool isVPNConnectionStarted = await _vpnState.plugin.startVpn(await getEdCurveKeys());
-
+//
 //                           // In case the VPN Plugin connection couldn't be started
 //                           if (!isVPNConnectionStarted) {
 //                             setState(() { _ipText = new Text("Please click connect again after accepting VPN permissions."); });
 //                             return;
 //                           }
-
+//
 //                           // When we are trying to connect to the network, set the timeout true
 //                           setState(() {
 //                             _vpnTimeoutRunning = true;
 //                             _statusMessage = new Text('Connecting ...', style: TextStyle(color: Colors.orange, fontWeight: FontWeight.bold, fontSize: 16));
 //                           });
-
-
+//
+//
 //                           // Set the timeout of 5 seconds
 //                           Future.delayed(const Duration(milliseconds: 5000), () {
 //                             setState(() {
@@ -116,22 +116,22 @@
 //                               _ipText = Text('IP Address: ' + _vpnState.ipAddress);
 //                             });
 //                           });
-
+//
 //                           // The VPN connection is established => activate the button
 //                           _vpnState.vpnConnected = true;
 //                           return;
 //                         }
-
+//
 //                         // Else: the the user is already connected and want to disconnect
 //                         setState(() {
 //                           _ipText = new Text("");
 //                           _vpnTimeoutRunning = true;
 //                           _statusMessage = new Text('Disconnecting ...', style: TextStyle(color: Colors.orange, fontWeight: FontWeight.bold, fontSize: 16));
 //                         });
-
+//
 //                         _vpnState.plugin.stopVpn();
 //                         _vpnState.vpnConnected = false;
-
+//
 //                         _vpnState.plugin = new YggdrasilPlugin();
 //                         setState(() {
 //                           Future.delayed(const Duration(milliseconds: 5000), () {
@@ -139,11 +139,11 @@
 //                               _vpnTimeoutRunning = false;
 //                               _statusMessage = new Text('Not connected', style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold, fontSize: 16));
 //                             });
-
+//
 //                             _vpnState.ipAddress = "";
 //                             _isSwitched = false;
 //                           });
-
+//
 //                           return;
 //                         });
 //                       },
@@ -156,11 +156,11 @@
 //                 onTap: () async {
 //                   if (_vpnState.ipAddress != "") {
 //                     Clipboard.setData(new ClipboardData(text: _vpnState.ipAddress));
-
+//
 //                     final snackBar = SnackBar(
 //                         content: Text('Address copied to clipboard'),
 //                     );
-
+//
 //                     ScaffoldMessenger.of(context).showSnackBar(snackBar);
 //                   }
 //                 },
