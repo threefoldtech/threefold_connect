@@ -28,7 +28,7 @@ class _IdentityVerificationScreenState
 
   Future _getPersonalData() async {
     print('testing');
-    await saveKYCLevel(0);
+    await saveKYCLevel(1);
     if (kycLevel == null) {
       int value = await getKYCLevel();
       setState(() {
@@ -324,62 +324,28 @@ class _IdentityVerificationScreenState
                 shape: BoxShape.circle,
                 color: Colors.white),
           ),
-          Padding(padding: EdgeInsets.only(left: 20)),
+          Padding(padding: EdgeInsets.only(left: 15)),
           Icon(
             icon,
             size: 20,
             color: Colors.black,
           ),
-          Padding(padding: EdgeInsets.only(left: 15)),
-          Flexible(
-              child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          Padding(padding: EdgeInsets.only(left: 10)),
+          Row(
+            mainAxisSize: MainAxisSize.min,
             children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      Text(
-                        text,
-                        textAlign: TextAlign.start,
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
-                            fontSize: 12.0, fontWeight: FontWeight.bold),
-                      ),
-                    ],
-                  ),
-                  SizedBox(
-                    height: 5,
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Verify now',
-                        style: TextStyle(
-                            color: Colors.orange,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 12),
-                      )
-                    ],
-                  ),
-                ],
-              ),
-              Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.chevron_right,
-                    size: 20,
-                    color: Colors.black,
-                  )
-                ],
-              )
+              Container(
+                  constraints: BoxConstraints(
+                      minWidth: MediaQuery.of(context).size.width * 0.4,
+                      maxWidth: MediaQuery.of(context).size.width * 0.4),
+                  padding: EdgeInsets.all(10),
+                  child: Text(text,
+                      style: TextStyle(
+                          fontSize: 12.0, fontWeight: FontWeight.bold),
+                      overflow: TextOverflow.ellipsis)),
+              ElevatedButton(onPressed: () async {}, child: Text('Verify'))
             ],
-          )),
+          ),
           Padding(padding: EdgeInsets.only(right: 10))
         ],
       ),
