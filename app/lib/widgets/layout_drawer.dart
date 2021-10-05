@@ -17,6 +17,7 @@ class LayoutDrawer extends StatefulWidget {
 
   @override
   _LayoutDrawerState createState() => _LayoutDrawerState();
+
 }
 
 class _LayoutDrawerState extends State<LayoutDrawer> {
@@ -68,8 +69,8 @@ class _LayoutDrawerState extends State<LayoutDrawer> {
               ),
               title: Text('Home'),
               onTap: () {
-                Navigator.pop(context);
-                globals.tabController.animateTo(0);
+                  Navigator.pop(context);
+                  globals.tabController.animateTo(0);
               },
             ),
             ListTile(
@@ -176,6 +177,21 @@ class _LayoutDrawerState extends State<LayoutDrawer> {
               onTap: () {
                 Navigator.pop(context);
                 globals.tabController.animateTo(6);
+              },
+            ),
+            ListTile(
+              minLeadingWidth: 10,
+              leading: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Padding(padding: const EdgeInsets.only(left: 30)),
+                  Icon(Icons.lock, color: Colors.black, size: 18)
+                ],
+              ),
+              title: Text('Testing'),
+              onTap: () {
+                Navigator.pop(context);
+                globals.tabController.animateTo(7);
               },
             ),
           ],

@@ -7,6 +7,7 @@ import 'package:threebotlogin/screens/identity_verification_screen.dart';
 import 'package:threebotlogin/screens/preference_screen.dart';
 import 'package:threebotlogin/screens/registered_screen.dart';
 import 'package:threebotlogin/screens/reservation_screen.dart';
+import 'package:threebotlogin/screens/testing_screen.dart';
 
 import 'apps/news/news.dart';
 
@@ -84,6 +85,14 @@ class JRouter {
             name: 'IdentityVerification',
             icon: Icons.lock,
             view: IdentityVerificationScreen(),
+          ),
+          app: null),
+      AppInfo(
+          route: Route(
+            path: '/testing',
+            name: 'Testing',
+            icon: Icons.tab,
+            view: TestingScreen(),
           ),
           app: null),
     ];

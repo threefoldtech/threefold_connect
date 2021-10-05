@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 
 import 'package:flutter_sodium/flutter_sodium.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:threebotlogin/helpers/globals.dart';
 import 'package:threebotlogin/services/3bot_service.dart';
 import 'package:threebotlogin/services/crypto_service.dart';
@@ -163,7 +164,7 @@ Future<void> saveEmail(String email, String signedEmailIdentifier) async {
   Globals().emailVerified.value = (signedEmailIdentifier != null);
 }
 
-Future<Map<String, Object>> getIdentity() async {
+Future<Map<String, dynamic>> getIdentity() async {
   final SharedPreferences prefs = await SharedPreferences.getInstance();
   return {
     'identityName': prefs.getString('identityName'),
@@ -185,13 +186,13 @@ Future<Map<String, Object>> getIdentity() async {
 }
 
 Future<void> saveIdentity(
-    String identityName,
+    Map<String, dynamic> identityName,
     String signedIdentityNameIdentifier,
     String identityCountry,
     String signedIdentityCountryIdentifier,
     String identityDOB,
     String signedIdentityDOBIdentifier,
-    String identityDocumentMeta,
+    Map<String, dynamic> identityDocumentMeta,
     String signedIdentityDocumentMetaIdentifier,
     String identityGender,
     String signedIdentityGenderIdentifier) async {
@@ -202,10 +203,11 @@ Future<void> saveIdentity(
   prefs.remove('identityDocumentMeta');
   prefs.remove('identityGender');
 
-  prefs.setString('identityName', identityName);
+
+  prefs.setString('identityName', jsonEncode(identityName));
   prefs.setString('identityCountry', identityCountry);
   prefs.setString('identityDOB', identityDOB);
-  prefs.setString('identityDocumentMeta', identityDocumentMeta);
+  prefs.setString('identityDocumentMeta', jsonEncode(identityDocumentMeta));
   prefs.setString('identityGender', identityGender);
 
   prefs.setString('signedIdentityNameIdentifier', signedIdentityNameIdentifier);
@@ -218,6 +220,13 @@ Future<void> saveIdentity(
       'signedIdentityGenderIdentifier', signedIdentityGenderIdentifier);
 
   prefs.remove('identityVerified');
+
+  print(signedIdentityNameIdentifier);
+  print(signedIdentityCountryIdentifier);
+  print(signedIdentityDOBIdentifier);
+  print(signedIdentityDocumentMetaIdentifier);
+  print(signedIdentityGenderIdentifier);
+
   Globals().identityVerified.value = (signedIdentityNameIdentifier != null &&
       signedIdentityCountryIdentifier != null &&
       signedIdentityDOBIdentifier != null &&
@@ -232,7 +241,6 @@ Future<void> removeIdentity() async {
   prefs.remove('identityDOB');
   prefs.remove('identityDocumentMeta');
   prefs.remove('identityGender');
-
   prefs.remove('identityVerified');
 }
 

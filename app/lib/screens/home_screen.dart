@@ -13,6 +13,7 @@ import 'package:threebotlogin/events/go_news_event.dart';
 import 'package:threebotlogin/events/go_reservations_event.dart';
 import 'package:threebotlogin/events/go_settings_event.dart';
 import 'package:threebotlogin/events/go_support_event.dart';
+import 'package:threebotlogin/events/go_testing_event.dart';
 import 'package:threebotlogin/events/phone_event.dart';
 import 'package:threebotlogin/events/events.dart';
 import 'package:threebotlogin/events/go_home_event.dart';
@@ -159,6 +160,10 @@ class _HomeScreenState extends State<HomeScreen>
 
     Events().onEvent(GoIdentificationVerificationEvent().runtimeType, (GoIdentificationVerificationEvent event) {
       globals.tabController.animateTo(6, duration: Duration(seconds: 0));
+    });
+
+    Events().onEvent(GoTestingEvent().runtimeType, (GoTestingEvent event) {
+      globals.tabController.animateTo(7, duration: Duration(seconds: 0));
     });
 
     Events().onEvent(NewLoginEvent().runtimeType, (NewLoginEvent event) {

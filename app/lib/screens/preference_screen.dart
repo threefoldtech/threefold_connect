@@ -215,142 +215,18 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
                 title: Text("Profile"),
               ),
               ListTile(
+                  leading: Icon(Icons.ten_k),
+                  title: Text('Testing ABCC'),
+                  onTap: () async {
+
+
+
+                    // await _warningVerifyIdentity();
+                  }),
+              ListTile(
                 leading: Icon(Icons.person),
                 title: Text(doubleName),
               ),
-              ListTile(
-                  leading: Icon(Icons.ten_k),
-                  title: Text('Testing'),
-                  onTap: () async {
-                    await _warningVerifyIdentity();
-                  }),
-              ListTile(
-                  trailing: !emailVerified ? Icon(Icons.refresh) : null,
-                  leading: Icon(Icons.mail),
-                  title: Text(emailAdress.toLowerCase()),
-                  subtitle: !emailVerified
-                      ? Text(
-                          "Unverified",
-                          style: TextStyle(color: Colors.grey),
-                        )
-                      : Text(
-                          "Verified",
-                          style: TextStyle(color: Colors.green),
-                        ),
-                  onTap: () {
-                    if (!emailVerified) {
-                      sendVerificationEmail();
-                      emailResendedDialog(context);
-                    }
-                  }),
-              ListTile(
-                  trailing: !phoneVerified && phoneAdress.isNotEmpty
-                      ? Icon(Icons.refresh)
-                      : null,
-                  leading: Icon(Icons.phone),
-                  title: phoneAdress.isEmpty
-                      ? Text("Add phone number",
-                          style: TextStyle(
-                              color: Theme.of(context).primaryColorDark,
-                              fontWeight: FontWeight.bold))
-                      : Text(
-                          phoneAdress,
-                        ),
-                  subtitle: phoneAdress.isEmpty
-                      ? null
-                      : !phoneVerified
-                          ? Text(
-                              "Unverified",
-                              style: TextStyle(color: Colors.deepOrangeAccent),
-                            )
-                          : Text(
-                              "Verified",
-                              style: TextStyle(color: Colors.green),
-                            ),
-                  onTap: () async {
-                    if (phoneVerified) {
-                      return;
-                    }
-
-                    if (phoneAdress.isEmpty) {
-                      await addPhoneNumberDialog(context);
-                      var phoneMap = (await getPhone());
-                      if (phoneMap.isEmpty || !phoneMap.containsKey('phone')) {
-                        return;
-                      }
-                      var pn = phoneMap['phone'];
-                      if (pn == null) {
-                        return;
-                      }
-
-                      setState(() {
-                        phoneAdress = pn;
-                      });
-
-                      if (phoneAdress.isEmpty) {
-                        return;
-                      }
-                    }
-
-                    int currentTime = new DateTime.now().millisecondsSinceEpoch;
-
-                    if (globals.tooManySmsAttempts &&
-                        globals.lockedSmsUntill > currentTime) {
-                      globals.sendSmsAttempts = 0;
-                      showDialog(
-                        context: context,
-                        builder: (BuildContext context) {
-                          return AlertDialog(
-                            title: new Text('Too many attemts please wait ' +
-                                ((globals.lockedSmsUntill - currentTime) / 1000)
-                                    .round()
-                                    .toString() +
-                                ' seconds.'),
-                            actions: <Widget>[
-                              FlatButton(
-                                child: new Text("OK"),
-                                onPressed: () {
-                                  Navigator.of(context).pop();
-                                },
-                              ),
-                            ],
-                          );
-                        },
-                      );
-                      return;
-                    }
-
-                    globals.tooManySmsAttempts = false;
-
-                    if (globals.sendSmsAttempts >= 3) {
-                      globals.tooManySmsAttempts = true;
-                      globals.lockedSmsUntill = currentTime + 60000;
-
-                      showDialog(
-                        context: context,
-                        builder: (BuildContext context) {
-                          return AlertDialog(
-                            title: new Text(
-                                'Too many attemts please wait one minute.'),
-                            actions: <Widget>[
-                              FlatButton(
-                                child: new Text("OK"),
-                                onPressed: () {
-                                  Navigator.of(context).pop();
-                                },
-                              ),
-                            ],
-                          );
-                        },
-                      );
-                      return;
-                    }
-
-                    globals.sendSmsAttempts++;
-
-                    sendVerificationSms();
-                    phoneSendDialog(context);
-                  }),
               FutureBuilder(
                 future: getPhrase(),
                 builder: (context, snapshot) {
@@ -383,9 +259,7 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
                                 if (snapshot.data == "Not found") {
                                   return Container();
                                 }
-
                                 biometricDeviceName = snapshot.data;
-
                                 return CheckboxListTile(
                                   secondary: Icon(Icons.fingerprint),
                                   value: finger,
@@ -399,6 +273,9 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
                                 return Container();
                               }
                             });
+                      }
+                      else {
+                        return Container();
                       }
                     } else {
                       return Container();
@@ -714,7 +591,7 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
               createdPayload["verification_mode"] = "image_only";
 
 
-              Navigator.push(
+              await Navigator.push(
                   context,
                   new MaterialPageRoute(
                       builder: (context) => new ShuftiPro(

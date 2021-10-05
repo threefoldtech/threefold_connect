@@ -116,9 +116,10 @@ Future emailVerification(BuildContext context) async {
       if (vsei != null &&
           vsei["email"] == email["email"] &&
           vsei["identifier"] == doubleName) {
-        await saveEmail(vsei["email"], signedEmailIdentifier);
 
         await saveKYCLevel(1);
+        print('SETTING KYC LEVEL TO 1');
+        await saveEmail(vsei["email"], signedEmailIdentifier);
 
         showDialog(
           context: context,
@@ -137,7 +138,6 @@ Future emailVerification(BuildContext context) async {
                 ],
               ),
         );
-
       } else {
         await saveEmail(email["email"], null);
       }
@@ -166,9 +166,10 @@ Future phoneVerification(BuildContext context) async {
       if (vspi != null &&
           vspi["phone"] == phone["phone"] &&
           vspi["identifier"] == doubleName) {
-        await savePhone(vspi["phone"], signedPhoneIdentifier);
 
         await saveKYCLevel(2);
+        print('SETTING KYC LEVEL TO 2');
+        await savePhone(vspi["phone"], signedPhoneIdentifier);
 
         showDialog(
           context: context,
@@ -227,6 +228,7 @@ Future identityVerification(BuildContext context, String reference) async {
     return;
   }
 
+
   Map<String, dynamic> identifiers = jsonDecode(
       (await verifySignedIdentityIdentifier(
           signedIdentityNameIdentifier,
@@ -236,6 +238,7 @@ Future identityVerification(BuildContext context, String reference) async {
           signedIdentityGenderIdentifier,
           reference))
           .body);
+
 
   Map<String, dynamic> verifiedSignedIdentityNameIdentifier =
   jsonDecode(identifiers["signedIdentityNameIdentifierVerified"]);
@@ -250,44 +253,54 @@ Future identityVerification(BuildContext context, String reference) async {
 
 
   if (verifiedSignedIdentityNameIdentifier == null ||
-      verifiedSignedIdentityNameIdentifier['identifier'].toString() != doubleName) {
+      verifiedSignedIdentityNameIdentifier['identifier'].toString() !=
+          doubleName) {
     //TODO:
     return;
   }
 
-  print('CANT FIND IT ');
-
   if (verifiedSignedIdentityCountryIdentifier == null ||
-      verifiedSignedIdentityCountryIdentifier['identifier'].toString() != doubleName) {
+      verifiedSignedIdentityCountryIdentifier['identifier'].toString() !=
+          doubleName) {
     //TODO:
     return;
   }
 
   if (verifiedSignedIdentityDOBIdentifier == null ||
-      verifiedSignedIdentityDOBIdentifier['identifier'].toString() != doubleName) {
+      verifiedSignedIdentityDOBIdentifier['identifier'].toString() !=
+          doubleName) {
     //TODO:
     return;
   }
 
   if (verifiedSignedIdentityDocumentMetaIdentifier == null ||
-      verifiedSignedIdentityDocumentMetaIdentifier['identifier'].toString() != doubleName) {
+      verifiedSignedIdentityDocumentMetaIdentifier['identifier'].toString() !=
+          doubleName) {
     //TODO:
     return;
   }
 
   if (verifiedSignedIdentityGenderIdentifier == null ||
-      verifiedSignedIdentityGenderIdentifier['identifier'].toString() != doubleName) {
+      verifiedSignedIdentityGenderIdentifier['identifier'].toString() !=
+          doubleName) {
     //TODO:
     return;
   }
 
-  await saveIdentity(verifiedSignedIdentityNameIdentifier['name_data'], signedIdentityNameIdentifier,
-      verifiedSignedIdentityCountryIdentifier['country_data'], signedIdentityCountryIdentifier,
-      verifiedSignedIdentityDOBIdentifier['dob_data'], signedIdentityDOBIdentifier,
-      verifiedSignedIdentityDocumentMetaIdentifier['document_meta_data'], signedIdentityDocumentMetaIdentifier,
-      verifiedSignedIdentityGenderIdentifier['gender_data'], signedIdentityGenderIdentifier);
-
+  print('SETTING KYC LEVEL TO 3');
   await saveKYCLevel(3);
+
+  await saveIdentity(
+      verifiedSignedIdentityNameIdentifier['name_data'],
+      signedIdentityNameIdentifier,
+      verifiedSignedIdentityCountryIdentifier['country_data'],
+      signedIdentityCountryIdentifier,
+      verifiedSignedIdentityDOBIdentifier['dob_data'],
+      signedIdentityDOBIdentifier,
+      verifiedSignedIdentityDocumentMetaIdentifier['document_meta_data'],
+      signedIdentityDocumentMetaIdentifier,
+      verifiedSignedIdentityGenderIdentifier['gender_data'],
+      signedIdentityGenderIdentifier);
 }
 
 
