@@ -31,11 +31,10 @@ String getCorrectState(int step, emailVerified, phoneVerified, identityVerified)
   }
 
   if(step == 3) {
-    print(identityVerified);
     if(!phoneVerified) {
       return 'Unverified';
     }
-    if(emailVerified && phoneVerified) {
+    if(emailVerified && phoneVerified && !identityVerified) {
       return 'CurrentPhase';
     }
 

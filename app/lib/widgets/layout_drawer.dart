@@ -1,13 +1,10 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
-import 'package:threebotlogin/events/events.dart';
-import 'package:threebotlogin/events/go_home_event.dart';
-import 'package:threebotlogin/events/go_news_event.dart';
-import 'package:threebotlogin/events/go_planetary_event.dart';
-import 'package:threebotlogin/events/go_reservations_event.dart';
-import 'package:threebotlogin/events/go_settings_event.dart';
-import 'package:threebotlogin/events/go_support_event.dart';
-import 'package:threebotlogin/events/go_wallet_event.dart';
+import 'package:http/http.dart';
 import 'package:threebotlogin/helpers/globals.dart';
+import 'package:threebotlogin/services/open_kyc_service.dart';
+import 'package:threebotlogin/services/user_service.dart';
 
 class LayoutDrawer extends StatefulWidget {
   LayoutDrawer({@required this.titleText, @required this.content});
@@ -17,7 +14,6 @@ class LayoutDrawer extends StatefulWidget {
 
   @override
   _LayoutDrawerState createState() => _LayoutDrawerState();
-
 }
 
 class _LayoutDrawerState extends State<LayoutDrawer> {
@@ -69,8 +65,8 @@ class _LayoutDrawerState extends State<LayoutDrawer> {
               ),
               title: Text('Home'),
               onTap: () {
-                  Navigator.pop(context);
-                  globals.tabController.animateTo(0);
+                Navigator.pop(context);
+                globals.tabController.animateTo(0);
               },
             ),
             ListTile(
@@ -94,8 +90,7 @@ class _LayoutDrawerState extends State<LayoutDrawer> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
                   Padding(padding: const EdgeInsets.only(left: 30)),
-                  Icon(Icons.account_balance_wallet,
-                      color: Colors.black, size: 18)
+                  Icon(Icons.account_balance_wallet, color: Colors.black, size: 18)
                 ],
               ),
               title: Text('Wallet'),
@@ -177,21 +172,6 @@ class _LayoutDrawerState extends State<LayoutDrawer> {
               onTap: () {
                 Navigator.pop(context);
                 globals.tabController.animateTo(6);
-              },
-            ),
-            ListTile(
-              minLeadingWidth: 10,
-              leading: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  Padding(padding: const EdgeInsets.only(left: 30)),
-                  Icon(Icons.lock, color: Colors.black, size: 18)
-                ],
-              ),
-              title: Text('Testing'),
-              onTap: () {
-                Navigator.pop(context);
-                globals.tabController.animateTo(7);
               },
             ),
           ],

@@ -2,7 +2,6 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:http/http.dart';
 import 'package:package_info/package_info.dart';
@@ -61,82 +60,6 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
 
   MaterialColor thiscolor = Colors.green;
 
-  var authObject = {
-    "auth_type": "basic_auth",
-    "client_id": dotenv.env['SHUFTI_CLIENT_ID'],
-    "secret_key": dotenv.env['SHUFTI_CLIENT_SECRET'],
-  };
-
-  // Default values for accessing the Shufti API
-  Map<String, Object> createdPayload = {
-    "country": "",
-    "language": "EN",
-    "email": "",
-    "callback_url": "http://www.example.com",
-    "redirect_url": "https://www.dummyurl.com/",
-    "show_consent": 1,
-    "show_results": 1,
-    "show_privacy_policy": 1,
-    "open_webView": false,
-  };
-
-  // Template for Shufti API verification object
-  Map<String, Object> verificationObj = {
-    "face": {},
-    "background_checks": {},
-    "phone": {},
-    "document": {
-      "supported_types": [
-        "passport",
-        "id_card",
-        "driving_license",
-        "credit_or_debit_card",
-      ],
-      "name": {
-        "first_name": "",
-        "last_name": "",
-        "middle_name": "",
-      },
-      "dob": "",
-      "document_number": "",
-      "expiry_date": "",
-      "issue_date": "",
-      "fetch_enhanced_data": "",
-      "gender": "",
-      "backside_proof_required": "1",
-    },
-    "document_two": {
-      "supported_types": [
-        "passport",
-        "id_card",
-        "driving_license",
-        "credit_or_debit_card"
-      ],
-      "name": {"first_name": "", "last_name": "", "middle_name": ""},
-      "dob": "",
-      "document_number": "",
-      "expiry_date": "",
-      "issue_date": "",
-      "fetch_enhanced_data": "",
-      "gender": "",
-      "backside_proof_required": "0",
-    },
-    "address": {
-      "full_address": "",
-      "name": {
-        "first_name": "",
-        "last_name": "",
-        "middle_name": "",
-        "fuzzy_match": "",
-      },
-      "supported_types": ["id_card", "utility_bill", "bank_statement"],
-    },
-    "consent": {
-      "supported_types": ["printed", "handwritten"],
-      "text": "My name is John Doe and I authorize this transaction of \$100/-",
-    },
-  };
-
   setEmailVerified() {
     if (mounted) {
       setState(() {
@@ -156,22 +79,6 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
   @override
   void initState() {
     super.initState();
-
-    setState(() {
-      // Here we can choose the different types of verification:
-      // Possibilities:
-
-      // createdPayload["face"] = verificationObj['face'];
-      // createdPayload["document"] = verificationObj['document'];
-      // createdPayload["document_two"] = verificationObj['document_two'];
-      // createdPayload["address"] = verificationObj['address'];
-      // createdPayload["consent"] = verificationObj['consent'];
-      // createdPayload["background_checks"] = verificationObj['background_checks'];
-      // createdPayload["phone"] = verificationObj['phone'];
-
-      createdPayload["document"] = verificationObj['document'];
-      createdPayload["verification_mode"] = "image_only";
-    });
 
     // checkBiometrics().then((result) => {biometricsCheck = result});
 
@@ -214,15 +121,6 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
               ListTile(
                 title: Text("Profile"),
               ),
-              ListTile(
-                  leading: Icon(Icons.ten_k),
-                  title: Text('Testing ABCC'),
-                  onTap: () async {
-
-
-
-                    // await _warningVerifyIdentity();
-                  }),
               ListTile(
                 leading: Icon(Icons.person),
                 title: Text(doubleName),
@@ -273,8 +171,7 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
                                 return Container();
                               }
                             });
-                      }
-                      else {
+                      } else {
                         return Container();
                       }
                     } else {
@@ -337,8 +234,7 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
       builder: (BuildContext context) => CustomDialog(
         image: Icons.error,
         title: "Disable Fingerprint",
-        description:
-            "Are you sure you want to deactivate fingerprint as authentication method?",
+        description: "Are you sure you want to deactivate fingerprint as authentication method?",
         actions: <Widget>[
           FlatButton(
             child: new Text("Cancel"),
@@ -392,17 +288,13 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
               if (result) {
                 Navigator.pop(context);
                 await Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) =>
-                            MainScreen(initDone: true, registered: false)));
+                    context, MaterialPageRoute(builder: (context) => MainScreen(initDone: true, registered: false)));
               } else {
                 showDialog(
                   context: preferenceContext,
                   builder: (BuildContext context) => CustomDialog(
                     title: 'Error',
-                    description:
-                        'Something went wrong when trying to remove your account.',
+                    description: 'Something went wrong when trying to remove your account.',
                     actions: <Widget>[
                       FlatButton(
                         child: Text('Ok'),
@@ -555,102 +447,6 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
     }
   }
 
-  Future<void> _warningVerifyIdentity() async {
-    await showDialog(
-      context: context,
-      builder: (BuildContext context) => CustomDialog(
-        image: Icons.info,
-        title: 'Are you sure?',
-        description: 'Are you sure you want to verify your identity?',
-        actions: <Widget>[
-          FlatButton(
-            child: Text('No'),
-            onPressed: () {
-              Navigator.pop(context);
-            },
-          ),
-          FlatButton(
-            child: Text('Yes'),
-            onPressed: () async {
-              Navigator.pop(context);
-
-              Response identityResponse = await sendVerificationIdentity();
-
-              if(identityResponse.statusCode != 200) {
-                // TODO implement this
-                return;
-              }
-
-              Map<String, Object> identityDetails =
-                  jsonDecode(identityResponse.body);
-
-              String verificationCode = identityDetails['verification_code'];
-              var reference = verificationCode;
-              createdPayload["reference"] = reference;
-              createdPayload["document"] = verificationObj['document'];
-              createdPayload["verification_mode"] = "image_only";
-
-
-              await Navigator.push(
-                  context,
-                  new MaterialPageRoute(
-                      builder: (context) => new ShuftiPro(
-                          authObject: authObject,
-                          createdPayload: createdPayload,
-                          async: false,
-                          callback: (res) async {
-                            Map<String, dynamic> data = jsonDecode(res);
-                            if(data['event'] == 'verification.unauthorized') {
-                              // TODO
-                              return;
-                            }
-
-                            print(reference);
-                            if (data['event'] == 'verification.accepted') {
-                              Response result = await verifyIdentity(reference);
-                              if (result.statusCode != 200) {
-                                print('Error in verifyIdentity');
-                                print(result.statusCode);
-                                // TODO
-                                // CUSTOM MESSAGE NEEDS TO BE PROVIDED
-                                return;
-                              }
-
-                              // String doubleName =  await getDoubleName();
-                              // Response identifierResult =  await getSignedIdentityIdentifierFromOpenKYC(doubleName);
-                              //
-                              // if(identifierResult.statusCode != 200) {
-                              //   print('Error in getSignedIdentifier');
-                              //   // TODO
-                              //   // CUSTOM MESSAGE NEEDS TO BE PROVIDED
-                              //   return;
-                              // }
-                              //
-                              // String signedIdentityIdentifier = jsonDecode(identifierResult.body)['signed_identity_identifier'];
-                              // Response identityResult = await verifySignedIdentityIdentifier(signedIdentityIdentifier);
-                              //
-                              // if(identityResult.statusCode != 200) {
-                              //   print('Error in verifySignedIdentifier');
-                              //   // TODO
-                              //   // CUSTOM MESSAGE NEEDS TO BE PROVIDED
-                              //   return;
-                              // }
-                              //
-                              // print('COMPLETED');
-                              // print(identityResult.body);
-
-                              await identityVerification(context, reference);
-
-                            }
-                          },
-                          homeClass: PreferenceScreen())));
-            },
-          )
-        ],
-      ),
-    );
-  }
-
   void _changePincode() async {
     String pin = await getPin();
     bool authenticated = false;
@@ -716,8 +512,7 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
           builder: (BuildContext context) => CustomDialog(
             image: Icons.perm_device_information,
             title: "Build information",
-            description:
-                "Type: ${appConfig.environment}\nGit hash: ${appConfig.githash}\nTime: ${appConfig.time}",
+            description: "Type: ${appConfig.environment}\nGit hash: ${appConfig.githash}\nTime: ${appConfig.time}",
             actions: <Widget>[
               FlatButton(
                 child: new Text("Ok"),

@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:http/http.dart' as http;
 import 'package:http/http.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:threebotlogin/app_config.dart';
 import 'package:threebotlogin/services/crypto_service.dart';
 import 'package:threebotlogin/services/user_service.dart';
@@ -16,73 +17,47 @@ Future<Response> getSignedEmailIdentifierFromOpenKYC(String doubleName) async {
   String timestamp = new DateTime.now().millisecondsSinceEpoch.toString();
   String privatekey = await getPrivateKey();
 
-  Map<String, String> payload = {
-    "timestamp": timestamp,
-    "intention": "get-signedemailidentifier"
-  };
+  Map<String, String> payload = {"timestamp": timestamp, "intention": "get-signedemailidentifier"};
   String signedPayload = await signData(jsonEncode(payload), privatekey);
 
-  Map<String, String> loginRequestHeaders = {
-    'Content-type': 'application/json',
-    'Jimber-Authorization': signedPayload
-  };
+  Map<String, String> loginRequestHeaders = {'Content-type': 'application/json', 'Jimber-Authorization': signedPayload};
 
-  return http.get('$openKycApiUrl/verification/retrieve-sei/$doubleName',
-      headers: loginRequestHeaders);
+  return http.get('$openKycApiUrl/verification/retrieve-sei/$doubleName', headers: loginRequestHeaders);
 }
 
 Future<Response> getSignedPhoneIdentifierFromOpenKYC(String doubleName) async {
   String timestamp = new DateTime.now().millisecondsSinceEpoch.toString();
   String privatekey = await getPrivateKey();
 
-  Map<String, String> payload = {
-    "timestamp": timestamp,
-    "intention": "get-signedphoneidentifier"
-  };
+  Map<String, String> payload = {"timestamp": timestamp, "intention": "get-signedphoneidentifier"};
   String signedPayload = await signData(jsonEncode(payload), privatekey);
 
-  Map<String, String> loginRequestHeaders = {
-    'Content-type': 'application/json',
-    'Jimber-Authorization': signedPayload
-  };
+  Map<String, String> loginRequestHeaders = {'Content-type': 'application/json', 'Jimber-Authorization': signedPayload};
 
-  return http.get('$openKycApiUrl/verification/retrieve-spi/$doubleName',
-      headers: loginRequestHeaders);
+  return http.get('$openKycApiUrl/verification/retrieve-spi/$doubleName', headers: loginRequestHeaders);
 }
 
-Future<Response> getSignedIdentityIdentifierFromOpenKYC(
-    String doubleName) async {
+Future<Response> getSignedIdentityIdentifierFromOpenKYC(String doubleName) async {
   String timestamp = new DateTime.now().millisecondsSinceEpoch.toString();
   String privateKey = await getPrivateKey();
 
-  Map<String, String> payload = {
-    "timestamp": timestamp,
-    "intention": "get-identity-kyc-data-identifiers"
-  };
+  Map<String, String> payload = {"timestamp": timestamp, "intention": "get-identity-kyc-data-identifiers"};
 
   String signedPayload = await signData(jsonEncode(payload), privateKey);
 
-  Map<String, String> loginRequestHeaders = {
-    'Content-type': 'application/json',
-    'Jimber-Authorization': signedPayload
-  };
+  Map<String, String> loginRequestHeaders = {'Content-type': 'application/json', 'Jimber-Authorization': signedPayload};
 
-  return http.get('$openKycApiUrl/verification/retrieve-sii/$doubleName',
-      headers: loginRequestHeaders);
+  return http.get('$openKycApiUrl/verification/retrieve-sii/$doubleName', headers: loginRequestHeaders);
 }
 
-Future<Response> verifySignedEmailIdentifier(
-    String signedEmailIdentifier) async {
+Future<Response> verifySignedEmailIdentifier(String signedEmailIdentifier) async {
   return http.post('$openKycApiUrl/verification/verify-sei',
-      body: json.encode({"signedEmailIdentifier": signedEmailIdentifier}),
-      headers: requestHeaders);
+      body: json.encode({"signedEmailIdentifier": signedEmailIdentifier}), headers: requestHeaders);
 }
 
-Future<Response> verifySignedPhoneIdentifier(
-    String signedPhoneIdentifier) async {
+Future<Response> verifySignedPhoneIdentifier(String signedPhoneIdentifier) async {
   return http.post('$openKycApiUrl/verification/verify-spi',
-      body: json.encode({"signedPhoneIdentifier": signedPhoneIdentifier}),
-      headers: requestHeaders);
+      body: json.encode({"signedPhoneIdentifier": signedPhoneIdentifier}), headers: requestHeaders);
 }
 
 Future<Response> verifySignedIdentityIdentifier(
@@ -123,6 +98,21 @@ Future<Response> sendVerificationSms() async {
         'number': (await getPhone())['phone'],
         'public_key': await getPublicKey(),
       }),
+      headers: requestHeaders);
+}
+
+Future<dynamic> getShuftiAccessToken() async {
+  final SharedPreferences prefs = await SharedPreferences.getInstance();
+  dynamic signedPhoneIdentifier = prefs.getString('signedPhoneIdentifier');
+
+  if (signedPhoneIdentifier == null) {
+    return;
+  }
+
+  print('Getting shufti Access token');
+  print('$openKycApiUrl/verification/shufti-access-token');
+  return http.post('$openKycApiUrl/verification/shufti-access-token',
+      body: json.encode({"signedPhoneIdentifier": signedPhoneIdentifier}),
       headers: requestHeaders);
 }
 

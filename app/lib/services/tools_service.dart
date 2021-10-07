@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:core';
 import 'dart:math';
 
@@ -44,5 +45,18 @@ bool validateDoubleName(String value) {
     return false;
   }
   
+  return true;
+}
+
+String extract3Bot(String name) {
+  return name.replaceAll('.3bot', '');
+}
+
+bool isJson(String str) {
+  try {
+    jsonDecode(str);
+  } catch (e) {
+    return false;
+  }
   return true;
 }

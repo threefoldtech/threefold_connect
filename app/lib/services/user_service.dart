@@ -179,11 +179,14 @@ Future<Map<String, dynamic>> getIdentity() async {
     'identityDocumentMeta': prefs.getString('identityDocumentMeta'),
     'signedIdentityDocumentMetaIdentifier':
         prefs.getString('signedIdentityDocumentMetaIdentifier'),
-    'identityGender': prefs.getString('identity'),
+    'identityGender': prefs.getString('identityGender'),
     'signedIdentityGenderIdentifier':
         prefs.getString('signedIdentityGenderIdentifier'),
   };
 }
+
+
+
 
 Future<void> saveIdentity(
     Map<String, dynamic> identityName,
@@ -196,6 +199,7 @@ Future<void> saveIdentity(
     String signedIdentityDocumentMetaIdentifier,
     String identityGender,
     String signedIdentityGenderIdentifier) async {
+
   final SharedPreferences prefs = await SharedPreferences.getInstance();
   prefs.remove('identityName');
   prefs.remove('identityCountry');
@@ -221,17 +225,8 @@ Future<void> saveIdentity(
 
   prefs.remove('identityVerified');
 
-  print(signedIdentityNameIdentifier);
-  print(signedIdentityCountryIdentifier);
-  print(signedIdentityDOBIdentifier);
-  print(signedIdentityDocumentMetaIdentifier);
-  print(signedIdentityGenderIdentifier);
-
-  Globals().identityVerified.value = (signedIdentityNameIdentifier != null &&
-      signedIdentityCountryIdentifier != null &&
-      signedIdentityDOBIdentifier != null &&
-      signedIdentityDocumentMetaIdentifier != null &&
-      signedIdentityGenderIdentifier != null);
+  print((signedIdentityNameIdentifier != null));
+  Globals().identityVerified.value = (signedIdentityNameIdentifier != null);
 }
 
 Future<void> removeIdentity() async {

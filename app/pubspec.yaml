@@ -50,7 +50,6 @@ dependencies:
   google_fonts: ^1.1.1
   international_phone_input: ^1.0.4
   intl_phone_field: ^1.4.2
-  flutter_dotenv: ^5.0.2
 
 dev_dependencies:
   flutter_test:
@@ -59,7 +58,6 @@ dev_dependencies:
 flutter:
   uses-material-design: true
   assets:
-    - .env
     - assets/circle_images/
     - assets/icons/
     - assets/
