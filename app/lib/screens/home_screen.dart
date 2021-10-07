@@ -8,12 +8,10 @@ import 'package:flutter_svg/svg.dart';
 //import 'package:threebotlogin/apps/free_flow_pages/ffp.dart';
 //import 'package:threebotlogin/apps/free_flow_pages/ffp_events.dart';
 import 'package:threebotlogin/events/email_event.dart';
-import 'package:threebotlogin/events/go_identification_verification_event.dart';
 import 'package:threebotlogin/events/go_news_event.dart';
 import 'package:threebotlogin/events/go_reservations_event.dart';
 import 'package:threebotlogin/events/go_settings_event.dart';
 import 'package:threebotlogin/events/go_support_event.dart';
-import 'package:threebotlogin/events/go_testing_event.dart';
 import 'package:threebotlogin/events/identity_callback_event.dart';
 import 'package:threebotlogin/events/phone_event.dart';
 import 'package:threebotlogin/events/events.dart';
@@ -151,10 +149,6 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver, Si
 
     Events().onEvent(GoReservationsEvent().runtimeType, (GoReservationsEvent event) {
       globals.tabController.animateTo(5, duration: Duration(seconds: 0));
-    });
-
-    Events().onEvent(GoTestingEvent().runtimeType, (GoTestingEvent event) {
-      globals.tabController.animateTo(7, duration: Duration(seconds: 0));
     });
 
     Events().onEvent(NewLoginEvent().runtimeType, (NewLoginEvent event) {
