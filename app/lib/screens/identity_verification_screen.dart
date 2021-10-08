@@ -303,6 +303,25 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
                       ),
                     );
                   }
+
+                  if (resData.contains('internet.connection.problem')) {
+                    return showDialog(
+                      context: context,
+                      barrierDismissible: false,
+                      builder: (BuildContext dialogContext) => CustomDialog(
+                        image: Icons.close,
+                        title: "Request canceled",
+                        description: "Please make sure your internet connection is stable.",
+                        actions: [
+                          FlatButton(
+                              onPressed: () {
+                                Navigator.pop(dialogContext);
+                              },
+                              child: Text('OK'))
+                        ],
+                      ),
+                    );
+                  }
                 }
 
                 Map<String, dynamic> data = jsonDecode(res);
@@ -323,6 +342,14 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
 
                   // DECLINED
                   case 'verification.declined':
+                    {
+                      Events().emit(IdentityCallbackEvent(type: 'failed'));
+                      break;
+                    }
+
+
+                // TIME OUT
+                  case 'request.timeout':
                     {
                       Events().emit(IdentityCallbackEvent(type: 'failed'));
                       break;
@@ -741,7 +768,7 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
                             ),
                             Row(
                               children: [
-                                Text(snapshot.data['identityDOB'] != null ? snapshot.data['identityDOB'] : 'Unknown')
+                                Text(snapshot.data['identityDOB'] != 'None' ? snapshot.data['identityDOB'] : 'Unknown')
                               ],
                             )
                           ],
@@ -784,7 +811,7 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
                             ),
                             Row(
                               children: [
-                                Text(snapshot.data['identityGender'] != null
+                                Text(snapshot.data['identityGender'] != 'None'
                                     ? snapshot.data['identityGender']
                                     : 'Unknown')
                               ],
