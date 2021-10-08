@@ -600,10 +600,12 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
     return Container();
   }
 
+
+
   Future verifyIdentityProcess() async {
-    // if (identityVerified) {
-    //   return;
-    // }
+    if (identityVerified) {
+      return;
+    }
 
     setState(() {
       this.isLoading = true;
