@@ -367,8 +367,190 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
   }
 
   Widget _fillCard(String phase, int step, String text, IconData icon) {
-    if (phase == 'Unverified') {
-      return Container(
+    switch (phase) {
+      case 'Unverified':
+        {
+          return unVerifiedWidget(step, text, icon);
+        }
+        break;
+
+      case 'Verified':
+        {
+          return verifiedWidget(step, text, icon);
+        }
+        break;
+
+      case 'CurrentPhase':
+        {
+          return currentPhaseWidget(step, text, icon);
+        }
+        break;
+
+      default:
+        {
+          return Container();
+        }
+        break;
+    }
+  }
+
+  Widget unVerifiedWidget(step, text, icon) {
+    return Container(
+      decoration: BoxDecoration(border: Border.all(width: 0.5, color: Colors.grey)),
+      height: 75,
+      width: MediaQuery.of(context).size.width * 100,
+      child: Row(
+        children: [
+          Padding(padding: EdgeInsets.only(left: 10)),
+          Container(
+            width: 30.0,
+            height: 30.0,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text('0' + step.toString(),
+                    style: TextStyle(color: Colors.blue, fontWeight: FontWeight.bold, fontSize: 12))
+              ],
+            ),
+            decoration: new BoxDecoration(
+                border: Border.all(color: Colors.blue, width: 2), shape: BoxShape.circle, color: Colors.white),
+          ),
+          Padding(padding: EdgeInsets.only(left: 20)),
+          Icon(
+            icon,
+            size: 20,
+            color: Colors.black,
+          ),
+          Padding(padding: EdgeInsets.only(left: 15)),
+          Flexible(
+              child: Container(
+                  child: Column(mainAxisAlignment: MainAxisAlignment.center, children: <Widget>[
+            Row(
+              children: <Widget>[
+                Expanded(
+                  child: Text(
+                    text,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(fontSize: 12.0, fontWeight: FontWeight.bold),
+                  ),
+                )
+              ],
+            ),
+            SizedBox(
+              height: 5,
+            ),
+            Row(
+              children: <Widget>[
+                Icon(
+                  Icons.close,
+                  color: Colors.red,
+                  size: 18.0,
+                ),
+                Padding(padding: EdgeInsets.only(left: 5)),
+                Text(
+                  'Not verified',
+                  style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold, fontSize: 12),
+                )
+              ],
+            ),
+          ]))),
+          Padding(padding: EdgeInsets.only(right: 10))
+        ],
+      ),
+    );
+  }
+
+  Widget currentPhaseWidget(step, text, icon) {
+    return Container(
+      decoration: BoxDecoration(
+          border: Border(
+              left: BorderSide(color: Colors.blue, width: 5),
+              right: BorderSide(color: Colors.grey, width: 0.5),
+              bottom: BorderSide(color: Colors.grey, width: 0.5),
+              top: BorderSide(color: Colors.grey, width: 0.5))),
+      height: 75,
+      width: MediaQuery.of(context).size.width * 100,
+      child: Row(
+        children: [
+          Padding(padding: EdgeInsets.only(left: 10)),
+          Container(
+            width: 30.0,
+            height: 30.0,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text('0' + step.toString(),
+                    style: TextStyle(color: Colors.blue, fontWeight: FontWeight.bold, fontSize: 12))
+              ],
+            ),
+            decoration: new BoxDecoration(
+                border: Border.all(color: Colors.blue, width: 2), shape: BoxShape.circle, color: Colors.white),
+          ),
+          Padding(padding: EdgeInsets.only(left: 15)),
+          Icon(
+            icon,
+            size: 20,
+            color: Colors.black,
+          ),
+          Padding(padding: EdgeInsets.only(left: 10)),
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                  constraints: BoxConstraints(
+                      minWidth: MediaQuery.of(context).size.width * 0.4,
+                      maxWidth: MediaQuery.of(context).size.width * 0.4),
+                  padding: EdgeInsets.all(10),
+                  child: Text(text,
+                      style: TextStyle(fontSize: 12.0, fontWeight: FontWeight.bold), overflow: TextOverflow.ellipsis)),
+              ElevatedButton(
+                  onPressed: () async {
+                    switch (step) {
+                      // Verify email
+                      case 1:
+                        {
+                          verifyEmail();
+                        }
+                        break;
+
+                      // Verify phone
+                      case 2:
+                        {
+                          await verifyPhone();
+                        }
+                        break;
+
+                      // Verify identity
+                      case 3:
+                        {
+                          await verifyIdentityProcess();
+                          break;
+                        }
+                      default:
+                        {}
+                        break;
+                    }
+                  },
+                  child: Text('Verify'))
+            ],
+          ),
+          Padding(padding: EdgeInsets.only(right: 10))
+        ],
+      ),
+    );
+  }
+
+  Widget verifiedWidget(step, text, icon) {
+    return GestureDetector(
+      onTap: () async {
+        // Only make this section clickable if it is Identity Verification + Current Phase
+        if (step != 3) {
+          return null;
+        }
+
+        return showIdentityDetails();
+      },
+      child: Container(
         decoration: BoxDecoration(border: Border.all(width: 0.5, color: Colors.grey)),
         height: 75,
         width: MediaQuery.of(context).size.width * 100,
@@ -378,15 +560,17 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
             Container(
               width: 30.0,
               height: 30.0,
-              child: Row(
+              child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text('0' + step.toString(),
-                      style: TextStyle(color: Colors.blue, fontWeight: FontWeight.bold, fontSize: 12))
+                  Icon(
+                    Icons.check,
+                    color: Colors.white,
+                    size: 15.0,
+                  ),
                 ],
               ),
-              decoration: new BoxDecoration(
-                  border: Border.all(color: Colors.blue, width: 2), shape: BoxShape.circle, color: Colors.white),
+              decoration: BoxDecoration(shape: BoxShape.circle, color: Colors.green),
             ),
             Padding(padding: EdgeInsets.only(left: 20)),
             Icon(
@@ -395,214 +579,53 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
               color: Colors.black,
             ),
             Padding(padding: EdgeInsets.only(left: 15)),
-            Flexible(
-                child: Container(
-                    child: Column(mainAxisAlignment: MainAxisAlignment.center, children: <Widget>[
-              Row(
-                children: <Widget>[
-                  Expanded(
-                    child: Text(
-                      text,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(fontSize: 12.0, fontWeight: FontWeight.bold),
-                    ),
-                  )
-                ],
-              ),
-              SizedBox(
-                height: 5,
-              ),
-              Row(
-                children: <Widget>[
-                  Icon(
-                    Icons.close,
-                    color: Colors.red,
-                    size: 18.0,
-                  ),
-                  Padding(padding: EdgeInsets.only(left: 5)),
-                  Text(
-                    'Not verified',
-                    style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold, fontSize: 12),
-                  )
-                ],
-              ),
-            ]))),
-            Padding(padding: EdgeInsets.only(right: 10))
-          ],
-        ),
-      );
-    }
-
-    if (phase == 'Verified') {
-      return GestureDetector(
-        onTap: () async {
-          if (step != 3) {
-            return null;
-          }
-
-          return showIdentityDetails();
-        },
-        child: Container(
-          decoration: BoxDecoration(border: Border.all(width: 0.5, color: Colors.grey)),
-          height: 75,
-          width: MediaQuery.of(context).size.width * 100,
-          child: Row(
-            children: [
-              Padding(padding: EdgeInsets.only(left: 10)),
-              Container(
-                width: 30.0,
-                height: 30.0,
-                child: Column(
+            Container(
+                child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Column(
                   mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Icon(
-                      Icons.check,
-                      color: Colors.white,
-                      size: 15.0,
+                    Row(
+                      children: [
+                        Container(
+                            constraints: BoxConstraints(
+                                minWidth: MediaQuery.of(context).size.width * 0.55,
+                                maxWidth: MediaQuery.of(context).size.width * 0.55),
+                            child: Text(text,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)))
+                      ],
                     ),
+                    SizedBox(height: 5),
+                    Row(
+                      children: [
+                        Text(
+                          'Verified',
+                          style: TextStyle(color: Colors.green, fontSize: 12, fontWeight: FontWeight.bold),
+                        )
+                      ],
+                    )
                   ],
                 ),
-                decoration: BoxDecoration(shape: BoxShape.circle, color: Colors.green),
-              ),
-              Padding(padding: EdgeInsets.only(left: 20)),
-              Icon(
-                icon,
-                size: 20,
-                color: Colors.black,
-              ),
-              Padding(padding: EdgeInsets.only(left: 15)),
-              Container(
-                  child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          Container(
-                              constraints: BoxConstraints(
-                                  minWidth: MediaQuery.of(context).size.width * 0.55,
-                                  maxWidth: MediaQuery.of(context).size.width * 0.55),
-                              child: Text(text,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)))
-                        ],
-                      ),
-                      SizedBox(height: 5),
-                      Row(
-                        children: [
-                          Text(
-                            'Verified',
-                            style: TextStyle(color: Colors.green, fontSize: 12, fontWeight: FontWeight.bold),
-                          )
-                        ],
+                step == 3
+                    ? Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [Icon(Icons.chevron_right, size: 20, color: Colors.black)],
                       )
-                    ],
-                  ),
-                  step == 3
-                      ? Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [Icon(Icons.chevron_right, size: 20, color: Colors.black)],
-                        )
-                      : Column()
-                ],
-              )),
-              Padding(padding: EdgeInsets.only(right: 10))
-            ],
-          ),
-        ),
-      );
-    }
-
-    if (phase == 'CurrentPhase') {
-      return Container(
-        decoration: BoxDecoration(
-            border: Border(
-                left: BorderSide(color: Colors.blue, width: 5),
-                right: BorderSide(color: Colors.grey, width: 0.5),
-                bottom: BorderSide(color: Colors.grey, width: 0.5),
-                top: BorderSide(color: Colors.grey, width: 0.5))),
-        height: 75,
-        width: MediaQuery.of(context).size.width * 100,
-        child: Row(
-          children: [
-            Padding(padding: EdgeInsets.only(left: 10)),
-            Container(
-              width: 30.0,
-              height: 30.0,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text('0' + step.toString(),
-                      style: TextStyle(color: Colors.blue, fontWeight: FontWeight.bold, fontSize: 12))
-                ],
-              ),
-              decoration: new BoxDecoration(
-                  border: Border.all(color: Colors.blue, width: 2), shape: BoxShape.circle, color: Colors.white),
-            ),
-            Padding(padding: EdgeInsets.only(left: 15)),
-            Icon(
-              icon,
-              size: 20,
-              color: Colors.black,
-            ),
-            Padding(padding: EdgeInsets.only(left: 10)),
-            Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Container(
-                    constraints: BoxConstraints(
-                        minWidth: MediaQuery.of(context).size.width * 0.4,
-                        maxWidth: MediaQuery.of(context).size.width * 0.4),
-                    padding: EdgeInsets.all(10),
-                    child: Text(text,
-                        style: TextStyle(fontSize: 12.0, fontWeight: FontWeight.bold),
-                        overflow: TextOverflow.ellipsis)),
-                ElevatedButton(
-                    onPressed: () async {
-                      switch (step) {
-                        // Verify email
-                        case 1:
-                          {
-                            verifyEmail();
-                          }
-                          break;
-
-                        // Verify phone
-                        case 2:
-                          {
-                            await verifyPhone();
-                          }
-                          break;
-
-                        // Verify identity
-                        case 3:
-                          {
-                            await verifyIdentityProcess();
-                            break;
-                          }
-                        default:
-                          {}
-                          break;
-                      }
-                    },
-                    child: Text('Verify'))
+                    : Column()
               ],
-            ),
+            )),
             Padding(padding: EdgeInsets.only(right: 10))
           ],
         ),
-      );
-    }
-
-    return Container();
+      ),
+    );
   }
 
-
-
   Future verifyIdentityProcess() async {
+    // Edge case: if the identity is already verified, don't let the user go through the verification process again
     if (identityVerified) {
       return;
     }
@@ -677,7 +700,7 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
     }
   }
 
-  showIdentityDetails() {
+  Future<Widget> showIdentityDetails() {
     return showDialog(
         context: context,
         builder: (BuildContext context) => Dialog(
@@ -823,8 +846,8 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
             ));
   }
 
-  emailResendDialog(context) {
-    showDialog(
+  Future<Widget> emailResendDialog(context) {
+    return showDialog(
       context: context,
       barrierDismissible: false,
       builder: (BuildContext context) => CustomDialog(
