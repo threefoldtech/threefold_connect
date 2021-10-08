@@ -201,7 +201,7 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
                   return Container(child: SizedBox(child: _inShuftiVerificationProcess()));
                 }
 
-                if(isLoading) {
+                if (isLoading) {
                   return _pleaseWait();
                 }
 
@@ -328,27 +328,11 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
                 switch (data['event']) {
                   // AUTHORIZATION IS WRONG
                   case 'request.unauthorized':
-                    {
-                      Events().emit(IdentityCallbackEvent(type: 'failed'));
-                      break;
-                    }
-
                   // NO BALANCE
                   case 'request.invalid':
-                    {
-                      Events().emit(IdentityCallbackEvent(type: 'failed'));
-                      break;
-                    }
-
                   // DECLINED
                   case 'verification.declined':
-                    {
-                      Events().emit(IdentityCallbackEvent(type: 'failed'));
-                      break;
-                    }
-
-
-                // TIME OUT
+                  // TIME OUT
                   case 'request.timeout':
                     {
                       Events().emit(IdentityCallbackEvent(type: 'failed'));
@@ -375,7 +359,6 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
                 }
               } catch (e) {
                 print(e);
-
               } finally {
                 dispose();
               }
@@ -618,9 +601,9 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
   }
 
   Future verifyIdentityProcess() async {
-    if (identityVerified) {
-      return;
-    }
+    // if (identityVerified) {
+    //   return;
+    // }
 
     setState(() {
       this.isLoading = true;
@@ -667,7 +650,6 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
         this.isLoading = false;
         this.isInIdentityProcess = true;
       });
-
     } catch (e) {
       setState(() {
         this.isLoading = false;
