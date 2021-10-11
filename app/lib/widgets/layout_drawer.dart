@@ -1,10 +1,14 @@
 import 'dart:convert';
+import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
 import 'package:threebotlogin/helpers/globals.dart';
+import 'package:threebotlogin/services/crypto_service.dart';
 import 'package:threebotlogin/services/open_kyc_service.dart';
+import 'package:threebotlogin/services/pkid_service.dart';
 import 'package:threebotlogin/services/user_service.dart';
+import 'package:http/http.dart' as http;
 
 class LayoutDrawer extends StatefulWidget {
   LayoutDrawer({@required this.titleText, @required this.content});
@@ -172,6 +176,24 @@ class _LayoutDrawerState extends State<LayoutDrawer> {
               onTap: () {
                 Navigator.pop(context);
                 globals.tabController.animateTo(6);
+              },
+            ),
+            ListTile(
+              minLeadingWidth: 10,
+              leading: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Padding(padding: const EdgeInsets.only(left: 30)),
+                  Icon(Icons.lock, color: Colors.black, size: 18)
+                ],
+              ),
+              title: Text('Testing'),
+              onTap: () async {
+                // Response abc = await getPKidDoc('save-identity');
+                // print(abc.body);
+                 Response res = await setPKidDoc('save-identity', {'abc':  'bca'}.toString());
+                 print(res.body);
+                 // print(res.body);
               },
             ),
           ],

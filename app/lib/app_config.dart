@@ -40,6 +40,10 @@ class AppConfig extends EnvConfig {
   String wizardUrl() {
     return appConfig.wizardUrl();
   }
+
+  String pKidUrl() {
+    return appConfig.pKidUrl();
+  }
 }
 
 abstract class AppConfigImpl {
@@ -54,6 +58,8 @@ abstract class AppConfigImpl {
   String threeBotSocketUrl();
 
   String wizardUrl();
+
+  String pKidUrl();
 }
 
 class AppConfigProduction extends AppConfigImpl {
@@ -79,6 +85,11 @@ class AppConfigProduction extends AppConfigImpl {
 
   String wizardUrl() {
     return 'https://wizard.jimber.org/';
+  }
+
+  String pKidUrl() {
+    // TBD
+    return '';
   }
 }
 
@@ -106,6 +117,11 @@ class AppConfigStaging extends AppConfigImpl {
   String wizardUrl() {
     return 'https://wizard.staging.jimber.org/';
   }
+
+  String pKidUrl() {
+    // TBD
+    return '';
+  }
 }
 
 class AppConfigTesting extends AppConfigImpl {
@@ -131,5 +147,10 @@ class AppConfigTesting extends AppConfigImpl {
 
   String wizardUrl() {
     return 'https://wizard.staging.jimber.org/';
+  }
+
+  String pKidUrl() {
+    // TBD
+    return '';
   }
 }
