@@ -2,13 +2,10 @@ import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
-import 'package:http/http.dart';
+import 'package:flutter_pkid/flutter_pkid.dart';
 import 'package:threebotlogin/helpers/globals.dart';
 import 'package:threebotlogin/services/crypto_service.dart';
-import 'package:threebotlogin/services/open_kyc_service.dart';
-import 'package:threebotlogin/services/pkid_service.dart';
 import 'package:threebotlogin/services/user_service.dart';
-import 'package:http/http.dart' as http;
 
 class LayoutDrawer extends StatefulWidget {
   LayoutDrawer({@required this.titleText, @required this.content});
@@ -189,11 +186,39 @@ class _LayoutDrawerState extends State<LayoutDrawer> {
               ),
               title: Text('Testing'),
               onTap: () async {
-                // Response abc = await getPKidDoc('save-identity');
-                // print(abc.body);
-                 Response res = await setPKidDoc('save-identity', {'abc':  'bca'}.toString());
-                 print(res.body);
-                 // print(res.body);
+                Map<String, dynamic> keyPair = {
+                  'publicKey' : Uint8List.fromList([
+                    205, 66, 22, 172, 129, 88, 14, 172, 18, 92, 157, 8, 180, 138, 2, 241, 106, 122, 150, 17, 34, 200, 118, 72,
+                    96, 90, 149, 141, 30, 43, 104, 90,
+                  ]),
+                  'privateKey' : Uint8List.fromList([
+                    247, 131, 3, 114, 223, 236, 177, 138, 78, 67, 19, 53, 169, 230, 86, 221, 220, 251, 15, 183, 126, 110, 143,
+                    176, 113, 193, 20, 174, 191, 103, 193, 233, 205, 66, 22, 172, 129, 88, 14, 172, 18, 92, 157, 8, 180, 138, 2,
+                    241, 106, 122, 150, 17, 34, 200, 118, 72, 96, 90, 149, 141, 30, 43, 104, 90,
+                  ])
+                };
+                //
+                // Response res = await setPKidDoc('save-identity', jsonEncode({'abc': 'bca'}).toString(), keyPair);
+                // print(res.body);
+                // dynamic data =  await getPKidDoc('save-identity', keyPair);
+                // print(data);
+
+
+                Map<String, dynamic> keyPair2 = await generateKeyPairFromSeedPhrase(await getPhrase());
+
+                Uint8List privateKey = base64.decode(await getPrivateKey());
+                print(privateKey);
+
+                // Map<String, dynamic> keyPair3 = await generateKeyPairFromSeedPhrase(await getPhrase());
+
+
+                var client = FlutterPkid('http://192.168.2.174:8080/v1', keyPair);
+              //
+              //   Response re = await client.setPKidDoc('abba', jsonEncode({'beng': 'beng'}).toString(), keyPair);
+              //   print(re.body);
+              //   dynamic r = await client.getPKidDoc('abba', keyPair);
+              //
+              //   print(r);
               },
             ),
           ],

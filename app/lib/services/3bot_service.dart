@@ -102,6 +102,7 @@ Future<bool> isAppUpToDate() async {
 }
 
 Future<bool> isAppUnderMaintenance() async {
+  print('$threeBotApiUrl/maintenance');
   Response response = await http
       .get('$threeBotApiUrl/maintenance', headers: requestHeaders)
       .timeout(const Duration(seconds: 3));
