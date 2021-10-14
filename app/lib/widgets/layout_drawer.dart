@@ -1,10 +1,14 @@
 import 'dart:convert';
+import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
-import 'package:http/http.dart';
+import 'package:flutter_pkid/flutter_pkid.dart';
 import 'package:threebotlogin/helpers/globals.dart';
-import 'package:threebotlogin/services/open_kyc_service.dart';
+import 'package:threebotlogin/services/crypto_service.dart';
 import 'package:threebotlogin/services/user_service.dart';
+import 'package:convert/convert.dart';
+
+import '../app_config.dart';
 
 class LayoutDrawer extends StatefulWidget {
   LayoutDrawer({@required this.titleText, @required this.content});

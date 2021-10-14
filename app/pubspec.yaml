@@ -31,6 +31,11 @@ dependencies:
   shuftipro_flutter_sdk:
     git:
       url: git@github.com:jimbertools/shufti-jimber.git
+
+  flutter_pkid:
+    git:
+      url: git@github.com:threefoldtech/flutter-pkid-client.git
+
   # yggdrasil_plugin:
   #   git:
   #     url: https://github.com/threefoldtech/yggdrasil_flutter

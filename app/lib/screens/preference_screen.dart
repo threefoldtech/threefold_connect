@@ -38,9 +38,6 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
   Map email;
   String doubleName = '';
   String phrase = '';
-  bool emailVerified = false;
-  bool phoneVerified = false;
-  bool identityVerified = false;
   bool showAdvancedOptions = false;
   Icon showAdvancedOptionsIcon = Icon(Icons.keyboard_arrow_down);
 
@@ -60,21 +57,6 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
 
   MaterialColor thiscolor = Colors.green;
 
-  setEmailVerified() {
-    if (mounted) {
-      setState(() {
-        this.emailVerified = Globals().emailVerified.value;
-      });
-    }
-  }
-
-  setPhoneVerified() {
-    if (mounted) {
-      setState(() {
-        this.phoneVerified = Globals().phoneVerified.value;
-      });
-    }
-  }
 
   @override
   void initState() {
@@ -88,9 +70,6 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
             buildNumber = packageInfo.buildNumber;
           })
         });
-
-    Globals().emailVerified.addListener(setEmailVerified);
-    Globals().phoneVerified.addListener(setPhoneVerified);
 
     getUserValues();
   }
@@ -348,30 +327,6 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
     getDoubleName().then((dn) {
       setState(() {
         doubleName = dn;
-      });
-    });
-    getEmail().then((emailMap) {
-      setState(() {
-        if (emailMap['email'] != null) {
-          emailAdress = emailMap['email'];
-          emailVerified = (emailMap['sei'] != null);
-        }
-      });
-    });
-    getPhone().then((phoneMap) {
-      setState(() {
-        if (phoneMap['phone'] != null) {
-          phoneAdress = phoneMap['phone'];
-          phoneVerified = (phoneMap['spi'] != null);
-        }
-      });
-    });
-    getIdentity().then((identityMap) {
-      setState(() {
-        if (identityMap['identity'] != null) {
-          identity = identityMap['identity'];
-          identityVerified = (identityMap['sii'] != null);
-        }
       });
     });
     getPhrase().then((seedPhrase) {

@@ -3,6 +3,7 @@ import 'dart:core';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_pkid/flutter_pkid.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:http/http.dart';
 import 'package:shuftipro_flutter_sdk/ShuftiPro.dart';
@@ -11,6 +12,7 @@ import 'package:threebotlogin/events/identity_callback_event.dart';
 import 'package:threebotlogin/helpers/globals.dart';
 import 'package:threebotlogin/helpers/hex_color.dart';
 import 'package:threebotlogin/screens/home_screen.dart';
+import 'package:threebotlogin/services/crypto_service.dart';
 import 'package:threebotlogin/services/identity_service.dart';
 import 'package:threebotlogin/services/open_kyc_service.dart';
 import 'package:threebotlogin/services/socket_service.dart';
@@ -706,7 +708,7 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
         builder: (BuildContext context) => Dialog(
               child: FutureBuilder(
                 future: getIdentity(),
-                builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+                builder: (BuildContext customContext, AsyncSnapshot<dynamic> snapshot) {
                   if (!snapshot.hasData) {
                     return _pleaseWait();
                   }
@@ -831,7 +833,7 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
                         children: [
                           FlatButton(
                               onPressed: () {
-                                Navigator.pop(context, true);
+                                Navigator.pop(customContext);
                               },
                               child: Text('OK')),
                           SizedBox(
@@ -895,6 +897,10 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
       setState(() {
         phone = phoneNumber;
       });
+
+      Map<String, dynamic> keyPair = await generateKeyPairFromSeedPhrase(await getPhrase());
+      var client = FlutterPkid(pkidUrl, keyPair);
+      client.setPKidDoc('phone', json.encode({'phone': phone}), keyPair);
 
       if (phone.isEmpty) {
         return;
