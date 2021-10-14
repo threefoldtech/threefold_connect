@@ -1,5 +1,8 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_pkid/flutter_pkid.dart';
 import 'package:http/http.dart';
 import 'package:threebotlogin/helpers/globals.dart';
 import 'package:threebotlogin/services/3bot_service.dart';
@@ -244,6 +247,11 @@ class _MobileRegistrationScreenState extends State<MobileRegistrationScreen> {
     saveEmail(_registrationData.email, null);
     saveDoubleName(_registrationData.doubleName);
     savePhrase(_registrationData.phrase);
+
+    Map<String, dynamic> keyPair = await generateKeyPairFromSeedPhrase(await getPhrase());
+    var client = FlutterPkid(pkidUrl, keyPair);
+    client.setPKidDoc('email', json.encode({'email': _registrationData.email }), keyPair);
+
 
     await sendVerificationEmail();
   }

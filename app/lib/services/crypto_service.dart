@@ -41,7 +41,7 @@ Future<Map<String, dynamic>> generateKeyPairFromSeedPhrase(seedPhrase) async {
   String entropy = bip39.mnemonicToEntropy(seedPhrase);
   Map<String, Uint8List> key = await Sodium.cryptoSignSeedKeypair(_toHex(entropy));
 
-  return {'publicKey': key['pk'], 'privateKey': key['sk'].toString()};
+  return {'publicKey': key['pk'], 'privateKey': key['sk']};
 }
 
 
