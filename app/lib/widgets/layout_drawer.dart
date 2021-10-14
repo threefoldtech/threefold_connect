@@ -178,42 +178,6 @@ class _LayoutDrawerState extends State<LayoutDrawer> {
                 globals.tabController.animateTo(6);
               },
             ),
-            ListTile(
-              minLeadingWidth: 10,
-              leading: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  Padding(padding: const EdgeInsets.only(left: 30)),
-                  Icon(Icons.lock, color: Colors.black, size: 18)
-                ],
-              ),
-              title: Text('Testing'),
-              onTap: () async {
-                // Map<String, dynamic> keyPair = {
-                //   'publicKey' : Uint8List.fromList([
-                //     205, 66, 22, 172, 129, 88, 14, 172, 18, 92, 157, 8, 180, 138, 2, 241, 106, 122, 150, 17, 34, 200, 118, 72,
-                //     96, 90, 149, 141, 30, 43, 104, 90,
-                //   ]),
-                //   'privateKey' : Uint8List.fromList([
-                //     247, 131, 3, 114, 223, 236, 177, 138, 78, 67, 19, 53, 169, 230, 86, 221, 220, 251, 15, 183, 126, 110, 143,
-                //     176, 113, 193, 20, 174, 191, 103, 193, 233, 205, 66, 22, 172, 129, 88, 14, 172, 18, 92, 157, 8, 180, 138, 2,
-                //     241, 106, 122, 150, 17, 34, 200, 118, 72, 96, 90, 149, 141, 30, 43, 104, 90,
-                //   ])
-                // };
-
-                print(await getKYCLevel());
-                // Map<String, dynamic> keyPair = await generateKeyPairFromSeedPhrase(await getPhrase());
-                // var client = FlutterPkid(pkidUrl, keyPair);
-                //
-                // Map<String, dynamic> emailPkid = await client.getPKidDoc('email', keyPair);
-                //
-                //
-                // if(emailPkid.containsKey('error') || !jsonDecode(emailPkid['data']).containsKey('sei')) {
-                //   print('HELLO');
-                // }
-
-              },
-            ),
           ],
         ),
       ),
