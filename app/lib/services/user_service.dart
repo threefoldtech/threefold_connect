@@ -2,8 +2,10 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:core';
 import 'package:convert/convert.dart';
+import 'package:flutter/services.dart';
 
 import 'package:flutter_sodium/flutter_sodium.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:threebotlogin/helpers/globals.dart';
 import 'package:threebotlogin/services/3bot_service.dart';
@@ -57,7 +59,6 @@ Future<Map<String, String>> getEdCurveKeys() async {
       await Sodium.cryptoSignEd25519PkToCurve25519(base64.decode(pkEd)));
   final String skCurve = base64.encode(
       await Sodium.cryptoSignEd25519SkToCurve25519(base64.decode(skEd)));
-
 
   return {
     'signingPublicKey': hex.encode(base64.decode(pkEd)),
@@ -163,6 +164,92 @@ Future<void> saveEmail(String email, String signedEmailIdentifier) async {
   Globals().emailVerified.value = (signedEmailIdentifier != null);
 }
 
+Future<Map<String, dynamic>> getIdentity() async {
+  final SharedPreferences prefs = await SharedPreferences.getInstance();
+  return {
+    'identityName': prefs.getString('identityName'),
+    'signedIdentityNameIdentifier':
+        prefs.getString('signedIdentityNameIdentifier'),
+    'identityCountry': prefs.getString('identityCountry'),
+    'signedIdentityCountryIdentifier':
+        prefs.getString('signedIdentityCountryIdentifier'),
+    'identityDOB': prefs.getString('identityDOB'),
+    'signedIdentityDOBIdentifier':
+        prefs.getString('signedIdentityDOBIdentifier'),
+    'identityDocumentMeta': prefs.getString('identityDocumentMeta'),
+    'signedIdentityDocumentMetaIdentifier':
+        prefs.getString('signedIdentityDocumentMetaIdentifier'),
+    'identityGender': prefs.getString('identityGender'),
+    'signedIdentityGenderIdentifier':
+        prefs.getString('signedIdentityGenderIdentifier'),
+  };
+}
+
+
+
+
+Future<void> saveIdentity(
+    Map<String, dynamic> identityName,
+    String signedIdentityNameIdentifier,
+    String identityCountry,
+    String signedIdentityCountryIdentifier,
+    String identityDOB,
+    String signedIdentityDOBIdentifier,
+    Map<String, dynamic> identityDocumentMeta,
+    String signedIdentityDocumentMetaIdentifier,
+    String identityGender,
+    String signedIdentityGenderIdentifier) async {
+
+  final SharedPreferences prefs = await SharedPreferences.getInstance();
+  prefs.remove('identityName');
+  prefs.remove('identityCountry');
+  prefs.remove('identityDOB');
+  prefs.remove('identityDocumentMeta');
+  prefs.remove('identityGender');
+
+
+  prefs.setString('identityName', jsonEncode(identityName));
+  prefs.setString('identityCountry', identityCountry);
+  prefs.setString('identityDOB', identityDOB);
+  prefs.setString('identityDocumentMeta', jsonEncode(identityDocumentMeta));
+  prefs.setString('identityGender', identityGender);
+
+  prefs.setString('signedIdentityNameIdentifier', signedIdentityNameIdentifier);
+  prefs.setString(
+      'signedIdentityCountryIdentifier', signedIdentityCountryIdentifier);
+  prefs.setString('signedIdentityDOBIdentifier', signedIdentityDOBIdentifier);
+  prefs.setString('signedIdentityDocumentMetaIdentifier',
+      signedIdentityDocumentMetaIdentifier);
+  prefs.setString(
+      'signedIdentityGenderIdentifier', signedIdentityGenderIdentifier);
+
+  prefs.remove('identityVerified');
+
+  print((signedIdentityNameIdentifier != null));
+  Globals().identityVerified.value = (signedIdentityNameIdentifier != null);
+}
+
+Future<void> removeIdentity() async {
+  final SharedPreferences prefs = await SharedPreferences.getInstance();
+  prefs.remove('identityName');
+  prefs.remove('identityCountry');
+  prefs.remove('identityDOB');
+  prefs.remove('identityDocumentMeta');
+  prefs.remove('identityGender');
+  prefs.remove('identityVerified');
+}
+
+Future<int> getKYCLevel() async {
+  final SharedPreferences prefs = await SharedPreferences.getInstance();
+  return prefs.getInt('kycLevel');
+}
+
+Future<void> saveKYCLevel(int level) async {
+  final SharedPreferences prefs = await SharedPreferences.getInstance();
+  prefs.remove('kycLevel');
+  prefs.setInt('kycLevel', level);
+}
+
 Future<Map<String, Object>> getEmail() async {
   final SharedPreferences prefs = await SharedPreferences.getInstance();
   return {
@@ -179,6 +266,7 @@ Future<void> removePhone() async {
 }
 
 Future<void> savePhone(String phone, String signedPhoneIdentifier) async {
+  print(signedPhoneIdentifier);
   final SharedPreferences prefs = await SharedPreferences.getInstance();
   prefs.remove('phone');
   prefs.setString('phone', phone);

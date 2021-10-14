@@ -1,3 +1,4 @@
 class GoSettingsEvent {
   GoSettingsEvent();
 }
+

@@ -12,6 +12,7 @@ import 'package:threebotlogin/events/go_news_event.dart';
 import 'package:threebotlogin/events/go_reservations_event.dart';
 import 'package:threebotlogin/events/go_settings_event.dart';
 import 'package:threebotlogin/events/go_support_event.dart';
+import 'package:threebotlogin/events/identity_callback_event.dart';
 import 'package:threebotlogin/events/phone_event.dart';
 import 'package:threebotlogin/events/events.dart';
 import 'package:threebotlogin/events/go_home_event.dart';
@@ -37,8 +38,7 @@ class HomeScreen extends StatefulWidget {
   _HomeScreenState createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen>
-    with WidgetsBindingObserver, SingleTickerProviderStateMixin {
+class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver, SingleTickerProviderStateMixin {
   Globals globals = Globals();
   StreamSubscription _sub;
   String initialLink;
@@ -48,15 +48,14 @@ class _HomeScreenState extends State<HomeScreen>
   final int pinCheckTimeout = 60000 * 5;
 
   _HomeScreenState() {
-    globals.tabController = NoAnimationTabController(
-        initialIndex: 0, length: Globals().router.routes.length, vsync: this);
+    globals.tabController =
+        NoAnimationTabController(initialIndex: 0, length: Globals().router.routes.length, vsync: this);
     //Events().onEvent(FfpBrowseEvent().runtimeType, activateFfpTab);
     globals.tabController.addListener(_handleTabSelection);
   }
 
   void checkPinAndNavigateIfSuccess(int indexIfAuthIsSuccess) async {
     String pin = await getPin();
-
     pinCheckOpen = true;
 
     bool authenticated = await Navigator.push(
@@ -83,17 +82,14 @@ class _HomeScreenState extends State<HomeScreen>
       return;
     }
 
-    if (Globals().router.pinRequired(globals.tabController.index) &&
-        timeoutExpiredInBackground &&
-        !pinCheckOpen) {
+    if (Globals().router.pinRequired(globals.tabController.index) && timeoutExpiredInBackground && !pinCheckOpen) {
       int authenticatedAppIndex = globals.tabController.index;
       globals.tabController.animateTo(globals.tabController.previousIndex);
 
       checkPinAndNavigateIfSuccess(authenticatedAppIndex);
     }
 
-    if (Globals().router.emailMustBeVerified(globals.tabController.index) &&
-        !Globals().emailVerified.value) {
+    if (Globals().router.emailMustBeVerified(globals.tabController.index) && !Globals().emailVerified.value) {
       globals.tabController.animateTo(globals.tabController.previousIndex);
       await emailVerificationDialog(context);
     }
@@ -151,8 +147,7 @@ class _HomeScreenState extends State<HomeScreen>
       globals.tabController.animateTo(4, duration: Duration(seconds: 0));
     });
 
-    Events().onEvent(GoReservationsEvent().runtimeType,
-        (GoReservationsEvent event) {
+    Events().onEvent(GoReservationsEvent().runtimeType, (GoReservationsEvent event) {
       globals.tabController.animateTo(5, duration: Duration(seconds: 0));
     });
 
@@ -163,6 +158,14 @@ class _HomeScreenState extends State<HomeScreen>
     Events().onEvent(EmailEvent().runtimeType, (EmailEvent event) {
       emailVerification(context);
     });
+
+    Events().onEvent(IdentityCallbackEvent().runtimeType, (IdentityCallbackEvent event) async {
+      Future(() {
+        globals.tabController.animateTo(0, duration: Duration(seconds: 0));
+        showIdentityMessage(context, event.type);
+      });
+    });
+
     Events().onEvent(PhoneEvent().runtimeType, (PhoneEvent event) {
       phoneVerification(context);
     });
@@ -184,15 +187,13 @@ class _HomeScreenState extends State<HomeScreen>
         return;
       }
 
-      int timeSpendWithPausedApp =
-          new DateTime.now().millisecondsSinceEpoch - lastCheck;
+      int timeSpendWithPausedApp = new DateTime.now().millisecondsSinceEpoch - lastCheck;
 
       if (timeSpendWithPausedApp >= pinCheckTimeout) {
         timeoutExpiredInBackground = true;
       }
 
-      if (Globals().router.pinRequired(globals.tabController.index) &&
-          timeoutExpiredInBackground) {
+      if (Globals().router.pinRequired(globals.tabController.index) && timeoutExpiredInBackground) {
         int homeTab = 0;
         globals.tabController.animateTo(homeTab);
       }
@@ -203,8 +204,7 @@ class _HomeScreenState extends State<HomeScreen>
   }
 
   Future<Null> initUniLinks() async {
-    Events().onEvent(
-        UniLinkEvent(null, null).runtimeType, UniLinkService.handleUniLink);
+    Events().onEvent(UniLinkEvent(null, null).runtimeType, UniLinkService.handleUniLink);
     initialLink = widget.initialLink;
 
     if (initialLink != null) {
@@ -278,11 +278,7 @@ class _HomeScreenState extends State<HomeScreen>
     if (Globals().router.routes[globals.tabController.index].app == null) {
       Events().emit(GoHomeEvent()); // if not an app, eg settings, go home
     }
-    Globals()
-        .router
-        .routes[globals.tabController.index]
-        .app
-        .back(); // if app ask app to handle back event
+    Globals().router.routes[globals.tabController.index].app.back(); // if app ask app to handle back event
 
     return Future(() => false);
   }
