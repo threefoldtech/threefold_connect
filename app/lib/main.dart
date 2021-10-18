@@ -7,6 +7,8 @@ import 'package:threebotlogin/services/logging_service.dart';
 import 'package:threebotlogin/services/user_service.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import 'helpers/kyc_helpers.dart';
+
 
 LoggingService logger;
 
@@ -18,8 +20,15 @@ Future<void> main() async {
   String doubleName = await getDoubleName();
 
   Map<String, Object> email = await getEmail();
+  Map<String, Object> phone = await getPhone();
+  Map<String, dynamic> identity = await getIdentity();
 
   Globals().emailVerified.value = (email['sei'] != null);
+  Globals().phoneVerified.value = (phone['spi'] != null);
+  Globals().identityVerified.value = (identity['signedIdentityNameIdentifier'] != null);
+
+  await saveCorrectKYCLevel();
+
   bool registered = doubleName != null;
 
   runApp(MyApp(initDone: initDone, registered: registered));

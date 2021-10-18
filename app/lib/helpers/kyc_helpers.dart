@@ -63,3 +63,19 @@ int calculateKYCLevel(
 
   return -1;
 }
+
+Future<void> saveCorrectKYCLevel() async {
+  await saveKYCLevel(0);
+
+  if(Globals().emailVerified.value == true) {
+    await saveKYCLevel(1);
+  }
+
+  if(Globals().phoneVerified.value == true) {
+    await saveKYCLevel(2);
+  }
+
+  if(Globals().identityVerified.value == true) {
+    await saveKYCLevel(3);
+  }
+}

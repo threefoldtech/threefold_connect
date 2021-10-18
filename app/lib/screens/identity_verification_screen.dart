@@ -175,8 +175,8 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
     });
     getIdentity().then((identityMap) {
       setState(() {
-        if (identityMap['identityName'] != null) {
-          identityVerified = (identityMap['identityName'] != null);
+        if (identityMap['signedIdentityNameIdentifier'] != null) {
+          identityVerified = (identityMap['signedIdentityNameIdentifier'] != null);
         }
       });
     });
@@ -638,6 +638,30 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
 
     try {
       Response accessTokenResponse = await getShuftiAccessToken();
+      print(accessTokenResponse.statusCode);
+
+      if (accessTokenResponse.statusCode == 403) {
+          setState(() {
+            this.isLoading = false;
+          });
+
+          return showDialog(
+              context: context,
+              builder: (BuildContext context) => CustomDialog(
+                image: Icons.warning,
+                title: "Maximum requests Reached",
+                description: "You already had 5 requests in last 24 hours. \nPlease try again in 24 hours.",
+                actions: <Widget>[
+                  FlatButton(
+                    child: new Text("Ok"),
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                  ),
+                ],
+              ));
+      }
+
       if (accessTokenResponse.statusCode != 200) {
         setState(() {
           this.isLoading = false;
@@ -646,19 +670,20 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
         return showDialog(
             context: context,
             builder: (BuildContext context) => CustomDialog(
-                  image: Icons.warning,
-                  title: "Maximum requests Reached",
-                  description: "You already had 5 requests in last 24 hours. \nPlease try again in 24 hours.",
-                  actions: <Widget>[
-                    FlatButton(
-                      child: new Text("Ok"),
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
-                    ),
-                  ],
-                ));
+              image: Icons.warning,
+              title: "Couldn't setup verification process",
+              description:  "Something went wrong. Please contact support if this issue persists.",
+              actions: <Widget>[
+                FlatButton(
+                  child: new Text("Ok"),
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                ),
+              ],
+            ));
       }
+
 
       Map<String, Object> details = jsonDecode(accessTokenResponse.body);
       authObject['access_token'] = details['access_token'];
@@ -671,12 +696,14 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
 
       createdPayload["reference"] = reference;
       createdPayload["document"] = verificationObj['document'];
+      createdPayload["face"] = verificationObj['face'];
       createdPayload["verification_mode"] = "image_only";
 
       setState(() {
         this.isLoading = false;
         this.isInIdentityProcess = true;
       });
+
     } catch (e) {
       setState(() {
         this.isLoading = false;
