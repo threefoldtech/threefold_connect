@@ -1,4 +1,4 @@
-export const threefoldBackend = 'https://login.staging.jimber.org';
+export const threefoldBackend = 'https://login.staging.jimber.io';
 export const kycBackend = 'https://openkyc.staging.jimber.org';
 export const redirect_url = '/callback';
 export const appId = window.location.host;
