@@ -94,7 +94,7 @@ class AppConfigProduction extends AppConfigImpl {
 
 class AppConfigStaging extends AppConfigImpl {
   String baseUrl() {
-    return "login.staging.jimber.org";
+    return "login.staging.jimber.io";
   }
 
   String openKycApiUrl() {
@@ -102,15 +102,15 @@ class AppConfigStaging extends AppConfigImpl {
   }
 
   String threeBotApiUrl() {
-    return "https://login.staging.jimber.org/api";
+    return "https://login.staging.jimber.io/api";
   }
 
   String threeBotFrontEndUrl() {
-    return "https://login.staging.jimber.org/";
+    return "https://login.staging.jimber.io/";
   }
 
   String threeBotSocketUrl() {
-    return "wss://login.staging.jimber.org";
+    return "wss://login.staging.jimber.io";
   }
 
   String wizardUrl() {
