@@ -28,4 +28,4 @@ jobs:
       - name: Pull Image
         run: docker pull jimber/3botlogin:staging-${{ github.sha }}
       - name: Run new docker
-        run: docker run -d -it --restart=unless-stopped --name 3botlogin -v /opt/3botlogin/pythonsqlite.db:/usr/share/nginx/backend/pythonsqlite.db -v /opt/3botlogin/config.ini:/usr/share/nginx/backend/config.ini --network=jimber_proxy_net jimber/3botlogin:staging-${{ github.sha }}
+        run: docker run -d -it --restart=unless-stopped --name 3botlogin -v /opt/3botlogin/pythonsqlite.db:/usr/share/nginx/backend/pythonsqlite.db -v /opt/3botlogin/config.ini:/usr/share/nginx/backend/config.ini --network=proxy jimber/3botlogin:staging-${{ github.sha }}
