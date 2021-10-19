@@ -114,7 +114,7 @@ class AppConfigStaging extends AppConfigImpl {
   }
 
   String wizardUrl() {
-    return 'https://wizard.staging.jimber.org/';
+    return 'https://wizard.staging.jimber.io/';
   }
 
   String pKidUrl() {
