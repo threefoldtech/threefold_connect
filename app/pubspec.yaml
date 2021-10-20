@@ -25,16 +25,20 @@ dependencies:
   keyboard_visibility:
     git:
       url: https://github.com/jimbertools/flutter_keyboard_visibility
+
   redirection:
     git:
       url: https://github.com/jimbertools/redirection
+
   shuftipro_flutter_sdk:
     git:
       url: git@github.com:jimbertools/shufti-jimber.git
+      ref: main_integration-dependencies
 
   flutter_pkid:
     git:
       url: git@github.com:threefoldtech/flutter-pkid-client.git
+      ref: main_integration-dependencies
 
   # yggdrasil_plugin:
   #   git:
@@ -48,13 +52,14 @@ dependencies:
   url_launcher: ^6.0.2
   intl: ^0.17.0
   password_hash: ^2.0.0
-  shared_preferences: ^2.0.0
+  shared_preferences: ^0.5.12+4
   http: ^0.12.2
   package_info: ^0.4.1
   cupertino_icons: ^1.0.2
   google_fonts: ^1.1.1
   international_phone_input: ^1.0.4
   intl_phone_field: ^1.4.2
+  flagsmith: ^1.0.1
 
 dev_dependencies:
   flutter_test:

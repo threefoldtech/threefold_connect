@@ -7,6 +7,7 @@ import 'package:threebotlogin/services/logging_service.dart';
 import 'package:threebotlogin/services/user_service.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import 'helpers/flags.dart';
 import 'helpers/kyc_helpers.dart';
 
 
@@ -30,6 +31,8 @@ Future<void> main() async {
   await saveCorrectKYCLevel();
 
   bool registered = doubleName != null;
+
+  await Flags().initialiseFlagSmith();
 
   runApp(MyApp(initDone: initDone, registered: registered));
 }

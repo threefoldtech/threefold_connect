@@ -9,6 +9,7 @@ import 'package:http/http.dart';
 import 'package:shuftipro_flutter_sdk/ShuftiPro.dart';
 import 'package:threebotlogin/events/events.dart';
 import 'package:threebotlogin/events/identity_callback_event.dart';
+import 'package:threebotlogin/helpers/flags.dart';
 import 'package:threebotlogin/helpers/globals.dart';
 import 'package:threebotlogin/helpers/hex_color.dart';
 import 'package:threebotlogin/screens/home_screen.dart';
@@ -40,6 +41,7 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
 
   bool isInIdentityProcess = false;
   bool isLoading = false;
+  bool isOpenKycEnabled = false;
 
   Globals globals = Globals();
 
@@ -147,6 +149,12 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
   }
 
   void getUserValues() {
+    Flags().getFlagValueByFeatureName('kyc').then((isEnabled) {
+      setState(() {
+        isOpenKycEnabled = isEnabled;
+      });
+    });
+
     getKYCLevel().then((level) {
       setState(() {
         kycLevel = level;
@@ -231,8 +239,13 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
                                             phone.isEmpty ? 'Unknown' : phone, Icons.phone),
 
                                         // Step three: verify identity
-                                        _fillCard(getCorrectState(3, emailVerified, phoneVerified, identityVerified), 3,
-                                            extract3Bot(doubleName), Icons.perm_identity)
+                                        isOpenKycEnabled
+                                            ? _fillCard(
+                                                getCorrectState(3, emailVerified, phoneVerified, identityVerified),
+                                                3,
+                                                extract3Bot(doubleName),
+                                                Icons.perm_identity)
+                                            : Container()
                                       ],
                                     ),
                                   );
@@ -638,28 +651,27 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
 
     try {
       Response accessTokenResponse = await getShuftiAccessToken();
-      print(accessTokenResponse.statusCode);
 
       if (accessTokenResponse.statusCode == 403) {
-          setState(() {
-            this.isLoading = false;
-          });
+        setState(() {
+          this.isLoading = false;
+        });
 
-          return showDialog(
-              context: context,
-              builder: (BuildContext context) => CustomDialog(
-                image: Icons.warning,
-                title: "Maximum requests Reached",
-                description: "You already had 5 requests in last 24 hours. \nPlease try again in 24 hours.",
-                actions: <Widget>[
-                  FlatButton(
-                    child: new Text("Ok"),
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
-                  ),
-                ],
-              ));
+        return showDialog(
+            context: context,
+            builder: (BuildContext context) => CustomDialog(
+                  image: Icons.warning,
+                  title: "Maximum requests Reached",
+                  description: "You already had 5 requests in last 24 hours. \nPlease try again in 24 hours.",
+                  actions: <Widget>[
+                    FlatButton(
+                      child: new Text("Ok"),
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                    ),
+                  ],
+                ));
       }
 
       if (accessTokenResponse.statusCode != 200) {
@@ -670,20 +682,19 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
         return showDialog(
             context: context,
             builder: (BuildContext context) => CustomDialog(
-              image: Icons.warning,
-              title: "Couldn't setup verification process",
-              description:  "Something went wrong. Please contact support if this issue persists.",
-              actions: <Widget>[
-                FlatButton(
-                  child: new Text("Ok"),
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                ),
-              ],
-            ));
+                  image: Icons.warning,
+                  title: "Couldn't setup verification process",
+                  description: "Something went wrong. Please contact support if this issue persists.",
+                  actions: <Widget>[
+                    FlatButton(
+                      child: new Text("Ok"),
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                    ),
+                  ],
+                ));
       }
-
 
       Map<String, Object> details = jsonDecode(accessTokenResponse.body);
       authObject['access_token'] = details['access_token'];
@@ -703,7 +714,6 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
         this.isLoading = false;
         this.isInIdentityProcess = true;
       });
-
     } catch (e) {
       setState(() {
         this.isLoading = false;
