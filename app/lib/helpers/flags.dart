@@ -1,4 +1,5 @@
 import 'package:flagsmith/flagsmith.dart';
+import 'package:threebotlogin/app_config.dart';
 import 'package:threebotlogin/services/user_service.dart';
 
 class Flags {
@@ -6,18 +7,30 @@ class Flags {
 
   FlagsmithClient client;
 
+  Map<String, String> flagSmithConfig = AppConfig().flagSmithConfig();
+
   Future<void> initialiseFlagSmith() async {
     client = await FlagsmithClient.init(
-      apiKey: 'ESyGaBhSi65vqTMcFee48r',
-      seeds: <Flag>[
-        Flag.seed('feature', enabled: true),
-      ],
-    );
+        config: FlagsmithConfig(
+          baseURI: flagSmithConfig['url'],
+        ),
+        apiKey: flagSmithConfig['apiKey']);
 
-    FeatureUser user = FeatureUser(identifier: await getDoubleName());
-    await client.getFeatureFlags(user: user, reload: true);
+
+    String doubleName = await getDoubleName();
+
+    if(doubleName != null) {
+      FeatureUser user = FeatureUser(identifier: doubleName);
+
+      try {
+        await client.getFeatureFlags(user: user, reload: true);
+      }
+
+      catch(e) {
+        print(e);
+      }
+    }
   }
-
 
   Future<bool> getFlagValueByFeatureName(String name) async {
     if (client != null) {
