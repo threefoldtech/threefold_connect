@@ -44,6 +44,10 @@ class AppConfig extends EnvConfig {
   String pKidUrl() {
     return appConfig.pKidUrl();
   }
+
+  Map<String, String> flagSmithConfig() {
+    return appConfig.flagSmithConfig();
+  }
 }
 
 abstract class AppConfigImpl {
@@ -60,6 +64,8 @@ abstract class AppConfigImpl {
   String wizardUrl();
 
   String pKidUrl();
+
+  Map<String, String> flagSmithConfig();
 }
 
 class AppConfigProduction extends AppConfigImpl {
@@ -89,6 +95,13 @@ class AppConfigProduction extends AppConfigImpl {
 
   String pKidUrl() {
     return 'https://pkid.jimber.org/v1';
+  }
+
+  Map<String, String> flagSmithConfig() {
+    return {
+      'url': 'https://flagsmith.jimber.io/api/v1/',
+      'apiKey': 'BuzktmbcnMJ77vznU7WhJB'
+    };
   }
 }
 
@@ -120,6 +133,13 @@ class AppConfigStaging extends AppConfigImpl {
   String pKidUrl() {
     return 'https://pkid.staging.jimber.org/v1';
   }
+
+  Map<String, String> flagSmithConfig() {
+    return {
+      'url': 'https://flagsmith.jimber.io/api/v1/',
+      'apiKey': 'n6YyxDdrePqwAF49KCYx7S'
+    };
+  }
 }
 
 class AppConfigTesting extends AppConfigImpl {
@@ -149,5 +169,12 @@ class AppConfigTesting extends AppConfigImpl {
 
   String pKidUrl() {
     return 'https://pkid.staging.jimber.org/v1';
+  }
+
+  Map<String, String> flagSmithConfig() {
+    return {
+      'url': 'https://flagsmith.jimber.io/api/v1/',
+      'apiKey': 'VtTsMwJwiF69QWFWHGEMKM'
+    };
   }
 }

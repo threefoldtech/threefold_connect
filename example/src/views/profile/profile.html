@@ -1,22 +1,86 @@
 <section class="profile">
-  <v-card>
-    <v-toolbar class="primary">
-      <h1 class="headline white--text text-xs-center fw">
-        You are logged in
-      </h1>
-    </v-toolbar>
-    <v-form>
-      <v-card-text>
-        <v-layout column>
-          <p>Hi {{user.name}}</p>
-          <br />
-          <p>Object: {{(user) ? user : "No object."}}</p>
-          <p>Email Object: {{(user.email) ? user.email : "No email object."}}</p>
-          <p>Email: {{(user.email && user.email.email) ? user.email.email : "No email."}}</p>
-          <p>SEI: {{(user.email && user.email.sei) ? user.email.sei : "No sei."}}</p>
-          <p>SEI Verified: {{(user.email && user.email.sei && seiResponse) ? seiResponse : "No email verification could be done."}}</p> 
-        </v-layout>
-      </v-card-text>
-    </v-form>
-  </v-card>
+    <v-card>
+        <v-toolbar class="primary">
+            <h1 class="headline white--text text-xs-center fw">
+                You are logged in
+            </h1>
+        </v-toolbar>
+        <v-form>
+            <v-card-text>
+                <v-layout column>
+                    <br/>
+                    <h1>
+                        Hi {{ user.name }}
+                    </h1>
+                    <br/>
+                    <h2>Object</h2>
+                    <br/>
+                    <p>Object: {{ (user) ? user : "No object." }}</p>
+
+                    <h2>Email </h2>
+                    <br>
+                    <p>Email Object: {{ (user.email) ? user.email : "No email object." }}</p>
+                    <p>Email: {{ (user.email && user.email.email) ? user.email.email : "No email." }}</p>
+                    <p>SEI: {{ (user.email && user.email.sei) ? user.email.sei : "No sei." }}</p>
+                    <p>SEI Verified:
+                        {{ (user.email && user.email.sei && seiResponse) ? seiResponse : "No email verification could be done." }}</p>
+
+                    <h2>Phone </h2>
+                    <br>
+                    <p>Phone Object: {{ (user.phone) ? user.phone : "No phone object." }}</p>
+                    <p>Phone: {{ (user.phone && user.phone.phone) ? user.phone.phone : "No phone." }}</p>
+                    <p>SPI: {{ (user.phone && user.phone.spi) ? user.phone.spi : "No spi." }}</p>
+                    <p>SPI Verified:
+                        {{ (user.phone && user.phone.spi && spiResponse) ? spiResponse : "No phone verification could be done." }}</p>
+
+                    <h2>Identity </h2>
+                    <br>
+                    <h3>Identity Name</h3>
+                    <br>
+                    <p>Identity Name Object: {{ (user.identityName) ? user.identityName : "No identity name object." }}</p>
+                    <p>Identity Name: {{ (user.identityName && user.identityName.identityName) ? user.identityName.identityName : "No identity name." }}</p>
+                    <p>Identity Name Identifier : {{ (user.identityName && user.identityName.signedIdentityNameIdentifier) ? user.identityName.signedIdentityNameIdentifier : "No signed identity name identifier." }}</p>
+                    <p>Identity Name Identifier Verified:
+                        {{ (user.identityName && user.identityName.signedIdentityNameIdentifier && signedIdentityNameResponse) ? signedIdentityNameResponse : "No identity name verification could be done." }} </p>
+
+                    <br>
+                    <h3>Identity DOB</h3>
+                    <br>
+                    <p>Identity DOB Object: {{ (user.identityDOB) ? user.identityDOB : "No identity DOB object." }}</p>
+                    <p>Identity DOB: {{ (user.identityDOB && user.identityDOB.identityDOB) ? user.identityDOB.identityDOB : "No identity DOB." }}</p>
+                    <p>Identity DOB Identifier : {{ (user.identityDOB && user.identityDOB.signedIdentityDOBIdentifier) ? user.identityDOB.signedIdentityDOBIdentifier : "No signed identity DOB identifier." }}</p>
+                    <p>Identity DOB Identifier Verified:
+                        {{ (user.identityDOB && user.identityDOB.signedIdentityDOBIdentifier && signedIdentityDOBResponse) ? signedIdentityDOBResponse : "No identity DOB verification could be done." }} </p>
+
+                    <br>
+                    <h3>Identity Country</h3>
+                    <br>
+                    <p>Identity Country Object: {{ (user.identityCountry) ? user.identityCountry : "No identity Country object." }}</p>
+                    <p>Identity Country: {{ (user.identityCountry && user.identityCountry.identityCountry) ? user.identityCountry.identityCountry : "No identity Country." }}</p>
+                    <p>Identity Country Identifier : {{ (user.identityCountry && user.identityCountry.signedIdentityCountryIdentifier) ? user.identityCountry.signedIdentityCountryIdentifier : "No signed identity Country identifier." }}</p>
+                    <p>Identity Country Identifier Verified:
+                        {{ (user.identityCountry && user.identityCountry.signedIdentityCountryIdentifier && signedIdentityCountryResponse) ? signedIdentityCountryResponse : "No identity Country verification could be done." }} </p>
+
+
+                    <br>
+                    <h3>Identity Gender</h3>
+                    <br>
+                    <p>Identity Gender Object: {{ (user.identityGender) ? user.identityGender : "No identity Gender object." }}</p>
+                    <p>Identity Gender: {{ (user.identityGender && user.identityGender.identityGender) ? user.identityGender.identityGender : "No identity Gender." }}</p>
+                    <p>Identity Gender Identifier : {{ (user.identityGender && user.identityGender.signedIdentityGenderIdentifier) ? user.identityGender.signedIdentityGenderIdentifier : "No signed identity Gender identifier." }}</p>
+                    <p>Identity Gender Identifier Verified:
+                        {{ (user.identityGender && user.identityGender.signedIdentityGenderIdentifier && signedIdentityGenderResponse) ? signedIdentityGenderResponse : "No identity Gender verification could be done." }} </p>
+
+                    <br>
+                    <h3>Identity Document Meta</h3>
+                    <br>
+                    <p>Identity Document Meta Object: {{ (user.identityDocumentMeta) ? user.identityDocumentMeta : "No identity Document Meta object." }}</p>
+                    <p>Identity Document Meta: {{ (user.identityDocumentMeta && user.identityDocumentMeta.identityDocumentMeta) ? user.identityDocumentMeta.identityDocumentMeta : "No identity Document Meta." }}</p>
+                    <p>Identity Document Meta Identifier : {{ (user.identityDocumentMeta && user.identityDocumentMeta.signedIdentityDocumentMetaIdentifier) ? user.identityDocumentMeta.signedIdentityDocumentMetaIdentifier : "No signed identity Document Meta identifier." }}</p>
+                    <p>Identity Document Meta Identifier Verified:
+                        {{ (user.identityDocumentMeta && user.identityDocumentMeta.signedIdentityDocumentMetaIdentifier && signedIdentityDocumentMetaResponse) ? signedIdentityDocumentMetaResponse : "No identity Document Meta verification could be done." }} </p>
+                </v-layout>
+            </v-card-text>
+        </v-form>
+    </v-card>
 </section>

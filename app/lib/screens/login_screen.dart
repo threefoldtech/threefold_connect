@@ -26,10 +26,8 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> with BlockAndRunMixin {
   String helperText = '';
-  String scopeTextMobile =
-      'Please select the data you want to share and press Accept';
-  String scopeText =
-      'Please select the data you want to share and press the corresponding emoji';
+  String scopeTextMobile = 'Please select the data you want to share and press Accept';
+  String scopeText = 'Please select the data you want to share and press the corresponding emoji';
 
   List<int> imageList = new List();
 
@@ -65,8 +63,7 @@ class _LoginScreenState extends State<LoginScreen> with BlockAndRunMixin {
       created = widget.loginData.created;
       currentTimestamp = new DateTime.now().millisecondsSinceEpoch;
 
-      timeLeft = Globals().loginTimeout -
-          ((currentTimestamp - created) / 1000).round();
+      timeLeft = Globals().loginTimeout - ((currentTimestamp - created) / 1000).round();
 
       timer = new Timer.periodic(oneSec, (Timer t) async {
         timeoutTimer();
@@ -83,12 +80,10 @@ class _LoginScreenState extends State<LoginScreen> with BlockAndRunMixin {
     currentTimestamp = new DateTime.now().millisecondsSinceEpoch;
 
     setState(() {
-      timeLeft = Globals().loginTimeout -
-          ((currentTimestamp - created) / 1000).round();
+      timeLeft = Globals().loginTimeout - ((currentTimestamp - created) / 1000).round();
     });
 
-    if (created != null &&
-        ((currentTimestamp - created) / 1000) > Globals().loginTimeout) {
+    if (created != null && ((currentTimestamp - created) / 1000) > Globals().loginTimeout) {
       timer.cancel();
 
       await showDialog(
@@ -96,8 +91,7 @@ class _LoginScreenState extends State<LoginScreen> with BlockAndRunMixin {
         builder: (BuildContext context) => CustomDialog(
           image: Icons.timer,
           title: 'Login attempt expired',
-          description:
-              'Your login attempt has expired, please request a new one in your browser.',
+          description: 'Your login attempt has expired, please request a new one in your browser.',
           actions: <Widget>[
             FlatButton(
               child: Text('Ok'),
@@ -119,23 +113,6 @@ class _LoginScreenState extends State<LoginScreen> with BlockAndRunMixin {
         padding: const EdgeInsets.only(top: 8.0),
         child: Column(
           children: <Widget>[
-            Visibility(
-              visible: !widget.loginData.isMobile,
-              child: Expanded(
-                flex: 1,
-                child: Center(
-                  child: Padding(
-                    padding: const EdgeInsets.only(right: 24.0, left: 24.0),
-                    child: Text(
-                      "Attempt expires in " +
-                          ((timeLeft >= 0) ? timeLeft.toString() : "0") +
-                          " second(s).",
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
-                ),
-              ),
-            ),
             Expanded(
               flex: 1,
               child: Center(
@@ -143,7 +120,7 @@ class _LoginScreenState extends State<LoginScreen> with BlockAndRunMixin {
                   padding: const EdgeInsets.only(right: 24.0, left: 24.0),
                   child: Text(
                     isMobileCheck ? scopeTextMobile : scopeText,
-                    style: TextStyle(fontSize: 18.0),
+                    style: TextStyle(fontSize: 14.0),
                     textAlign: TextAlign.center,
                   ),
                 ),
@@ -169,14 +146,10 @@ class _LoginScreenState extends State<LoginScreen> with BlockAndRunMixin {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: <Widget>[
-                      ImageButton(
-                          imageList[0], selectedImageId, imageSelectedCallback),
-                      ImageButton(
-                          imageList[1], selectedImageId, imageSelectedCallback),
-                      ImageButton(
-                          imageList[2], selectedImageId, imageSelectedCallback),
-                      ImageButton(
-                          imageList[3], selectedImageId, imageSelectedCallback),
+                      ImageButton(imageList[0], selectedImageId, imageSelectedCallback),
+                      ImageButton(imageList[1], selectedImageId, imageSelectedCallback),
+                      ImageButton(imageList[2], selectedImageId, imageSelectedCallback),
+                      ImageButton(imageList[3], selectedImageId, imageSelectedCallback),
                     ],
                   ),
                 ),
@@ -190,8 +163,7 @@ class _LoginScreenState extends State<LoginScreen> with BlockAndRunMixin {
                   shape: new RoundedRectangleBorder(
                     borderRadius: new BorderRadius.circular(30),
                   ),
-                  padding:
-                      EdgeInsets.symmetric(horizontal: 11.0, vertical: 6.0),
+                  padding: EdgeInsets.symmetric(horizontal: 11.0, vertical: 6.0),
                   color: Theme.of(context).accentColor,
                   child: Text(
                     'Accept',
@@ -202,7 +174,23 @@ class _LoginScreenState extends State<LoginScreen> with BlockAndRunMixin {
                   },
                 ),
               ),
-            )
+            ),
+            Visibility(
+              visible: !widget.loginData.isMobile,
+              child: Expanded(
+                flex: 1,
+                child: Center(
+                  child: Padding(
+                    padding: const EdgeInsets.only(right: 24.0, left: 24.0),
+                    child: Text(
+                      "Attempt expires in " + ((timeLeft >= 0) ? timeLeft.toString() : "0") + " second(s).",
+                      style: TextStyle(fontSize: 12),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                ),
+              ),
+            ),
           ],
         ),
       ),
@@ -234,8 +222,7 @@ class _LoginScreenState extends State<LoginScreen> with BlockAndRunMixin {
                   child: FlatButton(
                     child: Text(
                       "It wasn\'t me - cancel",
-                      style:
-                          TextStyle(fontSize: 16.0, color: Color(0xff0f296a)),
+                      style: TextStyle(fontSize: 16.0, color: Color(0xff0f296a)),
                     ),
                     onPressed: () {
                       cancelIt();
@@ -273,8 +260,7 @@ class _LoginScreenState extends State<LoginScreen> with BlockAndRunMixin {
             builder: (BuildContext context) => CustomDialog(
               image: Icons.warning,
               title: 'Wrong emoji',
-              description:
-                  'You selected the wrong emoji, please check your browser for the new one.',
+              description: 'You selected the wrong emoji, please check your browser for the new one.',
               actions: <Widget>[
                 FlatButton(
                   child: Text('Retry'),
@@ -291,8 +277,7 @@ class _LoginScreenState extends State<LoginScreen> with BlockAndRunMixin {
           }
         }
       } else {
-        _scaffoldKey.currentState
-            .showSnackBar(SnackBar(content: Text('Please select an emoji')));
+        _scaffoldKey.currentState.showSnackBar(SnackBar(content: Text('Please select an emoji')));
       }
     });
   }
@@ -321,15 +306,13 @@ class _LoginScreenState extends State<LoginScreen> with BlockAndRunMixin {
       int created = widget.loginData.created;
       int currentTimestamp = new DateTime.now().millisecondsSinceEpoch;
 
-      if (created != null &&
-          ((currentTimestamp - created) / 1000) > Globals().loginTimeout) {
+      if (created != null && ((currentTimestamp - created) / 1000) > Globals().loginTimeout) {
         await showDialog(
           context: context,
           builder: (BuildContext context) => CustomDialog(
             image: Icons.timer,
             title: 'Login attempt expired',
-            description:
-                'We cannot sign this login attempt because it has expired.',
+            description: 'We cannot sign this login attempt because it has expired.',
             actions: <Widget>[
               FlatButton(
                 child: Text('Ok'),
@@ -341,8 +324,7 @@ class _LoginScreenState extends State<LoginScreen> with BlockAndRunMixin {
           ),
         );
 
-        await sendData(
-            state, null, selectedImageId, null, widget.loginData.appId);
+        await sendData(state, null, selectedImageId, null, widget.loginData.appId);
 
         if (Navigator.canPop(context)) {
           Navigator.pop(context, false);
@@ -366,65 +348,90 @@ class _LoginScreenState extends State<LoginScreen> with BlockAndRunMixin {
 
     Map<String, dynamic> scope = Map<String, dynamic>();
 
-    var scopePermissions =
-        await getPreviousScopePermissions(widget.loginData.appId);
+    var scopePermissions = await getPreviousScopePermissions(widget.loginData.appId);
+
+    print(scopePermissions);
 
     var derivedSeed = (await getDerivedSeed(widget.loginData.appId));
 
+    //TODO: make separate function
     if (scopePermissions != null) {
       var scopePermissionsDecoded = jsonDecode(scopePermissions);
 
       if (scopePermissions != null && scopePermissions != "") {
-        if (scopePermissionsDecoded['email'] != null &&
-            scopePermissionsDecoded['email']) {
+        if (scopePermissionsDecoded['email'] != null && scopePermissionsDecoded['email']) {
           scope['email'] = (await getEmail());
         }
 
-        if (scopePermissionsDecoded['phone'] != null &&
-            scopePermissionsDecoded['phone']) {
+        if (scopePermissionsDecoded['phone'] != null && scopePermissionsDecoded['phone']) {
           scope['phone'] = (await getPhone());
         }
 
-        if (scopePermissionsDecoded['derivedSeed'] != null &&
-            scopePermissionsDecoded['derivedSeed']) {
+        if (scopePermissionsDecoded['derivedSeed'] != null && scopePermissionsDecoded['derivedSeed']) {
           scope['derivedSeed'] = derivedSeed;
         }
 
-        if (scopePermissionsDecoded['digitalTwin'] != null &&
-            scopePermissionsDecoded['digitalTwin']) {
+        if (scopePermissionsDecoded['digitalTwin'] != null && scopePermissionsDecoded['digitalTwin']) {
           scope['digitalTwin'] = 'ok';
+        }
+
+        if (scopePermissionsDecoded['identityName'] != null && scopePermissionsDecoded['identityName']) {
+          scope['identityName'] = {
+            'identityName': ((await getIdentity())['identityName']),
+            'signedIdentityNameIdentifier': ((await getIdentity())['signedIdentityNameIdentifier'])
+          };
+        }
+
+        if (scopePermissionsDecoded['identityDOB'] != null && scopePermissionsDecoded['identityDOB']) {
+          scope['identityDOB'] = {
+            'identityDOB': ((await getIdentity())['identityDOB']),
+            'signedIdentityDOBIdentifier': ((await getIdentity())['signedIdentityDOBIdentifier'])
+          };
+        }
+
+        if (scopePermissionsDecoded['identityCountry'] != null && scopePermissionsDecoded['identityCountry']) {
+          scope['identityCountry'] = {
+            'identityCountry': ((await getIdentity())['identityCountry']),
+            'signedIdentityCountryIdentifier': ((await getIdentity())['signedIdentityCountryIdentifier'])
+          };
+        }
+
+        if (scopePermissionsDecoded['identityDocumentMeta'] != null &&
+            scopePermissionsDecoded['identityDocumentMeta']) {
+          scope['identityDocumentMeta'] = {
+            'identityDocumentMeta': ((await getIdentity())['identityDocumentMeta']),
+            'signedIdentityDocumentMetaIdentifier': ((await getIdentity())['signedIdentityDocumentMetaIdentifier'])
+          };
+        }
+
+        if (scopePermissionsDecoded['identityGender'] != null && scopePermissionsDecoded['identityGender']) {
+          scope['identityGender'] = {
+            'identityGender': ((await getIdentity())['identityGender']),
+            'signedIdentityGenderIdentifier': ((await getIdentity())['signedIdentityGenderIdentifier'])
+          };
         }
       }
     }
 
-    Map<String, String> encryptedScopeData =
-        await encrypt(jsonEncode(scope), publicKey, await getPrivateKey());
+    Map<String, String> encryptedScopeData = await encrypt(jsonEncode(scope), publicKey, await getPrivateKey());
 
     //push to backend with signed
     if (!includeData) {
       await sendData(
-          state,
-          null,
-          selectedImageId,
-          null,
-          widget.loginData
-              .appId); // temp fix send empty data for regenerate emoji
+          state, null, selectedImageId, null, widget.loginData.appId); // temp fix send empty data for regenerate emoji
     } else {
-      await sendData(state, encryptedScopeData, selectedImageId, randomRoom,
-          widget.loginData.appId);
+      await sendData(state, encryptedScopeData, selectedImageId, randomRoom, widget.loginData.appId);
     }
 
     if (selectedImageId == correctImage || isMobileCheck) {
       // Only update data if the correct image was chosen:
       print("derivedSeed: " + derivedSeed);
       var name = await getDoubleName();
-      var digitalTwinDerivedPublicKey =
-          await generatePublicKeyFromEntropy(derivedSeed);
+      var digitalTwinDerivedPublicKey = await generatePublicKeyFromEntropy(derivedSeed);
 
       print("name: " + name);
       print("publicKey: " + digitalTwinDerivedPublicKey);
-      addDigitalTwinDerivedPublicKeyToBackend(
-          name, digitalTwinDerivedPublicKey, widget.loginData.appId);
+      addDigitalTwinDerivedPublicKeyToBackend(name, digitalTwinDerivedPublicKey, widget.loginData.appId);
 
       if (Navigator.canPop(context)) {
         Navigator.pop(context, true);

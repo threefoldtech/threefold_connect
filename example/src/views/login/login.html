@@ -1,53 +1,85 @@
 <section class="login">
-  <v-layout>
-    <v-flex>
-      <v-layout column>
-        <v-btn class="accent" @click="login">
-          Authenticate
-        </v-btn>
-        <br />
-        <v-btn class="accent" @click="loginToDesktop">
-          Login to secure desktop
-        </v-btn>
-        <v-btn class="accent" @click="loginWithCustomScope({email : false})">
-          Authenticate & get the users emailaddress
-        </v-btn>
-        <v-btn
-          class="accent"
-          @click="loginWithCustomScope({derivedSeed : false})"
-        >
-          Authenticate & get the derived seed.
-        </v-btn>
-        <v-btn
-          class="accent"
-          @click="loginWithCustomScope({email : false, derivedSeed : false})"
-        >
-          Authenticate & get emailaddress and derived seed.
-        </v-btn>
+    <v-layout>
+        <v-flex>
+            <v-layout column>
+                <v-btn class="accent" @click="login">
+                    Authenticate
+                </v-btn>
+                <br/>
+                <v-btn class="accent" @click="loginToDesktop">
+                    Login to secure desktop
+                </v-btn>
+                <v-btn class="accent" @click="loginWithCustomScope({email : false})">
+                    Authenticate & get the users emailaddress
+                </v-btn>
+                <v-btn
+                        class="accent"
+                        @click="loginWithCustomScope({derivedSeed : false})"
+                >
+                    Authenticate & get the derived seed.
+                </v-btn>
+                <v-btn
+                        class="accent"
+                        @click="loginWithCustomScope({email : false, derivedSeed : false})"
+                >
+                    Authenticate & get emailaddress and derived seed.
+                </v-btn>
 
-        <v-btn
-          class="accent"
-          @click="loginWithCustomScope({email : false, derivedSeed : true, digitalTwin: true})"
-        >
-          Authenticate & derived seed & trust digital twin (DT login Simulation)
-        </v-btn>
-        <br />
-        <v-btn class="accent" @click="loginWithCustomScope({email : true})">
-          Authenticate & get the users emailaddress mandatory
-        </v-btn>
-        <v-btn
-          class="accent"
-          @click="loginWithCustomScope({derivedSeed : true})"
-        >
-          Authenticate & get the derived seed mandatory
-        </v-btn>
-        <v-btn
-          class="accent"
-          @click="loginWithCustomScope({email : true, derivedSeed : true})"
-        >
-          Authenticate & get emailaddress and derived seed mandatory
-        </v-btn>
-      </v-layout>
-    </v-flex>
-  </v-layout>
+                <v-btn
+                        class="accent"
+                        @click="loginWithCustomScope({email : false, derivedSeed : true, digitalTwin: true})"
+                >
+                    Authenticate & derived seed & trust digital twin (DT login Simulation)
+                </v-btn>
+                <br/>
+                <v-btn class="accent" @click="loginWithCustomScope({email : true})">
+                    Authenticate & get the users emailaddress mandatory
+                </v-btn>
+                <v-btn
+                        class="accent"
+                        @click="loginWithCustomScope({derivedSeed : true})"
+                >
+                    Authenticate & get the derived seed mandatory
+                </v-btn>
+                <v-btn
+                        class="accent"
+                        @click="loginWithCustomScope({email : true, derivedSeed : true})"
+                >
+                    Authenticate & get emailaddress and derived seed mandatory
+                </v-btn>
+
+                <br>
+                <v-btn
+                        class="accent"
+                        @click="loginWithCustomScope({identityName: true, identityDOB: false, identityGender: false, identityDocumentMeta: false, identityCountry: false })"
+                >
+                    Authenticate & get identity data with identity Name mandatory
+                </v-btn>
+                <v-btn
+                        class="accent"
+                        @click="loginWithCustomScope({identityName: false, identityDOB: true, identityGender: false, identityDocumentMeta: false, identityCountry: false })"
+                >
+                    Authenticate & get identity data with identity DOB mandatory
+                </v-btn>
+                <v-btn
+                        class="accent"
+                        @click="loginWithCustomScope({identityName: false, identityDOB: false, identityGender: true, identityDocumentMeta: false, identityCountry: false })"
+                >
+                    Authenticate & get identity data with identity Gender mandatory
+                </v-btn>
+                <v-btn
+                        class="accent"
+                        @click="loginWithCustomScope({identityName: false, identityDOB: false, identityGender: false, identityDocumentMeta: true, identityCountry: false })"
+                >
+                    Authenticate & get identity data with identity Document Meta mandatory
+                </v-btn>
+                <v-btn
+                        class="accent"
+                        @click="loginWithCustomScope({identityName: false, identityDOB: false, identityGender: false, identityDocumentMeta: false, identityCountry: true })"
+                >
+                    Authenticate & get identity data with identity Country mandatory
+                </v-btn>
+            </v-layout>
+        </v-flex>
+    </v-layout>
 </section>
