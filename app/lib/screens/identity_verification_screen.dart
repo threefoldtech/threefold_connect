@@ -239,7 +239,7 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
                                             phone.isEmpty ? 'Unknown' : phone, Icons.phone),
 
                                         // Step three: verify identity
-                                        isOpenKycEnabled
+                                        isOpenKycEnabled == true
                                             ? _fillCard(
                                                 getCorrectState(3, emailVerified, phoneVerified, identityVerified),
                                                 3,
