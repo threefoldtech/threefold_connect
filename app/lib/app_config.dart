@@ -88,7 +88,7 @@ class AppConfigProduction extends AppConfigImpl {
   }
 
   String pKidUrl() {
-    return 'https://pkid.jimber.org';
+    return 'https://pkid.jimber.org/v1';
   }
 }
 
@@ -118,7 +118,7 @@ class AppConfigStaging extends AppConfigImpl {
   }
 
   String pKidUrl() {
-    return 'https://pkid.staging.jimber.org';
+    return 'https://pkid.staging.jimber.org/v1';
   }
 }
 
@@ -148,6 +148,6 @@ class AppConfigTesting extends AppConfigImpl {
   }
 
   String pKidUrl() {
-    return 'https://pkid.staging.jimber.org';
+    return 'https://pkid.staging.jimber.org/v1';
   }
 }
