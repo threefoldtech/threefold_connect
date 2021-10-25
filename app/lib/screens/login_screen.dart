@@ -410,6 +410,12 @@ class _LoginScreenState extends State<LoginScreen> with BlockAndRunMixin {
             'signedIdentityGenderIdentifier': ((await getIdentity())['signedIdentityGenderIdentifier'])
           };
         }
+
+        if (scopePermissionsDecoded['walletAddress'] != null) {
+          scope['walletAddress'] = {
+            'walletAddress': scopePermissionsDecoded['walletAddress'],
+          };
+        }
       }
     }
 

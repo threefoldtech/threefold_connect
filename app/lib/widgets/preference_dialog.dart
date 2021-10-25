@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:threebotlogin/models/scope.dart';
+import 'package:threebotlogin/models/wallet_data.dart';
 import 'package:threebotlogin/services/user_service.dart';
 import 'package:threebotlogin/widgets/custom_dialog.dart';
 
@@ -22,6 +23,11 @@ class _PreferenceDialogState extends State<PreferenceDialog> {
 
   Map<String, dynamic> scopeAsMap;
   Map<String, dynamic> previousSelectedScope;
+
+  WalletData _chosenDropDownValue = null;
+
+
+  String _selectedItem;
 
   @override
   void initState() {
@@ -358,6 +364,34 @@ class _PreferenceDialogState extends State<PreferenceDialog> {
                             }
                           },
                         );
+                        break;
+
+                      case "walletAddress":
+                        return FutureBuilder(
+                            future: getWallets(),
+                            builder: (BuildContext context, AsyncSnapshot snapshot) {
+                              if (!snapshot.hasData) {
+                                return Container();
+                              }
+                              List<WalletData> wallets = snapshot.data;
+                              return DropdownButton<String>(
+                                value: _selectedItem,
+                                hint: Text('Choose a wallet'),
+                                items: wallets.map((WalletData value) {
+                                  return DropdownMenuItem<String>(
+                                      value: value.address,
+                                      child: Text(value.name),
+                                    );
+                                }).toList(),
+                                onChanged: (String value) {
+                                  toggleScope(scopeItem, value);
+                                  _selectedItem = value;
+                                  // setState(() => _chosenDropDownValue = value);
+                                },
+                              );
+
+                              // return DropdownButtonHideUnderline(
+                            });
                         break;
                     }
                   }
