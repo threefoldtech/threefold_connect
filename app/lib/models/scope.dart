@@ -11,6 +11,7 @@ class Scope {
   bool identityDocumentMeta;
   bool identityCountry;
   bool walletAddress;
+  String walletAddressData;
 
   Scope({this.doubleName, this.email});
 
@@ -26,7 +27,8 @@ class Scope {
         identityGender = json['identityGender'] as bool,
         identityDocumentMeta = json['identityDocumentMeta'] as bool,
         identityCountry = json['identityCountry'] as bool,
-        walletAddress = json['walletAddress'] as bool;
+        walletAddress = json['walletAddress'] as bool,
+        walletAddressData = json['walletAddressData'] as String;
 
   Map<String, dynamic> toJson() => {
         'doubleName': doubleName,
@@ -39,6 +41,7 @@ class Scope {
         'identityGender': identityGender,
         'identityDocumentMeta': identityDocumentMeta,
         'identityCountry': identityCountry,
-        'walletAddress': walletAddress
+        'walletAddress' : walletAddress,
+        'walletAddressData': walletAddressData
       };
 }

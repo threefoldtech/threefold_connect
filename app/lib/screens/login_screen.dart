@@ -350,8 +350,6 @@ class _LoginScreenState extends State<LoginScreen> with BlockAndRunMixin {
 
     var scopePermissions = await getPreviousScopePermissions(widget.loginData.appId);
 
-    print(scopePermissions);
-
     var derivedSeed = (await getDerivedSeed(widget.loginData.appId));
 
     //TODO: make separate function
@@ -411,9 +409,9 @@ class _LoginScreenState extends State<LoginScreen> with BlockAndRunMixin {
           };
         }
 
-        if (scopePermissionsDecoded['walletAddress'] != null) {
-          scope['walletAddress'] = {
-            'walletAddress': scopePermissionsDecoded['walletAddress'],
+        if (scopePermissionsDecoded['walletAddress'] != null && scopePermissionsDecoded['walletAddress']) {
+          scope['walletAddressData'] = {
+            'walletAddressData': scopePermissionsDecoded['walletAddressData'],
           };
         }
       }
