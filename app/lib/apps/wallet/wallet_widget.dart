@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
@@ -8,6 +10,7 @@ import 'package:threebotlogin/clipboard_hack/clipboard_hack.dart';
 import 'package:threebotlogin/events/events.dart';
 import 'package:threebotlogin/events/go_home_event.dart';
 import 'package:threebotlogin/helpers/globals.dart';
+import 'package:threebotlogin/models/wallet_data.dart';
 import 'package:threebotlogin/screens/scan_screen.dart';
 import 'package:threebotlogin/services/3bot_service.dart';
 import 'package:threebotlogin/services/user_service.dart';
@@ -20,8 +23,7 @@ class WalletWidget extends StatefulWidget {
   _WalletState createState() => _WalletState();
 }
 
-class _WalletState extends State<WalletWidget>
-    with AutomaticKeepAliveClientMixin {
+class _WalletState extends State<WalletWidget> with AutomaticKeepAliveClientMixin {
   InAppWebViewController webView;
 
   double progress = 0;
@@ -42,19 +44,17 @@ class _WalletState extends State<WalletWidget>
   _WalletState() {
     iaWebView = InAppWebView(
       initialUrlRequest: URLRequest(
-          url: Uri.parse('https://${config.appId()}/init?cache_buster=' +
-              new DateTime.now().millisecondsSinceEpoch.toString())),
+          url: Uri.parse(
+              'https://${config.appId()}/init?cache_buster=' + new DateTime.now().millisecondsSinceEpoch.toString())),
       initialOptions: InAppWebViewGroupOptions(
           crossPlatform: InAppWebViewOptions(),
-          android: AndroidInAppWebViewOptions(
-              supportMultipleWindows: true, thirdPartyCookiesEnabled: true),
+          android: AndroidInAppWebViewOptions(supportMultipleWindows: true, thirdPartyCookiesEnabled: true),
           ios: IOSInAppWebViewOptions()),
       onWebViewCreated: (InAppWebViewController controller) {
         webView = controller;
         this.addHandler();
       },
-      onCreateWindow:
-          (InAppWebViewController controller, CreateWindowAction req) {},
+      onCreateWindow: (InAppWebViewController controller, CreateWindowAction req) {},
       onLoadStop: (InAppWebViewController controller, Uri url) async {
         addClipboardHandlersOnly(controller);
         if (url.toString().contains('/init')) {
@@ -66,8 +66,7 @@ class _WalletState extends State<WalletWidget>
           this.progress = progress / 100;
         });
       },
-      onConsoleMessage:
-          (InAppWebViewController controller, ConsoleMessage consoleMessage) {
+      onConsoleMessage: (InAppWebViewController controller, ConsoleMessage consoleMessage) {
         print("Wallet console: " + consoleMessage.message);
       },
     );
@@ -89,9 +88,7 @@ class _WalletState extends State<WalletWidget>
     var importedWallets = await getImportedWallets();
     var appWallets = await getAppWallets();
 
-    var jsStartApp =
-        "window.vueInstance.startWallet('$doubleName', '$seed', '$importedWallets', '$appWallets');";
-
+    var jsStartApp = "window.vueInstance.startWallet('$doubleName', '$seed', '$importedWallets', '$appWallets');";
 
     if (Globals().paymentRequest != null) {
       String paymentRequestString = Globals().paymentRequest.toString();
@@ -110,40 +107,51 @@ class _WalletState extends State<WalletWidget>
     await SystemChannels.textInput.invokeMethod('TextInput.hide');
 
     // QRCode scanner is black if we don't sleep here.
-    bool slept =
-    await Future.delayed(const Duration(milliseconds: 400), () => true);
+    bool slept = await Future.delayed(const Duration(milliseconds: 400), () => true);
 
     String result;
     if (slept) {
-      result = await Navigator.push(
-          context, MaterialPageRoute(builder: (context) => ScanScreen()));
+      result = await Navigator.push(context, MaterialPageRoute(builder: (context) => ScanScreen()));
     }
 
     return result;
   }
 
   addHandler() {
-    webView.addJavaScriptHandler(
-        handlerName: "ADD_IMPORT_WALLET", callback: saveImportedWallet);
-    webView.addJavaScriptHandler(
-        handlerName: "ADD_APP_WALLET", callback: saveAppWallet);
+    webView.addJavaScriptHandler(handlerName: "ADD_IMPORT_WALLET", callback: saveImportedWallet);
+    webView.addJavaScriptHandler(handlerName: "ADD_APP_WALLET", callback: saveAppWallet);
     webView.addJavaScriptHandler(handlerName: "SCAN_QR", callback: scanQrCode);
-    webView.addJavaScriptHandler(
-        handlerName: "VUE_INITIALIZED", callback: vueInitialized);
+    webView.addJavaScriptHandler(handlerName: "VUE_INITIALIZED", callback: vueInitialized);
+    webView.addJavaScriptHandler(handlerName: "SAVE_WALLETS", callback: saveWalletCallback);
   }
 
-  @override
-  Widget build(BuildContext context) {
-    super.build(context);
-    return LayoutDrawer(titleText: 'Wallet', content: Column(
-      children: <Widget>[
-        Expanded(
-          child: Container(child: iaWebView),
-        ),
-      ],
-    ));
+  saveWalletCallback(List<dynamic> params) async {
+    try {
+      List<WalletData> walletData = [];
+      for (var data in params[0]) {
+        walletData.add(WalletData(data['name'], data['chain'], data['address']));
+      }
+
+      await saveWallets(walletData);
+    }
+    catch (e) {
+      print(e);
+    }
   }
 
-  @override
-  bool get wantKeepAlive => false;
+@override
+Widget build(BuildContext context) {
+  super.build(context);
+  return LayoutDrawer(
+      titleText: 'Wallet',
+      content: Column(
+        children: <Widget>[
+          Expanded(
+            child: Container(child: iaWebView),
+          ),
+        ],
+      ));
 }
+
+@override
+bool get wantKeepAlive => false;}

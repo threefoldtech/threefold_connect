@@ -9,6 +9,7 @@ import 'package:flutter_sodium/flutter_sodium.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:threebotlogin/helpers/globals.dart';
+import 'package:threebotlogin/models/wallet_data.dart';
 import 'package:threebotlogin/services/3bot_service.dart';
 import 'package:threebotlogin/services/crypto_service.dart';
 
@@ -390,4 +391,23 @@ Future<bool> clearData() async {
   bool cleared = await prefs.clear();
   saveInitDone();
   return cleared;
+}
+
+Future<void> saveWallets(List<WalletData> data) async {
+  final SharedPreferences prefs = await SharedPreferences.getInstance();
+
+  await prefs.remove('walletData');
+  await prefs.setString('walletData', jsonEncode(data));
+}
+
+Future<List<WalletData>> getWallets() async {
+  final SharedPreferences prefs = await SharedPreferences.getInstance();
+  var string = prefs.getString('walletData');
+  var jsonDecoded = jsonDecode(string);
+
+  List<WalletData> walletData = [];
+  for (var data in jsonDecoded) {
+    walletData.add(WalletData(data['name'], data['chain'], data['address']));
+  }
+  return walletData;
 }

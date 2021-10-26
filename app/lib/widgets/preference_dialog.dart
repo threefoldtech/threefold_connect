@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:threebotlogin/models/scope.dart';
+import 'package:threebotlogin/models/wallet_data.dart';
 import 'package:threebotlogin/services/user_service.dart';
 import 'package:threebotlogin/widgets/custom_dialog.dart';
 
@@ -22,6 +23,8 @@ class _PreferenceDialogState extends State<PreferenceDialog> {
 
   Map<String, dynamic> scopeAsMap;
   Map<String, dynamic> previousSelectedScope;
+
+  String _selectedItem;
 
   @override
   void initState() {
@@ -111,7 +114,6 @@ class _PreferenceDialogState extends State<PreferenceDialog> {
 
                   if (scopeAsMap[scopeItem] != null) {
                     bool mandatory = scopeAsMap[scopeItem];
-
                     switch (scopeItem) {
                       case "doubleName":
                         return FutureBuilder(
@@ -358,6 +360,101 @@ class _PreferenceDialogState extends State<PreferenceDialog> {
                             }
                           },
                         );
+                        break;
+
+                      case "walletAddress":
+                        return FutureBuilder(
+                            future: getWallets(),
+                            builder: (BuildContext context, AsyncSnapshot snapshot) {
+                              if (!snapshot.hasData) {
+                                return Container(
+                                    padding: EdgeInsets.only(left: 16, right: 25, top: 8),
+                                    child: Column(
+                                      children: [
+                                        Row(
+                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Text(
+                                              "${scopeItem.toUpperCase()}" + (mandatory ? " *" : ""),
+                                              style: TextStyle(
+                                                  fontWeight: FontWeight.bold, color: Colors.black, fontSize: 16),
+                                            ),
+                                            Icon(
+                                              Icons.warning,
+                                              size: 24,
+                                              color: Colors.red,
+                                            ),
+                                          ],
+                                        ),
+                                        Padding(padding: EdgeInsets.only(bottom: 6)),
+                                        Row(children: [
+                                          Flexible(
+                                              child: Text(
+                                            'The wallet inside ThreeFold Connect should have been opened at least once.',
+                                            overflow: TextOverflow.clip,
+                                            style: TextStyle(fontSize: 12),
+                                          ))
+                                        ])
+                                      ],
+                                    ));
+                              }
+                              List<WalletData> wallets = snapshot.data;
+
+                              return Container(
+                                constraints: BoxConstraints(
+                                    minWidth: MediaQuery.of(context).size.width * 0.8,
+                                    maxWidth: MediaQuery.of(context).size.width * 0.8),
+                                child: Column(
+                                  children: [
+                                    Row(
+                                      children: [
+                                        Flexible(
+                                            child: CheckboxListTile(
+                                          value: (previousSelectedScope[scopeItem] == null)
+                                              ? mandatory
+                                              : previousSelectedScope[scopeItem],
+                                          onChanged: ((mandatory == null || mandatory == true)
+                                              ? null
+                                              : (value) {
+                                                  toggleScope(scopeItem, value);
+                                                }),
+                                          title: Text(
+                                            "${scopeItem.toUpperCase()}" + (mandatory ? " *" : ""),
+                                            style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
+                                          ),
+                                        ))
+                                      ],
+                                    ),
+                                    Row(
+                                      children: [
+                                        Padding(
+                                          padding: EdgeInsets.only(left: 16),
+                                        ),
+                                        Container(
+                                            width: MediaQuery.of(context).size.width * 0.8,
+                                            child: ButtonTheme(
+                                              child: DropdownButton<String>(
+                                                isExpanded: true,
+                                                value: _selectedItem,
+                                                hint: Text('Choose a wallet'),
+                                                items: wallets.map((WalletData value) {
+                                                  return DropdownMenuItem<String>(
+                                                    value: value.address,
+                                                    child: Text(value.name),
+                                                  );
+                                                }).toList(),
+                                                onChanged: (String value) {
+                                                  toggleScope('walletAddressData', value);
+                                                  _selectedItem = value;
+                                                },
+                                              ),
+                                            ))
+                                      ],
+                                    )
+                                  ],
+                                ),
+                              ); // return DropdownButtonHideUnderline(
+                            });
                         break;
                     }
                   }
