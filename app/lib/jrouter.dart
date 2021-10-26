@@ -87,14 +87,6 @@ class JRouter {
             view: IdentityVerificationScreen(),
           ),
           app: null),
-      AppInfo(
-          route: Route(
-            path: '/testingscreen',
-            name: 'TestingScreen',
-            icon: Icons.lock,
-            view: TestingScreen(),
-          ),
-          app: null),
     ];
   }
 

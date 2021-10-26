@@ -137,8 +137,6 @@ class _WalletState extends State<WalletWidget> with AutomaticKeepAliveClientMixi
     catch (e) {
       print(e);
     }
-
-    print(await getWallets());
   }
 
 @override
