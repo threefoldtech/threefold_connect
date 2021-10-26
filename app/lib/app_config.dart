@@ -119,7 +119,6 @@ class AppConfigStaging extends AppConfigImpl {
   }
 
   String threeBotFrontEndUrl() {
-    return "http://192.168.2.174:8083/";
     return "https://login.staging.jimber.io/";
   }
 
