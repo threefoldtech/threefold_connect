@@ -10,7 +10,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'helpers/flags.dart';
 import 'helpers/kyc_helpers.dart';
 
-
 LoggingService logger;
 
 Future<void> main() async {
@@ -34,6 +33,8 @@ Future<void> main() async {
 
   await Flags().initialiseFlagSmith();
 
+  await setFlagSmithValues();
+
   runApp(MyApp(initDone: initDone, registered: registered));
 }
 
@@ -46,7 +47,6 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     var textTheme = GoogleFonts.latoTextTheme(
       Theme.of(context).textTheme,
     );
@@ -59,14 +59,17 @@ class MyApp extends StatelessWidget {
         primaryColor: HexColor("#0a73b8"),
         accentColor: HexColor("#57BE8E"),
         textTheme: textTheme,
-        tabBarTheme: TabBarTheme(
-          labelStyle: textStyle,
-          unselectedLabelStyle: textStyle
-        ),
-        
-        appBarTheme: AppBarTheme(color: Colors.white ,textTheme: accentTextTheme, brightness: Brightness.dark),
+        tabBarTheme: TabBarTheme(labelStyle: textStyle, unselectedLabelStyle: textStyle),
+        appBarTheme: AppBarTheme(color: Colors.white, textTheme: accentTextTheme, brightness: Brightness.dark),
       ),
       home: MainScreen(initDone: initDone, registered: registered),
     );
   }
+}
+
+Future<void> setFlagSmithValues() async {
+  Globals().isOpenKYCEnabled = await Flags().hasFlagValueByFeatureName('kyc');
+  Globals().useNewWallet = await Flags().hasFlagValueByFeatureName('use_new_wallet');
+
+  Globals().walletConfigUrl = await Flags().getFlagValueByFeatureName('wallet_url');
 }

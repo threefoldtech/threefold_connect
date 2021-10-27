@@ -32,12 +32,22 @@ class Flags {
     }
   }
 
-  Future<bool> getFlagValueByFeatureName(String name) async {
+  Future<bool> hasFlagValueByFeatureName(String name) async {
     if (client != null) {
       return (await client.hasFeatureFlag(name));
     }
 
     return false;
+  }
+
+  Future<String> getFlagValueByFeatureName(String name) async {
+    if (client != null) {
+
+      FeatureUser user = FeatureUser(identifier: await getDoubleName());
+      return (await client.getFeatureFlagValue(name, user: user));
+    }
+
+    return '';
   }
 
   factory Flags() {

@@ -9,6 +9,7 @@ import 'package:threebotlogin/apps/wallet/wallet_user_data.dart';
 import 'package:threebotlogin/clipboard_hack/clipboard_hack.dart';
 import 'package:threebotlogin/events/events.dart';
 import 'package:threebotlogin/events/go_home_event.dart';
+import 'package:threebotlogin/helpers/flags.dart';
 import 'package:threebotlogin/helpers/globals.dart';
 import 'package:threebotlogin/models/wallet_data.dart';
 import 'package:threebotlogin/screens/scan_screen.dart';
@@ -27,6 +28,9 @@ class _WalletState extends State<WalletWidget> with AutomaticKeepAliveClientMixi
   InAppWebViewController webView;
 
   double progress = 0;
+
+  String walletConfigUrl = '';
+
   var config = WalletConfig();
   InAppWebView iaWebView;
 
@@ -44,8 +48,8 @@ class _WalletState extends State<WalletWidget> with AutomaticKeepAliveClientMixi
   _WalletState() {
     iaWebView = InAppWebView(
       initialUrlRequest: URLRequest(
-          url: Uri.parse(
-              'https://${config.appId()}/init?cache_buster=' + new DateTime.now().millisecondsSinceEpoch.toString())),
+          url: Uri.parse('https://${Globals().walletConfigUrl}/init?cache_buster=' +
+              new DateTime.now().millisecondsSinceEpoch.toString())),
       initialOptions: InAppWebViewGroupOptions(
           crossPlatform: InAppWebViewOptions(),
           android: AndroidInAppWebViewOptions(supportMultipleWindows: true, thirdPartyCookiesEnabled: true),
@@ -70,6 +74,7 @@ class _WalletState extends State<WalletWidget> with AutomaticKeepAliveClientMixi
         print("Wallet console: " + consoleMessage.message);
       },
     );
+
     Events().onEvent(WalletBackEvent().runtimeType, _back);
   }
 
@@ -88,6 +93,25 @@ class _WalletState extends State<WalletWidget> with AutomaticKeepAliveClientMixi
     var importedWallets = await getImportedWallets();
     var appWallets = await getAppWallets();
 
+    bool usesNewWallet = await Flags().hasFlagValueByFeatureName('use_new_wallet');
+
+    if (usesNewWallet) {
+      var jsStartApp = "window.startWallet('$doubleName', '$seed', '$importedWallets', '$appWallets');";
+
+      if (Globals().paymentRequest != null) {
+        String paymentRequestString = Globals().paymentRequest.toString();
+
+        print('PAYMENTREQUEST');
+        print(paymentRequestString);
+
+        Globals().paymentRequestIsUsed = true;
+        jsStartApp =
+            "window.startWallet('$doubleName', '$seed', '$importedWallets', '$appWallets', $paymentRequestString);";
+      }
+
+      return webView.evaluateJavascript(source: jsStartApp);
+    }
+
     var jsStartApp = "window.vueInstance.startWallet('$doubleName', '$seed', '$importedWallets', '$appWallets');";
 
     if (Globals().paymentRequest != null) {
@@ -98,7 +122,7 @@ class _WalletState extends State<WalletWidget> with AutomaticKeepAliveClientMixi
 
       Globals().paymentRequestIsUsed = true;
       jsStartApp =
-      "window.vueInstance.startWallet('$doubleName', '$seed', '$importedWallets', '$appWallets', $paymentRequestString);";
+          "window.vueInstance.startWallet('$doubleName', '$seed', '$importedWallets', '$appWallets', $paymentRequestString);";
     }
     webView.evaluateJavascript(source: jsStartApp);
   }
@@ -133,25 +157,25 @@ class _WalletState extends State<WalletWidget> with AutomaticKeepAliveClientMixi
       }
 
       await saveWallets(walletData);
-    }
-    catch (e) {
+    } catch (e) {
       print(e);
     }
   }
 
-@override
-Widget build(BuildContext context) {
-  super.build(context);
-  return LayoutDrawer(
-      titleText: 'Wallet',
-      content: Column(
-        children: <Widget>[
-          Expanded(
-            child: Container(child: iaWebView),
-          ),
-        ],
-      ));
-}
+  @override
+  Widget build(BuildContext context) {
+    super.build(context);
+    return LayoutDrawer(
+        titleText: 'Wallet',
+        content: Column(
+          children: <Widget>[
+            Expanded(
+              child: Container(child: iaWebView),
+            ),
+          ],
+        ));
+  }
 
-@override
-bool get wantKeepAlive => false;}
+  @override
+  bool get wantKeepAlive => false;
+}

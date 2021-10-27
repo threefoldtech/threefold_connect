@@ -41,7 +41,6 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
 
   bool isInIdentityProcess = false;
   bool isLoading = false;
-  bool isOpenKycEnabled = false;
 
   Globals globals = Globals();
 
@@ -149,15 +148,9 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
   }
 
   void getUserValues() {
-    Flags().getFlagValueByFeatureName('kyc').then((isEnabled) {
-      setState(() {
-        isOpenKycEnabled = isEnabled;
-      });
-    });
-
     getKYCLevel().then((level) {
       setState(() {
-        kycLevel = level;
+        kycLevel = 2;
       });
     });
     getDoubleName().then((dn) {
@@ -239,7 +232,7 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
                                             phone.isEmpty ? 'Unknown' : phone, Icons.phone),
 
                                         // Step three: verify identity
-                                        isOpenKycEnabled ? _fillCard(getCorrectState(3, emailVerified, phoneVerified, identityVerified), 3,
+                                        Globals().isOpenKYCEnabled ? _fillCard(getCorrectState(3, emailVerified, phoneVerified, identityVerified), 3,
                                             extract3Bot(doubleName), Icons.perm_identity) : Container()
                                       ],
                                     ),
@@ -512,7 +505,7 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
                       maxWidth: MediaQuery.of(context).size.width * 0.4),
                   padding: EdgeInsets.all(10),
                   child: Text(text,
-                      style: TextStyle(fontSize: 12.0, fontWeight: FontWeight.bold), overflow: TextOverflow.ellipsis)),
+                      style: TextStyle(fontSize: 12.0, fontWeight: FontWeight.bold), overflow: TextOverflow.clip)),
               ElevatedButton(
                   onPressed: () async {
                     switch (step) {
@@ -647,7 +640,8 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
     try {
       Response accessTokenResponse = await getShuftiAccessToken();
 
-      if (accessTokenResponse.statusCode == 403) {
+      print(accessTokenResponse);
+      if (accessTokenResponse.statusCode == 403 || accessTokenResponse == null) {
         setState(() {
           this.isLoading = false;
         });
