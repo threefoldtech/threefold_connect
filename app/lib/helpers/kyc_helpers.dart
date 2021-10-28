@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:threebotlogin/services/tools_service.dart';
 import 'package:threebotlogin/services/user_service.dart';
 
 import 'globals.dart';
@@ -78,4 +79,9 @@ Future<void> saveCorrectKYCLevel() async {
   if(Globals().identityVerified.value == true) {
     await saveKYCLevel(3);
   }
+}
+
+bool checkEmail(String email) {
+  String emailValue = email.toLowerCase()?.trim()?.replaceAll(new RegExp(r"\s+"), " ");
+  return validateEmail(emailValue);
 }

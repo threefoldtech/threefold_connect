@@ -12,6 +12,7 @@ import 'package:threebotlogin/events/identity_callback_event.dart';
 import 'package:threebotlogin/helpers/flags.dart';
 import 'package:threebotlogin/helpers/globals.dart';
 import 'package:threebotlogin/helpers/hex_color.dart';
+import 'package:threebotlogin/helpers/kyc_helpers.dart';
 import 'package:threebotlogin/screens/home_screen.dart';
 import 'package:threebotlogin/services/crypto_service.dart';
 import 'package:threebotlogin/services/identity_service.dart';
@@ -43,6 +44,9 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
   bool isLoading = false;
 
   Globals globals = Globals();
+
+  final emailController = TextEditingController();
+  bool emailInputValidated = false;
 
   var authObject = {
     "access_token": '',
@@ -229,11 +233,16 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
 
                                         // Step two: verify phone
                                         _fillCard(getCorrectState(2, emailVerified, phoneVerified, identityVerified), 2,
-                                            phone.isEmpty ? 'Unknown' : phone, Icons.phone),
+                                            phone, Icons.phone),
 
                                         // Step three: verify identity
-                                        Globals().isOpenKYCEnabled ? _fillCard(getCorrectState(3, emailVerified, phoneVerified, identityVerified), 3,
-                                            extract3Bot(doubleName), Icons.perm_identity) : Container()
+                                        Globals().isOpenKYCEnabled
+                                            ? _fillCard(
+                                                getCorrectState(3, emailVerified, phoneVerified, identityVerified),
+                                                3,
+                                                extract3Bot(doubleName),
+                                                Icons.perm_identity)
+                                            : Container()
                                       ],
                                     ),
                                   );
@@ -432,7 +441,7 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
               children: <Widget>[
                 Expanded(
                   child: Text(
-                    text,
+                    text == '' ? 'Unknown' : text,
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(fontSize: 12.0, fontWeight: FontWeight.bold),
                   ),
@@ -504,7 +513,7 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
                       minWidth: MediaQuery.of(context).size.width * 0.4,
                       maxWidth: MediaQuery.of(context).size.width * 0.4),
                   padding: EdgeInsets.all(10),
-                  child: Text(text,
+                  child: Text(text == '' ? 'Unknown' : text,
                       style: TextStyle(fontSize: 12.0, fontWeight: FontWeight.bold), overflow: TextOverflow.clip)),
               ElevatedButton(
                   onPressed: () async {
@@ -596,7 +605,7 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
                             constraints: BoxConstraints(
                                 minWidth: MediaQuery.of(context).size.width * 0.55,
                                 maxWidth: MediaQuery.of(context).size.width * 0.55),
-                            child: Text(text,
+                            child: Text(text == '' ? 'Unknown' : text,
                                 overflow: TextOverflow.ellipsis,
                                 style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)))
                       ],
@@ -639,8 +648,6 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
 
     try {
       Response accessTokenResponse = await getShuftiAccessToken();
-
-      print(accessTokenResponse);
       if (accessTokenResponse.statusCode == 403 || accessTokenResponse == null) {
         setState(() {
           this.isLoading = false;
@@ -894,9 +901,61 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
     );
   }
 
-  void verifyEmail() {
+  dynamic verifyEmail() {
     if (emailVerified) {
       return;
+    }
+
+    if (email == '') {
+      return showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: new Text('Your email seems to be empty'),
+            content: Container(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text('Please pass us your email address'),
+                  SizedBox(height: 16),
+                  TextField(
+                    controller: emailController,
+                    decoration: InputDecoration(
+                        labelText: 'Email', errorText: emailInputValidated ? null : 'Please enter a valid email'),
+                  ),
+                ],
+              ),
+            ),
+            actions: <Widget>[
+              FlatButton(
+                child: new Text("OK"),
+                onPressed: () async {
+                  bool isValid = checkEmail(emailController.text);
+                  if (!isValid) {
+                    setState(() {
+                      emailInputValidated = false;
+                    });
+                    return;
+                  }
+
+                  setState(() {
+                    emailInputValidated = true;
+                    email = emailController.text;
+                  });
+
+                  await saveEmail(emailController.text, null);
+
+                  Map<String, dynamic> keyPair = await generateKeyPairFromSeedPhrase(await getPhrase());
+                  var client = FlutterPkid(pkidUrl, keyPair);
+                  client.setPKidDoc('email', json.encode({'email': email }), keyPair);
+
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          );
+        },
+      );
     }
 
     sendVerificationEmail();

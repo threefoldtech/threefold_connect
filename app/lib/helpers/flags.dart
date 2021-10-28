@@ -2,6 +2,8 @@ import 'package:flagsmith/flagsmith.dart';
 import 'package:threebotlogin/app_config.dart';
 import 'package:threebotlogin/services/user_service.dart';
 
+import 'globals.dart';
+
 class Flags {
   static final Flags _singleton = new Flags._internal();
 
@@ -30,6 +32,12 @@ class Flags {
         print(e);
       }
     }
+  }
+
+  Future<void> setFlagSmithDefaultValues() async {
+    Globals().isOpenKYCEnabled = await Flags().hasFlagValueByFeatureName('kyc');
+    Globals().useNewWallet = await Flags().hasFlagValueByFeatureName('use_new_wallet');
+    Globals().walletConfigUrl = await Flags().getFlagValueByFeatureName('wallet_url');
   }
 
   Future<bool> hasFlagValueByFeatureName(String name) async {
