@@ -189,7 +189,7 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
   @override
   Widget build(BuildContext context) {
     return LayoutDrawer(
-      titleText: 'Identification verification',
+      titleText: 'Identification',
       content: Stack(
         children: [
           SvgPicture.asset(

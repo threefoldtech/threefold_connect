@@ -50,9 +50,7 @@ class Flags {
 
   Future<String> getFlagValueByFeatureName(String name) async {
     if (client != null) {
-
-      FeatureUser user = FeatureUser(identifier: await getDoubleName());
-      return (await client.getFeatureFlagValue(name, user: user));
+      return (await client.getFeatureFlagValue(name));
     }
 
     return '';
