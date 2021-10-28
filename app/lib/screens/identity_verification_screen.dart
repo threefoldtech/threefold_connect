@@ -75,7 +75,6 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
         "passport",
         "id_card",
         "driving_license",
-        "credit_or_debit_card",
       ],
       "name": {
         "first_name": "",
@@ -91,7 +90,7 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
       "backside_proof_required": "1",
     },
     "document_two": {
-      "supported_types": ["passport", "id_card", "driving_license", "credit_or_debit_card"],
+      "supported_types": ["passport", "id_card", "driving_license"],
       "name": {"first_name": "", "last_name": "", "middle_name": ""},
       "dob": "",
       "document_number": "",

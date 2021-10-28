@@ -38,7 +38,9 @@ Future<void> main() async {
   await Flags().initialiseFlagSmith();
   await Flags().setFlagSmithDefaultValues();
 
-  await migrateToNewSystem();
+  if(await getPhrase() != null) {
+    await migrateToNewSystem();
+  }
 
   runApp(MyApp(initDone: initDone, registered: registered));
 }
