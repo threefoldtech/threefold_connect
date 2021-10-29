@@ -38,7 +38,9 @@ Future<void> main() async {
   await Flags().initialiseFlagSmith();
   await Flags().setFlagSmithDefaultValues();
 
+  print('TRYING TO GET THE PHRASE');
   if(await getPhrase() != null) {
+    print('I AM DOING THIS');
     await migrateToNewSystem();
   }
 
@@ -51,6 +53,8 @@ Future<void> migrateToNewSystem() async {
   var client = FlutterPkid(pkidUrl, keyPair);
 
   Map<String, Object> email = await getEmail();
+  print('EMAIL');
+  print(email);
   var emailPKidResult = await client.getPKidDoc('email', keyPair);
   if(!emailPKidResult.containsKey('success') && email['email'] != null){
     if(email['sei'] != null) {
@@ -63,6 +67,8 @@ Future<void> migrateToNewSystem() async {
   }
 
   Map<String, Object> phone = await getPhone();
+  print('PHONE');
+  print(phone);
   var phonePKidResult = await client.getPKidDoc('phone', keyPair);
   if(!phonePKidResult.containsKey('success') && phone['phone'] != null){
     if(phone['spi'] != null) {
