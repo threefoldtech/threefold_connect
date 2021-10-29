@@ -111,7 +111,7 @@ class _RecoverScreenState extends State<RecoverScreen> {
       }
 
       if(phone['phone'] != null){
-        return client.setPKidDoc('phone', json.encode({'phone': phone }), keyPair);
+        return client.setPKidDoc('phone', json.encode({'phone': phone['phone'] }), keyPair);
       }
     }
   }
