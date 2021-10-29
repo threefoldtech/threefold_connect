@@ -56,8 +56,6 @@ Future<void> migrateToNewSystem() async {
 
 Future<void> saveEmailToPKid(FlutterPkid client, Map<String, dynamic> keyPair) async {
   Map<String, Object> email = await getEmail();
-  print('EMAIL');
-  print(email);
   var emailPKidResult = await client.getPKidDoc('email', keyPair);
   if(!emailPKidResult.containsKey('success') && email['email'] != null){
     if(email['sei'] != null) {
@@ -72,8 +70,6 @@ Future<void> saveEmailToPKid(FlutterPkid client, Map<String, dynamic> keyPair) a
 
 Future<void> savePhoneToPKid(FlutterPkid client, Map<String, dynamic> keyPair) async {
   Map<String, Object> phone = await getPhone();
-  print('PHONE');
-  print(phone);
   var phonePKidResult = await client.getPKidDoc('phone', keyPair);
   if(!phonePKidResult.containsKey('success') && phone['phone'] != null){
     if(phone['spi'] != null) {

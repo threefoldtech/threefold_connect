@@ -77,7 +77,6 @@ class _RecoverScreenState extends State<RecoverScreen> {
     var pKidResult = await Future.wait(futures);
     Map<int, Object> dataMap = pKidResult.asMap();
 
-    print(dataMap);
 
     await savePhrase(seedPhrase);
     await saveFingerprint(false);
