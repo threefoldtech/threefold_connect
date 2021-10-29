@@ -46,6 +46,8 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
   Globals globals = Globals();
 
   final emailController = TextEditingController();
+  final changeEmailController = TextEditingController();
+
   bool emailInputValidated = false;
 
   var authObject = {
@@ -165,6 +167,7 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
       setState(() {
         if (emailMap['email'] != null) {
           email = emailMap['email'];
+          changeEmailController.text = email;
           emailVerified = (emailMap['sei'] != null);
         }
       });
@@ -406,149 +409,186 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
   }
 
   Widget unVerifiedWidget(step, text, icon) {
-    return Container(
-      decoration: BoxDecoration(border: Border.all(width: 0.5, color: Colors.grey)),
-      height: 75,
-      width: MediaQuery.of(context).size.width * 100,
-      child: Row(
-        children: [
-          Padding(padding: EdgeInsets.only(left: 10)),
-          Container(
-            width: 30.0,
-            height: 30.0,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text('0' + step.toString(),
-                    style: TextStyle(color: Colors.blue, fontWeight: FontWeight.bold, fontSize: 12))
-              ],
-            ),
-            decoration: new BoxDecoration(
-                border: Border.all(color: Colors.blue, width: 2), shape: BoxShape.circle, color: Colors.white),
-          ),
-          Padding(padding: EdgeInsets.only(left: 20)),
-          Icon(
-            icon,
-            size: 20,
-            color: Colors.black,
-          ),
-          Padding(padding: EdgeInsets.only(left: 15)),
-          Flexible(
-              child: Container(
-                  child: Column(mainAxisAlignment: MainAxisAlignment.center, children: <Widget>[
-            Row(
-              children: <Widget>[
-                Expanded(
-                  child: Text(
-                    text == '' ? 'Unknown' : text,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(fontSize: 12.0, fontWeight: FontWeight.bold),
-                  ),
-                )
-              ],
-            ),
-            SizedBox(
-              height: 5,
-            ),
-            Row(
-              children: <Widget>[
-                Icon(
-                  Icons.close,
-                  color: Colors.red,
-                  size: 18.0,
+    return GestureDetector(
+        onTap: () async {
+          if (step == 2) {
+            await addPhoneNumber();
+          }
+        },
+        child: Container(
+          decoration: BoxDecoration(border: Border.all(width: 0.5, color: Colors.grey)),
+          height: 75,
+          width: MediaQuery.of(context).size.width * 100,
+          child: Row(
+            children: [
+              Padding(padding: EdgeInsets.only(left: 10)),
+              Container(
+                width: 30.0,
+                height: 30.0,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text('0' + step.toString(),
+                        style: TextStyle(color: Colors.blue, fontWeight: FontWeight.bold, fontSize: 12))
+                  ],
                 ),
-                Padding(padding: EdgeInsets.only(left: 5)),
-                Text(
-                  'Not verified',
-                  style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold, fontSize: 12),
-                )
-              ],
-            ),
-          ]))),
-          Padding(padding: EdgeInsets.only(right: 10))
-        ],
-      ),
-    );
+                decoration: new BoxDecoration(
+                    border: Border.all(color: Colors.blue, width: 2), shape: BoxShape.circle, color: Colors.white),
+              ),
+              Padding(padding: EdgeInsets.only(left: 20)),
+              Icon(
+                icon,
+                size: 20,
+                color: Colors.black,
+              ),
+              Padding(padding: EdgeInsets.only(left: 15)),
+              Flexible(
+                  child: Container(
+                      child: Column(mainAxisAlignment: MainAxisAlignment.center, children: <Widget>[
+                Row(
+                  children: <Widget>[
+                    Expanded(
+                      child: Text(
+                        text == '' ? 'Unknown' : text,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(fontSize: 12.0, fontWeight: FontWeight.bold),
+                      ),
+                    )
+                  ],
+                ),
+                SizedBox(
+                  height: 5,
+                ),
+                Row(
+                  children: <Widget>[
+                    Icon(
+                      Icons.close,
+                      color: Colors.red,
+                      size: 18.0,
+                    ),
+                    Padding(padding: EdgeInsets.only(left: 5)),
+                    Text(
+                      'Not verified',
+                      style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold, fontSize: 12),
+                    )
+                  ],
+                ),
+              ]))),
+              Padding(padding: EdgeInsets.only(right: 10))
+            ],
+          ),
+        ));
   }
 
   Widget currentPhaseWidget(step, text, icon) {
-    return Container(
-      decoration: BoxDecoration(
-          border: Border(
-              left: BorderSide(color: Colors.blue, width: 5),
-              right: BorderSide(color: Colors.grey, width: 0.5),
-              bottom: BorderSide(color: Colors.grey, width: 0.5),
-              top: BorderSide(color: Colors.grey, width: 0.5))),
-      height: 75,
-      width: MediaQuery.of(context).size.width * 100,
-      child: Row(
-        children: [
-          Padding(padding: EdgeInsets.only(left: 10)),
-          Container(
-            width: 30.0,
-            height: 30.0,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text('0' + step.toString(),
-                    style: TextStyle(color: Colors.blue, fontWeight: FontWeight.bold, fontSize: 12))
-              ],
-            ),
-            decoration: new BoxDecoration(
-                border: Border.all(color: Colors.blue, width: 2), shape: BoxShape.circle, color: Colors.white),
-          ),
-          Padding(padding: EdgeInsets.only(left: 15)),
-          Icon(
-            icon,
-            size: 20,
-            color: Colors.black,
-          ),
-          Padding(padding: EdgeInsets.only(left: 10)),
-          Row(
-            mainAxisSize: MainAxisSize.min,
+    return GestureDetector(
+        onTap: () async {
+          if (step == 1) {
+            await showEmailChangeDialog();
+          }
+
+          if (step == 2) {
+            await addPhoneNumberDialog(context);
+
+            var phoneMap = (await getPhone());
+            if (phoneMap.isEmpty || !phoneMap.containsKey('phone')) {
+              return;
+            }
+            String phoneNumber = phoneMap['phone'];
+            if (phoneNumber == null || phoneNumber.isEmpty) {
+              return;
+            }
+
+            setState(() {
+              phone = phoneNumber;
+            });
+
+            Map<String, dynamic> keyPair = await generateKeyPairFromSeedPhrase(await getPhrase());
+            var client = FlutterPkid(pkidUrl, keyPair);
+            client.setPKidDoc('phone', json.encode({'phone': phone}), keyPair);
+
+            if (phone.isEmpty) {
+              return;
+            }
+          }
+        },
+        child: Container(
+          decoration: BoxDecoration(
+              border: Border(
+                  left: BorderSide(color: Colors.blue, width: 5),
+                  right: BorderSide(color: Colors.grey, width: 0.5),
+                  bottom: BorderSide(color: Colors.grey, width: 0.5),
+                  top: BorderSide(color: Colors.grey, width: 0.5))),
+          height: 75,
+          width: MediaQuery.of(context).size.width * 100,
+          child: Row(
             children: [
+              Padding(padding: EdgeInsets.only(left: 10)),
               Container(
-                  constraints: BoxConstraints(
-                      minWidth: MediaQuery.of(context).size.width * 0.4,
-                      maxWidth: MediaQuery.of(context).size.width * 0.4),
-                  padding: EdgeInsets.all(10),
-                  child: Text(text == '' ? 'Unknown' : text,
-                      style: TextStyle(fontSize: 12.0, fontWeight: FontWeight.bold), overflow: TextOverflow.clip)),
-              ElevatedButton(
-                  onPressed: () async {
-                    switch (step) {
-                      // Verify email
-                      case 1:
-                        {
-                          verifyEmail();
-                        }
-                        break;
+                width: 30.0,
+                height: 30.0,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text('0' + step.toString(),
+                        style: TextStyle(color: Colors.blue, fontWeight: FontWeight.bold, fontSize: 12))
+                  ],
+                ),
+                decoration: new BoxDecoration(
+                    border: Border.all(color: Colors.blue, width: 2), shape: BoxShape.circle, color: Colors.white),
+              ),
+              Padding(padding: EdgeInsets.only(left: 15)),
+              Icon(
+                icon,
+                size: 20,
+                color: Colors.black,
+              ),
+              Padding(padding: EdgeInsets.only(left: 10)),
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                      constraints: BoxConstraints(
+                          minWidth: MediaQuery.of(context).size.width * 0.4,
+                          maxWidth: MediaQuery.of(context).size.width * 0.4),
+                      padding: EdgeInsets.all(10),
+                      child: Text(text == '' ? 'Unknown' : text,
+                          style: TextStyle(fontSize: 12.0, fontWeight: FontWeight.bold), overflow: TextOverflow.clip)),
+                  ElevatedButton(
+                      onPressed: () async {
+                        switch (step) {
+                          // Verify email
+                          case 1:
+                            {
+                              verifyEmail();
+                            }
+                            break;
 
-                      // Verify phone
-                      case 2:
-                        {
-                          await verifyPhone();
-                        }
-                        break;
+                          // Verify phone
+                          case 2:
+                            {
+                              await verifyPhone();
+                            }
+                            break;
 
-                      // Verify identity
-                      case 3:
-                        {
-                          await verifyIdentityProcess();
-                          break;
+                          // Verify identity
+                          case 3:
+                            {
+                              await verifyIdentityProcess();
+                            }
+                            break;
+                          default:
+                            {}
+                            break;
                         }
-                      default:
-                        {}
-                        break;
-                    }
-                  },
-                  child: Text('Verify'))
+                      },
+                      child: Text('Verify'))
+                ],
+              ),
+              Padding(padding: EdgeInsets.only(right: 10))
             ],
           ),
-          Padding(padding: EdgeInsets.only(right: 10))
-        ],
-      ),
-    );
+        ));
   }
 
   Widget verifiedWidget(step, text, icon) {
@@ -633,6 +673,31 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
         ),
       ),
     );
+  }
+
+  Future<void> addPhoneNumber() async {
+    await addPhoneNumberDialog(context);
+
+    var phoneMap = (await getPhone());
+    if (phoneMap.isEmpty || !phoneMap.containsKey('phone')) {
+      return;
+    }
+    String phoneNumber = phoneMap['phone'];
+    if (phoneNumber == null || phoneNumber.isEmpty) {
+      return;
+    }
+
+    setState(() {
+      phone = phoneNumber;
+    });
+
+    Map<String, dynamic> keyPair = await generateKeyPairFromSeedPhrase(await getPhrase());
+    var client = FlutterPkid(pkidUrl, keyPair);
+    client.setPKidDoc('phone', json.encode({'phone': phone}), keyPair);
+
+    if (phone.isEmpty) {
+      return;
+    }
   }
 
   Future verifyIdentityProcess() async {
@@ -900,6 +965,64 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
     );
   }
 
+  Future<Widget> showEmailChangeDialog() async {
+    Map<String, dynamic> keyPair = await generateKeyPairFromSeedPhrase(await getPhrase());
+    var client = FlutterPkid(pkidUrl, keyPair);
+
+    print(await getPhone());
+    var emailPKidResult = await client.getPKidDoc('phone', keyPair);
+    print(emailPKidResult);
+    return showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: new Text('Change your email'),
+          content: Container(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text('Please pass us your new email address'),
+                SizedBox(height: 16),
+                TextField(
+                  controller: changeEmailController,
+                  decoration: InputDecoration(
+                      labelText: 'Email', errorText: emailInputValidated ? null : 'Please enter a valid email'),
+                ),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            FlatButton(
+              child: new Text("OK"),
+              onPressed: () async {
+                bool isValid = checkEmail(changeEmailController.text);
+                if (!isValid) {
+                  setState(() {
+                    emailInputValidated = false;
+                  });
+                  return;
+                }
+
+                setState(() {
+                  emailInputValidated = true;
+                  email = changeEmailController.text;
+                });
+
+                await saveEmail(changeEmailController.text, null);
+
+                Map<String, dynamic> keyPair = await generateKeyPairFromSeedPhrase(await getPhrase());
+                var client = FlutterPkid(pkidUrl, keyPair);
+                client.setPKidDoc('email', json.encode({'email': email}), keyPair);
+
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   dynamic verifyEmail() {
     if (emailVerified) {
       return;
@@ -946,7 +1069,7 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
 
                   Map<String, dynamic> keyPair = await generateKeyPairFromSeedPhrase(await getPhrase());
                   var client = FlutterPkid(pkidUrl, keyPair);
-                  client.setPKidDoc('email', json.encode({'email': email }), keyPair);
+                  client.setPKidDoc('email', json.encode({'email': email}), keyPair);
 
                   Navigator.of(context).pop();
                 },
@@ -967,28 +1090,7 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
     }
 
     if (phone.isEmpty) {
-      await addPhoneNumberDialog(context);
-
-      var phoneMap = (await getPhone());
-      if (phoneMap.isEmpty || !phoneMap.containsKey('phone')) {
-        return;
-      }
-      String phoneNumber = phoneMap['phone'];
-      if (phoneNumber == null || phoneNumber.isEmpty) {
-        return;
-      }
-
-      setState(() {
-        phone = phoneNumber;
-      });
-
-      Map<String, dynamic> keyPair = await generateKeyPairFromSeedPhrase(await getPhrase());
-      var client = FlutterPkid(pkidUrl, keyPair);
-      client.setPKidDoc('phone', json.encode({'phone': phone}), keyPair);
-
-      if (phone.isEmpty) {
-        return;
-      }
+      return await addPhoneNumber();
     }
 
     int currentTime = new DateTime.now().millisecondsSinceEpoch;
