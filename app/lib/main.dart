@@ -38,20 +38,23 @@ Future<void> main() async {
   await Flags().initialiseFlagSmith();
   await Flags().setFlagSmithDefaultValues();
 
-  print('TRYING TO GET THE PHRASE');
   if(await getPhrase() != null) {
-    print('I AM DOING THIS');
     await migrateToNewSystem();
   }
 
   runApp(MyApp(initDone: initDone, registered: registered));
 }
 
-
 Future<void> migrateToNewSystem() async {
   Map<String, dynamic> keyPair = await generateKeyPairFromSeedPhrase(await getPhrase());
   var client = FlutterPkid(pkidUrl, keyPair);
 
+  await saveEmailToPKid(client, keyPair);
+  await savePhoneToPKid(client, keyPair);
+
+}
+
+Future<void> saveEmailToPKid(FlutterPkid client, Map<String, dynamic> keyPair) async {
   Map<String, Object> email = await getEmail();
   print('EMAIL');
   print(email);
@@ -65,7 +68,9 @@ Future<void> migrateToNewSystem() async {
       return client.setPKidDoc('email', json.encode({'email': email }), keyPair);
     }
   }
+}
 
+Future<void> savePhoneToPKid(FlutterPkid client, Map<String, dynamic> keyPair) async {
   Map<String, Object> phone = await getPhone();
   print('PHONE');
   print(phone);
@@ -80,6 +85,7 @@ Future<void> migrateToNewSystem() async {
     }
   }
 }
+
 
 class MyApp extends StatelessWidget {
   MyApp({this.initDone, this.doubleName, this.registered});
