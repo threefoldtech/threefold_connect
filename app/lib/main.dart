@@ -8,6 +8,8 @@ import 'package:threebotlogin/helpers/hex_color.dart';
 import 'package:threebotlogin/screens/main_screen.dart';
 import 'package:threebotlogin/services/crypto_service.dart';
 import 'package:threebotlogin/services/logging_service.dart';
+import 'package:threebotlogin/services/migration_service.dart';
+import 'package:threebotlogin/services/pkid_service.dart';
 import 'package:threebotlogin/services/user_service.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -23,14 +25,7 @@ Future<void> main() async {
   bool initDone = await getInitDone();
   String doubleName = await getDoubleName();
 
-  Map<String, Object> email = await getEmail();
-  Map<String, Object> phone = await getPhone();
-  Map<String, dynamic> identity = await getIdentity();
-
-  Globals().emailVerified.value = (email['sei'] != null);
-  Globals().phoneVerified.value = (phone['spi'] != null);
-  Globals().identityVerified.value = (identity['signedIdentityNameIdentifier'] != null);
-
+  await setGlobalValues();
   await saveCorrectKYCLevel();
 
   bool registered = doubleName != null;
@@ -45,43 +40,16 @@ Future<void> main() async {
   runApp(MyApp(initDone: initDone, registered: registered));
 }
 
-Future<void> migrateToNewSystem() async {
-  Map<String, dynamic> keyPair = await generateKeyPairFromSeedPhrase(await getPhrase());
-  var client = FlutterPkid(pkidUrl, keyPair);
-
-  await saveEmailToPKid(client, keyPair);
-  await savePhoneToPKid(client, keyPair);
-
-}
-
-Future<void> saveEmailToPKid(FlutterPkid client, Map<String, dynamic> keyPair) async {
+Future<void> setGlobalValues() async {
   Map<String, Object> email = await getEmail();
-  var emailPKidResult = await client.getPKidDoc('email', keyPair);
-  if(!emailPKidResult.containsKey('success') && email['email'] != null){
-    if(email['sei'] != null) {
-      return client.setPKidDoc('email', json.encode({'email': email['email'], 'sei' : email['sei'] }), keyPair);
-    }
-
-    if(email['email'] != null){
-      return client.setPKidDoc('email', json.encode({'email': email }), keyPair);
-    }
-  }
-}
-
-Future<void> savePhoneToPKid(FlutterPkid client, Map<String, dynamic> keyPair) async {
   Map<String, Object> phone = await getPhone();
-  var phonePKidResult = await client.getPKidDoc('phone', keyPair);
-  if(!phonePKidResult.containsKey('success') && phone['phone'] != null){
-    if(phone['spi'] != null) {
-      return client.setPKidDoc('phone', json.encode({'phone': phone['phone'], 'spi' : phone['spi'] }), keyPair);
-    }
+  Map<String, dynamic> identity = await getIdentity();
 
-    if(phone['phone'] != null){
-      return client.setPKidDoc('phone', json.encode({'phone': phone }), keyPair);
-    }
-  }
+  Globals().emailVerified.value = (email['sei'] != null);
+  Globals().phoneVerified.value = (phone['spi'] != null);
+  Globals().identityVerified.value = (identity['signedIdentityNameIdentifier'] != null);
+
 }
-
 
 class MyApp extends StatelessWidget {
   MyApp({this.initDone, this.doubleName, this.registered});

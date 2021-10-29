@@ -249,9 +249,9 @@ class _MobileRegistrationScreenState extends State<MobileRegistrationScreen> {
     saveDoubleName(_registrationData.doubleName);
     savePhrase(_registrationData.phrase);
 
-    // Map<String, dynamic> keyPair = await generateKeyPairFromSeedPhrase(await getPhrase());
-    // var client = FlutterPkid(pkidUrl, keyPair);
-    // client.setPKidDoc('email', json.encode({'email': _registrationData.email }), keyPair);
+    Map<String, dynamic> keyPair = await generateKeyPairFromSeedPhrase(await getPhrase());
+    var client = FlutterPkid(pkidUrl, keyPair);
+    client.setPKidDoc('email', json.encode({'email': _registrationData.email }), keyPair);
 
     await Flags().initialiseFlagSmith();
     await Flags().setFlagSmithDefaultValues();

@@ -11,6 +11,7 @@ import 'package:threebotlogin/helpers/kyc_helpers.dart';
 import 'package:threebotlogin/helpers/globals.dart';
 import 'package:threebotlogin/services/3bot_service.dart';
 import 'package:threebotlogin/services/crypto_service.dart';
+import 'package:threebotlogin/services/migration_service.dart';
 import 'package:threebotlogin/services/open_kyc_service.dart';
 import 'package:threebotlogin/services/tools_service.dart';
 import 'package:threebotlogin/services/user_service.dart';
@@ -88,34 +89,7 @@ class _RecoverScreenState extends State<RecoverScreen> {
     // await sendVerificationEmail();
   }
 
-  Future<void> migrateToNewSystem() async {
-    Map<String, dynamic> keyPair = await generateKeyPairFromSeedPhrase(await getPhrase());
-    var client = FlutterPkid(pkidUrl, keyPair);
 
-    Map<String, Object> email = await getEmail();
-    var emailPKidResult = await client.getPKidDoc('email', keyPair);
-    if(!emailPKidResult.containsKey('success') && email['email'] != null){
-      if(email['sei'] != null) {
-        return client.setPKidDoc('email', json.encode({'email': email['email'], 'sei' : email['sei'] }), keyPair);
-      }
-
-      if(email['email'] != null){
-        return client.setPKidDoc('email', json.encode({'email': email }), keyPair);
-      }
-    }
-
-    Map<String, Object> phone = await getPhone();
-    var phonePKidResult = await client.getPKidDoc('phone', keyPair);
-    if(!phonePKidResult.containsKey('success') && phone['phone'] != null){
-      if(phone['spi'] != null) {
-        return client.setPKidDoc('phone', json.encode({'phone': phone['phone'], 'spi' : phone['spi'] }), keyPair);
-      }
-
-      if(phone['phone'] != null){
-        return client.setPKidDoc('phone', json.encode({'phone': phone['phone'] }), keyPair);
-      }
-    }
-  }
 
   checkSeedLength(seedPhrase) {
     int seedLength = seedPhrase.split(" ").length;

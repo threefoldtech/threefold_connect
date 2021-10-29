@@ -153,7 +153,7 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
   void getUserValues() {
     getKYCLevel().then((level) {
       setState(() {
-        kycLevel = 2;
+        kycLevel = level;
       });
     });
     getDoubleName().then((dn) {
