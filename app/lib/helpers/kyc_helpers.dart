@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:threebotlogin/services/tools_service.dart';
 import 'package:threebotlogin/services/user_service.dart';
 
 import 'globals.dart';
@@ -11,6 +12,12 @@ Future<void> handleKYCData(
 
   if (kycLevel == 0) {
     await saveEmail(emailData['email'], null);
+
+    if (phoneData.isNotEmpty) {
+      if (phoneData['phone'] != null) {
+        await savePhone(phoneData['phone'], null);
+      }
+    }
   }
 
   if (kycLevel >= 1) {
@@ -67,15 +74,20 @@ int calculateKYCLevel(
 Future<void> saveCorrectKYCLevel() async {
   await saveKYCLevel(0);
 
-  if(Globals().emailVerified.value == true) {
+  if (Globals().emailVerified.value == true) {
     await saveKYCLevel(1);
   }
 
-  if(Globals().phoneVerified.value == true) {
+  if (Globals().phoneVerified.value == true) {
     await saveKYCLevel(2);
   }
 
-  if(Globals().identityVerified.value == true) {
+  if (Globals().identityVerified.value == true) {
     await saveKYCLevel(3);
   }
+}
+
+bool checkEmail(String email) {
+  String emailValue = email.toLowerCase()?.trim()?.replaceAll(new RegExp(r"\s+"), " ");
+  return validateEmail(emailValue);
 }

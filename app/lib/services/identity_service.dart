@@ -31,6 +31,10 @@ String getCorrectState(int step, emailVerified, phoneVerified, identityVerified)
   }
 
   if(step == 3) {
+    if(!emailVerified) {
+      return 'Unverified';
+    }
+
     if(!phoneVerified) {
       return 'Unverified';
     }

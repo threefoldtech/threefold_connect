@@ -172,7 +172,7 @@ class _LayoutDrawerState extends State<LayoutDrawer> {
                   Icon(Icons.lock, color: Colors.black, size: 18)
                 ],
               ),
-              title: Text('Identification verification'),
+              title: Text('Identification'),
               onTap: () {
                 Navigator.pop(context);
                 globals.tabController.animateTo(6);
