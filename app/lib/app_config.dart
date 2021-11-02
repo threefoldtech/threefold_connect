@@ -90,7 +90,7 @@ class AppConfigProduction extends AppConfigImpl {
   }
 
   String wizardUrl() {
-    return 'https://wizard.jimber.io/';
+    return 'https://wizard.jimber.org/';
   }
 
   String pKidUrl() {
