@@ -23,6 +23,7 @@ import 'package:threebotlogin/services/user_service.dart';
 import 'package:threebotlogin/widgets/custom_dialog.dart';
 import 'package:threebotlogin/widgets/email_verification_needed.dart';
 import 'package:threebotlogin/widgets/layout_drawer.dart';
+import 'package:country_picker/country_picker.dart';
 
 class IdentityVerificationScreen extends StatefulWidget {
   _IdentityVerificationScreenState createState() => _IdentityVerificationScreenState();
@@ -244,7 +245,12 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
                                                 3,
                                                 extract3Bot(doubleName),
                                                 Icons.perm_identity)
-                                            : Container()
+                                            : Container(),
+
+                                        Globals().redoIdentityVerification && kycLevel == 3 ? ElevatedButton(onPressed: () async {
+                                          showCountryPopup();
+                                          await verifyIdentityProcess();
+                                        }, child: Text('Redo identity verification')) : Container()
                                       ],
                                     ),
                                   );
@@ -261,6 +267,19 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
           )),
         ],
       ),
+    );
+  }
+
+  void showCountryPopup() {
+    return showCountryPicker(
+      context: context,
+      showPhoneCode: false, // optional. Shows phone code before the country name.
+      onSelect: (Country country) {
+        setState(() {
+          createdPayload['country'] = country.countryCode;
+        });
+        print('Select country: ${country.displayName}');
+      },
     );
   }
 
@@ -286,6 +305,7 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
   }
 
   Widget _inShuftiVerificationProcess() {
+    print(createdPayload);
     return Container(
         child: new ShuftiPro(
             authObject: authObject,
@@ -574,6 +594,7 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
                           // Verify identity
                           case 3:
                             {
+                              showCountryPopup();
                               await verifyIdentityProcess();
                             }
                             break;
@@ -632,42 +653,42 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
             Padding(padding: EdgeInsets.only(left: 15)),
             Container(
                 child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Row(
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Container(
-                            constraints: BoxConstraints(
-                                minWidth: MediaQuery.of(context).size.width * 0.55,
-                                maxWidth: MediaQuery.of(context).size.width * 0.55),
-                            child: Text(text == '' ? 'Unknown' : text,
-                                overflow: TextOverflow.ellipsis,
-                                style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)))
-                      ],
-                    ),
-                    SizedBox(height: 5),
-                    Row(
-                      children: [
-                        Text(
-                          'Verified',
-                          style: TextStyle(color: Colors.green, fontSize: 12, fontWeight: FontWeight.bold),
+                        Row(
+                          children: [
+                            Container(
+                                constraints: BoxConstraints(
+                                    minWidth: MediaQuery.of(context).size.width * 0.55,
+                                    maxWidth: MediaQuery.of(context).size.width * 0.55),
+                                child: Text(text == '' ? 'Unknown' : text,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)))
+                          ],
+                        ),
+                        SizedBox(height: 5),
+                        Row(
+                          children: [
+                            Text(
+                              'Verified',
+                              style: TextStyle(color: Colors.green, fontSize: 12, fontWeight: FontWeight.bold),
+                            )
+                          ],
                         )
                       ],
+                    ),
+                    step == 3
+                        ? Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [Icon(Icons.chevron_right, size: 20, color: Colors.black)],
                     )
+                        : Column()
                   ],
-                ),
-                step == 3
-                    ? Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [Icon(Icons.chevron_right, size: 20, color: Colors.black)],
-                      )
-                    : Column()
-              ],
-            )),
+                )),
             Padding(padding: EdgeInsets.only(right: 10))
           ],
         ),
@@ -702,9 +723,9 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
 
   Future verifyIdentityProcess() async {
     // Edge case: if the identity is already verified, don't let the user go through the verification process again
-    if (identityVerified) {
-      return;
-    }
+    // if (identityVerified) {
+    //   return;
+    // }
 
     setState(() {
       this.isLoading = true;

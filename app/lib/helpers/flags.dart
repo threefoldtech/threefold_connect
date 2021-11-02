@@ -38,6 +38,7 @@ class Flags {
     Globals().isOpenKYCEnabled = await Flags().hasFlagValueByFeatureName('kyc');
     Globals().useNewWallet = await Flags().hasFlagValueByFeatureName('use_new_wallet');
     Globals().walletConfigUrl = await Flags().getFlagValueByFeatureName('wallet_url');
+    Globals().redoIdentityVerification = await Flags().hasFlagValueByFeatureName('redo_identity_verification');
   }
 
   Future<bool> hasFlagValueByFeatureName(String name) async {

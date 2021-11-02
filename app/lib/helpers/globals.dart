@@ -50,6 +50,7 @@ class Globals {
   bool isOpenKYCEnabled;
   bool useNewWallet;
   String walletConfigUrl;
+  bool redoIdentityVerification;
 
 
   // VpnState vpnState = new VpnState();
