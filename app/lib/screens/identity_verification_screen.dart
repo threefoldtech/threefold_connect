@@ -431,11 +431,15 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
   Widget unVerifiedWidget(step, text, icon) {
     return GestureDetector(
         onTap: () async {
-          if (step == 2) {
-            await addPhoneNumber();
-          }
+          // if (step == 2) {
+          //   await addPhoneNumber();
+          // }
         },
         child: Container(
+          foregroundDecoration: BoxDecoration(
+            color: Colors.grey,
+            backgroundBlendMode: BlendMode.saturation,
+          ),
           decoration: BoxDecoration(border: Border.all(width: 0.5, color: Colors.grey)),
           height: 75,
           width: MediaQuery.of(context).size.width * 100,
