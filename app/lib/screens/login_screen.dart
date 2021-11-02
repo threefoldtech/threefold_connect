@@ -411,7 +411,7 @@ class _LoginScreenState extends State<LoginScreen> with BlockAndRunMixin {
 
         if (scopePermissionsDecoded['walletAddress'] != null && scopePermissionsDecoded['walletAddress']) {
           scope['walletAddressData'] = {
-            'walletAddressData': scopePermissionsDecoded['walletAddressData'],
+            'address': scopePermissionsDecoded['walletAddressData'],
           };
         }
       }

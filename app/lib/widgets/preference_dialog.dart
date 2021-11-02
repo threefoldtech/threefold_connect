@@ -24,6 +24,9 @@ class _PreferenceDialogState extends State<PreferenceDialog> {
   Map<String, dynamic> scopeAsMap;
   Map<String, dynamic> previousSelectedScope;
 
+  List<WalletData> wallets;
+  List<DropdownMenuItem<String>> _menuItems;
+
   String _selectedItem;
 
   @override
@@ -33,7 +36,10 @@ class _PreferenceDialogState extends State<PreferenceDialog> {
     _startup().then((value) {
       setState(() {
         _canRender = true;
-        print('Async done');
+
+        if(scopeAsMap['walletAddress'] != null){
+          initializeDropDown();
+        }
       });
     });
   }
@@ -93,6 +99,24 @@ class _PreferenceDialogState extends State<PreferenceDialog> {
     await savePreviousScopePermissions(widget.appId, jsonEncode(previousSelectedScope));
 
     setState(() {});
+  }
+
+  void initializeDropDown() {
+    getWallets().then((value) {
+      setState(() {
+        if (value != null) {
+          wallets = value;
+          _selectedItem = wallets[0].address;
+          _menuItems = List.generate(
+            wallets.length,
+                (i) => DropdownMenuItem(
+              value: wallets[i].address,
+              child: Text("${wallets[i].name}"),
+            ),
+          );
+        }
+      });
+    });
   }
 
   Widget scopeList(context) {
@@ -398,62 +422,59 @@ class _PreferenceDialogState extends State<PreferenceDialog> {
                                       ],
                                     ));
                               }
-                              List<WalletData> wallets = snapshot.data;
 
-                              return Container(
-                                constraints: BoxConstraints(
-                                    minWidth: MediaQuery.of(context).size.width * 0.8,
-                                    maxWidth: MediaQuery.of(context).size.width * 0.8),
-                                child: Column(
-                                  children: [
-                                    Row(
-                                      children: [
-                                        Flexible(
-                                            child: CheckboxListTile(
-                                          value: (previousSelectedScope[scopeItem] == null)
-                                              ? mandatory
-                                              : previousSelectedScope[scopeItem],
-                                          onChanged: ((mandatory == null || mandatory == true)
-                                              ? null
-                                              : (value) {
-                                                  toggleScope(scopeItem, value);
-                                                }),
-                                          title: Text(
-                                            "${scopeItem.toUpperCase()}" + (mandatory ? " *" : ""),
-                                            style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
+                              if (wallets != null && _selectedItem != null) {
+                                return Container(
+                                  constraints: BoxConstraints(
+                                      minWidth: MediaQuery.of(context).size.width * 0.8,
+                                      maxWidth: MediaQuery.of(context).size.width * 0.8),
+                                  child: Column(
+                                    children: [
+                                      Row(
+                                        children: [
+                                          Flexible(
+                                              child: CheckboxListTile(
+                                            value: (previousSelectedScope[scopeItem] == null)
+                                                ? mandatory
+                                                : previousSelectedScope[scopeItem],
+                                            onChanged: ((mandatory == null || mandatory == true)
+                                                ? null
+                                                : (value) {
+                                                    toggleScope(scopeItem, value);
+                                                  }),
+                                            title: Text(
+                                              "${scopeItem.toUpperCase()}" + (mandatory ? " *" : ""),
+                                              style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
+                                            ),
+                                          ))
+                                        ],
+                                      ),
+                                      Row(
+                                        children: [
+                                          Padding(
+                                            padding: EdgeInsets.only(left: 16),
                                           ),
-                                        ))
-                                      ],
-                                    ),
-                                    Row(
-                                      children: [
-                                        Padding(
-                                          padding: EdgeInsets.only(left: 16),
-                                        ),
-                                        Container(
-                                            width: MediaQuery.of(context).size.width * 0.8,
-                                            child: ButtonTheme(
-                                              child: DropdownButton<String>(
-                                                isExpanded: true,
-                                                value: _selectedItem,
-                                                hint: Text('Choose a wallet'),
-                                                items: wallets.map((WalletData value) {
-                                                  return DropdownMenuItem<String>(
-                                                    value: value.address,
-                                                    child: Text(value.name),
-                                                  );
-                                                }).toList(),
-                                                onChanged: (String value) {
-                                                  toggleScope('walletAddressData', value);
-                                                  _selectedItem = value;
-                                                },
-                                              ),
-                                            ))
-                                      ],
-                                    )
-                                  ],
-                                ),
-                              ); // return DropdownButtonHideUnderline(
+                                          Container(
+                                              width: MediaQuery.of(context).size.width * 0.8,
+                                              child: ButtonTheme(
+                                                child: DropdownButton<String>(
+                                                  items: _menuItems,
+                                                  value: _selectedItem,
+                                                  onChanged: (value)  {
+                                                    setState(() {
+                                                      toggleScope('walletAddressData', value);
+                                                      _selectedItem = value;
+                                                    });
+                                                  }
+                                                ),
+                                              ))
+                                        ],
+                                      )
+                                    ],
+                                  ),
+                                );
+                              }
+                              return Container();
                             });
                         break;
                     }
