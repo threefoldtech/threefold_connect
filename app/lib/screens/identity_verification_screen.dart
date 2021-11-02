@@ -248,7 +248,6 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
                                             : Container(),
 
                                         Globals().redoIdentityVerification && kycLevel == 3 ? ElevatedButton(onPressed: () async {
-                                          showCountryPopup();
                                           await verifyIdentityProcess();
                                         }, child: Text('Redo identity verification')) : Container()
                                       ],
@@ -437,7 +436,7 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
         },
         child: Container(
           foregroundDecoration: BoxDecoration(
-            color: Colors.grey,
+            color: Color.fromRGBO(220, 220, 220, 0.8),
             backgroundBlendMode: BlendMode.saturation,
           ),
           decoration: BoxDecoration(border: Border.all(width: 0.5, color: Colors.grey)),
@@ -598,7 +597,6 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
                           // Verify identity
                           case 3:
                             {
-                              showCountryPopup();
                               await verifyIdentityProcess();
                             }
                             break;
@@ -758,6 +756,8 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
                   ],
                 ));
       }
+
+      showCountryPopup();
 
       if (accessTokenResponse.statusCode != 200) {
         setState(() {
