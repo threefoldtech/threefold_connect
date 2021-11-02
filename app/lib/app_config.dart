@@ -40,6 +40,14 @@ class AppConfig extends EnvConfig {
   String wizardUrl() {
     return appConfig.wizardUrl();
   }
+
+  String pKidUrl() {
+    return appConfig.pKidUrl();
+  }
+
+  Map<String, String> flagSmithConfig() {
+    return appConfig.flagSmithConfig();
+  }
 }
 
 abstract class AppConfigImpl {
@@ -54,6 +62,10 @@ abstract class AppConfigImpl {
   String threeBotSocketUrl();
 
   String wizardUrl();
+
+  String pKidUrl();
+
+  Map<String, String> flagSmithConfig();
 }
 
 class AppConfigProduction extends AppConfigImpl {
@@ -78,33 +90,55 @@ class AppConfigProduction extends AppConfigImpl {
   }
 
   String wizardUrl() {
-    return 'https://wizard.jimber.org/';
+    return 'https://wizard.jimber.io/';
+  }
+
+  String pKidUrl() {
+    return 'https://pkid.jimber.org/v1';
+  }
+
+  Map<String, String> flagSmithConfig() {
+    return {
+      'url': 'https://flagsmith.jimber.io/api/v1/',
+      'apiKey': 'BuzktmbcnMJ77vznU7WhJB'
+    };
   }
 }
 
 class AppConfigStaging extends AppConfigImpl {
   String baseUrl() {
-    return "login.staging.jimber.org";
+    return "login.staging.jimber.io";
   }
 
   String openKycApiUrl() {
-    return "https://openkyc.staging.jimber.org";
+    return 'https://openkyc.staging.jimber.io';
   }
 
   String threeBotApiUrl() {
-    return "https://login.staging.jimber.org/api";
+    return "https://login.staging.jimber.io/api";
   }
 
   String threeBotFrontEndUrl() {
-    return "https://login.staging.jimber.org/";
+    return "https://login.staging.jimber.io/";
   }
 
   String threeBotSocketUrl() {
-    return "wss://login.staging.jimber.org";
+    return "wss://login.staging.jimber.io";
   }
 
   String wizardUrl() {
-    return 'https://wizard.staging.jimber.org/';
+    return 'https://wizard.staging.jimber.io/';
+  }
+
+  String pKidUrl() {
+    return 'https://pkid.staging.jimber.org/v1';
+  }
+
+  Map<String, String> flagSmithConfig() {
+    return {
+      'url': 'https://flagsmith.jimber.io/api/v1/',
+      'apiKey': 'n6YyxDdrePqwAF49KCYx7S'
+    };
   }
 }
 
@@ -131,5 +165,16 @@ class AppConfigTesting extends AppConfigImpl {
 
   String wizardUrl() {
     return 'https://wizard.staging.jimber.org/';
+  }
+
+  String pKidUrl() {
+    return 'https://pkid.staging.jimber.org/v1';
+  }
+
+  Map<String, String> flagSmithConfig() {
+    return {
+      'url': 'https://flagsmith.jimber.io/api/v1/',
+      'apiKey': 'VtTsMwJwiF69QWFWHGEMKM'
+    };
   }
 }

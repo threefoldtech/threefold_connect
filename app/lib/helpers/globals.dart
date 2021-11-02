@@ -27,6 +27,7 @@ class Globals {
 
   ValueNotifier<bool> emailVerified = ValueNotifier(false);
   ValueNotifier<bool> phoneVerified = ValueNotifier(false);
+  ValueNotifier<bool> identityVerified = ValueNotifier(false);
 
   final JRouter router = new JRouter();
 
@@ -43,6 +44,14 @@ class Globals {
   int loginTimeout = 120;
   PaymentRequest paymentRequest;
   bool paymentRequestIsUsed = false;
+
+
+  // FlagSmith configurations
+  bool isOpenKYCEnabled;
+  bool useNewWallet;
+  String walletConfigUrl;
+  bool redoIdentityVerification;
+
 
   // VpnState vpnState = new VpnState();
   static final Globals _singleton = new Globals._internal();

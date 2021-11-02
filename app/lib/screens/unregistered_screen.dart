@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:threebotlogin/helpers/flags.dart';
 import 'package:threebotlogin/screens/change_pin_screen.dart';
 import 'package:threebotlogin/screens/mobile_registration_screen.dart';
 import 'package:threebotlogin/screens/recover_screen.dart';
@@ -46,6 +47,10 @@ class _UnregisteredScreenState extends State<UnregisteredScreen>
               builder: (context) => SuccessfulScreen(
                   title: "Recovered",
                   text: "Your account has been recovered.")));
+
+
+      await Flags().initialiseFlagSmith();
+      await Flags().setFlagSmithDefaultValues();
 
       Navigator.pop(context);
     }

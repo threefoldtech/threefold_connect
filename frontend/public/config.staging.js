@@ -1,4 +1,4 @@
 export default ({
-  apiurl: 'https://login.staging.jimber.org/',
-  openkycurl: 'https://openkyc.staging.jimber.org/'
+  apiurl: 'https://login.staging.jimber.io/',
+  openkycurl: 'https://openkyc.staging.jimber.io/'
 })

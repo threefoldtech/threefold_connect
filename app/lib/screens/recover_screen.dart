@@ -4,10 +4,14 @@ import 'dart:core';
 import 'package:crypto/crypto.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_pkid/flutter_pkid.dart';
 import 'package:http/http.dart';
+import 'package:shuftipro_flutter_sdk/ShuftiProVerifications.dart';
+import 'package:threebotlogin/helpers/kyc_helpers.dart';
 import 'package:threebotlogin/helpers/globals.dart';
 import 'package:threebotlogin/services/3bot_service.dart';
 import 'package:threebotlogin/services/crypto_service.dart';
+import 'package:threebotlogin/services/migration_service.dart';
 import 'package:threebotlogin/services/open_kyc_service.dart';
 import 'package:threebotlogin/services/tools_service.dart';
 import 'package:threebotlogin/services/user_service.dart';
@@ -22,26 +26,18 @@ class RecoverScreen extends StatefulWidget {
 
 class _RecoverScreenState extends State<RecoverScreen> {
   final TextEditingController doubleNameController = TextEditingController();
-  final TextEditingController emailController = TextEditingController();
   final TextEditingController seedPhrasecontroller = TextEditingController();
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   bool _autoValidate = false;
-  bool emailVerified = false;
-  bool emailCheck = false;
 
   String doubleName = '';
-  String emailFromForm = '';
   String seedPhrase = '';
   String error = '';
   String privateKey;
 
   String errorStepperText = '';
-
-  String generateMd5(String input) {
-    return md5.convert(utf8.encode(input)).toString();
-  }
 
   checkSeedPhrase(doubleName, seedPhrase) async {
     checkSeedLength(seedPhrase);
@@ -68,12 +64,32 @@ class _RecoverScreenState extends State<RecoverScreen> {
     Map<String, String> keys = await generateKeysFromSeedPhrase(seedPhrase);
     await savePrivateKey(keys['privateKey']);
     await savePublicKey(keys['publicKey']);
-    await saveFingerprint(false);
-    await saveEmail(emailFromForm, null);
-    await saveDoubleName(doubleName);
+
+    Map<String, dynamic> keyPair = await generateKeyPairFromSeedPhrase(seedPhrase);
+    var client = FlutterPkid(pkidUrl, keyPair);
+
+    List<String> keyWords = ['email', 'phone', 'identity'];
+
+    var futures = keyWords.map((keyword) async {
+      var pKidResult = await client.getPKidDoc(keyword, keyPair);
+      return pKidResult.containsKey('data') && pKidResult.containsKey('success') ? jsonDecode(pKidResult['data']) : {};
+    });
+
+    var pKidResult = await Future.wait(futures);
+    Map<int, Object> dataMap = pKidResult.asMap();
+
+
     await savePhrase(seedPhrase);
-    await sendVerificationEmail();
+    await saveFingerprint(false);
+    await saveDoubleName(doubleName);
+
+    await handleKYCData(dataMap[0], dataMap[1], dataMap[2]);
+
+    await migrateToNewSystem();
+    // await sendVerificationEmail();
   }
+
+
 
   checkSeedLength(seedPhrase) {
     int seedLength = seedPhrase.split(" ").length;
@@ -91,7 +107,6 @@ class _RecoverScreenState extends State<RecoverScreen> {
   @override
   void dispose() {
     doubleNameController.dispose();
-    emailController.dispose();
     seedPhrasecontroller.dispose();
     super.dispose();
   }
@@ -148,27 +163,9 @@ class _RecoverScreenState extends State<RecoverScreen> {
             Padding(
               padding: const EdgeInsets.only(top: 8.5),
               child: TextFormField(
-                keyboardType: TextInputType.emailAddress,
-                decoration: InputDecoration(
-                  border: OutlineInputBorder(),
-                  labelText: 'EMAIL',
-                ),
-                validator: (value) {
-                  if (value.isEmpty || !validateEmail(value)) {
-                    return 'Please enter a valid Email';
-                  }
-                  return null;
-                },
-                controller: emailController,
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(top: 8.5),
-              child: TextFormField(
                 keyboardType: TextInputType.multiline,
                 maxLines: null,
-                decoration: InputDecoration(
-                    border: OutlineInputBorder(), labelText: 'SEED PHRASE'),
+                decoration: InputDecoration(border: OutlineInputBorder(), labelText: 'SEED PHRASE'),
                 controller: seedPhrasecontroller,
                 validator: (value) {
                   if (value.isEmpty) {
@@ -202,44 +199,32 @@ class _RecoverScreenState extends State<RecoverScreen> {
 
                 FocusScope.of(context).requestFocus(new FocusNode());
 
-                String doubleNameValue = doubleNameController.text?.toLowerCase()?.trim()?.replaceAll(new RegExp(r"\s+"), " ");
-                String emailValue = emailController.text?.toLowerCase()?.trim()?.replaceAll(new RegExp(r"\s+"), " ");
-                String seedPhraseValue = seedPhrasecontroller.text?.toLowerCase()?.trim()?.replaceAll(new RegExp(r"\s+"), " ");
-
-                bool emailValid = validateEmail(emailValue);
+                String doubleNameValue =
+                    doubleNameController.text?.toLowerCase()?.trim()?.replaceAll(new RegExp(r"\s+"), " ");
+                String seedPhraseValue =
+                    seedPhrasecontroller.text?.toLowerCase()?.trim()?.replaceAll(new RegExp(r"\s+"), " ");
 
                 setState(() {
                   doubleNameController.text = doubleNameValue;
-                  emailController.text = emailValue;
                   seedPhrasecontroller.text = seedPhraseValue;
 
                   _autoValidate = true;
-                  
+
                   doubleName = doubleNameController.text + '.3bot';
-                  emailFromForm = emailController.text;
                   seedPhrase = seedPhrasecontroller.text;
                 });
 
                 try {
-                  if (emailFromForm != null &&
-                      emailFromForm.isNotEmpty &&
-                      emailValid == true) {
-                    showSpinner();
+                  showSpinner();
 
-                    await checkSeedPhrase(doubleName, seedPhrase);
-                    await continueRecoverAccount();
+                  await checkSeedPhrase(doubleName, seedPhrase);
+                  await continueRecoverAccount();
 
-                    Navigator.pop(context); // To dismiss the spinner
-                    Navigator.pop(
-                        context, true); // to dismiss the recovery screen.
+                  Navigator.pop(context); // To dismiss the spinner
+                  Navigator.pop(context, true); // to dismiss the recovery screen.
 
-                  } else {
-                    setState(() {
-                      error =
-                          'Please make sure everything is correctly filled in';
-                    });
-                  }
                 } catch (e) {
+                  print(e);
                   // To dismiss the spinner
                   Navigator.pop(context);
                   if (e.message != "") {

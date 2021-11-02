@@ -102,6 +102,7 @@ Future<bool> isAppUpToDate() async {
 }
 
 Future<bool> isAppUnderMaintenance() async {
+  print('$threeBotApiUrl/maintenance');
   Response response = await http
       .get('$threeBotApiUrl/maintenance', headers: requestHeaders)
       .timeout(const Duration(seconds: 3));
@@ -177,7 +178,6 @@ Future<Response> activateDigitalTwin(
   String signedData = await signData(jsonEncode(jsonObject), privateKey);
 
   var body = json.encode({"doubleName": doubleName, "data": signedData});
-  print(body);
   return await http.post('$threeBotApiUrl/digitaltwin/productkey/activate',
       body: body, headers: {'Content-type': 'application/json'});
 }

@@ -1,13 +1,14 @@
+import 'dart:convert';
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
-import 'package:threebotlogin/events/events.dart';
-import 'package:threebotlogin/events/go_home_event.dart';
-import 'package:threebotlogin/events/go_news_event.dart';
-import 'package:threebotlogin/events/go_planetary_event.dart';
-import 'package:threebotlogin/events/go_reservations_event.dart';
-import 'package:threebotlogin/events/go_settings_event.dart';
-import 'package:threebotlogin/events/go_support_event.dart';
-import 'package:threebotlogin/events/go_wallet_event.dart';
+import 'package:flutter_pkid/flutter_pkid.dart';
 import 'package:threebotlogin/helpers/globals.dart';
+import 'package:threebotlogin/services/crypto_service.dart';
+import 'package:threebotlogin/services/user_service.dart';
+import 'package:convert/convert.dart';
+
+import '../app_config.dart';
 
 class LayoutDrawer extends StatefulWidget {
   LayoutDrawer({@required this.titleText, @required this.content});
@@ -93,8 +94,7 @@ class _LayoutDrawerState extends State<LayoutDrawer> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
                   Padding(padding: const EdgeInsets.only(left: 30)),
-                  Icon(Icons.account_balance_wallet,
-                      color: Colors.black, size: 18)
+                  Icon(Icons.account_balance_wallet, color: Colors.black, size: 18)
                 ],
               ),
               title: Text('Wallet'),
@@ -161,6 +161,21 @@ class _LayoutDrawerState extends State<LayoutDrawer> {
               onTap: () {
                 Navigator.pop(context);
                 globals.tabController.animateTo(5);
+              },
+            ),
+            ListTile(
+              minLeadingWidth: 10,
+              leading: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Padding(padding: const EdgeInsets.only(left: 30)),
+                  Icon(Icons.lock, color: Colors.black, size: 18)
+                ],
+              ),
+              title: Text('Identification'),
+              onTap: () {
+                Navigator.pop(context);
+                globals.tabController.animateTo(6);
               },
             ),
           ],

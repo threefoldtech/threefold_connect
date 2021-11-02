@@ -181,6 +181,7 @@ class _AppState extends State<MainScreen> {
         }
       }
     } on TimeoutException catch (_) {
+      print(_);
       CustomDialog dialog = CustomDialog(
           title: "Connection problem",
           description:

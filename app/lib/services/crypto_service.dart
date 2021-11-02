@@ -14,10 +14,7 @@ import 'package:threebotlogin/services/user_service.dart';
 Future<Map<String, String>> generateKeyPair() async {
   Map<String, Uint8List> keys = await Sodium.cryptoBoxKeypair();
 
-  return {
-    'privateKey': base64.encode(keys['sk']),
-    'publicKey': base64.encode(keys['pk'])
-  };
+  return {'privateKey': base64.encode(keys['sk']), 'publicKey': base64.encode(keys['pk'])};
 }
 
 Uint8List _toHex(String input) {
@@ -34,14 +31,19 @@ Uint8List _toHex(String input) {
 
 Future<Map<String, String>> generateKeysFromSeedPhrase(seedPhrase) async {
   String entropy = bip39.mnemonicToEntropy(seedPhrase);
-  Map<String, Uint8List> key =
-      await Sodium.cryptoSignSeedKeypair(_toHex(entropy));
+  Map<String, Uint8List> key = await Sodium.cryptoSignSeedKeypair(_toHex(entropy));
 
-  return {
-    'publicKey': base64.encode(key['pk']).toString(),
-    'privateKey': base64.encode(key['sk']).toString()
-  };
+  return {'publicKey': base64.encode(key['pk']).toString(), 'privateKey': base64.encode(key['sk']).toString()};
 }
+
+
+Future<Map<String, dynamic>> generateKeyPairFromSeedPhrase(seedPhrase) async {
+  String entropy = bip39.mnemonicToEntropy(seedPhrase);
+  Map<String, Uint8List> key = await Sodium.cryptoSignSeedKeypair(_toHex(entropy));
+
+  return {'publicKey': key['pk'], 'privateKey': key['sk']};
+}
+
 
 Future<String> generatePublicKeyFromEntropy(encodedEntropy) async {
   Uint8List entropy = base64.decode(encodedEntropy);
@@ -52,35 +54,25 @@ Future<String> generatePublicKeyFromEntropy(encodedEntropy) async {
 
 Future<String> signData(String data, String sk) async {
   Uint8List private = base64.decode(sk);
-  Uint8List signed =
-      await Sodium.cryptoSign(Uint8List.fromList(data.codeUnits), private);
+  Uint8List signed = await Sodium.cryptoSign(Uint8List.fromList(data.codeUnits), private);
 
   return base64.encode(signed);
 }
 
-Future<Map<String, String>> encrypt(
-    String data, String publicKey, String sk) async {
+Future<Map<String, String>> encrypt(String data, String publicKey, String sk) async {
   Uint8List nonce = await CryptoBox.generateNonce();
-  Uint8List private =
-      await Sodium.cryptoSignEd25519SkToCurve25519(base64.decode(sk));
+  Uint8List private = await Sodium.cryptoSignEd25519SkToCurve25519(base64.decode(sk));
   Uint8List public = base64.decode(publicKey);
   Uint8List message = Uint8List.fromList(data.codeUnits);
-  Uint8List encryptedData =
-      await Sodium.cryptoBoxEasy(message, nonce, public, private);
+  Uint8List encryptedData = await Sodium.cryptoBoxEasy(message, nonce, public, private);
 
-  return {
-    'nonce': base64.encode(nonce),
-    'ciphertext': base64.encode(encryptedData)
-  };
+  return {'nonce': base64.encode(nonce), 'ciphertext': base64.encode(encryptedData)};
 }
 
-Future<Uint8List> decrypt(String encodedCipherText, String encodedPublicKey,
-    String encodedSecretKey) async {
+Future<Uint8List> decrypt(String encodedCipherText, String encodedPublicKey, String encodedSecretKey) async {
   Uint8List cipherText = base64.decode(encodedCipherText);
-  Uint8List publicKey = await Sodium.cryptoSignEd25519PkToCurve25519(
-      base64.decode(encodedPublicKey));
-  Uint8List secretKey = await Sodium.cryptoSignEd25519SkToCurve25519(
-      base64.decode(encodedSecretKey));
+  Uint8List publicKey = await Sodium.cryptoSignEd25519PkToCurve25519(base64.decode(encodedPublicKey));
+  Uint8List secretKey = await Sodium.cryptoSignEd25519SkToCurve25519(base64.decode(encodedSecretKey));
 
   return await Sodium.cryptoBoxSealOpen(cipherText, publicKey, secretKey);
 }
@@ -112,8 +104,7 @@ Future<String> generateDerivedSeed(String appId) async {
   return base64.encode(derivedSeed);
 }
 
-Future<Map<String, Object>> generateDerivedKeypair(
-    String appId, String doubleName) async {
+Future<Map<String, Object>> generateDerivedKeypair(String appId, String doubleName) async {
   final SharedPreferences prefs = await SharedPreferences.getInstance();
 
   String derivedPublicKey = prefs.getString("${appId.toString()}.dpk");
@@ -124,8 +115,7 @@ Future<Map<String, Object>> generateDerivedKeypair(
   PBKDF2 generator = new PBKDF2();
   List<int> hashKey = generator.generateKey(privateKey, appId, 1000, 32);
 
-  Map<String, Uint8List> key =
-      await Sodium.cryptoBoxSeedKeypair(new Uint8List.fromList(hashKey));
+  Map<String, Uint8List> key = await Sodium.cryptoBoxSeedKeypair(new Uint8List.fromList(hashKey));
 
   if (derivedPublicKey == null || derivedPublicKey == "") {
     derivedPublicKey = base64.encode(key['pk']);
@@ -145,9 +135,5 @@ Future<Map<String, Object>> generateDerivedKeypair(
     prefs.setString("${appId.toString()}.dsk", derivedPrivateKey);
   }
 
-  return {
-    'appId': appId,
-    'derivedPublicKey': derivedPublicKey,
-    'derivedPrivateKey': derivedPrivateKey
-  };
+  return {'appId': appId, 'derivedPublicKey': derivedPublicKey, 'derivedPrivateKey': derivedPrivateKey};
 }

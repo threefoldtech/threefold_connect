@@ -4,8 +4,12 @@ COPY frontend /frontend
 WORKDIR /frontend
 RUN yarn install --frozen-lockfile && yarn build
 
-COPY example /example
-WORKDIR /example
+# COPY example /example
+# WORKDIR /example
+# RUN yarn install --frozen-lockfile && yarn build
+
+COPY wizard /wizard
+WORKDIR /wizard
 RUN yarn install --frozen-lockfile && yarn build
 
 
@@ -21,7 +25,9 @@ RUN pip3 install -r requirements.txt --ignore-installed
 RUN pip3 install gevent
 
 COPY --from=builder /frontend/dist /var/www/html/frontend
-COPY --from=builder /example/dist /var/www/html/example
+# COPY --from=builder /example/dist /var/www/html/example
+COPY --from=builder /wizard/dist /var/www/html/wizard
+
 COPY backend/ /usr/share/nginx/backend
 
 COPY nginx.conf /etc/nginx/conf.d/default.conf
