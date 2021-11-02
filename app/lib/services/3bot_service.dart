@@ -178,7 +178,6 @@ Future<Response> activateDigitalTwin(
   String signedData = await signData(jsonEncode(jsonObject), privateKey);
 
   var body = json.encode({"doubleName": doubleName, "data": signedData});
-  print(body);
   return await http.post('$threeBotApiUrl/digitaltwin/productkey/activate',
       body: body, headers: {'Content-type': 'application/json'});
 }

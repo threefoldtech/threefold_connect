@@ -45,6 +45,14 @@ class Globals {
   PaymentRequest paymentRequest;
   bool paymentRequestIsUsed = false;
 
+
+  // FlagSmith configurations
+  bool isOpenKYCEnabled;
+  bool useNewWallet;
+  String walletConfigUrl;
+  bool redoIdentityVerification;
+
+
   // VpnState vpnState = new VpnState();
   static final Globals _singleton = new Globals._internal();
 

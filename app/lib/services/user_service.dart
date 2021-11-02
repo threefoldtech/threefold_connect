@@ -157,7 +157,7 @@ Future<void> removeEmail() async {
   prefs.remove('emailVerified');
 }
 
-Future<void> saveEmail(String email, String signedEmailIdentifier) async {
+Future<void>  saveEmail(String email, String signedEmailIdentifier) async {
   final SharedPreferences prefs = await SharedPreferences.getInstance();
   prefs.remove('email');
   prefs.setString('email', email);

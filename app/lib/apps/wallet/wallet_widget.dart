@@ -139,19 +139,19 @@ class _WalletState extends State<WalletWidget> with AutomaticKeepAliveClientMixi
     }
   }
 
-@override
-Widget build(BuildContext context) {
-  super.build(context);
-  return LayoutDrawer(
-      titleText: 'Wallet',
-      content: Column(
-        children: <Widget>[
-          Expanded(
-            child: Container(child: iaWebView),
-          ),
-        ],
-      ));
-}
+  @override
+  Widget build(BuildContext context) {
+    super.build(context);
+    return LayoutDrawer(
+        titleText: 'Wallet',
+        content: Column(
+          children: <Widget>[
+            Expanded(
+              child: Container(child: iaWebView),
+            ),
+          ],
+        ));
+  }
 
-@override
-bool get wantKeepAlive => false;}
+  @override
+  bool get wantKeepAlive => false;}

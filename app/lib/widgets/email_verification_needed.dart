@@ -171,7 +171,7 @@ class PhoneAlertDialogState extends State<PhoneAlertDialog> {
               }),
           new FlatButton(
               color: valid ? Colors.green : Colors.grey,
-              child: const Text('VERIFY'),
+              child: const Text('OK'),
               onPressed: verifyButton)
         ]);
   }

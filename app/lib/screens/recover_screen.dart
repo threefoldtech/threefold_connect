@@ -11,6 +11,7 @@ import 'package:threebotlogin/helpers/kyc_helpers.dart';
 import 'package:threebotlogin/helpers/globals.dart';
 import 'package:threebotlogin/services/3bot_service.dart';
 import 'package:threebotlogin/services/crypto_service.dart';
+import 'package:threebotlogin/services/migration_service.dart';
 import 'package:threebotlogin/services/open_kyc_service.dart';
 import 'package:threebotlogin/services/tools_service.dart';
 import 'package:threebotlogin/services/user_service.dart';
@@ -77,14 +78,18 @@ class _RecoverScreenState extends State<RecoverScreen> {
     var pKidResult = await Future.wait(futures);
     Map<int, Object> dataMap = pKidResult.asMap();
 
+
     await savePhrase(seedPhrase);
     await saveFingerprint(false);
     await saveDoubleName(doubleName);
 
     await handleKYCData(dataMap[0], dataMap[1], dataMap[2]);
 
+    await migrateToNewSystem();
     // await sendVerificationEmail();
   }
+
+
 
   checkSeedLength(seedPhrase) {
     int seedLength = seedPhrase.split(" ").length;
