@@ -15,27 +15,28 @@ emailVerificationDialog(context) {
   showDialog(
     context: context,
     barrierDismissible: false,
-    builder: (BuildContext context) => CustomDialog(
-      image: Icons.error,
-      title: "Please verify email",
-      description: "Please verify email before using this app",
-      actions: <Widget>[
-        FlatButton(
-          child: new Text("Ok"),
-          onPressed: () {
-            Navigator.pop(context);
-          },
+    builder: (BuildContext context) =>
+        CustomDialog(
+          image: Icons.error,
+          title: "Please verify email",
+          description: "Please verify email before using this app",
+          actions: <Widget>[
+            FlatButton(
+              child: new Text("Ok"),
+              onPressed: () {
+                Navigator.pop(context);
+              },
+            ),
+            FlatButton(
+              child: new Text("Resend email"),
+              onPressed: () async {
+                sendVerificationEmail();
+                Navigator.pop(context);
+                emailResendedDialog(context);
+              },
+            ),
+          ],
         ),
-        FlatButton(
-          child: new Text("Resend email"),
-          onPressed: () async {
-            sendVerificationEmail();
-            Navigator.pop(context);
-            emailResendedDialog(context);
-          },
-        ),
-      ],
-    ),
   );
 }
 
@@ -43,19 +44,20 @@ emailResendedDialog(context) {
   showDialog(
     context: context,
     barrierDismissible: false,
-    builder: (BuildContext context) => CustomDialog(
-      image: Icons.check,
-      title: "Email has been resent.",
-      description: "A new verification email has been sent.",
-      actions: <Widget>[
-        FlatButton(
-          child: new Text("Ok"),
-          onPressed: () {
-            Navigator.pop(context);
-          },
+    builder: (BuildContext context) =>
+        CustomDialog(
+          image: Icons.check,
+          title: "Email has been resent.",
+          description: "A new verification email has been sent.",
+          actions: <Widget>[
+            FlatButton(
+              child: new Text("Ok"),
+              onPressed: () {
+                Navigator.pop(context);
+              },
+            ),
+          ],
         ),
-      ],
-    ),
   );
 }
 
@@ -63,19 +65,20 @@ phoneSendDialog(context) {
   showDialog(
     context: context,
     barrierDismissible: false,
-    builder: (BuildContext context) => CustomDialog(
-      image: Icons.check,
-      title: "Sms has been sent.",
-      description: "A verification sms has been sent.",
-      actions: <Widget>[
-        FlatButton(
-          child: new Text("Ok"),
-          onPressed: () {
-            Navigator.pop(context);
-          },
+    builder: (BuildContext context) =>
+        CustomDialog(
+          image: Icons.check,
+          title: "Sms has been sent.",
+          description: "A verification sms has been sent.",
+          actions: <Widget>[
+            FlatButton(
+              child: new Text("Ok"),
+              onPressed: () {
+                Navigator.pop(context);
+              },
+            ),
+          ],
         ),
-      ],
-    ),
   );
 }
 
@@ -89,7 +92,7 @@ addPhoneNumberDialog(context) async {
   await showDialog(
     context: context,
     barrierDismissible: false,
-    builder: (BuildContext context) => PhoneAlertDialog(defaultCountryCode: countryCode ),
+    builder: (BuildContext context) => PhoneAlertDialog(defaultCountryCode: countryCode),
   );
 }
 
@@ -172,10 +175,21 @@ class PhoneAlertDialogState extends State<PhoneAlertDialog> {
                 Navigator.pop(context);
               }),
           new FlatButton(
-              color: valid ? Colors.green : Colors.grey,
-              child: const Text('Verify'),
+              color: valid ? Theme
+                  .of(context)
+                  .primaryColor : Colors.grey,
+              child: valid ? const Text('Verify', style: const TextStyle(color: Colors.white)) : const Text(
+                  'Verify', style: const TextStyle(color: Colors.black)),
               onPressed: verifyButton)
         ]);
+  }
+
+  Color checkRightColor() {
+    if (valid) {
+      return Colors.white;
+    }
+
+    return Colors.black;
   }
 
   void verifyButton() async {
@@ -246,8 +260,7 @@ class PhoneAlertDialogState extends State<PhoneAlertDialog> {
     phoneSendDialog(context);
   }
 
-  void onNumberChange(
-      String phoneNumber, String internationalizedPhoneNumber, String isoCode) {
+  void onNumberChange(String phoneNumber, String internationalizedPhoneNumber, String isoCode) {
     setState(() {
       valid = internationalizedPhoneNumber.isNotEmpty;
       verificationPhoneNumber = internationalizedPhoneNumber;
