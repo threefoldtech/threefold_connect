@@ -1,9 +1,12 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_pkid/flutter_pkid.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl_phone_field/intl_phone_field.dart';
 import 'package:intl_phone_field/phone_number.dart';
+import 'package:threebotlogin/helpers/globals.dart';
+import 'package:threebotlogin/services/crypto_service.dart';
 import 'package:threebotlogin/services/open_kyc_service.dart';
 import 'package:threebotlogin/services/user_service.dart';
 import 'package:threebotlogin/widgets/custom_dialog.dart';
@@ -163,25 +166,84 @@ class PhoneAlertDialogState extends State<PhoneAlertDialog> {
         actions: <Widget>[
           new FlatButton(
               child: const Text(
-                'CANCEL',
-                style: TextStyle(color: Colors.redAccent),
+                'Cancel',
               ),
               onPressed: () {
                 Navigator.pop(context);
               }),
           new FlatButton(
               color: valid ? Colors.green : Colors.grey,
-              child: const Text('OK'),
+              child: const Text('Verify'),
               onPressed: verifyButton)
         ]);
   }
 
-  void verifyButton() {
+  void verifyButton() async {
     if (!valid) {
       return;
     }
+
+    int currentTime = new DateTime.now().millisecondsSinceEpoch;
+
+    if (Globals().tooManySmsAttempts && Globals().lockedSmsUntill > currentTime) {
+      Globals().sendSmsAttempts = 0;
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: new Text('Too many attempts please wait ' +
+                ((Globals().lockedSmsUntill - currentTime) / 1000).round().toString() +
+                ' seconds.'),
+            actions: <Widget>[
+              FlatButton(
+                child: new Text("OK"),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          );
+        },
+      );
+      return;
+    }
+
+    Globals().tooManySmsAttempts = false;
+
+    if (Globals().sendSmsAttempts >= 1) {
+      Globals().tooManySmsAttempts = true;
+      Globals().lockedSmsUntill = currentTime + 60000;
+
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: new Text('Too many attempts please wait one minute.'),
+            actions: <Widget>[
+              FlatButton(
+                child: new Text("OK"),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          );
+        },
+      );
+      return;
+    }
+
+    Globals().sendSmsAttempts++;
+
     savePhone(verificationPhoneNumber, null);
     Navigator.pop(context);
+
+    Map<String, dynamic> keyPair = await generateKeyPairFromSeedPhrase(await getPhrase());
+    var client = FlutterPkid(pkidUrl, keyPair);
+    client.setPKidDoc('phone', json.encode({'phone': verificationPhoneNumber}), keyPair);
+
+    sendVerificationSms();
+    phoneSendDialog(context);
   }
 
   void onNumberChange(
@@ -192,9 +254,3 @@ class PhoneAlertDialogState extends State<PhoneAlertDialog> {
     });
   }
 }
-
-void onPhoneNumberChange(
-    String phoneNumber, String internationalizedPhoneNumber, String isoCode) {}
-
-onValidPhoneNumber(
-    String number, String internationalizedPhoneNumber, String isoCode) {}

@@ -193,7 +193,7 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
   @override
   Widget build(BuildContext context) {
     return LayoutDrawer(
-      titleText: 'Identification',
+      titleText: 'Profile',
       content: Stack(
         children: [
           SvgPicture.asset(
@@ -1118,7 +1118,28 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
     }
 
     if (phone.isEmpty) {
-      return await addPhoneNumber();
+      await addPhoneNumberDialog(context);
+
+      var phoneMap = (await getPhone());
+      if (phoneMap.isEmpty || !phoneMap.containsKey('phone')) {
+        return;
+      }
+      String phoneNumber = phoneMap['phone'];
+      if (phoneNumber == null || phoneNumber.isEmpty) {
+        return;
+      }
+
+      setState(() {
+        phone = phoneNumber;
+      });
+
+      Map<String, dynamic> keyPair = await generateKeyPairFromSeedPhrase(await getPhrase());
+      var client = FlutterPkid(pkidUrl, keyPair);
+      client.setPKidDoc('phone', json.encode({'phone': phone}), keyPair);
+
+      if (phone.isEmpty) {
+        return;
+      }
     }
 
     int currentTime = new DateTime.now().millisecondsSinceEpoch;
