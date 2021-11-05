@@ -24,6 +24,7 @@ import 'package:threebotlogin/widgets/custom_dialog.dart';
 import 'package:threebotlogin/widgets/email_verification_needed.dart';
 import 'package:threebotlogin/widgets/layout_drawer.dart';
 import 'package:country_picker/country_picker.dart';
+import 'package:threebotlogin/widgets/phone_widget.dart';
 
 class IdentityVerificationScreen extends StatefulWidget {
   _IdentityVerificationScreenState createState() => _IdentityVerificationScreenState();
@@ -43,6 +44,8 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
 
   bool isInIdentityProcess = false;
   bool isLoading = false;
+
+  bool hidePhoneVerifyButton = false;
 
   Globals globals = Globals();
 
@@ -143,14 +146,32 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
     }
   }
 
+  setHidePhoneVerify() {
+    if (mounted) {
+      setState(() {
+        this.hidePhoneVerifyButton = Globals().identityVerified.value;
+      });
+    }
+  }
+
   void initState() {
     super.initState();
 
     Globals().emailVerified.addListener(setEmailVerified);
     Globals().phoneVerified.addListener(setPhoneVerified);
     Globals().identityVerified.addListener(setIdentityVerified);
+    Globals().hidePhoneButton.addListener(setHidePhoneVerify);
 
+    checkPhoneStatus();
     getUserValues();
+  }
+
+  checkPhoneStatus() {
+    if (Globals().smsSentOn + (5 * 60 * 1000) > new DateTime.now().millisecondsSinceEpoch) {
+      return Globals().hidePhoneButton.value = true;
+    }
+
+    return Globals().hidePhoneButton.value = false;
   }
 
   void getUserValues() {
@@ -433,11 +454,7 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
 
   Widget unVerifiedWidget(step, text, icon) {
     return GestureDetector(
-        onTap: () async {
-          // if (step == 2) {
-          //   await addPhoneNumber();
-          // }
-        },
+        onTap: () async {},
         child: Opacity(
           opacity: 0.5,
           child: Container(
@@ -475,7 +492,7 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
                       Expanded(
                         child: Text(
                           text == '' ? 'Unknown' : text,
-                          overflow: TextOverflow.ellipsis,
+                          overflow: TextOverflow.clip,
                           style: TextStyle(fontSize: 12.0, fontWeight: FontWeight.bold),
                         ),
                       )
@@ -514,12 +531,17 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
           }
 
           if (step == 2) {
+            if(Globals().hidePhoneButton.value == true) {
+              return;
+            }
+
             await addPhoneNumberDialog(context);
 
             var phoneMap = (await getPhone());
             if (phoneMap.isEmpty || !phoneMap.containsKey('phone')) {
               return;
             }
+
             String phoneNumber = phoneMap['phone'];
             if (phoneNumber == null || phoneNumber.isEmpty) {
               return;
@@ -573,48 +595,95 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
               Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Container(
-                      constraints: BoxConstraints(
-                          minWidth: MediaQuery.of(context).size.width * 0.4,
-                          maxWidth: MediaQuery.of(context).size.width * 0.4),
-                      padding: EdgeInsets.all(10),
-                      child: Text(text == '' ? 'Unknown' : text,
-                          style: TextStyle(fontSize: 12.0, fontWeight: FontWeight.bold), overflow: TextOverflow.clip)),
-                  ElevatedButton(
-                      onPressed: () async {
-                        switch (step) {
-                          // Verify email
-                          case 1:
-                            {
-                              verifyEmail();
-                            }
-                            break;
+                  Flexible(
+                      child: Container(
+                          constraints: Globals().hidePhoneButton.value == false ? BoxConstraints(
+                              minWidth: MediaQuery.of(context).size.width * 0.4,
+                              maxWidth: MediaQuery.of(context).size.width * 0.4) : BoxConstraints(
+                              minWidth: MediaQuery.of(context).size.width * 0.6,
+                              maxWidth: MediaQuery.of(context).size.width * 0.6),
+                          padding: EdgeInsets.all(10),
+                          child:
+                          Column(mainAxisAlignment: MainAxisAlignment.center, children: <Widget>[
+                            Row(
+                              children: <Widget>[
+                                Expanded(
+                                  child: Text(
+                                          text == '' ? 'Unknown' : text,
+                                          overflow: TextOverflow.clip,
+                                          style: TextStyle(fontSize: 12.0, fontWeight: FontWeight.bold),
+                                        ),
+                                )
+                              ],
+                            ),
+                            step == 2 && Globals().hidePhoneButton.value == true
+                                ? SizedBox(
+                                    height: 5,
+                                  )
+                                : Container(),
+                            step == 2 && Globals().hidePhoneButton.value == true
+                                ? Row(
+                                    children: <Widget>[
+                                      Text(
+                                        'SMS sent, retry in ${calculateMinutes()} minute${calculateMinutes() == '1' ? '' : 's'}',
+                                        overflow: TextOverflow.clip,
+                                        style:
+                                            TextStyle(color: Colors.orange, fontWeight: FontWeight.bold, fontSize: 12),
+                                      )
+                                    ],
+                                  )
+                                : Container(),
+                          ]))),
+                  Globals().hidePhoneButton.value == true && step == 2
+                      ? Container()
+                      : ElevatedButton(
+                          onPressed: () async {
+                            switch (step) {
+                              // Verify email
+                              case 1:
+                                {
+                                  verifyEmail();
+                                }
+                                break;
 
-                          // Verify phone
-                          case 2:
-                            {
-                              await verifyPhone();
-                            }
-                            break;
+                              // Verify phone
+                              case 2:
+                                {
+                                  await verifyPhone();
+                                }
+                                break;
 
-                          // Verify identity
-                          case 3:
-                            {
-                              await verifyIdentityProcess();
+                              // Verify identity
+                              case 3:
+                                {
+                                  await verifyIdentityProcess();
+                                }
+                                break;
+                              default:
+                                {}
+                                break;
                             }
-                            break;
-                          default:
-                            {}
-                            break;
-                        }
-                      },
-                      child: Text('Verify'))
+                          },
+                          child: Text('Verify'))
                 ],
               ),
               Padding(padding: EdgeInsets.only(right: 10))
             ],
           ),
         ));
+  }
+
+
+  String calculateMinutes() {
+    int currentTime = new DateTime.now().millisecondsSinceEpoch;
+    int lockedUntill = Globals().smsSentOn + (5 * 60 * 1000);
+    String difference =  ((lockedUntill - currentTime) / 1000 / 60 ).round().toString();
+
+    if(int.parse(difference) >= 0) {
+      return difference;
+    }
+
+    return '0';
   }
 
   Widget verifiedWidget(step, text, icon) {
@@ -671,7 +740,7 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
                                 minWidth: MediaQuery.of(context).size.width * 0.55,
                                 maxWidth: MediaQuery.of(context).size.width * 0.55),
                             child: Text(text == '' ? 'Unknown' : text,
-                                overflow: TextOverflow.ellipsis,
+                                overflow: TextOverflow.clip,
                                 style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)))
                       ],
                     ),
@@ -701,37 +770,7 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
     );
   }
 
-  Future<void> addPhoneNumber() async {
-    await addPhoneNumberDialog(context);
-
-    var phoneMap = (await getPhone());
-    if (phoneMap.isEmpty || !phoneMap.containsKey('phone')) {
-      return;
-    }
-    String phoneNumber = phoneMap['phone'];
-    if (phoneNumber == null || phoneNumber.isEmpty) {
-      return;
-    }
-
-    setState(() {
-      phone = phoneNumber;
-    });
-
-    Map<String, dynamic> keyPair = await generateKeyPairFromSeedPhrase(await getPhrase());
-    var client = FlutterPkid(pkidUrl, keyPair);
-    client.setPKidDoc('phone', json.encode({'phone': phone}), keyPair);
-
-    if (phone.isEmpty) {
-      return;
-    }
-  }
-
   Future verifyIdentityProcess() async {
-    // Edge case: if the identity is already verified, don't let the user go through the verification process again
-    // if (identityVerified) {
-    //   return;
-    // }
-
     setState(() {
       this.isLoading = true;
     });
@@ -1143,7 +1182,6 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
     }
 
     int currentTime = new DateTime.now().millisecondsSinceEpoch;
-
     if (globals.tooManySmsAttempts && globals.lockedSmsUntill > currentTime) {
       globals.sendSmsAttempts = 0;
       showDialog(
@@ -1168,8 +1206,7 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
     }
 
     globals.tooManySmsAttempts = false;
-
-    if (globals.sendSmsAttempts >= 3) {
+    if (globals.sendSmsAttempts >= 2) {
       globals.tooManySmsAttempts = true;
       globals.lockedSmsUntill = currentTime + 60000;
 
@@ -1177,7 +1214,7 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: new Text('Too many attemts please wait one minute.'),
+            title: new Text('Too many attempts please wait one minute.'),
             actions: <Widget>[
               FlatButton(
                 child: new Text("OK"),
@@ -1195,6 +1232,9 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
     globals.sendSmsAttempts++;
 
     sendVerificationSms();
+    Globals().hidePhoneButton.value = true;
+    Globals().smsSentOn = new DateTime.now().millisecondsSinceEpoch;
+
     phoneSendDialog(context);
   }
 }
