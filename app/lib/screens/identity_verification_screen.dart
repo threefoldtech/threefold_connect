@@ -134,6 +134,7 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
     if (mounted) {
       setState(() {
         this.phoneVerified = Globals().phoneVerified.value;
+        Globals().smsSentOn = 0;
       });
     }
   }
@@ -167,7 +168,7 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
   }
 
   checkPhoneStatus() {
-    if (Globals().smsSentOn + (5 * 60 * 1000) > new DateTime.now().millisecondsSinceEpoch) {
+    if (Globals().smsSentOn + (Globals().smsMinutesCoolDown * 60 * 1000) > new DateTime.now().millisecondsSinceEpoch) {
       return Globals().hidePhoneButton.value = true;
     }
 
@@ -531,7 +532,7 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
           }
 
           if (step == 2) {
-            if(Globals().hidePhoneButton.value == true) {
+            if (Globals().hidePhoneButton.value == true) {
               return;
             }
 
@@ -597,22 +598,24 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
                 children: [
                   Flexible(
                       child: Container(
-                          constraints: Globals().hidePhoneButton.value == false ? BoxConstraints(
-                              minWidth: MediaQuery.of(context).size.width * 0.4,
-                              maxWidth: MediaQuery.of(context).size.width * 0.4) : BoxConstraints(
-                              minWidth: MediaQuery.of(context).size.width * 0.6,
-                              maxWidth: MediaQuery.of(context).size.width * 0.6),
+                          constraints: Globals().hidePhoneButton.value == false ||
+                                  (step != 2 && Globals().hidePhoneButton.value == true)
+                              ? BoxConstraints(
+                                  minWidth: MediaQuery.of(context).size.width * 0.4,
+                                  maxWidth: MediaQuery.of(context).size.width * 0.4)
+                              : BoxConstraints(
+                                  minWidth: MediaQuery.of(context).size.width * 0.6,
+                                  maxWidth: MediaQuery.of(context).size.width * 0.6),
                           padding: EdgeInsets.all(10),
-                          child:
-                          Column(mainAxisAlignment: MainAxisAlignment.center, children: <Widget>[
+                          child: Column(mainAxisAlignment: MainAxisAlignment.center, children: <Widget>[
                             Row(
                               children: <Widget>[
                                 Expanded(
                                   child: Text(
-                                          text == '' ? 'Unknown' : text,
-                                          overflow: TextOverflow.clip,
-                                          style: TextStyle(fontSize: 12.0, fontWeight: FontWeight.bold),
-                                        ),
+                                    text == '' ? 'Unknown' : text,
+                                    overflow: TextOverflow.clip,
+                                    style: TextStyle(fontSize: 12.0, fontWeight: FontWeight.bold),
+                                  ),
                                 )
                               ],
                             ),
@@ -673,13 +676,12 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
         ));
   }
 
-
   String calculateMinutes() {
     int currentTime = new DateTime.now().millisecondsSinceEpoch;
-    int lockedUntill = Globals().smsSentOn + (5 * 60 * 1000);
-    String difference =  ((lockedUntill - currentTime) / 1000 / 60 ).round().toString();
+    int lockedUntill = Globals().smsSentOn + (Globals().smsMinutesCoolDown * 60 * 1000);
+    String difference = ((lockedUntill - currentTime) / 1000 / 60).round().toString();
 
-    if(int.parse(difference) >= 0) {
+    if (int.parse(difference) >= 0) {
       return difference;
     }
 

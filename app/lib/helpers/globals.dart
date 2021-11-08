@@ -54,6 +54,8 @@ class Globals {
 
 
   int smsSentOn = 0;
+  int smsMinutesCoolDown = 5;
+
   ValueNotifier<bool> hidePhoneButton = ValueNotifier(false);
 
   // VpnState vpnState = new VpnState();
