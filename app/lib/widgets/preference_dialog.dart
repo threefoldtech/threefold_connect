@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:threebotlogin/apps/wallet/wallet_config.dart';
 import 'package:threebotlogin/models/scope.dart';
 import 'package:threebotlogin/models/wallet_data.dart';
 import 'package:threebotlogin/services/user_service.dart';
@@ -28,6 +29,8 @@ class _PreferenceDialogState extends State<PreferenceDialog> {
   List<DropdownMenuItem<String>> _menuItems;
 
   String _selectedItem;
+
+  var config = WalletConfig();
 
   @override
   void initState() {
@@ -374,6 +377,32 @@ class _PreferenceDialogState extends State<PreferenceDialog> {
                                     : (value) {
                                         toggleScope(scopeItem, value);
                                       }),
+                                title: Text(
+                                  "${scopeItem.toUpperCase()}" + (mandatory ? " *" : ""),
+                                  style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
+                                ),
+                              );
+                            } else {
+                              return SizedBox(width: 0, height: 0);
+                            }
+                          },
+                        );
+                        break;
+
+                      case "walletSeed":
+                        return FutureBuilder(
+                          future: getDerivedSeed(config.appId()),
+                          builder: (BuildContext context, AsyncSnapshot snapshot) {
+                            if (snapshot.hasData) {
+                              return CheckboxListTile(
+                                value: (previousSelectedScope[scopeItem] == null)
+                                    ? mandatory
+                                    : previousSelectedScope[scopeItem],
+                                onChanged: ((mandatory == null || mandatory == true)
+                                    ? null
+                                    : (value) {
+                                  toggleScope('walletSeedData', value);
+                                }),
                                 title: Text(
                                   "${scopeItem.toUpperCase()}" + (mandatory ? " *" : ""),
                                   style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
