@@ -157,7 +157,7 @@ class _LayoutDrawerState extends State<LayoutDrawer> {
                   Icon(Icons.person_outlined, color: Colors.black, size: 18)
                 ],
               ),
-              title: Text('Profile'),
+              title: Text('Identity'),
               onTap: () {
                 Navigator.pop(context);
                 globals.tabController.animateTo(6);

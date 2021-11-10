@@ -417,10 +417,6 @@ class _LoginScreenState extends State<LoginScreen> with BlockAndRunMixin {
             'address': scopePermissionsDecoded['walletAddressData'],
           };
         }
-
-        if (scopePermissionsDecoded['walletSeed'] != null && scopePermissionsDecoded['walletSeed']) {
-          scope['walletSeedData'] = {'seed': ((await getDerivedSeed(config.appId())))};
-        }
       }
     }
 

@@ -389,32 +389,6 @@ class _PreferenceDialogState extends State<PreferenceDialog> {
                         );
                         break;
 
-                      case "walletSeed":
-                        return FutureBuilder(
-                          future: getDerivedSeed(config.appId()),
-                          builder: (BuildContext context, AsyncSnapshot snapshot) {
-                            if (snapshot.hasData) {
-                              return CheckboxListTile(
-                                value: (previousSelectedScope[scopeItem] == null)
-                                    ? mandatory
-                                    : previousSelectedScope[scopeItem],
-                                onChanged: ((mandatory == null || mandatory == true)
-                                    ? null
-                                    : (value) {
-                                  toggleScope('walletSeedData', value);
-                                }),
-                                title: Text(
-                                  "${scopeItem.toUpperCase()}" + (mandatory ? " *" : ""),
-                                  style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
-                                ),
-                              );
-                            } else {
-                              return SizedBox(width: 0, height: 0);
-                            }
-                          },
-                        );
-                        break;
-
                       case "walletAddress":
                         return FutureBuilder(
                             future: getWallets(),
