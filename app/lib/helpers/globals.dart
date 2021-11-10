@@ -2,6 +2,7 @@ import 'dart:ffi';
 
 import 'package:flutter/material.dart';
 import 'package:threebotlogin/helpers/hex_color.dart';
+import 'package:threebotlogin/helpers/vpn_state.dart';
 // import 'package:threebotlogin/helpers/vpn_state.dart';
 import 'package:threebotlogin/jrouter.dart';
 import 'package:threebotlogin/models/paymentRequest.dart';
@@ -45,15 +46,13 @@ class Globals {
   PaymentRequest paymentRequest;
   bool paymentRequestIsUsed = false;
 
-
   // FlagSmith configurations
   bool isOpenKYCEnabled;
   bool useNewWallet;
   String walletConfigUrl;
   bool redoIdentityVerification;
 
-
-  // VpnState vpnState = new VpnState();
+  VpnState vpnState = new VpnState();
   static final Globals _singleton = new Globals._internal();
 
   factory Globals() {
