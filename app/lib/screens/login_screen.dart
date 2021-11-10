@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:threebotlogin/apps/wallet/wallet_config.dart';
 import 'package:threebotlogin/events/events.dart';
 import 'package:threebotlogin/events/pop_all_login_event.dart';
 import 'package:threebotlogin/helpers/block_and_run_mixin.dart';
@@ -299,6 +300,8 @@ class _LoginScreenState extends State<LoginScreen> with BlockAndRunMixin {
   }
 
   sendIt(bool includeData) async {
+    var config = WalletConfig();
+
     String state = widget.loginData.state;
     String randomRoom = widget.loginData.randomRoom;
 

@@ -53,6 +53,11 @@ class Globals {
   bool redoIdentityVerification;
 
 
+  int smsSentOn = 0;
+  int smsMinutesCoolDown = 5;
+
+  ValueNotifier<bool> hidePhoneButton = ValueNotifier(false);
+
   // VpnState vpnState = new VpnState();
   static final Globals _singleton = new Globals._internal();
 

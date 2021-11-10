@@ -154,13 +154,13 @@ class _LayoutDrawerState extends State<LayoutDrawer> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
                   Padding(padding: const EdgeInsets.only(left: 30)),
-                  Icon(Icons.settings, color: Colors.black, size: 18)
+                  Icon(Icons.person_outlined, color: Colors.black, size: 18)
                 ],
               ),
-              title: Text('Settings'),
+              title: Text('Identity'),
               onTap: () {
                 Navigator.pop(context);
-                globals.tabController.animateTo(5);
+                globals.tabController.animateTo(6);
               },
             ),
             ListTile(
@@ -169,13 +169,13 @@ class _LayoutDrawerState extends State<LayoutDrawer> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
                   Padding(padding: const EdgeInsets.only(left: 30)),
-                  Icon(Icons.lock, color: Colors.black, size: 18)
+                  Icon(Icons.settings, color: Colors.black, size: 18)
                 ],
               ),
-              title: Text('Identification'),
+              title: Text('Settings'),
               onTap: () {
                 Navigator.pop(context);
-                globals.tabController.animateTo(6);
+                globals.tabController.animateTo(5);
               },
             ),
           ],

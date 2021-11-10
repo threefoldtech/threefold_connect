@@ -98,7 +98,7 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
           ListView(
             children: <Widget>[
               ListTile(
-                title: Text("Profile"),
+                title: Text("Global settings"),
               ),
               ListTile(
                 leading: Icon(Icons.person),
