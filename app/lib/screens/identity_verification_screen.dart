@@ -297,12 +297,18 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
 
   void showCountryPopup() {
     return showCountryPicker(
+      onClosed: () {
+        if(createdPayload['country'] == ''){
+          showCountryPopup();
+        }
+      },
       context: context,
       showPhoneCode: false, // optional. Shows phone code before the country name.
       onSelect: (Country country) {
         setState(() {
           createdPayload['country'] = country.countryCode;
         });
+
         print('Select country: ${country.displayName}');
       },
     );
