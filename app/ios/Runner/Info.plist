@@ -35,12 +35,16 @@
 	</array>
 	<key>CFBundleVersion</key>
 	<string>$(CURRENT_PROJECT_VERSION)</string>
+	<key>LSApplicationCategoryType</key>
+	<string></string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>MinimumOSVersion</key>
 	<string>13.0</string>
 	<key>NSCameraUsageDescription</key>
 	<string>App requires access to your camera to allow you to scan QR codes.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>App requires access to your microphone to validate your identity</string>
 	<key>NSFaceIDUsageDescription</key>
 	<string>ThreeFold Connect would like permission for using Face ID or Touch ID</string>
 	<key>UILaunchStoryboardName</key>
