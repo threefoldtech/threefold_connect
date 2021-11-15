@@ -43,10 +43,22 @@
 	<string>13.0</string>
 	<key>NSCameraUsageDescription</key>
 	<string>App requires access to your camera to allow you to scan QR codes.</string>
-	<key>NSMicrophoneUsageDescription</key>
-	<string>App requires access to your microphone to validate your identity</string>
 	<key>NSFaceIDUsageDescription</key>
 	<string>ThreeFold Connect would like permission for using Face ID or Touch ID</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>App requires access to your microphone to validate your identity</string>
+	<key>NSContactsUsageDescription</key>
+	<string>App requires access to your contacts</string>
+	<key>NSCalendarsUsageDescription</key>
+	<string>App requires access to your calendar</string>
+	<key>NSAppleMusicUsageDescription</key>
+	<string>App requires access to your Apple music</string>
+	<key>NSMotionUsageDescription</key>
+	<string>App requires access to your motion usage</string>
+	<key>NSSpeechRecognitionUsageDescription</key>
+	<string>App requires access to your speech</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>App requires access to your location</string>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UIMainStoryboardFile</key>
