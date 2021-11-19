@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:threebotlogin/apps/wallet/wallet_config.dart';
 import 'package:threebotlogin/models/scope.dart';
 import 'package:threebotlogin/models/wallet_data.dart';
 import 'package:threebotlogin/services/user_service.dart';
@@ -28,6 +29,8 @@ class _PreferenceDialogState extends State<PreferenceDialog> {
   List<DropdownMenuItem<String>> _menuItems;
 
   String _selectedItem;
+
+  var config = WalletConfig();
 
   @override
   void initState() {
