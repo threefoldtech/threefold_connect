@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
@@ -134,7 +135,7 @@ class _LayoutDrawerState extends State<LayoutDrawer> {
             //     globals.tabController.animateTo(4);
             //   },
             // ),
-            Globals().isYggdrasilEnabled ? ListTile(
+            if (Globals().isYggdrasilEnabled && !Platform.isIOS ) ListTile(
               minLeadingWidth: 10,
               leading: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -148,7 +149,7 @@ class _LayoutDrawerState extends State<LayoutDrawer> {
                 Navigator.pop(context);
                 globals.tabController.animateTo(4);
               },
-            ) : Container(),
+            ) else Container(),
             ListTile(
               minLeadingWidth: 10,
               leading: Column(
