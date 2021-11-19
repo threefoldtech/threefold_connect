@@ -39,7 +39,9 @@ class _PlanetaryNetworkScreenState extends State<PlanetaryNetworkScreen> {
 
     setState(() {
       if (_vpnState.vpnConnected) {
-        _ipText = new Text("IP Address: " + _vpnState.ipText);
+        print(_vpnState.ipAddress);
+
+        _ipText = Text("IP Address: " + _vpnState.ipAddress);
         _statusMessage = new Text('Connected',
             style: TextStyle(
                 color: Colors.green,
