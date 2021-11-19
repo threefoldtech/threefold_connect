@@ -128,8 +128,6 @@ class _AppState extends State<MainScreen> {
         exit(1);
       }
     }
-    print("Need some keys???? ");
-    print(await getEdCurveKeys());
   }
 
   checkInternetConnectionWithOurServers() async {
