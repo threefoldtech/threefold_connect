@@ -295,11 +295,42 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
     );
   }
 
+  showAreYouSureToExitDialog() {
+      return showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext customContext) =>
+            CustomDialog(
+              image: Icons.info,
+              title: "Are you sure",
+              description: "Are you sure you want to exit the verification process",
+              actions: <Widget>[
+                FlatButton(
+                  child: new Text("No"),
+                  onPressed: () {
+                    Navigator.pop(customContext);
+                    showCountryPopup();
+                  },
+                ),
+                FlatButton(
+                  child: new Text("Yes"),
+                  onPressed: () async {
+                    Navigator.pop(customContext);
+                    setState(() {
+                      this.isInIdentityProcess = false;
+                    });
+                  },
+                ),
+              ],
+            ),
+      );
+  }
+
   void showCountryPopup() {
     return showCountryPicker(
       onClosed: () {
         if(createdPayload['country'] == ''){
-          showCountryPopup();
+          showAreYouSureToExitDialog();
         }
       },
       context: context,

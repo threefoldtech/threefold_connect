@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
@@ -94,7 +95,8 @@ class _LayoutDrawerState extends State<LayoutDrawer> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
                   Padding(padding: const EdgeInsets.only(left: 30)),
-                  Icon(Icons.account_balance_wallet, color: Colors.black, size: 18)
+                  Icon(Icons.account_balance_wallet,
+                      color: Colors.black, size: 18)
                 ],
               ),
               title: Text('Wallet'),
@@ -133,21 +135,21 @@ class _LayoutDrawerState extends State<LayoutDrawer> {
             //     globals.tabController.animateTo(4);
             //   },
             // ),
-            // ListTile(
-            //   minLeadingWidth : 10,
-            //   leading: Column(
-            //     mainAxisAlignment: MainAxisAlignment.center,
-            //     children: <Widget>[
-            //       Padding(padding: const EdgeInsets.only(left: 30)),
-            //       Icon(Icons.network_check, color: Colors.black, size: 18)
-            //     ],
-            //   ),
-            //   title: Text('Planetary Network'),
-            //   onTap: () {
-            //     Navigator.pop(context);
-            //     globals.tabController.animateTo(5);
-            //   },
-            // ),
+            if (Globals().isYggdrasilEnabled && !Platform.isIOS ) ListTile(
+              minLeadingWidth: 10,
+              leading: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Padding(padding: const EdgeInsets.only(left: 30)),
+                  Icon(Icons.network_check, color: Colors.black, size: 18)
+                ],
+              ),
+              title: Text('Planetary Network'),
+              onTap: () {
+                Navigator.pop(context);
+                globals.tabController.animateTo(4);
+              },
+            ) else Container(),
             ListTile(
               minLeadingWidth: 10,
               leading: Column(
