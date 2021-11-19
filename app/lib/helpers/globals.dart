@@ -48,6 +48,7 @@ class Globals {
 
   // FlagSmith configurations
   bool isOpenKYCEnabled;
+  bool isYggdrasilEnabled;
   bool useNewWallet;
   String walletConfigUrl;
   bool redoIdentityVerification;

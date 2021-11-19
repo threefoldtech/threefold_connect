@@ -134,7 +134,7 @@ class _LayoutDrawerState extends State<LayoutDrawer> {
             //     globals.tabController.animateTo(4);
             //   },
             // ),
-            ListTile(
+            Globals().isYggdrasilEnabled ? ListTile(
               minLeadingWidth: 10,
               leading: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -148,7 +148,7 @@ class _LayoutDrawerState extends State<LayoutDrawer> {
                 Navigator.pop(context);
                 globals.tabController.animateTo(4);
               },
-            ),
+            ) : Container(),
             ListTile(
               minLeadingWidth: 10,
               leading: Column(
