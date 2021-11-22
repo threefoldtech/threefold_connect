@@ -107,17 +107,22 @@ class _PreferenceDialogState extends State<PreferenceDialog> {
   void initializeDropDown() {
     getWallets().then((value) {
       setState(() {
-        if (value != null) {
+        if (value != null && value.length != 0) {
           wallets = value;
-          _selectedItem = wallets[0].address;
-          toggleScope('walletAddressData', _selectedItem);
-          _menuItems = List.generate(
-            wallets.length,
-            (i) => DropdownMenuItem(
-              value: wallets[i].address,
-              child: Text("${wallets[i].name}"),
-            ),
-          );
+          if(wallets.length != 0){
+            _selectedItem = wallets[0].address;
+            toggleScope('walletAddressData', _selectedItem);
+            _menuItems = List.generate(
+              wallets.length,
+                  (i) => DropdownMenuItem(
+                value: wallets[i].address,
+                child: Text("${wallets[i].name}"),
+              ),
+            );
+          }
+          else {
+            _menuItems = [];
+          }
         }
       });
     });
@@ -486,7 +491,7 @@ class _PreferenceDialogState extends State<PreferenceDialog> {
                         return FutureBuilder(
                             future: getWallets(),
                             builder: (BuildContext context, AsyncSnapshot snapshot) {
-                              if (!snapshot.hasData) {
+                              if (!snapshot.hasData || wallets == null) {
                                 return Container(
                                     decoration: BoxDecoration(
                                       border: Border(

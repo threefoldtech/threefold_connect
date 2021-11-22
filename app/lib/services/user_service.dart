@@ -403,6 +403,11 @@ Future<void> saveWallets(List<WalletData> data) async {
 Future<List<WalletData>> getWallets() async {
   final SharedPreferences prefs = await SharedPreferences.getInstance();
   var string = prefs.getString('walletData');
+
+  if(string == null) {
+    return [];
+  }
+
   var jsonDecoded = jsonDecode(string);
 
   List<WalletData> walletData = [];
