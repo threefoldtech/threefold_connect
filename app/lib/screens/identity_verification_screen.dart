@@ -424,6 +424,10 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
                 switch (data['event']) {
                   // AUTHORIZATION IS WRONG
                   case 'request.unauthorized':
+                    {
+                      Events().emit(IdentityCallbackEvent(type: 'unauthorized'));
+                      break;
+                    }
                   // NO BALANCE
                   case 'request.invalid':
                   // DECLINED
