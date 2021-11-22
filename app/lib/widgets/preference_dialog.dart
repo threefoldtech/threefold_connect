@@ -110,6 +110,7 @@ class _PreferenceDialogState extends State<PreferenceDialog> {
         if (value != null) {
           wallets = value;
           _selectedItem = wallets[0].address;
+          toggleScope('walletAddressData', _selectedItem);
           _menuItems = List.generate(
             wallets.length,
             (i) => DropdownMenuItem(
