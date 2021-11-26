@@ -183,6 +183,24 @@ Future phoneVerification(BuildContext context) async {
 
 Future showIdentityMessage(BuildContext context, String type) async {
   {
+    if(type == 'unauthorized') {
+      return showDialog(
+        context: context,
+        builder: (BuildContext context) => CustomDialog(
+          image: Icons.warning,
+          title: "Identity verify timed out",
+          description: "Your verification attempt has expired, please retry and finish the flow in under 10 minutes.",
+          actions: <Widget>[
+            FlatButton(
+              child: new Text("Ok"),
+              onPressed: () {
+                Navigator.pop(context);
+              },
+            ),
+          ],
+        ),
+      );
+    }
     if (type == 'failed') {
       return showDialog(
         context: context,

@@ -25,4 +25,15 @@ class AppConfigLocal extends AppConfigImpl {
   String wizardUrl() {
     return 'https://wizard.jimber.org/';
   }
+
+  String pKidUrl() {
+      return 'http://192.168.2.174:8080/v1';
+  }
+
+  Map<String, String> flagSmithConfig() {
+      return {
+        'url': 'https://flagsmith.jimber.io/api/v1/',
+        'apiKey': 'm3L3gTcQYcFwCzSGxFJJWd'
+      };
+  }
 }

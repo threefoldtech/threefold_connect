@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:threebotlogin/apps/wallet/wallet_config.dart';
 import 'package:threebotlogin/models/scope.dart';
 import 'package:threebotlogin/models/wallet_data.dart';
 import 'package:threebotlogin/services/user_service.dart';
@@ -29,6 +30,8 @@ class _PreferenceDialogState extends State<PreferenceDialog> {
 
   String _selectedItem;
 
+  var config = WalletConfig();
+
   @override
   void initState() {
     super.initState();
@@ -37,7 +40,7 @@ class _PreferenceDialogState extends State<PreferenceDialog> {
       setState(() {
         _canRender = true;
 
-        if(scopeAsMap['walletAddress'] != null){
+        if (scopeAsMap['walletAddress'] != null) {
           initializeDropDown();
         }
       });
@@ -104,16 +107,22 @@ class _PreferenceDialogState extends State<PreferenceDialog> {
   void initializeDropDown() {
     getWallets().then((value) {
       setState(() {
-        if (value != null) {
+        if (value != null && value.length != 0) {
           wallets = value;
-          _selectedItem = wallets[0].address;
-          _menuItems = List.generate(
-            wallets.length,
-                (i) => DropdownMenuItem(
-              value: wallets[i].address,
-              child: Text("${wallets[i].name}"),
-            ),
-          );
+          if(wallets.length != 0){
+            _selectedItem = wallets[0].address;
+            toggleScope('walletAddressData', _selectedItem);
+            _menuItems = List.generate(
+              wallets.length,
+                  (i) => DropdownMenuItem(
+                value: wallets[i].address,
+                child: Text("${wallets[i].name}"),
+              ),
+            );
+          }
+          else {
+            _menuItems = [];
+          }
         }
       });
     });
@@ -122,11 +131,12 @@ class _PreferenceDialogState extends State<PreferenceDialog> {
   Widget scopeList(context) {
     return ConstrainedBox(
       constraints: BoxConstraints(
-        maxHeight: 300,
+        maxHeight: MediaQuery.of(context).size.height * 0.42,
       ),
       child: widget.scope != null
           ? RawScrollbar(
-              thumbColor: Colors.blue,
+              isAlwaysShown: true,
+              thumbColor: Theme.of(context).primaryColor,
               thickness: 3,
               child: ListView.builder(
                 scrollDirection: Axis.vertical,
@@ -144,18 +154,27 @@ class _PreferenceDialogState extends State<PreferenceDialog> {
                           future: getDoubleName(),
                           builder: (BuildContext context, AsyncSnapshot snapshot) {
                             if (snapshot.hasData) {
-                              return CheckboxListTile(
-                                value: (previousSelectedScope[scopeItem] == null)
-                                    ? mandatory
-                                    : previousSelectedScope[scopeItem],
-                                onChanged: ((mandatory == null || mandatory == true)
-                                    ? null
-                                    : (value) {
-                                        toggleScope(scopeItem, value);
-                                      }),
-                                title: Text(
-                                  "${scopeItem.toUpperCase()}" + (mandatory ? " *" : ""),
-                                  style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
+                              return Container(
+                                decoration: BoxDecoration(
+                                  border: Border(
+                                      bottom: BorderSide(
+                                    color: Colors.grey,
+                                    width: 0.5,
+                                  )),
+                                ),
+                                child: CheckboxListTile(
+                                  value: (previousSelectedScope[scopeItem] == null)
+                                      ? mandatory
+                                      : previousSelectedScope[scopeItem],
+                                  onChanged: ((mandatory == null || mandatory == true)
+                                      ? null
+                                      : (value) {
+                                          toggleScope(scopeItem, value);
+                                        }),
+                                  title: Text(
+                                    "${scopeItem.toUpperCase()}" + (mandatory ? " *" : ""),
+                                    style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
+                                  ),
                                 ),
                               );
                             } else {
@@ -170,18 +189,27 @@ class _PreferenceDialogState extends State<PreferenceDialog> {
                           future: getEmail(),
                           builder: (BuildContext context, AsyncSnapshot snapshot) {
                             if (snapshot.hasData) {
-                              return CheckboxListTile(
-                                value: (previousSelectedScope[scopeItem] == null)
-                                    ? mandatory
-                                    : previousSelectedScope[scopeItem],
-                                onChanged: ((mandatory == null || mandatory == true)
-                                    ? null
-                                    : (value) {
-                                        toggleScope(scopeItem, value);
-                                      }),
-                                title: Text(
-                                  "${scopeItem.toUpperCase()}" + (mandatory ? " *" : ""),
-                                  style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
+                              return Container(
+                                decoration: BoxDecoration(
+                                  border: Border(
+                                      bottom: BorderSide(
+                                    color: Colors.grey,
+                                    width: 0.5,
+                                  )),
+                                ),
+                                child: CheckboxListTile(
+                                  value: (previousSelectedScope[scopeItem] == null)
+                                      ? mandatory
+                                      : previousSelectedScope[scopeItem],
+                                  onChanged: ((mandatory == null || mandatory == true)
+                                      ? null
+                                      : (value) {
+                                          toggleScope(scopeItem, value);
+                                        }),
+                                  title: Text(
+                                    "${scopeItem.toUpperCase()}" + (mandatory ? " *" : ""),
+                                    style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
+                                  ),
                                 ),
                               );
                             } else {
@@ -191,17 +219,27 @@ class _PreferenceDialogState extends State<PreferenceDialog> {
                         );
                         break;
                       case "digitalTwin":
-                        return CheckboxListTile(
-                          value:
-                              (previousSelectedScope[scopeItem] == null) ? mandatory : previousSelectedScope[scopeItem],
-                          onChanged: ((mandatory == null || mandatory == true)
-                              ? null
-                              : (value) {
-                                  toggleScope(scopeItem, value);
-                                }),
-                          title: Text(
-                            "${scopeItem.toUpperCase()}" + (mandatory ? " *" : ""),
-                            style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
+                        return Container(
+                          decoration: BoxDecoration(
+                            border: Border(
+                                bottom: BorderSide(
+                              color: Colors.grey,
+                              width: 0.5,
+                            )),
+                          ),
+                          child: CheckboxListTile(
+                            value: (previousSelectedScope[scopeItem] == null)
+                                ? mandatory
+                                : previousSelectedScope[scopeItem],
+                            onChanged: ((mandatory == null || mandatory == true)
+                                ? null
+                                : (value) {
+                                    toggleScope(scopeItem, value);
+                                  }),
+                            title: Text(
+                              "${scopeItem.toUpperCase()}" + (mandatory ? " *" : ""),
+                              style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
+                            ),
                           ),
                         );
                         break;
@@ -210,18 +248,27 @@ class _PreferenceDialogState extends State<PreferenceDialog> {
                           future: getPhone(),
                           builder: (BuildContext context, AsyncSnapshot snapshot) {
                             if (snapshot.hasData) {
-                              return CheckboxListTile(
-                                value: (previousSelectedScope[scopeItem] == null)
-                                    ? mandatory
-                                    : previousSelectedScope[scopeItem],
-                                onChanged: ((mandatory == null || mandatory == true)
-                                    ? null
-                                    : (value) {
-                                        toggleScope(scopeItem, value);
-                                      }),
-                                title: Text(
-                                  "PHONE NUMBER" + (mandatory ? " *" : ""),
-                                  style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
+                              return Container(
+                                child: CheckboxListTile(
+                                  value: (previousSelectedScope[scopeItem] == null)
+                                      ? mandatory
+                                      : previousSelectedScope[scopeItem],
+                                  onChanged: ((mandatory == null || mandatory == true)
+                                      ? null
+                                      : (value) {
+                                          toggleScope(scopeItem, value);
+                                        }),
+                                  title: Text(
+                                    "PHONE NUMBER" + (mandatory ? " *" : ""),
+                                    style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
+                                  ),
+                                ),
+                                decoration: BoxDecoration(
+                                  border: Border(
+                                      bottom: BorderSide(
+                                    color: Colors.grey,
+                                    width: 0.5,
+                                  )),
                                 ),
                               );
                             } else {
@@ -235,18 +282,27 @@ class _PreferenceDialogState extends State<PreferenceDialog> {
                           future: getDerivedSeed(widget.appId),
                           builder: (BuildContext context, AsyncSnapshot snapshot) {
                             if (snapshot.hasData) {
-                              return CheckboxListTile(
-                                value: (previousSelectedScope[scopeItem] == null)
-                                    ? mandatory
-                                    : previousSelectedScope[scopeItem],
-                                onChanged: ((mandatory == null || mandatory == true)
-                                    ? null
-                                    : (value) {
-                                        toggleScope(scopeItem, value);
-                                      }),
-                                title: Text(
-                                  "${scopeItem.toUpperCase()}" + (mandatory ? " *" : ""),
-                                  style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
+                              return Container(
+                                decoration: BoxDecoration(
+                                  border: Border(
+                                      bottom: BorderSide(
+                                    color: Colors.grey,
+                                    width: 0.5,
+                                  )),
+                                ),
+                                child: CheckboxListTile(
+                                  value: (previousSelectedScope[scopeItem] == null)
+                                      ? mandatory
+                                      : previousSelectedScope[scopeItem],
+                                  onChanged: ((mandatory == null || mandatory == true)
+                                      ? null
+                                      : (value) {
+                                          toggleScope(scopeItem, value);
+                                        }),
+                                  title: Text(
+                                    "${scopeItem.toUpperCase()}" + (mandatory ? " *" : ""),
+                                    style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
+                                  ),
                                 ),
                               );
                             } else {
@@ -261,18 +317,27 @@ class _PreferenceDialogState extends State<PreferenceDialog> {
                           future: getIdentity(),
                           builder: (BuildContext context, AsyncSnapshot snapshot) {
                             if (snapshot.hasData) {
-                              return CheckboxListTile(
-                                value: (previousSelectedScope[scopeItem] == null)
-                                    ? mandatory
-                                    : previousSelectedScope[scopeItem],
-                                onChanged: ((mandatory == null || mandatory == true)
-                                    ? null
-                                    : (value) {
-                                        toggleScope(scopeItem, value);
-                                      }),
-                                title: Text(
-                                  "${scopeItem.toUpperCase()}" + (mandatory ? " *" : ""),
-                                  style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
+                              return Container(
+                                decoration: BoxDecoration(
+                                  border: Border(
+                                      bottom: BorderSide(
+                                    color: Colors.grey,
+                                    width: 0.5,
+                                  )),
+                                ),
+                                child: CheckboxListTile(
+                                  value: (previousSelectedScope[scopeItem] == null)
+                                      ? mandatory
+                                      : previousSelectedScope[scopeItem],
+                                  onChanged: ((mandatory == null || mandatory == true)
+                                      ? null
+                                      : (value) {
+                                          toggleScope(scopeItem, value);
+                                        }),
+                                  title: Text(
+                                    "NAME (IDENTITY)" + (mandatory ? " *" : ""),
+                                    style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
+                                  ),
                                 ),
                               );
                             } else {
@@ -287,18 +352,27 @@ class _PreferenceDialogState extends State<PreferenceDialog> {
                           future: getIdentity(),
                           builder: (BuildContext context, AsyncSnapshot snapshot) {
                             if (snapshot.hasData) {
-                              return CheckboxListTile(
-                                value: (previousSelectedScope[scopeItem] == null)
-                                    ? mandatory
-                                    : previousSelectedScope[scopeItem],
-                                onChanged: ((mandatory == null || mandatory == true)
-                                    ? null
-                                    : (value) {
-                                        toggleScope(scopeItem, value);
-                                      }),
-                                title: Text(
-                                  "${scopeItem.toUpperCase()}" + (mandatory ? " *" : ""),
-                                  style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
+                              return Container(
+                                decoration: BoxDecoration(
+                                  border: Border(
+                                      bottom: BorderSide(
+                                    color: Colors.grey,
+                                    width: 0.5,
+                                  )),
+                                ),
+                                child: CheckboxListTile(
+                                  value: (previousSelectedScope[scopeItem] == null)
+                                      ? mandatory
+                                      : previousSelectedScope[scopeItem],
+                                  onChanged: ((mandatory == null || mandatory == true)
+                                      ? null
+                                      : (value) {
+                                          toggleScope(scopeItem, value);
+                                        }),
+                                  title: Text(
+                                    "DATE OF BIRTH (IDENTITY)" + (mandatory ? " *" : ""),
+                                    style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
+                                  ),
                                 ),
                               );
                             } else {
@@ -313,18 +387,27 @@ class _PreferenceDialogState extends State<PreferenceDialog> {
                           future: getIdentity(),
                           builder: (BuildContext context, AsyncSnapshot snapshot) {
                             if (snapshot.hasData) {
-                              return CheckboxListTile(
-                                value: (previousSelectedScope[scopeItem] == null)
-                                    ? mandatory
-                                    : previousSelectedScope[scopeItem],
-                                onChanged: ((mandatory == null || mandatory == true)
-                                    ? null
-                                    : (value) {
-                                        toggleScope(scopeItem, value);
-                                      }),
-                                title: Text(
-                                  "${scopeItem.toUpperCase()}" + (mandatory ? " *" : ""),
-                                  style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
+                              return Container(
+                                decoration: BoxDecoration(
+                                  border: Border(
+                                      bottom: BorderSide(
+                                    color: Colors.grey,
+                                    width: 0.5,
+                                  )),
+                                ),
+                                child: CheckboxListTile(
+                                  value: (previousSelectedScope[scopeItem] == null)
+                                      ? mandatory
+                                      : previousSelectedScope[scopeItem],
+                                  onChanged: ((mandatory == null || mandatory == true)
+                                      ? null
+                                      : (value) {
+                                          toggleScope(scopeItem, value);
+                                        }),
+                                  title: Text(
+                                    "GENDER (IDENTITY)" + (mandatory ? " *" : ""),
+                                    style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
+                                  ),
                                 ),
                               );
                             } else {
@@ -339,18 +422,27 @@ class _PreferenceDialogState extends State<PreferenceDialog> {
                           future: getIdentity(),
                           builder: (BuildContext context, AsyncSnapshot snapshot) {
                             if (snapshot.hasData) {
-                              return CheckboxListTile(
-                                value: (previousSelectedScope[scopeItem] == null)
-                                    ? mandatory
-                                    : previousSelectedScope[scopeItem],
-                                onChanged: ((mandatory == null || mandatory == true)
-                                    ? null
-                                    : (value) {
-                                        toggleScope(scopeItem, value);
-                                      }),
-                                title: Text(
-                                  "${scopeItem.toUpperCase()}" + (mandatory ? " *" : ""),
-                                  style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
+                              return Container(
+                                decoration: BoxDecoration(
+                                  border: Border(
+                                      bottom: BorderSide(
+                                    color: Colors.grey,
+                                    width: 0.5,
+                                  )),
+                                ),
+                                child: CheckboxListTile(
+                                  value: (previousSelectedScope[scopeItem] == null)
+                                      ? mandatory
+                                      : previousSelectedScope[scopeItem],
+                                  onChanged: ((mandatory == null || mandatory == true)
+                                      ? null
+                                      : (value) {
+                                          toggleScope(scopeItem, value);
+                                        }),
+                                  title: Text(
+                                    "DOCUMENT META DATA (IDENTITY)" + (mandatory ? " *" : ""),
+                                    style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
+                                  ),
                                 ),
                               );
                             } else {
@@ -365,18 +457,27 @@ class _PreferenceDialogState extends State<PreferenceDialog> {
                           future: getIdentity(),
                           builder: (BuildContext context, AsyncSnapshot snapshot) {
                             if (snapshot.hasData) {
-                              return CheckboxListTile(
-                                value: (previousSelectedScope[scopeItem] == null)
-                                    ? mandatory
-                                    : previousSelectedScope[scopeItem],
-                                onChanged: ((mandatory == null || mandatory == true)
-                                    ? null
-                                    : (value) {
-                                        toggleScope(scopeItem, value);
-                                      }),
-                                title: Text(
-                                  "${scopeItem.toUpperCase()}" + (mandatory ? " *" : ""),
-                                  style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
+                              return Container(
+                                decoration: BoxDecoration(
+                                  border: Border(
+                                      bottom: BorderSide(
+                                    color: Colors.grey,
+                                    width: 0.5,
+                                  )),
+                                ),
+                                child: CheckboxListTile(
+                                  value: (previousSelectedScope[scopeItem] == null)
+                                      ? mandatory
+                                      : previousSelectedScope[scopeItem],
+                                  onChanged: ((mandatory == null || mandatory == true)
+                                      ? null
+                                      : (value) {
+                                          toggleScope(scopeItem, value);
+                                        }),
+                                  title: Text(
+                                    "COUNTRY (IDENTITY)" + (mandatory ? " *" : ""),
+                                    style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
+                                  ),
                                 ),
                               );
                             } else {
@@ -390,8 +491,15 @@ class _PreferenceDialogState extends State<PreferenceDialog> {
                         return FutureBuilder(
                             future: getWallets(),
                             builder: (BuildContext context, AsyncSnapshot snapshot) {
-                              if (!snapshot.hasData) {
+                              if (!snapshot.hasData || wallets == null) {
                                 return Container(
+                                    decoration: BoxDecoration(
+                                      border: Border(
+                                          bottom: BorderSide(
+                                        color: Colors.grey,
+                                        width: 0.5,
+                                      )),
+                                    ),
                                     padding: EdgeInsets.only(left: 16, right: 25, top: 8),
                                     child: Column(
                                       children: [
@@ -425,6 +533,13 @@ class _PreferenceDialogState extends State<PreferenceDialog> {
 
                               if (wallets != null && _selectedItem != null) {
                                 return Container(
+                                  decoration: BoxDecoration(
+                                    border: Border(
+                                        bottom: BorderSide(
+                                      color: Colors.grey,
+                                      width: 0.5,
+                                    )),
+                                  ),
                                   constraints: BoxConstraints(
                                       minWidth: MediaQuery.of(context).size.width * 0.8,
                                       maxWidth: MediaQuery.of(context).size.width * 0.8),
@@ -458,15 +573,14 @@ class _PreferenceDialogState extends State<PreferenceDialog> {
                                               width: MediaQuery.of(context).size.width * 0.8,
                                               child: ButtonTheme(
                                                 child: DropdownButton<String>(
-                                                  items: _menuItems,
-                                                  value: _selectedItem,
-                                                  onChanged: (value)  {
-                                                    setState(() {
-                                                      toggleScope('walletAddressData', value);
-                                                      _selectedItem = value;
-                                                    });
-                                                  }
-                                                ),
+                                                    items: _menuItems,
+                                                    value: _selectedItem,
+                                                    onChanged: (value) {
+                                                      setState(() {
+                                                        toggleScope('walletAddressData', value);
+                                                        _selectedItem = value;
+                                                      });
+                                                    }),
                                               ))
                                         ],
                                       )

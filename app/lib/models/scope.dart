@@ -41,7 +41,7 @@ class Scope {
         'identityGender': identityGender,
         'identityDocumentMeta': identityDocumentMeta,
         'identityCountry': identityCountry,
-        'walletAddress' : walletAddress,
-        'walletAddressData': walletAddressData
+        'walletAddress': walletAddress,
+        'walletAddressData': walletAddressData,
       };
 }
