@@ -12,7 +12,6 @@ String getFullNameOfObject(Map<String, dynamic> identityName) {
 }
 
 String getCorrectState(int step, emailVerified, phoneVerified, identityVerified) {
-  print(identityVerified);
   if(step == 1) {
     if(!emailVerified) {
       return 'CurrentPhase';

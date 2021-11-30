@@ -621,7 +621,6 @@ def use_productkey(key):
 def update_user_email(double_name, email):
     update_sql = 'UPDATE users set email =? where double_name =?'
 
-    print(update_sql, (email, double_name))
     try:
         cursor = conn.cursor()
         cursor.execute(update_sql, (email, double_name))
