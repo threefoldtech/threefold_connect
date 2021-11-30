@@ -6,6 +6,7 @@ import 'package:flutter_pkid/flutter_pkid.dart';
 import 'package:http/http.dart';
 import 'package:threebotlogin/helpers/flags.dart';
 import 'package:threebotlogin/helpers/globals.dart';
+import 'package:threebotlogin/helpers/kyc_helpers.dart';
 import 'package:threebotlogin/services/3bot_service.dart';
 import 'package:threebotlogin/services/crypto_service.dart';
 import 'package:threebotlogin/services/open_kyc_service.dart';
@@ -238,10 +239,6 @@ class _MobileRegistrationScreenState extends State<MobileRegistrationScreen> {
   }
 
   void saveRegistration() async {
-    // _registrationData.doubleName = _registrationData.doubleName?.toLowerCase()?.trim()?.replaceAll(new RegExp(r"\s+"), " ");
-    // _registrationData.email = _registrationData.email?.toLowerCase()?.trim()?.replaceAll(new RegExp(r"\s+"), " ");
-    // _registrationData.phrase = _registrationData.phrase?.toLowerCase()?.trim()?.replaceAll(new RegExp(r"\s+"), " ");
-
     savePrivateKey(_registrationData.keys['privateKey']);
     savePublicKey(_registrationData.keys['publicKey']);
     saveFingerprint(false);
@@ -255,6 +252,8 @@ class _MobileRegistrationScreenState extends State<MobileRegistrationScreen> {
 
     await Flags().initialiseFlagSmith();
     await Flags().setFlagSmithDefaultValues();
+
+    await fetchPKidData();
 
     await sendVerificationEmail();
   }
