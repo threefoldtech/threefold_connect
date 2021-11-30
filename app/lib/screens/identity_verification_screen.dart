@@ -17,6 +17,7 @@ import 'package:threebotlogin/screens/home_screen.dart';
 import 'package:threebotlogin/services/crypto_service.dart';
 import 'package:threebotlogin/services/identity_service.dart';
 import 'package:threebotlogin/services/open_kyc_service.dart';
+import 'package:threebotlogin/services/pkid_service.dart';
 import 'package:threebotlogin/services/socket_service.dart';
 import 'package:threebotlogin/services/tools_service.dart';
 import 'package:threebotlogin/services/user_service.dart';
@@ -31,10 +32,11 @@ class IdentityVerificationScreen extends StatefulWidget {
 }
 
 class _IdentityVerificationScreenState extends State<IdentityVerificationScreen> {
-  int kycLevel;
   String doubleName = '';
   String email = '';
   String phone = '';
+
+  String kycLogs = '';
 
   String reference = '';
 
@@ -176,11 +178,6 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
   }
 
   void getUserValues() {
-    getKYCLevel().then((level) {
-      setState(() {
-        kycLevel = level;
-      });
-    });
     getDoubleName().then((dn) {
       setState(() {
         doubleName = dn;
@@ -226,7 +223,7 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
           ),
           Container(
               child: FutureBuilder(
-            future: getKYCLevel(),
+            future: getEmail(),
             builder: (ctx, snapshot) {
               if (snapshot.connectionState == ConnectionState.done) {
                 if (isInIdentityProcess) {
@@ -269,13 +266,28 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
                                                 Icons.perm_identity)
                                             : Container(),
 
-                                        Globals().redoIdentityVerification && kycLevel == 3
+                                        Globals().redoIdentityVerification && identityVerified == true
                                             ? ElevatedButton(
                                                 onPressed: () async {
                                                   await verifyIdentityProcess();
                                                 },
                                                 child: Text('Redo identity verification'))
-                                            : Container()
+                                            : Container(),
+                                        Globals().debugMode == true ? ElevatedButton(
+                                            onPressed: () async {
+                                              bool isEmailVerified = await getIsEmailVerified();
+                                              bool isPhoneVerified = await getIsPhoneVerified();
+                                              bool isIdentityVerified = await getIsIdentityVerified();
+
+                                              kycLogs = '';
+                                              kycLogs += 'Email verified: ' + isEmailVerified.toString() + '\n';
+                                              kycLogs += 'Phone verified: ' + isPhoneVerified.toString() + '\n';
+                                              kycLogs += 'Identity verified: ' + isIdentityVerified.toString() + '\n';
+
+                                              setState(() {});
+                                            },
+                                            child: Text('KYC Status')) : Container(),
+                                        Text(kycLogs),
                                       ],
                                     ),
                                   );
@@ -296,40 +308,39 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
   }
 
   showAreYouSureToExitDialog() {
-      return showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (BuildContext customContext) =>
-            CustomDialog(
-              image: Icons.info,
-              title: "Are you sure",
-              description: "Are you sure you want to exit the verification process",
-              actions: <Widget>[
-                FlatButton(
-                  child: new Text("No"),
-                  onPressed: () {
-                    Navigator.pop(customContext);
-                    showCountryPopup();
-                  },
-                ),
-                FlatButton(
-                  child: new Text("Yes"),
-                  onPressed: () async {
-                    Navigator.pop(customContext);
-                    setState(() {
-                      this.isInIdentityProcess = false;
-                    });
-                  },
-                ),
-              ],
-            ),
-      );
+    return showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext customContext) => CustomDialog(
+        image: Icons.info,
+        title: "Are you sure",
+        description: "Are you sure you want to exit the verification process",
+        actions: <Widget>[
+          FlatButton(
+            child: new Text("No"),
+            onPressed: () {
+              Navigator.pop(customContext);
+              showCountryPopup();
+            },
+          ),
+          FlatButton(
+            child: new Text("Yes"),
+            onPressed: () async {
+              Navigator.pop(customContext);
+              setState(() {
+                this.isInIdentityProcess = false;
+              });
+            },
+          ),
+        ],
+      ),
+    );
   }
 
   void showCountryPopup() {
     return showCountryPicker(
       onClosed: () {
-        if(createdPayload['country'] == ''){
+        if (createdPayload['country'] == '') {
           showAreYouSureToExitDialog();
         }
       },
@@ -363,6 +374,36 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
           ),
         ],
       ),
+    );
+  }
+
+  Future _loadingDialog() {
+    return showDialog(
+      barrierDismissible: false,
+      context: context,
+      builder: (BuildContext context) {
+        return WillPopScope(
+          onWillPop: () => Future.value(false),
+          child: Dialog(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                SizedBox(
+                  height: 10,
+                ),
+                new CircularProgressIndicator(),
+                SizedBox(
+                  height: 10,
+                ),
+                new Text("One moment please"),
+                SizedBox(
+                  height: 10,
+                ),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 
@@ -569,7 +610,7 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
     return GestureDetector(
         onTap: () async {
           if (step == 1) {
-            await showEmailChangeDialog();
+            return _changeEmailDialog(false);
           }
 
           if (step == 2) {
@@ -711,7 +752,7 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
                           child: Text('Verify'))
                 ],
               ),
-              Padding(padding: EdgeInsets.only(right: 10))
+              Padding(padding: EdgeInsets.only(right: 10)),
             ],
           ),
         ));
@@ -732,6 +773,9 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
   Widget verifiedWidget(step, text, icon) {
     return GestureDetector(
       onTap: () async {
+        if (step == 1) {
+          return _changeEmailDialog(false);
+        }
         // Only make this section clickable if it is Identity Verification + Current Phase
         if (step != 3) {
           return null;
@@ -798,6 +842,12 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
                     )
                   ],
                 ),
+                step == 1
+                    ? Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [Icon(Icons.edit, size: 20, color: Colors.black)],
+                      )
+                    : Column(),
                 step == 3
                     ? Column(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -1055,7 +1105,7 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
             ));
   }
 
-  Future<Widget> emailResendDialog(context) {
+  Future<Widget> resendEmailDialog(context) {
     return showDialog(
       context: context,
       barrierDismissible: false,
@@ -1075,12 +1125,115 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
     );
   }
 
+  void _changeEmailDialog(bool emailWasEmpty) {
+    TextEditingController controller = new TextEditingController();
+
+    bool validEmail = false;
+    String errorEmail;
+    Text statusMessage = const Text('');
+
+    showDialog(
+        context: context,
+        builder: (BuildContext dialogContext) {
+          return StatefulBuilder(builder: (statefulContext, setCustomState) {
+            return AlertDialog(
+              title: emailWasEmpty == true ? Text('Add email') : Text('Change email'),
+              contentPadding: EdgeInsets.all(24),
+              content: Container(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    emailWasEmpty == true
+                        ? Text('Please pass us your email address')
+                        : Text(
+                            'Are you sure you want to change your email, if the email is changed, the verification of email will be needed.'),
+                    TextField(
+                      controller: controller,
+                      decoration: InputDecoration(
+                          focusedBorder: UnderlineInputBorder(
+                            borderSide: BorderSide(color: Theme.of(context).primaryColor),
+                          ),
+                          labelText: 'Email',
+                          errorText: validEmail == true ? null : errorEmail),
+                    ),
+                    SizedBox(
+                      height: 20,
+                    ),
+                    statusMessage
+                  ],
+                ),
+              ),
+              actions: [
+                FlatButton(
+                    onPressed: () {
+                      Navigator.pop(dialogContext);
+                    },
+                    child: Text('Cancel')),
+                FlatButton(
+                    onPressed: () async {
+                      _loadingDialog();
+
+                      String emailValue = controller.text.toLowerCase().trim().replaceAll(new RegExp(r"\s+"), " ");
+                      bool isValidEmail = validateEmail(emailValue);
+
+                      var oldEmail = await getEmail();
+
+                      if (isValidEmail == false) {
+                        validEmail = false;
+                        errorEmail = 'Please enter a valid email';
+                        setCustomState(() {});
+                        Navigator.pop(context);
+                        return;
+                      }
+
+                      try {
+                        errorEmail = null;
+                        await saveEmail(emailValue, null);
+
+                        Response res = await updateEmailAddressOfUser();
+
+                        if (res.statusCode != 200) {
+                          throw Exception();
+                        }
+
+                        sendVerificationEmail();
+                        Navigator.pop(dialogContext);
+
+                        email = emailValue;
+
+                        await setIsEmailVerified(false);
+                        await saveEmailToPKid();
+
+                        Navigator.pop(context);
+                        resendEmailDialog(context);
+
+                        setState(() {});
+                      } catch (e) {
+                        print(e);
+                        Navigator.pop(context);
+
+                        await saveEmail(oldEmail['email'], oldEmail['sei']);
+                        await saveEmailToPKid();
+
+                        statusMessage = Text('Something went wrong',
+                            style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold));
+
+                        setState(() {});
+                        setCustomState(() {});
+                      }
+                    },
+                    child: Text('Change'))
+              ],
+            );
+          });
+        });
+  }
+
   Future<Widget> showEmailChangeDialog() async {
     Map<String, dynamic> keyPair = await generateKeyPairFromSeedPhrase(await getPhrase());
     var client = FlutterPkid(pkidUrl, keyPair);
 
-    print(await getPhone());
-    var emailPKidResult = await client.getPKidDoc('phone', keyPair);
+    var emailPKidResult = await client.getPKidDoc('email', keyPair);
     print(emailPKidResult);
     return showDialog(
       context: context,
@@ -1133,65 +1286,17 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
     );
   }
 
-  dynamic verifyEmail() {
+  void verifyEmail() {
     if (emailVerified) {
       return;
     }
 
     if (email == '') {
-      return showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: new Text('Your email seems to be empty'),
-            content: Container(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text('Please pass us your email address'),
-                  SizedBox(height: 16),
-                  TextField(
-                    controller: emailController,
-                    decoration: InputDecoration(
-                        labelText: 'Email', errorText: emailInputValidated ? null : 'Please enter a valid email'),
-                  ),
-                ],
-              ),
-            ),
-            actions: <Widget>[
-              FlatButton(
-                child: new Text("OK"),
-                onPressed: () async {
-                  bool isValid = checkEmail(emailController.text);
-                  if (!isValid) {
-                    setState(() {
-                      emailInputValidated = false;
-                    });
-                    return;
-                  }
-
-                  setState(() {
-                    emailInputValidated = true;
-                    email = emailController.text;
-                  });
-
-                  await saveEmail(emailController.text, null);
-
-                  Map<String, dynamic> keyPair = await generateKeyPairFromSeedPhrase(await getPhrase());
-                  var client = FlutterPkid(pkidUrl, keyPair);
-                  client.setPKidDoc('email', json.encode({'email': email}), keyPair);
-
-                  Navigator.of(context).pop();
-                },
-              ),
-            ],
-          );
-        },
-      );
+      return _changeEmailDialog(true);
     }
 
     sendVerificationEmail();
-    emailResendDialog(context);
+    resendEmailDialog(context);
   }
 
   Future verifyPhone() async {

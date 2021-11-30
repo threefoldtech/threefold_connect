@@ -20,7 +20,7 @@ String getCorrectState(int step, emailVerified, phoneVerified, identityVerified)
   }
 
   if(step == 2) {
-    if(!emailVerified) {
+    if(!emailVerified && !phoneVerified) {
       return 'Unverified';
     }
     if(emailVerified && !phoneVerified) {
@@ -31,6 +31,10 @@ String getCorrectState(int step, emailVerified, phoneVerified, identityVerified)
   }
 
   if(step == 3) {
+    if(identityVerified) {
+      return 'Verified';
+    }
+
     if(!emailVerified) {
       return 'Unverified';
     }
@@ -38,12 +42,9 @@ String getCorrectState(int step, emailVerified, phoneVerified, identityVerified)
     if(!phoneVerified) {
       return 'Unverified';
     }
+
     if(emailVerified && phoneVerified && !identityVerified) {
       return 'CurrentPhase';
-    }
-
-    if(emailVerified && phoneVerified && identityVerified) {
-      return 'Verified';
     }
   }
 

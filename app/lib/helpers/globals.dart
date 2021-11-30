@@ -52,6 +52,7 @@ class Globals {
   bool useNewWallet;
   String walletConfigUrl;
   bool redoIdentityVerification;
+  bool debugMode;
 
   VpnState vpnState = new VpnState();
 

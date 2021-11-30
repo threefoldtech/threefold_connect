@@ -1,16 +1,39 @@
 import 'dart:convert';
 
+import 'package:flutter_pkid/flutter_pkid.dart';
+import 'package:threebotlogin/services/crypto_service.dart';
 import 'package:threebotlogin/services/tools_service.dart';
 import 'package:threebotlogin/services/user_service.dart';
 
 import 'globals.dart';
 
+Future<void> fetchPKidData() async {
+  Map<String, dynamic> keyPair = await generateKeyPairFromSeedPhrase(await getPhrase());
+  var client = FlutterPkid(pkidUrl, keyPair);
+
+  List<String> keyWords = ['email', 'phone', 'identity'];
+
+  var futures = keyWords.map((keyword) async {
+    var pKidResult = await client.getPKidDoc(keyword, keyPair);
+    return pKidResult.containsKey('data') && pKidResult.containsKey('success') ? jsonDecode(pKidResult['data']) : {};
+  });
+
+  var pKidResult = await Future.wait(futures);
+  Map<int, Object> dataMap = pKidResult.asMap();
+
+  await handleKYCData(dataMap[0], dataMap[1], dataMap[2]);
+}
+
 Future<void> handleKYCData(
     Map<dynamic, dynamic> emailData, Map<dynamic, dynamic> phoneData, Map<dynamic, dynamic> identityData) async {
-  int kycLevel = calculateKYCLevel(emailData, phoneData, identityData);
-  await saveKYCLevel(kycLevel);
 
-  if (kycLevel == 0) {
+  await saveCorrectVerificationStates(emailData, phoneData, identityData);
+
+  bool isEmailVerified = await getIsEmailVerified();
+  bool isPhoneVerified = await getIsPhoneVerified();
+  bool isIdentityVerified = await getIsIdentityVerified();
+
+  if (isEmailVerified == false) {
     await saveEmail(emailData['email'], null);
 
     if (phoneData.isNotEmpty) {
@@ -20,7 +43,7 @@ Future<void> handleKYCData(
     }
   }
 
-  if (kycLevel >= 1) {
+  if (isEmailVerified == true) {
     Globals().emailVerified.value = true;
     await saveEmail(emailData['email'], emailData['sei']);
 
@@ -29,12 +52,12 @@ Future<void> handleKYCData(
     }
   }
 
-  if (kycLevel >= 2) {
+  if (isPhoneVerified == true) {
     Globals().phoneVerified.value = true;
     await savePhone(phoneData['phone'], phoneData['spi']);
   }
 
-  if (kycLevel == 3) {
+  if (isIdentityVerified == true) {
     Globals().identityVerified.value = true;
     await saveIdentity(
         jsonDecode(identityData['identityName']),
@@ -50,40 +73,30 @@ Future<void> handleKYCData(
   }
 }
 
-int calculateKYCLevel(
-    Map<dynamic, dynamic> emailData, Map<dynamic, dynamic> phoneData, Map<dynamic, dynamic> identityData) {
+Future<void> saveCorrectVerificationStates(
+    Map<dynamic, dynamic> emailData, Map<dynamic, dynamic> phoneData, Map<dynamic, dynamic> identityData) async {
   if (identityData.containsKey('signedIdentityNameIdentifier')) {
-    return 3;
+     await setIsIdentityVerified(true);
   }
 
-  if (phoneData.containsKey('spi') && !identityData.containsKey('signedIdentityNameIdentifier')) {
-    return 2;
+  else {
+    await setIsIdentityVerified(false);
   }
 
-  if (emailData.containsKey('sei') && !phoneData.containsKey('spi')) {
-    return 1;
+  if (phoneData.containsKey('spi')) {
+    await setIsPhoneVerified(true);
   }
 
-  if (!emailData.containsKey('sei')) {
-    return 0;
+  else {
+    await setIsPhoneVerified(false);
   }
 
-  return -1;
-}
-
-Future<void> saveCorrectKYCLevel() async {
-  await saveKYCLevel(0);
-
-  if (Globals().emailVerified.value == true) {
-    await saveKYCLevel(1);
+  if (emailData.containsKey('sei')) {
+    await setIsEmailVerified(true);
   }
 
-  if (Globals().phoneVerified.value == true) {
-    await saveKYCLevel(2);
-  }
-
-  if (Globals().identityVerified.value == true) {
-    await saveKYCLevel(3);
+  else {
+    await setIsEmailVerified(false);
   }
 }
 
