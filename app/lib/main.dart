@@ -23,9 +23,6 @@ Future<void> main() async {
 
   bool registered = doubleName != null;
 
-  await Flags().initialiseFlagSmith();
-  await Flags().setFlagSmithDefaultValues();
-
   if (await getPhrase() != null) {
     await migrateToNewSystem();
     await fetchPKidData();
