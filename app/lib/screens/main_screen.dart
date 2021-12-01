@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:threebotlogin/app_config.dart';
 import 'package:threebotlogin/events/events.dart';
 import 'package:threebotlogin/helpers/environment.dart';
+import 'package:threebotlogin/helpers/flags.dart';
 import 'package:threebotlogin/helpers/globals.dart';
 import 'package:threebotlogin/screens/home_screen.dart';
 import 'package:threebotlogin/screens/init_screen.dart';
@@ -61,21 +62,35 @@ class _AppState extends State<MainScreen> {
     await checkInternetConnectionWithOurServers();
     await checkIfAppIsUnderMaintenance();
     await checkIfAppIsUpToDate();
-    // await checkIfDeviceIdIsCorrect();
+
+    try {
+      await Flags().initialiseFlagSmith();
+      await Flags().setFlagSmithDefaultValues();
+
+    } catch (e) {
+      print(e);
+      CustomDialog dialog = CustomDialog(
+          title: "Oops",
+          description:
+              "Something went wrong when trying to connect to our servers, please try again. Contact support if this issue persists. Code: FlagSmithError");
+      await dialog.show(context);
+      if (Platform.isAndroid) {
+        SystemNavigator.pop();
+      } else if (Platform.isIOS) {
+        exit(1);
+      }
+    }
 
     if (widget.initDone != null && !widget.initDone) {
       InitScreen init = InitScreen();
       bool accepted = false;
       while (!accepted) {
-        accepted = !(await Navigator.push(
-                context, MaterialPageRoute(builder: (context) => init)) ==
-            null);
+        accepted = !(await Navigator.push(context, MaterialPageRoute(builder: (context) => init)) == null);
       }
     }
 
     if (!widget.registered) {
-      await Navigator.push(context,
-          MaterialPageRoute(builder: (context) => UnregisteredScreen()));
+      await Navigator.push(context, MaterialPageRoute(builder: (context) => UnregisteredScreen()));
     }
 
     await Globals().router.init();
@@ -92,16 +107,13 @@ class _AppState extends State<MainScreen> {
     await Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-            builder: (context) => HomeScreen(
-                initialLink: initialLink,
-                backendConnection: _backendConnection)));
+            builder: (context) => HomeScreen(initialLink: initialLink, backendConnection: _backendConnection)));
   }
 
   checkInternetConnection() async {
     try {
       final List<InternetAddress> result =
-          await InternetAddress.lookup('google.com')
-              .timeout(const Duration(seconds: 3));
+          await InternetAddress.lookup('google.com').timeout(const Duration(seconds: 3));
       if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
         print('connected to the internet');
       }
@@ -135,16 +147,14 @@ class _AppState extends State<MainScreen> {
       try {
         String baseUrl = AppConfig().baseUrl();
         final List<InternetAddress> result =
-            await InternetAddress.lookup('$baseUrl')
-                .timeout(const Duration(seconds: 3));
+            await InternetAddress.lookup('$baseUrl').timeout(const Duration(seconds: 3));
         if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
           print('connected to the internet');
         }
       } on TimeoutException catch (_) {
         CustomDialog dialog = CustomDialog(
             title: "Connection problem",
-            description:
-                "The connection to our servers has failed, please try again later.");
+            description: "The connection to our servers has failed, please try again later.");
         await dialog.show(context);
         if (Platform.isAndroid) {
           SystemNavigator.pop();
@@ -171,8 +181,7 @@ class _AppState extends State<MainScreen> {
       if (await isAppUnderMaintenance()) {
         CustomDialog dialog = CustomDialog(
             title: "App is being rolled out",
-            description:
-                "The new version of our app is being rolled out, please try again later.");
+            description: "The new version of our app is being rolled out, please try again later.");
         await dialog.show(context);
         if (Platform.isAndroid) {
           SystemNavigator.pop();
@@ -184,8 +193,7 @@ class _AppState extends State<MainScreen> {
       print(_);
       CustomDialog dialog = CustomDialog(
           title: "Connection problem",
-          description:
-              "The connection to our servers has failed, please try again later. 2");
+          description: "The connection to our servers has failed, please try again later. 2");
       await dialog.show(context);
       if (Platform.isAndroid) {
         SystemNavigator.pop();
@@ -194,9 +202,7 @@ class _AppState extends State<MainScreen> {
       }
     } on Exception catch (_) {
       CustomDialog dialog = CustomDialog(
-          title: "Oops",
-          description:
-              "Something went wrong. Please contact support if this issue persists.");
+          title: "Oops", description: "Something went wrong. Please contact support if this issue persists.");
       await dialog.show(context);
       if (Platform.isAndroid) {
         SystemNavigator.pop();
@@ -210,9 +216,7 @@ class _AppState extends State<MainScreen> {
     try {
       if (!await isAppUpToDate()) {
         CustomDialog dialog = CustomDialog(
-            title: "Update required",
-            description:
-                "The app is outdated. Please, update it to the latest version.");
+            title: "Update required", description: "The app is outdated. Please, update it to the latest version.");
 
         await dialog.show(context);
         if (Platform.isAndroid) {
@@ -224,8 +228,7 @@ class _AppState extends State<MainScreen> {
     } on TimeoutException catch (_) {
       CustomDialog dialog = CustomDialog(
           title: "Connection problem",
-          description:
-              "The connection to our servers has failed, please try again later. 3");
+          description: "The connection to our servers has failed, please try again later. 3");
       await dialog.show(context);
       if (Platform.isAndroid) {
         SystemNavigator.pop();

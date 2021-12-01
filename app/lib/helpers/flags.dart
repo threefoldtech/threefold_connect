@@ -30,6 +30,7 @@ class Flags {
 
       catch(e) {
         print(e);
+        throw Exception();
       }
     }
   }
@@ -38,9 +39,9 @@ class Flags {
     Globals().isOpenKYCEnabled = await Flags().hasFlagValueByFeatureName('kyc');
     Globals().isYggdrasilEnabled = await Flags().hasFlagValueByFeatureName('yggdrasil');
     Globals().debugMode = await Flags().hasFlagValueByFeatureName('debug');
-    Globals().useNewWallet = await Flags().hasFlagValueByFeatureName('use_new_wallet');
-    Globals().walletConfigUrl = await Flags().getFlagValueByFeatureName('wallet_url');
-    Globals().redoIdentityVerification = await Flags().hasFlagValueByFeatureName('redo_identity_verification');
+    Globals().useNewWallet = await Flags().hasFlagValueByFeatureName('use-new-wallet');
+    Globals().newWalletUrl = await Flags().getFlagValueByFeatureName('new-wallet-url');
+    Globals().redoIdentityVerification = await Flags().hasFlagValueByFeatureName('redo-identity-verification');
   }
 
   Future<bool> hasFlagValueByFeatureName(String name) async {
