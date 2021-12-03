@@ -1146,7 +1146,7 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
                     emailWasEmpty == true
                         ? Text('Please pass us your email address')
                         : Text(
-                            'Are you sure you want to change your email, if the email is changed, the verification of email will be needed.'),
+                            'Changing your email will require you to go through the email verification process again.'),
                     TextField(
                       controller: controller,
                       decoration: InputDecoration(
@@ -1178,6 +1178,14 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
 
                       var oldEmail = await getEmail();
 
+                      if(oldEmail['email'] == emailValue) {
+                        validEmail = false;
+                        errorEmail = "Please enter a different email";
+                        setCustomState(() {});
+                        Navigator.pop(context);
+                        return;
+                      }
+
                       if (isValidEmail == false) {
                         validEmail = false;
                         errorEmail = 'Please enter a valid email';
@@ -1196,8 +1204,8 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
                           throw Exception();
                         }
 
+
                         sendVerificationEmail();
-                        Navigator.pop(dialogContext);
 
                         email = emailValue;
 
@@ -1205,6 +1213,7 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
                         await saveEmailToPKid();
 
                         Navigator.pop(context);
+                        Navigator.pop(dialogContext);
                         resendEmailDialog(context);
 
                         setState(() {});
@@ -1222,7 +1231,7 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
                         setCustomState(() {});
                       }
                     },
-                    child: Text('Change'))
+                    child: Text('Ok'))
               ],
             );
           });
