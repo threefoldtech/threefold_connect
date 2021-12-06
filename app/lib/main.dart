@@ -15,21 +15,17 @@ LoggingService logger;
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  // SharedPreferences.setMockInitialValues({});
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
   bool initDone = await getInitDone();
   String doubleName = await getDoubleName();
 
   await setGlobalValues();
-  await saveCorrectKYCLevel();
 
   bool registered = doubleName != null;
 
-  await Flags().initialiseFlagSmith();
-  await Flags().setFlagSmithDefaultValues();
-
   if (await getPhrase() != null) {
     await migrateToNewSystem();
+    await fetchPKidData();
   }
 
   runApp(MyApp(initDone: initDone, registered: registered));

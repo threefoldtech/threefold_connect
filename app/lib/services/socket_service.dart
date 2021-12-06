@@ -111,7 +111,7 @@ Future emailVerification(BuildContext context) async {
       Map<String, dynamic> vsei = jsonDecode((await verifySignedEmailIdentifier(signedEmailIdentifier)).body);
 
       if (vsei != null && vsei["email"] == email["email"] && vsei["identifier"] == doubleName) {
-        await saveKYCLevel(1);
+        await setIsEmailVerified(true);
         await saveEmail(vsei["email"], signedEmailIdentifier);
 
         showDialog(
@@ -155,7 +155,7 @@ Future phoneVerification(BuildContext context) async {
       Map<String, dynamic> vspi = jsonDecode((await verifySignedPhoneIdentifier(signedPhoneIdentifier)).body);
 
       if (vspi != null && vspi["phone"] == phone["phone"] && vspi["identifier"] == doubleName) {
-        await saveKYCLevel(2);
+        await setIsPhoneVerified(true);
         await savePhone(vspi["phone"], signedPhoneIdentifier);
 
         showDialog(
@@ -311,8 +311,7 @@ Future identityVerification(String reference) async {
     return;
   }
 
-  print('SETTING KYC LEVEL TO 3');
-  await saveKYCLevel(3);
+  await setIsIdentityVerified(true);
 
   await saveIdentity(
       verifiedSignedIdentityNameIdentifier['name_data'],

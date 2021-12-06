@@ -159,9 +159,12 @@ Future<void> removeEmail() async {
 
 Future<void>  saveEmail(String email, String signedEmailIdentifier) async {
   final SharedPreferences prefs = await SharedPreferences.getInstance();
+
   prefs.remove('email');
-  prefs.setString('email', email);
+  prefs.remove('signedEmailIdentifier');
   prefs.remove('emailVerified');
+
+  prefs.setString('email', email);
 
   if (signedEmailIdentifier != null) {
     prefs.setString('signedEmailIdentifier', signedEmailIdentifier);
@@ -254,20 +257,34 @@ Future<void> removeIdentity() async {
   prefs.remove('identityVerified');
 }
 
-Future<int> getKYCLevel() async {
+Future<bool> getIsEmailVerified() async {
   final SharedPreferences prefs = await SharedPreferences.getInstance();
-  return prefs.getInt('kycLevel');
+  return prefs.getBool('isEmailVerified');
 }
 
-Future<void> saveKYCLevel(int level) async {
+Future<bool> getIsPhoneVerified() async {
   final SharedPreferences prefs = await SharedPreferences.getInstance();
-  prefs.remove('kycLevel');
-  prefs.setInt('kycLevel', level);
+  return prefs.getBool('isPhoneVerified');
 }
 
-Future<Map<String, Object>> getEmail() async {
+Future<bool> getIsIdentityVerified() async {
   final SharedPreferences prefs = await SharedPreferences.getInstance();
-  return {'email': prefs.getString('email'), 'sei': prefs.getString('signedEmailIdentifier')};
+  return prefs.getBool('isIdentityVerified');
+}
+
+Future<void> setIsEmailVerified(bool isEmailVerified) async {
+  final SharedPreferences prefs = await SharedPreferences.getInstance();
+  return prefs.setBool('isEmailVerified', isEmailVerified);
+}
+
+Future<void> setIsPhoneVerified(bool isPhoneVerified) async {
+  final SharedPreferences prefs = await SharedPreferences.getInstance();
+  return prefs.setBool('isPhoneVerified', isPhoneVerified);
+}
+
+Future<void> setIsIdentityVerified(bool isIdentityVerified) async {
+  final SharedPreferences prefs = await SharedPreferences.getInstance();
+  return prefs.setBool('isIdentityVerified', isIdentityVerified);
 }
 
 Future<void> removePhone() async {
@@ -293,6 +310,11 @@ Future<void> savePhone(String phone, String signedPhoneIdentifier) async {
   }
 
   Globals().phoneVerified.value = (signedPhoneIdentifier != null);
+}
+
+Future<Map<String, Object>> getEmail() async {
+  final SharedPreferences prefs = await SharedPreferences.getInstance();
+  return {'email': prefs.getString('email'), 'sei': prefs.getString('signedEmailIdentifier')};
 }
 
 Future<Map<String, Object>> getPhone() async {

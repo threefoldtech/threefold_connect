@@ -42,10 +42,12 @@ class _WalletState extends State<WalletWidget> with AutomaticKeepAliveClientMixi
   }
 
   _WalletState() {
+    String walletUri = Globals().useNewWallet == true ? Globals().newWalletUrl : 'https://${config.appId()}/init';
+
     iaWebView = InAppWebView(
       initialUrlRequest: URLRequest(
           url: Uri.parse(
-              'https://${config.appId()}/init?cache_buster=' + new DateTime.now().millisecondsSinceEpoch.toString())),
+              walletUri + '?cache_buster=' + new DateTime.now().millisecondsSinceEpoch.toString())),
       initialOptions: InAppWebViewGroupOptions(
           crossPlatform: InAppWebViewOptions(),
           android: AndroidInAppWebViewOptions(supportMultipleWindows: true, thirdPartyCookiesEnabled: true),
@@ -88,9 +90,11 @@ class _WalletState extends State<WalletWidget> with AutomaticKeepAliveClientMixi
     var importedWallets = await getImportedWallets();
     var appWallets = await getAppWallets();
 
-    var jsStartApp = "window.vueInstance.startWallet('$doubleName', '$seed', '$importedWallets', '$appWallets');";
+    var jsStartApp = Globals().useNewWallet == true
+        ? "window.init'('$doubleName', '$seed')"
+        : "window.vueInstance.startWallet('$doubleName', '$seed', '$importedWallets', '$appWallets');";
 
-    if (Globals().paymentRequest != null) {
+    if (Globals().paymentRequest != null && !Globals().useNewWallet) {
       String paymentRequestString = Globals().paymentRequest.toString();
 
       print('PAYMENTREQUEST');
@@ -98,8 +102,9 @@ class _WalletState extends State<WalletWidget> with AutomaticKeepAliveClientMixi
 
       Globals().paymentRequestIsUsed = true;
       jsStartApp =
-      "window.vueInstance.startWallet('$doubleName', '$seed', '$importedWallets', '$appWallets', $paymentRequestString);";
+          "window.vueInstance.startWallet('$doubleName', '$seed', '$importedWallets', '$appWallets', $paymentRequestString);";
     }
+
     webView.evaluateJavascript(source: jsStartApp);
   }
 
@@ -133,8 +138,7 @@ class _WalletState extends State<WalletWidget> with AutomaticKeepAliveClientMixi
       }
 
       await saveWallets(walletData);
-    }
-    catch (e) {
+    } catch (e) {
       print(e);
     }
   }
@@ -154,4 +158,5 @@ class _WalletState extends State<WalletWidget> with AutomaticKeepAliveClientMixi
   }
 
   @override
-  bool get wantKeepAlive => false;}
+  bool get wantKeepAlive => false;
+}
