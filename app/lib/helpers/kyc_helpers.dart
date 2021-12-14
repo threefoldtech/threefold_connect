@@ -26,7 +26,6 @@ Future<void> fetchPKidData() async {
 
 Future<void> handleKYCData(
     Map<dynamic, dynamic> emailData, Map<dynamic, dynamic> phoneData, Map<dynamic, dynamic> identityData) async {
-
   await saveCorrectVerificationStates(emailData, phoneData, identityData);
 
   bool isEmailVerified = await getIsEmailVerified();
@@ -34,7 +33,13 @@ Future<void> handleKYCData(
   bool isIdentityVerified = await getIsIdentityVerified();
 
   if (isEmailVerified == false) {
-    await saveEmail(emailData['email'], null);
+    try {
+      if (emailData['email']['email'] != null) {
+        await saveEmail(emailData['email']['email'], null);
+      }
+    } catch (e) {
+      await saveEmail(emailData['email'], null);
+    }
 
     if (phoneData.isNotEmpty) {
       if (phoneData['phone'] != null) {
@@ -76,26 +81,20 @@ Future<void> handleKYCData(
 Future<void> saveCorrectVerificationStates(
     Map<dynamic, dynamic> emailData, Map<dynamic, dynamic> phoneData, Map<dynamic, dynamic> identityData) async {
   if (identityData.containsKey('signedIdentityNameIdentifier')) {
-     await setIsIdentityVerified(true);
-  }
-
-  else {
+    await setIsIdentityVerified(true);
+  } else {
     await setIsIdentityVerified(false);
   }
 
   if (phoneData.containsKey('spi')) {
     await setIsPhoneVerified(true);
-  }
-
-  else {
+  } else {
     await setIsPhoneVerified(false);
   }
 
   if (emailData.containsKey('sei')) {
     await setIsEmailVerified(true);
-  }
-
-  else {
+  } else {
     await setIsEmailVerified(false);
   }
 }
