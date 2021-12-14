@@ -78,7 +78,6 @@ class _RecoverScreenState extends State<RecoverScreen> {
     var pKidResult = await Future.wait(futures);
     Map<int, Object> dataMap = pKidResult.asMap();
 
-
     await savePhrase(seedPhrase);
     await saveFingerprint(false);
     await saveDoubleName(doubleName);
@@ -88,8 +87,6 @@ class _RecoverScreenState extends State<RecoverScreen> {
     await migrateToNewSystem();
     // await sendVerificationEmail();
   }
-
-
 
   checkSeedLength(seedPhrase) {
     int seedLength = seedPhrase.split(" ").length;
@@ -227,15 +224,17 @@ class _RecoverScreenState extends State<RecoverScreen> {
                   print(e);
                   // To dismiss the spinner
                   Navigator.pop(context);
-                  if (e.message != "") {
-                    setState(() {
-                      error = e.message;
-                    });
-                  } else {
-                    setState(() {
-                      error = "Something went wrong";
-                    });
-                  }
+                  error = e.toString();
+                  setState(() {});
+                  // if (e.message != "") {
+                  //   setState(() {
+                  //     error = e.message;
+                  //   });
+                  // } else {
+                  //   setState(() {
+                  //     error = "Something went wrong";
+                  //   });
+                  // }
                 }
               },
             ),
