@@ -11,7 +11,9 @@ Future<void> saveEmailToPKidForMigration() async {
 
   Map<String, Object> email = await getEmail();
   var emailPKidResult = await client.getPKidDoc('email', keyPair);
-  if(!emailPKidResult.containsKey('success') && email['email'] != null){
+  // if(!emailPKidResult.containsKey('success') && email['email'] != null)
+  if(emailPKidResult.containsKey('success') && email['email'] != null)
+  {
     if(email['sei'] != null) {
       return client.setPKidDoc('email', json.encode({'email': email['email'], 'sei' : email['sei'] }), keyPair);
     }
