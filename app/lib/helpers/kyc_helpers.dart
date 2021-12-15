@@ -33,6 +33,8 @@ Future<void> handleKYCData(
   bool isIdentityVerified = await getIsIdentityVerified();
 
   if (isEmailVerified == false) {
+
+    // This is needed cause a small mapping mistake in a previous migration to PKID
     try {
       if (emailData['email']['email'] != null) {
         await saveEmail(emailData['email']['email'], null);
@@ -40,6 +42,8 @@ Future<void> handleKYCData(
     } catch (e) {
       await saveEmail(emailData['email'], null);
     }
+
+
 
     if (phoneData.isNotEmpty) {
       if (phoneData['phone'] != null) {
