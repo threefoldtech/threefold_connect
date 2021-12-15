@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter_pkid/flutter_pkid.dart';
 import 'package:threebotlogin/services/crypto_service.dart';
+import 'package:threebotlogin/services/pkid_service.dart';
 import 'package:threebotlogin/services/tools_service.dart';
 import 'package:threebotlogin/services/user_service.dart';
 
@@ -34,16 +35,17 @@ Future<void> handleKYCData(
 
   if (isEmailVerified == false) {
 
-    // This is needed cause a small mapping mistake in a previous migration to PKID
+    // This is needed cause a small mapping mistake in a previous migration to pkid
     try {
       if (emailData['email']['email'] != null) {
+
+        // Once this code is executed, it will never get executed again
+        await wrongPKidDataStructureMigration();
         await saveEmail(emailData['email']['email'], null);
       }
     } catch (e) {
       await saveEmail(emailData['email'], null);
     }
-
-
 
     if (phoneData.isNotEmpty) {
       if (phoneData['phone'] != null) {

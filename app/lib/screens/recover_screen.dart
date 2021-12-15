@@ -61,31 +61,39 @@ class _RecoverScreenState extends State<RecoverScreen> {
   }
 
   continueRecoverAccount() async {
-    Map<String, String> keys = await generateKeysFromSeedPhrase(seedPhrase);
-    await savePrivateKey(keys['privateKey']);
-    await savePublicKey(keys['publicKey']);
+    try {
+      Map<String, String> keys = await generateKeysFromSeedPhrase(seedPhrase);
+      await savePrivateKey(keys['privateKey']);
+      await savePublicKey(keys['publicKey']);
 
-    Map<String, dynamic> keyPair = await generateKeyPairFromSeedPhrase(seedPhrase);
-    var client = FlutterPkid(pkidUrl, keyPair);
+      Map<String, dynamic> keyPair = await generateKeyPairFromSeedPhrase(seedPhrase);
+      var client = FlutterPkid(pkidUrl, keyPair);
 
-    List<String> keyWords = ['email', 'phone', 'identity'];
+      List<String> keyWords = ['email', 'phone', 'identity'];
 
-    var futures = keyWords.map((keyword) async {
-      var pKidResult = await client.getPKidDoc(keyword, keyPair);
-      return pKidResult.containsKey('data') && pKidResult.containsKey('success') ? jsonDecode(pKidResult['data']) : {};
-    });
+      var futures = keyWords.map((keyword) async {
+        var pKidResult = await client.getPKidDoc(keyword, keyPair);
+        return pKidResult.containsKey('data') && pKidResult.containsKey('success') ? jsonDecode(pKidResult['data']) : {};
+      });
 
-    var pKidResult = await Future.wait(futures);
-    Map<int, Object> dataMap = pKidResult.asMap();
+      var pKidResult = await Future.wait(futures);
+      Map<int, Object> dataMap = pKidResult.asMap();
 
-    await savePhrase(seedPhrase);
-    await saveFingerprint(false);
-    await saveDoubleName(doubleName);
+      await savePhrase(seedPhrase);
+      await saveFingerprint(false);
+      await saveDoubleName(doubleName);
 
-    await handleKYCData(dataMap[0], dataMap[1], dataMap[2]);
+      await handleKYCData(dataMap[0], dataMap[1], dataMap[2]);
 
-    await migrateToNewSystem();
-    // await sendVerificationEmail();
+      await migrateToNewSystem();
+      // await sendVerificationEmail();
+    }
+
+    catch(e) {
+      print(e);
+      throw Exception('Something went wrong');
+    }
+
   }
 
   checkSeedLength(seedPhrase) {
@@ -222,19 +230,9 @@ class _RecoverScreenState extends State<RecoverScreen> {
 
                 } catch (e) {
                   print(e);
-                  // To dismiss the spinner
                   Navigator.pop(context);
                   error = e.toString();
                   setState(() {});
-                  // if (e.message != "") {
-                  //   setState(() {
-                  //     error = e.message;
-                  //   });
-                  // } else {
-                  //   setState(() {
-                  //     error = "Something went wrong";
-                  //   });
-                  // }
                 }
               },
             ),
