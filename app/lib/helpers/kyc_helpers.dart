@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter_pkid/flutter_pkid.dart';
 import 'package:threebotlogin/services/crypto_service.dart';
+import 'package:threebotlogin/services/pkid_service.dart';
 import 'package:threebotlogin/services/tools_service.dart';
 import 'package:threebotlogin/services/user_service.dart';
 
@@ -26,7 +27,6 @@ Future<void> fetchPKidData() async {
 
 Future<void> handleKYCData(
     Map<dynamic, dynamic> emailData, Map<dynamic, dynamic> phoneData, Map<dynamic, dynamic> identityData) async {
-
   await saveCorrectVerificationStates(emailData, phoneData, identityData);
 
   bool isEmailVerified = await getIsEmailVerified();
@@ -34,7 +34,18 @@ Future<void> handleKYCData(
   bool isIdentityVerified = await getIsIdentityVerified();
 
   if (isEmailVerified == false) {
-    await saveEmail(emailData['email'], null);
+
+    // This is needed cause a small mapping mistake in a previous migration to pkid
+    try {
+      if (emailData['email']['email'] != null) {
+
+        // Once this code is executed, it will never get executed again
+        await wrongPKidDataStructureMigration();
+        await saveEmail(emailData['email']['email'], null);
+      }
+    } catch (e) {
+      await saveEmail(emailData['email'], null);
+    }
 
     if (phoneData.isNotEmpty) {
       if (phoneData['phone'] != null) {
@@ -76,26 +87,20 @@ Future<void> handleKYCData(
 Future<void> saveCorrectVerificationStates(
     Map<dynamic, dynamic> emailData, Map<dynamic, dynamic> phoneData, Map<dynamic, dynamic> identityData) async {
   if (identityData.containsKey('signedIdentityNameIdentifier')) {
-     await setIsIdentityVerified(true);
-  }
-
-  else {
+    await setIsIdentityVerified(true);
+  } else {
     await setIsIdentityVerified(false);
   }
 
   if (phoneData.containsKey('spi')) {
     await setIsPhoneVerified(true);
-  }
-
-  else {
+  } else {
     await setIsPhoneVerified(false);
   }
 
   if (emailData.containsKey('sei')) {
     await setIsEmailVerified(true);
-  }
-
-  else {
+  } else {
     await setIsEmailVerified(false);
   }
 }
