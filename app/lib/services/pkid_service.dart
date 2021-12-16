@@ -5,20 +5,7 @@ import 'package:threebotlogin/services/user_service.dart';
 
 import 'crypto_service.dart';
 
-Future<void> wrongPKidDataStructureMigration() async {
-  Map<String, dynamic> keyPair = await generateKeyPairFromSeedPhrase(await getPhrase());
-  var client = FlutterPkid(pkidUrl, keyPair);
 
-  Map<String, Object> email = await getEmail();
-
-  if (email['sei'] != null) {
-    return client.setPKidDoc('email', json.encode({'email': email['email'], 'sei': email['sei']}), keyPair);
-  }
-
-  if (email['email'] != null) {
-    return client.setPKidDoc('email', json.encode({'email': email['email']}), keyPair);
-  }
-}
 
 Future<void> saveEmailToPKidForMigration() async {
   Map<String, dynamic> keyPair = await generateKeyPairFromSeedPhrase(await getPhrase());
@@ -75,3 +62,19 @@ Future<dynamic> getEmailFromPKid() async {
   var client = FlutterPkid(pkidUrl, keyPair);
   return await client.getPKidDoc('email', keyPair);
 }
+
+Future<void> savePhoneToPKid() async {
+  Map<String, dynamic> keyPair = await generateKeyPairFromSeedPhrase(await getPhrase());
+  var client = FlutterPkid(pkidUrl, keyPair);
+
+  Map<String, Object> phone = await getPhone();
+
+  if (phone['spi'] != null) {
+    return client.setPKidDoc('phone', json.encode({'phone': phone['phone'], 'spi': phone['spi']}), keyPair);
+  }
+
+  if (phone['phone'] != null) {
+    return client.setPKidDoc('phone', json.encode({'phone': phone['phone']}), keyPair);
+  }
+}
+
