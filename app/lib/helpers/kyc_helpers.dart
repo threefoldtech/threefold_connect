@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter_pkid/flutter_pkid.dart';
 import 'package:threebotlogin/services/crypto_service.dart';
+import 'package:threebotlogin/services/migration_service.dart';
 import 'package:threebotlogin/services/pkid_service.dart';
 import 'package:threebotlogin/services/tools_service.dart';
 import 'package:threebotlogin/services/user_service.dart';
@@ -33,39 +34,27 @@ Future<void> handleKYCData(
   bool isPhoneVerified = await getIsPhoneVerified();
   bool isIdentityVerified = await getIsIdentityVerified();
 
+  // This method got refactored due my mistake in one little mapping in the migration from no pkid to pkid
   if (isEmailVerified == false) {
-
-    // This is needed cause a small mapping mistake in a previous migration to pkid
-    try {
-      if (emailData['email']['email'] != null) {
-
-        // Once this code is executed, it will never get executed again
-        await wrongPKidDataStructureMigration();
-        await saveEmail(emailData['email']['email'], null);
-      }
-    } catch (e) {
-      await saveEmail(emailData['email'], null);
-    }
+    await saveEmailInCorrectFormatPKid(emailData);
 
     if (phoneData.isNotEmpty) {
-      if (phoneData['phone'] != null) {
-        await savePhone(phoneData['phone'], null);
-      }
+      await savePhoneInCorrectFormatPKid(phoneData);
     }
   }
 
   if (isEmailVerified == true) {
     Globals().emailVerified.value = true;
-    await saveEmail(emailData['email'], emailData['sei']);
+    await saveEmailInCorrectFormatPKid(emailData);
 
     if (phoneData.isNotEmpty) {
-      await savePhone(phoneData['phone'], null);
+      await savePhoneInCorrectFormatPKid(phoneData);
     }
   }
 
   if (isPhoneVerified == true) {
     Globals().phoneVerified.value = true;
-    await savePhone(phoneData['phone'], phoneData['spi']);
+    await savePhoneInCorrectFormatPKid(phoneData);
   }
 
   if (isIdentityVerified == true) {
