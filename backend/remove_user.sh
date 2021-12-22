@@ -50,5 +50,6 @@ then
 		echo "Success."
 	else
 		echo "Something went wrong."
+		echo "If this didnt't work, try to delete the user by copying the database outside the container and delete the user manually, and copy the database back after"
 	fi
 fi
