@@ -3,11 +3,12 @@ name: production
 on:
   push:
     tags:
-      - "v[0-9]+.[0-9]+.[0-9]+"
+      - "v[0-9]+.[0-9]+.[0-9]"
 jobs:
   build:
     runs-on: frank
     steps:
+      - name : running production
       - uses: actions/checkout@v2
       - name: Login to docker hub
         run: docker login --username ${{ secrets.DOCKER_USERNAME }} --password ${{ secrets.DOCKER_TOKEN }}
