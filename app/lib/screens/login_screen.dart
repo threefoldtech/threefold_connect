@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:math';
+import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:threebotlogin/apps/wallet/wallet_config.dart';
@@ -16,6 +17,7 @@ import 'package:threebotlogin/services/shared_preference_service.dart';
 import 'package:threebotlogin/widgets/custom_dialog.dart';
 import 'package:threebotlogin/widgets/image_button.dart';
 import 'package:threebotlogin/widgets/preference_dialog.dart';
+import 'package:flutter_sodium/flutter_sodium.dart';
 
 class LoginScreen extends StatefulWidget {
   final Login loginData;
@@ -353,7 +355,7 @@ class _LoginScreenState extends State<LoginScreen> with BlockAndRunMixin {
 
     var scopePermissions = await getPreviousScopePermissions(widget.loginData.appId);
 
-    var derivedSeed = (await getDerivedSeed(widget.loginData.appId));
+    Uint8List derivedSeed = (await getDerivedSeed(widget.loginData.appId));
 
     //TODO: make separate function
     if (scopePermissions != null) {
@@ -432,13 +434,14 @@ class _LoginScreenState extends State<LoginScreen> with BlockAndRunMixin {
 
     if (selectedImageId == correctImage || isMobileCheck) {
       // Only update data if the correct image was chosen:
-      print("derivedSeed: " + derivedSeed);
+      print("derivedSeed: " + base64.encode(derivedSeed));
       var name = await getDoubleName();
-      var digitalTwinDerivedPublicKey = await generatePublicKeyFromEntropy(derivedSeed);
+      KeyPair dtKeyPair = await generateKeyPairFromEntropy(derivedSeed);
 
+      String dtEncodedPublicKey = base64.encode(dtKeyPair.pk)
       print("name: " + name);
-      print("publicKey: " + digitalTwinDerivedPublicKey);
-      addDigitalTwinDerivedPublicKeyToBackend(name, digitalTwinDerivedPublicKey, widget.loginData.appId);
+      print("publicKey: " + dtEncodedPublicKey);
+      addDigitalTwinDerivedPublicKeyToBackend(name, dtEncodedPublicKey, widget.loginData.appId);
 
       if (Navigator.canPop(context)) {
         Navigator.pop(context, true);

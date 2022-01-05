@@ -3,7 +3,6 @@ import 'package:flutter/services.dart';
 import 'package:threebotlogin/helpers/globals.dart';
 import 'package:threebotlogin/helpers/hex_color.dart';
 import 'package:threebotlogin/screens/main_screen.dart';
-import 'package:threebotlogin/services/logging_service.dart';
 import 'package:threebotlogin/services/migration_service.dart';
 import 'package:threebotlogin/services/shared_preference_service.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -11,7 +10,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'helpers/flags.dart';
 import 'helpers/kyc_helpers.dart';
 
-LoggingService logger;
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();

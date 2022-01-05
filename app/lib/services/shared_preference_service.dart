@@ -355,11 +355,8 @@ Future<Map<String, Object>> getPhone() async {
   };
 }
 
-Future<Map<String, Object>> getKeys(String appId, String doubleName) async {
-  return await generateDerivedKeypair(appId, doubleName);
-}
 
-Future<String> getDerivedSeed(String appId) async {
+Future<Uint8List> getDerivedSeed(String appId) async {
   return await generateDerivedSeed(appId);
 }
 
