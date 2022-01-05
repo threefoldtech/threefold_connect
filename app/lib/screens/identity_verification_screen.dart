@@ -20,7 +20,7 @@ import 'package:threebotlogin/services/open_kyc_service.dart';
 import 'package:threebotlogin/services/pkid_service.dart';
 import 'package:threebotlogin/services/socket_service.dart';
 import 'package:threebotlogin/services/tools_service.dart';
-import 'package:threebotlogin/services/user_service.dart';
+import 'package:threebotlogin/services/shared_preference_service.dart';
 import 'package:threebotlogin/widgets/custom_dialog.dart';
 import 'package:threebotlogin/widgets/email_verification_needed.dart';
 import 'package:threebotlogin/widgets/layout_drawer.dart';

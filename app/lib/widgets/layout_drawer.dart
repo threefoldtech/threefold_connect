@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_pkid/flutter_pkid.dart';
 import 'package:threebotlogin/helpers/globals.dart';
 import 'package:threebotlogin/services/crypto_service.dart';
-import 'package:threebotlogin/services/user_service.dart';
+import 'package:threebotlogin/services/shared_preference_service.dart';
 import 'package:convert/convert.dart';
 
 import '../app_config.dart';

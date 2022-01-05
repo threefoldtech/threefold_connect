@@ -5,7 +5,7 @@ import 'package:threebotlogin/services/crypto_service.dart';
 import 'package:threebotlogin/services/migration_service.dart';
 import 'package:threebotlogin/services/pkid_service.dart';
 import 'package:threebotlogin/services/tools_service.dart';
-import 'package:threebotlogin/services/user_service.dart';
+import 'package:threebotlogin/services/shared_preference_service.dart';
 
 import 'globals.dart';
 

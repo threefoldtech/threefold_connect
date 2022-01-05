@@ -13,7 +13,7 @@ import 'package:threebotlogin/helpers/globals.dart';
 import 'package:threebotlogin/models/wallet_data.dart';
 import 'package:threebotlogin/screens/scan_screen.dart';
 import 'package:threebotlogin/services/3bot_service.dart';
-import 'package:threebotlogin/services/user_service.dart';
+import 'package:threebotlogin/services/shared_preference_service.dart';
 import 'package:threebotlogin/widgets/layout_drawer.dart';
 
 bool created = false;

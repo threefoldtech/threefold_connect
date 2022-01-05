@@ -11,7 +11,7 @@ import 'package:threebotlogin/services/3bot_service.dart';
 import 'package:threebotlogin/services/crypto_service.dart';
 import 'package:threebotlogin/services/open_kyc_service.dart';
 import 'package:threebotlogin/services/tools_service.dart';
-import 'package:threebotlogin/services/user_service.dart';
+import 'package:threebotlogin/services/shared_preference_service.dart';
 import 'package:threebotlogin/widgets/custom_dialog.dart';
 import 'package:threebotlogin/widgets/reusable_text_field_step.dart';
 import 'package:threebotlogin/widgets/reusable_text_step.dart';

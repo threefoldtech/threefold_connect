@@ -3,7 +3,7 @@ import 'dart:typed_data';
 
 import 'package:threebotlogin/models/scope.dart';
 import 'package:threebotlogin/services/crypto_service.dart';
-import 'package:threebotlogin/services/user_service.dart';
+import 'package:threebotlogin/services/shared_preference_service.dart';
 
 class Login {
   String doubleName;

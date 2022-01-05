@@ -9,7 +9,7 @@ import 'package:threebotlogin/models/login.dart';
 import 'package:threebotlogin/models/scope.dart';
 import 'package:threebotlogin/screens/authentication_screen.dart';
 import 'package:threebotlogin/screens/login_screen.dart';
-import 'package:threebotlogin/services/user_service.dart';
+import 'package:threebotlogin/services/shared_preference_service.dart';
 
 class UniLinkService {
   static void handleUniLink(UniLinkEvent e) async {

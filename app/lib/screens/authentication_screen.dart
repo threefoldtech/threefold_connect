@@ -8,7 +8,7 @@ import 'package:threebotlogin/helpers/globals.dart';
 import 'package:threebotlogin/helpers/hex_color.dart';
 import 'package:threebotlogin/models/login.dart';
 import 'package:threebotlogin/services/fingerprint_service.dart';
-import 'package:threebotlogin/services/user_service.dart';
+import 'package:threebotlogin/services/shared_preference_service.dart';
 import 'package:threebotlogin/widgets/custom_dialog.dart';
 
 class AuthenticationScreen extends StatefulWidget {

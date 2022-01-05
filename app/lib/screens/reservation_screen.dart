@@ -13,7 +13,7 @@ import 'package:threebotlogin/helpers/globals.dart';
 import 'package:threebotlogin/helpers/hex_color.dart';
 import 'package:threebotlogin/models/paymentRequest.dart';
 import 'package:threebotlogin/services/3bot_service.dart';
-import 'package:threebotlogin/services/user_service.dart';
+import 'package:threebotlogin/services/shared_preference_service.dart';
 import 'package:threebotlogin/widgets/custom_dialog.dart';
 import 'package:threebotlogin/widgets/layout_drawer.dart';
 import 'package:url_launcher/url_launcher.dart';

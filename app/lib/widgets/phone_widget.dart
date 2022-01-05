@@ -9,7 +9,7 @@ import 'package:threebotlogin/helpers/globals.dart';
 import 'package:threebotlogin/services/crypto_service.dart';
 import 'package:threebotlogin/services/open_kyc_service.dart';
 import 'package:threebotlogin/services/phone_service.dart';
-import 'package:threebotlogin/services/user_service.dart';
+import 'package:threebotlogin/services/shared_preference_service.dart';
 
 import 'custom_dialog.dart';
 

@@ -13,7 +13,7 @@ import 'package:threebotlogin/screens/init_screen.dart';
 import 'package:threebotlogin/screens/unregistered_screen.dart';
 import 'package:threebotlogin/services/3bot_service.dart';
 import 'package:threebotlogin/services/socket_service.dart';
-import 'package:threebotlogin/services/user_service.dart';
+import 'package:threebotlogin/services/shared_preference_service.dart';
 import 'package:threebotlogin/widgets/custom_dialog.dart';
 import 'package:threebotlogin/widgets/error_widget.dart';
 import 'package:uni_links/uni_links.dart';
@@ -177,6 +177,8 @@ class _AppState extends State<MainScreen> {
   }
 
   checkIfAppIsUnderMaintenance() async {
+    print('HALLO');
+    print(await isAppUnderMaintenance());
     try {
       if (await isAppUnderMaintenance()) {
         CustomDialog dialog = CustomDialog(

@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:threebotlogin/apps/wallet/wallet_config.dart';
 import 'package:threebotlogin/models/scope.dart';
 import 'package:threebotlogin/models/wallet_data.dart';
-import 'package:threebotlogin/services/user_service.dart';
+import 'package:threebotlogin/services/shared_preference_service.dart';
 import 'package:threebotlogin/widgets/custom_dialog.dart';
 
 class PreferenceDialog extends StatefulWidget {

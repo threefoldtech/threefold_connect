@@ -1,12 +1,10 @@
-import 'dart:async';
 import 'dart:convert';
 import 'dart:core';
+import 'dart:typed_data';
 import 'package:convert/convert.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_pkid/flutter_pkid.dart';
 
 import 'package:flutter_sodium/flutter_sodium.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:threebotlogin/helpers/globals.dart';
 import 'package:threebotlogin/models/wallet_data.dart';
@@ -15,54 +13,63 @@ import 'package:threebotlogin/services/crypto_service.dart';
 
 import '../app_config.dart';
 
-String pkidUrl = AppConfig().pKidUrl();
+String pKidUrl = AppConfig().pKidUrl();
 
-Future<void> savePin(pin) async {
+Future<void> savePin(String pin) async {
   final SharedPreferences prefs = await SharedPreferences.getInstance();
   prefs.remove('pin');
   prefs.setString('pin', pin);
 }
 
-Future<String> getPin() async {
+Future<String?> getPin() async {
   final SharedPreferences prefs = await SharedPreferences.getInstance();
   return prefs.getString('pin');
 }
 
-Future<void> savePublicKey(key) async {
+Future<void> savePublicKey(Uint8List publicKey) async {
   final SharedPreferences prefs = await SharedPreferences.getInstance();
-  prefs.remove('publickey');
-  prefs.setString('publickey', key);
+  prefs.remove('publicKey');
+
+  String encodedPublicKey = base64.encode(publicKey);
+  prefs.setString('publicKey', encodedPublicKey);
 }
 
-Future<String> getPublicKey() async {
+Future<Uint8List> getPublicKey() async {
   final SharedPreferences prefs = await SharedPreferences.getInstance();
 
-  if (!(await getIsPublicKeyFixed())) {
-    var userInfoResponse = await getUserInfo(await getDoubleName());
+  bool? isPublicKeyFixed = await getIsPublicKeyFixed();
 
-    if (userInfoResponse.statusCode != 200) {
-      throw new Exception('User not found');
-    }
-
-    var userInfo = json.decode(userInfoResponse.body);
-    var done = await prefs.setString("publickey", userInfo['publicKey']);
-
-    if (done && prefs.getString('publickey') == userInfo['publicKey']) {
-      setPublicKeyFixed();
-    }
+  if (isPublicKeyFixed == true) {
+    String? encodedPublicKey = prefs.getString('publicKey');
+    return base64.decode(encodedPublicKey!);
   }
 
-  return prefs.getString('publickey');
+  var userInfoResponse = await getUserInfo(await getDoubleName());
+  if (userInfoResponse.statusCode != 200) {
+    throw new Exception('User not found');
+  }
+
+  var userInfo = json.decode(userInfoResponse.body);
+  var done = await prefs.setString("publicKey", userInfo['publicKey']);
+
+  if (done && prefs.getString('publicKey') == userInfo['publicKey']) {
+    setPublicKeyFixed();
+  }
+
+  String? encodedPublicKey = prefs.getString('publicKey');
+  return base64.decode(encodedPublicKey!);
 }
 
 Future<Map<String, String>> getEdCurveKeys() async {
   final SharedPreferences prefs = await SharedPreferences.getInstance();
 
-  final String pkEd = prefs.getString('publickey');
-  final String skEd = prefs.getString('privatekey');
+  final String? pkEd = prefs.getString('publicKey');
+  final String? skEd = prefs.getString('privateKey');
 
-  final String pkCurve = base64.encode(await Sodium.cryptoSignEd25519PkToCurve25519(base64.decode(pkEd)));
-  final String skCurve = base64.encode(await Sodium.cryptoSignEd25519SkToCurve25519(base64.decode(skEd)));
+  final String pkCurve = base64
+      .encode(Sodium.cryptoSignEd25519PkToCurve25519(base64.decode(pkEd!)));
+  final String skCurve = base64
+      .encode(Sodium.cryptoSignEd25519SkToCurve25519(base64.decode(skEd!)));
 
   return {
     'signingPublicKey': hex.encode(base64.decode(pkEd)),
@@ -74,43 +81,46 @@ Future<Map<String, String>> getEdCurveKeys() async {
 
 Future<void> setPublicKeyFixed() async {
   final SharedPreferences prefs = await SharedPreferences.getInstance();
-  prefs.setBool('ispublickeyfixed', true);
+  prefs.setBool('isPublicKeyFixed', true);
 }
 
-Future<bool> getIsPublicKeyFixed() async {
-  try {
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
+Future<bool?> getIsPublicKeyFixed() async {
+  final SharedPreferences prefs = await SharedPreferences.getInstance();
 
-    if (prefs.getBool('ispublickeyfixed') == null) {
-      return false;
-    }
-
-    return prefs.getBool('ispublickeyfixed');
-  } catch (_) {
+  if (prefs.getBool('isPublicKeyFixed') == null) {
     return false;
   }
+
+  return prefs.getBool('isPublicKeyFixed');
 }
 
-Future<void> savePrivateKey(key) async {
+Future<void> savePrivateKey(Uint8List privateKey) async {
   final SharedPreferences prefs = await SharedPreferences.getInstance();
-  prefs.remove('privatekey');
-  prefs.setString('privatekey', key);
+  prefs.remove('privateKey');
+
+  String encodedPrivateKey = base64.encode(privateKey);
+  prefs.setString('privateKey', encodedPrivateKey);
 }
 
-Future<String> getPrivateKey() async {
+Future<Uint8List> getPrivateKey() async {
   final SharedPreferences prefs = await SharedPreferences.getInstance();
-  return prefs.getString('privatekey');
+
+  String? privateKey = prefs.getString('privateKey');
+  Uint8List decodedPrivateKey = base64.decode(privateKey!);
+
+  return decodedPrivateKey;
 }
 
-Future<void> savePhrase(phrase) async {
+Future<void> savePhrase(String phrase) async {
   final SharedPreferences prefs = await SharedPreferences.getInstance();
-  prefs.remove('phrase');
-  prefs.setString('phrase', phrase);
+  prefs.remove('seedPhrase');
+
+  prefs.setString('seedPhrase', phrase);
 }
 
-Future<String> getPhrase() async {
+Future<String?> getPhrase() async {
   final SharedPreferences prefs = await SharedPreferences.getInstance();
-  return prefs.getString('phrase');
+  return prefs.getString('seedPhrase');
 }
 
 Future<void> saveLocationId(String locationId) async {
@@ -130,22 +140,22 @@ Future<List<dynamic>> getLocationIdList() async {
   final SharedPreferences prefs = await SharedPreferences.getInstance();
 
   try {
-    String locationIdListAsJson = prefs.getString('locationIdList');
-    List<dynamic> locationIdList = jsonDecode(locationIdListAsJson);
+    String? locationIdListAsJson = prefs.getString('locationIdList');
+    List<dynamic> locationIdList = jsonDecode(locationIdListAsJson!);
 
     return locationIdList;
   } catch (_) {
-    return new List<dynamic>();
+    return [];
   }
 }
 
-Future<void> saveDoubleName(doubleName) async {
+Future<void> saveDoubleName(String doubleName) async {
   final SharedPreferences prefs = await SharedPreferences.getInstance();
   prefs.remove('doubleName');
   prefs.setString('doubleName', doubleName);
 }
 
-Future<String> getDoubleName() async {
+Future<String?> getDoubleName() async {
   final SharedPreferences prefs = await SharedPreferences.getInstance();
   return prefs.getString('doubleName');
 }
@@ -157,7 +167,7 @@ Future<void> removeEmail() async {
   prefs.remove('emailVerified');
 }
 
-Future<void>  saveEmail(String email, String signedEmailIdentifier) async {
+Future<void> saveEmail(String email, String signedEmailIdentifier) async {
   final SharedPreferences prefs = await SharedPreferences.getInstance();
 
   prefs.remove('email');
@@ -169,9 +179,12 @@ Future<void>  saveEmail(String email, String signedEmailIdentifier) async {
   if (signedEmailIdentifier != null) {
     prefs.setString('signedEmailIdentifier', signedEmailIdentifier);
 
-    Map<String, dynamic> keyPair = await generateKeyPairFromSeedPhrase(await getPhrase());
+    Map<String, dynamic> keyPair =
+        await generateKeyPairFromSeedPhrase(await getPhrase());
+
     var client = FlutterPkid(pkidUrl, keyPair);
-    client.setPKidDoc('email', json.encode({'email': email, 'sei': signedEmailIdentifier}), keyPair);
+    client.setPKidDoc('email',
+        json.encode({'email': email, 'sei': signedEmailIdentifier}), keyPair);
   }
 
   Globals().emailVerified.value = (signedEmailIdentifier != null);
@@ -181,15 +194,20 @@ Future<Map<String, dynamic>> getIdentity() async {
   final SharedPreferences prefs = await SharedPreferences.getInstance();
   return {
     'identityName': prefs.getString('identityName'),
-    'signedIdentityNameIdentifier': prefs.getString('signedIdentityNameIdentifier'),
+    'signedIdentityNameIdentifier':
+        prefs.getString('signedIdentityNameIdentifier'),
     'identityCountry': prefs.getString('identityCountry'),
-    'signedIdentityCountryIdentifier': prefs.getString('signedIdentityCountryIdentifier'),
+    'signedIdentityCountryIdentifier':
+        prefs.getString('signedIdentityCountryIdentifier'),
     'identityDOB': prefs.getString('identityDOB'),
-    'signedIdentityDOBIdentifier': prefs.getString('signedIdentityDOBIdentifier'),
+    'signedIdentityDOBIdentifier':
+        prefs.getString('signedIdentityDOBIdentifier'),
     'identityDocumentMeta': prefs.getString('identityDocumentMeta'),
-    'signedIdentityDocumentMetaIdentifier': prefs.getString('signedIdentityDocumentMetaIdentifier'),
+    'signedIdentityDocumentMetaIdentifier':
+        prefs.getString('signedIdentityDocumentMetaIdentifier'),
     'identityGender': prefs.getString('identityGender'),
-    'signedIdentityGenderIdentifier': prefs.getString('signedIdentityGenderIdentifier'),
+    'signedIdentityGenderIdentifier':
+        prefs.getString('signedIdentityGenderIdentifier'),
   };
 }
 
@@ -218,15 +236,21 @@ Future<void> saveIdentity(
   prefs.setString('identityGender', identityGender);
 
   prefs.setString('signedIdentityNameIdentifier', signedIdentityNameIdentifier);
-  prefs.setString('signedIdentityCountryIdentifier',
-      signedIdentityCountryIdentifier == 'null' ? 'test' : signedIdentityCountryIdentifier);
+  prefs.setString(
+      'signedIdentityCountryIdentifier',
+      signedIdentityCountryIdentifier == 'null'
+          ? 'test'
+          : signedIdentityCountryIdentifier);
   prefs.setString('signedIdentityDOBIdentifier', signedIdentityDOBIdentifier);
-  prefs.setString('signedIdentityDocumentMetaIdentifier', signedIdentityDocumentMetaIdentifier);
-  prefs.setString('signedIdentityGenderIdentifier', signedIdentityGenderIdentifier);
+  prefs.setString('signedIdentityDocumentMetaIdentifier',
+      signedIdentityDocumentMetaIdentifier);
+  prefs.setString(
+      'signedIdentityGenderIdentifier', signedIdentityGenderIdentifier);
 
   prefs.remove('identityVerified');
 
-  Map<String, dynamic> keyPair = await generateKeyPairFromSeedPhrase(await getPhrase());
+  Map<String, dynamic> keyPair =
+      await generateKeyPairFromSeedPhrase(await getPhrase());
   var client = FlutterPkid(pkidUrl, keyPair);
   client.setPKidDoc(
       'identity',
@@ -238,7 +262,8 @@ Future<void> saveIdentity(
         'identityDOB': identityDOB,
         'signedIdentityDOBIdentifier': signedIdentityDOBIdentifier,
         'identityDocumentMeta': jsonEncode(identityDocumentMeta),
-        'signedIdentityDocumentMetaIdentifier': signedIdentityDocumentMetaIdentifier,
+        'signedIdentityDocumentMetaIdentifier':
+            signedIdentityDocumentMetaIdentifier,
         'identityGender': identityGender,
         'signedIdentityGenderIdentifier': signedIdentityGenderIdentifier
       }),
@@ -304,9 +329,11 @@ Future<void> savePhone(String phone, String signedPhoneIdentifier) async {
   if (signedPhoneIdentifier != null) {
     prefs.setString('signedPhoneIdentifier', signedPhoneIdentifier);
 
-    Map<String, dynamic> keyPair = await generateKeyPairFromSeedPhrase(await getPhrase());
+    Map<String, dynamic> keyPair =
+        await generateKeyPairFromSeedPhrase(await getPhrase());
     var client = FlutterPkid(pkidUrl, keyPair);
-    client.setPKidDoc('phone', json.encode({'phone': phone, 'spi': signedPhoneIdentifier}), keyPair);
+    client.setPKidDoc('phone',
+        json.encode({'phone': phone, 'spi': signedPhoneIdentifier}), keyPair);
   }
 
   Globals().phoneVerified.value = (signedPhoneIdentifier != null);
@@ -314,12 +341,18 @@ Future<void> savePhone(String phone, String signedPhoneIdentifier) async {
 
 Future<Map<String, Object>> getEmail() async {
   final SharedPreferences prefs = await SharedPreferences.getInstance();
-  return {'email': prefs.getString('email'), 'sei': prefs.getString('signedEmailIdentifier')};
+  return {
+    'email': prefs.getString('email'),
+    'sei': prefs.getString('signedEmailIdentifier')
+  };
 }
 
 Future<Map<String, Object>> getPhone() async {
   final SharedPreferences prefs = await SharedPreferences.getInstance();
-  return {'phone': prefs.getString('phone'), 'spi': prefs.getString('signedPhoneIdentifier')};
+  return {
+    'phone': prefs.getString('phone'),
+    'spi': prefs.getString('signedPhoneIdentifier')
+  };
 }
 
 Future<Map<String, Object>> getKeys(String appId, String doubleName) async {
@@ -359,7 +392,8 @@ Future<String> getScopePermissions() async {
   return prefs.getString('scopePermissions');
 }
 
-Future<void> savePreviousScopePermissions(String appId, String scopePermissions) async {
+Future<void> savePreviousScopePermissions(
+    String appId, String scopePermissions) async {
   final SharedPreferences prefs = await SharedPreferences.getInstance();
   await prefs.remove('$appId-scopePreviousPermissions');
   await prefs.setString('$appId-scopePreviousPermissions', scopePermissions);
@@ -426,7 +460,7 @@ Future<List<WalletData>> getWallets() async {
   final SharedPreferences prefs = await SharedPreferences.getInstance();
   var string = prefs.getString('walletData');
 
-  if(string == null) {
+  if (string == null) {
     return [];
   }
 

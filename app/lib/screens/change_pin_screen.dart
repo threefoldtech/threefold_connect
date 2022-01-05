@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:threebotlogin/helpers/hex_color.dart';
-import 'package:threebotlogin/services/user_service.dart';
+import 'package:threebotlogin/services/shared_preference_service.dart';
 import 'package:threebotlogin/widgets/pin_field.dart';
 
 class ChangePinScreen extends StatefulWidget {

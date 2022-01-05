@@ -5,7 +5,7 @@ import 'package:http/http.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:threebotlogin/app_config.dart';
 import 'package:threebotlogin/services/crypto_service.dart';
-import 'package:threebotlogin/services/user_service.dart';
+import 'package:threebotlogin/services/shared_preference_service.dart';
 
 String openKycApiUrl = AppConfig().openKycApiUrl();
 String threeBotApiUrl = AppConfig().threeBotApiUrl();

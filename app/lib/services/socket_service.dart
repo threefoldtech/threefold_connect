@@ -16,7 +16,7 @@ import 'package:threebotlogin/screens/authentication_screen.dart';
 import 'package:threebotlogin/screens/login_screen.dart';
 import 'package:threebotlogin/screens/warning_screen.dart';
 import 'package:threebotlogin/services/open_kyc_service.dart';
-import 'package:threebotlogin/services/user_service.dart';
+import 'package:threebotlogin/services/shared_preference_service.dart';
 import 'package:threebotlogin/widgets/custom_dialog.dart';
 
 class BackendConnection {

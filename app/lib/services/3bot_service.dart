@@ -6,7 +6,7 @@ import 'package:http/http.dart';
 import 'package:package_info/package_info.dart';
 import 'package:threebotlogin/app_config.dart';
 import 'package:threebotlogin/services/crypto_service.dart';
-import 'package:threebotlogin/services/user_service.dart';
+import 'package:threebotlogin/services/shared_preference_service.dart';
 
 String threeBotApiUrl = AppConfig().threeBotApiUrl();
 Map<String, String> requestHeaders = {'Content-type': 'application/json'};
@@ -80,7 +80,7 @@ Future<Response> sendProductReservation(Map<String, Object> data) async {
       body: body, headers: {'Content-type': 'application/json'});
 }
 
-Future<bool> isAppUpToDate() async {
+Future<bool>  isAppUpToDate() async {
   PackageInfo packageInfo = await PackageInfo.fromPlatform();
 
   int currentBuildNumber = int.parse(packageInfo.buildNumber);

@@ -1,6 +1,6 @@
 import 'package:flagsmith/flagsmith.dart';
 import 'package:threebotlogin/app_config.dart';
-import 'package:threebotlogin/services/user_service.dart';
+import 'package:threebotlogin/services/shared_preference_service.dart';
 
 import 'globals.dart';
 
