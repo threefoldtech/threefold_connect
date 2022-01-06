@@ -1,9 +1,23 @@
 import 'dart:convert';
 
 import 'package:flutter_pkid/flutter_pkid.dart';
+import 'package:flutter_sodium/flutter_sodium.dart';
 import 'package:threebotlogin/services/shared_preference_service.dart';
 
+import '../app_config.dart';
 import 'crypto_service.dart';
+
+
+
+Future<FlutterPkid> getPkidClient() async {
+  String pKidUrl = AppConfig().pKidUrl();
+
+  String? phrase = await getPhrase();
+  KeyPair keyPair = await generateKeyPairFromSeedPhrase(phrase!);
+
+  return FlutterPkid(pKidUrl, keyPair);
+}
+
 
 
 
