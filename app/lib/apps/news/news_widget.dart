@@ -17,15 +17,16 @@ class NewsWidget extends StatefulWidget {
 
 class _NewsState extends State<NewsWidget>
     with AutomaticKeepAliveClientMixin {
-  InAppWebViewController webView;
+  late InAppWebViewController webView;
+  late InAppWebView iaWebView;
+
   String url = "";
   String initialEndsWith= "";
   double progress = 0;
   var config = NewsConfig();
-  InAppWebView iaWebView;
 
   _back(NewsBackEvent event) async {
-    Uri url = await webView.getUrl();
+    Uri? url = await webView.getUrl();
     print("URL: " + url.toString());
     if (url.toString().endsWith(initialEndsWith)) {
       Events().emit(GoHomeEvent());
@@ -54,7 +55,7 @@ class _NewsState extends State<NewsWidget>
 
         return true;
       },
-      onLoadStop: (InAppWebViewController controller, Uri url) async {
+      onLoadStop: (InAppWebViewController controller, Uri? url) async {
         addClipboardHandlersOnly(controller);
       },
       onProgressChanged: (InAppWebViewController controller, int progress) {

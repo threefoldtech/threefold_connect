@@ -131,7 +131,7 @@ Future<bool?> getIsEmailVerified() async {
   return prefs.getBool('isEmailVerified');
 }
 
-Future<Map<String, Object?>> getEmail() async {
+Future<Map<String, String?>> getEmail() async {
   final SharedPreferences prefs = await SharedPreferences.getInstance();
   return {'email': prefs.getString('email'), 'sei': prefs.getString('signedEmailIdentifier')};
 }
@@ -174,7 +174,7 @@ Future<bool?> getIsPhoneVerified() async {
   return prefs.getBool('isPhoneVerified');
 }
 
-Future<Map<String, Object?>> getPhone() async {
+Future<Map<String, String?>> getPhone() async {
   final SharedPreferences prefs = await SharedPreferences.getInstance();
   return {'phone': prefs.getString('phone'), 'spi': prefs.getString('signedPhoneIdentifier')};
 }
@@ -348,10 +348,10 @@ Future<String?> getScopePermissions() async {
   return prefs.getString('scopePermissions');
 }
 
-Future<void> savePreviousScopePermissions(String appId, String scopePermissions) async {
+Future<void> savePreviousScopePermissions(String appId, String? scopePermissions) async {
   final SharedPreferences prefs = await SharedPreferences.getInstance();
   await prefs.remove('$appId-scopePreviousPermissions');
-  await prefs.setString('$appId-scopePreviousPermissions', scopePermissions);
+  await prefs.setString('$appId-scopePreviousPermissions', scopePermissions!);
 }
 
 Future<String?> getPreviousScopePermissions(String appId) async {
@@ -370,7 +370,7 @@ Future<void> saveInitDone() async {
   prefs.setBool('initDone', true);
 }
 
-Future<bool?> getInitDone() async {
+Future<bool> getInitDone() async {
   final SharedPreferences prefs = await SharedPreferences.getInstance();
 
   bool? initDone = prefs.getBool('initDone');
@@ -379,7 +379,8 @@ Future<bool?> getInitDone() async {
     initDone = prefs.getBool('initDone');
   }
 
-  return initDone;
+  bool isInitDone = initDone == true;
+  return isInitDone;
 }
 
 

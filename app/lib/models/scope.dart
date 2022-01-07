@@ -1,17 +1,17 @@
 class Scope {
-  bool doubleName;
-  bool user;
-  bool email;
-  bool derivedSeed;
-  bool phone;
-  bool digitalTwin;
-  bool identityName;
-  bool identityDOB;
-  bool identityGender;
-  bool identityDocumentMeta;
-  bool identityCountry;
-  bool walletAddress;
-  String walletAddressData;
+  bool? doubleName;
+  bool? user;
+  bool? email;
+  bool? derivedSeed;
+  bool? phone;
+  bool? digitalTwin;
+  bool? identityName;
+  bool? identityDOB;
+  bool? identityGender;
+  bool? identityDocumentMeta;
+  bool? identityCountry;
+  bool? walletAddress;
+  String? walletAddressData;
 
   Scope({this.doubleName, this.email});
 

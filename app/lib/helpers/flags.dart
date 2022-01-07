@@ -1,63 +1,64 @@
 import 'package:flagsmith/flagsmith.dart';
-import 'package:threebotlogin/app_config.dart';
-import 'package:threebotlogin/services/shared_preference_service.dart';
 
+import '../app_config.dart';
 import 'globals.dart';
 
 class Flags {
   static final Flags _singleton = new Flags._internal();
 
-  FlagsmithClient client;
+  FlagsmithClient? client;
 
-  Map<String, String> flagSmithConfig = AppConfig().flagSmithConfig();
+  Map<String?, String?>? flagSmithConfig = AppConfig().flagSmithConfig();
 
-  Future<void> initialiseFlagSmith() async {
-    client = await FlagsmithClient.init(
-        config: FlagsmithConfig(
-          baseURI: flagSmithConfig['url'],
-        ),
-        apiKey: flagSmithConfig['apiKey']);
+  Future<void> initFlagSmith() async {
+    try {
+      client = await FlagsmithClient.init(
+          config: FlagsmithConfig(
+            baseURI: flagSmithConfig!['url'].toString(),
+          ),
+          apiKey: flagSmithConfig!['apiKey'].toString());
 
-
-    String doubleName = await getDoubleName();
-
-    if(doubleName != null) {
-      FeatureUser user = FeatureUser(identifier: doubleName);
-
-      try {
-        await client.getFeatureFlags(user: user, reload: true);
-      }
-
-      catch(e) {
-        print(e);
-        throw Exception();
-      }
+      await client?.getFeatureFlags(reload: true);
+    } catch (e) {
+      print(e);
+      setFallbackConfigs();
     }
+  }
+
+  Future<void> getNewFlagValues() async {
+    await client?.getFeatureFlags(reload: true);
   }
 
   Future<void> setFlagSmithDefaultValues() async {
-    Globals().isOpenKYCEnabled = await Flags().hasFlagValueByFeatureName('kyc');
-    Globals().isYggdrasilEnabled = await Flags().hasFlagValueByFeatureName('yggdrasil');
-    Globals().debugMode = await Flags().hasFlagValueByFeatureName('debug');
-    Globals().useNewWallet = await Flags().hasFlagValueByFeatureName('use-new-wallet');
-    Globals().newWalletUrl = await Flags().getFlagValueByFeatureName('new-wallet-url');
-    Globals().redoIdentityVerification = await Flags().hasFlagValueByFeatureName('redo-identity-verification');
+    try {
+      await client?.getFeatureFlags(reload: true);
+
+      Globals().isOpenKYCEnabled = (await Flags().hasFlagValueByFeatureName('kyc'))!;
+      Globals().isYggdrasilEnabled = (await Flags().hasFlagValueByFeatureName('yggdrasil'))!;
+      Globals().debugMode = (await Flags().hasFlagValueByFeatureName('debug'))!;
+      Globals().useNewWallet = (await Flags().hasFlagValueByFeatureName('use-new-wallet'))!;
+      Globals().newWalletUrl = (await Flags().getFlagValueByFeatureName('new-wallet-url'))!;
+      Globals().redoIdentityVerification =
+          (await Flags().hasFlagValueByFeatureName('redo-identity-verification'))!;
+    } catch (e) {
+      print(e);
+    }
   }
 
-  Future<bool> hasFlagValueByFeatureName(String name) async {
-    if (client != null) {
-      return (await client.hasFeatureFlag(name));
-    }
-
-    return false;
+  Future<bool?> hasFlagValueByFeatureName(String name) async {
+    return (await client?.hasFeatureFlag(name));
   }
 
-  Future<String> getFlagValueByFeatureName(String name) async {
-    if (client != null) {
-      return (await client.getFeatureFlagValue(name));
-    }
+  Future<bool?> isFlagEnabled(String name) async {
+    return (await client?.isFeatureFlagEnabled(name));
+  }
 
-    return '';
+  Future<String?> getFlagValueByFeatureName(String name) async {
+    return (await client?.getFeatureFlagValue(name));
+  }
+
+  Future<String?> getGlobalFlagValue(String name) async {
+    return (await client?.getFeatureFlagValue(name));
   }
 
   factory Flags() {

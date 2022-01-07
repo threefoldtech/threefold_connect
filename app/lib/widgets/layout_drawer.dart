@@ -12,7 +12,7 @@ import 'package:convert/convert.dart';
 import '../app_config.dart';
 
 class LayoutDrawer extends StatefulWidget {
-  LayoutDrawer({@required this.titleText, @required this.content});
+  LayoutDrawer({required this.titleText, required this.content});
 
   final String titleText;
   final Widget content;

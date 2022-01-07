@@ -2,7 +2,7 @@ import 'package:threebotlogin/helpers/env_config.dart';
 import 'package:threebotlogin/helpers/environment.dart';
 
 class NewsConfig extends EnvConfig {
-  NewsConfigImpls impl;
+  late NewsConfigImpls impl;
 
   NewsConfig() {
     if (environment == Environment.Staging) {

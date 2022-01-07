@@ -15,10 +15,10 @@ String randomString(int strlen) {
   return result;
 }
 
-bool validateEmail(String value) {
+bool validateEmail(String? value) {
   RegExp regex = new RegExp(
       r"^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,253}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,253}[a-zA-Z0-9])?)*$");
-  return regex.hasMatch(value);
+  return regex.hasMatch(value.toString());
 }
 
 bool validateSeedWords(String seed, String confirmationWords) {
@@ -39,12 +39,12 @@ bool validateSeedWords(String seed, String confirmationWords) {
 
 bool validateDoubleName(String value) {
   Pattern pattern = r'^[a-zA-Z0-9]+$';
-  RegExp regex = new RegExp(pattern);
+  RegExp regex = new RegExp(pattern.toString());
 
   if (!regex.hasMatch(value)) {
     return false;
   }
-  
+
   return true;
 }
 
@@ -59,4 +59,10 @@ bool isJson(String str) {
     return false;
   }
   return true;
+}
+
+extension BoolParsing on String {
+  bool parseBool() {
+    return this.toLowerCase() == 'true';
+  }
 }

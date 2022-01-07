@@ -1,7 +1,3 @@
-import 'dart:convert';
-
-import 'package:threebotlogin/helpers/globals.dart';
-
 String getFullNameOfObject(Map<String, dynamic> identityName) {
 
   String firstName = identityName['first_name'] != null ? identityName['first_name'] : '';

@@ -2,22 +2,22 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
 class CustomDialog extends StatefulWidget {
-  //@todo this is used for everything, just seems like a very bad idea. Make dialogs for the seperate things. Maybe a popup dialog with info ok/cancel and other dialogs for eg pin entry
-  final String description;
-  final Widget widgetDescription;
-  final List<Widget> actions;
+  final String? description;
+  final Widget? widgetDescription;
+  final List<Widget>? actions;
   final String title;
   final IconData image;
   final dynamic hiddenaction;
 
   CustomDialog({
-    @required this.title,
-    @required this.description,
+    required this.title,
+    this.description,
     this.widgetDescription,
     this.actions,
     this.image = Icons.person,
     this.hiddenaction,
   });
+
   show(context) {
     return showDialog(
       context: context,
@@ -120,8 +120,7 @@ class _CustomDialogState extends State<CustomDialog> {
 
   card(context) {
     return ConstrainedBox(
-      constraints:
-          BoxConstraints(maxHeight: double.infinity, maxWidth: double.infinity),
+      constraints: BoxConstraints(maxHeight: double.infinity, maxWidth: double.infinity),
       child: Container(
         padding: EdgeInsets.only(top: 30.0 + 20.0),
         margin: EdgeInsets.only(top: 30.0),
@@ -159,14 +158,14 @@ class _CustomDialogState extends State<CustomDialog> {
                 padding: EdgeInsets.symmetric(horizontal: 5.0),
                 child: (widget.widgetDescription == null)
                     ? Text(
-                        widget.description,
+                        widget.description!,
                         textAlign: TextAlign.center,
                       )
                     : widget.widgetDescription,
               ),
             ),
             SizedBox(height: 24.0),
-            widget.actions != null && widget.actions.length > 0
+            widget.actions != null && widget.actions!.length > 0
                 ? Container(
                     decoration: new BoxDecoration(
                       color: Theme.of(context).scaffoldBackgroundColor,
@@ -184,7 +183,7 @@ class _CustomDialogState extends State<CustomDialog> {
                     ),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: widget.actions,
+                      children: widget.actions!,
                     ),
                   )
                 : Container()

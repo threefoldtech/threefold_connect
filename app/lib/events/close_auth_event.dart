@@ -1,5 +1,5 @@
 class CloseAuthEvent {
-  bool close;
+  bool? close;
 
   CloseAuthEvent({this.close});
 }

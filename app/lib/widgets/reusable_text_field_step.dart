@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 
 class ReuseableTextFieldStep extends StatelessWidget {
   ReuseableTextFieldStep(
-      {@required this.titleText,
-      @required this.labelText,
-      @required this.focusNode,
-      @required this.controller,
-      @required this.typeText,
-      @required this.errorStepperText,
+      {required this.titleText,
+      required this.labelText,
+      required this.focusNode,
+      required this.controller,
+      required this.typeText,
+      required this.errorStepperText,
       this.suffixText});
 
   final String titleText;
@@ -15,7 +15,7 @@ class ReuseableTextFieldStep extends StatelessWidget {
   final String errorStepperText;
   final FocusNode focusNode;
   final TextEditingController controller;
-  final String suffixText;
+  final String? suffixText;
   final TextInputType typeText;
 
   @override

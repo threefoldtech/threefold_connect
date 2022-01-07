@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 
 class ReuseableTextStep extends StatelessWidget {
   ReuseableTextStep(
-      {@required this.titleText,
-      @required this.extraText,
-      @required this.errorStepperText});
+      {required this.titleText,
+      required this.extraText,
+      required this.errorStepperText});
 
   final String titleText;
   final String extraText;

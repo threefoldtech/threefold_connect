@@ -7,7 +7,6 @@ import 'package:threebotlogin/services/migration_service.dart';
 import 'package:threebotlogin/services/shared_preference_service.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import 'helpers/flags.dart';
 import 'helpers/kyc_helpers.dart';
 
 
@@ -15,7 +14,7 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
   bool initDone = await getInitDone();
-  String doubleName = await getDoubleName();
+  String? doubleName = await getDoubleName();
 
   await setGlobalValues();
 
@@ -30,8 +29,8 @@ Future<void> main() async {
 }
 
 Future<void> setGlobalValues() async {
-  Map<String, Object> email = await getEmail();
-  Map<String, Object> phone = await getPhone();
+  Map<String, String?> email = await getEmail();
+  Map<String, String?> phone = await getPhone();
   Map<String, dynamic> identity = await getIdentity();
 
   Globals().emailVerified.value = (email['sei'] != null);
@@ -41,10 +40,10 @@ Future<void> setGlobalValues() async {
 }
 
 class MyApp extends StatelessWidget {
-  MyApp({this.initDone, this.doubleName, this.registered});
+  MyApp({required this.initDone, this.doubleName, required this.registered});
 
   final bool initDone;
-  final String doubleName;
+  final String? doubleName;
   final bool registered;
 
   @override

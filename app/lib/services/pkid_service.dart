@@ -7,8 +7,6 @@ import 'package:threebotlogin/services/shared_preference_service.dart';
 import '../app_config.dart';
 import 'crypto_service.dart';
 
-
-
 Future<FlutterPkid> getPkidClient() async {
   String pKidUrl = AppConfig().pKidUrl();
 
@@ -18,77 +16,82 @@ Future<FlutterPkid> getPkidClient() async {
   return FlutterPkid(pKidUrl, keyPair);
 }
 
-
-
-
 Future<void> saveEmailToPKidForMigration() async {
-  Map<String, dynamic> keyPair = await generateKeyPairFromSeedPhrase(await getPhrase());
-  var client = FlutterPkid(pkidUrl, keyPair);
+  FlutterPkid client = await getPkidClient();
 
-  Map<String, Object> email = await getEmail();
-  var emailPKidResult = await client.getPKidDoc('email', keyPair);
+  Map<String, String?> email = await getEmail();
+  var emailPKidResult = await client.getPKidDoc('email');
 
   if (!emailPKidResult.containsKey('success') && email['email'] != null) {
     if (email['sei'] != null) {
-      return client.setPKidDoc('email', json.encode({'email': email['email'], 'sei': email['sei']}), keyPair);
+      await client.setPKidDoc('email', json.encode({'email': email['email'], 'sei': email['sei']}));
+      return;
     }
 
     if (email['email'] != null) {
-      return client.setPKidDoc('email', json.encode({'email': email['email']}), keyPair);
+      await client.setPKidDoc('email', json.encode({'email': email['email']}));
+      return;
     }
   }
 }
 
 Future<void> savePhoneToPKidForMigration() async {
-  Map<String, dynamic> keyPair = await generateKeyPairFromSeedPhrase(await getPhrase());
-  var client = FlutterPkid(pkidUrl, keyPair);
+  FlutterPkid client = await getPkidClient();
 
-  Map<String, Object> phone = await getPhone();
-  var phonePKidResult = await client.getPKidDoc('phone', keyPair);
+  Map<String, String?> phone = await getPhone();
+  var phonePKidResult = await client.getPKidDoc('phone');
+
   if (!phonePKidResult.containsKey('success') && phone['phone'] != null) {
     if (phone['spi'] != null) {
-      return client.setPKidDoc('phone', json.encode({'phone': phone['phone'], 'spi': phone['spi']}), keyPair);
+      await client.setPKidDoc('phone', json.encode({'phone': phone['phone'], 'spi': phone['spi']}));
+      return;
     }
 
     if (phone['phone'] != null) {
-      return client.setPKidDoc('phone', json.encode({'phone': phone}), keyPair);
+      await client.setPKidDoc('phone', json.encode({'phone': phone}));
+      return;
     }
   }
 }
 
 Future<void> saveEmailToPKid() async {
-  Map<String, dynamic> keyPair = await generateKeyPairFromSeedPhrase(await getPhrase());
-  var client = FlutterPkid(pkidUrl, keyPair);
+  FlutterPkid client = await getPkidClient();
 
-  Map<String, Object> email = await getEmail();
+  Map<String, String?> email = await getEmail();
 
   if (email['sei'] != null) {
-    return client.setPKidDoc('email', json.encode({'email': email['email'], 'sei': email['sei']}), keyPair);
+    await client.setPKidDoc('email', json.encode({'email': email['email'], 'sei': email['sei']}));
+    return;
   }
 
   if (email['email'] != null) {
-    return client.setPKidDoc('email', json.encode({'email': email['email']}), keyPair);
+    await client.setPKidDoc('email', json.encode({'email': email['email']}));
+    return;
+  }
+}
+
+Future<void> savePhoneToPKid() async {
+  FlutterPkid client = await getPkidClient();
+
+  Map<String, String?> phone = await getPhone();
+
+  if (phone['spi'] != null) {
+    await client.setPKidDoc('phone', json.encode({'phone': phone['phone'], 'spi': phone['spi']}));
+    return;
+  }
+
+  if (phone['phone'] != null) {
+    await client.setPKidDoc('phone', json.encode({'phone': phone['phone']}));
+    return;
   }
 }
 
 Future<dynamic> getEmailFromPKid() async {
-  Map<String, dynamic> keyPair = await generateKeyPairFromSeedPhrase(await getPhrase());
-  var client = FlutterPkid(pkidUrl, keyPair);
-  return await client.getPKidDoc('email', keyPair);
+  FlutterPkid client = await getPkidClient();
+  return await client.getPKidDoc('email');
 }
 
-Future<void> savePhoneToPKid() async {
-  Map<String, dynamic> keyPair = await generateKeyPairFromSeedPhrase(await getPhrase());
-  var client = FlutterPkid(pkidUrl, keyPair);
-
-  Map<String, Object> phone = await getPhone();
-
-  if (phone['spi'] != null) {
-    return client.setPKidDoc('phone', json.encode({'phone': phone['phone'], 'spi': phone['spi']}), keyPair);
-  }
-
-  if (phone['phone'] != null) {
-    return client.setPKidDoc('phone', json.encode({'phone': phone['phone']}), keyPair);
-  }
+Future<dynamic> getPhoneFromPkid() async {
+  FlutterPkid client = await getPkidClient();
+  return await client.getPKidDoc('phone');
 }
-

@@ -2,8 +2,10 @@ import 'package:threebotlogin/app_config_local.dart';
 import 'package:threebotlogin/helpers/env_config.dart';
 import 'package:threebotlogin/helpers/environment.dart';
 
+import 'helpers/globals.dart';
+
 class AppConfig extends EnvConfig {
-  AppConfigImpl appConfig;
+  late AppConfigImpl appConfig;
 
   AppConfig() {
     if (environment == Environment.Staging) {
@@ -17,7 +19,7 @@ class AppConfig extends EnvConfig {
     }
   }
 
-  String baseUrl() {
+  String? baseUrl() {
     return appConfig.baseUrl();
   }
 
@@ -177,4 +179,15 @@ class AppConfigTesting extends AppConfigImpl {
       'apiKey': 'VtTsMwJwiF69QWFWHGEMKM'
     };
   }
+}
+
+void setFallbackConfigs() {
+  print("Can't connect to FlagSmith, setting default configs... ");
+
+  Globals().isOpenKYCEnabled = false;
+  Globals().isYggdrasilEnabled = false;
+  Globals().debugMode = false;
+  Globals().useNewWallet = false;
+  Globals().newWalletUrl = '';
+  Globals().redoIdentityVerification = false;
 }

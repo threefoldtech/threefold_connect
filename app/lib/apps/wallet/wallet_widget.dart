@@ -24,14 +24,14 @@ class WalletWidget extends StatefulWidget {
 }
 
 class _WalletState extends State<WalletWidget> with AutomaticKeepAliveClientMixin {
-  InAppWebViewController webView;
+  late InAppWebViewController webView;
+  late InAppWebView iaWebView;
 
   double progress = 0;
   var config = WalletConfig();
-  InAppWebView iaWebView;
 
   _back(WalletBackEvent event) async {
-    Uri url = await webView.getUrl();
+    Uri? url = await webView.getUrl();
     print(url.toString());
     String endsWith = config.appId() + '/';
     if (url.toString().endsWith(endsWith)) {
@@ -42,7 +42,8 @@ class _WalletState extends State<WalletWidget> with AutomaticKeepAliveClientMixi
   }
 
   _WalletState() {
-    String walletUri = Globals().useNewWallet == true ? Globals().newWalletUrl : 'https://${config.appId()}/init';
+    String walletUri =
+        Globals().useNewWallet == true ? Globals().newWalletUrl : 'https://${config.appId()}/init';
 
     iaWebView = InAppWebView(
       initialUrlRequest: URLRequest(
@@ -50,14 +51,17 @@ class _WalletState extends State<WalletWidget> with AutomaticKeepAliveClientMixi
               walletUri + '?cache_buster=' + new DateTime.now().millisecondsSinceEpoch.toString())),
       initialOptions: InAppWebViewGroupOptions(
           crossPlatform: InAppWebViewOptions(),
-          android: AndroidInAppWebViewOptions(supportMultipleWindows: true, thirdPartyCookiesEnabled: true),
+          android: AndroidInAppWebViewOptions(
+              supportMultipleWindows: true, thirdPartyCookiesEnabled: true),
           ios: IOSInAppWebViewOptions()),
       onWebViewCreated: (InAppWebViewController controller) {
         webView = controller;
         this.addHandler();
       },
-      onCreateWindow: (InAppWebViewController controller, CreateWindowAction req) {},
-      onLoadStop: (InAppWebViewController controller, Uri url) async {
+      onCreateWindow: (InAppWebViewController controller, CreateWindowAction req) {
+        return Future.value(true);
+      },
+      onLoadStop: (InAppWebViewController controller, Uri? url) async {
         addClipboardHandlersOnly(controller);
         if (url.toString().contains('/init')) {
           initKeys();
@@ -114,7 +118,7 @@ class _WalletState extends State<WalletWidget> with AutomaticKeepAliveClientMixi
     // QRCode scanner is black if we don't sleep here.
     bool slept = await Future.delayed(const Duration(milliseconds: 400), () => true);
 
-    String result;
+    String result = '';
     if (slept) {
       result = await Navigator.push(context, MaterialPageRoute(builder: (context) => ScanScreen()));
     }

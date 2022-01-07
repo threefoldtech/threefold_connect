@@ -6,11 +6,12 @@ import 'package:threebotlogin/events/go_home_event.dart';
 import 'package:threebotlogin/services/shared_preference_service.dart';
 
 class Chatbot implements App {
-  ChatbotWidget _widget;
+  late ChatbotWidget _widget;
 
   Future<Widget> widget() async {
-    var email = await getEmail();
-    this._widget = ChatbotWidget(email: email['email']);
+    Map<String, String?> email = await getEmail();
+    String emailAddress = email['email'].toString();
+    this._widget = ChatbotWidget(email: emailAddress);
     return this._widget;
   }
 

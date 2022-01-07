@@ -4,7 +4,8 @@ class VpnState {
   VpnState() {
     plugin = new YggdrasilPlugin();
   }
-  YggdrasilPlugin plugin;
+
+  YggdrasilPlugin plugin = new YggdrasilPlugin();
 
   bool vpnConnected = false;
   String ipAddress = "";

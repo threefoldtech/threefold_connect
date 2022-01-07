@@ -6,13 +6,12 @@ import 'package:threebotlogin/apps/wallet/wallet_config.dart';
 import 'package:threebotlogin/models/scope.dart';
 import 'package:threebotlogin/models/wallet_data.dart';
 import 'package:threebotlogin/services/shared_preference_service.dart';
-import 'package:threebotlogin/widgets/custom_dialog.dart';
 
 class PreferenceDialog extends StatefulWidget {
-  final Scope scope;
-  final String appId;
-  final Function callback;
-  final String type;
+  final Scope? scope;
+  final String? appId;
+  final Function? callback;
+  final String? type;
 
   PreferenceDialog({this.scope, this.appId, this.callback, this.type});
 
@@ -22,13 +21,13 @@ class PreferenceDialog extends StatefulWidget {
 class _PreferenceDialogState extends State<PreferenceDialog> {
   bool _canRender = false;
 
-  Map<String, dynamic> scopeAsMap;
-  Map<String, dynamic> previousSelectedScope;
+  Map<String, dynamic> scopeAsMap = {};
+  Map<String, dynamic> previousSelectedScope = {};
 
-  List<WalletData> wallets;
-  List<DropdownMenuItem<String>> _menuItems;
+  List<WalletData> wallets = [];
+  List<DropdownMenuItem<String>> _menuItems = [];
 
-  String _selectedItem;
+  String _selectedItem = '';
 
   var config = WalletConfig();
 
@@ -49,27 +48,31 @@ class _PreferenceDialogState extends State<PreferenceDialog> {
 
   Future _startup() async {
     if (widget.scope != null) {
-      scopeAsMap = widget.scope.toJson(); // Scope we received from the application the users wants to log into.
+      scopeAsMap = widget.scope!
+          .toJson(); // Scope we received from the application the users wants to log into.
 
-      String previousScopePermissions =
-          await getPreviousScopePermissions(widget.appId); // Scope from our history based on the appId.
+      String? previousScopePermissions = await getPreviousScopePermissions(
+          widget.appId!); // Scope from our history based on the appId.
       Map<String, dynamic> previousScopePermissionsObject;
 
       if (previousScopePermissions != null) {
         previousScopePermissionsObject = jsonDecode(previousScopePermissions);
       } else {
-        previousScopePermissionsObject = widget.scope.toJson();
-        await savePreviousScopePermissions(widget.appId, jsonEncode(previousScopePermissionsObject));
+        previousScopePermissionsObject = widget.scope!.toJson();
+        await savePreviousScopePermissions(
+            widget.appId!, jsonEncode(previousScopePermissionsObject));
       }
 
       if (!scopeIsEqual(scopeAsMap, previousScopePermissionsObject)) {
-        previousScopePermissionsObject = widget.scope.toJson();
-        await savePreviousScopePermissions(widget.appId, jsonEncode(previousScopePermissionsObject));
+        previousScopePermissionsObject = widget.scope!.toJson();
+        await savePreviousScopePermissions(
+            widget.appId!, jsonEncode(previousScopePermissionsObject));
       }
 
-      previousSelectedScope = (previousScopePermissionsObject == null) ? scopeAsMap : previousScopePermissionsObject;
+      previousSelectedScope =
+          (previousScopePermissionsObject == null) ? scopeAsMap : previousScopePermissionsObject;
     } else {
-      await savePreviousScopePermissions(widget.appId, null);
+      await savePreviousScopePermissions(widget.appId!, null);
     }
   }
 
@@ -99,7 +102,7 @@ class _PreferenceDialogState extends State<PreferenceDialog> {
 
   void toggleScope(String scopeItem, value) async {
     previousSelectedScope[scopeItem] = value;
-    await savePreviousScopePermissions(widget.appId, jsonEncode(previousSelectedScope));
+    await savePreviousScopePermissions(widget.appId!, jsonEncode(previousSelectedScope));
 
     setState(() {});
   }
@@ -107,20 +110,19 @@ class _PreferenceDialogState extends State<PreferenceDialog> {
   void initializeDropDown() {
     getWallets().then((value) {
       setState(() {
-        if (value != null && value.length != 0) {
+        if (value.length != 0) {
           wallets = value;
-          if(wallets.length != 0){
+          if (wallets.length != 0) {
             _selectedItem = wallets[0].address;
             toggleScope('walletAddressData', _selectedItem);
             _menuItems = List.generate(
               wallets.length,
-                  (i) => DropdownMenuItem(
+              (i) => DropdownMenuItem(
                 value: wallets[i].address,
                 child: Text("${wallets[i].name}"),
               ),
             );
-          }
-          else {
+          } else {
             _menuItems = [];
           }
         }
@@ -166,14 +168,15 @@ class _PreferenceDialogState extends State<PreferenceDialog> {
                                   value: (previousSelectedScope[scopeItem] == null)
                                       ? mandatory
                                       : previousSelectedScope[scopeItem],
-                                  onChanged: ((mandatory == null || mandatory == true)
+                                  onChanged: ((mandatory == true)
                                       ? null
                                       : (value) {
                                           toggleScope(scopeItem, value);
                                         }),
                                   title: Text(
                                     "${scopeItem.toUpperCase()}" + (mandatory ? " *" : ""),
-                                    style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
+                                    style:
+                                        TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
                                   ),
                                 ),
                               );
@@ -201,14 +204,15 @@ class _PreferenceDialogState extends State<PreferenceDialog> {
                                   value: (previousSelectedScope[scopeItem] == null)
                                       ? mandatory
                                       : previousSelectedScope[scopeItem],
-                                  onChanged: ((mandatory == null || mandatory == true)
+                                  onChanged: ((mandatory == true)
                                       ? null
                                       : (value) {
                                           toggleScope(scopeItem, value);
                                         }),
                                   title: Text(
                                     "${scopeItem.toUpperCase()}" + (mandatory ? " *" : ""),
-                                    style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
+                                    style:
+                                        TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
                                   ),
                                 ),
                               );
@@ -231,7 +235,7 @@ class _PreferenceDialogState extends State<PreferenceDialog> {
                             value: (previousSelectedScope[scopeItem] == null)
                                 ? mandatory
                                 : previousSelectedScope[scopeItem],
-                            onChanged: ((mandatory == null || mandatory == true)
+                            onChanged: ((mandatory == true)
                                 ? null
                                 : (value) {
                                     toggleScope(scopeItem, value);
@@ -253,14 +257,15 @@ class _PreferenceDialogState extends State<PreferenceDialog> {
                                   value: (previousSelectedScope[scopeItem] == null)
                                       ? mandatory
                                       : previousSelectedScope[scopeItem],
-                                  onChanged: ((mandatory == null || mandatory == true)
+                                  onChanged: ((mandatory == true)
                                       ? null
                                       : (value) {
                                           toggleScope(scopeItem, value);
                                         }),
                                   title: Text(
                                     "PHONE NUMBER" + (mandatory ? " *" : ""),
-                                    style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
+                                    style:
+                                        TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
                                   ),
                                 ),
                                 decoration: BoxDecoration(
@@ -279,7 +284,7 @@ class _PreferenceDialogState extends State<PreferenceDialog> {
                         break;
                       case "derivedSeed":
                         return FutureBuilder(
-                          future: getDerivedSeed(widget.appId),
+                          future: getDerivedSeed(widget.appId!),
                           builder: (BuildContext context, AsyncSnapshot snapshot) {
                             if (snapshot.hasData) {
                               return Container(
@@ -294,14 +299,15 @@ class _PreferenceDialogState extends State<PreferenceDialog> {
                                   value: (previousSelectedScope[scopeItem] == null)
                                       ? mandatory
                                       : previousSelectedScope[scopeItem],
-                                  onChanged: ((mandatory == null || mandatory == true)
+                                  onChanged: ((mandatory == true)
                                       ? null
                                       : (value) {
                                           toggleScope(scopeItem, value);
                                         }),
                                   title: Text(
                                     "${scopeItem.toUpperCase()}" + (mandatory ? " *" : ""),
-                                    style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
+                                    style:
+                                        TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
                                   ),
                                 ),
                               );
@@ -329,14 +335,15 @@ class _PreferenceDialogState extends State<PreferenceDialog> {
                                   value: (previousSelectedScope[scopeItem] == null)
                                       ? mandatory
                                       : previousSelectedScope[scopeItem],
-                                  onChanged: ((mandatory == null || mandatory == true)
+                                  onChanged: ((mandatory == true)
                                       ? null
                                       : (value) {
                                           toggleScope(scopeItem, value);
                                         }),
                                   title: Text(
                                     "NAME (IDENTITY)" + (mandatory ? " *" : ""),
-                                    style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
+                                    style:
+                                        TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
                                   ),
                                 ),
                               );
@@ -364,14 +371,15 @@ class _PreferenceDialogState extends State<PreferenceDialog> {
                                   value: (previousSelectedScope[scopeItem] == null)
                                       ? mandatory
                                       : previousSelectedScope[scopeItem],
-                                  onChanged: ((mandatory == null || mandatory == true)
+                                  onChanged: ((mandatory == true)
                                       ? null
                                       : (value) {
                                           toggleScope(scopeItem, value);
                                         }),
                                   title: Text(
                                     "DATE OF BIRTH (IDENTITY)" + (mandatory ? " *" : ""),
-                                    style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
+                                    style:
+                                        TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
                                   ),
                                 ),
                               );
@@ -399,14 +407,15 @@ class _PreferenceDialogState extends State<PreferenceDialog> {
                                   value: (previousSelectedScope[scopeItem] == null)
                                       ? mandatory
                                       : previousSelectedScope[scopeItem],
-                                  onChanged: ((mandatory == null || mandatory == true)
+                                  onChanged: ((mandatory == true)
                                       ? null
                                       : (value) {
                                           toggleScope(scopeItem, value);
                                         }),
                                   title: Text(
                                     "GENDER (IDENTITY)" + (mandatory ? " *" : ""),
-                                    style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
+                                    style:
+                                        TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
                                   ),
                                 ),
                               );
@@ -434,14 +443,15 @@ class _PreferenceDialogState extends State<PreferenceDialog> {
                                   value: (previousSelectedScope[scopeItem] == null)
                                       ? mandatory
                                       : previousSelectedScope[scopeItem],
-                                  onChanged: ((mandatory == null || mandatory == true)
+                                  onChanged: ((mandatory == true)
                                       ? null
                                       : (value) {
                                           toggleScope(scopeItem, value);
                                         }),
                                   title: Text(
                                     "DOCUMENT META DATA (IDENTITY)" + (mandatory ? " *" : ""),
-                                    style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
+                                    style:
+                                        TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
                                   ),
                                 ),
                               );
@@ -469,14 +479,15 @@ class _PreferenceDialogState extends State<PreferenceDialog> {
                                   value: (previousSelectedScope[scopeItem] == null)
                                       ? mandatory
                                       : previousSelectedScope[scopeItem],
-                                  onChanged: ((mandatory == null || mandatory == true)
+                                  onChanged: ((mandatory == true)
                                       ? null
                                       : (value) {
                                           toggleScope(scopeItem, value);
                                         }),
                                   title: Text(
                                     "COUNTRY (IDENTITY)" + (mandatory ? " *" : ""),
-                                    style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
+                                    style:
+                                        TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
                                   ),
                                 ),
                               );
@@ -491,7 +502,7 @@ class _PreferenceDialogState extends State<PreferenceDialog> {
                         return FutureBuilder(
                             future: getWallets(),
                             builder: (BuildContext context, AsyncSnapshot snapshot) {
-                              if (!snapshot.hasData || wallets == null) {
+                              if (!snapshot.hasData) {
                                 return Container(
                                     decoration: BoxDecoration(
                                       border: Border(
@@ -507,9 +518,12 @@ class _PreferenceDialogState extends State<PreferenceDialog> {
                                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                           children: [
                                             Text(
-                                              "${scopeItem.toUpperCase()}" + (mandatory ? " *" : ""),
+                                              "${scopeItem.toUpperCase()}" +
+                                                  (mandatory ? " *" : ""),
                                               style: TextStyle(
-                                                  fontWeight: FontWeight.bold, color: Colors.black, fontSize: 16),
+                                                  fontWeight: FontWeight.bold,
+                                                  color: Colors.black,
+                                                  fontSize: 16),
                                             ),
                                             Icon(
                                               Icons.warning,
@@ -531,7 +545,7 @@ class _PreferenceDialogState extends State<PreferenceDialog> {
                                     ));
                               }
 
-                              if (wallets != null && _selectedItem != null) {
+                              if (wallets != null) {
                                 return Container(
                                   decoration: BoxDecoration(
                                     border: Border(
@@ -552,14 +566,16 @@ class _PreferenceDialogState extends State<PreferenceDialog> {
                                             value: (previousSelectedScope[scopeItem] == null)
                                                 ? mandatory
                                                 : previousSelectedScope[scopeItem],
-                                            onChanged: ((mandatory == null || mandatory == true)
+                                            onChanged: ((mandatory == true)
                                                 ? null
                                                 : (value) {
                                                     toggleScope(scopeItem, value);
                                                   }),
                                             title: Text(
-                                              "${scopeItem.toUpperCase()}" + (mandatory ? " *" : ""),
-                                              style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
+                                              "${scopeItem.toUpperCase()}" +
+                                                  (mandatory ? " *" : ""),
+                                              style: TextStyle(
+                                                  fontWeight: FontWeight.bold, color: Colors.black),
                                             ),
                                           ))
                                         ],
@@ -578,7 +594,7 @@ class _PreferenceDialogState extends State<PreferenceDialog> {
                                                     onChanged: (value) {
                                                       setState(() {
                                                         toggleScope('walletAddressData', value);
-                                                        _selectedItem = value;
+                                                        _selectedItem = value!;
                                                       });
                                                     }),
                                               ))
