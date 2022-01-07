@@ -19,8 +19,8 @@ import 'package:threebotlogin/widgets/error_widget.dart';
 import 'package:uni_links/uni_links.dart';
 
 class MainScreen extends StatefulWidget {
-  final bool initDone;
-  final bool registered;
+  final bool? initDone;
+  final bool? registered;
 
   MainScreen({this.initDone, this.registered});
 
@@ -29,17 +29,17 @@ class MainScreen extends StatefulWidget {
 }
 
 class _AppState extends State<MainScreen> {
-  StreamSubscription _sub;
-  String initialLink;
+  StreamSubscription? _sub;
+  String? initialLink;
   // FirebaseNotificationListener _listener;
-  BackendConnection _backendConnection;
+  late BackendConnection _backendConnection;
 
   @override
   void initState() {
     super.initState();
     Events().reset();
     // _listener = FirebaseNotificationListener();
-    WidgetsBinding.instance.addPostFrameCallback((_) => pushScreens());
+    WidgetsBinding.instance?.addPostFrameCallback((_) => pushScreens());
   }
 
   @override
@@ -64,7 +64,7 @@ class _AppState extends State<MainScreen> {
     await checkIfAppIsUpToDate();
 
     try {
-      await Flags().initialiseFlagSmith();
+      await Flags().initFlagSmith();
       await Flags().setFlagSmithDefaultValues();
 
     } catch (e) {
@@ -81,7 +81,7 @@ class _AppState extends State<MainScreen> {
       }
     }
 
-    if (widget.initDone != null && !widget.initDone) {
+    if (widget.initDone != null && !widget.initDone!) {
       InitScreen init = InitScreen();
       bool accepted = false;
       while (!accepted) {
@@ -89,19 +89,19 @@ class _AppState extends State<MainScreen> {
       }
     }
 
-    if (!widget.registered) {
+    if (!widget.registered!) {
       await Navigator.push(context, MaterialPageRoute(builder: (context) => UnregisteredScreen()));
     }
 
     await Globals().router.init();
 
-    _backendConnection = BackendConnection(await getDoubleName());
+    _backendConnection = BackendConnection((await getDoubleName())!);
     _backendConnection.init();
 
     await initUniLinks();
 
     if (_sub != null) {
-      _sub.cancel();
+      _sub?.cancel();
     }
 
     await Navigator.pushReplacement(
@@ -287,7 +287,7 @@ class _AppState extends State<MainScreen> {
     initialLink = await getInitialLink();
 
     // Doesn't seem needed in this scenario. Might be removed in the future.
-    _sub = getLinksStream().listen((String incomingLink) {
+    _sub = getLinksStream().listen((String? incomingLink) {
       if (!mounted) {
         return;
       }

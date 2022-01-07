@@ -19,7 +19,7 @@ class AppConfig extends EnvConfig {
     }
   }
 
-  String? baseUrl() {
+  String baseUrl() {
     return appConfig.baseUrl();
   }
 

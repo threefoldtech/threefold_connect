@@ -28,41 +28,42 @@ import 'package:threebotlogin/services/shared_preference_service.dart';
 import 'package:threebotlogin/widgets/email_verification_needed.dart';
 import 'package:uni_links/uni_links.dart';
 
-/* Screen shows tabbar and all pages defined in router.dart */
+/* Screen shows tab bar and all pages defined in router.dart */
 class HomeScreen extends StatefulWidget {
-  final String initialLink;
-  final BackendConnection backendConnection;
+  final String? initialLink;
+  final BackendConnection? backendConnection;
 
   HomeScreen({this.initialLink, this.backendConnection});
 
   _HomeScreenState createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver, SingleTickerProviderStateMixin {
+class _HomeScreenState extends State<HomeScreen>
+    with WidgetsBindingObserver, SingleTickerProviderStateMixin {
   Globals globals = Globals();
-  StreamSubscription _sub;
-  String initialLink;
+  StreamSubscription? _sub;
+  String? initialLink;
   bool timeoutExpiredInBackground = true;
   bool pinCheckOpen = false;
   int lastCheck = 0;
   final int pinCheckTimeout = 60000 * 5;
 
   _HomeScreenState() {
-    globals.tabController =
-        NoAnimationTabController(initialIndex: 0, length: Globals().router.routes.length, vsync: this);
+    globals.tabController = NoAnimationTabController(
+        initialIndex: 0, length: Globals().router.routes.length, vsync: this);
     //Events().onEvent(FfpBrowseEvent().runtimeType, activateFfpTab);
     globals.tabController.addListener(_handleTabSelection);
   }
 
   void checkPinAndNavigateIfSuccess(int indexIfAuthIsSuccess) async {
-    String pin = await getPin();
+    String? pin = await getPin();
     pinCheckOpen = true;
 
-    bool authenticated = await Navigator.push(
+    bool? authenticated = await Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => AuthenticationScreen(
-          correctPin: pin,
+          correctPin: pin!,
           userMessage: "access the wallet.",
         ),
       ),
@@ -82,14 +83,17 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver, Si
       return;
     }
 
-    if (Globals().router.pinRequired(globals.tabController.index) && timeoutExpiredInBackground && !pinCheckOpen) {
+    if (Globals().router.pinRequired(globals.tabController.index) &&
+        timeoutExpiredInBackground &&
+        !pinCheckOpen) {
       int authenticatedAppIndex = globals.tabController.index;
       globals.tabController.animateTo(globals.tabController.previousIndex);
 
       checkPinAndNavigateIfSuccess(authenticatedAppIndex);
     }
 
-    if (Globals().router.emailMustBeVerified(globals.tabController.index) && !Globals().emailVerified.value) {
+    if (Globals().router.emailMustBeVerified(globals.tabController.index) &&
+        !Globals().emailVerified.value) {
       globals.tabController.animateTo(globals.tabController.previousIndex);
       await emailVerificationDialog(context);
     }
@@ -152,7 +156,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver, Si
     });
 
     Events().onEvent(NewLoginEvent().runtimeType, (NewLoginEvent event) {
-      openLogin(context, event.loginData, widget.backendConnection);
+      openLogin(context, event.loginData!, widget.backendConnection!);
     });
 
     Events().onEvent(EmailEvent().runtimeType, (EmailEvent event) {
@@ -162,7 +166,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver, Si
     Events().onEvent(IdentityCallbackEvent().runtimeType, (IdentityCallbackEvent event) async {
       Future(() {
         globals.tabController.animateTo(0, duration: Duration(seconds: 0));
-        showIdentityMessage(context, event.type);
+        showIdentityMessage(context, event.type!);
       });
     });
 
@@ -170,13 +174,13 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver, Si
       phoneVerification(context);
     });
 
-    WidgetsBinding.instance.addObserver(this);
+    WidgetsBinding.instance?.addObserver(this);
   }
 
   @override
   void dispose() {
-    _sub.cancel();
-    WidgetsBinding.instance.removeObserver(this);
+    _sub?.cancel();
+    WidgetsBinding.instance?.removeObserver(this);
     super.dispose();
   }
 
@@ -208,13 +212,13 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver, Si
     initialLink = widget.initialLink;
 
     if (initialLink != null) {
-      Events().emit(UniLinkEvent(Uri.parse(initialLink), context));
+      Events().emit(UniLinkEvent(Uri.parse(initialLink!), context));
     }
-    _sub = getLinksStream().listen((String incomingLink) {
+    _sub = getLinksStream().listen((String? incomingLink) {
       if (!mounted) {
         return;
       }
-      Events().emit(UniLinkEvent(Uri.parse(incomingLink), context));
+      Events().emit(UniLinkEvent(Uri.parse(incomingLink!), context));
     });
   }
 
@@ -248,21 +252,6 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver, Si
                 )),
               ],
             ),
-            // bottomNavigationBar: Container(
-            //   color: HexColor("#0A73B8"),
-            //   //@todo theme obj
-            //   padding: EdgeInsets.all(0.0),
-            //   height: 80,
-            //   margin: EdgeInsets.all(0.0),
-            //   child: TabBar(
-            //     controller: _tabController,
-            //     isScrollable: false,
-            //     indicatorSize: TabBarIndicatorSize.tab,
-            //     tabs: Globals().router.getAppButtons(),
-            //     labelPadding: EdgeInsets.all(0.0),
-            //     indicatorPadding: EdgeInsets.all(0.0),
-            //   ),
-            // ),
           ),
           onWillPop: onWillPop,
         ),
@@ -278,7 +267,11 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver, Si
     if (Globals().router.routes[globals.tabController.index].app == null) {
       Events().emit(GoHomeEvent()); // if not an app, eg settings, go home
     }
-    Globals().router.routes[globals.tabController.index].app.back(); // if app ask app to handle back event
+    Globals()
+        .router
+        .routes[globals.tabController.index]
+        .app!
+        .back(); // if app ask app to handle back event
 
     return Future(() => false);
   }

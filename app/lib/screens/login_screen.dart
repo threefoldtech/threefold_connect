@@ -32,7 +32,7 @@ class _LoginScreenState extends State<LoginScreen> with BlockAndRunMixin {
   String scopeTextMobile = 'Please select the data you want to share and press Accept';
   String scopeText = 'Please select the data you want to share and press the corresponding emoji';
 
-  List<int> imageList = new List();
+  List<int> imageList = [];
 
   int selectedImageId = -1;
   int correctImage = -1;
@@ -43,12 +43,12 @@ class _LoginScreenState extends State<LoginScreen> with BlockAndRunMixin {
 
   String emitCode = randomString(10);
 
-  Timer timer;
+  late Timer timer;
 
   int timeLeft = Globals().loginTimeout;
 
-  int created;
-  int currentTimestamp;
+  int? created = 0;
+  int? currentTimestamp = 0;
 
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
@@ -56,17 +56,17 @@ class _LoginScreenState extends State<LoginScreen> with BlockAndRunMixin {
   void initState() {
     super.initState();
     Events().onEvent(PopAllLoginEvent("").runtimeType, close);
-    isMobileCheck = widget.loginData.isMobile;
+    isMobileCheck = widget.loginData.isMobile == true;
     generateEmojiImageList();
 
-    if (widget.loginData != null && !widget.loginData.isMobile) {
+    if (widget.loginData.isMobile == false) {
       const oneSec = const Duration(seconds: 1);
       print('Starting timer ... ');
 
       created = widget.loginData.created;
       currentTimestamp = new DateTime.now().millisecondsSinceEpoch;
 
-      timeLeft = Globals().loginTimeout - ((currentTimestamp - created) / 1000).round();
+      timeLeft = Globals().loginTimeout - ((currentTimestamp! - created!) / 1000).round();
 
       timer = new Timer.periodic(oneSec, (Timer t) async {
         timeoutTimer();
@@ -83,10 +83,10 @@ class _LoginScreenState extends State<LoginScreen> with BlockAndRunMixin {
     currentTimestamp = new DateTime.now().millisecondsSinceEpoch;
 
     setState(() {
-      timeLeft = Globals().loginTimeout - ((currentTimestamp - created) / 1000).round();
+      timeLeft = Globals().loginTimeout - ((currentTimestamp! - created!) / 1000).round();
     });
 
-    if (created != null && ((currentTimestamp - created) / 1000) > Globals().loginTimeout) {
+    if (created != null && ((currentTimestamp! - created!) / 1000) > Globals().loginTimeout) {
       timer.cancel();
 
       await showDialog(
@@ -136,7 +136,7 @@ class _LoginScreenState extends State<LoginScreen> with BlockAndRunMixin {
                   scope: widget.loginData.scope,
                   appId: widget.loginData.appId,
                   callback: cancelIt,
-                  type: widget.loginData.isMobile ? 'mobilelogin' : 'login',
+                  type: widget.loginData.isMobile == true ? 'mobilelogin' : 'login',
                 ),
               ),
             ),
@@ -179,14 +179,16 @@ class _LoginScreenState extends State<LoginScreen> with BlockAndRunMixin {
               ),
             ),
             Visibility(
-              visible: !widget.loginData.isMobile,
+              visible: widget.loginData.isMobile == false,
               child: Expanded(
                 flex: 1,
                 child: Center(
                   child: Padding(
                     padding: const EdgeInsets.only(right: 24.0, left: 24.0),
                     child: Text(
-                      "Attempt expires in " + ((timeLeft >= 0) ? timeLeft.toString() : "0") + " second(s).",
+                      "Attempt expires in " +
+                          ((timeLeft >= 0) ? timeLeft.toString() : "0") +
+                          " second(s).",
                       style: TextStyle(fontSize: 12),
                       textAlign: TextAlign.center,
                     ),
@@ -263,7 +265,8 @@ class _LoginScreenState extends State<LoginScreen> with BlockAndRunMixin {
             builder: (BuildContext context) => CustomDialog(
               image: Icons.warning,
               title: 'Wrong emoji',
-              description: 'You selected the wrong emoji, please check your browser for the new one.',
+              description:
+                  'You selected the wrong emoji, please check your browser for the new one.',
               actions: <Widget>[
                 FlatButton(
                   child: Text('Retry'),
@@ -280,7 +283,7 @@ class _LoginScreenState extends State<LoginScreen> with BlockAndRunMixin {
           }
         }
       } else {
-        _scaffoldKey.currentState.showSnackBar(SnackBar(content: Text('Please select an emoji')));
+        _scaffoldKey.currentState?.showSnackBar(SnackBar(content: Text('Please select an emoji')));
       }
     });
   }
@@ -304,11 +307,11 @@ class _LoginScreenState extends State<LoginScreen> with BlockAndRunMixin {
   sendIt(bool includeData) async {
     var config = WalletConfig();
 
-    String state = widget.loginData.state;
-    String randomRoom = widget.loginData.randomRoom;
+    String? state = widget.loginData.state;
+    String? randomRoom = widget.loginData.randomRoom;
 
-    if (widget.loginData != null && !widget.loginData.isMobile) {
-      int created = widget.loginData.created;
+    if (widget.loginData.isMobile == false) {
+      int? created = widget.loginData.created;
       int currentTimestamp = new DateTime.now().millisecondsSinceEpoch;
 
       if (created != null && ((currentTimestamp - created) / 1000) > Globals().loginTimeout) {
@@ -329,7 +332,7 @@ class _LoginScreenState extends State<LoginScreen> with BlockAndRunMixin {
           ),
         );
 
-        await sendData(state, null, selectedImageId, null, widget.loginData.appId);
+        await sendData(state!, null, selectedImageId, null, widget.loginData.appId!);
 
         if (Navigator.canPop(context)) {
           Navigator.pop(context, false);
@@ -338,12 +341,12 @@ class _LoginScreenState extends State<LoginScreen> with BlockAndRunMixin {
       }
     }
 
-    String publicKey = widget.loginData.appPublicKey?.replaceAll(" ", "+");
+    String publicKey = widget.loginData.appPublicKey!.replaceAll(" ", "+");
 
-    bool stateCheck = RegExp(r"[^A-Za-z0-9]+").hasMatch(state);
+    bool stateCheck = RegExp(r"[^A-Za-z0-9]+").hasMatch(state!);
 
     if (stateCheck) {
-      _scaffoldKey.currentState.showSnackBar(
+      _scaffoldKey.currentState?.showSnackBar(
         SnackBar(
           content: Text('States can only be alphanumeric [^A-Za-z0-9]'),
         ),
@@ -353,9 +356,9 @@ class _LoginScreenState extends State<LoginScreen> with BlockAndRunMixin {
 
     Map<String, dynamic> scope = Map<String, dynamic>();
 
-    var scopePermissions = await getPreviousScopePermissions(widget.loginData.appId);
+    var scopePermissions = await getPreviousScopePermissions(widget.loginData.appId!);
 
-    Uint8List derivedSeed = (await getDerivedSeed(widget.loginData.appId));
+    Uint8List derivedSeed = (await getDerivedSeed(widget.loginData.appId!));
 
     //TODO: make separate function
     if (scopePermissions != null) {
@@ -370,32 +373,38 @@ class _LoginScreenState extends State<LoginScreen> with BlockAndRunMixin {
           scope['phone'] = (await getPhone());
         }
 
-        if (scopePermissionsDecoded['derivedSeed'] != null && scopePermissionsDecoded['derivedSeed']) {
+        if (scopePermissionsDecoded['derivedSeed'] != null &&
+            scopePermissionsDecoded['derivedSeed']) {
           scope['derivedSeed'] = derivedSeed;
         }
 
-        if (scopePermissionsDecoded['digitalTwin'] != null && scopePermissionsDecoded['digitalTwin']) {
+        if (scopePermissionsDecoded['digitalTwin'] != null &&
+            scopePermissionsDecoded['digitalTwin']) {
           scope['digitalTwin'] = 'ok';
         }
 
-        if (scopePermissionsDecoded['identityName'] != null && scopePermissionsDecoded['identityName']) {
+        if (scopePermissionsDecoded['identityName'] != null &&
+            scopePermissionsDecoded['identityName']) {
           scope['identityName'] = {
             'identityName': ((await getIdentity())['identityName']),
             'signedIdentityNameIdentifier': ((await getIdentity())['signedIdentityNameIdentifier'])
           };
         }
 
-        if (scopePermissionsDecoded['identityDOB'] != null && scopePermissionsDecoded['identityDOB']) {
+        if (scopePermissionsDecoded['identityDOB'] != null &&
+            scopePermissionsDecoded['identityDOB']) {
           scope['identityDOB'] = {
             'identityDOB': ((await getIdentity())['identityDOB']),
             'signedIdentityDOBIdentifier': ((await getIdentity())['signedIdentityDOBIdentifier'])
           };
         }
 
-        if (scopePermissionsDecoded['identityCountry'] != null && scopePermissionsDecoded['identityCountry']) {
+        if (scopePermissionsDecoded['identityCountry'] != null &&
+            scopePermissionsDecoded['identityCountry']) {
           scope['identityCountry'] = {
             'identityCountry': ((await getIdentity())['identityCountry']),
-            'signedIdentityCountryIdentifier': ((await getIdentity())['signedIdentityCountryIdentifier'])
+            'signedIdentityCountryIdentifier':
+                ((await getIdentity())['signedIdentityCountryIdentifier'])
           };
         }
 
@@ -403,18 +412,22 @@ class _LoginScreenState extends State<LoginScreen> with BlockAndRunMixin {
             scopePermissionsDecoded['identityDocumentMeta']) {
           scope['identityDocumentMeta'] = {
             'identityDocumentMeta': ((await getIdentity())['identityDocumentMeta']),
-            'signedIdentityDocumentMetaIdentifier': ((await getIdentity())['signedIdentityDocumentMetaIdentifier'])
+            'signedIdentityDocumentMetaIdentifier':
+                ((await getIdentity())['signedIdentityDocumentMetaIdentifier'])
           };
         }
 
-        if (scopePermissionsDecoded['identityGender'] != null && scopePermissionsDecoded['identityGender']) {
+        if (scopePermissionsDecoded['identityGender'] != null &&
+            scopePermissionsDecoded['identityGender']) {
           scope['identityGender'] = {
             'identityGender': ((await getIdentity())['identityGender']),
-            'signedIdentityGenderIdentifier': ((await getIdentity())['signedIdentityGenderIdentifier'])
+            'signedIdentityGenderIdentifier':
+                ((await getIdentity())['signedIdentityGenderIdentifier'])
           };
         }
 
-        if (scopePermissionsDecoded['walletAddress'] != null && scopePermissionsDecoded['walletAddress']) {
+        if (scopePermissionsDecoded['walletAddress'] != null &&
+            scopePermissionsDecoded['walletAddress']) {
           scope['walletAddressData'] = {
             'address': scopePermissionsDecoded['walletAddressData'],
           };
@@ -422,14 +435,16 @@ class _LoginScreenState extends State<LoginScreen> with BlockAndRunMixin {
       }
     }
 
-    Map<String, String> encryptedScopeData = await encrypt(jsonEncode(scope), publicKey, await getPrivateKey());
+    Map<String, String> encryptedScopeData =
+        await encrypt(jsonEncode(scope), base64.decode(publicKey), await getPrivateKey());
 
     //push to backend with signed
     if (!includeData) {
-      await sendData(
-          state, null, selectedImageId, null, widget.loginData.appId); // temp fix send empty data for regenerate emoji
+      await sendData(state, null, selectedImageId, null,
+          widget.loginData.appId!); // temp fix send empty data for regenerate emoji
     } else {
-      await sendData(state, encryptedScopeData, selectedImageId, randomRoom, widget.loginData.appId);
+      await sendData(
+          state, encryptedScopeData, selectedImageId, randomRoom, widget.loginData.appId!);
     }
 
     if (selectedImageId == correctImage || isMobileCheck) {
@@ -438,8 +453,8 @@ class _LoginScreenState extends State<LoginScreen> with BlockAndRunMixin {
       var name = await getDoubleName();
       KeyPair dtKeyPair = await generateKeyPairFromEntropy(derivedSeed);
 
-      String dtEncodedPublicKey = base64.encode(dtKeyPair.pk)
-      print("name: " + name);
+      String dtEncodedPublicKey = base64.encode(dtKeyPair.pk);
+      print("name: " + name!);
       print("publicKey: " + dtEncodedPublicKey);
       addDigitalTwinDerivedPublicKeyToBackend(name, dtEncodedPublicKey, widget.loginData.appId);
 
@@ -451,7 +466,7 @@ class _LoginScreenState extends State<LoginScreen> with BlockAndRunMixin {
     }
   }
 
-  int parseImageId(String imageId) {
+  int parseImageId(String? imageId) {
     if (imageId == null || imageId == '') {
       return 1;
     }
@@ -459,7 +474,7 @@ class _LoginScreenState extends State<LoginScreen> with BlockAndRunMixin {
   }
 
   void generateEmojiImageList() {
-    correctImage = parseImageId(widget.loginData.randomImageId);
+    correctImage = parseImageId(widget.loginData.randomImageId!);
 
     imageList.add(correctImage);
 

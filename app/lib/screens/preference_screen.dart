@@ -27,7 +27,7 @@ import 'package:threebotlogin/widgets/layout_drawer.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class PreferenceScreen extends StatefulWidget {
-  PreferenceScreen({Key key}) : super(key: key);
+  PreferenceScreen({Key? key}) : super(key: key);
 
   @override
   _PreferenceScreenState createState() => _PreferenceScreenState();
@@ -35,7 +35,7 @@ class PreferenceScreen extends StatefulWidget {
 
 class _PreferenceScreenState extends State<PreferenceScreen> {
   // FirebaseNotificationListener _listener;
-  Map email;
+  Map email = {};
   String doubleName = '';
   String phrase = '';
   bool showAdvancedOptions = false;
@@ -45,13 +45,13 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
   String phoneAdress = '';
   String identity = '';
 
-  BuildContext preferenceContext;
+  BuildContext? preferenceContext;
   bool biometricsCheck = false;
   bool finger = false;
 
   String version = '';
   String buildNumber = '';
-  String biometricDeviceName = "";
+  Object? biometricDeviceName;
 
   Globals globals = Globals();
 
@@ -75,11 +75,11 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
   }
 
   showChangePin() async {
-    String pin = await getPin();
+    String? pin = await getPin();
     Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => AuthenticationScreen(correctPin: pin),
+          builder: (context) => AuthenticationScreen(correctPin: pin!, userMessage: 'Enter your pincode',),
         ));
   }
 
@@ -140,10 +140,10 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
                                 return CheckboxListTile(
                                   secondary: Icon(Icons.fingerprint),
                                   value: finger,
-                                  title: Text(snapshot.data),
+                                  title: Text(snapshot.data.toString()),
                                   activeColor: Theme.of(context).accentColor,
-                                  onChanged: (bool newValue) async {
-                                    _toggleFingerprint(newValue);
+                                  onChanged: (bool? newValue) async {
+                                    _toggleFingerprint(newValue!);
                                   },
                                 );
                               } else {
@@ -270,7 +270,7 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
                     context, MaterialPageRoute(builder: (context) => MainScreen(initDone: true, registered: false)));
               } else {
                 showDialog(
-                  context: preferenceContext,
+                  context: preferenceContext!,
                   builder: (BuildContext context) => CustomDialog(
                     title: 'Error',
                     description: 'Something went wrong when trying to remove your account.',
@@ -326,12 +326,12 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
   void getUserValues() {
     getDoubleName().then((dn) {
       setState(() {
-        doubleName = dn;
+        doubleName = dn!;
       });
     });
     getPhrase().then((seedPhrase) {
       setState(() {
-        phrase = seedPhrase;
+        phrase = seedPhrase!;
       });
     });
     getFingerprint().then((fingerprint) {
@@ -346,13 +346,13 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
   }
 
   void _showPhrase() async {
-    String pin = await getPin();
+    String? pin = await getPin();
 
-    bool authenticated = await Navigator.push(
+    bool? authenticated = await Navigator.push(
         context,
         MaterialPageRoute(
           builder: (context) => AuthenticationScreen(
-            correctPin: pin,
+            correctPin: pin!,
             userMessage: "show your phrase.",
           ),
         ));
@@ -383,14 +383,14 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
   }
 
   void _toggleFingerprint(bool newFingerprintValue) async {
-    String pin = await getPin();
+    String? pin = await getPin();
 
-    bool authenticated = await Navigator.push(
+    bool? authenticated = await Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => AuthenticationScreen(
-          correctPin: pin,
-          userMessage: "toggle " + biometricDeviceName + ".",
+          correctPin: pin!,
+          userMessage: "toggle " + biometricDeviceName.toString() + ".",
         ),
       ),
     );
@@ -403,8 +403,8 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
   }
 
   void _changePincode() async {
-    String pin = await getPin();
-    bool authenticated = false;
+    String? pin = await getPin();
+    bool? authenticated = false;
 
     if (pin == null || pin.isEmpty) {
       authenticated = true; // In case the pin wasn't set.

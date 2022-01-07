@@ -13,8 +13,8 @@ import 'package:threebotlogin/services/shared_preference_service.dart';
 
 class UniLinkService {
   static void handleUniLink(UniLinkEvent e) async {
-    Uri link = e.link;
-    BuildContext context = e.context;
+    Uri link = e.link!;
+    BuildContext context = e.context!;
 
     String? jsonScope = link.queryParameters['scope'];
     String? state = link.queryParameters['state'];

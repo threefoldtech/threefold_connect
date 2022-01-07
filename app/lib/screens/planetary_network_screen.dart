@@ -17,7 +17,7 @@ class _PlanetaryNetworkScreenState extends State<PlanetaryNetworkScreen> {
   VpnState _vpnState = new VpnState();
   bool _vpnTimeoutRunning = false;
 
-  Text _ipText;
+  Text _ipText = Text('');
   Text _statusMessage = Text('');
 
   bool _isSwitched = Globals().vpnState.vpnConnected;

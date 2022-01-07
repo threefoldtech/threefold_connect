@@ -5,7 +5,7 @@ class ImageButton extends StatefulWidget {
   final selectedImageId;
   final callback;
 
-  ImageButton(this.imageId, this.selectedImageId, this.callback, {required Key key})
+  ImageButton(this.imageId, this.selectedImageId, this.callback, {Key? key})
       : super(key: key);
 
   _ImageButtonState createState() => _ImageButtonState();

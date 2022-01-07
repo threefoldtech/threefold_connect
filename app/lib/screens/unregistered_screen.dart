@@ -34,7 +34,7 @@ class _UnregisteredScreenState extends State<UnregisteredScreen>
   }
 
   Future<void> startRecovery() async {
-    final bool registered = await Navigator.push(
+    final bool? registered = await Navigator.push(
         context, MaterialPageRoute(builder: (context) => RecoverScreen()));
     if (registered != null && registered) {
       await Navigator.push(
@@ -49,7 +49,7 @@ class _UnregisteredScreenState extends State<UnregisteredScreen>
                   text: "Your account has been recovered.")));
 
 
-      await Flags().initialiseFlagSmith();
+      await Flags().initFlagSmith();
       await Flags().setFlagSmithDefaultValues();
 
       Navigator.pop(context);
