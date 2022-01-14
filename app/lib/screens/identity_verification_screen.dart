@@ -6,7 +6,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_pkid/flutter_pkid.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:http/http.dart';
-import 'package:shuftipro_flutter_sdk/ShuftiPro.dart';
+// import 'package:shuftipro_flutter_sdk/ShuftiPro.dart';
 import 'package:threebotlogin/events/events.dart';
 import 'package:threebotlogin/events/identity_callback_event.dart';
 import 'package:threebotlogin/helpers/globals.dart';
@@ -432,102 +432,103 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
 
   Widget _inShuftiVerificationProcess() {
     print(createdPayload);
-    return Container(
-        child: new ShuftiPro(
-            authObject: authObject,
-            createdPayload: createdPayload,
-            async: false,
-            callback: (res) async {
-              // For some reason, Shufti returns bad JSON in case when request is canceled
-              // "verification_process_closed", "1","message", "User cancel the verification process"
-
-              try {
-                if (!isJson(res)) {
-                  String resData = res.toString();
-
-                  if (resData.contains('verification_process_closed')) {
-                    return showDialog(
-                      context: context,
-                      barrierDismissible: false,
-                      builder: (BuildContext dialogContext) => CustomDialog(
-                        image: Icons.close,
-                        title: "Request canceled",
-                        description: "Verification process has been canceled.",
-                        actions: [
-                          FlatButton(
-                              onPressed: () {
-                                Navigator.pop(dialogContext);
-                              },
-                              child: Text('OK'))
-                        ],
-                      ),
-                    );
-                  }
-
-                  if (resData.contains('internet.connection.problem')) {
-                    return showDialog(
-                      context: context,
-                      barrierDismissible: false,
-                      builder: (BuildContext dialogContext) => CustomDialog(
-                        image: Icons.close,
-                        title: "Request canceled",
-                        description: "Please make sure your internet connection is stable.",
-                        actions: [
-                          FlatButton(
-                              onPressed: () {
-                                Navigator.pop(dialogContext);
-                              },
-                              child: Text('OK'))
-                        ],
-                      ),
-                    );
-                  }
-                }
-
-                Map<String, dynamic> data = jsonDecode(res);
-                switch (data['event']) {
-                  // AUTHORIZATION IS WRONG
-                  case 'request.unauthorized':
-                    {
-                      Events().emit(IdentityCallbackEvent(type: 'unauthorized'));
-                      break;
-                    }
-                  // NO BALANCE
-                  case 'request.invalid':
-                  // DECLINED
-                  case 'verification.declined':
-                  // TIME OUT
-                  case 'request.timeout':
-                    {
-                      Events().emit(IdentityCallbackEvent(type: 'failed'));
-                      break;
-                    }
-
-                  // ACCEPTED
-                  case 'verification.accepted':
-                    {
-                      await verifyIdentity(reference);
-                      await identityVerification(reference).then((value) {
-                        if (value == null) {
-                          return Events().emit(IdentityCallbackEvent(type: 'failed'));
-                        }
-                        Events().emit(IdentityCallbackEvent(type: 'success'));
-                      });
-                      break;
-                    }
-                  default:
-                    {
-                      return;
-                    }
-                    break;
-                }
-              } catch (e) {
-                print(e);
-              } finally {
-                dispose();
-              }
-            },
-            homeClass: HomeScreen()));
+    return Container();
+    // return Container(
+    //     child: new ShuftiPro(
+    //         authObject: authObject,
+    //         createdPayload: createdPayload,
+    //         async: false,
+    //         callback: (res) async {
+    //           // For some reason, Shufti returns bad JSON in case when request is canceled
+    //           // "verification_process_closed", "1","message", "User cancel the verification process"
+    //
+    //           try {
+    //             if (!isJson(res)) {
+    //               String resData = res.toString();
+    //
+    //               if (resData.contains('verification_process_closed')) {
+    //                 return showDialog(
+    //                   context: context,
+    //                   barrierDismissible: false,
+    //                   builder: (BuildContext dialogContext) => CustomDialog(
+    //                     image: Icons.close,
+    //                     title: "Request canceled",
+    //                     description: "Verification process has been canceled.",
+    //                     actions: [
+    //                       FlatButton(
+    //                           onPressed: () {
+    //                             Navigator.pop(dialogContext);
+    //                           },
+    //                           child: Text('OK'))
+    //                     ],
+    //                   ),
+    //                 );
+    //               }
+    //
+    //               if (resData.contains('internet.connection.problem')) {
+    //                 return showDialog(
+    //                   context: context,
+    //                   barrierDismissible: false,
+    //                   builder: (BuildContext dialogContext) => CustomDialog(
+    //                     image: Icons.close,
+    //                     title: "Request canceled",
+    //                     description: "Please make sure your internet connection is stable.",
+    //                     actions: [
+    //                       FlatButton(
+    //                           onPressed: () {
+    //                             Navigator.pop(dialogContext);
+    //                           },
+    //                           child: Text('OK'))
+    //                     ],
+    //                   ),
+    //                 );
+    //               }
+    //             }
+    //
+    //             Map<String, dynamic> data = jsonDecode(res);
+    //             switch (data['event']) {
+    //               // AUTHORIZATION IS WRONG
+    //               case 'request.unauthorized':
+    //                 {
+    //                   Events().emit(IdentityCallbackEvent(type: 'unauthorized'));
+    //                   break;
+    //                 }
+    //               // NO BALANCE
+    //               case 'request.invalid':
+    //               // DECLINED
+    //               case 'verification.declined':
+    //               // TIME OUT
+    //               case 'request.timeout':
+    //                 {
+    //                   Events().emit(IdentityCallbackEvent(type: 'failed'));
+    //                   break;
+    //                 }
+    //
+    //               // ACCEPTED
+    //               case 'verification.accepted':
+    //                 {
+    //                   await verifyIdentity(reference);
+    //                   await identityVerification(reference).then((value) {
+    //                     if (value == null) {
+    //                       return Events().emit(IdentityCallbackEvent(type: 'failed'));
+    //                     }
+    //                     Events().emit(IdentityCallbackEvent(type: 'success'));
+    //                   });
+    //                   break;
+    //                 }
+    //               default:
+    //                 {
+    //                   return;
+    //                 }
+    //                 break;
+    //             }
+    //           } catch (e) {
+    //             print(e);
+    //           } finally {
+    //             dispose();
+    //           }
+    //         },
+    //         homeClass: HomeScreen()));
   }
 
   Widget _fillCard(String phase, int step, String text, IconData icon) {

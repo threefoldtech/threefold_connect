@@ -94,6 +94,6 @@ Future<void> saveCorrectVerificationStates(
 }
 
 bool checkEmail(String email) {
-  String? emailValue = email.toLowerCase()?.trim()?.replaceAll(new RegExp(r"\s+"), " ");
+  String? emailValue = email.toLowerCase().trim().replaceAll(new RegExp(r"\s+"), " ");
   return validateEmail(emailValue);
 }

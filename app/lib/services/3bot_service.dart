@@ -15,23 +15,22 @@ Map<String, String> requestHeaders = {'Content-type': 'application/json'};
 Future<Response> sendData(
     String state, Map<String, String>? data, selectedImageId, String? randomRoom, String appId) async {
   Uri url = Uri.parse('$threeBotApiUrl/signedAttempt');
-  print('Sending call: ${url.toString()}');
-
-  Uint8List sk = await getPrivateKey();
-  String jsonData = json.encode({
-    'signedState': state,
-    'data': data,
-    'selectedImageId': selectedImageId,
-    'doubleName': await getDoubleName(),
-    'randomRoom': randomRoom,
-    'appId': appId
-  });
-
-  String signedData = await signData(jsonData, sk);
-
   return http.post(url,
-      body: json.encode({'signedAttempt': signedData, 'doubleName': await getDoubleName()}),
+      body: json.encode({
+        'signedAttempt': await signData(
+            json.encode({
+              'signedState': state,
+              'data': data,
+              'selectedImageId': selectedImageId,
+              'doubleName': await getDoubleName(),
+              'randomRoom': randomRoom,
+              'appId': appId
+            }),
+            await getPrivateKey()),
+        'doubleName': await getDoubleName()
+      }),
       headers: requestHeaders);
+
 }
 
 Future<Response> addDigitalTwinDerivedPublicKeyToBackend(name, publicKey, appId) async {

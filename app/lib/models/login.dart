@@ -46,7 +46,7 @@ class Login {
         type = json['type'],
         randomRoom = json['randomRoom'],
         redirectUrl = json['redirecturl'],
-        isMobile = json['mobile'] as bool,
+        isMobile = json['mobile'] as bool?,
         created = json['created'],
         locationId = json['locationId'];
 
@@ -74,6 +74,9 @@ class Login {
 
       String decryptedLoginAttempt = await decrypt(data['encryptedLoginAttempt'], pk, sk);
       dynamic decryptedLoginAttemptMap = jsonDecode(decryptedLoginAttempt);
+
+      print('Decrypted login attempt');
+      print(decryptedLoginAttempt);
 
       decryptedLoginAttemptMap['type'] = data['type'];
       decryptedLoginAttemptMap['created'] = data['created'];

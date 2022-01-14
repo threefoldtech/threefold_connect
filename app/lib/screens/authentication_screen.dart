@@ -124,11 +124,12 @@ class AuthenticationScreenState extends State<AuthenticationScreen> {
     double height = MediaQuery.of(context).size.height;
 
     if (buttonText == 'OK')
-      onPressedMethod = (input.length >= widget.pinLength ? () => onOk() : null)!;
-    if (buttonText == 'C') onPressedMethod = (input.length >= 1 ? () => onClear() : null)!;
+      onPressedMethod = (input.length >= widget.pinLength ? () => onOk() : (){});
+    if (buttonText == 'C') onPressedMethod = (input.length >= 1 ? () => onClear() : (){});
     return Container(
         padding: EdgeInsets.only(top: height / 136, bottom: height / 136),
         child: Center(
+
             child: RawMaterialButton(
           padding: EdgeInsets.all(12),
           child: Text(

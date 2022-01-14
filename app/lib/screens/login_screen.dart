@@ -305,11 +305,10 @@ class _LoginScreenState extends State<LoginScreen> with BlockAndRunMixin {
   }
 
   sendIt(bool includeData) async {
-    var config = WalletConfig();
-
     String? state = widget.loginData.state;
     String? randomRoom = widget.loginData.randomRoom;
 
+    print('HALLO22');
     if (widget.loginData.isMobile == false) {
       int? created = widget.loginData.created;
       int currentTimestamp = new DateTime.now().millisecondsSinceEpoch;
@@ -332,6 +331,9 @@ class _LoginScreenState extends State<LoginScreen> with BlockAndRunMixin {
           ),
         );
 
+        print('IK KOM HIER');
+        print(state);
+        print(widget.loginData.appId);
         await sendData(state!, null, selectedImageId, null, widget.loginData.appId!);
 
         if (Navigator.canPop(context)) {
@@ -438,11 +440,14 @@ class _LoginScreenState extends State<LoginScreen> with BlockAndRunMixin {
     Map<String, String> encryptedScopeData =
         await encrypt(jsonEncode(scope), base64.decode(publicKey), await getPrivateKey());
 
+    print(widget.loginData.appId);
+    print(encryptedScopeData);
     //push to backend with signed
     if (!includeData) {
       await sendData(state, null, selectedImageId, null,
           widget.loginData.appId!); // temp fix send empty data for regenerate emoji
     } else {
+      print('IK KOM IN DEZE');
       await sendData(
           state, encryptedScopeData, selectedImageId, randomRoom, widget.loginData.appId!);
     }

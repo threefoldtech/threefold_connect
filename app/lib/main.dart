@@ -7,6 +7,7 @@ import 'package:threebotlogin/services/migration_service.dart';
 import 'package:threebotlogin/services/shared_preference_service.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import 'app_config.dart';
 import 'helpers/kyc_helpers.dart';
 
 
@@ -17,6 +18,8 @@ Future<void> main() async {
   String? doubleName = await getDoubleName();
 
   await setGlobalValues();
+
+  print(AppConfig().threeBotSocketUrl());
 
   bool registered = doubleName != null;
 

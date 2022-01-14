@@ -24,7 +24,7 @@ Future<Uint8List> getPublicKey() async {
   bool? isPublicKeyFixed = await getIsPublicKeyFixed();
 
   if (isPublicKeyFixed == true) {
-    String? encodedPublicKey = prefs.getString('publicKey');
+    String? encodedPublicKey = prefs.getString('publickey');
     return base64.decode(encodedPublicKey!);
   }
 
@@ -34,22 +34,22 @@ Future<Uint8List> getPublicKey() async {
   }
 
   var userInfo = json.decode(userInfoResponse.body);
-  var done = await prefs.setString("publicKey", userInfo['publicKey']);
+  var done = await prefs.setString("publickey", userInfo['publicKey']);
 
-  if (done && prefs.getString('publicKey') == userInfo['publicKey']) {
+  if (done && prefs.getString('publickey') == userInfo['publicKey']) {
     setPublicKeyFixed();
   }
 
-  String? encodedPublicKey = prefs.getString('publicKey');
+  String? encodedPublicKey = prefs.getString('publickey');
   return base64.decode(encodedPublicKey!);
 }
 
 Future<void> savePublicKey(Uint8List publicKey) async {
   final SharedPreferences prefs = await SharedPreferences.getInstance();
-  prefs.remove('publicKey');
+  prefs.remove('publickey');
 
   String encodedPublicKey = base64.encode(publicKey);
-  prefs.setString('publicKey', encodedPublicKey);
+  prefs.setString('publickey', encodedPublicKey);
 }
 
 Future<bool?> getIsPublicKeyFixed() async {
@@ -70,7 +70,7 @@ Future<void> setPublicKeyFixed() async {
 Future<Uint8List> getPrivateKey() async {
   final SharedPreferences prefs = await SharedPreferences.getInstance();
 
-  String? privateKey = prefs.getString('privateKey');
+  String? privateKey = prefs.getString('privatekey');
   Uint8List decodedPrivateKey = base64.decode(privateKey!);
 
   return decodedPrivateKey;
@@ -78,22 +78,23 @@ Future<Uint8List> getPrivateKey() async {
 
 Future<void> savePrivateKey(Uint8List privateKey) async {
   final SharedPreferences prefs = await SharedPreferences.getInstance();
-  prefs.remove('privateKey');
+  prefs.remove('privatekey');
 
   String encodedPrivateKey = base64.encode(privateKey);
-  prefs.setString('privateKey', encodedPrivateKey);
+  prefs.setString('privatekey', encodedPrivateKey);
 }
 
 Future<Map<String, String>> getEdCurveKeys() async {
   final SharedPreferences prefs = await SharedPreferences.getInstance();
 
-  final String? pkEd = prefs.getString('publicKey');
-  final String? skEd = prefs.getString('privateKey');
+  final String? pkEd = prefs.getString('publickey');
+  final String? skEd = prefs.getString('privatekey');
+
 
   final String pkCurve =
-  base64.encode(Sodium.cryptoSignEd25519PkToCurve25519(base64.decode(pkEd!)));
+      base64.encode(Sodium.cryptoSignEd25519PkToCurve25519(base64.decode(pkEd!)));
   final String skCurve =
-  base64.encode(Sodium.cryptoSignEd25519SkToCurve25519(base64.decode(skEd!)));
+      base64.encode(Sodium.cryptoSignEd25519SkToCurve25519(base64.decode(skEd!)));
 
   return {
     'signingPublicKey': hex.encode(base64.decode(pkEd)),
@@ -105,14 +106,14 @@ Future<Map<String, String>> getEdCurveKeys() async {
 
 Future<void> savePhrase(String phrase) async {
   final SharedPreferences prefs = await SharedPreferences.getInstance();
-  prefs.remove('seedPhrase');
+  prefs.remove('phrase');
 
-  prefs.setString('seedPhrase', phrase);
+  prefs.setString('phrase', phrase);
 }
 
 Future<String?> getPhrase() async {
   final SharedPreferences prefs = await SharedPreferences.getInstance();
-  return prefs.getString('seedPhrase');
+  return prefs.getString('phrase');
 }
 
 ///
@@ -330,14 +331,13 @@ Future<bool?> getFingerprint() async {
   return result;
 }
 
-
 ///
 ///
 /// Methods for login permissions
 ///
 ///
 
-Future<void> saveScopePermissions(scopePermissions) async {
+Future<void> saveScopePermissions(String scopePermissions) async {
   final SharedPreferences prefs = await SharedPreferences.getInstance();
   prefs.remove('scopePermissions');
   prefs.setString('scopePermissions', scopePermissions);
@@ -382,7 +382,6 @@ Future<bool> getInitDone() async {
   bool isInitDone = initDone == true;
   return isInitDone;
 }
-
 
 ///
 ///

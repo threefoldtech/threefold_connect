@@ -5,7 +5,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:http/http.dart';
 import 'package:package_info/package_info.dart';
-import 'package:shuftipro_flutter_sdk/ShuftiPro.dart';
 import 'package:threebotlogin/app_config.dart';
 import 'package:threebotlogin/apps/free_flow_pages/ffp_events.dart';
 import 'package:threebotlogin/events/close_socket_event.dart';
@@ -347,6 +346,7 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
 
   void _showPhrase() async {
     String? pin = await getPin();
+    print(pin);
 
     bool? authenticated = await Navigator.push(
         context,

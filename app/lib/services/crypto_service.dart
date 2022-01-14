@@ -60,6 +60,8 @@ Future<String> decrypt(String encodedCipherText, Uint8List pk, Uint8List sk) asy
   Uint8List publicKey = Sodium.cryptoSignEd25519PkToCurve25519(pk);
   Uint8List secretKey = Sodium.cryptoSignEd25519SkToCurve25519(sk);
 
+  print(base64.encode(publicKey));
+  print(base64.encode(secretKey));
   Uint8List decryptedData = Sodium.cryptoBoxSealOpen(cipherText, publicKey, secretKey);
   return new String.fromCharCodes(decryptedData);
 }
