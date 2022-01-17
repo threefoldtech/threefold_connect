@@ -51,7 +51,7 @@ Future<Map<String, String>> encrypt(String data, Uint8List pk, Uint8List sk) asy
   Uint8List message = Uint8List.fromList(data.codeUnits);
   Uint8List encryptedData = Sodium.cryptoBoxEasy(message, nonce, pk, private);
 
-  return {'nonce': base64.encode(nonce), 'cipher': base64.encode(encryptedData)};
+  return {'nonce': base64.encode(nonce), 'ciphertext': base64.encode(encryptedData)};
 }
 
 // Decrypt given ciphertext with a keypair

@@ -90,7 +90,6 @@ Future<Map<String, String>> getEdCurveKeys() async {
   final String? pkEd = prefs.getString('publickey');
   final String? skEd = prefs.getString('privatekey');
 
-
   final String pkCurve =
       base64.encode(Sodium.cryptoSignEd25519PkToCurve25519(base64.decode(pkEd!)));
   final String skCurve =
@@ -458,14 +457,10 @@ Future<void> saveLocationId(String locationId) async {
 Future<List<dynamic>> getLocationIdList() async {
   final SharedPreferences prefs = await SharedPreferences.getInstance();
 
-  try {
-    String? locationIdListAsJson = prefs.getString('locationIdList');
-    List<dynamic> locationIdList = jsonDecode(locationIdListAsJson!);
+  String? locationIdListAsJson = prefs.getString('locationIdList');
+  List<dynamic> locationIdList = jsonDecode(locationIdListAsJson!);
 
-    return locationIdList;
-  } catch (_) {
-    return [];
-  }
+  return locationIdList;
 }
 
 Future<void> saveDoubleName(String doubleName) async {

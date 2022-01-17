@@ -32,7 +32,7 @@ class _WalletState extends State<WalletWidget> with AutomaticKeepAliveClientMixi
 
   _back(WalletBackEvent event) async {
     Uri? url = await webView.getUrl();
-    print(url.toString());
+
     String endsWith = config.appId() + '/';
     if (url.toString().endsWith(endsWith)) {
       Events().emit(GoHomeEvent());

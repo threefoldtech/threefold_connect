@@ -28,7 +28,6 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> with BlockAndRunMixin {
-  String helperText = '';
   String scopeTextMobile = 'Please select the data you want to share and press Accept';
   String scopeText = 'Please select the data you want to share and press the corresponding emoji';
 
@@ -344,6 +343,8 @@ class _LoginScreenState extends State<LoginScreen> with BlockAndRunMixin {
     }
 
     String publicKey = widget.loginData.appPublicKey!.replaceAll(" ", "+");
+    print('Public key');
+    print(publicKey);
 
     bool stateCheck = RegExp(r"[^A-Za-z0-9]+").hasMatch(state!);
 
@@ -357,7 +358,6 @@ class _LoginScreenState extends State<LoginScreen> with BlockAndRunMixin {
     }
 
     Map<String, dynamic> scope = Map<String, dynamic>();
-
     var scopePermissions = await getPreviousScopePermissions(widget.loginData.appId!);
 
     Uint8List derivedSeed = (await getDerivedSeed(widget.loginData.appId!));
@@ -365,6 +365,9 @@ class _LoginScreenState extends State<LoginScreen> with BlockAndRunMixin {
     //TODO: make separate function
     if (scopePermissions != null) {
       var scopePermissionsDecoded = jsonDecode(scopePermissions);
+
+
+
 
       if (scopePermissions != null && scopePermissions != "") {
         if (scopePermissionsDecoded['email'] != null && scopePermissionsDecoded['email']) {
@@ -436,6 +439,10 @@ class _LoginScreenState extends State<LoginScreen> with BlockAndRunMixin {
         }
       }
     }
+
+
+    print('Encoded scope');
+    print(jsonEncode(scope));
 
     Map<String, String> encryptedScopeData =
         await encrypt(jsonEncode(scope), base64.decode(publicKey), await getPrivateKey());

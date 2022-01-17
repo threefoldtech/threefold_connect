@@ -12,25 +12,26 @@ import 'package:threebotlogin/services/shared_preference_service.dart';
 String threeBotApiUrl = AppConfig().threeBotApiUrl();
 Map<String, String> requestHeaders = {'Content-type': 'application/json'};
 
-Future<Response> sendData(
-    String state, Map<String, String>? data, selectedImageId, String? randomRoom, String appId) async {
+Future<Response> sendData(String state, Map<String, String>? data, selectedImageId,
+    String? randomRoom, String appId) async {
   Uri url = Uri.parse('$threeBotApiUrl/signedAttempt');
-  return http.post(url,
-      body: json.encode({
-        'signedAttempt': await signData(
-            json.encode({
-              'signedState': state,
-              'data': data,
-              'selectedImageId': selectedImageId,
-              'doubleName': await getDoubleName(),
-              'randomRoom': randomRoom,
-              'appId': appId
-            }),
-            await getPrivateKey()),
-        'doubleName': await getDoubleName()
-      }),
-      headers: requestHeaders);
+  print('Sending call: ${url.toString()}');
 
+  String encodedBody = json.encode({
+    'signedAttempt': await signData(
+        json.encode({
+          'signedState': state,
+          'data': data,
+          'selectedImageId': selectedImageId,
+          'doubleName': await getDoubleName(),
+          'randomRoom': randomRoom,
+          'appId': appId
+        }),
+        await getPrivateKey()),
+    'doubleName': await getDoubleName()
+  });
+
+  return http.post(url, body: encodedBody, headers: requestHeaders);
 }
 
 Future<Response> addDigitalTwinDerivedPublicKeyToBackend(name, publicKey, appId) async {

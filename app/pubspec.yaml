@@ -27,14 +27,14 @@ dependencies:
       url: git@github.com:threefoldtech/flutter-pkid-client.git
       ref: main_null-safety
 
-#  shuftipro_flutter_sdk:
-#    git:
-#      url: git@github.com:jimbertools/shufti-jimber.git
-#      ref: main_null-safety
-
   redirection:
     git:
       url: https://github.com/jimbertools/redirection
+      ref: main_null-safety
+
+  shuftipro_flutter_sdk:
+    git:
+      url: https://github.com/jimbertools/shufti-jimber
       ref: main_null-safety
 
   flutter_svg: ^1.0.0
