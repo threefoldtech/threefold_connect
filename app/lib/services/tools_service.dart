@@ -4,11 +4,11 @@ import 'dart:math';
 
 const chars = "abcdefghijklmnopqrstuvwxyz0123456789";
 
-String randomString(int strlen) {
+String randomString(int len) {
   Random rnd = new Random(new DateTime.now().millisecondsSinceEpoch);
   String result = "";
 
-  for (int i = 0; i < strlen; i++) {
+  for (int i = 0; i < len; i++) {
     result += chars[rnd.nextInt(chars.length)];
   }
 

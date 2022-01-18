@@ -19,6 +19,7 @@ import 'package:threebotlogin/services/fingerprint_service.dart';
 import 'package:threebotlogin/services/open_kyc_service.dart';
 import 'package:threebotlogin/services/shared_preference_service.dart';
 import 'package:threebotlogin/widgets/custom_dialog.dart';
+import 'package:threebotlogin/widgets/login_dialogs.dart';
 
 class BackendConnection {
   late IO.Socket socket;
@@ -332,7 +333,7 @@ Future identityVerification(String reference) async {
   return 'Verified';
 }
 
-Future openLogin(BuildContext context, Login loginData, BackendConnection backendConnection) async {
+Future openLogin(BuildContext ctx, Login loginData, BackendConnection backendConnection) async {
   String? messageType = loginData.type;
 
   if (messageType == null || messageType != 'login' || loginData.isMobile == true) {
@@ -344,7 +345,7 @@ Future openLogin(BuildContext context, Login loginData, BackendConnection backen
   Events().emit(CloseAuthEvent(close: true));
 
   bool? authenticated = await Navigator.push(
-    context,
+    ctx,
     MaterialPageRoute(
       builder: (context) => AuthenticationScreen(
           correctPin: pin!, userMessage: "Sign your attempt.", loginData: loginData),
@@ -357,7 +358,7 @@ Future openLogin(BuildContext context, Login loginData, BackendConnection backen
 
   if (loginData.showWarning == true) {
     bool? warningScreenCompleted = await Navigator.push(
-      context,
+      ctx,
       MaterialPageRoute(
         builder: (context) => WarningScreen(),
       ),
@@ -373,7 +374,7 @@ Future openLogin(BuildContext context, Login loginData, BackendConnection backen
   backendConnection.leaveRoom(loginData.doubleName);
 
   bool? loggedIn = await Navigator.push(
-    context,
+    ctx,
     MaterialPageRoute(
       builder: (context) => LoginScreen(loginData),
     ),
@@ -381,24 +382,9 @@ Future openLogin(BuildContext context, Login loginData, BackendConnection backen
 
   if (loggedIn == null || loggedIn == false) {
     backendConnection.joinRoom(loginData.doubleName);
+    return;
   }
 
   backendConnection.joinRoom(loginData.doubleName);
-
-  await showDialog(
-    context: context,
-    builder: (BuildContext context) => CustomDialog(
-      image: Icons.check,
-      title: 'Logged in',
-      description: 'You are now logged in. Please return to your browser.',
-      actions: <Widget>[
-        FlatButton(
-          child: Text('Ok'),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        )
-      ],
-    ),
-  );
+  await showLoggedInDialog(ctx);
 }
