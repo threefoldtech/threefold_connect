@@ -10,24 +10,27 @@ import 'package:google_fonts/google_fonts.dart';
 import 'app_config.dart';
 import 'helpers/kyc_helpers.dart';
 
-
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
+
   bool initDone = await getInitDone();
   String? doubleName = await getDoubleName();
 
   await setGlobalValues();
 
-  print(AppConfig().threeBotSocketUrl());
+  String? seedPhrase = await getPhrase();
 
-  bool registered = doubleName != null;
+  if (seedPhrase != null &&
+      (await isPKidMigrationIssueSolved() == false || await isPKidMigrationIssueSolved() == null)) {
+    fixPkidMigration();
+  }
 
   if (await getPhrase() != null) {
-    await migrateToNewSystem();
     await fetchPKidData();
   }
 
+  bool registered = doubleName != null;
   runApp(MyApp(initDone: initDone, registered: registered));
 }
 
@@ -38,8 +41,7 @@ Future<void> setGlobalValues() async {
 
   Globals().emailVerified.value = (email['sei'] != null);
   Globals().phoneVerified.value = (phone['spi'] != null);
-  Globals().identityVerified.value =
-      (identity['signedIdentityNameIdentifier'] != null);
+  Globals().identityVerified.value = (identity['signedIdentityNameIdentifier'] != null);
 }
 
 class MyApp extends StatelessWidget {
@@ -63,12 +65,9 @@ class MyApp extends StatelessWidget {
         primaryColor: HexColor("#0a73b8"),
         accentColor: HexColor("#57BE8E"),
         textTheme: textTheme,
-        tabBarTheme:
-            TabBarTheme(labelStyle: textStyle, unselectedLabelStyle: textStyle),
+        tabBarTheme: TabBarTheme(labelStyle: textStyle, unselectedLabelStyle: textStyle),
         appBarTheme: AppBarTheme(
-            color: Colors.white,
-            textTheme: accentTextTheme,
-            brightness: Brightness.dark),
+            color: Colors.white, textTheme: accentTextTheme, brightness: Brightness.dark),
       ),
       home: MainScreen(initDone: initDone, registered: registered),
     );

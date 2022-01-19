@@ -7,10 +7,10 @@ import 'package:threebotlogin/services/shared_preference_service.dart';
 import '../app_config.dart';
 import 'crypto_service.dart';
 
-Future<FlutterPkid> getPkidClient() async {
+Future<FlutterPkid> getPkidClient({String seedPhrase = ''}) async {
   String pKidUrl = AppConfig().pKidUrl();
 
-  String? phrase = await getPhrase();
+  String? phrase = seedPhrase != '' ? seedPhrase : await getPhrase();
   KeyPair keyPair = await generateKeyPairFromSeedPhrase(phrase!);
 
   return FlutterPkid(pKidUrl, keyPair);

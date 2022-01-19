@@ -89,15 +89,22 @@ class _WalletState extends State<WalletWidget> with AutomaticKeepAliveClientMixi
   }
 
   initKeys() async {
-    var seed = await getDerivedSeed(config.appId());
+    var seed = base64.encode(await getDerivedSeed(config.appId()));
     var doubleName = await getDoubleName();
     var importedWallets = await getImportedWallets();
     var appWallets = await getAppWallets();
+
+    print(seed);
+    print(doubleName);
+    print(importedWallets);
+    print(appWallets);
 
     var jsStartApp = Globals().useNewWallet == true
         ? "window.init'('$doubleName', '$seed')"
         : "window.vueInstance.startWallet('$doubleName', '$seed', '$importedWallets', '$appWallets');";
 
+
+    print(jsStartApp);
     if (Globals().paymentRequest != null && !Globals().useNewWallet) {
       String paymentRequestString = Globals().paymentRequest.toString();
 

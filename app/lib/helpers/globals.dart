@@ -50,6 +50,7 @@ class Globals {
   String newWalletUrl = '';
   bool redoIdentityVerification = false;
   bool debugMode = false;
+  int timeOutSeconds = 5;
 
   VpnState vpnState = new VpnState();
 

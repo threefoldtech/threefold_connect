@@ -4,9 +4,17 @@ import 'package:threebotlogin/services/shared_preference_service.dart';
 
 import 'crypto_service.dart';
 
-Future<void> migrateToNewSystem() async {
-  await saveEmailToPKidForMigration();
-  await savePhoneToPKidForMigration();
+Future<void> fixPkidMigration() async {
+  try {
+    print('Doing the migration... ');
+    await saveEmailToPKidForMigration();
+    await savePhoneToPKidForMigration();
+
+    await setPKidMigrationIssueSolved(true);
+  }
+  catch(e) {
+    await setPKidMigrationIssueSolved(false);
+  }
 }
 
 Future<void> saveEmailInCorrectFormatPKid(Map<dynamic, dynamic> emailData) async {

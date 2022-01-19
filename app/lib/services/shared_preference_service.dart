@@ -473,3 +473,25 @@ Future<String?> getDoubleName() async {
   final SharedPreferences prefs = await SharedPreferences.getInstance();
   return prefs.getString('doubleName');
 }
+
+
+///
+///
+/// Migration problems
+///
+///
+
+
+// In the past there was a mapping mistake by Lennert in the initial migration to PKID
+// This has been solved in a second patch but we want to make sure all the users get the right fix
+Future<bool?> isPKidMigrationIssueSolved() async {
+  final SharedPreferences prefs = await SharedPreferences.getInstance();
+  return prefs.getBool('isPkidMigrationIssueSolved');
+}
+
+Future<void> setPKidMigrationIssueSolved(bool isFixed) async {
+  final SharedPreferences prefs = await SharedPreferences.getInstance();
+  await prefs.setBool('isPkidMigrationIssueSolved', isFixed);
+}
+
+

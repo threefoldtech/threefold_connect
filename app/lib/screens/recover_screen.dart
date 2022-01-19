@@ -57,7 +57,9 @@ class _RecoverScreenState extends State<RecoverScreen> {
       await savePrivateKey(keyPair.sk);
       await savePublicKey(keyPair.pk);
 
-      FlutterPkid client = await getPkidClient();
+      print('A');
+      FlutterPkid client = await getPkidClient(seedPhrase: seedPhrase);
+      print(client);
       List<String> keyWords = ['email', 'phone', 'identity'];
 
       var futures = keyWords.map((keyword) async {
@@ -76,8 +78,8 @@ class _RecoverScreenState extends State<RecoverScreen> {
 
       await handleKYCData(dataMap[0], dataMap[1], dataMap[2]);
 
-      await migrateToNewSystem();
-      // await sendVerificationEmail();
+      await fixPkidMigration();
+
     } catch (e) {
       print(e);
       throw Exception('Something went wrong');

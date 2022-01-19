@@ -41,6 +41,7 @@ class _UnregisteredScreenState extends State<UnregisteredScreen>
           context,
           MaterialPageRoute(
               builder: (context) => ChangePinScreen(hideBackButton: true)));
+
       await Navigator.push(
           context,
           MaterialPageRoute(
@@ -48,11 +49,10 @@ class _UnregisteredScreenState extends State<UnregisteredScreen>
                   title: "Recovered",
                   text: "Your account has been recovered.")));
 
+      Navigator.pop(context);
 
       await Flags().initFlagSmith();
       await Flags().setFlagSmithDefaultValues();
-
-      Navigator.pop(context);
     }
   }
 

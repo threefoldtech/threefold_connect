@@ -33,6 +33,7 @@ class Flags {
     try {
       await client?.getFeatureFlags(reload: true);
 
+      Globals().timeOutSeconds = int.parse((await Flags().getFlagValueByFeatureName('timeout-seconds'))!);
       Globals().isOpenKYCEnabled = (await Flags().hasFlagValueByFeatureName('kyc'))!;
       Globals().isYggdrasilEnabled = (await Flags().hasFlagValueByFeatureName('yggdrasil'))!;
       Globals().debugMode = (await Flags().hasFlagValueByFeatureName('debug'))!;
