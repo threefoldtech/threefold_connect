@@ -88,21 +88,8 @@ class _FarmersState extends State<FarmersWidget> with AutomaticKeepAliveClientMi
   initKeys() async {
     var seed = await getDerivedSeed(config.appId());
     var doubleName = await getDoubleName();
-    var importedWallets = await getImportedWallets();
-    var appWallets = await getAppWallets();
 
     var jsStartApp = "window.init('$doubleName', '$seed')";
-
-    if (Globals().paymentRequest != null) {
-      String paymentRequestString = Globals().paymentRequest.toString();
-
-      print('PAYMENTREQUEST');
-      print(paymentRequestString);
-
-      Globals().paymentRequestIsUsed = true;
-      jsStartApp = "window.vueInstance.startWallet('$doubleName', '$seed', '$importedWallets', '$appWallets', $paymentRequestString);";
-    }
-
     webView.evaluateJavascript(source: jsStartApp);
   }
 
@@ -145,7 +132,7 @@ class _FarmersState extends State<FarmersWidget> with AutomaticKeepAliveClientMi
   Widget build(BuildContext context) {
     super.build(context);
     return LayoutDrawer(
-        titleText: 'Wallet',
+        titleText: 'Farmers',
         content: Column(
           children: <Widget>[
             Expanded(
