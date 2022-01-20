@@ -458,7 +458,15 @@ Future<List<dynamic>> getLocationIdList() async {
   final SharedPreferences prefs = await SharedPreferences.getInstance();
 
   String? locationIdListAsJson = prefs.getString('locationIdList');
-  List<dynamic> locationIdList = jsonDecode(locationIdListAsJson!);
+
+  List<dynamic> locationIdList = [];
+
+  if(locationIdListAsJson != null) {
+    locationIdList = jsonDecode(locationIdListAsJson);
+  }
+  else {
+    locationIdList = [];
+  }
 
   return locationIdList;
 }
