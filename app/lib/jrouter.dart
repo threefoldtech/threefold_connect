@@ -55,7 +55,7 @@ class JRouter {
             icon: Icons.person_pin,
             view: await Farmers().widget(),
           ),
-          app: Wallet()),
+          app: Farmers()),
       AppInfo(
           route: Route(
             path: '/chatbot',

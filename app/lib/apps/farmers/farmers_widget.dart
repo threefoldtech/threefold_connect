@@ -100,8 +100,7 @@ class _FarmersState extends State<FarmersWidget> with AutomaticKeepAliveClientMi
       print(paymentRequestString);
 
       Globals().paymentRequestIsUsed = true;
-      jsStartApp =
-      "window.vueInstance.startWallet('$doubleName', '$seed', '$importedWallets', '$appWallets', $paymentRequestString);";
+      jsStartApp = "window.vueInstance.startWallet('$doubleName', '$seed', '$importedWallets', '$appWallets', $paymentRequestString);";
     }
 
     webView.evaluateJavascript(source: jsStartApp);

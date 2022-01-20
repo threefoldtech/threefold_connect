@@ -105,6 +105,21 @@ class _LayoutDrawerState extends State<LayoutDrawer> {
                 globals.tabController.animateTo(2);
               },
             ),
+            if (Globals().canSeeFarmers) ListTile(
+              minLeadingWidth: 10,
+              leading: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Padding(padding: const EdgeInsets.only(left: 30)),
+                  Icon(Icons.computer_sharp, color: Colors.black, size: 18)
+                ],
+              ),
+              title: Text('Farmers'),
+              onTap: () {
+                Navigator.pop(context);
+                globals.tabController.animateTo(3);
+              },
+            ) else Container(),
             ListTile(
               minLeadingWidth: 10,
               leading: Column(
@@ -117,7 +132,7 @@ class _LayoutDrawerState extends State<LayoutDrawer> {
               title: Text('Support'),
               onTap: () {
                 Navigator.pop(context);
-                globals.tabController.animateTo(3);
+                globals.tabController.animateTo(4);
               },
             ),
             // ListTile(
@@ -145,21 +160,6 @@ class _LayoutDrawerState extends State<LayoutDrawer> {
                 ],
               ),
               title: Text('Planetary Network'),
-              onTap: () {
-                Navigator.pop(context);
-                globals.tabController.animateTo(4);
-              },
-            ) else Container(),
-            if (Globals().canSeeFarmers) ListTile(
-              minLeadingWidth: 10,
-              leading: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  Padding(padding: const EdgeInsets.only(left: 30)),
-                  Icon(Icons.person_pin, color: Colors.black, size: 18)
-                ],
-              ),
-              title: Text('Farmers'),
               onTap: () {
                 Navigator.pop(context);
                 globals.tabController.animateTo(5);
