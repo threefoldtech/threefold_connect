@@ -24,8 +24,13 @@ export default new Router({
     name: 'verifysms',
     component: () => import(/* webpackChunkName: "verifysms-page" */ './views/VerifySms')
   }, {
-    path: '/error',
-    name: 'error',
-    component: () => import(/* webpackChunkName: "error-page" */ './views/Errorpage')
-  } ]
+    path: '/sign',
+    name: 'sign',
+    component: () => import(/* webpackChunkName: "sign-page" */ './views/Sign')
+  },
+    {
+      path: '/error',
+      name: 'error',
+      component: () => import(/* webpackChunkName: "error-page" */ './views/Errorpage')
+    }]
 })
