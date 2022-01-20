@@ -51,8 +51,10 @@ class Globals {
   bool isYggdrasilEnabled;
   bool useNewWallet;
   String newWalletUrl;
+  String farmersUrl;
   bool redoIdentityVerification;
   bool debugMode;
+  bool canSeeFarmers;
 
   VpnState vpnState = new VpnState();
 

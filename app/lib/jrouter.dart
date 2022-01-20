@@ -9,6 +9,7 @@ import 'package:threebotlogin/screens/preference_screen.dart';
 import 'package:threebotlogin/screens/registered_screen.dart';
 import 'package:threebotlogin/screens/reservation_screen.dart';
 
+import 'apps/farmers/farmers.dart';
 import 'apps/news/news.dart';
 
 class AppInfo {
@@ -45,6 +46,14 @@ class JRouter {
             name: 'Wallet',
             icon: Icons.account_balance_wallet,
             view: await Wallet().widget(),
+          ),
+          app: Wallet()),
+      AppInfo(
+          route: Route(
+            path: '/farmers',
+            name: 'Farmers',
+            icon: Icons.person_pin,
+            view: await Farmers().widget(),
           ),
           app: Wallet()),
       AppInfo(
