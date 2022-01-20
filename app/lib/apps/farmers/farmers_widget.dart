@@ -18,12 +18,12 @@ import 'package:threebotlogin/widgets/layout_drawer.dart';
 
 bool created = false;
 
-class WalletWidget extends StatefulWidget {
+class FarmersWidget extends StatefulWidget {
   @override
-  _WalletState createState() => _WalletState();
+  _FarmersState createState() => _FarmersState();
 }
 
-class _WalletState extends State<WalletWidget> with AutomaticKeepAliveClientMixin {
+class _FarmersState extends State<FarmersWidget> with AutomaticKeepAliveClientMixin {
   InAppWebViewController webView;
 
   double progress = 0;
@@ -41,8 +41,8 @@ class _WalletState extends State<WalletWidget> with AutomaticKeepAliveClientMixi
     this.webView.goBack();
   }
 
-  _WalletState() {
-    String walletUri = Globals().useNewWallet == true ? Globals().newWalletUrl : 'https://${config.appId()}/init';
+  _FarmersState() {
+    String walletUri = Globals().farmersUrl;
 
     iaWebView = InAppWebView(
       initialUrlRequest: URLRequest(
@@ -50,7 +50,8 @@ class _WalletState extends State<WalletWidget> with AutomaticKeepAliveClientMixi
               walletUri + '?cache_buster=' + new DateTime.now().millisecondsSinceEpoch.toString())),
       initialOptions: InAppWebViewGroupOptions(
           crossPlatform: InAppWebViewOptions(),
-          android: AndroidInAppWebViewOptions(supportMultipleWindows: true, thirdPartyCookiesEnabled: true),
+          android: AndroidInAppWebViewOptions(
+              supportMultipleWindows: true, thirdPartyCookiesEnabled: true),
           ios: IOSInAppWebViewOptions()),
       onWebViewCreated: (InAppWebViewController controller) {
         webView = controller;
@@ -87,25 +88,8 @@ class _WalletState extends State<WalletWidget> with AutomaticKeepAliveClientMixi
   initKeys() async {
     var seed = await getDerivedSeed(config.appId());
     var doubleName = await getDoubleName();
-    var importedWallets = await getImportedWallets();
-    var appWallets = await getAppWallets();
 
-
-    var jsStartApp = Globals().useNewWallet == true
-        ? "window.init('$doubleName', '$seed')"
-        : "window.vueInstance.startWallet('$doubleName', '$seed', '$importedWallets', '$appWallets');";
-
-    if (Globals().paymentRequest != null && !Globals().useNewWallet) {
-      String paymentRequestString = Globals().paymentRequest.toString();
-
-      print('PAYMENTREQUEST');
-      print(paymentRequestString);
-
-      Globals().paymentRequestIsUsed = true;
-      jsStartApp =
-          "window.vueInstance.startWallet('$doubleName', '$seed', '$importedWallets', '$appWallets', $paymentRequestString);";
-    }
-
+    var jsStartApp = "window.init('$doubleName', '$seed')";
     webView.evaluateJavascript(source: jsStartApp);
   }
 
@@ -148,7 +132,7 @@ class _WalletState extends State<WalletWidget> with AutomaticKeepAliveClientMixi
   Widget build(BuildContext context) {
     super.build(context);
     return LayoutDrawer(
-        titleText: 'Wallet',
+        titleText: 'Farmers',
         content: Column(
           children: <Widget>[
             Expanded(
