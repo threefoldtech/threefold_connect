@@ -100,7 +100,7 @@ class _WalletState extends State<WalletWidget> with AutomaticKeepAliveClientMixi
     print(appWallets);
 
     var jsStartApp = Globals().useNewWallet == true
-        ? "window.init'('$doubleName', '$seed')"
+        ? "window.init('$doubleName', '$seed')"
         : "window.vueInstance.startWallet('$doubleName', '$seed', '$importedWallets', '$appWallets');";
 
 

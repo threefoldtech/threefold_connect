@@ -113,7 +113,7 @@ Future<Response> sendVerificationEmail() async {
   String encodedBody = json.encode({
     'user_id': await getDoubleName(),
     'email': (await getEmail())['email'],
-    'public_key': await getPublicKey(),
+    'public_key': base64.encode(await getPublicKey()),
   });
 
   Uri url = Uri.parse('$openKycApiUrl/verification/send-email');
@@ -126,7 +126,7 @@ Future<Response> sendVerificationSms() async {
   String encodedBody = json.encode({
     'user_id': await getDoubleName(),
     'number': (await getPhone())['phone'],
-    'public_key': await getPublicKey(),
+    'public_key': base64.encode(await getPublicKey()),
   });
 
   Uri url = Uri.parse('$openKycApiUrl/verification/send-sms');
@@ -158,7 +158,7 @@ Future<Response> sendVerificationIdentity() async {
   String encodedBody = json.encode({
     'user_id': await getDoubleName(),
     'kycLevel': (level),
-    'public_key': await getPublicKey(),
+    'public_key': base64.encode(await getPublicKey()),
   });
 
   Uri url = Uri.parse('$openKycApiUrl/verification/send-identity');

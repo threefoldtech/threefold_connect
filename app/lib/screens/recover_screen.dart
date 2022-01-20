@@ -57,9 +57,7 @@ class _RecoverScreenState extends State<RecoverScreen> {
       await savePrivateKey(keyPair.sk);
       await savePublicKey(keyPair.pk);
 
-      print('A');
       FlutterPkid client = await getPkidClient(seedPhrase: seedPhrase);
-      print(client);
       List<String> keyWords = ['email', 'phone', 'identity'];
 
       var futures = keyWords.map((keyword) async {

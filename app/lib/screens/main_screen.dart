@@ -57,16 +57,15 @@ class _AppState extends State<MainScreen> {
   }
 
   pushScreens() async {
-    print("checking internet connection now");
-    await checkInternetConnection();
-    await checkInternetConnectionWithOurServers();
-    await checkIfAppIsUnderMaintenance();
-    await checkIfAppIsUpToDate();
-
     try {
       await Flags().initFlagSmith();
       await Flags().setFlagSmithDefaultValues();
 
+      print("Checking internet connection now");
+      await checkInternetConnection();
+      await checkInternetConnectionWithOurServers();
+      await checkIfAppIsUnderMaintenance();
+      await checkIfAppIsUpToDate();
     } catch (e) {
       print(e);
       CustomDialog dialog = CustomDialog(
@@ -113,11 +112,14 @@ class _AppState extends State<MainScreen> {
   checkInternetConnection() async {
     try {
       final List<InternetAddress> result =
-          await InternetAddress.lookup('google.com').timeout(const Duration(seconds: 3));
+          await InternetAddress.lookup('google.com').timeout(Duration(seconds: Globals().timeOutSeconds));
+
       if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
-        print('connected to the internet');
+        print('Connected to the internet');
       }
+
     } on TimeoutException catch (_) {
+      print(_);
       CustomDialog dialog = CustomDialog(
         title: "No internet connection available",
         description: "Please enable your internet connection to use this app.",
@@ -129,10 +131,12 @@ class _AppState extends State<MainScreen> {
         exit(1);
       }
     } on Exception catch (_) {
+      print(_);
       CustomDialog dialog = CustomDialog(
         title: "No internet connection available",
         description: "Please enable your internet connection to use this app.",
       );
+
       await dialog.show(context);
       if (Platform.isAndroid) {
         SystemNavigator.pop();
@@ -147,7 +151,7 @@ class _AppState extends State<MainScreen> {
       try {
         String baseUrl = AppConfig().baseUrl();
         final List<InternetAddress> result =
-            await InternetAddress.lookup('$baseUrl').timeout(const Duration(seconds: 3));
+            await InternetAddress.lookup('$baseUrl').timeout(Duration(seconds: Globals().timeOutSeconds));
         if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
           print('connected to the internet');
         }
@@ -177,8 +181,6 @@ class _AppState extends State<MainScreen> {
   }
 
   checkIfAppIsUnderMaintenance() async {
-    print('HALLO');
-    print(await isAppUnderMaintenance());
     try {
       if (await isAppUnderMaintenance()) {
         CustomDialog dialog = CustomDialog(

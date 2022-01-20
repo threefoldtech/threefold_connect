@@ -6,6 +6,7 @@ import 'package:http/http.dart' as http;
 import 'package:http/http.dart';
 import 'package:package_info/package_info.dart';
 import 'package:threebotlogin/app_config.dart';
+import 'package:threebotlogin/helpers/globals.dart';
 import 'package:threebotlogin/services/crypto_service.dart';
 import 'package:threebotlogin/services/shared_preference_service.dart';
 
@@ -85,8 +86,12 @@ Future<bool> isAppUpToDate() async {
   int currentBuildNumber = int.parse(packageInfo.buildNumber);
   int minimumBuildNumber = 0;
 
+
+  print('Count of timeout seconds');
+  print(Globals().timeOutSeconds);
+
   String jsonResponse =
-      (await http.get(url, headers: requestHeaders).timeout(const Duration(seconds: 3))).body;
+      (await http.get(url, headers: requestHeaders).timeout(Duration(seconds: Globals().timeOutSeconds))).body;
 
   Map<String, dynamic> minimumVersion = json.decode(jsonResponse);
 
@@ -104,7 +109,7 @@ Future<bool> isAppUnderMaintenance() async {
   print('Sending call: ${url.toString()}');
 
   Response response =
-      await http.get(url, headers: requestHeaders).timeout(const Duration(seconds: 3));
+      await http.get(url, headers: requestHeaders).timeout(Duration(seconds: Globals().timeOutSeconds));
 
   if (response.statusCode != 200) {
     return false;
