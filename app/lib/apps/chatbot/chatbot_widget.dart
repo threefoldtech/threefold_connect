@@ -27,7 +27,7 @@ class _ChatbotState extends State<ChatbotWidget> with AutomaticKeepAliveClientMi
               new DateTime.now().millisecondsSinceEpoch.toString())),
       initialOptions: InAppWebViewGroupOptions(
           crossPlatform: InAppWebViewOptions(useShouldOverrideUrlLoading: true),
-          android: AndroidInAppWebViewOptions(supportMultipleWindows: true)),
+          android: AndroidInAppWebViewOptions(supportMultipleWindows: true, useHybridComposition: true)),
       onWebViewCreated: (InAppWebViewController controller) {
         webView = controller;
       },

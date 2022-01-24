@@ -31,7 +31,7 @@ class _InitState extends State<InitScreen> {
               '?cache_buster=' +
               new DateTime.now().millisecondsSinceEpoch.toString())),
       initialOptions: InAppWebViewGroupOptions(
-        android: AndroidInAppWebViewOptions(supportMultipleWindows: true),
+        android: AndroidInAppWebViewOptions(supportMultipleWindows: true, useHybridComposition: true),
       ),
       onWebViewCreated: (InAppWebViewController controller) {
         webView = controller;
