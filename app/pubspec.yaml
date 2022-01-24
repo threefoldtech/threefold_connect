@@ -37,6 +37,10 @@ dependencies:
       url: https://github.com/jimbertools/shufti-jimber
       ref: main_null-safety
 
+  keyboard_visibility:
+    git:
+      url: https://github.com/jimbertools/flutter_keyboard_visibility
+
   flutter_svg: ^1.0.0
   bip39: ^1.0.6
   socket_io_client: ^1.0.2

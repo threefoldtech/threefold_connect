@@ -5,6 +5,7 @@ import cryptoService from './services/cryptoService'
 import userService from './services/userService'
 import axios from 'axios'
 import config from '../public/config'
+import { toBoolean } from 'vue-qr/src/util'
 
 Vue.use(Vuex)
 
@@ -42,7 +43,10 @@ export default new Vuex.Store({
     loginTimestamp: 0,
     loginTimeleft: 120,
     loginTimeout: 120,
-    loginInterval: null
+    loginInterval: null,
+    isJson: false,
+    dataUrl: null,
+    dataUrlHash: null,
   },
   mutations: {
     setNameCheckStatus (state, status) {
@@ -110,6 +114,15 @@ export default new Vuex.Store({
           clearInterval(this.loginInterval)
         }
       }, 1000)
+    },
+    setDataUrl (state, dataUrl) {
+      state.dataUrl = dataUrl
+    },
+    setIsJson (state, isJson) {
+      state.isJson = isJson
+    },
+    setHashedDataUrl (state, dataUrlHash) {
+      state.dataUrlHash = dataUrlHash
     }
   },
   actions: {
@@ -233,6 +246,32 @@ export default new Vuex.Store({
         context.commit('setSignedAttempt', data)
       }
     },
+
+    async signDataUser (context, data) {
+      await context.dispatch('setDoubleName', data.doubleName)
+      context.commit('setAppId', data.appId)
+      context.commit('setIsJson', data.isJson)
+      context.commit('setHashedDataUrl', data.dataUrlHash)
+      context.commit('setDataUrl', data.dataUrl)
+      let publicKey = (await userService.getUserData(context.getters.doubleName)).data.publicKey
+
+      let encryptedSignAttempt = await cryptoService.encrypt(JSON.stringify({
+        doubleName: context.getters.doubleName,
+        isJson: toBoolean(context.getters.isJson),
+        dataUrlHash: context.getters.dataUrlHash,
+        dataUrl: context.getters.dataUrl,
+        appId: context.getters.appId
+      }), publicKey)
+
+      let randomRoom = generateUUID()
+      socketService.emit('leave', { 'room': context.getters.doubleName })
+      await context.dispatch('setRandomRoom', randomRoom)
+
+      socketService.emit('sign', {
+        'doubleName': context.getters.doubleName,
+        'encryptedSignAttempt': encryptedSignAttempt
+      })
+    },
     async loginUser (context, data) {
       console.log(`LoginUser`)
       context.dispatch('setDoubleName', data.doubleName)
@@ -273,7 +312,10 @@ export default new Vuex.Store({
       socketService.emit('leave', { 'room': context.getters.doubleName })
       context.dispatch('setRandomRoom', randomRoom)
 
-      socketService.emit('login', { 'doubleName': context.getters.doubleName, 'encryptedLoginAttempt': encryptedLoginAttempt })
+      socketService.emit('login', {
+        'doubleName': context.getters.doubleName,
+        'encryptedLoginAttempt': encryptedLoginAttempt
+      })
     },
     loginUserMobile (context, data) {
       context.commit('setSignedAttempt', null)
@@ -312,7 +354,10 @@ export default new Vuex.Store({
       socketService.emit('leave', { 'room': context.getters.randomRoom })
       context.dispatch('setRandomRoom', randomRoom)
       context.dispatch('resetTimer')
-      socketService.emit('login', { 'doubleName': context.getters.doubleName, 'encryptedLoginAttempt': encryptedLoginAttempt })
+      socketService.emit('login', {
+        'doubleName': context.getters.doubleName,
+        'encryptedLoginAttempt': encryptedLoginAttempt
+      })
     },
     sendValidationEmail (context, data) {
       var callbackUrl = `${window.location.protocol}//${window.location.host}/verifyemail`
@@ -471,8 +516,11 @@ export default new Vuex.Store({
     loginTimestamp: state => state.loginTimestamp,
     loginTimeleft: state => state.loginTimeleft,
     loginTimeout: state => state.loginTimeout,
-    loginInterval: state => state.loginInterval
-  }
+    loginInterval: state => state.loginInterval,
+    dataUrl: state => state.dataUrl,
+    dataUrlHash: state => state.dataUrlHash,
+    isJson: state => state.isJson
+}
 })
 
 function generateUUID () {

@@ -22,7 +22,8 @@ export default {
       nameCheckerTimeOut: null
     }
   },
-  mounted () {},
+  mounted () {
+  },
   computed: {
     ...mapGetters([
       'nameCheckStatus',
@@ -48,10 +49,24 @@ export default {
       'checkName',
       'clearCheckStatus',
       'setAttemptCanceled',
-      'setRandomRoom'
+      'setRandomRoom',
+      'signDataUser'
     ]),
-    onSignIn () {
-      console.log('HOI')
+    async onSignIn () {
+      const query = this.$route.query
+
+      const appId = query.appId
+      const dataHash = query.dataHash
+      const dataUrl = query.dataUrl
+      const isJson = query.isJson
+      await this.signDataUser({
+        doubleName: this.doubleName,
+        appId: appId,
+        isJson: isJson,
+        dataUrlHash: dataHash,
+        dataUrl: dataUrl
+      })
+      console.log('Done')
     },
     checkNameAvailability () {
       this.clearCheckStatus()

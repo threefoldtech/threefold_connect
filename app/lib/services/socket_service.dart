@@ -8,10 +8,12 @@ import 'package:threebotlogin/events/close_auth_event.dart';
 import 'package:threebotlogin/events/close_socket_event.dart';
 import 'package:threebotlogin/events/email_event.dart';
 import 'package:threebotlogin/events/events.dart';
+import 'package:threebotlogin/events/go_sign_event.dart';
 import 'package:threebotlogin/events/new_login_event.dart';
 import 'package:threebotlogin/events/phone_event.dart';
 import 'package:threebotlogin/helpers/globals.dart';
 import 'package:threebotlogin/models/login.dart';
+import 'package:threebotlogin/models/sign.dart';
 import 'package:threebotlogin/screens/authentication_screen.dart';
 import 'package:threebotlogin/screens/login_screen.dart';
 import 'package:threebotlogin/screens/warning_screen.dart';
@@ -63,6 +65,11 @@ class BackendConnection {
       Login loginData = await Login.createAndDecryptLoginObject(data);
 
       Events().emit(NewLoginEvent(loginData: loginData));
+    });
+
+    socket.on('sign', (dynamic data) async {
+      Sign signData = await Sign.createAndDecryptSignObject(data);
+      Events().emit(NewSignEvent(signData: signData));
     });
 
     socket.on('disconnect', (_) {
