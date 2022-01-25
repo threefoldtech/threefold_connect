@@ -30,7 +30,7 @@ class _InitState extends State<InitScreen> {
       initialUrlRequest: URLRequest(url:Uri.parse(AppConfig().wizardUrl() + '?cache_buster=' + new DateTime.now().millisecondsSinceEpoch.toString())),
 
       initialOptions: InAppWebViewGroupOptions(
-        android: AndroidInAppWebViewOptions(supportMultipleWindows: true),
+        android: AndroidInAppWebViewOptions(supportMultipleWindows: true, useHybridComposition: true),
       ),
       onWebViewCreated: (InAppWebViewController controller) {
         webView = controller;
