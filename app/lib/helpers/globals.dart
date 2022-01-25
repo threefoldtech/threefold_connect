@@ -44,6 +44,7 @@ class Globals {
   bool paymentRequestIsUsed = false;
 
   // FlagSmith configurations
+<<<<<<< HEAD
   bool isOpenKYCEnabled = false;
   bool isYggdrasilEnabled = false;
   bool useNewWallet = false;
@@ -51,6 +52,16 @@ class Globals {
   bool redoIdentityVerification = false;
   bool debugMode = false;
   int timeOutSeconds = 5;
+=======
+  bool isOpenKYCEnabled;
+  bool isYggdrasilEnabled;
+  bool useNewWallet;
+  String newWalletUrl;
+  String farmersUrl;
+  bool redoIdentityVerification;
+  bool debugMode;
+  bool canSeeFarmers;
+>>>>>>> master
 
   VpnState vpnState = new VpnState();
 

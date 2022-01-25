@@ -35,15 +35,14 @@ class Flags {
   }
 
   Future<void> setFlagSmithDefaultValues() async {
-    Globals().timeOutSeconds =
-        int.parse((await Flags().getFlagValueByFeatureName('timeout-seconds'))!);
-    Globals().isOpenKYCEnabled = (await Flags().hasFlagValueByFeatureName('kyc'));
-    Globals().isYggdrasilEnabled = (await Flags().hasFlagValueByFeatureName('yggdrasil'));
-    Globals().debugMode = (await Flags().hasFlagValueByFeatureName('debug'));
-    Globals().useNewWallet = (await Flags().hasFlagValueByFeatureName('use-new-wallet'));
-    Globals().newWalletUrl = (await Flags().getFlagValueByFeatureName('new-wallet-url'))!;
-    Globals().redoIdentityVerification =
-        (await Flags().hasFlagValueByFeatureName('redo-identity-verification'));
+    Globals().isOpenKYCEnabled = await Flags().hasFlagValueByFeatureName('kyc');
+    Globals().isYggdrasilEnabled = await Flags().hasFlagValueByFeatureName('yggdrasil');
+    Globals().debugMode = await Flags().hasFlagValueByFeatureName('debug');
+    Globals().useNewWallet = await Flags().hasFlagValueByFeatureName('use-new-wallet');
+    Globals().canSeeFarmers = await Flags().hasFlagValueByFeatureName('can-see-farmers');
+    Globals().newWalletUrl = await Flags().getFlagValueByFeatureName('new-wallet-url');
+    Globals().farmersUrl = await Flags().getFlagValueByFeatureName('farmers-url');
+    Globals().redoIdentityVerification = await Flags().hasFlagValueByFeatureName('redo-identity-verification');
   }
 
   Future<bool> hasFlagValueByFeatureName(String name) async {
