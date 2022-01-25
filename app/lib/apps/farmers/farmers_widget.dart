@@ -51,7 +51,7 @@ class _FarmersState extends State<FarmersWidget> with AutomaticKeepAliveClientMi
       initialOptions: InAppWebViewGroupOptions(
           crossPlatform: InAppWebViewOptions(),
           android: AndroidInAppWebViewOptions(
-              supportMultipleWindows: true, thirdPartyCookiesEnabled: true),
+              supportMultipleWindows: true, thirdPartyCookiesEnabled: true, useHybridComposition: true),
           ios: IOSInAppWebViewOptions()),
       onWebViewCreated: (InAppWebViewController controller) {
         webView = controller;
