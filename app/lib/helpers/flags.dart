@@ -40,8 +40,8 @@ class Flags {
     Globals().debugMode = await Flags().hasFlagValueByFeatureName('debug');
     Globals().useNewWallet = await Flags().hasFlagValueByFeatureName('use-new-wallet');
     Globals().canSeeFarmers = await Flags().hasFlagValueByFeatureName('can-see-farmers');
-    Globals().newWalletUrl = await Flags().getFlagValueByFeatureName('new-wallet-url');
-    Globals().farmersUrl = await Flags().getFlagValueByFeatureName('farmers-url');
+    Globals().newWalletUrl = (await Flags().getFlagValueByFeatureName('new-wallet-url'))!;
+    Globals().farmersUrl = (await Flags().getFlagValueByFeatureName('farmers-url'))!;
     Globals().redoIdentityVerification = await Flags().hasFlagValueByFeatureName('redo-identity-verification');
   }
 
