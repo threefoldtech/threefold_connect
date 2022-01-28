@@ -111,7 +111,7 @@ class _LayoutDrawerState extends State<LayoutDrawer> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
                   Padding(padding: const EdgeInsets.only(left: 30)),
-                  Icon(Icons.computer_sharp, color: Colors.black, size: 18)
+                  Icon(Icons.account_tree_outlined, color: Colors.black, size: 18)
                 ],
               ),
               title: Text('Farmers'),

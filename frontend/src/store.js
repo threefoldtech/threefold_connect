@@ -47,6 +47,7 @@ export default new Vuex.Store({
     isJson: false,
     dataUrl: null,
     dataUrlHash: null,
+    signedSignAttempt: null
   },
   mutations: {
     setNameCheckStatus (state, status) {
@@ -69,6 +70,9 @@ export default new Vuex.Store({
     },
     setCancelLoginUp (state, cancelLoginUp) {
       state.cancelLoginUp = cancelLoginUp
+    },
+    setSignedSignAttempt (state, signedSignAttempt) {
+      state.signedSignAttempt = signedSignAttempt
     },
     setSignedAttempt (state, signedAttempt) {
       state.signedAttempt = signedAttempt
@@ -188,6 +192,21 @@ export default new Vuex.Store({
       console.log('f')
       context.commit('setCancelLoginUp', true)
     },
+
+    async SOCKET_signedSignDataAttempt (context, data) {
+      console.log('signedSignDataAttempt', data.signedSignAttempt)
+      console.log('signedSignDataAttempt', data.doubleName)
+
+      let publicKey = (await userService.getUserData(data.doubleName)).data.publicKey
+      var signedAttempt = await cryptoService.validateSignedAttempt(data.signedSignAttempt, publicKey)
+      console.log('decoded', signedAttempt)
+      var string = new TextDecoder().decode(signedAttempt)
+
+
+      context.commit('setSignedSignAttempt', data)
+      console.log(data)
+    },
+
     async SOCKET_signedAttempt (context, data) {
       console.log('signedAttempt', data.signedAttempt)
       console.log('signedAttempt', data.doubleName)
@@ -254,18 +273,17 @@ export default new Vuex.Store({
       context.commit('setHashedDataUrl', data.dataUrlHash)
       context.commit('setDataUrl', data.dataUrl)
       let publicKey = (await userService.getUserData(context.getters.doubleName)).data.publicKey
-
+      let randomRoom = generateUUID()
+      socketService.emit('leave', { 'room': context.getters.doubleName })
+      await context.dispatch('setRandomRoom', randomRoom)
       let encryptedSignAttempt = await cryptoService.encrypt(JSON.stringify({
         doubleName: context.getters.doubleName,
         isJson: toBoolean(context.getters.isJson),
         dataUrlHash: context.getters.dataUrlHash,
         dataUrl: context.getters.dataUrl,
-        appId: context.getters.appId
+        appId: context.getters.appId,
+        randomRoom: randomRoom
       }), publicKey)
-
-      let randomRoom = generateUUID()
-      socketService.emit('leave', { 'room': context.getters.doubleName })
-      await context.dispatch('setRandomRoom', randomRoom)
 
       socketService.emit('sign', {
         'doubleName': context.getters.doubleName,
@@ -519,8 +537,9 @@ export default new Vuex.Store({
     loginInterval: state => state.loginInterval,
     dataUrl: state => state.dataUrl,
     dataUrlHash: state => state.dataUrlHash,
-    isJson: state => state.isJson
-}
+    isJson: state => state.isJson,
+    signedSignAttempt: state => state.signedSignAttempt
+  }
 })
 
 function generateUUID () {

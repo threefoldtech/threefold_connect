@@ -11,6 +11,7 @@ import 'package:threebotlogin/events/email_event.dart';
 import 'package:threebotlogin/events/go_news_event.dart';
 import 'package:threebotlogin/events/go_reservations_event.dart';
 import 'package:threebotlogin/events/go_settings_event.dart';
+import 'package:threebotlogin/events/go_sign_event.dart';
 import 'package:threebotlogin/events/go_support_event.dart';
 import 'package:threebotlogin/events/identity_callback_event.dart';
 import 'package:threebotlogin/events/phone_event.dart';
@@ -157,6 +158,10 @@ class _HomeScreenState extends State<HomeScreen>
 
     Events().onEvent(NewLoginEvent().runtimeType, (NewLoginEvent event) {
       openLogin(context, event.loginData!, widget.backendConnection!);
+    });
+
+    Events().onEvent(NewSignEvent().runtimeType, (NewSignEvent event) {
+      openSign(context, event.signData!, widget.backendConnection!);
     });
 
     Events().onEvent(EmailEvent().runtimeType, (EmailEvent event) {

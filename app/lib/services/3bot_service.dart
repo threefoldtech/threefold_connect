@@ -13,6 +13,29 @@ import 'package:threebotlogin/services/shared_preference_service.dart';
 String threeBotApiUrl = AppConfig().threeBotApiUrl();
 Map<String, String> requestHeaders = {'Content-type': 'application/json'};
 
+Future<Response> sendSignedData(
+    String socketRoom, String signedDataIdentifier, String appId) async {
+  Uri url = Uri.parse('$threeBotApiUrl/signedSignDataAttempt');
+  print('Sending call: ${url.toString()}');
+
+  String timestamp = new DateTime.now().millisecondsSinceEpoch.toString();
+
+  Uint8List sk = await getPrivateKey();
+  String encodedBody = jsonEncode({
+    'signedSignAttempt': await signData(
+        json.encode({
+          'signedOn': timestamp,
+          'randomRoom': socketRoom,
+          'appId': appId,
+          'signedData': signedDataIdentifier
+        }),
+        sk),
+    'doubleName': await getDoubleName()
+  });
+
+  return http.post(url, body: encodedBody, headers: requestHeaders);
+}
+
 Future<Response> sendData(String state, Map<String, String>? data, selectedImageId,
     String? randomRoom, String appId) async {
   Uri url = Uri.parse('$threeBotApiUrl/signedAttempt');
@@ -86,12 +109,13 @@ Future<bool> isAppUpToDate() async {
   int currentBuildNumber = int.parse(packageInfo.buildNumber);
   int minimumBuildNumber = 0;
 
-
   print('Count of timeout seconds');
   print(Globals().timeOutSeconds);
 
-  String jsonResponse =
-      (await http.get(url, headers: requestHeaders).timeout(Duration(seconds: Globals().timeOutSeconds))).body;
+  String jsonResponse = (await http
+          .get(url, headers: requestHeaders)
+          .timeout(Duration(seconds: Globals().timeOutSeconds)))
+      .body;
 
   Map<String, dynamic> minimumVersion = json.decode(jsonResponse);
 
@@ -108,8 +132,9 @@ Future<bool> isAppUnderMaintenance() async {
   Uri url = Uri.parse('$threeBotApiUrl/maintenance');
   print('Sending call: ${url.toString()}');
 
-  Response response =
-      await http.get(url, headers: requestHeaders).timeout(Duration(seconds: Globals().timeOutSeconds));
+  Response response = await http
+      .get(url, headers: requestHeaders)
+      .timeout(Duration(seconds: Globals().timeOutSeconds));
 
   if (response.statusCode != 200) {
     return false;

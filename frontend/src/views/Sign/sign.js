@@ -27,7 +27,7 @@ export default {
   computed: {
     ...mapGetters([
       'nameCheckStatus',
-      'signedAttempt',
+      'signedSignAttempt',
       'redirectUrl',
       'firstTime',
       'randomImageId',
@@ -78,6 +78,57 @@ export default {
       }
     }
   },
-  cancelLoginUp (val) {
+  watch: {
+    signedSignAttempt (val) {
+      if (!val) {
+        console.log('Missing data')
+        return
+      }
+
+      try {
+        console.log('signedAttemptObject: ', val)
+        console.log('signedAttemptObject: ', JSON.stringify(val))
+        window.localStorage.setItem('username', this.doubleName)
+
+        var data = encodeURIComponent(JSON.stringify(val))
+        console.log('data', data)
+
+        if (data) {
+          var union = '?'
+          if (this.redirectUrl.indexOf('?') >= 0) {
+            union = '&'
+          }
+
+          var safeRedirectUri
+          // Otherwise evil app could do appid+redirecturl = wallet.com + .evil.com = wallet.com.evil.com
+          // Now its wallet.com/.evil.com
+          if (this.redirectUrl[0] === '/') {
+            safeRedirectUri = this.redirectUrl
+          } else {
+            safeRedirectUri = '/' + this.redirectUrl
+          }
+
+          console.log('!!!! this.doubleName: ', this.doubleName)
+          var url = `//${this.appId}${safeRedirectUri}${union}signedAttempt=${data}`
+
+          if (!this.isRedirecting) {
+            this.isRedirecting = true
+            console.log('Changing href: ', url)
+            window.location.href = url
+          }
+        }
+      }
+    else
+      {
+        console.log('Val was null')
+      }
+    } catch (e) {
+      console.log('Something went wrong ... ', e)
+    }
   }
+}
+,
+cancelLoginUp(val)
+{
+}
 }

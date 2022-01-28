@@ -11,7 +11,7 @@ config = configparser.ConfigParser()
 config.read("config.ini")
 
 
-def verify_signed_data(double_name, data):
+def  verify_signed_data(double_name, data):
     if 'DEBUG_PLAIN_SIGNED_DATA' in config["DEFAULT"] and int(config["DEFAULT"]["DEBUG_PLAIN_SIGNED_DATA"]) == 1:
         return json.dumps(data).encode('utf8')
 

@@ -9,6 +9,15 @@ import 'package:threebotlogin/services/shared_preference_service.dart';
 import 'package:pbkdf2ns/pbkdf2ns.dart';
 
 
+bool verifyHash(String data, String hash) {
+  final List<int> codeUnits = data.codeUnits;
+  final Uint8List unit8List = Uint8List.fromList(codeUnits);
+
+  Uint8List hashedData = Sodium.cryptoHash(unit8List);
+
+  return hash == base64.encode(hashedData);
+}
+
 // Helper method to convert a String input to hex used for entropy
 Uint8List _toHex(String input) {
   double length = input.length / 2;
@@ -60,8 +69,6 @@ Future<String> decrypt(String encodedCipherText, Uint8List pk, Uint8List sk) asy
   Uint8List publicKey = Sodium.cryptoSignEd25519PkToCurve25519(pk);
   Uint8List secretKey = Sodium.cryptoSignEd25519SkToCurve25519(sk);
 
-  print(base64.encode(publicKey));
-  print(base64.encode(secretKey));
   Uint8List decryptedData = Sodium.cryptoBoxSealOpen(cipherText, publicKey, secretKey);
   return new String.fromCharCodes(decryptedData);
 }

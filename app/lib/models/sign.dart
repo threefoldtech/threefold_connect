@@ -5,29 +5,42 @@ import 'package:threebotlogin/services/crypto_service.dart';
 import 'package:threebotlogin/services/shared_preference_service.dart';
 
 class Sign {
+  String? doubleName;
   String? hashedDataUrl;
   String? dataUrl;
   String? appId;
   bool? isJson;
+  String? type;
+  String? randomRoom;
 
   Sign({
+    this.doubleName,
     this.hashedDataUrl,
     this.dataUrl,
     this.isJson,
     this.appId,
+    this.type,
+    this.randomRoom
   });
 
   Sign.fromJson(Map<String, dynamic> json)
-      : hashedDataUrl = json['dataUrlHash'],
+      :
+        doubleName = json['doubleName'],
+        hashedDataUrl = json['dataUrlHash'],
         dataUrl = json['dataUrl'],
         appId = json['appId'],
-        isJson = json['isJson'] as bool?;
+        isJson = json['isJson'] as bool?,
+        type = json['type'],
+        randomRoom = json['randomRoom'];
 
   Map<String, dynamic> toJson() => {
+        'doubleName' : doubleName,
         'hashedDataUrl': hashedDataUrl,
         'dataUrl': dataUrl,
         'isJson': isJson,
         'appId': appId,
+        'type' : type,
+        'randomRoom' : randomRoom
       };
 
   static Future<Sign> createAndDecryptSignObject(dynamic data) async {

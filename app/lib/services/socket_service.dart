@@ -16,6 +16,7 @@ import 'package:threebotlogin/models/login.dart';
 import 'package:threebotlogin/models/sign.dart';
 import 'package:threebotlogin/screens/authentication_screen.dart';
 import 'package:threebotlogin/screens/login_screen.dart';
+import 'package:threebotlogin/screens/sign_screen.dart';
 import 'package:threebotlogin/screens/warning_screen.dart';
 import 'package:threebotlogin/services/fingerprint_service.dart';
 import 'package:threebotlogin/services/open_kyc_service.dart';
@@ -339,6 +340,54 @@ Future identityVerification(String reference) async {
 
   return 'Verified';
 }
+
+
+Future openSign(BuildContext ctx, Sign signData, BackendConnection backendConnection) async {
+  print('Open sign');
+  String? messageType = signData.type;
+
+  print(signData.toJson());
+  print(messageType);
+
+  if (messageType == null || messageType != 'sign') {
+    return;
+  }
+
+  String? pin = await getPin();
+  Events().emit(CloseAuthEvent(close: true));
+
+  bool? authenticated = await Navigator.push(
+    ctx,
+    MaterialPageRoute(
+      builder: (context) => AuthenticationScreen(
+          correctPin: pin!, userMessage: "sign your attempt"),
+    ),
+  );
+
+  if (authenticated == null || authenticated == false) {
+    return;
+  }
+
+  print('Jahoo');
+
+  backendConnection.leaveRoom(signData.doubleName);
+
+  bool? signAccepted = await Navigator.push(
+    ctx,
+    MaterialPageRoute(
+      builder: (context) => SignScreen(signData),
+    ),
+  );
+
+  if (signAccepted == null || signAccepted == false) {
+    backendConnection.joinRoom(signData.doubleName);
+    return;
+  }
+
+  backendConnection.joinRoom(signData.doubleName);
+  await showLoggedInDialog(ctx);
+}
+
 
 Future openLogin(BuildContext ctx, Login loginData, BackendConnection backendConnection) async {
   String? messageType = loginData.type;
