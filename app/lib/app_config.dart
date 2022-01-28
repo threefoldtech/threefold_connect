@@ -131,7 +131,7 @@ class AppConfigStaging extends AppConfigImpl {
   }
 
   String pKidUrl() {
-    return 'https://pkid.staging.jimber.org/v1';
+    return 'https://pkid.staging.jimber.io/v1';
   }
 
   Map<String, String> flagSmithConfig() {
@@ -168,7 +168,7 @@ class AppConfigTesting extends AppConfigImpl {
   }
 
   String pKidUrl() {
-    return 'https://pkid.staging.jimber.org/v1';
+    return 'https://pkid.staging.jimber.io/v1';
   }
 
   Map<String, String> flagSmithConfig() {
