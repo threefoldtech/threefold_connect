@@ -1,0 +1,14 @@
+#apiVersion: v1
+#kind: PersistentVolume 
+#metadata:
+#  name: {{ template "releaseName" .}}-ps
+#  labels:
+#    type: {{ .Values.storage.className }}
+#spec:
+#  storageClassName: {{ .Values.storage.className }}
+#  capacity:
+#    storage: {{ .Values.storage.size }}
+#  accessModes:
+#    - {{ .Values.storage.rights }}
+#  hostPath:
+#    path: {{ .Values.storage.hostpath }}

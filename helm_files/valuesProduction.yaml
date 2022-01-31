@@ -1,0 +1,28 @@
+environment: prod
+
+images:
+  login:
+    name: threebotlogin-prod
+    tag: production-337f2c85635dc81a5e59756dcfc66303f6f6afd7
+  wizard:
+    name: wizard-prod
+    tag: prodv1
+
+
+ingress:
+  # Used to create an Ingress record.
+  hosts:
+    - name: login.threefold.me
+      # default paths for "/" and "/*" will be added
+      path: /
+      service: threebotlogin-prod
+      port: 80
+    - name: login.threefold.me
+      path: /socket.io/
+      service: threebotlogin-prod
+      port: 5000
+    - name: wizard.jimber.org
+      path: /
+      service: wizard-prod
+      port: 82
+
