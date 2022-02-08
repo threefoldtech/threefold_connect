@@ -95,6 +95,8 @@ export default {
 
         if (data) {
           var union = '?'
+          console.log('redirect url: ')
+          console.log(this.redirectUrl)
           if (this.redirectUrl.indexOf('?') >= 0) {
             union = '&'
           }
@@ -116,19 +118,14 @@ export default {
             console.log('Changing href: ', url)
             window.location.href = url
           }
+        } else {
+          console.log('Val was null')
         }
+      } catch (e) {
+        console.log('Something went wrong ... ', e)
       }
-    else
-      {
-        console.log('Val was null')
-      }
-    } catch (e) {
-      console.log('Something went wrong ... ', e)
     }
+  },
+  cancelLoginUp (val) {
   }
-}
-,
-cancelLoginUp(val)
-{
-}
 }

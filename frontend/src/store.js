@@ -202,6 +202,7 @@ export default new Vuex.Store({
       console.log('decoded', signedAttempt)
       var string = new TextDecoder().decode(signedAttempt)
 
+      console.log('in string', string)
 
       context.commit('setSignedSignAttempt', data)
       console.log(data)

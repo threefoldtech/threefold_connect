@@ -12,6 +12,7 @@ class Sign {
   bool? isJson;
   String? type;
   String? randomRoom;
+  String? redirectUrl;
 
   Sign({
     this.doubleName,
@@ -20,7 +21,8 @@ class Sign {
     this.isJson,
     this.appId,
     this.type,
-    this.randomRoom
+    this.randomRoom,
+    this.redirectUrl
   });
 
   Sign.fromJson(Map<String, dynamic> json)
@@ -31,7 +33,8 @@ class Sign {
         appId = json['appId'],
         isJson = json['isJson'] as bool?,
         type = json['type'],
-        randomRoom = json['randomRoom'];
+        randomRoom = json['randomRoom'],
+        redirectUrl = json['redirectUrl'];
 
   Map<String, dynamic> toJson() => {
         'doubleName' : doubleName,
@@ -40,7 +43,8 @@ class Sign {
         'isJson': isJson,
         'appId': appId,
         'type' : type,
-        'randomRoom' : randomRoom
+        'randomRoom' : randomRoom,
+        'redirectUrl' : redirectUrl
       };
 
   static Future<Sign> createAndDecryptSignObject(dynamic data) async {
