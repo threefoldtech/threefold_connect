@@ -13,6 +13,7 @@ class Sign {
   String? type;
   String? randomRoom;
   String? redirectUrl;
+  String? state;
 
   Sign({
     this.doubleName,
@@ -22,7 +23,8 @@ class Sign {
     this.appId,
     this.type,
     this.randomRoom,
-    this.redirectUrl
+    this.redirectUrl,
+    this.state
   });
 
   Sign.fromJson(Map<String, dynamic> json)
@@ -34,7 +36,8 @@ class Sign {
         isJson = json['isJson'] as bool?,
         type = json['type'],
         randomRoom = json['randomRoom'],
-        redirectUrl = json['redirectUrl'];
+        redirectUrl = json['redirectUrl'],
+        state = json['state'];
 
   Map<String, dynamic> toJson() => {
         'doubleName' : doubleName,
@@ -44,7 +47,8 @@ class Sign {
         'appId': appId,
         'type' : type,
         'randomRoom' : randomRoom,
-        'redirectUrl' : redirectUrl
+        'redirectUrl' : redirectUrl,
+        'state' : state
       };
 
   static Future<Sign> createAndDecryptSignObject(dynamic data) async {
@@ -62,6 +66,9 @@ class Sign {
 
       decryptedSignAttemptMap['type'] = data['type'];
       signData = Sign.fromJson(decryptedSignAttemptMap);
+
+      print('This is the signData');
+      print(signData);
     } else {
       signData = Sign.fromJson(data);
     }

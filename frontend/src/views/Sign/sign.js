@@ -55,16 +55,23 @@ export default {
     async onSignIn () {
       const query = this.$route.query
 
+      console.log('QUERIES')
+      console.log(query)
       const appId = query.appId
       const dataHash = query.dataHash
       const dataUrl = query.dataUrl
       const isJson = query.isJson
+      const redirectUrl = query.redirectUrl
+      const state = query.state
+
       await this.signDataUser({
         doubleName: this.doubleName,
         appId: appId,
         isJson: isJson,
         dataUrlHash: dataHash,
-        dataUrl: dataUrl
+        dataUrl: dataUrl,
+        redirectUrl: redirectUrl,
+        state: state
       })
       console.log('Done')
     },

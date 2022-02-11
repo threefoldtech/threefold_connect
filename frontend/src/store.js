@@ -194,11 +194,11 @@ export default new Vuex.Store({
     },
 
     async SOCKET_signedSignDataAttempt (context, data) {
-      console.log('signedSignDataAttempt', data.signedSignAttempt)
+      console.log('signedSignDataAttempt', data.signedAttempt)
       console.log('signedSignDataAttempt', data.doubleName)
 
       let publicKey = (await userService.getUserData(data.doubleName)).data.publicKey
-      var signedAttempt = await cryptoService.validateSignedAttempt(data.signedSignAttempt, publicKey)
+      var signedAttempt = await cryptoService.validateSignedAttempt(data.signedAttempt, publicKey)
       console.log('decoded', signedAttempt)
       var string = new TextDecoder().decode(signedAttempt)
 
@@ -273,17 +273,25 @@ export default new Vuex.Store({
       context.commit('setIsJson', data.isJson)
       context.commit('setHashedDataUrl', data.dataUrlHash)
       context.commit('setDataUrl', data.dataUrl)
+      context.commit('setRedirectUrl', data.redirectUrl)
+      context.commit('setState', data.state)
+
+      console.log('THIS IS THE STATE')
+      console.log(data.state)
+
       let publicKey = (await userService.getUserData(context.getters.doubleName)).data.publicKey
       let randomRoom = generateUUID()
       socketService.emit('leave', { 'room': context.getters.doubleName })
       await context.dispatch('setRandomRoom', randomRoom)
       let encryptedSignAttempt = await cryptoService.encrypt(JSON.stringify({
+        state: context.getters._state,
         doubleName: context.getters.doubleName,
         isJson: toBoolean(context.getters.isJson),
         dataUrlHash: context.getters.dataUrlHash,
         dataUrl: context.getters.dataUrl,
         appId: context.getters.appId,
-        randomRoom: randomRoom
+        randomRoom: randomRoom,
+        redirectUrl: context.getters.redirectUrl
       }), publicKey)
 
       socketService.emit('sign', {

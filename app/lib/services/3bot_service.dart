@@ -14,7 +14,7 @@ String threeBotApiUrl = AppConfig().threeBotApiUrl();
 Map<String, String> requestHeaders = {'Content-type': 'application/json'};
 
 Future<Response> sendSignedData(
-    String socketRoom, String signedDataIdentifier, String appId) async {
+    String state, String socketRoom, String signedDataIdentifier, String appId) async {
   Uri url = Uri.parse('$threeBotApiUrl/signedSignDataAttempt');
   print('Sending call: ${url.toString()}');
 
@@ -22,12 +22,14 @@ Future<Response> sendSignedData(
 
   Uint8List sk = await getPrivateKey();
   String encodedBody = jsonEncode({
-    'signedSignAttempt': await signData(
+    'signedAttempt': await signData(
         json.encode({
+          'signedState': state,
           'signedOn': timestamp,
           'randomRoom': socketRoom,
           'appId': appId,
-          'signedData': signedDataIdentifier
+          'signedData': signedDataIdentifier,
+          'doubleName' : await getDoubleName()
         }),
         sk),
     'doubleName': await getDoubleName()

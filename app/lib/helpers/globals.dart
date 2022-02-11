@@ -13,9 +13,9 @@ class NoAnimationTabController extends TabController {
 
   @override
   void animateTo(int value,
-      {Duration duration = kTabScrollDuration, Curve curve = Curves.ease}) {
+      {Duration? duration = kTabScrollDuration, Curve curve = Curves.ease}) {
     super.animateTo(value,
-        duration: const Duration(milliseconds: 0), curve: curve);
+        duration: const Duration(milliseconds: 1000), curve: curve);
   }
 }
 

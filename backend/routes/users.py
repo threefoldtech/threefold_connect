@@ -188,6 +188,106 @@ def set_phone_verified_handler(doublename):
     return Response("Ok")
 
 
+@ api_users.route("testing", methods=["get"])
+def testing():
+
+    user = '''{
+      "ParaString": "www.apigj.com",
+      "ParaObject": {
+        "ObjectType": "Api",
+        "ObjectName": "Manager",
+        "ObjectId": "Code",
+        "FatherId": "Generator"
+      },
+      "ParaLong": 6222123188092928,
+      "ParaInt": 5303,
+      "ParaFloat": -268311581425.664,
+      "ParaBool": false,
+      "ParaArrString": [
+        "easy",
+        "fast"
+      ],
+      "ParaArrObj": [
+        {
+          "SParaString": "Work efficiently long words long words long words long words long words long words long words long words long words long words long words long words long words ",
+          "SParaLong": 7996655703949312,
+          "SParaInt": 8429,
+          "SParaFloat": -67669103057.3056,
+          "SParaBool": false,
+          "SParaArrString": [
+            "har",
+            "zezbehseh"
+          ],
+          "SParaArrLong": [
+            6141464276893696,
+            2096646955466752
+          ],
+          "SParaArrInt": [
+            1601,
+            757
+          ],
+          "SParaArrFloat": [
+            -643739466439.0656,
+            -582978647149.7728
+          ],
+          "SParaArrBool": [
+            false,
+            false
+          ]
+        },
+        {
+          "SParaString": "Let's go",
+          "SParaLong": 641970970034176,
+          "SParaInt": 37,
+          "SParaFloat": 556457726574.592,
+          "SParaBool": false,
+          "SParaArrString": [
+            "miw",
+            "aweler"
+          ],
+          "SParaArrLong": [
+            3828767638159360,
+            7205915801419776
+          ],
+          "SParaArrInt": [
+            1187,
+            6397
+          ],
+          "SParaArrFloat": [
+            -744659811617.9968,
+            494621489417.4208
+          ],
+          "SParaArrBool": [
+            true,
+            false
+          ]
+        }
+      ],
+      "ParaArrLong": [
+        7607846344589312,
+        7840335854043136
+      ],
+      "ParaArrInt": [
+        2467,
+        1733
+      ],
+      "ParaArrFloat": [
+        759502472845.7216,
+        -157877664743.424
+      ],
+      "ParaArrBool": [
+        true,
+        true
+      ]
+    }'''
+
+    response = Response(
+        response=user, mimetype="application/json"
+    )
+
+    return response
+
+
 @ api_users.route("/change-email", methods=["POST"])
 def change_email_for_user():
     body = request.get_json()

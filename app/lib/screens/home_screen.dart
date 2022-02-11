@@ -50,10 +50,12 @@ class _HomeScreenState extends State<HomeScreen>
   final int pinCheckTimeout = 60000 * 5;
 
   _HomeScreenState() {
+    print('YO');
+    print(mounted);
     globals.tabController = NoAnimationTabController(
         initialIndex: 0, length: Globals().router.routes.length, vsync: this);
-    //Events().onEvent(FfpBrowseEvent().runtimeType, activateFfpTab);
     globals.tabController.addListener(_handleTabSelection);
+    print('YO 2');
   }
 
   void checkPinAndNavigateIfSuccess(int indexIfAuthIsSuccess) async {
@@ -118,6 +120,7 @@ class _HomeScreenState extends State<HomeScreen>
 
   @override
   void initState() {
+    print('INITIALIZATION');
     super.initState();
     initUniLinks();
 

@@ -31,6 +31,7 @@ class MainScreen extends StatefulWidget {
 class _AppState extends State<MainScreen> {
   StreamSubscription? _sub;
   String? initialLink;
+
   // FirebaseNotificationListener _listener;
   late BackendConnection _backendConnection;
 
@@ -84,7 +85,8 @@ class _AppState extends State<MainScreen> {
       InitScreen init = InitScreen();
       bool accepted = false;
       while (!accepted) {
-        accepted = !(await Navigator.push(context, MaterialPageRoute(builder: (context) => init)) == null);
+        accepted =
+            !(await Navigator.push(context, MaterialPageRoute(builder: (context) => init)) == null);
       }
     }
 
@@ -102,22 +104,21 @@ class _AppState extends State<MainScreen> {
     if (_sub != null) {
       _sub?.cancel();
     }
-
     await Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-            builder: (context) => HomeScreen(initialLink: initialLink, backendConnection: _backendConnection)));
+            builder: (context) =>
+                HomeScreen(initialLink: initialLink, backendConnection: _backendConnection)));
   }
 
   checkInternetConnection() async {
     try {
-      final List<InternetAddress> result =
-          await InternetAddress.lookup('google.com').timeout(Duration(seconds: Globals().timeOutSeconds));
+      final List<InternetAddress> result = await InternetAddress.lookup('google.com')
+          .timeout(Duration(seconds: Globals().timeOutSeconds));
 
       if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
         print('Connected to the internet');
       }
-
     } on TimeoutException catch (_) {
       print(_);
       CustomDialog dialog = CustomDialog(
@@ -150,8 +151,8 @@ class _AppState extends State<MainScreen> {
     if (AppConfig().environment != Environment.Local) {
       try {
         String baseUrl = AppConfig().baseUrl();
-        final List<InternetAddress> result =
-            await InternetAddress.lookup('$baseUrl').timeout(Duration(seconds: Globals().timeOutSeconds));
+        final List<InternetAddress> result = await InternetAddress.lookup('$baseUrl')
+            .timeout(Duration(seconds: Globals().timeOutSeconds));
         if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
           print('connected to the internet');
         }
@@ -206,7 +207,8 @@ class _AppState extends State<MainScreen> {
       }
     } on Exception catch (_) {
       CustomDialog dialog = CustomDialog(
-          title: "Oops", description: "Something went wrong. Please contact support if this issue persists.");
+          title: "Oops",
+          description: "Something went wrong. Please contact support if this issue persists.");
       await dialog.show(context);
       if (Platform.isAndroid) {
         SystemNavigator.pop();
@@ -220,7 +222,8 @@ class _AppState extends State<MainScreen> {
     try {
       if (!await isAppUpToDate()) {
         CustomDialog dialog = CustomDialog(
-            title: "Update required", description: "The app is outdated. Please, update it to the latest version.");
+            title: "Update required",
+            description: "The app is outdated. Please, update it to the latest version.");
 
         await dialog.show(context);
         if (Platform.isAndroid) {

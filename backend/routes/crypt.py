@@ -41,7 +41,7 @@ def sign_data_attempt_handler():
     data = request.get_json()
 
     double_name = data["doubleName"].lower()
-    verified_data = verify_signed_data(double_name, data["signedSignAttempt"])
+    verified_data = verify_signed_data(double_name, data["signedAttempt"])
 
     if not verified_data:
         return Response("Missing signature", status=400)
