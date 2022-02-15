@@ -170,6 +170,15 @@ def cancel_login_attempt(doublename):
     return Response("Canceled by User")
 
 
+@ api_users.route("/<doublename>/cancelSign", methods=["POST"])
+def cancel_sign_attempt(doublename):
+    logger.debug("/cancel %s", doublename)
+    user = db.get_user_by_double_name(doublename)
+
+    sio.emit("cancelSign", {"scanned": True}, room=user["double_name"])
+    return Response("Canceled Sign by User")
+
+
 @ api_users.route("/<doublename>/emailverified", methods=["post"])
 def set_email_verified_handler(doublename):
     logger.debug("/emailverified from user %s", doublename)

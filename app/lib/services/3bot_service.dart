@@ -153,6 +153,13 @@ Future<Response> cancelLogin(doubleName) {
   return http.post(url, body: null, headers: requestHeaders);
 }
 
+Future<Response> cancelSign(doubleName) {
+  Uri url = Uri.parse('$threeBotApiUrl/users/$doubleName/cancelSign');
+  print('Sending call: ${url.toString()}');
+
+  return http.post(url, body: null, headers: requestHeaders);
+}
+
 Future<Response> getUserInfo(doubleName) {
   Uri url = Uri.parse('$threeBotApiUrl/users/$doubleName');
   print('Sending call: ${url.toString()}');

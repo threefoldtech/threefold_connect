@@ -343,11 +343,7 @@ Future identityVerification(String reference) async {
 
 
 Future openSign(BuildContext ctx, Sign signData, BackendConnection backendConnection) async {
-  print('Open sign');
   String? messageType = signData.type;
-
-  print(signData.toJson());
-  print(messageType);
 
   if (messageType == null || messageType != 'sign') {
     return;
@@ -368,7 +364,6 @@ Future openSign(BuildContext ctx, Sign signData, BackendConnection backendConnec
     return;
   }
 
-  print('Jahoo');
 
   backendConnection.leaveRoom(signData.doubleName);
 
@@ -385,7 +380,7 @@ Future openSign(BuildContext ctx, Sign signData, BackendConnection backendConnec
   }
 
   backendConnection.joinRoom(signData.doubleName);
-  await showLoggedInDialog(ctx);
+  await showSignedInDialog(ctx);
 }
 
 

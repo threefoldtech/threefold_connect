@@ -19,7 +19,8 @@ export default {
         v => v.length <= 50 || 'Name must be less than 50 characters.'
       ],
       url: '',
-      nameCheckerTimeOut: null
+      nameCheckerTimeOut: null,
+      isSignAttemptOnGoing: false
     }
   },
   mounted () {
@@ -31,11 +32,12 @@ export default {
       'redirectUrl',
       'firstTime',
       'randomImageId',
-      'cancelLoginUp',
+      'cancelSignUp',
       '_state',
       'scope',
       'appId',
-      'appPublicKey'
+      'appPublicKey',
+      'signAttemptOnGoing'
     ])
   },
   methods: {
@@ -48,15 +50,17 @@ export default {
       'setAppPublicKey',
       'checkName',
       'clearCheckStatus',
-      'setAttemptCanceled',
+      'setSignAttemptCanceled',
       'setRandomRoom',
-      'signDataUser'
+      'signDataUser',
+      'resendSignNotification'
     ]),
+    async triggerResendSignSocket () {
+      await this.resendSignNotification()
+    },
     async onSignIn () {
       const query = this.$route.query
 
-      console.log('QUERIES')
-      console.log(query)
       const appId = query.appId
       const dataHash = query.dataHash
       const dataUrl = query.dataUrl
@@ -73,7 +77,6 @@ export default {
         redirectUrl: redirectUrl,
         state: state
       })
-      console.log('Done')
     },
     checkNameAvailability () {
       this.clearCheckStatus()
@@ -131,8 +134,22 @@ export default {
       } catch (e) {
         console.log('Something went wrong ... ', e)
       }
+    },
+    cancelSignUp (val) {
+      console.log('CANCELED')
+      console.log(val)
+      var safeRedirectUri
+      if (this.redirectUrl[0] === '/') {
+        safeRedirectUri = this.redirectUrl
+      } else {
+        safeRedirectUri = '/' + this.redirectUrl
+      }
+
+      var url = `//${this.appId}${safeRedirectUri}?error=CancelledByUser`
+      window.location.href = url
+    },
+    signAttemptOnGoing (val) {
+      this.isSignAttemptOnGoing = val
     }
-  },
-  cancelLoginUp (val) {
   }
 }

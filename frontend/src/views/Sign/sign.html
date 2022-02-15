@@ -20,9 +20,24 @@
 
                    <v-card-actions>
                     <v-layout column align-center>
-                        <v-layout justify-center class="pb-3" style="width: 100%;" v-if="nameCheckStatus.checked">
+                        <v-layout justify-center class="pb-3" style="width: 100%;" v-if="nameCheckStatus.checked && !isSignAttemptOnGoing">
                             <v-btn type="submit" class="sign-in" elevation="0" color="accent" :disabled="!nameCheckStatus.checking && nameCheckStatus.available">
                                 Sign in</v-btn>
+                        </v-layout>
+
+                        <v-layout style="margin-bottom: 16px" column align-center v-if="isSignAttemptOnGoing">
+                            <v-progress-circular
+                                    style="margin-bottom: 14px"
+                                    indeterminate
+                                    :value="60"
+                                    color="accent"
+                            ></v-progress-circular>
+                            <v-btn class="accent" @click="triggerResendSignSocket" v-if="!firstTime && !isMobile">
+                                <v-icon left>
+                                    refresh
+                                </v-icon>
+                                RESEND NOTIFICATION
+                            </v-btn>
                         </v-layout>
 
                         <v-flex
@@ -36,6 +51,7 @@
                         </v-flex>
                     </v-layout>
                     </v-card-actions>
+
                 </v-form>
             </v-card>
         </v-flex>

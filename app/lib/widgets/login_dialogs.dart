@@ -58,3 +58,22 @@ Future<void> showLoggedInDialog(BuildContext ctx) async {
     ),
   );
 }
+
+Future<void> showSignedInDialog(BuildContext ctx) async {
+  await showDialog(
+    context: ctx,
+    builder: (BuildContext context) => CustomDialog(
+      image: Icons.check,
+      title: 'Successfully signed',
+      description: 'The data has been successfully signed. Please return to your browser.',
+      actions: <Widget>[
+        FlatButton(
+          child: Text('Ok'),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        )
+      ],
+    ),
+  );
+}

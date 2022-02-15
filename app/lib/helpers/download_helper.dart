@@ -28,3 +28,8 @@ Future<File?> downloadFile(String url, String name) async {
     return null;
   }
 }
+
+
+String extractFileName(String url) {
+  return url.split('/').last;
+}

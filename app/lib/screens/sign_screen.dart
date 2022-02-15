@@ -6,13 +6,16 @@ import 'package:flutter_json_viewer/flutter_json_viewer.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/http.dart';
 
+import 'package:threebotlogin/events/events.dart';
 import 'package:flutter/material.dart';
+import 'package:threebotlogin/events/pop_all_sign_event.dart';
 import 'package:threebotlogin/helpers/block_and_run_mixin.dart';
 import 'package:threebotlogin/helpers/download_helper.dart';
 import 'package:threebotlogin/models/sign.dart';
 import 'package:threebotlogin/services/3bot_service.dart';
 import 'package:threebotlogin/services/crypto_service.dart';
 import 'package:threebotlogin/services/shared_preference_service.dart';
+import 'package:threebotlogin/services/tools_service.dart';
 import 'package:threebotlogin/widgets/custom_dialog.dart';
 
 class SignScreen extends StatefulWidget {
@@ -34,10 +37,12 @@ class _SignScreenState extends State<SignScreen> with BlockAndRunMixin {
   bool isDataLoading = true;
   Map<String, dynamic> urlData = {};
   String? errorMessage;
+  String emitCode = randomString(10);
 
   @override
   void initState() {
     super.initState();
+    Events().onEvent(PopAllSignEvent("").runtimeType, close);
     WidgetsBinding.instance?.addPostFrameCallback((_) => fetchNecessaryData());
   }
 
@@ -105,8 +110,28 @@ class _SignScreenState extends State<SignScreen> with BlockAndRunMixin {
             widget.signData.isJson! ? jsonLayout() : fileLayout(),
           ],
         ),
-        signButton(),
+        Column(
+          children: [
+            signButton(),
+            SizedBox(height: 5,),
+            wasNotMeButton()
+          ],
+        )
       ],
+    );
+  }
+
+  Widget wasNotMeButton() {
+    return FlatButton(
+      child: Text(
+        "It wasn\'t me - cancel",
+        style: TextStyle(fontSize: 16.0, color: Color(0xff0f296a)),
+      ),
+      onPressed: () {
+        cancelSignAttempt();
+        Navigator.pop(context, false);
+        Events().emit(PopAllSignEvent(emitCode));
+      },
     );
   }
 
@@ -218,7 +243,9 @@ class _SignScreenState extends State<SignScreen> with BlockAndRunMixin {
               String signedData = await signData(widget.signData.dataUrl!, sk);
 
               await sendSignedData(state, randomRoom, signedData, appId);
-              Navigator.pop(context);
+
+              Navigator.pop(context, true);
+              Events().emit(PopAllSignEvent(emitCode));
             },
           )
         ],
@@ -262,15 +289,22 @@ class _SignScreenState extends State<SignScreen> with BlockAndRunMixin {
               isBusy = true;
               updateMessage = 'Verifying hash.. ';
               setState(() {});
-              verifyHash(widget.signData.dataUrl!, widget.signData.hashedDataUrl!);
+              bool verified = verifyHash(widget.signData.dataUrl!, widget.signData.hashedDataUrl!);
+
+              if(verified == false) {
+                updateMessage = 'Could not verify hash ';
+                setState(() {});
+                return;
+              }
 
               updateMessage = 'Downloading file.. ';
               setState(() {});
 
-              String timestamp = new DateTime.now().millisecondsSinceEpoch.toString();
-
               try {
-                downloadedFile = await downloadFile(widget.signData.dataUrl!, 'tfc-$timestamp.pdf');
+
+                String fileName = extractFileName(widget.signData.dataUrl!);
+
+                downloadedFile = await downloadFile(widget.signData.dataUrl!, fileName);
 
                 if(downloadedFile == null) {
                   updateMessage = 'Failed to download the file';
@@ -361,6 +395,7 @@ class _SignScreenState extends State<SignScreen> with BlockAndRunMixin {
 
               await sendSignedData(state, randomRoom, signedData, appId);
               Navigator.pop(customContext);
+              Navigator.pop(context, true);
             },
           ),
         ],
@@ -368,9 +403,22 @@ class _SignScreenState extends State<SignScreen> with BlockAndRunMixin {
     );
   }
 
+  close(PopAllSignEvent e) {
+    if (e.emitCode == emitCode) {
+      return;
+    }
+
+    if (!mounted) {
+      return;
+    }
+
+    if (Navigator.canPop(context)) {
+      Navigator.pop(context, false);
+    }
+  }
+
   cancelSignAttempt() async {
     String? doubleName = await getDoubleName();
-    // TODO: implement cancel
-    // cancelSign(doubleName!);
+    cancelSign(doubleName!);
   }
 }

@@ -32,6 +32,8 @@ export default new Vuex.Store({
     },
     scannedFlagUp: false,
     cancelLoginUp: false,
+    cancelSignUp: false,
+    signAttemptOnGoing: false,
     signedAttempt: null,
     firstTime: null,
     isMobile: false,
@@ -71,6 +73,9 @@ export default new Vuex.Store({
     setCancelLoginUp (state, cancelLoginUp) {
       state.cancelLoginUp = cancelLoginUp
     },
+    setCancelSignUp (state, cancelSignUp) {
+      state.cancelSignUp = cancelSignUp
+    },
     setSignedSignAttempt (state, signedSignAttempt) {
       state.signedSignAttempt = signedSignAttempt
     },
@@ -104,6 +109,9 @@ export default new Vuex.Store({
     },
     setRandomRoom (state, randomRoom) {
       state.randomRoom = randomRoom
+    },
+    setSignAttemptOnGoing (state, signAttemptOnGoing) {
+      state.signAttemptOnGoing = signAttemptOnGoing
     },
     resetTimer (state) {
       if (state.loginInterval !== undefined) {
@@ -148,6 +156,9 @@ export default new Vuex.Store({
     setAttemptCanceled (context, payload) {
       context.commit('setCancelLoginUp', payload)
     },
+    setSignAttemptCanceled (context, payload) {
+      context.commit('setCancelSignUp', payload)
+    },
     SOCKET_connect (context, payload) {
       console.log(`hi, connected with SOCKET_connect`)
     },
@@ -191,6 +202,11 @@ export default new Vuex.Store({
     SOCKET_cancelLogin (context) {
       console.log('f')
       context.commit('setCancelLoginUp', true)
+    },
+    SOCKET_cancelSign (context) {
+      console.log('Cancel sign attempt')
+      context.commit('setCancelSignUp', true)
+      context.commit('setSignAttemptOnGoing', false)
     },
 
     async SOCKET_signedSignDataAttempt (context, data) {
@@ -298,6 +314,8 @@ export default new Vuex.Store({
         'doubleName': context.getters.doubleName,
         'encryptedSignAttempt': encryptedSignAttempt
       })
+
+      context.commit('setSignAttemptOnGoing', true)
     },
     async loginUser (context, data) {
       console.log(`LoginUser`)
@@ -349,6 +367,29 @@ export default new Vuex.Store({
       context.commit('setFirstTime', data.firstTime)
       context.commit('setRandomImageId')
       context.commit('setIsMobile', data.mobile)
+    },
+    async resendSignNotification (context) {
+      let publicKey = (await userService.getUserData(context.getters.doubleName)).data.publicKey
+      let randomRoom = generateUUID()
+      socketService.emit('leave', { 'room': context.getters.doubleName })
+      await context.dispatch('setRandomRoom', randomRoom)
+      let encryptedSignAttempt = await cryptoService.encrypt(JSON.stringify({
+        state: context.getters._state,
+        doubleName: context.getters.doubleName,
+        isJson: toBoolean(context.getters.isJson),
+        dataUrlHash: context.getters.dataUrlHash,
+        dataUrl: context.getters.dataUrl,
+        appId: context.getters.appId,
+        randomRoom: randomRoom,
+        redirectUrl: context.getters.redirectUrl
+      }), publicKey)
+
+      socketService.emit('sign', {
+        'doubleName': context.getters.doubleName,
+        'encryptedSignAttempt': encryptedSignAttempt
+      })
+
+      context.commit('setSignAttemptOnGoing', true)
     },
     async resendNotification (context) {
       context.commit('setRandomImageId')
@@ -530,6 +571,7 @@ export default new Vuex.Store({
     redirectUrl: state => state.redirectUrl,
     scannedFlagUp: state => state.scannedFlagUp,
     cancelLoginUp: state => state.cancelLoginUp,
+    cancelSignUp: state => state.cancelSignUp,
     signedAttempt: state => state.signedAttempt,
     firstTime: state => state.firstTime,
     emailVerificationStatus: state => state.emailVerificationStatus,
@@ -547,7 +589,8 @@ export default new Vuex.Store({
     dataUrl: state => state.dataUrl,
     dataUrlHash: state => state.dataUrlHash,
     isJson: state => state.isJson,
-    signedSignAttempt: state => state.signedSignAttempt
+    signedSignAttempt: state => state.signedSignAttempt,
+    signAttemptOnGoing: state => state.signAttemptOnGoing
   }
 })
 
