@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 import 'dart:typed_data';
 import 'package:flutter_json_viewer/flutter_json_viewer.dart';
 import 'package:http/http.dart' as http;
@@ -12,6 +13,7 @@ import 'package:threebotlogin/models/sign.dart';
 import 'package:threebotlogin/services/3bot_service.dart';
 import 'package:threebotlogin/services/crypto_service.dart';
 import 'package:threebotlogin/services/shared_preference_service.dart';
+import 'package:threebotlogin/widgets/custom_dialog.dart';
 
 class SignScreen extends StatefulWidget {
   final Sign signData;
@@ -27,6 +29,8 @@ class _SignScreenState extends State<SignScreen> with BlockAndRunMixin {
   String updateMessage = '';
   bool isBusy = false;
 
+  File? downloadedFile;
+
   bool isDataLoading = true;
   Map<String, dynamic> urlData = {};
   String? errorMessage;
@@ -39,7 +43,9 @@ class _SignScreenState extends State<SignScreen> with BlockAndRunMixin {
 
   void fetchNecessaryData() async {
     if (widget.signData.isJson == false) {
+      print('Coming here');
       isDataLoading = false;
+      setState(() {});
       return;
     }
 
@@ -50,34 +56,11 @@ class _SignScreenState extends State<SignScreen> with BlockAndRunMixin {
       urlData = json.decode(r.body);
       isDataLoading = false;
       setState(() {});
-    }
-    catch(e) {
+    } catch (e) {
       errorMessage = 'Failed to load data';
+      isDataLoading = false;
       setState(() {});
     }
-  }
-
-  Widget jsonLayoutContainer() {
-    Uri url = Uri.parse(widget.signData.dataUrl!);
-
-    var dataObject;
-
-    try {
-      var r = http.get(url).then((value) {
-        dataObject = value.body;
-        var testObject = json.decode(dataObject);
-        return Container(
-          child: JsonViewer(testObject),
-        );
-      });
-    }
-    catch(e) {
-      return Container(
-        child: Text('Failed to load the JSON data')
-      );
-    }
-
-    return Container();
   }
 
   @override
@@ -94,80 +77,11 @@ class _SignScreenState extends State<SignScreen> with BlockAndRunMixin {
           child: Column(
             children: <Widget>[
               Container(
+                constraints: BoxConstraints(
+                    minHeight: MediaQuery.of(context).size.height * 0.85,
+                    minWidth: MediaQuery.of(context).size.width * 0.85),
                 padding: EdgeInsets.all(20),
-                child: Column(
-                  children: <Widget>[
-                    RichText(
-                      textAlign: TextAlign.center,
-                      text: new TextSpan(
-                          style: new TextStyle(
-                            fontSize: 15.0,
-                            color: Colors.black,
-                          ),
-                          children: <TextSpan>[
-                            TextSpan(children: <TextSpan>[
-                              new TextSpan(
-                                  text: widget.signData.appId!,
-                                  style: TextStyle(fontWeight: FontWeight.bold)),
-                              new TextSpan(
-                                  text:
-                                      ' wants you to sign a data document. The URL of the document is: \n \n'),
-                              new TextSpan(
-                                  text: widget.signData.dataUrl! + '\n \n \n',
-                                  style: TextStyle(fontSize: 14)),
-                            ]),
-                          ]),
-                    ),
-                    isDataLoading == true ? loadContainer() : dataContainer(),
-                    Text(errorMessage ? ),
-                    // SizedBox(height: 10),
-                    // Text(widget.signData.dataUrl!),
-                    // SizedBox(height: 20),
-                    // ElevatedButton(
-                    //     onPressed: () async {
-                    //       isBusy = true;
-                    //       updateMessage = 'Verifying hash.. ';
-                    //       setState(() {});
-                    //       verifyHash(widget.signData.dataUrl!, widget.signData.hashedDataUrl!);
-                    //
-                    //       updateMessage = 'Downloading and opening file.. ';
-                    //       setState(() {});
-                    //       await openFile(url: widget.signData.dataUrl!, fileName: 'test.pdf');
-                    //       updateMessage = '';
-                    //       isBusy = false;
-                    //       setState(() {});
-                    //     },
-                    //     child: Text('Download')),
-                    // SizedBox(
-                    //   height: 10,
-                    // ),
-                    // isBusy == true
-                    //     ? Transform.scale(
-                    //         scale: 0.5,
-                    //         child: CircularProgressIndicator(),
-                    //       )
-                    //     : Container(),
-                    // SizedBox(
-                    //   height: 10,
-                    // ),
-                    // Text(
-                    //   updateMessage,
-                    //   style: TextStyle(color: Colors.orange),
-                    // ),
-                    ElevatedButton(
-                        onPressed: () async {
-                          String randomRoom = widget.signData.randomRoom!;
-                          String appId = widget.signData.appId!;
-                          String state = widget.signData.state!;
-
-                          Uint8List sk = await getPrivateKey();
-                          String signedData = await signData(widget.signData.dataUrl!, sk);
-
-                          await sendSignedData(state, randomRoom, signedData, appId);
-                        },
-                        child: Text('SIGN'))
-                  ],
-                ),
+                child: isDataLoading == true ? loadContainer() : mainLayout(),
               ),
             ],
           ),
@@ -181,18 +95,225 @@ class _SignScreenState extends State<SignScreen> with BlockAndRunMixin {
     );
   }
 
-  Widget dataContainer() {
-    if (widget.signData.isJson == true) {
-      return jsonContainer();
+  Widget mainLayout() {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Column(
+          children: [
+            leadingText(),
+            widget.signData.isJson! ? jsonLayout() : fileLayout(),
+          ],
+        ),
+        signButton(),
+      ],
+    );
+  }
+
+  Widget leadingText() {
+    return RichText(
+      textAlign: TextAlign.center,
+      text: new TextSpan(
+          style: new TextStyle(
+            fontSize: 15.0,
+            color: Colors.black,
+          ),
+          children: <TextSpan>[
+            TextSpan(children: <TextSpan>[
+              new TextSpan(
+                  text: widget.signData.appId!, style: TextStyle(fontWeight: FontWeight.bold)),
+              new TextSpan(
+                  text: ' wants you to sign a data document. The URL of the document is: \n \n'),
+              new TextSpan(
+                  text: widget.signData.dataUrl! + '\n',
+                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
+            ]),
+          ]),
+    );
+  }
+
+  Widget jsonLayout() {
+    try {
+      if (errorMessage == null) {
+        return jsonDataView();
+      }
+
+      return Container(
+          child: Text(
+        'Failed to load the data',
+        style: TextStyle(fontWeight: FontWeight.bold, color: Colors.red, fontSize: 15),
+      ));
+    } catch (e) {
+      return Container(
+          child: Text(
+        'Failed to parse the data',
+        style: TextStyle(fontWeight: FontWeight.bold, color: Colors.red, fontSize: 15),
+      ));
     }
-    return Container();
   }
 
-  loadContainer() {
-    return new CircularProgressIndicator();
+  Widget fileLayout() {
+    return Container(
+      child: Column(
+        children: [
+          SizedBox(
+            height: 40,
+          ),
+          Text(
+            'You can download the document for review here',
+            style: TextStyle(fontWeight: FontWeight.w600),
+          ),
+          SizedBox(
+            height: 15,
+          ),
+          downloadButton(),
+          SizedBox(
+            height: 15,
+          ),
+          isBusy ? CircularProgressIndicator() : Container(),
+          isBusy
+              ? SizedBox(
+                  height: 10,
+                )
+              : Container(),
+          Text(
+            updateMessage,
+            style: TextStyle(color: Colors.orange, fontWeight: FontWeight.bold),
+          )
+        ],
+      ),
+    );
   }
 
-  Widget jsonContainer() {
+  Widget signButton() {
+    return Container(
+      child: Column(
+        children: [
+          SizedBox(height: 20),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              minimumSize: Size.fromHeight(50),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.assignment_turned_in_outlined),
+                Padding(padding: EdgeInsets.only(left: 20)),
+                Text(
+                  'SIGN',
+                  style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+                )
+              ],
+            ),
+            onPressed: () async {
+              if (errorMessage != null) {
+                return await areYouSure();
+              }
+
+              String randomRoom = widget.signData.randomRoom!;
+              String appId = widget.signData.appId!;
+              String state = widget.signData.state!;
+
+              Uint8List sk = await getPrivateKey();
+              String signedData = await signData(widget.signData.dataUrl!, sk);
+
+              await sendSignedData(state, randomRoom, signedData, appId);
+              Navigator.pop(context);
+            },
+          )
+        ],
+      ),
+    );
+  }
+
+  Widget downloadButton() {
+    return Container(
+      width: MediaQuery.of(context).size.width * 0.9,
+      child: Column(
+        children: [
+          ElevatedButton(
+            style: ButtonStyle(
+                backgroundColor: MaterialStateProperty.all<Color>(Colors.white),
+                padding: MaterialStateProperty.all<EdgeInsets>(EdgeInsets.all(12))),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  downloadedFile != null ? Icons.remove_red_eye_outlined : Icons.download,
+                  color: Colors.grey,
+                ),
+                Padding(padding: EdgeInsets.only(left: 20)),
+                Text(
+                  downloadedFile != null ? 'OPEN FILE' : 'DOWNLOAD FILE',
+                  style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: Colors.grey),
+                )
+              ],
+            ),
+            onPressed: () async {
+              if (downloadedFile != null) {
+                updateMessage = 'Opening file.. ';
+                setState(() {});
+                await openFile(downloadedFile);
+                updateMessage = '';
+                setState(() {});
+                return;
+              }
+
+              isBusy = true;
+              updateMessage = 'Verifying hash.. ';
+              setState(() {});
+              verifyHash(widget.signData.dataUrl!, widget.signData.hashedDataUrl!);
+
+              updateMessage = 'Downloading file.. ';
+              setState(() {});
+
+              String timestamp = new DateTime.now().millisecondsSinceEpoch.toString();
+
+              try {
+                downloadedFile = await downloadFile(widget.signData.dataUrl!, 'tfc-$timestamp.pdf');
+
+                if(downloadedFile == null) {
+                  updateMessage = 'Failed to download the file';
+                  isBusy = false;
+                  setState(() {});
+                  return;
+                }
+
+                updateMessage = '';
+                isBusy = false;
+                setState(() {});
+              } catch (e) {
+                updateMessage = 'Failed to download the file';
+                setState(() {});
+              }
+            },
+          )
+        ],
+      ),
+    );
+  }
+
+  Widget loadContainer() {
+    return Center(
+      child: Container(
+        constraints: BoxConstraints(minHeight: MediaQuery.of(context).size.height * 0.8),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            CircularProgressIndicator(),
+            SizedBox(height: 20),
+            Text(
+              'Loading ...',
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+            )
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget jsonDataView() {
     return RawScrollbar(
       isAlwaysShown: true,
       thumbColor: Theme.of(context).primaryColor,
@@ -208,6 +329,41 @@ class _SignScreenState extends State<SignScreen> with BlockAndRunMixin {
         child: SingleChildScrollView(
           child: JsonViewer(urlData),
         ),
+      ),
+    );
+  }
+
+  Future<void> areYouSure() async {
+    return showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext customContext) => CustomDialog(
+        image: Icons.warning,
+        title: "Are you sure",
+        description:
+            "Are you sure you want to sign the data, even if the data has been failed to load?",
+        actions: <Widget>[
+          FlatButton(
+            child: new Text("No"),
+            onPressed: () {
+              Navigator.pop(customContext);
+            },
+          ),
+          FlatButton(
+            child: new Text("Yes"),
+            onPressed: () async {
+              String randomRoom = widget.signData.randomRoom!;
+              String appId = widget.signData.appId!;
+              String state = widget.signData.state!;
+
+              Uint8List sk = await getPrivateKey();
+              String signedData = await signData(widget.signData.dataUrl!, sk);
+
+              await sendSignedData(state, randomRoom, signedData, appId);
+              Navigator.pop(customContext);
+            },
+          ),
+        ],
       ),
     );
   }
