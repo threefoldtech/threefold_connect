@@ -24,6 +24,18 @@ export default {
     }
   },
   mounted () {
+    const query = this.$route.query
+
+    const appId = query.appId
+    const dataHash = query.dataHash
+    const dataUrl = query.dataUrl
+    const isJson = query.isJson
+    const redirectUrl = query.redirectUrl
+    const state = query.state
+
+    if (!appId || !dataHash || !dataUrl || !isJson || !redirectUrl || !state) {
+      this.$router.push({ name: 'error' })
+    }
   },
   computed: {
     ...mapGetters([
