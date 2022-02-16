@@ -33,7 +33,7 @@ abstract class WalletConfigImpls {
 
 class WalletConfigStaging extends WalletConfigImpls {
   String appId() {
-    return 'wallet.staging.jimber.org';
+    return 'wallet.staging.jimber.io';
   }
 
   String redirectUrl() {
