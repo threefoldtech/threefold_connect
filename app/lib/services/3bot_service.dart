@@ -146,6 +146,22 @@ Future<bool> isAppUnderMaintenance() async {
   return mappedResponse['maintenance'] == 1;
 }
 
+Future<bool> checkIfPkidIsAvailable() async {
+  Uri url = Uri.parse(AppConfig().pKidUrl());
+  print('Sending call: ${url.toString()}');
+
+  Response response = await http
+      .get(url, headers: requestHeaders)
+      .timeout(Duration(seconds: Globals().timeOutSeconds));
+
+  if (response.statusCode != 200) {
+    return false;
+  }
+
+  return true;
+}
+
+
 Future<Response> cancelLogin(doubleName) {
   Uri url = Uri.parse('$threeBotApiUrl/users/$doubleName/cancel');
   print('Sending call: ${url.toString()}');

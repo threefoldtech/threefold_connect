@@ -12,6 +12,7 @@ class Flags {
   Map<String, String> flagSmithConfig = AppConfig().flagSmithConfig();
 
   Future<void> initFlagSmith() async {
+    try {
     client = await FlagsmithClient.init(
         config: FlagsmithConfig(
           baseURI: flagSmithConfig['url']!,
@@ -20,7 +21,6 @@ class Flags {
 
     String? doubleName = await getDoubleName();
 
-    try {
       if (doubleName != null) {
         Identity user = Identity(identifier: doubleName);
         await client.getFeatureFlags(user: user, reload: true);
@@ -28,9 +28,8 @@ class Flags {
       }
       await client.getFeatureFlags(reload: true);
     } catch (e) {
-      print('Error in init flagsmith');
       print(e);
-      throw Exception();
+      throw Exception('Error in initialization in Flagsmith, please try again. If this issue persist, please contact support');
     }
   }
 

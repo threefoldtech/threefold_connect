@@ -31,8 +31,9 @@ class MainScreen extends StatefulWidget {
 class _AppState extends State<MainScreen> {
   StreamSubscription? _sub;
   String? initialLink;
+  String? updateMessage = '';
+  String? errorMessage;
 
-  // FirebaseNotificationListener _listener;
   late BackendConnection _backendConnection;
 
   @override
@@ -54,31 +55,99 @@ class _AppState extends State<MainScreen> {
       return getErrorWidget(context, errorDetails);
     };
 
-    return Container();
+    return Scaffold(
+        body: Center(
+            child: Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: <Widget>[
+        Image.asset(
+          'assets/logo.png',
+          height: 100,
+        ),
+        SizedBox(
+          height: 40,
+        ),
+        Text(
+          updateMessage != null ? updateMessage.toString() : errorMessage.toString(),
+          style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              color: errorMessage != null ? Colors.red : Colors.black),
+        ),
+        SizedBox(
+          height: 40,
+        ),
+        Transform.scale(
+          scale: 0.5,
+          child: CircularProgressIndicator(
+            color: Color.fromRGBO(0, 174, 239, 1),
+          ),
+        ),
+        SizedBox(height: 20),
+        Visibility(
+            maintainSize: true,
+            maintainAnimation: true,
+            maintainState: true,
+            visible: errorMessage != null,
+            child: RaisedButton(
+              shape: new RoundedRectangleBorder(
+                borderRadius: new BorderRadius.circular(30),
+              ),
+              color: Theme.of(context).accentColor,
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Text(
+                    'RETRY',
+                    style: TextStyle(color: Colors.white, fontSize: 16),
+                  ),
+                ],
+              ),
+              onPressed: () async {
+                await pushScreens();
+              },
+            ))
+      ],
+    )));
   }
 
   pushScreens() async {
     try {
+      errorMessage = null;
+      updateMessage = 'Checking internet connection';
+      setState(() {});
+      await checkInternetConnection();
+
+      updateMessage = 'Checking connection to our server';
+      setState(() {});
+      await checkInternetConnectionWithOurServers();
+
+      updateMessage = 'Checking connection to FlagSmith';
+      setState(() {});
+
       await Flags().initFlagSmith();
       await Flags().setFlagSmithDefaultValues();
 
-      print("Checking internet connection now");
-      await checkInternetConnection();
-      await checkInternetConnectionWithOurServers();
+      updateMessage = 'Checking if app is under maintenance';
+      setState(() {});
       await checkIfAppIsUnderMaintenance();
+
+      updateMessage = 'Checking if app is up to date';
+      setState(() {});
       await checkIfAppIsUpToDate();
+
+      updateMessage = 'Checking connection to pkid';
+      setState(() {});
+      await checkConnectionToPkid();
     } catch (e) {
+      print('Error in main screen');
       print(e);
-      CustomDialog dialog = CustomDialog(
-          title: "Oops",
-          description:
-              "Something went wrong when trying to connect to our servers, please try again. Contact support if this issue persists. Code: FlagSmithError");
-      await dialog.show(context);
-      if (Platform.isAndroid) {
-        SystemNavigator.pop();
-      } else if (Platform.isIOS) {
-        exit(1);
-      }
+
+      updateMessage = null;
+      errorMessage = e.toString().split('Exception:')[1];
+      setState(() {});
+      return;
     }
 
     if (widget.initDone != null && !widget.initDone!) {
@@ -119,31 +188,9 @@ class _AppState extends State<MainScreen> {
       if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
         print('Connected to the internet');
       }
-    } on TimeoutException catch (_) {
-      print(_);
-      CustomDialog dialog = CustomDialog(
-        title: "No internet connection available",
-        description: "Please enable your internet connection to use this app.",
-      );
-      await dialog.show(context);
-      if (Platform.isAndroid) {
-        SystemNavigator.pop();
-      } else if (Platform.isIOS) {
-        exit(1);
-      }
-    } on Exception catch (_) {
-      print(_);
-      CustomDialog dialog = CustomDialog(
-        title: "No internet connection available",
-        description: "Please enable your internet connection to use this app.",
-      );
-
-      await dialog.show(context);
-      if (Platform.isAndroid) {
-        SystemNavigator.pop();
-      } else if (Platform.isIOS) {
-        exit(1);
-      }
+    } catch (e) {
+      throw new Exception(
+          "No internet connection available, please make sure you have a stable internet connection.");
     }
   }
 
@@ -153,140 +200,49 @@ class _AppState extends State<MainScreen> {
         String baseUrl = AppConfig().baseUrl();
         final List<InternetAddress> result = await InternetAddress.lookup('$baseUrl')
             .timeout(Duration(seconds: Globals().timeOutSeconds));
+
         if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
-          print('connected to the internet');
+          print('Connected to the servers');
         }
-      } on TimeoutException catch (_) {
-        CustomDialog dialog = CustomDialog(
-            title: "Connection problem",
-            description: "The connection to our servers has failed, please try again later.");
-        await dialog.show(context);
-        if (Platform.isAndroid) {
-          SystemNavigator.pop();
-        } else if (Platform.isIOS) {
-          exit(1);
-        }
-      } on Exception catch (_) {
-        CustomDialog dialog = CustomDialog(
-            title: "Oops",
-            description:
-                "Something went wrong when trying to connect to our servers, please try again. Contact support if this issue persists.");
-        await dialog.show(context);
-        if (Platform.isAndroid) {
-          SystemNavigator.pop();
-        } else if (Platform.isIOS) {
-          exit(1);
-        }
+      } catch (e) {
+        throw new Exception(
+            "Can't connect to our servers, please try again. Contact support if this issue persists.");
       }
     }
   }
 
+  checkConnectionToPkid() async {
+    try {
+      if (!!await checkIfPkidIsAvailable()) {
+        throw new Exception(
+            "Can't connect to our pkid service, please try again. Contact support if this issue persists.");
+      }
+    } catch (e) {
+      throw new Exception(
+          "Can't connect to our pkid service, please try again. Contact support if this issue persists.");
+    }
+  }
+
   checkIfAppIsUnderMaintenance() async {
+    print(await isAppUnderMaintenance());
     try {
       if (await isAppUnderMaintenance()) {
-        CustomDialog dialog = CustomDialog(
-            title: "App is being rolled out",
-            description: "The new version of our app is being rolled out, please try again later.");
-        await dialog.show(context);
-        if (Platform.isAndroid) {
-          SystemNavigator.pop();
-        } else if (Platform.isIOS) {
-          exit(1);
-        }
+        throw new Exception('App is being rolled out. Please try again later.');
       }
-    } on TimeoutException catch (_) {
-      print(_);
-      CustomDialog dialog = CustomDialog(
-          title: "Connection problem",
-          description: "The connection to our servers has failed, please try again later. 2");
-      await dialog.show(context);
-      if (Platform.isAndroid) {
-        SystemNavigator.pop();
-      } else if (Platform.isIOS) {
-        exit(1);
-      }
-    } on Exception catch (_) {
-      CustomDialog dialog = CustomDialog(
-          title: "Oops",
-          description: "Something went wrong. Please contact support if this issue persists.");
-      await dialog.show(context);
-      if (Platform.isAndroid) {
-        SystemNavigator.pop();
-      } else if (Platform.isIOS) {
-        exit(1);
-      }
+    } catch (e) {
+      throw new Exception("App is being rolled out. Please try again later.");
     }
   }
 
   checkIfAppIsUpToDate() async {
     try {
       if (!await isAppUpToDate()) {
-        CustomDialog dialog = CustomDialog(
-            title: "Update required",
-            description: "The app is outdated. Please, update it to the latest version.");
-
-        await dialog.show(context);
-        if (Platform.isAndroid) {
-          SystemNavigator.pop();
-        } else if (Platform.isIOS) {
-          exit(1);
-        }
+        throw new Exception('The app is outdated. Please, update it to the latest version');
       }
-    } on TimeoutException catch (_) {
-      CustomDialog dialog = CustomDialog(
-          title: "Connection problem",
-          description: "The connection to our servers has failed, please try again later. 3");
-      await dialog.show(context);
-      if (Platform.isAndroid) {
-        SystemNavigator.pop();
-      } else if (Platform.isIOS) {
-        exit(1);
-      }
-    } on Exception catch (_) {
-      CustomDialog dialog = CustomDialog(
-          title: "Oops",
-          description:
-              "Something went wrong when checking if the app is up-to-date, please try again. Contact support if this issue persists.");
-      await dialog.show(context);
-      if (Platform.isAndroid) {
-        SystemNavigator.pop();
-      } else if (Platform.isIOS) {
-        exit(1);
-      }
+    } catch (e) {
+      throw new Exception("The app is outdated. Please, update it to the latest version");
     }
   }
-
-  // checkIfDeviceIdIsCorrect() async {
-  //   var doubleName = await getDoubleName();
-  //   if (doubleName != null) {
-  //     try {
-  //       // Get user info
-  //       Response userInfoResult = await getUserInfo(doubleName);
-  //       if (userInfoResult.statusCode != 200) {
-  //         throw new Exception('User not found.');
-  //       }
-  //       Map<String, dynamic> body = json.decode(userInfoResult.body);
-
-  //       // Compare device id
-  //       if (body == null ||
-  //           body['device_id'] == null ||
-  //           !body['device_id'].contains(await _listener.getToken())) {
-  //         // If no match, update and recheck
-  //         updateDeviceID(
-  //             await getDoubleName(),
-  //             await signData(
-  //                 await _listener.getToken(), await getPrivateKey()));
-  //         checkIfDeviceIdIsCorrect();
-  //       }
-  //     } on Exception catch (_) {
-  //       CustomDialog dialog = CustomDialog(
-  //           title: "Oops",
-  //           description:
-  //               "Something went wrong when checking the deviceID, please try again. Contact support if this issue persists.");
-  //       await dialog.show(context);
-  //     }
-  //   }
-  // }
 
   Future<Null> initUniLinks() async {
     initialLink = await getInitialLink();
