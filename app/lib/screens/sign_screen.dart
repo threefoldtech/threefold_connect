@@ -148,9 +148,9 @@ class _SignScreenState extends State<SignScreen> with BlockAndRunMixin {
               new TextSpan(
                   text: widget.signData.appId!, style: TextStyle(fontWeight: FontWeight.bold)),
               new TextSpan(
-                  text: ' wants you to sign a data document. The URL of the document is: \n \n'),
+                  text: ' wants you to sign a data document. The Title of the document is: \n \n'),
               new TextSpan(
-                  text: widget.signData.dataUrl! + '\n',
+                  text: widget.signData.friendlyName! + '\n',
                   style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
             ]),
           ]),

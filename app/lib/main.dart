@@ -3,10 +3,8 @@ import 'package:flutter/services.dart';
 import 'package:threebotlogin/helpers/globals.dart';
 import 'package:threebotlogin/helpers/hex_color.dart';
 import 'package:threebotlogin/screens/main_screen.dart';
-import 'package:threebotlogin/services/migration_service.dart';
 import 'package:threebotlogin/services/shared_preference_service.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'helpers/kyc_helpers.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -16,17 +14,6 @@ Future<void> main() async {
   String? doubleName = await getDoubleName();
 
   await setGlobalValues();
-
-  String? seedPhrase = await getPhrase();
-
-  if (seedPhrase != null &&
-      (await isPKidMigrationIssueSolved() == false || await isPKidMigrationIssueSolved() == null)) {
-    fixPkidMigration();
-  }
-
-  if (await getPhrase() != null) {
-    await fetchPKidData();
-  }
 
   bool registered = doubleName != null;
   runApp(MyApp(initDone: initDone, registered: registered));

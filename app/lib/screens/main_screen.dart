@@ -8,10 +8,12 @@ import 'package:threebotlogin/events/events.dart';
 import 'package:threebotlogin/helpers/environment.dart';
 import 'package:threebotlogin/helpers/flags.dart';
 import 'package:threebotlogin/helpers/globals.dart';
+import 'package:threebotlogin/helpers/kyc_helpers.dart';
 import 'package:threebotlogin/screens/home_screen.dart';
 import 'package:threebotlogin/screens/init_screen.dart';
 import 'package:threebotlogin/screens/unregistered_screen.dart';
 import 'package:threebotlogin/services/3bot_service.dart';
+import 'package:threebotlogin/services/migration_service.dart';
 import 'package:threebotlogin/services/socket_service.dart';
 import 'package:threebotlogin/services/shared_preference_service.dart';
 import 'package:threebotlogin/widgets/custom_dialog.dart';
@@ -140,6 +142,12 @@ class _AppState extends State<MainScreen> {
       updateMessage = 'Checking connection to pkid';
       setState(() {});
       await checkConnectionToPkid();
+
+
+      updateMessage = 'Fetching pkid data';
+      setState(() {});
+      await pkidDataFetch();
+
     } catch (e) {
       print('Error in main screen');
       print(e);
@@ -178,6 +186,26 @@ class _AppState extends State<MainScreen> {
         MaterialPageRoute(
             builder: (context) =>
                 HomeScreen(initialLink: initialLink, backendConnection: _backendConnection)));
+  }
+
+
+  pkidDataFetch() async {
+    try {
+      String? seedPhrase = await getPhrase();
+
+      if (seedPhrase != null &&
+          (await isPKidMigrationIssueSolved() == false || await isPKidMigrationIssueSolved() == null)) {
+        fixPkidMigration();
+      }
+
+      if (await getPhrase() != null) {
+        await fetchPKidData();
+      }
+    }
+    catch(e) {
+      print(e);
+      throw Exception('Unable to fetch pkid data');
+    }
   }
 
   checkInternetConnection() async {

@@ -8,6 +8,7 @@ class Sign {
   String? doubleName;
   String? hashedDataUrl;
   String? dataUrl;
+  String? friendlyName;
   String? appId;
   bool? isJson;
   String? type;
@@ -19,6 +20,7 @@ class Sign {
     this.doubleName,
     this.hashedDataUrl,
     this.dataUrl,
+    this.friendlyName,
     this.isJson,
     this.appId,
     this.type,
@@ -32,6 +34,7 @@ class Sign {
         doubleName = json['doubleName'],
         hashedDataUrl = json['dataUrlHash'],
         dataUrl = json['dataUrl'],
+        friendlyName = json['friendlyName'],
         appId = json['appId'],
         isJson = json['isJson'] as bool?,
         type = json['type'],
@@ -43,6 +46,7 @@ class Sign {
         'doubleName' : doubleName,
         'hashedDataUrl': hashedDataUrl,
         'dataUrl': dataUrl,
+        'friendlyName': friendlyName,
         'isJson': isJson,
         'appId': appId,
         'type' : type,

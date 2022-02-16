@@ -31,9 +31,10 @@ export default {
     const dataUrl = query.dataUrl
     const isJson = query.isJson
     const redirectUrl = query.redirectUrl
+    const friendlyName = query.friendlyName
     const state = query.state
 
-    if (!appId || !dataHash || !dataUrl || !isJson || !redirectUrl || !state) {
+    if (!appId || !dataHash || !dataUrl || !isJson || !redirectUrl || !state || !friendlyName) {
       this.$router.push({ name: 'error' })
     }
   },
@@ -78,6 +79,7 @@ export default {
       const dataUrl = query.dataUrl
       const isJson = query.isJson
       const redirectUrl = query.redirectUrl
+      const friendlyName = query.friendlyName
       const state = query.state
 
       await this.signDataUser({
@@ -86,6 +88,7 @@ export default {
         isJson: isJson,
         dataUrlHash: dataHash,
         dataUrl: dataUrl,
+        friendlyName: friendlyName,
         redirectUrl: redirectUrl,
         state: state
       })

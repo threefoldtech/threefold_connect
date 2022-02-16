@@ -48,6 +48,7 @@ export default new Vuex.Store({
     loginInterval: null,
     isJson: false,
     dataUrl: null,
+    friendlyName: null,
     dataUrlHash: null,
     signedSignAttempt: null
   },
@@ -129,6 +130,9 @@ export default new Vuex.Store({
     },
     setDataUrl (state, dataUrl) {
       state.dataUrl = dataUrl
+    },
+    setFriendlyName (state, friendlyName) {
+      state.friendlyName = friendlyName
     },
     setIsJson (state, isJson) {
       state.isJson = isJson
@@ -289,6 +293,7 @@ export default new Vuex.Store({
       context.commit('setIsJson', data.isJson)
       context.commit('setHashedDataUrl', data.dataUrlHash)
       context.commit('setDataUrl', data.dataUrl)
+      context.commit('setFriendlyName', data.friendlyName)
       context.commit('setRedirectUrl', data.redirectUrl)
       context.commit('setState', data.state)
 
@@ -305,6 +310,7 @@ export default new Vuex.Store({
         isJson: toBoolean(context.getters.isJson),
         dataUrlHash: context.getters.dataUrlHash,
         dataUrl: context.getters.dataUrl,
+        friendlyName: context.getters.friendlyName,
         appId: context.getters.appId,
         randomRoom: randomRoom,
         redirectUrl: context.getters.redirectUrl
@@ -587,6 +593,7 @@ export default new Vuex.Store({
     loginTimeout: state => state.loginTimeout,
     loginInterval: state => state.loginInterval,
     dataUrl: state => state.dataUrl,
+    friendlyName: state => state.friendlyName,
     dataUrlHash: state => state.dataUrlHash,
     isJson: state => state.isJson,
     signedSignAttempt: state => state.signedSignAttempt,
