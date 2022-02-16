@@ -2,38 +2,37 @@
 
 ## Introduction
 
-Threefold Connect is a mobile app that serves as your main gateway to the Threefold Grid, Threefold products and services. 
+Threefold Connect is a mobile app that serves as your main gateway to the Threefold Grid and various other Threefold products and services. 
 
-It has a ultra secure 2FA authenticator for authenticating through third party applications.
+It contains an ultra secure 2FA authenticator for authenticating through third party applications.
 
-Inside the app, you can manage your Threefold Tokens within a XLM wallet.
+Inside the app, you can manage your Threefold Tokens(TFT).
 
 ## Features
 
 #### Threefold news
 
-Inside the app, there is a "News" section where you can find all the latest news of Threefold!
+Inside the app, there is a "News" section where you can find all the latest Threefold news!
 
 #### Wallet
 
-In the Threefold Connect app, it is possible to manage your TFT tokens and managing your transaction history on the TF chain.
-
+In the Threefold Connect app, it is possible to manage your TFT and view your transaction history on the TF chain.
 
 #### Farmers
 
-If you are in ownership of a Threefold node, you can manage your farm inside this tool.
+If you own a Threefold node, you can manage your farm here.
 
 #### Support
 
-If you have Threefold related questions, we provide a support chat where we will answer the question as soon as possible!
+If you have Threefold related questions, we provide a support chat where we will answer your questions as soon as possible!
 
 #### Planetary network
 
-It is possible to have a Yggdrasil IPv6 address by navigating to the Planetary network tab. There you can enable the Yggdrasil connection and your phone will be connected to the p2p network.
+It is possible to have a a planetary network IPv6 address. Here you can enable the planety network connection and your phone will automatically be connected to the p2p network.
 
 #### Identity
 
-When you are using the secure 2FA authentication, some third party apps require certain information (eg. phone number). In this tab you can verify your email, phone number and identity to provide this data to the third party application.
+When you are using the secure 2FA authentication, some third party apps require certain information (eg. phone number). In this tab you can verify your email, phone number and identity to provide this data to the third party application. This allows you total granular control over which data you choose to share or not share.
 
 ## Local development
 
