@@ -53,6 +53,19 @@ Future<String> signData(String data, Uint8List sk) async {
   return base64.encode(signed);
 }
 
+// Verify signed data
+bool verifySignature(Uint8List signedMessage, Uint8List pk) {
+  try {
+    Uint8List data = Sodium.cryptoSignOpen(signedMessage, pk);
+    print(utf8.decode(data));
+    return true;
+  }
+  catch(e) {
+    print(e);
+    return false;
+  }
+}
+
 // Encrypt given data encrypted with a keypair
 Future<Map<String, String>> encrypt(String data, Uint8List pk, Uint8List sk) async {
   Uint8List nonce = CryptoBox.randomNonce();
