@@ -71,9 +71,9 @@ Start UWSGI backend:
 
 Make sure you have at least Flutter 2.8.1 installed. If everything is installed properly, execute the following commands: 
 
-After this, copy the file in /lib/app_config_local.template into /lib/app_config_local.dart and change the configuration to your local IP's
+Copy the file in /lib/app_config_local.template into /lib/app_config_local.dart and change the configuration to your local IP's
 
-Afther that, use the build.sh script to set up the right environement
+After that, use the build.sh script to set up the right environement
 
 `./build.sh --init && ./build.sh --switch --local`
 
