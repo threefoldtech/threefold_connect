@@ -69,12 +69,15 @@ class _AppState extends State<MainScreen> {
         SizedBox(
           height: 40,
         ),
-        Text(
-          updateMessage != null ? updateMessage.toString() : errorMessage.toString(),
-          style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-              color: errorMessage != null ? Colors.red : Colors.black),
+        Container(
+          padding: EdgeInsets.only(left: 12, right: 12),
+          child:  Text(
+            updateMessage != null ? updateMessage.toString() : errorMessage.toString(),
+            style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: errorMessage != null ? Colors.red : Colors.black),
+          ),
         ),
         SizedBox(
           height: 40,
@@ -181,11 +184,16 @@ class _AppState extends State<MainScreen> {
     if (_sub != null) {
       _sub?.cancel();
     }
-    await Navigator.pushReplacement(
+
+    print(mounted);
+
+    // await Navigator.push(context, MaterialPageRoute(builder: (context) => UnregisteredScreen()));
+    await Navigator.push(
         context,
         MaterialPageRoute(
             builder: (context) =>
                 HomeScreen(initialLink: initialLink, backendConnection: _backendConnection)));
+
   }
 
 

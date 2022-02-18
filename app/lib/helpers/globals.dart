@@ -35,7 +35,7 @@ class Globals {
   bool tooManySmsAttempts = false;
 
   String routeName = 'Home';
-  late NoAnimationTabController tabController;
+  late TabController tabController;
 
   int lockedUntill = 0;
   int lockedSmsUntill = 0;

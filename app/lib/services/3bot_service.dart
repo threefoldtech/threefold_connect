@@ -111,9 +111,6 @@ Future<bool> isAppUpToDate() async {
   int currentBuildNumber = int.parse(packageInfo.buildNumber);
   int minimumBuildNumber = 0;
 
-  print('Count of timeout seconds');
-  print(Globals().timeOutSeconds);
-
   String jsonResponse = (await http
           .get(url, headers: requestHeaders)
           .timeout(Duration(seconds: Globals().timeOutSeconds)))
