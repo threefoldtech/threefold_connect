@@ -8,17 +8,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - name: Login to docker hub
-        run: docker login --username ${{ secrets.DOCKER_USERNAME }} --password ${{ secrets.DOCKER_TOKEN }}
-      - name: Set config
-        run: mv frontend/public/config.staging.js frontend/public/config.js
-      - name: Build the Docker image
-        run: docker build . --file Dockerfile --tag jimber/3botlogin:staging-${{ github.sha }}
-      - name: Push the Docker image
-        run: docker push jimber/3botlogin:staging-${{ github.sha }}
-
-      - uses: actions/checkout@v1
+          - uses: actions/checkout@v1
       - uses: actions/setup-java@v1
         with:
           java-version: '12.x'
@@ -46,6 +36,16 @@ jobs:
         with:
           name: release-apk
           path: app/apks/app-release.apk
+          
+      - uses: actions/checkout@v2
+      - name: Login to docker hub
+        run: docker login --username ${{ secrets.DOCKER_USERNAME }} --password ${{ secrets.DOCKER_TOKEN }}
+      - name: Set config
+        run: mv frontend/public/config.staging.js frontend/public/config.js
+      - name: Build the Docker image
+        run: docker build . --file Dockerfile --tag jimber/3botlogin:staging-${{ github.sha }}
+      - name: Push the Docker image
+        run: docker push jimber/3botlogin:staging-${{ github.sha }}
         
   deploy:
     needs: build
