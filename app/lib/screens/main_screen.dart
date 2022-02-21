@@ -149,7 +149,7 @@ class _AppState extends State<MainScreen> {
 
       updateMessage = 'Fetching pkid data';
       setState(() {});
-      await pkidDataFetch();
+      await fetchPkidData();
 
     } catch (e) {
       print('Error in main screen');
@@ -197,7 +197,7 @@ class _AppState extends State<MainScreen> {
   }
 
 
-  pkidDataFetch() async {
+  fetchPkidData() async {
     try {
       String? seedPhrase = await getPhrase();
 

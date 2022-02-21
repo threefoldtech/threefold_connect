@@ -29,12 +29,12 @@ Future<void> saveEmailInCorrectFormatPKid(Map<dynamic, dynamic> emailData) async
       await saveEmailToPKid();
     }
   } catch (e) {
-    if (emailData['email'] != null) {
-      await saveEmail(emailData['email'], null);
-    }
-
     if (emailData['sei'] != null) {
       await saveEmail(emailData['email'], emailData['sei']);
+      return;
+    }
+    if (emailData['email'] != null) {
+      await saveEmail(emailData['email'], null);
     }
   }
 }
@@ -43,21 +43,25 @@ Future<void> savePhoneInCorrectFormatPKid(Map<dynamic, dynamic> phoneData) async
   try {
     if (phoneData['phone']['phone'] != null) {
       if (phoneData['phone']['spi'] != null) {
+        print('333');
         await savePhone(phoneData['phone']['phone'], phoneData['phone']['spi']);
         await savePhoneToPKid();
         return;
       }
 
+      print('444');
       await savePhone(phoneData['phone']['phone'], null);
       await savePhoneToPKid();
     }
   } catch (e) {
-    if (phoneData['phone'] != null) {
-      await savePhone(phoneData['phone'], null);
-    }
-
     if (phoneData['spi'] != null) {
+      print('222');
       await savePhone(phoneData['phone'], phoneData['spi']);
+      return;
+    }
+    if (phoneData['phone'] != null) {
+      print('111');
+      await savePhone(phoneData['phone'], null);
     }
   }
 }
