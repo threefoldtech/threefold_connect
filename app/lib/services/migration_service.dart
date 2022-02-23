@@ -43,24 +43,20 @@ Future<void> savePhoneInCorrectFormatPKid(Map<dynamic, dynamic> phoneData) async
   try {
     if (phoneData['phone']['phone'] != null) {
       if (phoneData['phone']['spi'] != null) {
-        print('333');
         await savePhone(phoneData['phone']['phone'], phoneData['phone']['spi']);
         await savePhoneToPKid();
         return;
       }
 
-      print('444');
       await savePhone(phoneData['phone']['phone'], null);
       await savePhoneToPKid();
     }
   } catch (e) {
     if (phoneData['spi'] != null) {
-      print('222');
       await savePhone(phoneData['phone'], phoneData['spi']);
       return;
     }
     if (phoneData['phone'] != null) {
-      print('111');
       await savePhone(phoneData['phone'], null);
     }
   }

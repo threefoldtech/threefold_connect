@@ -137,11 +137,11 @@ Future<Response> sendVerificationSms() async {
 
 Future<dynamic> getShuftiAccessToken() async {
   Map<String, String?> phoneMap = await getPhone();
-  if (phoneMap['signedPhoneIdentifier'] == null) {
+  if (phoneMap['spi'] == null) {
     return;
   }
 
-  String encodedBody = json.encode({"signedPhoneIdentifier": phoneMap['signedPhoneIdentifier']});
+  String encodedBody = json.encode({"signedPhoneIdentifier": phoneMap['spi']});
 
   Uri url = Uri.parse('$openKycApiUrl/verification/shufti-access-token');
   print('Sending call: ${url.toString()}');
