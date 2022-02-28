@@ -346,8 +346,6 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
 
   void _showPhrase() async {
     String? pin = await getPin();
-    print(pin);
-
     bool? authenticated = await Navigator.push(
         context,
         MaterialPageRoute(

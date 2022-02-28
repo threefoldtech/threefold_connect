@@ -182,7 +182,7 @@ Future<Response> verifyIdentity(String reference) async {
     'reference': reference,
   });
 
-  Uri url = Uri.parse('$openKycApiUrl/verification/send-identity');
+  Uri url = Uri.parse('$openKycApiUrl/verification/verify-identity');
   print('Sending call: ${url.toString()}');
 
   return http.post(url, body: encodedBody, headers: requestHeaders);

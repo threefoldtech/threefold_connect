@@ -6,15 +6,12 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_pkid/flutter_pkid.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:http/http.dart';
-import 'package:shuftipro_flutter_sdk/ShuftiPro.dart';
-// import 'package:shuftipro_flutter_sdk/ShuftiPro.dart';
+import 'package:shuftipro_sdk/shuftipro_sdk.dart';
 import 'package:threebotlogin/events/events.dart';
 import 'package:threebotlogin/events/identity_callback_event.dart';
 import 'package:threebotlogin/helpers/globals.dart';
 import 'package:threebotlogin/helpers/hex_color.dart';
 import 'package:threebotlogin/helpers/kyc_helpers.dart';
-import 'package:threebotlogin/screens/home_screen.dart';
-import 'package:threebotlogin/services/crypto_service.dart';
 import 'package:threebotlogin/services/identity_service.dart';
 import 'package:threebotlogin/services/open_kyc_service.dart';
 import 'package:threebotlogin/services/pkid_service.dart';
@@ -55,7 +52,13 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
 
   bool emailInputValidated = false;
 
-  var authObject = {
+  Map<String, Object> configObj = {
+    "open_webview": false,
+    "asyncRequest": false,
+    "captureEnabled": false,
+  };
+
+  Map<String, Object> authObject = {
     "access_token": '',
   };
 
@@ -69,7 +72,6 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
     "show_consent": 1,
     "show_results": 1,
     "show_privacy_policy": 1,
-    "open_webView": false,
   };
 
   // Template for Shufti API verification object
@@ -226,10 +228,6 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
             future: getEmail(),
             builder: (ctx, snapshot) {
               if (snapshot.connectionState == ConnectionState.done) {
-                if (isInIdentityProcess) {
-                  return Container(child: SizedBox(child: _inShuftiVerificationProcess()));
-                }
-
                 if (isLoading) {
                   return _pleaseWait();
                 }
@@ -342,7 +340,7 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
         actions: <Widget>[
           FlatButton(
             child: new Text("No"),
-            onPressed: () {
+            onPressed: () async {
               Navigator.pop(customContext);
               showCountryPopup();
             },
@@ -370,14 +368,113 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
       },
       context: context,
       showPhoneCode: false, // optional. Shows phone code before the country name.
-      onSelect: (Country country) {
+      onSelect: (Country country) async {
         setState(() {
           createdPayload['country'] = country.countryCode;
         });
 
         print('Select country: ${country.displayName}');
+
+        String r = await ShuftiproSdk.sendRequest(
+            authObject: authObject, createdPayload: createdPayload, configObject: configObj);
+
+        print('Receiving response');
+        debugPrint(r);
+
+        await handleShuftiCallBack(r);
       },
     );
+  }
+
+  Future<void> handleShuftiCallBack(String res) async {
+    try {
+      if (!isJson(res)) {
+        String resData = res.toString();
+
+        if (resData.contains('verification_process_closed')) {
+          return showDialog(
+            context: context,
+            barrierDismissible: false,
+            builder: (BuildContext dialogContext) => CustomDialog(
+              image: Icons.close,
+              title: "Request canceled",
+              description: "Verification process has been canceled.",
+              actions: [
+                FlatButton(
+                    onPressed: () {
+                      Navigator.pop(dialogContext);
+                    },
+                    child: Text('OK'))
+              ],
+            ),
+          );
+        }
+
+        if (resData.contains('internet.connection.problem')) {
+          return showDialog(
+            context: context,
+            barrierDismissible: false,
+            builder: (BuildContext dialogContext) => CustomDialog(
+              image: Icons.close,
+              title: "Request canceled",
+              description: "Please make sure your internet connection is stable.",
+              actions: [
+                FlatButton(
+                    onPressed: () {
+                      Navigator.pop(dialogContext);
+                    },
+                    child: Text('OK'))
+              ],
+            ),
+          );
+        }
+      }
+
+      // Close your eyes for one second
+      String bodyText = res.split('body=')[1].split(', verification_url')[0];
+      Map<String, dynamic> data = jsonDecode(bodyText);
+
+      switch (data['event']) {
+        // AUTHORIZATION IS WRONG
+        case 'request.unauthorized':
+          {
+            Events().emit(IdentityCallbackEvent(type: 'unauthorized'));
+            break;
+          }
+        // NO BALANCE
+        case 'request.invalid':
+        // DECLINED
+        case 'verification.declined':
+        // TIME OUT
+        case 'request.timeout':
+          {
+            Events().emit(IdentityCallbackEvent(type: 'failed'));
+            break;
+          }
+
+        // ACCEPTED
+        case 'verification.accepted':
+          {
+            await verifyIdentity(reference);
+            await identityVerification(reference).then((value) {
+              if (value == null) {
+                return Events().emit(IdentityCallbackEvent(type: 'failed'));
+              }
+              Events().emit(IdentityCallbackEvent(type: 'success'));
+            });
+            break;
+          }
+        default:
+          {
+            return;
+          }
+          break;
+      }
+    } catch (e) {
+      print(e);
+    } finally {
+      dispose();
+    }
   }
 
   Widget _pleaseWait() {
@@ -430,106 +527,6 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
       },
     );
   }
-
-  Widget _inShuftiVerificationProcess() {
-    return Container(
-        child: new ShuftiPro(
-            authObject: authObject,
-            createdPayload: createdPayload,
-            async: false,
-            callback: (res) async {
-              // For some reason, Shufti returns bad JSON in case when request is canceled
-              // "verification_process_closed", "1","message", "User cancel the verification process"
-
-              try {
-                if (!isJson(res)) {
-                  String resData = res.toString();
-
-                  if (resData.contains('verification_process_closed')) {
-                    return showDialog(
-                      context: context,
-                      barrierDismissible: false,
-                      builder: (BuildContext dialogContext) => CustomDialog(
-                        image: Icons.close,
-                        title: "Request canceled",
-                        description: "Verification process has been canceled.",
-                        actions: [
-                          FlatButton(
-                              onPressed: () {
-                                Navigator.pop(dialogContext);
-                              },
-                              child: Text('OK'))
-                        ],
-                      ),
-                    );
-                  }
-
-                  if (resData.contains('internet.connection.problem')) {
-                    return showDialog(
-                      context: context,
-                      barrierDismissible: false,
-                      builder: (BuildContext dialogContext) => CustomDialog(
-                        image: Icons.close,
-                        title: "Request canceled",
-                        description: "Please make sure your internet connection is stable.",
-                        actions: [
-                          FlatButton(
-                              onPressed: () {
-                                Navigator.pop(dialogContext);
-                              },
-                              child: Text('OK'))
-                        ],
-                      ),
-                    );
-                  }
-                }
-
-                Map<String, dynamic> data = jsonDecode(res);
-                switch (data['event']) {
-                  // AUTHORIZATION IS WRONG
-                  case 'request.unauthorized':
-                    {
-                      Events().emit(IdentityCallbackEvent(type: 'unauthorized'));
-                      break;
-                    }
-                  // NO BALANCE
-                  case 'request.invalid':
-                  // DECLINED
-                  case 'verification.declined':
-                  // TIME OUT
-                  case 'request.timeout':
-                    {
-                      Events().emit(IdentityCallbackEvent(type: 'failed'));
-                      break;
-                    }
-
-                  // ACCEPTED
-                  case 'verification.accepted':
-                    {
-                      await verifyIdentity(reference);
-                      await identityVerification(reference).then((value) {
-                        if (value == null) {
-                          return Events().emit(IdentityCallbackEvent(type: 'failed'));
-                        }
-                        Events().emit(IdentityCallbackEvent(type: 'success'));
-                      });
-                      break;
-                    }
-                  default:
-                    {
-                      return;
-                    }
-                    break;
-                }
-              } catch (e) {
-                print(e);
-              } finally {
-                dispose();
-              }
-            },
-            homeClass: HomeScreen()));
-  }
-
   Widget _fillCard(String phase, int step, String text, IconData icon) {
     switch (phase) {
       case 'Unverified':

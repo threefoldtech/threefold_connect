@@ -128,7 +128,7 @@ class PhoneAlertDialogState extends State<PhoneAlertDialog> {
         ]);
   }
 
-  Future<Widget> wantToVerifyNow() async {
+  Future<dynamic> wantToVerifyNow() async {
     return await showDialog(
       context: context,
       barrierDismissible: false,
