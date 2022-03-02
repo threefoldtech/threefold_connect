@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_pkid/flutter_pkid.dart';
+import 'package:flutter_sodium/flutter_sodium.dart';
 import 'package:http/http.dart';
 import 'package:threebotlogin/helpers/flags.dart';
 import 'package:threebotlogin/helpers/globals.dart';
@@ -10,19 +11,19 @@ import 'package:threebotlogin/helpers/kyc_helpers.dart';
 import 'package:threebotlogin/services/3bot_service.dart';
 import 'package:threebotlogin/services/crypto_service.dart';
 import 'package:threebotlogin/services/open_kyc_service.dart';
+import 'package:threebotlogin/services/pkid_service.dart';
 import 'package:threebotlogin/services/tools_service.dart';
-import 'package:threebotlogin/services/user_service.dart';
+import 'package:threebotlogin/services/shared_preference_service.dart';
 import 'package:threebotlogin/widgets/custom_dialog.dart';
 import 'package:threebotlogin/widgets/reusable_text_field_step.dart';
 import 'package:threebotlogin/widgets/reusable_text_step.dart';
 
 class MobileRegistrationScreen extends StatefulWidget {
-  final String doubleName;
+  final String? doubleName;
 
   MobileRegistrationScreen({this.doubleName});
 
-  _MobileRegistrationScreenState createState() =>
-      _MobileRegistrationScreenState();
+  _MobileRegistrationScreenState createState() => _MobileRegistrationScreenState();
 }
 
 enum _State { DoubleName, Email, SeedPhrase, ConfirmSeedPhrase, Finish }
@@ -31,7 +32,7 @@ class RegistrationData {
   String doubleName = '';
   String phrase = '';
   String email = '';
-  Map<String, String> keys;
+  late KeyPair keyPair;
 }
 
 class _MobileRegistrationScreenState extends State<MobileRegistrationScreen> {
@@ -39,7 +40,6 @@ class _MobileRegistrationScreenState extends State<MobileRegistrationScreen> {
   final emailController = TextEditingController();
   final seedConfirmationController = TextEditingController();
   _State state = _State.DoubleName;
-  // FirebaseNotificationListener _listener;
 
   bool isVisible = false;
 
@@ -56,7 +56,7 @@ class _MobileRegistrationScreenState extends State<MobileRegistrationScreen> {
   void initState() {
     if (widget.doubleName != null) {
       setState(() {
-        doubleNameController.text = widget.doubleName;
+        doubleNameController.text = widget.doubleName!;
       });
     }
     // _listener = FirebaseNotificationListener();
@@ -68,7 +68,8 @@ class _MobileRegistrationScreenState extends State<MobileRegistrationScreen> {
   }
 
   checkEmail() async {
-    String emailValue = emailController.text?.toLowerCase()?.trim()?.replaceAll(new RegExp(r"\s+"), " ");
+    String? emailValue =
+        emailController.text.toLowerCase().trim().replaceAll(new RegExp(r"\s+"), " ");
 
     setState(() {
       emailController.text = emailValue;
@@ -87,7 +88,8 @@ class _MobileRegistrationScreenState extends State<MobileRegistrationScreen> {
   }
 
   checkDoubleName() async {
-    String doubleNameValue = doubleNameController.text?.toLowerCase()?.trim()?.replaceAll(new RegExp(r"\s+"), " ");
+    String? doubleNameValue =
+        doubleNameController.text.toLowerCase().trim().replaceAll(new RegExp(r"\s+"), " ");
 
     setState(() {
       doubleNameController.text = doubleNameValue;
@@ -123,19 +125,20 @@ class _MobileRegistrationScreenState extends State<MobileRegistrationScreen> {
     setState(() {
       state = _State.ConfirmSeedPhrase;
     });
-    _registrationData.keys =
-        await generateKeysFromSeedPhrase(_registrationData.phrase);
+    _registrationData.keyPair = await generateKeyPairFromSeedPhrase(_registrationData.phrase);
   }
 
   checkConfirm() {
-    String seedCheckValue = seedConfirmationController.text?.toLowerCase()?.trim()?.replaceAll(new RegExp(r"\s+"), " ");
+    String? seedCheckValue =
+        seedConfirmationController.text.toLowerCase().trim().replaceAll(new RegExp(r"\s+"), " ");
 
     setState(() {
       seedConfirmationController.text = seedCheckValue;
     });
 
-    bool seedWordConfirmationValidation = validateSeedWords(_registrationData.phrase, seedConfirmationController.text);
-    
+    bool seedWordConfirmationValidation =
+        validateSeedWords(_registrationData.phrase, seedConfirmationController.text);
+
     if (seedWordConfirmationValidation) {
       setState(() {
         state = _State.Finish;
@@ -152,11 +155,8 @@ class _MobileRegistrationScreenState extends State<MobileRegistrationScreen> {
     // String deviceId = await _listener.getToken();
     // String signedDeviceId =
     //     await (signData(deviceId, _registrationData.keys['privateKey']));
-    Response response = await finishRegistration(
-        doubleNameController.text,
-        emailController.text,
-        'random',
-        _registrationData.keys['publicKey']);
+    Response response = await finishRegistration(doubleNameController.text, emailController.text,
+        'random', base64.encode(_registrationData.keyPair.pk));
 
     if (response.statusCode == 200) {
       saveRegistration();
@@ -171,8 +171,7 @@ class _MobileRegistrationScreenState extends State<MobileRegistrationScreen> {
         builder: (BuildContext context) => CustomDialog(
           image: Icons.error,
           title: 'Error',
-          description:
-              'Something went wrong when trying to create your account.',
+          description: 'Something went wrong when trying to create your account.',
           actions: <Widget>[
             FlatButton(
               child: Text('Ok'),
@@ -239,18 +238,17 @@ class _MobileRegistrationScreenState extends State<MobileRegistrationScreen> {
   }
 
   void saveRegistration() async {
-    savePrivateKey(_registrationData.keys['privateKey']);
-    savePublicKey(_registrationData.keys['publicKey']);
+    savePrivateKey(_registrationData.keyPair.sk);
+    savePublicKey(_registrationData.keyPair.pk);
     saveFingerprint(false);
     saveEmail(_registrationData.email, null);
     saveDoubleName(_registrationData.doubleName);
     savePhrase(_registrationData.phrase);
 
-    Map<String, dynamic> keyPair = await generateKeyPairFromSeedPhrase(await getPhrase());
-    var client = FlutterPkid(pkidUrl, keyPair);
-    client.setPKidDoc('email', json.encode({'email': _registrationData.email }), keyPair);
+    FlutterPkid client = await getPkidClient();
+    client.setPKidDoc('email', json.encode({'email': _registrationData.email}));
 
-    await Flags().initialiseFlagSmith();
+    await Flags().initFlagSmith();
     await Flags().setFlagSmithDefaultValues();
 
     await fetchPKidData();
@@ -290,8 +288,7 @@ class _MobileRegistrationScreenState extends State<MobileRegistrationScreen> {
         accentColor: Globals.color,
       ),
       child: Stepper(
-        controlsBuilder: (BuildContext context,
-            {VoidCallback onStepContinue, VoidCallback onStepCancel}) {
+        controlsBuilder: (BuildContext context, ControlsDetails details) {
           return Column(
             children: <Widget>[
               Row(
@@ -300,7 +297,7 @@ class _MobileRegistrationScreenState extends State<MobileRegistrationScreen> {
                 children: <Widget>[
                   FlatButton(
                     onPressed: () {
-                      onStepCancel();
+                      details.onStepCancel!();
                     },
                     child: Text(
                       state == _State.DoubleName ? 'CANCEL' : 'PREVIOUS',
@@ -310,7 +307,7 @@ class _MobileRegistrationScreenState extends State<MobileRegistrationScreen> {
                   ),
                   FlatButton(
                     onPressed: () {
-                      onStepContinue();
+                      details.onStepContinue!();
                     },
                     child: Text(
                       state == _State.Finish ? 'FINISH' : 'NEXT',
@@ -363,7 +360,7 @@ class _MobileRegistrationScreenState extends State<MobileRegistrationScreen> {
                         ),
                         controller: doubleNameController,
                         inputFormatters: <TextInputFormatter>[
-                          WhitelistingTextInputFormatter(RegExp("[a-zA-Z0-9]"))
+                          FilteringTextInputFormatter.allow(RegExp("[a-zA-Z0-9]"))
                         ],
                         enableSuggestions: false,
                         autocorrect: false,
@@ -397,9 +394,7 @@ class _MobileRegistrationScreenState extends State<MobileRegistrationScreen> {
                     ? StepState.editing
                     : StepState.disabled,
             title: Text('Email'),
-            subtitle: state.index > _State.Email.index
-                ? Text(emailController.text)
-                : null,
+            subtitle: state.index > _State.Email.index ? Text(emailController.text) : null,
             content: Card(
               child: Padding(
                 padding: const EdgeInsets.all(16.0),
@@ -447,8 +442,7 @@ class _MobileRegistrationScreenState extends State<MobileRegistrationScreen> {
                 padding: const EdgeInsets.all(16.0),
                 child: ReuseableTextFieldStep(
                   focusNode: seedFocus,
-                  titleText:
-                      'Type 3 random words from your seed phrase, separated by a space.',
+                  titleText: 'Type 3 random words from your seed phrase, separated by a space.',
                   labelText: 'Seed phrase words',
                   typeText: TextInputType.text,
                   errorStepperText: errorStepperText,

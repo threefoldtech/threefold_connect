@@ -1,24 +1,21 @@
-import 'dart:ffi';
-
 import 'package:flutter/material.dart';
 import 'package:threebotlogin/helpers/hex_color.dart';
 import 'package:threebotlogin/helpers/vpn_state.dart';
-// import 'package:threebotlogin/helpers/vpn_state.dart';
 import 'package:threebotlogin/jrouter.dart';
 import 'package:threebotlogin/models/paymentRequest.dart';
 
 class NoAnimationTabController extends TabController {
   NoAnimationTabController(
       {int initialIndex = 0,
-      @required int length,
-      @required TickerProvider vsync})
+      required int length,
+      required TickerProvider vsync})
       : super(initialIndex: initialIndex, length: length, vsync: vsync);
 
   @override
   void animateTo(int value,
-      {Duration duration = kTabScrollDuration, Curve curve = Curves.ease}) {
+      {Duration? duration = kTabScrollDuration, Curve curve = Curves.ease}) {
     super.animateTo(value,
-        duration: const Duration(milliseconds: 0), curve: curve);
+        duration: const Duration(milliseconds: 1000), curve: curve);
   }
 }
 
@@ -38,21 +35,25 @@ class Globals {
   bool tooManySmsAttempts = false;
 
   String routeName = 'Home';
-  NoAnimationTabController tabController;
+  late TabController tabController;
 
   int lockedUntill = 0;
   int lockedSmsUntill = 0;
   int loginTimeout = 120;
-  PaymentRequest paymentRequest;
+  PaymentRequest? paymentRequest;
   bool paymentRequestIsUsed = false;
 
   // FlagSmith configurations
-  bool isOpenKYCEnabled;
-  bool isYggdrasilEnabled;
-  bool useNewWallet;
-  String newWalletUrl;
-  bool redoIdentityVerification;
-  bool debugMode;
+  bool isOpenKYCEnabled = false;
+  bool isYggdrasilEnabled = false;
+  bool useNewWallet = false;
+  String newWalletUrl = '';
+  bool redoIdentityVerification = false;
+  bool debugMode = false;
+  int timeOutSeconds = 5;
+  String farmersUrl = '';
+  bool canSeeFarmers = false;
+
 
   VpnState vpnState = new VpnState();
 
@@ -61,7 +62,6 @@ class Globals {
 
   ValueNotifier<bool> hidePhoneButton = ValueNotifier(false);
 
-  // VpnState vpnState = new VpnState();
   static final Globals _singleton = new Globals._internal();
 
   factory Globals() {

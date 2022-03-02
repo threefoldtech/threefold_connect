@@ -1,5 +1,5 @@
 class FfpBrowseEvent {
-  String url;
+  String? url;
 
   FfpBrowseEvent({this.url});
 }

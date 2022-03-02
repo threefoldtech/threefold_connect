@@ -2,8 +2,10 @@ import 'package:threebotlogin/app_config_local.dart';
 import 'package:threebotlogin/helpers/env_config.dart';
 import 'package:threebotlogin/helpers/environment.dart';
 
+import 'helpers/globals.dart';
+
 class AppConfig extends EnvConfig {
-  AppConfigImpl appConfig;
+  late AppConfigImpl appConfig;
 
   AppConfig() {
     if (environment == Environment.Staging) {
@@ -131,7 +133,7 @@ class AppConfigStaging extends AppConfigImpl {
   }
 
   String pKidUrl() {
-    return 'https://pkid.staging.jimber.org/v1';
+    return 'https://pkid.staging.jimber.io/v1';
   }
 
   Map<String, String> flagSmithConfig() {
@@ -168,7 +170,7 @@ class AppConfigTesting extends AppConfigImpl {
   }
 
   String pKidUrl() {
-    return 'https://pkid.staging.jimber.org/v1';
+    return 'https://pkid.staging.jimber.io/v1';
   }
 
   Map<String, String> flagSmithConfig() {
@@ -177,4 +179,16 @@ class AppConfigTesting extends AppConfigImpl {
       'apiKey': 'VtTsMwJwiF69QWFWHGEMKM'
     };
   }
+}
+
+void setFallbackConfigs() {
+  print("Can't connect to FlagSmith, setting default configs... ");
+
+  Globals().isOpenKYCEnabled = false;
+  Globals().isYggdrasilEnabled = false;
+  Globals().debugMode = false;
+  Globals().useNewWallet = false;
+  Globals().newWalletUrl = '';
+  Globals().redoIdentityVerification = false;
+  Globals().timeOutSeconds = 5;
 }

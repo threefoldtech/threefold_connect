@@ -11,7 +11,7 @@ class Events {
 
   onEvent(Type eventType, Function function) {
     if (this.eventList[eventType] == null) {
-      this.eventList[eventType] = new List<Function>();
+      this.eventList[eventType] = [];
     }
     this.eventList[eventType].add(function);
   }

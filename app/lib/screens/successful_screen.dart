@@ -6,7 +6,7 @@ class SuccessfulScreen extends StatefulWidget {
   final String title;
   final String text;
 
-  SuccessfulScreen({this.title, this.text});
+  SuccessfulScreen({required this.title, required this.text});
 
   _SuccessfulScreenState createState() => _SuccessfulScreenState();
 }

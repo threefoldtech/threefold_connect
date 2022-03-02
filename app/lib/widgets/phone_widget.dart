@@ -9,7 +9,8 @@ import 'package:threebotlogin/helpers/globals.dart';
 import 'package:threebotlogin/services/crypto_service.dart';
 import 'package:threebotlogin/services/open_kyc_service.dart';
 import 'package:threebotlogin/services/phone_service.dart';
-import 'package:threebotlogin/services/user_service.dart';
+import 'package:threebotlogin/services/pkid_service.dart';
+import 'package:threebotlogin/services/shared_preference_service.dart';
 
 import 'custom_dialog.dart';
 
@@ -50,7 +51,7 @@ phoneSendDialog(context) {
 class PhoneAlertDialog extends StatefulWidget {
   final String defaultCountryCode;
 
-  const PhoneAlertDialog({Key key, this.defaultCountryCode}) : super(key: key);
+  const PhoneAlertDialog({Key? key, required this.defaultCountryCode}) : super(key: key);
 
   @override
   State<StatefulWidget> createState() {
@@ -59,8 +60,8 @@ class PhoneAlertDialog extends StatefulWidget {
 }
 
 class PhoneAlertDialogState extends State<PhoneAlertDialog> {
-  bool valid;
-  String verificationPhoneNumber;
+  bool valid = false;
+  String verificationPhoneNumber = '';
 
   @override
   void initState() {
@@ -127,8 +128,8 @@ class PhoneAlertDialogState extends State<PhoneAlertDialog> {
         ]);
   }
 
-  Future<Widget> wantToVerifyNow() async {
-    return showDialog(
+  Future<dynamic> wantToVerifyNow() async {
+    return await showDialog(
       context: context,
       barrierDismissible: false,
       builder: (BuildContext dialogContext) => CustomDialog(
@@ -160,9 +161,8 @@ class PhoneAlertDialogState extends State<PhoneAlertDialog> {
 
     savePhone(verificationPhoneNumber, null);
 
-    Map<String, dynamic> keyPair = await generateKeyPairFromSeedPhrase(await getPhrase());
-    var client = FlutterPkid(pkidUrl, keyPair);
-    client.setPKidDoc('phone', json.encode({'phone': verificationPhoneNumber}), keyPair);
+    FlutterPkid client = await getPkidClient();
+    client.setPKidDoc('phone', json.encode({'phone': verificationPhoneNumber}));
 
     wantToVerifyNow();
   }

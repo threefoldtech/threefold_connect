@@ -1,51 +1,42 @@
 import 'dart:convert';
 import 'dart:core';
+import 'dart:typed_data';
 
-import 'package:crypto/crypto.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_pkid/flutter_pkid.dart';
+import 'package:flutter_sodium/flutter_sodium.dart';
 import 'package:http/http.dart';
-import 'package:shuftipro_flutter_sdk/ShuftiProVerifications.dart';
 import 'package:threebotlogin/helpers/kyc_helpers.dart';
 import 'package:threebotlogin/helpers/globals.dart';
 import 'package:threebotlogin/services/3bot_service.dart';
 import 'package:threebotlogin/services/crypto_service.dart';
 import 'package:threebotlogin/services/migration_service.dart';
-import 'package:threebotlogin/services/open_kyc_service.dart';
-import 'package:threebotlogin/services/tools_service.dart';
-import 'package:threebotlogin/services/user_service.dart';
+import 'package:threebotlogin/services/pkid_service.dart';
+import 'package:threebotlogin/services/shared_preference_service.dart';
 
 class RecoverScreen extends StatefulWidget {
-  final Widget recoverScreen;
+  final Widget? recoverScreen;
 
-  RecoverScreen({Key key, this.recoverScreen}) : super(key: key);
+  RecoverScreen({Key? key, this.recoverScreen}) : super(key: key);
 
   _RecoverScreenState createState() => _RecoverScreenState();
 }
 
 class _RecoverScreenState extends State<RecoverScreen> {
   final TextEditingController doubleNameController = TextEditingController();
-  final TextEditingController seedPhrasecontroller = TextEditingController();
+  final TextEditingController seedPhraseController = TextEditingController();
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-
-  bool _autoValidate = false;
 
   String doubleName = '';
   String seedPhrase = '';
   String error = '';
-  String privateKey;
 
   String errorStepperText = '';
 
   checkSeedPhrase(doubleName, seedPhrase) async {
     checkSeedLength(seedPhrase);
-    Map<String, String> keys = await generateKeysFromSeedPhrase(seedPhrase);
-
-    setState(() {
-      privateKey = keys['privateKey'];
-    });
+    KeyPair keyPair = await generateKeyPairFromSeedPhrase(seedPhrase);
 
     Response userInfoResult = await getUserInfo(doubleName);
 
@@ -55,29 +46,29 @@ class _RecoverScreenState extends State<RecoverScreen> {
 
     Map<String, dynamic> body = json.decode(userInfoResult.body);
 
-    if (body['publicKey'] != keys['publicKey']) {
+    if (body['publicKey'] != base64.encode(keyPair.pk)) {
       throw new Exception('Seed phrase does not match with $doubleName');
     }
   }
 
   continueRecoverAccount() async {
     try {
-      Map<String, String> keys = await generateKeysFromSeedPhrase(seedPhrase);
-      await savePrivateKey(keys['privateKey']);
-      await savePublicKey(keys['publicKey']);
+      KeyPair keyPair = await generateKeyPairFromSeedPhrase(seedPhrase);
+      await savePrivateKey(keyPair.sk);
+      await savePublicKey(keyPair.pk);
 
-      Map<String, dynamic> keyPair = await generateKeyPairFromSeedPhrase(seedPhrase);
-      var client = FlutterPkid(pkidUrl, keyPair);
-
+      FlutterPkid client = await getPkidClient(seedPhrase: seedPhrase);
       List<String> keyWords = ['email', 'phone', 'identity'];
 
       var futures = keyWords.map((keyword) async {
-        var pKidResult = await client.getPKidDoc(keyword, keyPair);
-        return pKidResult.containsKey('data') && pKidResult.containsKey('success') ? jsonDecode(pKidResult['data']) : {};
+        var pKidResult = await client.getPKidDoc(keyword);
+        return pKidResult.containsKey('data') && pKidResult.containsKey('success')
+            ? jsonDecode(pKidResult['data'])
+            : {};
       });
 
       var pKidResult = await Future.wait(futures);
-      Map<int, Object> dataMap = pKidResult.asMap();
+      Map<int, dynamic> dataMap = pKidResult.asMap();
 
       await savePhrase(seedPhrase);
       await saveFingerprint(false);
@@ -85,15 +76,12 @@ class _RecoverScreenState extends State<RecoverScreen> {
 
       await handleKYCData(dataMap[0], dataMap[1], dataMap[2]);
 
-      await migrateToNewSystem();
-      // await sendVerificationEmail();
-    }
+      await fixPkidMigration();
 
-    catch(e) {
+    } catch (e) {
       print(e);
       throw Exception('Something went wrong');
     }
-
   }
 
   checkSeedLength(seedPhrase) {
@@ -112,7 +100,7 @@ class _RecoverScreenState extends State<RecoverScreen> {
   @override
   void dispose() {
     doubleNameController.dispose();
-    seedPhrasecontroller.dispose();
+    seedPhraseController.dispose();
     super.dispose();
   }
 
@@ -135,7 +123,6 @@ class _RecoverScreenState extends State<RecoverScreen> {
   Widget recoverForm() {
     return new Form(
       key: _formKey,
-      autovalidate: _autoValidate,
       child: SingleChildScrollView(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -158,8 +145,8 @@ class _RecoverScreenState extends State<RecoverScreen> {
                     suffixStyle: TextStyle(fontWeight: FontWeight.bold),
                   ),
                   controller: doubleNameController,
-                  validator: (value) {
-                    if (value.isEmpty) {
+                  validator: (String? value) {
+                    if (value!.isEmpty) {
                       return 'Please enter your Name';
                     }
                     return null;
@@ -171,9 +158,9 @@ class _RecoverScreenState extends State<RecoverScreen> {
                 keyboardType: TextInputType.multiline,
                 maxLines: null,
                 decoration: InputDecoration(border: OutlineInputBorder(), labelText: 'SEED PHRASE'),
-                controller: seedPhrasecontroller,
-                validator: (value) {
-                  if (value.isEmpty) {
+                controller: seedPhraseController,
+                validator: (String? value) {
+                  if (value!.isEmpty) {
                     return 'Please enter your Seed phrase';
                   }
                   return null;
@@ -204,19 +191,21 @@ class _RecoverScreenState extends State<RecoverScreen> {
 
                 FocusScope.of(context).requestFocus(new FocusNode());
 
-                String doubleNameValue =
-                    doubleNameController.text?.toLowerCase()?.trim()?.replaceAll(new RegExp(r"\s+"), " ");
-                String seedPhraseValue =
-                    seedPhrasecontroller.text?.toLowerCase()?.trim()?.replaceAll(new RegExp(r"\s+"), " ");
+                String doubleNameValue = doubleNameController.text
+                    .toLowerCase()
+                    .trim()
+                    .replaceAll(new RegExp(r"\s+"), " ");
+                String seedPhraseValue = seedPhraseController.text
+                    .toLowerCase()
+                    .trim()
+                    .replaceAll(new RegExp(r"\s+"), " ");
 
                 setState(() {
                   doubleNameController.text = doubleNameValue;
-                  seedPhrasecontroller.text = seedPhraseValue;
-
-                  _autoValidate = true;
+                  seedPhraseController.text = seedPhraseValue;
 
                   doubleName = doubleNameController.text + '.3bot';
-                  seedPhrase = seedPhrasecontroller.text;
+                  seedPhrase = seedPhraseController.text;
                 });
 
                 try {

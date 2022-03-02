@@ -1,27 +1,25 @@
 import 'dart:convert';
 
 import 'package:flutter_pkid/flutter_pkid.dart';
-import 'package:threebotlogin/services/crypto_service.dart';
 import 'package:threebotlogin/services/migration_service.dart';
 import 'package:threebotlogin/services/pkid_service.dart';
 import 'package:threebotlogin/services/tools_service.dart';
-import 'package:threebotlogin/services/user_service.dart';
+import 'package:threebotlogin/services/shared_preference_service.dart';
 
 import 'globals.dart';
 
 Future<void> fetchPKidData() async {
-  Map<String, dynamic> keyPair = await generateKeyPairFromSeedPhrase(await getPhrase());
-  var client = FlutterPkid(pkidUrl, keyPair);
+  FlutterPkid client = await getPkidClient();
 
   List<String> keyWords = ['email', 'phone', 'identity'];
 
   var futures = keyWords.map((keyword) async {
-    var pKidResult = await client.getPKidDoc(keyword, keyPair);
+    var pKidResult = await client.getPKidDoc(keyword);
     return pKidResult.containsKey('data') && pKidResult.containsKey('success') ? jsonDecode(pKidResult['data']) : {};
   });
 
   var pKidResult = await Future.wait(futures);
-  Map<int, Object> dataMap = pKidResult.asMap();
+  Map<int, dynamic> dataMap = pKidResult.asMap();
 
   await handleKYCData(dataMap[0], dataMap[1], dataMap[2]);
 }
@@ -30,9 +28,9 @@ Future<void> handleKYCData(
     Map<dynamic, dynamic> emailData, Map<dynamic, dynamic> phoneData, Map<dynamic, dynamic> identityData) async {
   await saveCorrectVerificationStates(emailData, phoneData, identityData);
 
-  bool isEmailVerified = await getIsEmailVerified();
-  bool isPhoneVerified = await getIsPhoneVerified();
-  bool isIdentityVerified = await getIsIdentityVerified();
+  bool? isEmailVerified = await getIsEmailVerified();
+  bool? isPhoneVerified = await getIsPhoneVerified();
+  bool? isIdentityVerified = await getIsIdentityVerified();
 
   // This method got refactored due my mistake in one little mapping in the migration from no pkid to pkid
   if (isEmailVerified == false) {
@@ -95,6 +93,6 @@ Future<void> saveCorrectVerificationStates(
 }
 
 bool checkEmail(String email) {
-  String emailValue = email.toLowerCase()?.trim()?.replaceAll(new RegExp(r"\s+"), " ");
+  String? emailValue = email.toLowerCase().trim().replaceAll(new RegExp(r"\s+"), " ");
   return validateEmail(emailValue);
 }

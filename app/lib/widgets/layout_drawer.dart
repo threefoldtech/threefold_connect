@@ -6,13 +6,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_pkid/flutter_pkid.dart';
 import 'package:threebotlogin/helpers/globals.dart';
 import 'package:threebotlogin/services/crypto_service.dart';
-import 'package:threebotlogin/services/user_service.dart';
+import 'package:threebotlogin/services/shared_preference_service.dart';
 import 'package:convert/convert.dart';
 
 import '../app_config.dart';
 
 class LayoutDrawer extends StatefulWidget {
-  LayoutDrawer({@required this.titleText, @required this.content});
+  LayoutDrawer({required this.titleText, required this.content});
 
   final String titleText;
   final Widget content;
@@ -105,6 +105,21 @@ class _LayoutDrawerState extends State<LayoutDrawer> {
                 globals.tabController.animateTo(2);
               },
             ),
+            if (Globals().canSeeFarmers) ListTile(
+              minLeadingWidth: 10,
+              leading: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Padding(padding: const EdgeInsets.only(left: 30)),
+                  Image.asset('assets/server.png', scale:1.0, height:18.0,width:18.0,),
+                ],
+              ),
+              title: Text('Farmers'),
+              onTap: () {
+                Navigator.pop(context);
+                globals.tabController.animateTo(3);
+              },
+            ) else Container(),
             ListTile(
               minLeadingWidth: 10,
               leading: Column(
@@ -117,7 +132,7 @@ class _LayoutDrawerState extends State<LayoutDrawer> {
               title: Text('Support'),
               onTap: () {
                 Navigator.pop(context);
-                globals.tabController.animateTo(3);
+                globals.tabController.animateTo(4);
               },
             ),
             // ListTile(
@@ -147,7 +162,7 @@ class _LayoutDrawerState extends State<LayoutDrawer> {
               title: Text('Planetary Network'),
               onTap: () {
                 Navigator.pop(context);
-                globals.tabController.animateTo(4);
+                globals.tabController.animateTo(5);
               },
             ) else Container(),
             ListTile(
@@ -162,7 +177,7 @@ class _LayoutDrawerState extends State<LayoutDrawer> {
               title: Text('Identity'),
               onTap: () {
                 Navigator.pop(context);
-                globals.tabController.animateTo(6);
+                globals.tabController.animateTo(7);
               },
             ),
             ListTile(
@@ -177,7 +192,7 @@ class _LayoutDrawerState extends State<LayoutDrawer> {
               title: Text('Settings'),
               onTap: () {
                 Navigator.pop(context);
-                globals.tabController.animateTo(5);
+                globals.tabController.animateTo(6);
               },
             ),
           ],

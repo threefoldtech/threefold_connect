@@ -2,13 +2,13 @@ import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 
 class MyInAppBrowser extends InAppBrowser {
   @override
-  void onLoadStart(Uri url) {
+  void onLoadStart(Uri? url) {
     super.onLoadStart(url);
     print("\n\nStarted $url\n\n");
   }
 
   @override
-  void onLoadStop(Uri url) {
+  void onLoadStop(Uri? url) {
     super.onLoadStop(url);
     print("\n\nStopped $url\n\n");
   }

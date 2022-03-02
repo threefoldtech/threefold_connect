@@ -17,15 +17,34 @@ jobs:
         run: docker build . --file Dockerfile --tag jimber/3botlogin:production-${{ github.sha }}
       - name: Push the Docker image
         run: docker push jimber/3botlogin:production-${{ github.sha }}
+  # deploy:
+  #   needs: build
+  #   runs-on: whale-replacement
+  #   steps:
+  #     - name: Login to docker hub
+  #       run: docker login --username ${{ secrets.DOCKER_USERNAME }} --password ${{ secrets.DOCKER_TOKEN }}
+  #     - name: kill old docker
+  #       run: docker rm -f 3botlogin || true
+  #     - name: Pull Image
+  #       run: docker pull jimber/3botlogin:production-${{ github.sha }}
+  #     - name: Run new docker
+  #       run: docker run -d -it --restart=unless-stopped --name 3botlogin -v /opt/3botlogin/db/pythonsqlite.db:/usr/share/nginx/backend/pythonsqlite.db -v /opt/3botlogin/config.ini:/usr/share/nginx/backend/config.ini --network=3proxynet jimber/3botlogin:production-${{ github.sha }}
+
   deploy:
-    needs: build
-    runs-on: prod
+    needs: [build]
+    runs-on: ubuntu-latest
     steps:
-      - name: Login to docker hub
-        run: docker login --username ${{ secrets.DOCKER_USERNAME }} --password ${{ secrets.DOCKER_TOKEN }}
-      - name: kill old docker
-        run: docker rm -f 3botlogin || true
-      - name: Pull Image
-        run: docker pull jimber/3botlogin:production-${{ github.sha }}
-      - name: Run new docker
-        run: docker run -d -it --restart=unless-stopped --name 3botlogin -v /opt/3botlogin/db/pythonsqlite.db:/usr/share/nginx/backend/pythonsqlite.db -v /opt/3botlogin/config.ini:/usr/share/nginx/backend/config.ini --network=3proxynet jimber/3botlogin:production-${{ github.sha }}
+      - uses: actions/checkout@v2
+      - name: Set authorization certificate
+        run: |
+          mkdir ${HOME}/.kube
+          echo ${{ secrets.KUBE_KEY }} | base64 --decode > ${HOME}/.kube/jimber-prod2.key
+          echo ${HOME}/.kube/jimber-prod2.key
+          echo ${{ secrets.KUBE_CRT }} | base64 --decode > ${HOME}/.kube/jimber-prod2.crt
+          echo ${HOME}/.kube/jimber-prod2.crt
+      - name: context
+        run: |
+          echo ${{ secrets.KUBE_CONFIG }} | base64 --decode > ${HOME}/.kube/config
+          cat ${HOME}/.kube/config
+      - name: Upgrade production on cluster
+        run: helm upgrade threebotlogin helm_files -f helm_files/valuesProduction.yaml --set image.tag=production-${{ github.sha }} -n jimber

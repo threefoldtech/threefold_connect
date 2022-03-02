@@ -7,44 +7,41 @@ import 'package:threebotlogin/widgets/layout_drawer.dart';
 class ChatbotWidget extends StatefulWidget {
   final String email;
 
-  ChatbotWidget({this.email});
+  ChatbotWidget({required this.email});
 
   @override
   _ChatbotState createState() => new _ChatbotState(email: this.email);
 }
 
-class _ChatbotState extends State<ChatbotWidget>
-    with AutomaticKeepAliveClientMixin {
-  InAppWebViewController webView;
+class _ChatbotState extends State<ChatbotWidget> with AutomaticKeepAliveClientMixin {
+  InAppWebViewController? webView;
 
   ChatbotConfig config = ChatbotConfig();
-  InAppWebView iaWebview;
+  InAppWebView? iaWebview;
   final String email;
 
-  _ChatbotState({this.email}) {
+  _ChatbotState({required this.email}) {
     iaWebview = InAppWebView(
       initialUrlRequest: URLRequest(
           url: Uri.parse('${config.url()}$email&cache_buster=' +
               new DateTime.now().millisecondsSinceEpoch.toString())),
       initialOptions: InAppWebViewGroupOptions(
           crossPlatform: InAppWebViewOptions(useShouldOverrideUrlLoading: true),
-          android: AndroidInAppWebViewOptions(supportMultipleWindows: true)),
+          android: AndroidInAppWebViewOptions(supportMultipleWindows: true, useHybridComposition: true)),
       onWebViewCreated: (InAppWebViewController controller) {
         webView = controller;
       },
-      onCreateWindow:
-          (InAppWebViewController controller, CreateWindowAction req) {
-        inAppBrowser.openUrlRequest(
-            urlRequest: req.request, options: InAppBrowserClassOptions());
+      onCreateWindow: (InAppWebViewController controller, CreateWindowAction req) {
+        inAppBrowser.openUrlRequest(urlRequest: req.request, options: InAppBrowserClassOptions());
+        return Future.value(true);
       },
-      onConsoleMessage:
-          (InAppWebViewController controller, ConsoleMessage consoleMessage) {
+      onConsoleMessage: (InAppWebViewController controller, ConsoleMessage consoleMessage) {
         print("CB console: " + consoleMessage.message);
       },
-      onLoadStart: (InAppWebViewController controller, Uri url) {
+      onLoadStart: (InAppWebViewController controller, _) {
         webView = controller;
       },
-      onLoadStop: (InAppWebViewController controller, Uri url) {
+      onLoadStop: (InAppWebViewController controller, _) {
         controller.evaluateJavascript(source: """
           function waitForElm(selector) {
           return new Promise(resolve => {

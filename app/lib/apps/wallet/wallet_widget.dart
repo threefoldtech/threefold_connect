@@ -13,7 +13,7 @@ import 'package:threebotlogin/helpers/globals.dart';
 import 'package:threebotlogin/models/wallet_data.dart';
 import 'package:threebotlogin/screens/scan_screen.dart';
 import 'package:threebotlogin/services/3bot_service.dart';
-import 'package:threebotlogin/services/user_service.dart';
+import 'package:threebotlogin/services/shared_preference_service.dart';
 import 'package:threebotlogin/widgets/layout_drawer.dart';
 
 bool created = false;
@@ -24,15 +24,15 @@ class WalletWidget extends StatefulWidget {
 }
 
 class _WalletState extends State<WalletWidget> with AutomaticKeepAliveClientMixin {
-  InAppWebViewController webView;
+  late InAppWebViewController webView;
+  late InAppWebView iaWebView;
 
   double progress = 0;
   var config = WalletConfig();
-  InAppWebView iaWebView;
 
   _back(WalletBackEvent event) async {
-    Uri url = await webView.getUrl();
-    print(url.toString());
+    Uri? url = await webView.getUrl();
+
     String endsWith = config.appId() + '/';
     if (url.toString().endsWith(endsWith)) {
       Events().emit(GoHomeEvent());
@@ -42,7 +42,8 @@ class _WalletState extends State<WalletWidget> with AutomaticKeepAliveClientMixi
   }
 
   _WalletState() {
-    String walletUri = Globals().useNewWallet == true ? Globals().newWalletUrl : 'https://${config.appId()}/init';
+    String walletUri =
+        Globals().useNewWallet == true ? Globals().newWalletUrl : 'https://${config.appId()}/init';
 
     iaWebView = InAppWebView(
       initialUrlRequest: URLRequest(
@@ -50,14 +51,16 @@ class _WalletState extends State<WalletWidget> with AutomaticKeepAliveClientMixi
               walletUri + '?cache_buster=' + new DateTime.now().millisecondsSinceEpoch.toString())),
       initialOptions: InAppWebViewGroupOptions(
           crossPlatform: InAppWebViewOptions(),
-          android: AndroidInAppWebViewOptions(supportMultipleWindows: true, thirdPartyCookiesEnabled: true),
+          android: AndroidInAppWebViewOptions(supportMultipleWindows: true, thirdPartyCookiesEnabled: true, useHybridComposition: true),
           ios: IOSInAppWebViewOptions()),
       onWebViewCreated: (InAppWebViewController controller) {
         webView = controller;
         this.addHandler();
       },
-      onCreateWindow: (InAppWebViewController controller, CreateWindowAction req) {},
-      onLoadStop: (InAppWebViewController controller, Uri url) async {
+      onCreateWindow: (InAppWebViewController controller, CreateWindowAction req) {
+        return Future.value(true);
+      },
+      onLoadStop: (InAppWebViewController controller, Uri? url) async {
         addClipboardHandlersOnly(controller);
         if (url.toString().contains('/init')) {
           initKeys();
@@ -85,15 +88,18 @@ class _WalletState extends State<WalletWidget> with AutomaticKeepAliveClientMixi
   }
 
   initKeys() async {
-    var seed = await getDerivedSeed(config.appId());
+    var seed = base64.encode(await getDerivedSeed(config.appId()));
     var doubleName = await getDoubleName();
     var importedWallets = await getImportedWallets();
     var appWallets = await getAppWallets();
+
 
     var jsStartApp = Globals().useNewWallet == true
         ? "window.init('$doubleName', '$seed')"
         : "window.vueInstance.startWallet('$doubleName', '$seed', '$importedWallets', '$appWallets');";
 
+
+    print(jsStartApp);
     if (Globals().paymentRequest != null && !Globals().useNewWallet) {
       String paymentRequestString = Globals().paymentRequest.toString();
 
@@ -114,7 +120,7 @@ class _WalletState extends State<WalletWidget> with AutomaticKeepAliveClientMixi
     // QRCode scanner is black if we don't sleep here.
     bool slept = await Future.delayed(const Duration(milliseconds: 400), () => true);
 
-    String result;
+    String result = '';
     if (slept) {
       result = await Navigator.push(context, MaterialPageRoute(builder: (context) => ScanScreen()));
     }

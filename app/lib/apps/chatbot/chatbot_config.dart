@@ -2,7 +2,7 @@ import 'package:threebotlogin/helpers/env_config.dart';
 import 'package:threebotlogin/helpers/environment.dart';
 
 class ChatbotConfig extends EnvConfig {
-  ChatbotConfigImpls impl;
+  late ChatbotConfigImpls impl;
 
   ChatbotConfig() {
     if (environment == Environment.Staging) {

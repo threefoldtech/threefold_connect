@@ -2,7 +2,7 @@ import 'package:threebotlogin/helpers/env_config.dart';
 import 'package:threebotlogin/helpers/environment.dart';
 
 class WalletConfig extends EnvConfig {
-  WalletConfigImpls impl;
+  late WalletConfigImpls impl;
 
   WalletConfig() {
     if (environment == Environment.Staging) {
@@ -33,7 +33,7 @@ abstract class WalletConfigImpls {
 
 class WalletConfigStaging extends WalletConfigImpls {
   String appId() {
-    return 'wallet.staging.jimber.org';
+    return 'wallet.staging.jimber.io';
   }
 
   String redirectUrl() {

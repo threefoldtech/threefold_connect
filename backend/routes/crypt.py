@@ -36,6 +36,31 @@ def sign_attempt_handler():
     return Response("Ok")
 
 
+@api_crypt.route("/signedSignDataAttempt", methods=["POST"])
+def sign_data_attempt_handler():
+    data = request.get_json()
+
+    double_name = data["doubleName"].lower()
+    verified_data = verify_signed_data(double_name, data["signedAttempt"])
+
+    if not verified_data:
+        return Response("Missing signature", status=400)
+
+    body = json.loads(verified_data)
+
+    logger.debug("/sign: %s", body)
+    logger.debug("body.get('doubleName'): %s", body.get("doubleName"))
+
+    random_room = body.get("randomRoom")
+    if random_room is None:
+        random_room = body.get("doubleName")
+
+    random_room = random_room.lower()
+
+    logger.debug("roomToSendTo %s", random_room)
+    sio.emit("signedSignDataAttempt", data, room=random_room)
+    return Response("Ok")
+
 @api_crypt.route("/mobileregistration", methods=["POST"])
 def mobile_registration_handler():
     logger.debug("/mobile_registration_handler ")

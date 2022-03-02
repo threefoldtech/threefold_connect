@@ -9,17 +9,18 @@ import 'package:threebotlogin/screens/preference_screen.dart';
 import 'package:threebotlogin/screens/registered_screen.dart';
 import 'package:threebotlogin/screens/reservation_screen.dart';
 
+import 'apps/farmers/farmers.dart';
 import 'apps/news/news.dart';
 
 class AppInfo {
   Route route;
-  App app;
+  App? app;
 
-  AppInfo({this.route, this.app});
+  AppInfo({required this.route,  this.app});
 }
 
 class JRouter {
-  List<AppInfo> routes;
+  List<AppInfo> routes = [];
 
   init() async {
     routes = [
@@ -47,6 +48,14 @@ class JRouter {
             view: await Wallet().widget(),
           ),
           app: Wallet()),
+      AppInfo(
+          route: Route(
+            path: '/farmers',
+            name: 'Farmers',
+            icon: Icons.person_pin,
+            view: await Farmers().widget(),
+          ),
+          app: Farmers()),
       AppInfo(
           route: Route(
             path: '/chatbot',
@@ -96,14 +105,14 @@ class JRouter {
 
   bool emailMustBeVerified(int index) {
     if (routes[index].app != null) {
-      return routes[index].app.emailVerificationRequired();
+      return routes[index].app!.emailVerificationRequired();
     }
     return false;
   }
 
   bool pinRequired(int index) {
     if (routes[index].app != null) {
-      return routes[index].app.pinRequired();
+      return routes[index].app!.pinRequired();
     }
     return false;
   }
@@ -138,5 +147,5 @@ class Route {
   final String path;
   final Widget view;
 
-  Route({this.path, this.name, this.icon, this.view});
+  Route({required this.path, required this.name, required this.icon, required this.view});
 }
