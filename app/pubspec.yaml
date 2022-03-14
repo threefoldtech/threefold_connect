@@ -50,7 +50,7 @@ dependencies:
   flutter_sodium: ^0.2.0
   uni_links: ^0.5.1
   pbkdf2ns: ^0.0.2
-  qr_code_scanner: ^0.6.1
+  qr_code_scanner: ^0.7.0
   flutter_json_viewer: ^1.0.1
 
   permission_handler: ^8.3.0

@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
+import 'package:qr_code_scanner/qr_code_scanner.dart';
 import 'package:threebotlogin/apps/wallet/wallet_config.dart';
 import 'package:threebotlogin/apps/wallet/wallet_events.dart';
 import 'package:threebotlogin/apps/wallet/wallet_user_data.dart';
@@ -116,16 +117,13 @@ class _WalletState extends State<WalletWidget> with AutomaticKeepAliveClientMixi
 
   scanQrCode(List<dynamic> params) async {
     await SystemChannels.textInput.invokeMethod('TextInput.hide');
-
     // QRCode scanner is black if we don't sleep here.
     bool slept = await Future.delayed(const Duration(milliseconds: 400), () => true);
-
-    String result = '';
+    late Barcode result;
     if (slept) {
       result = await Navigator.push(context, MaterialPageRoute(builder: (context) => ScanScreen()));
     }
-
-    return result;
+    return result.code;
   }
 
   addHandler() {
