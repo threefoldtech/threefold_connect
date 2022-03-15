@@ -8,7 +8,21 @@
                     </h1>
                     <v-btn icon outlined color="white" @click.stop="dialog = true">?</v-btn>
                 </v-toolbar>
-                <v-form class="pa-4" v-model="valid" @submit.prevent="onSignIn">
+                <v-layout v-if="isMobile" style="width: 100%;" column justify-space-around fill-height>
+                    <v-layout align-center row wrap justify-center class="py-5">
+
+                        <v-layout column align-center>
+                            <v-avatar class="mb-4" size="200">
+                                <v-img src="logo.png"></v-img>
+                            </v-avatar>
+
+                            <v-btn class="accent" @click="promptToSignMobile">
+                                Open ThreeFold Connect app
+                            </v-btn>
+                        </v-layout>
+                    </v-layout>
+                </v-layout>
+                <v-form v-else class="pa-4" v-model="valid" @submit.prevent="onSignIn">
                     <v-card-text>
                         <v-text-field @input="checkNameAvailability" :disabled="nameCheckStatus.checking"
                                       :rules="nameRules"
