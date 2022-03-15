@@ -53,7 +53,11 @@ export default {
       'scope',
       'appId',
       'appPublicKey',
-      'signAttemptOnGoing'
+      'signAttemptOnGoing',
+      'dataUrl',
+      'dataUrlHash',
+      'isJson',
+      'friendlyName'
     ])
   },
   methods: {
@@ -92,7 +96,7 @@ export default {
       this.signUserMobile({
         state: state,
         appId: appId,
-        dataHash: dataHash,
+        dataUrlHash: dataHash,
         dataUrl: dataUrl,
         isJson: isJson,
         redirectUrl: redirectUrl,
@@ -100,13 +104,13 @@ export default {
       })
 
       if (this.isMobile) {
-        var url = `threebot://sign/?state=${encodeURIComponent(state)}`
+        var url = `threebot://sign/?state=${encodeURIComponent(this.state)}`
         if (this.appId) url += `&appId=${encodeURIComponent(this.appId)}`
         if (dataHash) url += `&dataHash=${encodeURIComponent(this.dataUrlHash)}`
         if (dataUrl) url += `&dataUrl=${encodeURIComponent(this.dataUrl)}`
         if (isJson) url += `&isJson=${encodeURIComponent(this.isJson)}`
-        if (redirectUrl) url += `&isJson=${encodeURIComponent(this.redirectUrl)}`
-        if (friendlyName) url += `&isJson=${encodeURIComponent(this.friendlyName)}`
+        if (redirectUrl) url += `&redirectUrl=${encodeURIComponent(this.redirectUrl)}`
+        if (friendlyName) url += `&friendlyName=${encodeURIComponent(this.friendlyName)}`
       }
 
       if (/iPhone|iPad|iPod/i.test(navigator.userAgent)) {
