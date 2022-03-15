@@ -94,6 +94,8 @@ export default {
       const redirectUrl = query.redirectUrl
       const friendlyName = query.friendlyName
 
+      this.setRandomRoom(this.randomRoom)
+
       this.signUserMobile({
         state: state,
         appId: appId,
@@ -105,7 +107,7 @@ export default {
       })
 
       if (this.isMobile) {
-        var url = `threebot://sign/?state=${encodeURIComponent(this.state)}`
+        var url = `threebot://sign/?state=${encodeURIComponent(this.state)}&randomRoom=${this.randomRoom}`
         if (this.appId) url += `&appId=${encodeURIComponent(this.appId)}`
         if (dataHash) url += `&dataHash=${encodeURIComponent(this.dataUrlHash)}`
         if (dataUrl) url += `&dataUrl=${encodeURIComponent(this.dataUrl)}`
