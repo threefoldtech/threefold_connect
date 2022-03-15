@@ -369,7 +369,6 @@ export default new Vuex.Store({
       })
     },
     signUserMobile (context, data) {
-      context.dispatch('setDoubleName', data.doubleName)
       context.commit('setAppId', data.appId)
       context.commit('setIsJson', data.isJson)
       context.commit('setHashedDataUrl', data.dataUrlHash)

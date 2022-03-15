@@ -60,7 +60,7 @@ export default {
     ...mapActions([
       'setDoubleName',
       'loginUser',
-      'loginUserMobile',
+      'signUserMobile',
       'setScope',
       'setAppId',
       'setAppPublicKey',
