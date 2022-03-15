@@ -37,6 +37,15 @@ export default {
     const friendlyName = query.friendlyName
     const state = query.state
 
+    if (this.isMobile) {
+      this.randomRoom = window.localStorage.getItem('randomRoom')
+      if (!this.randomRoom) {
+        this.randomRoom = generateUUID()
+        window.localStorage.setItem('randomRoom', this.randomRoom)
+      }
+      this.setRandomRoom(this.randomRoom)
+    }
+
     if (!appId || !dataHash || !dataUrl || !isJson || !redirectUrl || !state || !friendlyName) {
       this.$router.push({ name: 'error' })
     }
@@ -107,7 +116,7 @@ export default {
       })
 
       if (this.isMobile) {
-        var url = `threebot://sign/?state=${encodeURIComponent(this.state)}&randomRoom=${this.randomRoom}`
+        var url = `threebot://sign/?state=${encodeURIComponent(this._state)}&randomRoom=${this.randomRoom}`
         if (this.appId) url += `&appId=${encodeURIComponent(this.appId)}`
         if (dataHash) url += `&dataHash=${encodeURIComponent(this.dataUrlHash)}`
         if (dataUrl) url += `&dataUrl=${encodeURIComponent(this.dataUrl)}`
