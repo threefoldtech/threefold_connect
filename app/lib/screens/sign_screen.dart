@@ -242,7 +242,7 @@ class _SignScreenState extends State<SignScreen> with BlockAndRunMixin {
               Uint8List sk = await getPrivateKey();
               String signedData = await signData(widget.signData.dataUrl!, sk);
 
-              await sendSignedData(state, randomRoom, signedData, appId);
+              await sendSignedData(state, randomRoom, signedData, appId, widget.signData.hashedDataUrl!);
 
               Navigator.pop(context, true);
               Events().emit(PopAllSignEvent(emitCode));
@@ -393,7 +393,7 @@ class _SignScreenState extends State<SignScreen> with BlockAndRunMixin {
               Uint8List sk = await getPrivateKey();
               String signedData = await signData(widget.signData.dataUrl!, sk);
 
-              await sendSignedData(state, randomRoom, signedData, appId);
+              await sendSignedData(state, randomRoom, signedData, appId, widget.signData.hashedDataUrl!);
               Navigator.pop(customContext);
               Navigator.pop(context, true);
             },
