@@ -57,7 +57,8 @@ export default {
       'dataUrl',
       'dataUrlHash',
       'isJson',
-      'friendlyName'
+      'friendlyName',
+      '_state'
     ])
   },
   methods: {
