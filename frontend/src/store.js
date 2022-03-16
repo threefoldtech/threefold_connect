@@ -288,7 +288,7 @@ export default new Vuex.Store({
     },
 
     async signDataUser (context, data) {
-      await context.dispatch('setDoubleName', data.doubleName)
+      context.dispatch('setDoubleName', data.doubleName)
       context.commit('setAppId', data.appId)
       context.commit('setIsJson', data.isJson)
       context.commit('setHashedDataUrl', data.dataUrlHash)
@@ -368,12 +368,23 @@ export default new Vuex.Store({
         'encryptedLoginAttempt': encryptedLoginAttempt
       })
     },
+    signUserMobile (context, data) {
+      context.commit('setAppId', data.appId)
+      context.commit('setIsJson', data.isJson)
+      context.commit('setHashedDataUrl', data.dataUrlHash)
+      context.commit('setDataUrl', data.dataUrl)
+      context.commit('setFriendlyName', data.friendlyName)
+      context.commit('setRedirectUrl', data.redirectUrl)
+      context.commit('setState', data.state)
+    },
+
     loginUserMobile (context, data) {
       context.commit('setSignedAttempt', null)
       context.commit('setFirstTime', data.firstTime)
       context.commit('setRandomImageId')
       context.commit('setIsMobile', data.mobile)
     },
+
     async resendSignNotification (context) {
       let publicKey = (await userService.getUserData(context.getters.doubleName)).data.publicKey
       let randomRoom = generateUUID()

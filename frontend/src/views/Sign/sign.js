@@ -20,10 +20,13 @@ export default {
       ],
       url: '',
       nameCheckerTimeOut: null,
-      isSignAttemptOnGoing: false
+      isSignAttemptOnGoing: false,
+      isMobile: /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
     }
   },
   mounted () {
+    window.onfocus = this.gotFocus
+
     const query = this.$route.query
 
     const appId = query.appId
@@ -33,6 +36,15 @@ export default {
     const redirectUrl = query.redirectUrl
     const friendlyName = query.friendlyName
     const state = query.state
+
+    if (this.isMobile) {
+      this.randomRoom = window.localStorage.getItem('randomRoom')
+      if (!this.randomRoom) {
+        this.randomRoom = generateUUID()
+        window.localStorage.setItem('randomRoom', this.randomRoom)
+      }
+      this.setRandomRoom(this.randomRoom)
+    }
 
     if (!appId || !dataHash || !dataUrl || !isJson || !redirectUrl || !state || !friendlyName) {
       this.$router.push({ name: 'error' })
@@ -50,14 +62,19 @@ export default {
       'scope',
       'appId',
       'appPublicKey',
-      'signAttemptOnGoing'
+      'signAttemptOnGoing',
+      'dataUrl',
+      'dataUrlHash',
+      'isJson',
+      'friendlyName',
+      '_state'
     ])
   },
   methods: {
     ...mapActions([
       'setDoubleName',
       'loginUser',
-      'loginUserMobile',
+      'signUserMobile',
       'setScope',
       'setAppId',
       'setAppPublicKey',
@@ -68,20 +85,62 @@ export default {
       'signDataUser',
       'resendSignNotification'
     ]),
+    gotFocus () {
+      this.randomRoom = window.localStorage.getItem('randomRoom')
+      this.setRandomRoom(this.randomRoom)
+    },
     async triggerResendSignSocket () {
       await this.resendSignNotification()
     },
-    async onSignIn () {
+    async promptToSignMobile () {
       const query = this.$route.query
 
+      const state = query.state
       const appId = query.appId
       const dataHash = query.dataHash
       const dataUrl = query.dataUrl
       const isJson = query.isJson
       const redirectUrl = query.redirectUrl
       const friendlyName = query.friendlyName
-      const state = query.state
 
+      this.setRandomRoom(this.randomRoom)
+
+      this.signUserMobile({
+        state: state,
+        appId: appId,
+        dataUrlHash: dataHash,
+        dataUrl: dataUrl,
+        isJson: isJson,
+        redirectUrl: redirectUrl,
+        friendlyName: friendlyName
+      })
+
+      if (this.isMobile) {
+        var url = `threebot://sign/?state=${encodeURIComponent(this._state)}&randomRoom=${this.randomRoom}`
+        if (this.appId) url += `&appId=${encodeURIComponent(this.appId)}`
+        if (dataHash) url += `&dataHash=${encodeURIComponent(this.dataUrlHash)}`
+        if (dataUrl) url += `&dataUrl=${encodeURIComponent(this.dataUrl)}`
+        if (isJson) url += `&isJson=${encodeURIComponent(this.isJson)}`
+        if (redirectUrl) url += `&redirectUrl=${encodeURIComponent(this.redirectUrl)}`
+        if (friendlyName) url += `&friendlyName=${encodeURIComponent(this.friendlyName)}`
+      }
+
+      if (/iPhone|iPad|iPod/i.test(navigator.userAgent)) {
+        window.location.replace(url)
+      } else if (/Android|webOS|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+        window.location.href = url
+      }
+    },
+    async onSignIn () {
+      const query = this.$route.query
+
+      const state = query.state
+      const appId = query.appId
+      const dataHash = query.dataHash
+      const dataUrl = query.dataUrl
+      const isJson = query.isJson
+      const redirectUrl = query.redirectUrl
+      const friendlyName = query.friendlyName
       await this.signDataUser({
         doubleName: this.doubleName,
         appId: appId,
@@ -167,4 +226,21 @@ export default {
       this.isSignAttemptOnGoing = val
     }
   }
+}
+
+function generateUUID () {
+  var d = new Date().getTime()
+  var d2 = (performance && performance.now && (performance.now() * 1000)) || 0
+
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+    var r = Math.random() * 16
+    if (d > 0) {
+      r = (d + r) % 16 | 0
+      d = Math.floor(d / 16)
+    } else {
+      r = (d2 + r) % 16 | 0
+      d2 = Math.floor(d2 / 16)
+    }
+    return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16)
+  })
 }
