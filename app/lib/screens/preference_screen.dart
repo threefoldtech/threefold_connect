@@ -78,7 +78,10 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
     Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => AuthenticationScreen(correctPin: pin!, userMessage: 'Enter your pincode',),
+          builder: (context) => AuthenticationScreen(
+            correctPin: pin!,
+            userMessage: 'Enter your pincode',
+          ),
         ));
   }
 
@@ -451,7 +454,12 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
   }
 
   Future<void> _showTermsAndConds() async {
-    const url = 'https://wiki.threefold.io/#/legal__legal';
+    String url = Globals().tosUrl;
+
+    if (url == '') {
+      return;
+    }
+
     await launch(url);
   }
 

@@ -53,6 +53,8 @@ class Globals {
   int timeOutSeconds = 5;
   String farmersUrl = '';
   bool canSeeFarmers = false;
+  String tosUrl = '';
+  bool maintenance = false;
 
 
   VpnState vpnState = new VpnState();

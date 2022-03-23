@@ -29,6 +29,7 @@ class Flags {
       await client.getFeatureFlags(reload: true);
     } catch (e) {
       print(e);
+      setFallbackConfigs();
       throw Exception('Error in initialization in Flagsmith, please try again. If this issue persist, please contact support');
     }
   }
@@ -38,9 +39,11 @@ class Flags {
     Globals().isYggdrasilEnabled = await Flags().hasFlagValueByFeatureName('yggdrasil');
     Globals().debugMode = await Flags().hasFlagValueByFeatureName('debug');
     Globals().useNewWallet = await Flags().hasFlagValueByFeatureName('use-new-wallet');
+    Globals().maintenance = await Flags().hasFlagValueByFeatureName('maintenance-mode');
     Globals().canSeeFarmers = await Flags().hasFlagValueByFeatureName('can-see-farmers');
     Globals().newWalletUrl = (await Flags().getFlagValueByFeatureName('new-wallet-url'))!;
     Globals().farmersUrl = (await Flags().getFlagValueByFeatureName('farmers-url'))!;
+    Globals().tosUrl = (await Flags().getFlagValueByFeatureName('tos-url'))!;
     Globals().redoIdentityVerification = await Flags().hasFlagValueByFeatureName('redo-identity-verification');
   }
 

@@ -114,7 +114,7 @@ class _LayoutDrawerState extends State<LayoutDrawer> {
                   Image.asset('assets/server.png', scale:1.0, height:18.0,width:18.0,),
                 ],
               ),
-              title: Text('Farmers'),
+              title: Text('Farmer migration'),
               onTap: () {
                 Navigator.pop(context);
                 globals.tabController.animateTo(3);

@@ -71,12 +71,10 @@ class _AppState extends State<MainScreen> {
         ),
         Container(
           padding: EdgeInsets.only(left: 12, right: 12),
-          child:  Text(
+          child: Text(
             updateMessage != null ? updateMessage.toString() : errorMessage.toString(),
             style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: errorMessage != null ? Colors.red : Colors.black),
+                fontSize: 16, fontWeight: FontWeight.bold, color: errorMessage != null ? Colors.red : Colors.black),
           ),
         ),
         SizedBox(
@@ -146,11 +144,9 @@ class _AppState extends State<MainScreen> {
       setState(() {});
       await checkConnectionToPkid();
 
-
       updateMessage = 'Fetching pkid data';
       setState(() {});
       await fetchPkidData();
-
     } catch (e) {
       print('Error in main screen');
       print(e);
@@ -165,8 +161,7 @@ class _AppState extends State<MainScreen> {
       InitScreen init = InitScreen();
       bool accepted = false;
       while (!accepted) {
-        accepted =
-            !(await Navigator.push(context, MaterialPageRoute(builder: (context) => init)) == null);
+        accepted = !(await Navigator.push(context, MaterialPageRoute(builder: (context) => init)) == null);
       }
     }
 
@@ -191,11 +186,8 @@ class _AppState extends State<MainScreen> {
     await Navigator.push(
         context,
         MaterialPageRoute(
-            builder: (context) =>
-                HomeScreen(initialLink: initialLink, backendConnection: _backendConnection)));
-
+            builder: (context) => HomeScreen(initialLink: initialLink, backendConnection: _backendConnection)));
   }
-
 
   fetchPkidData() async {
     try {
@@ -209,8 +201,7 @@ class _AppState extends State<MainScreen> {
       if (await getPhrase() != null) {
         await fetchPKidData();
       }
-    }
-    catch(e) {
+    } catch (e) {
       print(e);
       throw Exception('Unable to fetch pkid data');
     }
@@ -218,15 +209,14 @@ class _AppState extends State<MainScreen> {
 
   checkInternetConnection() async {
     try {
-      final List<InternetAddress> result = await InternetAddress.lookup('google.com')
-          .timeout(Duration(seconds: Globals().timeOutSeconds));
+      final List<InternetAddress> result =
+          await InternetAddress.lookup('google.com').timeout(Duration(seconds: Globals().timeOutSeconds));
 
       if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
         print('Connected to the internet');
       }
     } catch (e) {
-      throw new Exception(
-          "No internet connection available, please make sure you have a stable internet connection.");
+      throw new Exception("No internet connection available, please make sure you have a stable internet connection.");
     }
   }
 
@@ -234,15 +224,14 @@ class _AppState extends State<MainScreen> {
     if (AppConfig().environment != Environment.Local) {
       try {
         String baseUrl = AppConfig().baseUrl();
-        final List<InternetAddress> result = await InternetAddress.lookup('$baseUrl')
-            .timeout(Duration(seconds: Globals().timeOutSeconds));
+        final List<InternetAddress> result =
+            await InternetAddress.lookup('$baseUrl').timeout(Duration(seconds: Globals().timeOutSeconds));
 
         if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
           print('Connected to the servers');
         }
       } catch (e) {
-        throw new Exception(
-            "Can't connect to our servers, please try again. Contact support if this issue persists.");
+        throw new Exception("Can't connect to our servers, please try again. Contact support if this issue persists.");
       }
     }
   }
@@ -260,7 +249,11 @@ class _AppState extends State<MainScreen> {
   }
 
   checkIfAppIsUnderMaintenance() async {
-    print(await isAppUnderMaintenance());
+    bool isUnderMaintenanceInFlagSmith = Globals().maintenance;
+    if (isUnderMaintenanceInFlagSmith == true) {
+      throw new Exception('App is being rolled out. Please try again later.');
+    }
+
     try {
       if (await isAppUnderMaintenance()) {
         throw new Exception('App is being rolled out. Please try again later.');
