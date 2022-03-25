@@ -105,21 +105,29 @@ class _LayoutDrawerState extends State<LayoutDrawer> {
                 globals.tabController.animateTo(2);
               },
             ),
-            if (Globals().canSeeFarmers) ListTile(
-              minLeadingWidth: 10,
-              leading: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  Padding(padding: const EdgeInsets.only(left: 30)),
-                  Image.asset('assets/server.png', scale:1.0, height:18.0,width:18.0,),
-                ],
-              ),
-              title: Text('Farmer migration'),
-              onTap: () {
-                Navigator.pop(context);
-                globals.tabController.animateTo(3);
-              },
-            ) else Container(),
+            if (Globals().canSeeFarmers)
+              ListTile(
+                minLeadingWidth: 10,
+                leading: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    Padding(padding: const EdgeInsets.only(left: 30)),
+                    Image.asset(
+                      'assets/server.png',
+                      scale: 1.0,
+                      height: 18.0,
+                      width: 18.0,
+                    ),
+                  ],
+                ),
+                title: Text('Farmer migration'),
+                onTap: () {
+                  Navigator.pop(context);
+                  globals.tabController.animateTo(3);
+                },
+              )
+            else
+              Container(),
             ListTile(
               minLeadingWidth: 10,
               leading: Column(
@@ -150,21 +158,24 @@ class _LayoutDrawerState extends State<LayoutDrawer> {
             //     globals.tabController.animateTo(4);
             //   },
             // ),
-            if (Globals().isYggdrasilEnabled && !Platform.isIOS ) ListTile(
-              minLeadingWidth: 10,
-              leading: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  Padding(padding: const EdgeInsets.only(left: 30)),
-                  Icon(Icons.network_check, color: Colors.black, size: 18)
-                ],
-              ),
-              title: Text('Planetary Network'),
-              onTap: () {
-                Navigator.pop(context);
-                globals.tabController.animateTo(5);
-              },
-            ) else Container(),
+            if (Globals().isYggdrasilEnabled)
+              ListTile(
+                minLeadingWidth: 10,
+                leading: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    Padding(padding: const EdgeInsets.only(left: 30)),
+                    Icon(Icons.network_check, color: Colors.black, size: 18)
+                  ],
+                ),
+                title: Text('Planetary Network'),
+                onTap: () {
+                  Navigator.pop(context);
+                  globals.tabController.animateTo(5);
+                },
+              )
+            else
+              Container(),
             ListTile(
               minLeadingWidth: 10,
               leading: Column(
