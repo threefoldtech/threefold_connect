@@ -1369,9 +1369,7 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
       FlutterPkid client = await getPkidClient();
       client.setPKidDoc('phone', json.encode({'phone': phone}));
 
-      if (phone.isEmpty) {
-        return;
-      }
+      return;
     }
 
     int currentTime = new DateTime.now().millisecondsSinceEpoch;

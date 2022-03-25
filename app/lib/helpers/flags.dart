@@ -13,13 +13,13 @@ class Flags {
 
   Future<void> initFlagSmith() async {
     try {
-    client = await FlagsmithClient.init(
-        config: FlagsmithConfig(
-          baseURI: flagSmithConfig['url']!,
-        ),
-        apiKey: flagSmithConfig['apiKey']!);
+      client = await FlagsmithClient.init(
+          config: FlagsmithConfig(
+            baseURI: flagSmithConfig['url']!,
+          ),
+          apiKey: flagSmithConfig['apiKey']!);
 
-    String? doubleName = await getDoubleName();
+      String? doubleName = await getDoubleName();
 
       if (doubleName != null) {
         Identity user = Identity(identifier: doubleName);
@@ -30,7 +30,8 @@ class Flags {
     } catch (e) {
       print(e);
       setFallbackConfigs();
-      throw Exception('Error in initialization in Flagsmith, please try again. If this issue persist, please contact support');
+      throw Exception(
+          'Error in initialization in Flagsmith, please try again. If this issue persist, please contact support');
     }
   }
 
@@ -42,6 +43,7 @@ class Flags {
     Globals().maintenance = await Flags().hasFlagValueByFeatureName('maintenance-mode');
     Globals().canSeeFarmers = await Flags().hasFlagValueByFeatureName('can-see-farmers');
     Globals().newWalletUrl = (await Flags().getFlagValueByFeatureName('new-wallet-url'))!;
+    Globals().timeOutSeconds = int.parse((await Flags().getFlagValueByFeatureName('timeout-seconds')).toString());
     Globals().farmersUrl = (await Flags().getFlagValueByFeatureName('farmers-url'))!;
     Globals().tosUrl = (await Flags().getFlagValueByFeatureName('tos-url'))!;
     Globals().redoIdentityVerification = await Flags().hasFlagValueByFeatureName('redo-identity-verification');

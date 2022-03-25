@@ -50,7 +50,7 @@ class Globals {
   String newWalletUrl = '';
   bool redoIdentityVerification = false;
   bool debugMode = false;
-  int timeOutSeconds = 5;
+  int timeOutSeconds = 10;
   String farmersUrl = '';
   bool canSeeFarmers = false;
   String tosUrl = '';
