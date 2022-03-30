@@ -17,15 +17,17 @@ class _PlanetaryNetworkScreenState extends State<PlanetaryNetworkScreen> {
   VpnState _vpnState = new VpnState();
   bool _vpnTimeoutRunning = false;
 
-  Text _ipText = Text('');
+  String _ipAddress = '';
   Text _statusMessage = Text('');
+
+  bool isDoneConnecting = false;
 
   bool _isSwitched = Globals().vpnState.vpnConnected;
 
   void reportIp(String ip) {
-    setState(() {
-      _vpnState.ipAddress = ip;
-    });
+    _vpnState.ipAddress = ip;
+    isDoneConnecting = true;
+    setState(() {});
   }
 
   _PlanetaryNetworkScreenState() {
@@ -41,18 +43,14 @@ class _PlanetaryNetworkScreenState extends State<PlanetaryNetworkScreen> {
       if (_vpnState.vpnConnected) {
         print(_vpnState.ipAddress);
 
-        _ipText = Text("IP Address: " + _vpnState.ipAddress);
-        _statusMessage = new Text('Connected',
-            style: TextStyle(
-                color: Colors.green,
-                fontWeight: FontWeight.bold,
-                fontSize: 16));
+        _ipAddress = "IP Address: " + _vpnState.ipAddress;
+        _statusMessage =
+        new Text('Connected', style: TextStyle(color: Colors.green, fontWeight: FontWeight.bold, fontSize: 16));
         return;
       }
-      _ipText = new Text("");
-      _statusMessage = new Text('Not Connected',
-          style: TextStyle(
-              color: Colors.red, fontWeight: FontWeight.bold, fontSize: 16));
+      _ipAddress = '';
+      _statusMessage =
+      new Text('Not Connected', style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold, fontSize: 16));
     });
   }
 
@@ -74,125 +72,54 @@ class _PlanetaryNetworkScreenState extends State<PlanetaryNetworkScreen> {
                 width: MediaQuery.of(context).size.width,
                 child: Image.asset('assets/planetary-network.png'),
               ),
-              Text('Planetary Network',
-                  style: const TextStyle(
-                      fontWeight: FontWeight.bold, fontSize: 24)),
+              Text('Planetary Network', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 24)),
               Padding(
                 padding: const EdgeInsets.only(top: 20, left: 40, right: 40),
                 child: Text(
                     'A public peer-to-peer overlay network to connect everything on the planet. Connections are end-to-end'
-                    ' encrypted and take the shortest path.',
+                        ' encrypted and take the shortest path.',
                     style: const TextStyle(fontSize: 14)),
               ),
               Padding(
                 padding: const EdgeInsets.only(top: 20, left: 40, right: 40),
                 child: Text(
                     'Think of it as a Local Area Network (LAN) on a planetary scale, a "global peer-to-peer VPN"'
-                    ' that lives on top of other networks and looks for any path to connectivity. '
-                    'Strongly authenticated at the edge.',
+                        ' that lives on top of other networks and looks for any path to connectivity. '
+                        'Strongly authenticated at the edge.',
                     style: const TextStyle(fontSize: 14)),
               ),
               Padding(
                 padding: const EdgeInsets.only(left: 40, right: 40, top: 20),
-                child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      _statusMessage,
-                      Switch(
-                        value: _isSwitched,
-                        // If the user spams the button, the application would crash => use a timeout
-                        onChanged: _vpnTimeoutRunning
-                            ? null
-                            : (value) async {
-                                // When the user is not connected yet
-                                if (!_vpnState.vpnConnected) {
-                                  bool isVPNConnectionStarted = await _vpnState
-                                      .plugin
-                                      .startVpn(await getEdCurveKeys());
+                child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+                  _statusMessage,
+                  Switch(
+                    value: _isSwitched,
+                    // If the user spams the button, the application would crash => use a timeout
+                    onChanged: _vpnTimeoutRunning
+                        ? null
+                        : (value) async {
+                      // Check status => if connected early return
+                      if (_vpnState.vpnConnected) {
+                        return disconnectVpn();
+                      }
 
-                                  // In case the VPN Plugin connection couldn't be started
-                                  if (!isVPNConnectionStarted) {
-                                    setState(() {
-                                      _ipText = new Text(
-                                          "Please click connect again after accepting VPN permissions.");
-                                    });
-                                    return;
-                                  }
+                      bool isVPNConnectionStarted = await _vpnState.plugin.startVpn(await getEdCurveKeys());
 
-                                  // When we are trying to connect to the network, set the timeout true
-                                  setState(() {
-                                    _vpnTimeoutRunning = true;
-                                    _statusMessage = new Text('Connecting ...',
-                                        style: TextStyle(
-                                            color: Colors.orange,
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 16));
-                                  });
+                      if (!isVPNConnectionStarted) {
+                        return askForVpnPermissions();
+                      }
 
-                                  // Set the timeout of 5 seconds
-                                  Future.delayed(
-                                      const Duration(milliseconds: 5000), () {
-                                    setState(() {
-                                      _vpnTimeoutRunning = false;
-                                      _isSwitched = true;
-                                      _statusMessage = new Text('Connected',
-                                          style: TextStyle(
-                                              color: Colors.green,
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: 16));
-                                      _ipText = Text(
-                                          'IP Address: ' + _vpnState.ipAddress);
-                                    });
-                                  });
+                      await connectVpn();
+                    },
 
-                                  // The VPN connection is established => activate the button
-                                  _vpnState.vpnConnected = true;
-                                  return;
-                                }
-
-                                // Else: the the user is already connected and want to disconnect
-                                setState(() {
-                                  _ipText = new Text("");
-                                  _vpnTimeoutRunning = true;
-                                  _statusMessage = new Text('Disconnecting ...',
-                                      style: TextStyle(
-                                          color: Colors.orange,
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 16));
-                                });
-
-                                _vpnState.plugin.stopVpn();
-                                _vpnState.vpnConnected = false;
-
-                                _vpnState.plugin = new YggdrasilPlugin();
-                                setState(() {
-                                  Future.delayed(
-                                      const Duration(milliseconds: 5000), () {
-                                    setState(() {
-                                      _vpnTimeoutRunning = false;
-                                      _statusMessage = new Text('Not connected',
-                                          style: TextStyle(
-                                              color: Colors.red,
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: 16));
-                                    });
-
-                                    _vpnState.ipAddress = "";
-                                    _isSwitched = false;
-                                  });
-
-                                  return;
-                                });
-                              },
-                        activeColor: Theme.of(context).primaryColorDark,
-                      ),
-                    ]),
+                    activeColor: Theme.of(context).primaryColorDark,
+                  ),
+                ]),
               ),
               new GestureDetector(
                 onTap: () async {
                   if (_vpnState.ipAddress != "") {
-                    Clipboard.setData(
-                        new ClipboardData(text: _vpnState.ipAddress));
+                    Clipboard.setData(new ClipboardData(text: _vpnState.ipAddress));
 
                     final snackBar = SnackBar(
                       content: Text('Address copied to clipboard'),
@@ -201,12 +128,80 @@ class _PlanetaryNetworkScreenState extends State<PlanetaryNetworkScreen> {
                     ScaffoldMessenger.of(context).showSnackBar(snackBar);
                   }
                 },
-                child: _ipText,
+                child: Text(_ipAddress),
               ),
             ],
           )
         ],
       ),
     );
+  }
+
+  void disconnectingVpnMessage() {
+    _ipAddress = '';
+    _vpnTimeoutRunning = true;
+    _statusMessage = new Text('Disconnecting ...',
+        style: TextStyle(color: Colors.orange, fontWeight: FontWeight.bold, fontSize: 16));
+
+    setState(() {});
+  }
+
+  void disconnectVpn() {
+    _ipAddress = '';
+    _vpnTimeoutRunning = true;
+    _statusMessage = new Text('Disconnecting ...',
+        style: TextStyle(color: Colors.orange, fontWeight: FontWeight.bold, fontSize: 16));
+
+    setState(() {});
+
+    _vpnState.plugin.stopVpn();
+    _vpnState.vpnConnected = false;
+    _vpnState.plugin = new YggdrasilPlugin();
+    _ipAddress = '';
+    _isSwitched = false;
+
+    _vpnTimeoutRunning = false;
+    _statusMessage =
+    new Text('Not connected', style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold, fontSize: 16));
+
+    setState(() {});
+  }
+
+  void askForVpnPermissions() {
+    _ipAddress = "Please click connect again after accepting VPN permissions.";
+    setState(() {});
+  }
+
+  Future<void> connectVpn() async {
+    _vpnTimeoutRunning = true;
+    _statusMessage =
+    new Text('Connecting ...', style: TextStyle(color: Colors.orange, fontWeight: FontWeight.bold, fontSize: 16));
+
+    setState(() {});
+
+    connectToYggDrasil();
+  }
+
+  Future<void> connectToYggDrasil() async {
+    int counter = 0;
+
+    while (isDoneConnecting == false && counter <= 10) {
+      await Future.delayed(Duration(seconds: 1));
+      counter++;
+      setState(() {});
+    }
+
+    if (isDoneConnecting == true) {
+      isDoneConnecting = false;
+      _vpnTimeoutRunning = false;
+      _isSwitched = true;
+      _statusMessage =
+      new Text('Connected', style: TextStyle(color: Colors.green, fontWeight: FontWeight.bold, fontSize: 16));
+      _ipAddress = 'IP Address: ' + _vpnState.ipAddress;
+      setState(() {});
+      _vpnState.vpnConnected = true;
+    } else {
+      print('FAILED');
+    }
   }
 }
