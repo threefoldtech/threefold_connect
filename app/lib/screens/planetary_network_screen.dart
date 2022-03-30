@@ -45,12 +45,12 @@ class _PlanetaryNetworkScreenState extends State<PlanetaryNetworkScreen> {
 
         _ipAddress = "IP Address: " + _vpnState.ipAddress;
         _statusMessage =
-        new Text('Connected', style: TextStyle(color: Colors.green, fontWeight: FontWeight.bold, fontSize: 16));
+            new Text('Connected', style: TextStyle(color: Colors.green, fontWeight: FontWeight.bold, fontSize: 16));
         return;
       }
       _ipAddress = '';
       _statusMessage =
-      new Text('Not Connected', style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold, fontSize: 16));
+          new Text('Not Connected', style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold, fontSize: 16));
     });
   }
 
@@ -77,15 +77,15 @@ class _PlanetaryNetworkScreenState extends State<PlanetaryNetworkScreen> {
                 padding: const EdgeInsets.only(top: 20, left: 40, right: 40),
                 child: Text(
                     'A public peer-to-peer overlay network to connect everything on the planet. Connections are end-to-end'
-                        ' encrypted and take the shortest path.',
+                    ' encrypted and take the shortest path.',
                     style: const TextStyle(fontSize: 14)),
               ),
               Padding(
                 padding: const EdgeInsets.only(top: 20, left: 40, right: 40),
                 child: Text(
                     'Think of it as a Local Area Network (LAN) on a planetary scale, a "global peer-to-peer VPN"'
-                        ' that lives on top of other networks and looks for any path to connectivity. '
-                        'Strongly authenticated at the edge.',
+                    ' that lives on top of other networks and looks for any path to connectivity. '
+                    'Strongly authenticated at the edge.',
                     style: const TextStyle(fontSize: 14)),
               ),
               Padding(
@@ -98,19 +98,19 @@ class _PlanetaryNetworkScreenState extends State<PlanetaryNetworkScreen> {
                     onChanged: _vpnTimeoutRunning
                         ? null
                         : (value) async {
-                      // Check status => if connected early return
-                      if (_vpnState.vpnConnected) {
-                        return disconnectVpn();
-                      }
+                            // Check status => if connected early return
+                            if (_vpnState.vpnConnected) {
+                              return disconnectVpn();
+                            }
 
-                      bool isVPNConnectionStarted = await _vpnState.plugin.startVpn(await getEdCurveKeys());
+                            bool isVPNConnectionStarted = await _vpnState.plugin.startVpn(await getEdCurveKeys());
 
-                      if (!isVPNConnectionStarted) {
-                        return askForVpnPermissions();
-                      }
+                            if (!isVPNConnectionStarted) {
+                              return askForVpnPermissions();
+                            }
 
-                      await connectVpn();
-                    },
+                            await connectVpn();
+                          },
 
                     activeColor: Theme.of(context).primaryColorDark,
                   ),
@@ -162,7 +162,7 @@ class _PlanetaryNetworkScreenState extends State<PlanetaryNetworkScreen> {
 
     _vpnTimeoutRunning = false;
     _statusMessage =
-    new Text('Not connected', style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold, fontSize: 16));
+        new Text('Not connected', style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold, fontSize: 16));
 
     setState(() {});
   }
@@ -175,7 +175,7 @@ class _PlanetaryNetworkScreenState extends State<PlanetaryNetworkScreen> {
   Future<void> connectVpn() async {
     _vpnTimeoutRunning = true;
     _statusMessage =
-    new Text('Connecting ...', style: TextStyle(color: Colors.orange, fontWeight: FontWeight.bold, fontSize: 16));
+        new Text('Connecting ...', style: TextStyle(color: Colors.orange, fontWeight: FontWeight.bold, fontSize: 16));
 
     setState(() {});
 
@@ -196,12 +196,12 @@ class _PlanetaryNetworkScreenState extends State<PlanetaryNetworkScreen> {
       _vpnTimeoutRunning = false;
       _isSwitched = true;
       _statusMessage =
-      new Text('Connected', style: TextStyle(color: Colors.green, fontWeight: FontWeight.bold, fontSize: 16));
+          new Text('Connected', style: TextStyle(color: Colors.green, fontWeight: FontWeight.bold, fontSize: 16));
       _ipAddress = 'IP Address: ' + _vpnState.ipAddress;
       setState(() {});
       _vpnState.vpnConnected = true;
     } else {
-      print('FAILED');
+      disconnectVpn();
     }
   }
 }
