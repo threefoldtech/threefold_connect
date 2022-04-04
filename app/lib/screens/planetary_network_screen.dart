@@ -113,15 +113,7 @@ class _PlanetaryNetworkScreenState extends State<PlanetaryNetworkScreen> {
                                   return disconnectVpn();
                                 }
 
-                                _vpnTimeoutRunning = true;
-                                _statusMessage = new Text('Connecting ...',
-                                    style: TextStyle(
-                                        color: Colors.orange,
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 16));
-
-                                setState(() {});
-
+                                connectingVpnmessage();
                                 bool isVPNConnectionStarted = await _vpnState
                                     .plugin
                                     .startVpn(await getEdCurveKeys());
@@ -163,6 +155,16 @@ class _PlanetaryNetworkScreenState extends State<PlanetaryNetworkScreen> {
     _ipAddress = '';
     _vpnTimeoutRunning = true;
     _statusMessage = new Text('Disconnecting ...',
+        style: TextStyle(
+            color: Colors.orange, fontWeight: FontWeight.bold, fontSize: 16));
+
+    setState(() {});
+  }
+
+  void connectingVpnmessage() {
+    _ipAddress = '';
+    _vpnTimeoutRunning = true;
+    _statusMessage = new Text('Connecting ...',
         style: TextStyle(
             color: Colors.orange, fontWeight: FontWeight.bold, fontSize: 16));
 

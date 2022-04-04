@@ -3,7 +3,7 @@ description: A decentralized login application
 
 publish_to: "none"
 
-version: 3.5.0+155
+version: 3.5.0+156
 
 environment:
   sdk: ">=2.12.0<3.0.0"
@@ -20,7 +20,7 @@ dependencies:
   yggdrasil_plugin:
     git:
       url: https://github.com/threefoldtech/yggdrasil_flutter
-      ref: main
+      ref: feature/yggdrasil_plugin_swift
 
   flutter_pkid:
     git:
@@ -52,7 +52,7 @@ dependencies:
   pbkdf2ns: ^0.0.2
   qr_code_scanner: ^0.7.0
   flutter_json_viewer: ^1.0.1
-
+  device_info_plus: ^3.2.2
   permission_handler: ^8.3.0
   path_provider: ^2.0.2
   dio: ^4.0.4

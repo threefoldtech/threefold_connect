@@ -1,6 +1,8 @@
 import 'package:flagsmith/flagsmith.dart';
 import 'package:threebotlogin/app_config.dart';
 import 'package:threebotlogin/services/shared_preference_service.dart';
+import 'package:threebotlogin/services/tools_service.dart';
+import 'dart:io' show Platform;
 
 import 'globals.dart';
 
@@ -47,6 +49,9 @@ class Flags {
     Globals().farmersUrl = (await Flags().getFlagValueByFeatureName('farmers-url'))!;
     Globals().tosUrl = (await Flags().getFlagValueByFeatureName('tos-url'))!;
     Globals().redoIdentityVerification = await Flags().hasFlagValueByFeatureName('redo-identity-verification');
+    Globals().phoneVerification = await Flags().hasFlagValueByFeatureName('phone-verification');
+
+    await setDeviceTrait();
   }
 
   Future<bool> hasFlagValueByFeatureName(String name) async {
@@ -65,6 +70,16 @@ class Flags {
       return (await client.getFeatureFlagValue(name, user: user));
     }
     return (await client.getFeatureFlagValue(name));
+  }
+  
+  Future<dynamic> setDeviceTrait() async {
+    String? doubleName = await getDoubleName();
+    if(doubleName != null) {
+      Identity user = Identity(identifier: doubleName);
+      String info = await getDeviceInfo();
+      TraitWithIdentity trait = new TraitWithIdentity(identity: user, key: 'device', value: info);
+      return (await client.createTrait(value: trait));
+    }
   }
 
   factory Flags() {

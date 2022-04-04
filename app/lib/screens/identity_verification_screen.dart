@@ -259,12 +259,12 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
                                             Icons.email),
 
                                         // Step two: verify phone
-                                        _fillCard(
+                                        Globals().phoneVerification == true ? _fillCard(
                                             getCorrectState(
                                                 2, emailVerified, phoneVerified, identityVerified),
                                             2,
                                             phone,
-                                            Icons.phone),
+                                            Icons.phone) : Container(),
 
                                         // Step three: verify identity
                                         Globals().isOpenKYCEnabled
