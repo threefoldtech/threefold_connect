@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:threebotlogin/services/tools_service.dart';
 import 'package:threebotlogin/widgets/layout_drawer.dart';
 
 class RegisteredScreen extends StatefulWidget {
@@ -56,6 +57,9 @@ class _RegisteredScreenState extends State<RegisteredScreen>
                     ),
                   ),
                   SizedBox(height: 30),
+                  ElevatedButton(onPressed: (){
+                    getDeviceInfo();
+                  }, child: Text('hi')),
                   Container(
                     width: MediaQuery.of(context).size.width / 1.75,
                     child: RichText(

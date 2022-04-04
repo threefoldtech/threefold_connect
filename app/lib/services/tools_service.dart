@@ -1,6 +1,9 @@
 import 'dart:convert';
 import 'dart:core';
+import 'dart:io';
 import 'dart:math';
+
+import 'package:device_info_plus/device_info_plus.dart';
 
 const chars = "abcdefghijklmnopqrstuvwxyz0123456789";
 
@@ -60,6 +63,25 @@ bool isJson(String str) {
   }
   return true;
 }
+
+Future<String> getDeviceInfo() async {
+  DeviceInfoPlugin deviceInfoPlugin = DeviceInfoPlugin();
+
+  String info = '';
+  if(Platform.isIOS) {
+    IosDeviceInfo i = await deviceInfoPlugin.iosInfo;
+  }
+
+  else if(Platform.isAndroid) {
+    AndroidDeviceInfo i = await deviceInfoPlugin.androidInfo;
+    info = 'ANDROID_' + i.brand.toString().replaceAll(' ', '').toUpperCase() + '_' + i.model.toString().replaceAll(' ', '').toUpperCase() +'_' + i.version.sdkInt.toString();
+  }
+
+  return info;
+}
+
+
+
 
 extension BoolParsing on String {
   bool parseBool() {
