@@ -25,6 +25,8 @@ class _PlanetaryNetworkScreenState extends State<PlanetaryNetworkScreen> {
   bool _isSwitched = Globals().vpnState.vpnConnected;
 
   void reportIp(String ip) {
+    print('RECEVING DATA IN REPORT IP');
+    print(ip);
     _vpnState.ipAddress = ip;
     isDoneConnecting = true;
     setState(() {});
