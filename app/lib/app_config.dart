@@ -191,4 +191,5 @@ void setFallbackConfigs() {
   Globals().newWalletUrl = '';
   Globals().redoIdentityVerification = false;
   Globals().timeOutSeconds = 10;
+  Globals().phoneVerification = false;
 }

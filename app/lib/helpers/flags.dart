@@ -49,6 +49,7 @@ class Flags {
     Globals().farmersUrl = (await Flags().getFlagValueByFeatureName('farmers-url'))!;
     Globals().tosUrl = (await Flags().getFlagValueByFeatureName('tos-url'))!;
     Globals().redoIdentityVerification = await Flags().hasFlagValueByFeatureName('redo-identity-verification');
+    Globals().phoneVerification = await Flags().hasFlagValueByFeatureName('phone-verification');
 
     await setDeviceTrait();
   }

@@ -55,7 +55,7 @@ class Globals {
   bool canSeeFarmers = false;
   String tosUrl = '';
   bool maintenance = false;
-
+  bool phoneVerification = false;
 
   VpnState vpnState = new VpnState();
 
