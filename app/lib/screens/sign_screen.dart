@@ -35,7 +35,7 @@ class _SignScreenState extends State<SignScreen> with BlockAndRunMixin {
   File? downloadedFile;
 
   bool isDataLoading = true;
-  Map<String, dynamic> urlData = {};
+  dynamic urlData = {};
   String? errorMessage;
   String emitCode = randomString(10);
 
@@ -58,7 +58,7 @@ class _SignScreenState extends State<SignScreen> with BlockAndRunMixin {
       Uri url = Uri.parse(widget.signData.dataUrl!);
       Response r = await http.get(url);
 
-      urlData = json.decode(r.body);
+      urlData = json.decode(r.body.toString());
       isDataLoading = false;
       setState(() {});
     } catch (e) {
