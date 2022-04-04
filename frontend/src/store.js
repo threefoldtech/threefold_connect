@@ -395,6 +395,7 @@ export default new Vuex.Store({
         doubleName: context.getters.doubleName,
         isJson: toBoolean(context.getters.isJson),
         dataUrlHash: context.getters.dataUrlHash,
+        friendlyName: context.getters.friendlyName,
         dataUrl: context.getters.dataUrl,
         appId: context.getters.appId,
         randomRoom: randomRoom,
