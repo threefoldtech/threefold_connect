@@ -77,7 +77,7 @@ Future<String> getDeviceInfo() async {
         i.brand.toString().replaceAll(' ', '').toUpperCase() +
         '_' +
         i.model.toString().replaceAll(' ', '').toUpperCase() +
-        '_' +
+        '_SDK' +
         i.version.sdkInt.toString();
   }
 
