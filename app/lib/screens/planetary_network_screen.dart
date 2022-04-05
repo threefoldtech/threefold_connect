@@ -34,7 +34,14 @@ class _PlanetaryNetworkScreenState extends State<PlanetaryNetworkScreen> {
 
   _PlanetaryNetworkScreenState() {
     _vpnState = Globals().vpnState;
+    initPlatformState();
     _vpnState.plugin.setOnReportIp(reportIp);
+  }
+
+  // Platform messages are asynchronous, so we initialize in an async method.
+  Future<void> initPlatformState() async {
+    String platformVersion;
+    platformVersion = await _vpnState.plugin.platformVersion();
   }
 
   @override
