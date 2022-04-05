@@ -326,12 +326,6 @@ class _SignScreenState extends State<SignScreen> with BlockAndRunMixin {
                 String fileName = extractFileName(widget.signData.dataUrl!);
 
                 downloadedFile = await downloadFile(widget.signData.dataUrl!, fileName);
-
-                // print(await downloadedFile?.readAsString(encoding: utf8));
-
-                var f = downloadedFile?.readAsStringSync();
-                print(f);
-
                 if (downloadedFile == null) {
                   updateMessage = 'Failed to download the file';
                   isBusy = false;
