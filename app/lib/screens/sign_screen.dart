@@ -39,6 +39,8 @@ class _SignScreenState extends State<SignScreen> with BlockAndRunMixin {
   String? errorMessage;
   String emitCode = randomString(10);
 
+  String newHash = '';
+
   @override
   void initState() {
     super.initState();
@@ -113,7 +115,9 @@ class _SignScreenState extends State<SignScreen> with BlockAndRunMixin {
         Column(
           children: [
             signButton(),
-            SizedBox(height: 5,),
+            SizedBox(
+              height: 5,
+            ),
             wasNotMeButton()
           ],
         )
@@ -145,10 +149,8 @@ class _SignScreenState extends State<SignScreen> with BlockAndRunMixin {
           ),
           children: <TextSpan>[
             TextSpan(children: <TextSpan>[
-              new TextSpan(
-                  text: widget.signData.appId!, style: TextStyle(fontWeight: FontWeight.bold)),
-              new TextSpan(
-                  text: ' wants you to sign a data document. The Title of the document is: \n \n'),
+              new TextSpan(text: widget.signData.appId!, style: TextStyle(fontWeight: FontWeight.bold)),
+              new TextSpan(text: ' wants you to sign a data document. The Title of the document is: \n \n'),
               new TextSpan(
                   text: widget.signData.friendlyName! + '\n',
                   style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
@@ -159,6 +161,24 @@ class _SignScreenState extends State<SignScreen> with BlockAndRunMixin {
 
   Widget jsonLayout() {
     try {
+      isBusy = true;
+      updateMessage = 'Verifying hash.. ';
+      setState(() {});
+
+      newHash = hashData(widget.signData.dataUrl!);
+
+      if (newHash != widget.signData.hashedDataUrl!) {
+        // updateMessage = 'Could not verify hash ';
+        isBusy = false;
+        setState(() {});
+        errorMessage = 'Cant verify hash';
+        return Container(
+            child: Text(
+              "Can't verify hash, please cancel this sign attempt",
+              style: TextStyle(fontWeight: FontWeight.bold, color: Colors.red, fontSize: 15),
+            ));
+      }
+
       if (errorMessage == null) {
         return jsonDataView();
       }
@@ -242,7 +262,7 @@ class _SignScreenState extends State<SignScreen> with BlockAndRunMixin {
               Uint8List sk = await getPrivateKey();
               String signedData = await signData(widget.signData.dataUrl!, sk);
 
-              await sendSignedData(state, randomRoom, signedData, appId, widget.signData.hashedDataUrl!);
+              await sendSignedData(state, randomRoom, signedData, appId, newHash);
 
               Navigator.pop(context, true);
               Events().emit(PopAllSignEvent(emitCode));
@@ -289,10 +309,12 @@ class _SignScreenState extends State<SignScreen> with BlockAndRunMixin {
               isBusy = true;
               updateMessage = 'Verifying hash.. ';
               setState(() {});
-              bool verified = verifyHash(widget.signData.dataUrl!, widget.signData.hashedDataUrl!);
 
-              if(verified == false) {
+              newHash = hashData(widget.signData.dataUrl!);
+
+              if (newHash != widget.signData.hashedDataUrl!) {
                 updateMessage = 'Could not verify hash ';
+                isBusy = false;
                 setState(() {});
                 return;
               }
@@ -301,12 +323,16 @@ class _SignScreenState extends State<SignScreen> with BlockAndRunMixin {
               setState(() {});
 
               try {
-
                 String fileName = extractFileName(widget.signData.dataUrl!);
 
                 downloadedFile = await downloadFile(widget.signData.dataUrl!, fileName);
 
-                if(downloadedFile == null) {
+                // print(await downloadedFile?.readAsString(encoding: utf8));
+
+                var f = downloadedFile?.readAsStringSync();
+                print(f);
+
+                if (downloadedFile == null) {
                   updateMessage = 'Failed to download the file';
                   isBusy = false;
                   setState(() {});
@@ -317,7 +343,9 @@ class _SignScreenState extends State<SignScreen> with BlockAndRunMixin {
                 isBusy = false;
                 setState(() {});
               } catch (e) {
+                print(e);
                 updateMessage = 'Failed to download the file';
+                isBusy = false;
                 setState(() {});
               }
             },
@@ -374,8 +402,7 @@ class _SignScreenState extends State<SignScreen> with BlockAndRunMixin {
       builder: (BuildContext customContext) => CustomDialog(
         image: Icons.warning,
         title: "Are you sure",
-        description:
-            "Are you sure you want to sign the data, even if the data has been failed to load?",
+        description: "Are you sure you want to sign the data, even if the data has been failed to load?",
         actions: <Widget>[
           FlatButton(
             child: new Text("No"),
@@ -393,7 +420,7 @@ class _SignScreenState extends State<SignScreen> with BlockAndRunMixin {
               Uint8List sk = await getPrivateKey();
               String signedData = await signData(widget.signData.dataUrl!, sk);
 
-              await sendSignedData(state, randomRoom, signedData, appId, widget.signData.hashedDataUrl!);
+              await sendSignedData(state, randomRoom, signedData, appId, newHash);
               Navigator.pop(customContext);
               Navigator.pop(context, true);
             },

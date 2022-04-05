@@ -18,6 +18,14 @@ bool verifyHash(String data, String hash) {
   return hash == base64.encode(hashedData);
 }
 
+String hashData(String data) {
+  final List<int> codeUnits = data.codeUnits;
+  final Uint8List unit8List = Uint8List.fromList(codeUnits);
+
+  return base64.encode(Sodium.cryptoHash(unit8List));
+}
+
+
 // Helper method to convert a String input to hex used for entropy
 Uint8List _toHex(String input) {
   double length = input.length / 2;
