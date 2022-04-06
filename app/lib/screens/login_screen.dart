@@ -159,6 +159,10 @@ class _LoginScreenState extends State<LoginScreen> with BlockAndRunMixin {
                   ),
                   onPressed: () async {
                     await sendIt(true);
+                    if (Navigator.canPop(context)) {
+                      Navigator.pop(context, true);
+                    }
+
                   },
                 ),
               ),
@@ -338,7 +342,12 @@ class _LoginScreenState extends State<LoginScreen> with BlockAndRunMixin {
   }
 
   void generateEmojiImageList() {
-    correctImage = parseImageId(widget.loginData.randomImageId!);
+    if(widget.loginData.randomImageId == null) {
+      correctImage = 1;
+    }
+    else {
+      correctImage = parseImageId(widget.loginData.randomImageId!);
+    }
 
     imageList.add(correctImage);
 

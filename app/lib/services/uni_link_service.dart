@@ -12,6 +12,7 @@ import 'package:threebotlogin/screens/authentication_screen.dart';
 import 'package:threebotlogin/screens/login_screen.dart';
 import 'package:threebotlogin/screens/sign_screen.dart';
 import 'package:threebotlogin/services/shared_preference_service.dart';
+import 'package:threebotlogin/widgets/login_dialogs.dart';
 
 
 class UniLinkService {
@@ -71,7 +72,10 @@ void handleLoginUniLink(Uri link, BuildContext context) async {
     return;
   }
 
+  print(loggedIn);
   bool stateSaved = await savePreviousState(login.state.toString());
+  
+  await showLoggedInDialog(context);
 
   if (stateSaved) {
     if (Platform.isAndroid) {
