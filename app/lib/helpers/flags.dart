@@ -25,6 +25,7 @@ class Flags {
 
       if (doubleName != null) {
         Identity user = Identity(identifier: doubleName);
+        await setDeviceTrait(user);
         await client.getFeatureFlags(user: user, reload: true);
         return;
       }
@@ -50,8 +51,6 @@ class Flags {
     Globals().tosUrl = (await Flags().getFlagValueByFeatureName('tos-url'))!;
     Globals().redoIdentityVerification = await Flags().hasFlagValueByFeatureName('redo-identity-verification');
     Globals().phoneVerification = await Flags().hasFlagValueByFeatureName('phone-verification');
-
-    await setDeviceTrait();
   }
 
   Future<bool> hasFlagValueByFeatureName(String name) async {
@@ -72,14 +71,10 @@ class Flags {
     return (await client.getFeatureFlagValue(name));
   }
   
-  Future<dynamic> setDeviceTrait() async {
-    String? doubleName = await getDoubleName();
-    if(doubleName != null) {
-      Identity user = Identity(identifier: doubleName);
+  Future<dynamic> setDeviceTrait(Identity user) async {
       String info = await getDeviceInfo();
       TraitWithIdentity trait = new TraitWithIdentity(identity: user, key: 'device', value: info);
       return (await client.createTrait(value: trait));
-    }
   }
 
   factory Flags() {
