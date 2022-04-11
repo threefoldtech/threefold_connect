@@ -6,7 +6,7 @@ images:
     tag: production-337f2c85635dc81a5e59756dcfc66303f6f6afd7
   wizard:
     name: wizard-prod
-    tag: prodv1
+    tag: latest
 
 
 ingress:
