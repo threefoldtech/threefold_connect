@@ -1,5 +1,9 @@
 name: production
 
+
+
+
+## DEPLOY TAG FOR WIZARD IS SET MANUAL IN THE HELM FILES  -> TODO
 on:
   push:
     tags:
