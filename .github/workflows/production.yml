@@ -53,4 +53,4 @@ jobs:
       - name: Upgrade production on cluster
         run: |
           echo production-${{ github.sha }}
-          helm upgrade threebotlogin helm_files -f helm_files/valuesProduction.yaml --set image.tag=production-${{ github.sha }} -n jimber
+          helm upgrade threebotlogin helm_files -f helm_files/valuesProduction.yaml --set images.login.tag=production-${{ github.sha }} -n jimber
