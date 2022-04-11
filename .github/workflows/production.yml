@@ -51,4 +51,6 @@ jobs:
           echo ${{ secrets.KUBE_CONFIG }} | base64 --decode > ${HOME}/.kube/config
           cat ${HOME}/.kube/config
       - name: Upgrade production on cluster
-        run: helm upgrade threebotlogin helm_files -f helm_files/valuesProduction.yaml --set image.tag=production-${{ github.sha }} -n jimber
+        run: |
+          echo production-${{ github.sha }}
+          helm upgrade threebotlogin helm_files -f helm_files/valuesProduction.yaml --set image.tag=production-${{ github.sha }} -n jimber
