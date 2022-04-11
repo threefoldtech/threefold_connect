@@ -10,7 +10,7 @@ images:
     tag: staging-2
   wizard:
     name: wizard-prod
-    tag: prodv1
+    tag: latest
 
 
 ingress:
