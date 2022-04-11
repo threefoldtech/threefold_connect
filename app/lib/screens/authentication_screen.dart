@@ -8,17 +8,18 @@ import 'package:threebotlogin/helpers/globals.dart';
 import 'package:threebotlogin/helpers/hex_color.dart';
 import 'package:threebotlogin/models/login.dart';
 import 'package:threebotlogin/services/fingerprint_service.dart';
-import 'package:threebotlogin/services/user_service.dart';
+import 'package:threebotlogin/services/shared_preference_service.dart';
 import 'package:threebotlogin/widgets/custom_dialog.dart';
 
 class AuthenticationScreen extends StatefulWidget {
   final int pinLength = 4;
   final String correctPin;
   final String userMessage;
-  final Login loginData;
+  final Login? loginData;
 
   @override
-  AuthenticationScreen({this.correctPin, this.userMessage, this.loginData});
+  AuthenticationScreen(
+      {required this.correctPin, required this.userMessage, this.loginData});
 
   @override
   AuthenticationScreenState createState() => AuthenticationScreenState();
@@ -27,7 +28,7 @@ class AuthenticationScreen extends StatefulWidget {
 class AuthenticationScreenState extends State<AuthenticationScreen> {
   int timeout = 30000;
   Globals globals = Globals();
-  Timer timer;
+  late Timer timer;
 
   void initState() {
     super.initState();
@@ -38,7 +39,7 @@ class AuthenticationScreenState extends State<AuthenticationScreen> {
       }
     });
 
-    if (widget.loginData != null && !widget.loginData.isMobile) {
+    if (widget.loginData != null && widget.loginData!.isMobile == false) {
       const oneSec = const Duration(seconds: 1);
 
       print('Starting timer ... ');
@@ -47,7 +48,7 @@ class AuthenticationScreenState extends State<AuthenticationScreen> {
       });
     }
 
-    WidgetsBinding.instance.addPostFrameCallback((_) => checkFingerprint());
+    WidgetsBinding.instance?.addPostFrameCallback((_) => checkFingerprint());
   }
 
   timeoutTimer() async {
@@ -56,11 +57,10 @@ class AuthenticationScreenState extends State<AuthenticationScreen> {
       return;
     }
 
-    int created = widget.loginData.created;
+    int? created = widget.loginData!.created;
     int currentTimestamp = new DateTime.now().millisecondsSinceEpoch;
 
-    if (created != null &&
-        ((currentTimestamp - created) / 1000) > Globals().loginTimeout) {
+    if (created != null && ((currentTimestamp - created) / 1000) > Globals().loginTimeout) {
       timer.cancel();
 
       await showDialog(
@@ -68,8 +68,7 @@ class AuthenticationScreenState extends State<AuthenticationScreen> {
         builder: (BuildContext context) => CustomDialog(
           image: Icons.timer,
           title: 'Login attempt expired',
-          description:
-              'Your login attempt has expired, please request a new one in your browser.',
+          description: 'Your login attempt has expired, please request a new one in your browser.',
           actions: <Widget>[
             FlatButton(
               child: Text('Ok'),
@@ -92,9 +91,9 @@ class AuthenticationScreenState extends State<AuthenticationScreen> {
   }
 
   checkFingerprint() async {
-    bool isFingerprintEnabled = await getFingerprint();
+    bool? isFingerprintEnabled = await getFingerprint();
 
-    if (isFingerprintEnabled) {
+    if (isFingerprintEnabled == true) {
       bool isAuthenticated = await authenticate();
 
       if (isAuthenticated) {
@@ -103,7 +102,7 @@ class AuthenticationScreenState extends State<AuthenticationScreen> {
     }
   }
 
-  List<String> input = List();
+  List<String> input = [];
 
   Widget buildTextField(int i, BuildContext context) {
     const double maxSize = 7;
@@ -125,12 +124,12 @@ class AuthenticationScreenState extends State<AuthenticationScreen> {
     double height = MediaQuery.of(context).size.height;
 
     if (buttonText == 'OK')
-      onPressedMethod = input.length >= widget.pinLength ? () => onOk() : null;
-    if (buttonText == 'C')
-      onPressedMethod = input.length >= 1 ? () => onClear() : null;
+      onPressedMethod = (input.length >= widget.pinLength ? () => onOk() : (){});
+    if (buttonText == 'C') onPressedMethod = (input.length >= 1 ? () => onClear() : (){});
     return Container(
         padding: EdgeInsets.only(top: height / 136, bottom: height / 136),
         child: Center(
+
             child: RawMaterialButton(
           padding: EdgeInsets.all(12),
           child: Text(
@@ -144,31 +143,16 @@ class AuthenticationScreenState extends State<AuthenticationScreen> {
   }
 
   Widget generateNumbers(BuildContext context) {
-    List<String> possibleInput = [
-      '1',
-      '2',
-      '3',
-      '4',
-      '5',
-      '6',
-      '7',
-      '8',
-      '9',
-      'C',
-      '0',
-      'OK'
-    ];
+    List<String> possibleInput = ['1', '2', '3', '4', '5', '6', '7', '8', '9', 'C', '0', 'OK'];
     List<Widget> pins = List.generate(possibleInput.length, (int i) {
       String buttonText = possibleInput[i];
       if (buttonText == 'C')
         return buildNumberPin(possibleInput[i], context,
-            backgroundColor:
-                input.length >= 1 ? Colors.yellow[700] : Colors.yellow[200]);
+            backgroundColor: input.length >= 1 ? Colors.yellow.shade700 : Colors.yellow.shade200);
       else if (buttonText == 'OK')
         return buildNumberPin(possibleInput[i], context,
-            backgroundColor: input.length >= widget.pinLength
-                ? Colors.green[600]
-                : Colors.green[100]);
+            backgroundColor:
+                input.length >= widget.pinLength ? Colors.green.shade600 : Colors.green.shade100);
       else
         return buildNumberPin(possibleInput[i], context, backgroundColor: HexColor("#0a73b8"));
     });
@@ -254,8 +238,7 @@ class AuthenticationScreenState extends State<AuthenticationScreen> {
     int currentTime = new DateTime.now().millisecondsSinceEpoch;
 
     if (globals.incorrectPincodeAttempts >= 3 &&
-        (globals.tooManyAuthenticationAttempts &&
-            globals.lockedUntill < currentTime)) {
+        (globals.tooManyAuthenticationAttempts && globals.lockedUntill < currentTime)) {
       globals.tooManyAuthenticationAttempts = false;
       globals.lockedUntill = 0;
       globals.incorrectPincodeAttempts = 0;
@@ -274,8 +257,7 @@ class AuthenticationScreenState extends State<AuthenticationScreen> {
     var dialog;
 
     if (globals.incorrectPincodeAttempts >= 3 ||
-        (globals.tooManyAuthenticationAttempts &&
-            globals.lockedUntill >= currentTime)) {
+        (globals.tooManyAuthenticationAttempts && globals.lockedUntill >= currentTime)) {
       if (!globals.tooManyAuthenticationAttempts) {
         globals.tooManyAuthenticationAttempts = true;
         globals.lockedUntill = currentTime + timeout;

@@ -5,6 +5,7 @@ import cryptoService from './services/cryptoService'
 import userService from './services/userService'
 import axios from 'axios'
 import config from '../public/config'
+import { toBoolean } from 'vue-qr/src/util'
 
 Vue.use(Vuex)
 
@@ -31,6 +32,8 @@ export default new Vuex.Store({
     },
     scannedFlagUp: false,
     cancelLoginUp: false,
+    cancelSignUp: false,
+    signAttemptOnGoing: false,
     signedAttempt: null,
     firstTime: null,
     isMobile: false,
@@ -42,7 +45,12 @@ export default new Vuex.Store({
     loginTimestamp: 0,
     loginTimeleft: 120,
     loginTimeout: 120,
-    loginInterval: null
+    loginInterval: null,
+    isJson: false,
+    dataUrl: null,
+    friendlyName: null,
+    dataUrlHash: null,
+    signedSignAttempt: null
   },
   mutations: {
     setNameCheckStatus (state, status) {
@@ -65,6 +73,12 @@ export default new Vuex.Store({
     },
     setCancelLoginUp (state, cancelLoginUp) {
       state.cancelLoginUp = cancelLoginUp
+    },
+    setCancelSignUp (state, cancelSignUp) {
+      state.cancelSignUp = cancelSignUp
+    },
+    setSignedSignAttempt (state, signedSignAttempt) {
+      state.signedSignAttempt = signedSignAttempt
     },
     setSignedAttempt (state, signedAttempt) {
       state.signedAttempt = signedAttempt
@@ -97,6 +111,9 @@ export default new Vuex.Store({
     setRandomRoom (state, randomRoom) {
       state.randomRoom = randomRoom
     },
+    setSignAttemptOnGoing (state, signAttemptOnGoing) {
+      state.signAttemptOnGoing = signAttemptOnGoing
+    },
     resetTimer (state) {
       if (state.loginInterval !== undefined) {
         clearInterval(state.loginInterval)
@@ -110,6 +127,18 @@ export default new Vuex.Store({
           clearInterval(this.loginInterval)
         }
       }, 1000)
+    },
+    setDataUrl (state, dataUrl) {
+      state.dataUrl = dataUrl
+    },
+    setFriendlyName (state, friendlyName) {
+      state.friendlyName = friendlyName
+    },
+    setIsJson (state, isJson) {
+      state.isJson = isJson
+    },
+    setHashedDataUrl (state, dataUrlHash) {
+      state.dataUrlHash = dataUrlHash
     }
   },
   actions: {
@@ -130,6 +159,9 @@ export default new Vuex.Store({
     },
     setAttemptCanceled (context, payload) {
       context.commit('setCancelLoginUp', payload)
+    },
+    setSignAttemptCanceled (context, payload) {
+      context.commit('setCancelSignUp', payload)
     },
     SOCKET_connect (context, payload) {
       console.log(`hi, connected with SOCKET_connect`)
@@ -175,6 +207,27 @@ export default new Vuex.Store({
       console.log('f')
       context.commit('setCancelLoginUp', true)
     },
+    SOCKET_cancelSign (context) {
+      console.log('Cancel sign attempt')
+      context.commit('setCancelSignUp', true)
+      context.commit('setSignAttemptOnGoing', false)
+    },
+
+    async SOCKET_signedSignDataAttempt (context, data) {
+      console.log('signedSignDataAttempt', data.signedAttempt)
+      console.log('signedSignDataAttempt', data.doubleName)
+
+      let publicKey = (await userService.getUserData(data.doubleName)).data.publicKey
+      var signedAttempt = await cryptoService.validateSignedAttempt(data.signedAttempt, publicKey)
+      console.log('decoded', signedAttempt)
+      var string = new TextDecoder().decode(signedAttempt)
+
+      console.log('in string', string)
+
+      context.commit('setSignedSignAttempt', data)
+      console.log(data)
+    },
+
     async SOCKET_signedAttempt (context, data) {
       console.log('signedAttempt', data.signedAttempt)
       console.log('signedAttempt', data.doubleName)
@@ -233,6 +286,43 @@ export default new Vuex.Store({
         context.commit('setSignedAttempt', data)
       }
     },
+
+    async signDataUser (context, data) {
+      context.dispatch('setDoubleName', data.doubleName)
+      context.commit('setAppId', data.appId)
+      context.commit('setIsJson', data.isJson)
+      context.commit('setHashedDataUrl', data.dataUrlHash)
+      context.commit('setDataUrl', data.dataUrl)
+      context.commit('setFriendlyName', data.friendlyName)
+      context.commit('setRedirectUrl', data.redirectUrl)
+      context.commit('setState', data.state)
+
+      console.log('THIS IS THE STATE')
+      console.log(data.state)
+
+      let publicKey = (await userService.getUserData(context.getters.doubleName)).data.publicKey
+      let randomRoom = generateUUID()
+      socketService.emit('leave', { 'room': context.getters.doubleName })
+      await context.dispatch('setRandomRoom', randomRoom)
+      let encryptedSignAttempt = await cryptoService.encrypt(JSON.stringify({
+        state: context.getters._state,
+        doubleName: context.getters.doubleName,
+        isJson: toBoolean(context.getters.isJson),
+        dataUrlHash: context.getters.dataUrlHash,
+        dataUrl: context.getters.dataUrl,
+        friendlyName: context.getters.friendlyName,
+        appId: context.getters.appId,
+        randomRoom: randomRoom,
+        redirectUrl: context.getters.redirectUrl
+      }), publicKey)
+
+      socketService.emit('sign', {
+        'doubleName': context.getters.doubleName,
+        'encryptedSignAttempt': encryptedSignAttempt
+      })
+
+      context.commit('setSignAttemptOnGoing', true)
+    },
     async loginUser (context, data) {
       console.log(`LoginUser`)
       context.dispatch('setDoubleName', data.doubleName)
@@ -273,13 +363,51 @@ export default new Vuex.Store({
       socketService.emit('leave', { 'room': context.getters.doubleName })
       context.dispatch('setRandomRoom', randomRoom)
 
-      socketService.emit('login', { 'doubleName': context.getters.doubleName, 'encryptedLoginAttempt': encryptedLoginAttempt })
+      socketService.emit('login', {
+        'doubleName': context.getters.doubleName,
+        'encryptedLoginAttempt': encryptedLoginAttempt
+      })
     },
+    signUserMobile (context, data) {
+      context.commit('setAppId', data.appId)
+      context.commit('setIsJson', data.isJson)
+      context.commit('setHashedDataUrl', data.dataUrlHash)
+      context.commit('setDataUrl', data.dataUrl)
+      context.commit('setFriendlyName', data.friendlyName)
+      context.commit('setRedirectUrl', data.redirectUrl)
+      context.commit('setState', data.state)
+    },
+
     loginUserMobile (context, data) {
       context.commit('setSignedAttempt', null)
       context.commit('setFirstTime', data.firstTime)
       context.commit('setRandomImageId')
       context.commit('setIsMobile', data.mobile)
+    },
+
+    async resendSignNotification (context) {
+      let publicKey = (await userService.getUserData(context.getters.doubleName)).data.publicKey
+      let randomRoom = generateUUID()
+      socketService.emit('leave', { 'room': context.getters.doubleName })
+      await context.dispatch('setRandomRoom', randomRoom)
+      let encryptedSignAttempt = await cryptoService.encrypt(JSON.stringify({
+        state: context.getters._state,
+        doubleName: context.getters.doubleName,
+        isJson: toBoolean(context.getters.isJson),
+        dataUrlHash: context.getters.dataUrlHash,
+        friendlyName: context.getters.friendlyName,
+        dataUrl: context.getters.dataUrl,
+        appId: context.getters.appId,
+        randomRoom: randomRoom,
+        redirectUrl: context.getters.redirectUrl
+      }), publicKey)
+
+      socketService.emit('sign', {
+        'doubleName': context.getters.doubleName,
+        'encryptedSignAttempt': encryptedSignAttempt
+      })
+
+      context.commit('setSignAttemptOnGoing', true)
     },
     async resendNotification (context) {
       context.commit('setRandomImageId')
@@ -312,7 +440,10 @@ export default new Vuex.Store({
       socketService.emit('leave', { 'room': context.getters.randomRoom })
       context.dispatch('setRandomRoom', randomRoom)
       context.dispatch('resetTimer')
-      socketService.emit('login', { 'doubleName': context.getters.doubleName, 'encryptedLoginAttempt': encryptedLoginAttempt })
+      socketService.emit('login', {
+        'doubleName': context.getters.doubleName,
+        'encryptedLoginAttempt': encryptedLoginAttempt
+      })
     },
     sendValidationEmail (context, data) {
       var callbackUrl = `${window.location.protocol}//${window.location.host}/verifyemail`
@@ -458,6 +589,7 @@ export default new Vuex.Store({
     redirectUrl: state => state.redirectUrl,
     scannedFlagUp: state => state.scannedFlagUp,
     cancelLoginUp: state => state.cancelLoginUp,
+    cancelSignUp: state => state.cancelSignUp,
     signedAttempt: state => state.signedAttempt,
     firstTime: state => state.firstTime,
     emailVerificationStatus: state => state.emailVerificationStatus,
@@ -471,7 +603,13 @@ export default new Vuex.Store({
     loginTimestamp: state => state.loginTimestamp,
     loginTimeleft: state => state.loginTimeleft,
     loginTimeout: state => state.loginTimeout,
-    loginInterval: state => state.loginInterval
+    loginInterval: state => state.loginInterval,
+    dataUrl: state => state.dataUrl,
+    friendlyName: state => state.friendlyName,
+    dataUrlHash: state => state.dataUrlHash,
+    isJson: state => state.isJson,
+    signedSignAttempt: state => state.signedSignAttempt,
+    signAttemptOnGoing: state => state.signAttemptOnGoing
   }
 })
 

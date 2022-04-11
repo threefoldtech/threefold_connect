@@ -12,8 +12,7 @@ import 'package:threebotlogin/events/go_home_event.dart';
 import 'package:threebotlogin/helpers/globals.dart';
 import 'package:threebotlogin/models/wallet_data.dart';
 import 'package:threebotlogin/screens/scan_screen.dart';
-import 'package:threebotlogin/services/3bot_service.dart';
-import 'package:threebotlogin/services/user_service.dart';
+import 'package:threebotlogin/services/shared_preference_service.dart';
 import 'package:threebotlogin/widgets/layout_drawer.dart';
 
 bool created = false;
@@ -24,14 +23,14 @@ class FarmersWidget extends StatefulWidget {
 }
 
 class _FarmersState extends State<FarmersWidget> with AutomaticKeepAliveClientMixin {
-  InAppWebViewController webView;
+  late InAppWebViewController webView;
 
   double progress = 0;
   var config = WalletConfig();
-  InAppWebView iaWebView;
+  late InAppWebView iaWebView;
 
   _back(WalletBackEvent event) async {
-    Uri url = await webView.getUrl();
+    Uri? url = await webView.getUrl();
     print(url.toString());
     String endsWith = config.appId() + '/';
     if (url.toString().endsWith(endsWith)) {
@@ -57,8 +56,10 @@ class _FarmersState extends State<FarmersWidget> with AutomaticKeepAliveClientMi
         webView = controller;
         this.addHandler();
       },
-      onCreateWindow: (InAppWebViewController controller, CreateWindowAction req) {},
-      onLoadStop: (InAppWebViewController controller, Uri url) async {
+      onCreateWindow: (InAppWebViewController controller, CreateWindowAction req) {
+        return Future.value(true);
+      },
+      onLoadStop: (InAppWebViewController controller, Uri? url) async {
         addClipboardHandlersOnly(controller);
         if (url.toString().contains('/init')) {
           initKeys();
@@ -86,20 +87,20 @@ class _FarmersState extends State<FarmersWidget> with AutomaticKeepAliveClientMi
   }
 
   initKeys() async {
-    var seed = await getDerivedSeed(config.appId());
-    var doubleName = await getDoubleName();
+    String seed = base64.encode(await getDerivedSeed(config.appId()));
+    String? doubleName = await getDoubleName();
 
     var jsStartApp = "window.init('$doubleName', '$seed')";
     webView.evaluateJavascript(source: jsStartApp);
   }
 
-  scanQrCode(List<dynamic> params) async {
+  Future<String?> scanQrCode(List<dynamic> params) async {
     await SystemChannels.textInput.invokeMethod('TextInput.hide');
 
     // QRCode scanner is black if we don't sleep here.
     bool slept = await Future.delayed(const Duration(milliseconds: 400), () => true);
 
-    String result;
+    String? result;
     if (slept) {
       result = await Navigator.push(context, MaterialPageRoute(builder: (context) => ScanScreen()));
     }
@@ -132,7 +133,7 @@ class _FarmersState extends State<FarmersWidget> with AutomaticKeepAliveClientMi
   Widget build(BuildContext context) {
     super.build(context);
     return LayoutDrawer(
-        titleText: 'Farmers',
+        titleText: 'Farmer migration',
         content: Column(
           children: <Widget>[
             Expanded(

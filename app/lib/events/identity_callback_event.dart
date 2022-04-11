@@ -1,4 +1,4 @@
 class IdentityCallbackEvent {
-  String type;
+  String? type;
   IdentityCallbackEvent({this.type});
 }

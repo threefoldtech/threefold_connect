@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:threebotlogin/helpers/hex_color.dart';
-import 'package:threebotlogin/services/user_service.dart';
+import 'package:threebotlogin/services/shared_preference_service.dart';
 import 'package:threebotlogin/widgets/pin_field.dart';
 
 class ChangePinScreen extends StatefulWidget {
   final currentPin;
-  final bool hideBackButton;
+  final bool? hideBackButton;
 
   ChangePinScreen({this.currentPin, this.hideBackButton});
 
@@ -15,8 +15,8 @@ class ChangePinScreen extends StatefulWidget {
 enum _State { CurrentPin, CurrentPinWrong, NewPinWrong, NewPin, Confirm, Done }
 
 class _ChangePinScreenState extends State<ChangePinScreen> {
-  String newPin;
-  _State state;
+  String newPin = '';
+  _State? state;
 
   _ChangePinScreenState() {
     state = _State.NewPin;
@@ -46,7 +46,7 @@ class _ChangePinScreenState extends State<ChangePinScreen> {
                 ? Text("Choose your pincode")
                 : Text("Change pincode"),
             elevation: 0.0,
-            automaticallyImplyLeading: !widget.hideBackButton),
+            automaticallyImplyLeading: widget.hideBackButton == false),
         body: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           mainAxisSize: MainAxisSize.max,
@@ -65,7 +65,7 @@ class _ChangePinScreenState extends State<ChangePinScreen> {
         ),
       ),
       onWillPop: () {
-        if (state != _State.Done && widget.hideBackButton) {
+        if (state != _State.Done && widget.hideBackButton == true) {
           return Future(() => false);
         }
         return Future(() => true);

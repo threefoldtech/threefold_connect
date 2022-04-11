@@ -1,5 +1,5 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="org.jimber.threebotlogin.local">
-    <application android:label="3Bot Local" android:icon="@mipmap/ic_launcher" android:usesCleartextTraffic="true">
+<manifest xmlns:tools="http://schemas.android.com/tools" xmlns:android="http://schemas.android.com/apk/res/android" package="org.jimber.threebotlogin.local">
+    <application tools:replace="android:label" android:label="3Bot Local" android:icon="@mipmap/ic_launcher" android:usesCleartextTraffic="true">
         <service
             android:name="org.threefold.yggdrasil_plugin.PacketTunnelProvider"
             android:enabled="true"
@@ -31,6 +31,12 @@
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
                 <data android:scheme="threebot" android:host="login" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="threebot" android:host="sign" />
             </intent-filter>
         </activity>
         <meta-data android:name="flutterEmbedding" android:value="2" />

@@ -2,7 +2,7 @@ import 'package:threebotlogin/helpers/env_config.dart';
 import 'package:threebotlogin/helpers/environment.dart';
 
 class FfpConfig extends EnvConfig {
-  FfpConfigImpls impl;
+  late FfpConfigImpls impl;
 
   FfpConfig() {
     if (environment == Environment.Staging) {

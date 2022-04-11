@@ -1,20 +1,21 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:math';
+import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
-import 'package:threebotlogin/apps/wallet/wallet_config.dart';
 import 'package:threebotlogin/events/events.dart';
 import 'package:threebotlogin/events/pop_all_login_event.dart';
 import 'package:threebotlogin/helpers/block_and_run_mixin.dart';
 import 'package:threebotlogin/helpers/globals.dart';
+import 'package:threebotlogin/helpers/login_helpers.dart';
 import 'package:threebotlogin/models/login.dart';
 import 'package:threebotlogin/services/3bot_service.dart';
 import 'package:threebotlogin/services/crypto_service.dart';
 import 'package:threebotlogin/services/tools_service.dart';
-import 'package:threebotlogin/services/user_service.dart';
-import 'package:threebotlogin/widgets/custom_dialog.dart';
+import 'package:threebotlogin/services/shared_preference_service.dart';
 import 'package:threebotlogin/widgets/image_button.dart';
+import 'package:threebotlogin/widgets/login_dialogs.dart';
 import 'package:threebotlogin/widgets/preference_dialog.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -26,11 +27,10 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> with BlockAndRunMixin {
-  String helperText = '';
   String scopeTextMobile = 'Please select the data you want to share and press Accept';
   String scopeText = 'Please select the data you want to share and press the corresponding emoji';
 
-  List<int> imageList = new List();
+  List<int> imageList = [];
 
   int selectedImageId = -1;
   int correctImage = -1;
@@ -41,12 +41,12 @@ class _LoginScreenState extends State<LoginScreen> with BlockAndRunMixin {
 
   String emitCode = randomString(10);
 
-  Timer timer;
+  late Timer timer;
 
   int timeLeft = Globals().loginTimeout;
 
-  int created;
-  int currentTimestamp;
+  int? created = 0;
+  int? currentTimestamp = 0;
 
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
@@ -54,22 +54,24 @@ class _LoginScreenState extends State<LoginScreen> with BlockAndRunMixin {
   void initState() {
     super.initState();
     Events().onEvent(PopAllLoginEvent("").runtimeType, close);
-    isMobileCheck = widget.loginData.isMobile;
+    isMobileCheck = widget.loginData.isMobile == true;
     generateEmojiImageList();
 
-    if (widget.loginData != null && !widget.loginData.isMobile) {
-      const oneSec = const Duration(seconds: 1);
-      print('Starting timer ... ');
-
-      created = widget.loginData.created;
-      currentTimestamp = new DateTime.now().millisecondsSinceEpoch;
-
-      timeLeft = Globals().loginTimeout - ((currentTimestamp - created) / 1000).round();
-
-      timer = new Timer.periodic(oneSec, (Timer t) async {
-        timeoutTimer();
-      });
+    if (widget.loginData.isMobile == true) {
+      return;
     }
+
+    const oneSec = const Duration(seconds: 1);
+    print('Starting timer ... ');
+
+    created = widget.loginData.created;
+    currentTimestamp = new DateTime.now().millisecondsSinceEpoch;
+
+    timeLeft = Globals().loginTimeout - ((currentTimestamp! - created!) / 1000).round();
+
+    timer = new Timer.periodic(oneSec, (Timer t) async {
+      timeoutTimer();
+    });
   }
 
   timeoutTimer() async {
@@ -81,31 +83,16 @@ class _LoginScreenState extends State<LoginScreen> with BlockAndRunMixin {
     currentTimestamp = new DateTime.now().millisecondsSinceEpoch;
 
     setState(() {
-      timeLeft = Globals().loginTimeout - ((currentTimestamp - created) / 1000).round();
+      timeLeft = Globals().loginTimeout - ((currentTimestamp! - created!) / 1000).round();
     });
 
-    if (created != null && ((currentTimestamp - created) / 1000) > Globals().loginTimeout) {
-      timer.cancel();
-
-      await showDialog(
-        context: context,
-        builder: (BuildContext context) => CustomDialog(
-          image: Icons.timer,
-          title: 'Login attempt expired',
-          description: 'Your login attempt has expired, please request a new one in your browser.',
-          actions: <Widget>[
-            FlatButton(
-              child: Text('Ok'),
-              onPressed: () {
-                Navigator.pop(context);
-              },
-            )
-          ],
-        ),
-      );
-
-      Navigator.pop(context, false);
+    if (created == null || ((currentTimestamp! - created!) / 1000) < Globals().loginTimeout) {
+      return;
     }
+
+    timer.cancel();
+    await showExpiredDialog(context);
+    Navigator.pop(context, false);
   }
 
   Widget scopeEmojiView() {
@@ -134,7 +121,7 @@ class _LoginScreenState extends State<LoginScreen> with BlockAndRunMixin {
                   scope: widget.loginData.scope,
                   appId: widget.loginData.appId,
                   callback: cancelIt,
-                  type: widget.loginData.isMobile ? 'mobilelogin' : 'login',
+                  type: widget.loginData.isMobile == true ? 'mobilelogin' : 'login',
                 ),
               ),
             ),
@@ -172,19 +159,25 @@ class _LoginScreenState extends State<LoginScreen> with BlockAndRunMixin {
                   ),
                   onPressed: () async {
                     await sendIt(true);
+                    if (Navigator.canPop(context)) {
+                      Navigator.pop(context, true);
+                    }
+
                   },
                 ),
               ),
             ),
             Visibility(
-              visible: !widget.loginData.isMobile,
+              visible: widget.loginData.isMobile == false,
               child: Expanded(
                 flex: 1,
                 child: Center(
                   child: Padding(
                     padding: const EdgeInsets.only(right: 24.0, left: 24.0),
                     child: Text(
-                      "Attempt expires in " + ((timeLeft >= 0) ? timeLeft.toString() : "0") + " second(s).",
+                      "Attempt expires in " +
+                          ((timeLeft >= 0) ? timeLeft.toString() : "0") +
+                          " second(s).",
                       style: TextStyle(fontSize: 12),
                       textAlign: TextAlign.center,
                     ),
@@ -250,35 +243,22 @@ class _LoginScreenState extends State<LoginScreen> with BlockAndRunMixin {
         selectedImageId = imageId;
       });
 
-      if (selectedImageId != -1) {
-        if (selectedImageId == correctImage) {
-          await sendIt(true);
-        } else {
-          await sendIt(false);
+      if (selectedImageId == -1) {
+        print('No image selected');
+        return;
+      }
 
-          await showDialog(
-            context: context,
-            builder: (BuildContext context) => CustomDialog(
-              image: Icons.warning,
-              title: 'Wrong emoji',
-              description: 'You selected the wrong emoji, please check your browser for the new one.',
-              actions: <Widget>[
-                FlatButton(
-                  child: Text('Retry'),
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                )
-              ],
-            ),
-          );
+      if (selectedImageId == correctImage) {
+        await sendIt(true);
+        return;
+      }
 
-          if (Navigator.canPop(context)) {
-            Navigator.pop(context, false);
-          }
-        }
-      } else {
-        _scaffoldKey.currentState.showSnackBar(SnackBar(content: Text('Please select an emoji')));
+      await sendIt(false);
+      print(context);
+      await showWrongEmojiDialog(context);
+
+      if (Navigator.canPop(context)) {
+        Navigator.pop(context, false);
       }
     });
   }
@@ -288,175 +268,86 @@ class _LoginScreenState extends State<LoginScreen> with BlockAndRunMixin {
       return;
     }
 
-    if (mounted) {
-      if (Navigator.canPop(context)) {
-        Navigator.pop(context, false);
-      }
+    if (!mounted) {
+      return;
+    }
+
+    if (Navigator.canPop(context)) {
+      Navigator.pop(context, false);
     }
   }
 
   cancelIt() async {
-    cancelLogin(await getDoubleName());
+    String? doubleName = await getDoubleName();
+    cancelLogin(doubleName!);
   }
 
   sendIt(bool includeData) async {
-    var config = WalletConfig();
+    String? state = widget.loginData.state;
+    String? randomRoom = widget.loginData.randomRoom;
 
-    String state = widget.loginData.state;
-    String randomRoom = widget.loginData.randomRoom;
-
-    if (widget.loginData != null && !widget.loginData.isMobile) {
-      int created = widget.loginData.created;
+    if (widget.loginData.isMobile == false) {
+      int? created = widget.loginData.created;
       int currentTimestamp = new DateTime.now().millisecondsSinceEpoch;
 
       if (created != null && ((currentTimestamp - created) / 1000) > Globals().loginTimeout) {
-        await showDialog(
-          context: context,
-          builder: (BuildContext context) => CustomDialog(
-            image: Icons.timer,
-            title: 'Login attempt expired',
-            description: 'We cannot sign this login attempt because it has expired.',
-            actions: <Widget>[
-              FlatButton(
-                child: Text('Ok'),
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-              )
-            ],
-          ),
-        );
-
-        await sendData(state, null, selectedImageId, null, widget.loginData.appId);
+        await showExpiredDialog(context);
+        await sendData(state!, null, selectedImageId, null, widget.loginData.appId!);
 
         if (Navigator.canPop(context)) {
           Navigator.pop(context, false);
         }
+
         return;
       }
     }
 
-    String publicKey = widget.loginData.appPublicKey?.replaceAll(" ", "+");
-
-    bool stateCheck = RegExp(r"[^A-Za-z0-9]+").hasMatch(state);
-
+    // If the state is not passed through the regEx
+    bool stateCheck = RegExp(r"[^A-Za-z0-9]+").hasMatch(state!);
     if (stateCheck) {
-      _scaffoldKey.currentState.showSnackBar(
-        SnackBar(
-          content: Text('States can only be alphanumeric [^A-Za-z0-9]'),
-        ),
-      );
+      print('States can only be alphanumeric [^A-Za-z0-9]');
       return;
     }
 
-    Map<String, dynamic> scope = Map<String, dynamic>();
+    String appId = widget.loginData.appId!;
+    String publicKey = widget.loginData.appPublicKey!.replaceAll(" ", "+");
+    Uint8List derivedSeed = await getDerivedSeed(appId);
 
-    var scopePermissions = await getPreviousScopePermissions(widget.loginData.appId);
+    // Get the selected scope permissions and get the required data
+    var scopePermissions = await getPreviousScopePermissions(widget.loginData.appId!);
+    Map<String, dynamic>? scopeData = await readScopeAsObject(scopePermissions, derivedSeed);
 
-    var derivedSeed = (await getDerivedSeed(widget.loginData.appId));
+    // Encrypt the scope data
+    Map<String, String> encryptedScopeData = await encryptLoginData(publicKey, scopeData);
 
-    //TODO: make separate function
-    if (scopePermissions != null) {
-      var scopePermissionsDecoded = jsonDecode(scopePermissions);
-
-      if (scopePermissions != null && scopePermissions != "") {
-        if (scopePermissionsDecoded['email'] != null && scopePermissionsDecoded['email']) {
-          scope['email'] = (await getEmail());
-        }
-
-        if (scopePermissionsDecoded['phone'] != null && scopePermissionsDecoded['phone']) {
-          scope['phone'] = (await getPhone());
-        }
-
-        if (scopePermissionsDecoded['derivedSeed'] != null && scopePermissionsDecoded['derivedSeed']) {
-          scope['derivedSeed'] = derivedSeed;
-        }
-
-        if (scopePermissionsDecoded['digitalTwin'] != null && scopePermissionsDecoded['digitalTwin']) {
-          scope['digitalTwin'] = 'ok';
-        }
-
-        if (scopePermissionsDecoded['identityName'] != null && scopePermissionsDecoded['identityName']) {
-          scope['identityName'] = {
-            'identityName': ((await getIdentity())['identityName']),
-            'signedIdentityNameIdentifier': ((await getIdentity())['signedIdentityNameIdentifier'])
-          };
-        }
-
-        if (scopePermissionsDecoded['identityDOB'] != null && scopePermissionsDecoded['identityDOB']) {
-          scope['identityDOB'] = {
-            'identityDOB': ((await getIdentity())['identityDOB']),
-            'signedIdentityDOBIdentifier': ((await getIdentity())['signedIdentityDOBIdentifier'])
-          };
-        }
-
-        if (scopePermissionsDecoded['identityCountry'] != null && scopePermissionsDecoded['identityCountry']) {
-          scope['identityCountry'] = {
-            'identityCountry': ((await getIdentity())['identityCountry']),
-            'signedIdentityCountryIdentifier': ((await getIdentity())['signedIdentityCountryIdentifier'])
-          };
-        }
-
-        if (scopePermissionsDecoded['identityDocumentMeta'] != null &&
-            scopePermissionsDecoded['identityDocumentMeta']) {
-          scope['identityDocumentMeta'] = {
-            'identityDocumentMeta': ((await getIdentity())['identityDocumentMeta']),
-            'signedIdentityDocumentMetaIdentifier': ((await getIdentity())['signedIdentityDocumentMetaIdentifier'])
-          };
-        }
-
-        if (scopePermissionsDecoded['identityGender'] != null && scopePermissionsDecoded['identityGender']) {
-          scope['identityGender'] = {
-            'identityGender': ((await getIdentity())['identityGender']),
-            'signedIdentityGenderIdentifier': ((await getIdentity())['signedIdentityGenderIdentifier'])
-          };
-        }
-
-        if (scopePermissionsDecoded['walletAddress'] != null && scopePermissionsDecoded['walletAddress']) {
-          scope['walletAddressData'] = {
-            'address': scopePermissionsDecoded['walletAddressData'],
-          };
-        }
-      }
-    }
-
-    Map<String, String> encryptedScopeData = await encrypt(jsonEncode(scope), publicKey, await getPrivateKey());
-
-    //push to backend with signed
     if (!includeData) {
-      await sendData(
-          state, null, selectedImageId, null, widget.loginData.appId); // temp fix send empty data for regenerate emoji
+      await sendData(state, null, selectedImageId, null, widget.loginData.appId!);
     } else {
-      await sendData(state, encryptedScopeData, selectedImageId, randomRoom, widget.loginData.appId);
+      await sendData(
+          state, encryptedScopeData, selectedImageId, randomRoom, widget.loginData.appId!);
     }
 
-    if (selectedImageId == correctImage || isMobileCheck) {
-      // Only update data if the correct image was chosen:
-      print("derivedSeed: " + derivedSeed);
-      var name = await getDoubleName();
-      var digitalTwinDerivedPublicKey = await generatePublicKeyFromEntropy(derivedSeed);
-
-      print("name: " + name);
-      print("publicKey: " + digitalTwinDerivedPublicKey);
-      addDigitalTwinDerivedPublicKeyToBackend(name, digitalTwinDerivedPublicKey, widget.loginData.appId);
-
-      if (Navigator.canPop(context)) {
-        Navigator.pop(context, true);
-      }
-
-      Events().emit(PopAllLoginEvent(emitCode));
+    // If the image is wrong, quit here and don't add the digital twin to the table
+    if (selectedImageId != correctImage) {
+      return;
     }
-  }
 
-  int parseImageId(String imageId) {
-    if (imageId == null || imageId == '') {
-      return 1;
+    addDigitalTwinToBackend(derivedSeed, widget.loginData.appId!);
+
+    if (Navigator.canPop(context)) {
+      Navigator.pop(context, true);
     }
-    return int.parse(imageId);
+
+    Events().emit(PopAllLoginEvent(emitCode));
   }
 
   void generateEmojiImageList() {
-    correctImage = parseImageId(widget.loginData.randomImageId);
+    if(widget.loginData.randomImageId == null) {
+      correctImage = 1;
+    }
+    else {
+      correctImage = parseImageId(widget.loginData.randomImageId!);
+    }
 
     imageList.add(correctImage);
 

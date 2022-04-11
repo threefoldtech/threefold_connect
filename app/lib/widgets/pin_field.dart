@@ -6,10 +6,10 @@ class PinField extends StatefulWidget {
   final int pinLength = 4;
   final callback;
   final callbackParam;
-  final Function callbackFunction;
+  final Function? callbackFunction;
 
   PinField(
-      {Key key,
+      {Key? key,
       @required this.callback,
       this.callbackParam,
       this.callbackFunction})
@@ -22,11 +22,11 @@ class _PinFieldState extends State<PinField> {
   void initState() {
     super.initState();
     if (widget.callbackFunction != null) {
-      widget.callbackFunction();
+      widget.callbackFunction!();
     }
   }
 
-  List<String> input = List();
+  List<String> input = [];
 
   Widget buildTextField(int i, BuildContext context) {
     const double maxSize = 7;
@@ -48,9 +48,9 @@ class _PinFieldState extends State<PinField> {
     double height = MediaQuery.of(context).size.height;
 
     if (buttonText == 'OK')
-      onPressedMethod = input.length >= widget.pinLength ? () => onOk() : null;
+      onPressedMethod = (input.length >= widget.pinLength ? () => onOk() : (){});
     if (buttonText == 'C')
-      onPressedMethod = input.length >= 1 ? () => onClear() : null;
+      onPressedMethod = (input.length >= 1 ? () => onClear() : (){});
     return Container(
         padding: EdgeInsets.only(top: height / 136, bottom: height / 136),
         child: Center(
@@ -86,12 +86,12 @@ class _PinFieldState extends State<PinField> {
       if (buttonText == 'C')
         return buildNumberPin(possibleInput[i], context,
             backgroundColor:
-                input.length >= 1 ? Colors.yellow[700] : Colors.yellow[200]);
+                input.length >= 1 ? Colors.yellow.shade700 : Colors.yellow.shade200);
       else if (buttonText == 'OK')
         return buildNumberPin(possibleInput[i], context,
             backgroundColor: input.length >= widget.pinLength
-                ? Colors.green[600]
-                : Colors.green[100]);
+                ? Colors.green.shade600
+                : Colors.green.shade100);
       else
         return buildNumberPin(possibleInput[i], context,  backgroundColor: HexColor("#0a73b8"));
     });
@@ -152,7 +152,7 @@ class _PinFieldState extends State<PinField> {
       widget.callback(pin);
     }
     setState(() {
-      input = List();
+      input = [];
     });
   }
 

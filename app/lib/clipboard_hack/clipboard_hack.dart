@@ -8,8 +8,9 @@ void copy(List<dynamic> params) {
   Clipboard.setData(new ClipboardData(text: params[0]));
 }
 
-Future<String> paste(List<dynamic> params) async {
-  return (await Clipboard.getData('text/plain')).text.toString();
+Future<String?> paste(List<dynamic> params) async {
+  ClipboardData? data = await Clipboard.getData('text/plain');
+  return data?.text.toString();
 }
 
 Future<void> addClipboardHack(InAppWebViewController webview) async {

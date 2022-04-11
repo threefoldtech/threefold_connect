@@ -103,6 +103,18 @@ def on_login(data):
         emitOrQueue("login", data, room=user["double_name"])
 
 
+@sio.on("sign")
+def on_sign(data):
+    logger.debug("/sign %s", data)
+    double_name = data.get("doubleName")
+
+    data["type"] = "sign"
+    user = db.get_user_by_double_name(double_name)
+    if user:
+        logger.debug("[sign]: User found %s", user["double_name"])
+        emitOrQueue("sign", data, room=user["double_name"])
+
+
 def emitOrQueue(event, data, room):
     logger.debug("Emit or queue data %s", data)
     if not room in usersInRoom or usersInRoom[room] == 0:

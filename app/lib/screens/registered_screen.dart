@@ -1,13 +1,6 @@
-import 'dart:ffi';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:threebotlogin/helpers/globals.dart';
-import 'package:threebotlogin/helpers/vpn_state.dart';
-import 'package:threebotlogin/services/user_service.dart';
 import 'package:threebotlogin/widgets/layout_drawer.dart';
-// import 'package:yggdrasil_plugin/yggdrasil_plugin.dart';
-import 'package:flutter/services.dart';
 
 class RegisteredScreen extends StatefulWidget {
   static final RegisteredScreen _singleton = new RegisteredScreen._internal();

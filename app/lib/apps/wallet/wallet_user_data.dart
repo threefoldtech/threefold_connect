@@ -3,10 +3,10 @@ import 'package:shared_preferences/shared_preferences.dart';
 void saveImportedWallet(List<dynamic> params) async {
   String importedWallet = params[0].toString();
   final prefs = await SharedPreferences.getInstance();
-  List<String> importedWallets = await getImportedWallets();
+  List<String>? importedWallets = await getImportedWallets();
 
   if (importedWallets == null) {
-    importedWallets = new List<String>();
+    importedWallets = [];
   }
 
   if (!importedWallets.contains(importedWallet)) {
@@ -17,23 +17,23 @@ void saveImportedWallet(List<dynamic> params) async {
   }
 }
 
-Future<List<String>> getImportedWallets() async {
+Future<List<String>?> getImportedWallets() async {
   final prefs = await SharedPreferences.getInstance();
 
   return prefs.getStringList("importedWallets");
 }
 
 Future<bool> saveAppWallet(List<dynamic> params) async {
-  String appWalletToAdd = params[0].toString();
+  String? appWalletToAdd = params[0];
   final prefs = await SharedPreferences.getInstance();
-  List<String> appWallets = await getAppWallets();
+  List<String>? appWallets = await getAppWallets();
 
   if (appWalletToAdd == null) {
     return false;
   }
 
   if (appWallets == null) {
-    appWallets = new List<String>();
+    appWallets = [];
   }
 
   if (!appWallets.contains(appWalletToAdd)) {
@@ -45,7 +45,7 @@ Future<bool> saveAppWallet(List<dynamic> params) async {
   return false;
 }
 
-Future<List<String>> getAppWallets() async {
+Future<List<String>?> getAppWallets() async {
   final prefs = await SharedPreferences.getInstance();
   var wallets = prefs.getStringList("appWallets");
   return wallets;

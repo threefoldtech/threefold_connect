@@ -14,13 +14,13 @@ import 'apps/news/news.dart';
 
 class AppInfo {
   Route route;
-  App app;
+  App? app;
 
-  AppInfo({this.route, this.app});
+  AppInfo({required this.route,  this.app});
 }
 
 class JRouter {
-  List<AppInfo> routes;
+  List<AppInfo> routes = [];
 
   init() async {
     routes = [
@@ -105,14 +105,14 @@ class JRouter {
 
   bool emailMustBeVerified(int index) {
     if (routes[index].app != null) {
-      return routes[index].app.emailVerificationRequired();
+      return routes[index].app!.emailVerificationRequired();
     }
     return false;
   }
 
   bool pinRequired(int index) {
     if (routes[index].app != null) {
-      return routes[index].app.pinRequired();
+      return routes[index].app!.pinRequired();
     }
     return false;
   }
@@ -147,5 +147,5 @@ class Route {
   final String path;
   final Widget view;
 
-  Route({this.path, this.name, this.icon, this.view});
+  Route({required this.path, required this.name, required this.icon, required this.view});
 }

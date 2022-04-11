@@ -12,10 +12,6 @@ Widget getErrorWidget(BuildContext context, FlutterErrorDetails error) {
               padding: const EdgeInsets.all(16.0),
               child: Text(
                 "Oops something went wrong.",
-                style: Theme.of(context)
-                    .textTheme
-                    .title
-                    .copyWith(color: Colors.white),
               ),
             ),
           ),
@@ -24,15 +20,10 @@ Widget getErrorWidget(BuildContext context, FlutterErrorDetails error) {
           ),
           Center(
             child: Padding(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 16.0, vertical: 16.0),
+              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 16.0),
               child: Text(
                 'Please restart the application. If this error persists, please contact support.',
                 textAlign: TextAlign.center,
-                style: Theme.of(context)
-                    .textTheme
-                    .title
-                    .copyWith(color: Colors.white),
               ),
             ),
           ),

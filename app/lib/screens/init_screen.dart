@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:threebotlogin/app_config.dart';
-import 'package:threebotlogin/services/user_service.dart';
+import 'package:threebotlogin/services/shared_preference_service.dart';
 
 class InitScreen extends StatefulWidget {
   InitScreen();
@@ -11,9 +11,8 @@ class InitScreen extends StatefulWidget {
 }
 
 class _InitState extends State<InitScreen> {
-  InAppWebViewController webView;
-
-  InAppWebView iaWebView;
+  late InAppWebViewController webView;
+  late InAppWebView iaWebView;
 
   finish(List<dynamic> params) async {
     print("**** LOAD DONE ");
@@ -27,8 +26,10 @@ class _InitState extends State<InitScreen> {
 
   _InitState() {
     iaWebView = InAppWebView(
-      initialUrlRequest: URLRequest(url:Uri.parse(AppConfig().wizardUrl() + '?cache_buster=' + new DateTime.now().millisecondsSinceEpoch.toString())),
-
+      initialUrlRequest: URLRequest(
+          url: Uri.parse(AppConfig().wizardUrl() +
+              '?cache_buster=' +
+              new DateTime.now().millisecondsSinceEpoch.toString())),
       initialOptions: InAppWebViewGroupOptions(
         android: AndroidInAppWebViewOptions(supportMultipleWindows: true, useHybridComposition: true),
       ),
@@ -36,10 +37,11 @@ class _InitState extends State<InitScreen> {
         webView = controller;
         addHandler();
       },
-      onCreateWindow:
-          (InAppWebViewController controller, CreateWindowAction req) {},
-      onLoadStart: (InAppWebViewController controller, Uri url) {},
-      onLoadStop: (InAppWebViewController controller, Uri url) async {},
+      onCreateWindow: (InAppWebViewController controller, CreateWindowAction req) {
+        return Future.value(true);
+      },
+      onLoadStart: (InAppWebViewController controller, Uri? url) {},
+      onLoadStop: (InAppWebViewController controller, Uri? url) async {},
       onProgressChanged: (InAppWebViewController controller, int progress) {},
     );
   }
