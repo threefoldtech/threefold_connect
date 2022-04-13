@@ -501,7 +501,7 @@ class _PreferenceDialogState extends State<PreferenceDialog> {
                         return FutureBuilder(
                             future: getWallets(),
                             builder: (BuildContext context, AsyncSnapshot snapshot) {
-                              if (!snapshot.hasData) {
+                              if (!snapshot.hasData || snapshot.data.length == 0) {
                                 return Container(
                                     decoration: BoxDecoration(
                                       border: Border(
