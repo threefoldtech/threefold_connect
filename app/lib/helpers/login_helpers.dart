@@ -19,10 +19,6 @@ void addDigitalTwinToBackend(Uint8List derivedSeed, String appId) async {
   KeyPair dtKeyPair = await generateKeyPairFromEntropy(derivedSeed);
   String dtEncodedPublicKey = base64.encode(dtKeyPair.pk);
 
-  print("Derived Seed: " + base64.encode(derivedSeed));
-  print("Username: " + doubleName!);
-  print("Public key: " + dtEncodedPublicKey);
-
   addDigitalTwinDerivedPublicKeyToBackend(doubleName, dtEncodedPublicKey, appId);
 }
 
