@@ -66,7 +66,7 @@ class _RegisteredScreenState extends State<RegisteredScreen>
                             color: Colors.black,
                           ),
                           children: <TextSpan>[
-                            new TextSpan(text: 'Welcome to \n'),
+                            new TextSpan(text: 'Welcome to the\n'),
                             new TextSpan(
                                 text: 'ThreeFold Connect App! \n',
                                 style:

@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:threebotlogin/app_config.dart';
 import 'package:threebotlogin/events/events.dart';
 import 'package:threebotlogin/helpers/environment.dart';
@@ -16,7 +15,6 @@ import 'package:threebotlogin/services/3bot_service.dart';
 import 'package:threebotlogin/services/migration_service.dart';
 import 'package:threebotlogin/services/socket_service.dart';
 import 'package:threebotlogin/services/shared_preference_service.dart';
-import 'package:threebotlogin/widgets/custom_dialog.dart';
 import 'package:threebotlogin/widgets/error_widget.dart';
 import 'package:uni_links/uni_links.dart';
 
@@ -161,12 +159,12 @@ class _AppState extends State<MainScreen> {
       InitScreen init = InitScreen();
       bool accepted = false;
       while (!accepted) {
-        accepted = !(await Navigator.push(context, MaterialPageRoute(builder: (context) => init)) == null);
+        accepted = !(await Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => init)) == null);
       }
     }
 
     if (!widget.registered!) {
-      await Navigator.push(context, MaterialPageRoute(builder: (context) => UnregisteredScreen()));
+      await Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => UnregisteredScreen()));
     }
 
     await Globals().router.init();
@@ -183,7 +181,7 @@ class _AppState extends State<MainScreen> {
     print(mounted);
 
     // await Navigator.push(context, MaterialPageRoute(builder: (context) => UnregisteredScreen()));
-    await Navigator.push(
+    await Navigator.pushReplacement(
         context,
         MaterialPageRoute(
             builder: (context) => HomeScreen(initialLink: initialLink, backendConnection: _backendConnection)));
