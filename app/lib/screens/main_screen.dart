@@ -159,12 +159,12 @@ class _AppState extends State<MainScreen> {
       InitScreen init = InitScreen();
       bool accepted = false;
       while (!accepted) {
-        accepted = !(await Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => init)) == null);
+        accepted = !(await Navigator.push(context, MaterialPageRoute(builder: (context) => init)) == null);
       }
     }
 
     if (!widget.registered!) {
-      await Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => UnregisteredScreen()));
+      await Navigator.push(context, MaterialPageRoute(builder: (context) => UnregisteredScreen()));
     }
 
     await Globals().router.init();
