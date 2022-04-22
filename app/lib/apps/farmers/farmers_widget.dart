@@ -136,7 +136,7 @@ class _FarmersState extends State<FarmersWidget> with AutomaticKeepAliveClientMi
   Widget build(BuildContext context) {
     super.build(context);
     return LayoutDrawer(
-        titleText: 'Farmer migration',
+        titleText: 'Farming',
         content: Column(
           children: <Widget>[
             Expanded(
