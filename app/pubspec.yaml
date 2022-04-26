@@ -3,7 +3,7 @@ description: A decentralized login application
 
 publish_to: "none"
 
-version: 3.5.0+158
+version: 3.6.0+159
 
 environment:
   sdk: ">=2.12.0<3.0.0"
@@ -32,7 +32,7 @@ dependencies:
       url: https://github.com/jimbertools/redirection
       ref: main_null-safety
 
-  shuftipro_sdk: ^1.0.4
+  shuftipro_sdk: ^1.0.5
   flutter_svg: ^1.0.0
   bip39: ^1.0.6
   socket_io_client: ^1.0.2
