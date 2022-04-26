@@ -3,8 +3,8 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
+import 'package:threebotlogin/apps/farmers/farmers_events.dart';
 import 'package:threebotlogin/apps/wallet/wallet_config.dart';
-import 'package:threebotlogin/apps/wallet/wallet_events.dart';
 import 'package:threebotlogin/apps/wallet/wallet_user_data.dart';
 import 'package:threebotlogin/clipboard_hack/clipboard_hack.dart';
 import 'package:threebotlogin/events/events.dart';
@@ -26,14 +26,17 @@ class _FarmersState extends State<FarmersWidget> with AutomaticKeepAliveClientMi
   late InAppWebViewController webView;
 
   double progress = 0;
-  var config = WalletConfig();
+
+  // Still use wallet configs to have the same derived key
+  var walletConfig = WalletConfig();
+
+
   late InAppWebView iaWebView;
 
-  _back(WalletBackEvent event) async {
+  _back(FarmersBackEvent event) async {
     Uri? url = await webView.getUrl();
-    print(url.toString());
-    String endsWith = config.appId() + '/';
-    if (url.toString().endsWith(endsWith)) {
+    String rootUrl = Globals().farmersUrl + 'farmer';
+    if (url.toString() == rootUrl.toString()) {
       Events().emit(GoHomeEvent());
       return;
     }
@@ -41,12 +44,12 @@ class _FarmersState extends State<FarmersWidget> with AutomaticKeepAliveClientMi
   }
 
   _FarmersState() {
-    String walletUri = Globals().farmersUrl;
+    String farmersUri = Globals().farmersUrl;
 
     iaWebView = InAppWebView(
       initialUrlRequest: URLRequest(
           url: Uri.parse(
-              walletUri + '?cache_buster=' + new DateTime.now().millisecondsSinceEpoch.toString())),
+              farmersUri + '?cache_buster=' + new DateTime.now().millisecondsSinceEpoch.toString())),
       initialOptions: InAppWebViewGroupOptions(
           crossPlatform: InAppWebViewOptions(),
           android: AndroidInAppWebViewOptions(
@@ -74,7 +77,7 @@ class _FarmersState extends State<FarmersWidget> with AutomaticKeepAliveClientMi
         print("Wallet console: " + consoleMessage.message);
       },
     );
-    Events().onEvent(WalletBackEvent().runtimeType, _back);
+    Events().onEvent(FarmersBackEvent().runtimeType, _back);
   }
 
   @override
@@ -87,7 +90,7 @@ class _FarmersState extends State<FarmersWidget> with AutomaticKeepAliveClientMi
   }
 
   initKeys() async {
-    String seed = base64.encode(await getDerivedSeed(config.appId()));
+    String seed = base64.encode(await getDerivedSeed(walletConfig.appId()));
     String? doubleName = await getDoubleName();
 
     var jsStartApp = "window.init('$doubleName', '$seed')";
@@ -133,7 +136,7 @@ class _FarmersState extends State<FarmersWidget> with AutomaticKeepAliveClientMi
   Widget build(BuildContext context) {
     super.build(context);
     return LayoutDrawer(
-        titleText: 'Farmer migration',
+        titleText: 'Farming',
         content: Column(
           children: <Widget>[
             Expanded(

@@ -120,7 +120,7 @@ class _LayoutDrawerState extends State<LayoutDrawer> {
                     ),
                   ],
                 ),
-                title: Text('Farmer migration'),
+                title: Text('Farming'),
                 onTap: () {
                   Navigator.pop(context);
                   globals.tabController.animateTo(3);

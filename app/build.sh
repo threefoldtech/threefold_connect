@@ -4,7 +4,7 @@ gituser=$(git config user.name)
 gitbranch=$(git rev-parse --abbrev-ref HEAD)
 githash=$(git log --pretty=format:'%h' -n 1)
 logcurrent_time=$(date "+%H:%M:%S %d.%m.%Y")
-current_time=$(date "+%H.%M.%S-%d.%m.%Y")
+current_time=$(date "+%Y.%m.%d-%H.%M.%S")
 
 compileAndUpload() {
     if [[ $2 == "--$5" ]]
@@ -54,12 +54,12 @@ setConfigsAndBuild() {
 }
 
 msgTelegramAndUploadToAppServer () {
-    mv build/app/outputs/apk/release/app-release.apk "build/app/outputs/apk/release/$githash-TF-Connect-$1-$current_time.apk"
+    mv build/app/outputs/apk/release/app-release.apk "build/app/outputs/apk/release/$current_time-TF-Connect-$1-$githash.apk"
 
-    scp "build/app/outputs/apk/release/$githash-TF-Connect-$1-$current_time.apk" jimber@192.168.3.10:/opt/apps/threefold/$1/
+    scp "build/app/outputs/apk/release/$current_time-TF-Connect-$1-$githash.apk" jimber@192.168.3.10:/opt/apps/threefold/$1/
     
-    curl --http1.1 -s -X POST "https://api.telegram.org/bot868129294:AAEd-UDDSru9zGeGklzWL6mPO33NovuXYqo/sendMessage" -d parse_mode=markdown -d chat_id=-1001186043363 -d parse_mode=markdown -d text="Type: *$1* %0AGit user: *$gituser* %0AGit branch: *$gitbranch* %0AGit hash: *$githash* %0ATime: *$logcurrent_time* %0AMessage: *$2* %0AURL: *https://apps.staging.jimber.io/*"
-    curl --http1.1 -s -X POST "https://api.telegram.org/bot868129294:AAEd-UDDSru9zGeGklzWL6mPO33NovuXYqo/sendDocument" -F chat_id=-1001186043363 -F document="@build/app/outputs/apk/release/$githash-TF-Connect-$1-$current_time.apk"
+    curl --http1.1 -s -X POST "https://api.telegram.org/bot868129294:AAEd-UDDSru9zGeGklzWL6mPO33NovuXYqo/sendMessage" -d parse_mode=markdown -d chat_id=-1001186043363 -d parse_mode=markdown -d text="Type: *$1* %0AGit user: *$gituser* %0AGit branch: *$gitbranch* %0AGit hash: *$githash* %0ATime: *$logcurrent_time* %0AMessage: *$2* %0AURL: *https://apps.staging.jimber.io/threefold/$1/*"
+#    curl --http1.1 -s -X POST "https://api.telegram.org/bot868129294:AAEd-UDDSru9zGeGklzWL6mPO33NovuXYqo/sendDocument" -F chat_id=-1001186043363 -F document="@build/app/outputs/apk/release/$githash-TF-Connect-$1-$current_time.apk"
     
     paplay /usr/share/sounds/gnome/default/alerts/glass.ogg
 }

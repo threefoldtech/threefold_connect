@@ -30,7 +30,7 @@ PODS:
     - MTBBarcodeScanner
   - redirection (0.0.1):
     - Flutter
-  - shared_preferences (0.0.1):
+  - shared_preferences_ios (0.0.1):
     - Flutter
   - ShuftiPro (1.1.5)
   - shuftipro_sdk (1.1.4):
@@ -58,7 +58,7 @@ DEPENDENCIES:
   - permission_handler (from `.symlinks/plugins/permission_handler/ios`)
   - qr_code_scanner (from `.symlinks/plugins/qr_code_scanner/ios`)
   - redirection (from `.symlinks/plugins/redirection/ios`)
-  - shared_preferences (from `.symlinks/plugins/shared_preferences/ios`)
+  - shared_preferences_ios (from `.symlinks/plugins/shared_preferences_ios/ios`)
   - shuftipro_sdk (from `.symlinks/plugins/shuftipro_sdk/ios`)
   - uni_links (from `.symlinks/plugins/uni_links/ios`)
   - url_launcher_ios (from `.symlinks/plugins/url_launcher_ios/ios`)
@@ -96,8 +96,8 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/qr_code_scanner/ios"
   redirection:
     :path: ".symlinks/plugins/redirection/ios"
-  shared_preferences:
-    :path: ".symlinks/plugins/shared_preferences/ios"
+  shared_preferences_ios:
+    :path: ".symlinks/plugins/shared_preferences_ios/ios"
   shuftipro_sdk:
     :path: ".symlinks/plugins/shuftipro_sdk/ios"
   uni_links:
@@ -113,16 +113,16 @@ SPEC CHECKSUMS:
   flutter_inappwebview: bfd58618f49dc62f2676de690fc6dcda1d6c3721
   flutter_pkid: 7808bd0baee7580afc1cebebf2a6f3b290e190c5
   flutter_sodium: c84426b4de738514b5b66cfdeb8a06634e72fe0b
-  local_auth: 25938960984c3a7f6e3253e3f8d962fdd16852bd
+  local_auth: 1740f55d7af0a2e2a8684ce225fe79d8931e808c
   MTBBarcodeScanner: f453b33c4b7dfe545d8c6484ed744d55671788cb
   open_file: 02eb5cb6b21264bd3a696876f5afbfb7ca4f4b7d
   OrderedSet: aaeb196f7fef5a9edf55d89760da9176ad40b93c
   package_info: 873975fc26034f0b863a300ad47e7f1ac6c7ec62
-  path_provider_ios: 7d7ce634493af4477d156294792024ec3485acd5
+  path_provider_ios: 14f3d2fd28c4fdb42f44e0f751d12861c43cee02
   permission_handler: ccb20a9fad0ee9b1314a52b70b76b473c5f8dab0
   qr_code_scanner: bb67d64904c3b9658ada8c402e8b4d406d5d796e
   redirection: 86a0674fdc4d10643d0a2b45d2b73a9aba1363b8
-  shared_preferences: 5033afbb22d372e15aff8ff766df9021b845f273
+  shared_preferences_ios: 548a61f8053b9b8a49ac19c1ffbc8b92c50d68ad
   ShuftiPro: 8850ec667a807a772c6958c74499801bba76cdf9
   shuftipro_sdk: 6f1eef3a64faf9a54fdeee7dbcdf55ad97164657
   SwiftSocket: 6f4c9c63fbc5c1d61188936bb3c599fd546f40ae

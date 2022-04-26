@@ -13,7 +13,6 @@ import 'package:threebotlogin/events/go_home_event.dart';
 import 'package:threebotlogin/helpers/globals.dart';
 import 'package:threebotlogin/models/wallet_data.dart';
 import 'package:threebotlogin/screens/scan_screen.dart';
-import 'package:threebotlogin/services/3bot_service.dart';
 import 'package:threebotlogin/services/shared_preference_service.dart';
 import 'package:threebotlogin/widgets/layout_drawer.dart';
 
@@ -34,8 +33,8 @@ class _WalletState extends State<WalletWidget> with AutomaticKeepAliveClientMixi
   _back(WalletBackEvent event) async {
     Uri? url = await webView.getUrl();
 
-    String endsWith = config.appId() + '/';
-    if (url.toString().endsWith(endsWith)) {
+    String rootUrl = Globals().newWalletUrl;
+    if (url.toString() == rootUrl.toString()) {
       Events().emit(GoHomeEvent());
       return;
     }
@@ -99,8 +98,6 @@ class _WalletState extends State<WalletWidget> with AutomaticKeepAliveClientMixi
         ? "window.init('$doubleName', '$seed')"
         : "window.vueInstance.startWallet('$doubleName', '$seed', '$importedWallets', '$appWallets');";
 
-
-    print(jsStartApp);
     if (Globals().paymentRequest != null && !Globals().useNewWallet) {
       String paymentRequestString = Globals().paymentRequest.toString();
 
