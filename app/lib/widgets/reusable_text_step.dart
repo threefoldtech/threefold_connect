@@ -16,9 +16,6 @@ class ReuseableTextStep extends StatelessWidget {
       children: <Widget>[
         Text(
           titleText,
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-          ),
         ),
         Divider(
           height: 50,
@@ -52,20 +49,11 @@ class ReuseableTextStep extends StatelessWidget {
           ],
         ),
         Divider(
-          height: 50,
+          height: 5,
         ),
         Row(
           mainAxisAlignment: MainAxisAlignment.start,
           children: const <Widget>[
-            Icon(
-              Icons.warning,
-              color: Colors.orange,
-              size: 22.0,
-            ),
-            Text(
-              "This is needed to recover.",
-              style: TextStyle(fontSize: 13),
-            ),
           ],
         )
       ],
