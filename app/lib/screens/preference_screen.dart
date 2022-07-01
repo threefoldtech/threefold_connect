@@ -56,7 +56,6 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
 
   MaterialColor thiscolor = Colors.green;
 
-
   @override
   void initState() {
     super.initState();
@@ -328,7 +327,7 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
   void getUserValues() {
     getDoubleName().then((dn) {
       setState(() {
-        doubleName = dn!;
+        doubleName = dn!.substring(0, dn.length - 5);
       });
     });
     getPhrase().then((seedPhrase) {
