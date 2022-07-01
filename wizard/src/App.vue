@@ -61,8 +61,7 @@
           </header>
           <main>
             <p>
-              Access your ThreeFold Wallet and your ThreeFold Tokens (TFT). More
-              currencies are to be added in the future.
+              Access your ThreeFold Wallet and your ThreeFold Tokens (TFT).
             </p>
           </main>
         </v-carousel-item>
@@ -109,11 +108,11 @@
                   >
                   <template v-slot:label>
                     <div  :class="{'red--text':getStartedClicked && !acceptedTT, 'black--text':!getStartedClicked || !acceptedTT}" class="mr-3">
-                      I agree to Threefold’s <br><button
-                      style="text-decoration: underline; display:inline-block; margin-top: 1rem"
+                      I agree to ThreeFold’s<button
+                      style="text-decoration: underline; display:inline-block; margin-top: 2px"
                       @click.stop.prevent="showDisclaimer = true"
                     >
-                      Terms and conditions
+                      Terms and Conditions
                     </button>
                     </div>
                   </template>
