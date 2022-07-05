@@ -195,6 +195,11 @@ class _RecoverScreenState extends State<RecoverScreen> {
                     .toLowerCase()
                     .trim()
                     .replaceAll(new RegExp(r"\s+"), " ");
+
+                if(doubleNameValue.endsWith('.3bot')) {
+                  doubleNameValue  = doubleNameValue.replaceAll('.3bot', '');
+                }
+
                 String seedPhraseValue = seedPhraseController.text
                     .toLowerCase()
                     .trim()
