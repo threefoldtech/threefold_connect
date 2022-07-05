@@ -3,7 +3,7 @@ description: A decentralized login application
 
 publish_to: "none"
 
-version: 3.6.1+160
+version: 3.7.0+162
 
 environment:
   sdk: ">=2.12.0<3.0.0"
@@ -15,7 +15,7 @@ dependencies:
   country_picker:
     git:
       url: git@github.com:jimbertools/flutter-country-picker.git
-      ref: maing
+      ref: main
 
   yggdrasil_plugin:
     git:
