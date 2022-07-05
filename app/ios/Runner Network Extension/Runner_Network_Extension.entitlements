@@ -12,7 +12,7 @@
 	</array>
 	<key>com.apple.security.application-groups</key>
 	<array>
-		<string>group.org.jimber.threebotlogin.staging</string>
+		<string>group.org.jimber.threebot</string>
 	</array>
 </dict>
 </plist>
