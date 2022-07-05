@@ -42,6 +42,7 @@ class _MobileRegistrationScreenState extends State<MobileRegistrationScreen> {
   _State state = _State.DoubleName;
 
   bool isVisible = false;
+  bool didWriteSeed = false;
 
   String phraseConfirmationWords = '';
   String errorStepperText = '';
@@ -300,13 +301,14 @@ class _MobileRegistrationScreenState extends State<MobileRegistrationScreen> {
                       details.onStepCancel!();
                     },
                     child: Text(
-                      state == _State.DoubleName ? 'CANCEL' : 'PREVIOUS',
+                      state == _State.DoubleName ? 'CANCEL' :  'PREVIOUS',
                       style: TextStyle(color: Colors.white),
                     ),
                     color: Theme.of(context).accentColor,
                   ),
                   FlatButton(
-                    onPressed: () {
+                    disabledColor: Colors.grey,
+                    onPressed :state == _State.SeedPhrase && didWriteSeed == false ? null : () {
                       details.onStepContinue!();
                     },
                     child: Text(
@@ -339,7 +341,7 @@ class _MobileRegistrationScreenState extends State<MobileRegistrationScreen> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
                     Text(
-                      'Hi, please choose a ThreeFold Connect Id.',
+                      'Hi, please choose a ThreeFold Connect username.',
                       style: TextStyle(fontWeight: FontWeight.bold),
                     ),
                     Divider(
@@ -355,7 +357,7 @@ class _MobileRegistrationScreenState extends State<MobileRegistrationScreen> {
                         decoration: InputDecoration(
                           border: OutlineInputBorder(),
                           labelText: 'Name',
-                          suffixText: '.3bot',
+                          // suffixText: '.3bot',
                           suffixStyle: TextStyle(fontWeight: FontWeight.bold),
                         ),
                         controller: doubleNameController,
@@ -420,12 +422,25 @@ class _MobileRegistrationScreenState extends State<MobileRegistrationScreen> {
             content: Card(
               child: Padding(
                 padding: const EdgeInsets.all(16.0),
-                child: ReuseableTextStep(
-                  titleText:
-                      'Please write this seed phrase and your 3bot name on a piece of paper and keep it in a secure place.',
-                  extraText: _registrationData.phrase,
-                  errorStepperText: errorStepperText,
-                ),
+                child: Column(
+                  children: [
+                    ReuseableTextStep(
+                      titleText:
+                      'In order to ever retrieve your tokens in case of switching to a new device or app, you will have to enter your seedphrase in combination with your TF Connect username. \n\nPlease write this seedphrase and your username on a piece of paper and keep it in a secure place. Do not communicate this key to anyone. ThreeFold can not be held responsible in case of loss of this seedphrase.',
+                      extraText: _registrationData.phrase,
+                      errorStepperText: errorStepperText,
+                    ),
+                    CheckboxListTile(
+                      title: Text("I have written down my seedphrase and username", style: TextStyle(fontSize: 14 ),),
+                      value: didWriteSeed,
+                      onChanged: (newValue) {
+                        didWriteSeed = newValue!;
+                        setState(() {});
+                      },
+                      controlAffinity: ListTileControlAffinity.leading,  //  <-- leading Checkbox
+                    )
+                  ],
+                )
               ),
             ),
           ),

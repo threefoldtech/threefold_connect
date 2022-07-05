@@ -141,7 +141,7 @@ class _RecoverScreenState extends State<RecoverScreen> {
                   decoration: InputDecoration(
                     border: OutlineInputBorder(),
                     labelText: 'NAME',
-                    suffixText: '.3bot',
+                    // suffixText: '.3bot',
                     suffixStyle: TextStyle(fontWeight: FontWeight.bold),
                   ),
                   controller: doubleNameController,
