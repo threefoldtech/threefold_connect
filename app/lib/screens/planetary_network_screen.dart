@@ -85,16 +85,7 @@ class _PlanetaryNetworkScreenState extends State<PlanetaryNetworkScreen> {
               Padding(
                 padding: const EdgeInsets.only(top: 20, left: 40, right: 40),
                 child: Text(
-                    'A public peer-to-peer overlay network to connect everything on the planet. Connections are end-to-end'
-                    ' encrypted and take the shortest path.',
-                    style: const TextStyle(fontSize: 14)),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(top: 20, left: 40, right: 40),
-                child: Text(
-                    'Think of it as a Local Area Network (LAN) on a planetary scale, a "global peer-to-peer VPN"'
-                    ' that lives on top of other networks and looks for any path to connectivity. '
-                    'Strongly authenticated at the edge.',
+                    'The planetary network is an extra VPN (Virtual Private Network) on top of your existing internet connection. Everything still works the same, but you also gain access to all the extra services hosted exclusively on the planetary network.',
                     style: const TextStyle(fontSize: 14)),
               ),
               Padding(
@@ -191,7 +182,7 @@ class _PlanetaryNetworkScreenState extends State<PlanetaryNetworkScreen> {
     _isSwitched = false;
     _vpnTimeoutRunning = false;
     _statusMessage =
-    new Text('Not connected', style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold, fontSize: 16));
+        new Text('Not connected', style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold, fontSize: 16));
 
     setState(() {});
   }
