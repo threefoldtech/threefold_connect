@@ -15,7 +15,7 @@ dependencies:
   country_picker:
     git:
       url: git@github.com:jimbertools/flutter-country-picker.git
-      ref: maing
+      ref: main
 
   yggdrasil_plugin:
     git:
