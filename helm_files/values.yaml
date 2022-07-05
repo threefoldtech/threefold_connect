@@ -36,9 +36,9 @@ storage:
 
 claims:
   data:
-    name: threebotlogin-pvc
-    accessModes: ReadWriteOnce
-    storage: 700Mi
+    name: threebotlogin
+    accessModes: ReadWriteMany
+    storage: 2G
 
 
 acme:

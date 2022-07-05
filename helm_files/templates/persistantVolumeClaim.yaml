@@ -1,15 +1,12 @@
-#apiVersion: v1
-#kind: PersistentVolumeClaim
-#metadata:
-#  labels:
-#    app: {{ template "releaseName" . }}
-#  name: {{ .Values.claims.data.name }}
-#spec:
-#  storageClassName: {{ .Values.storage.className }}
-#  accessModes:
-#    - {{ .Values.claims.data.accessModes }}
-#  resources:
-#    requests:
-#      storage: {{ .Values.claims.data.storage }}
-#status: {}
-#
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ .Values.claims.data.name }}
+  namespace: jimber
+spec:
+  accessModes:
+  - {{ .Values.claims.data.accessModes }}
+  resources:
+    requests:
+      storage: {{ .Values.claims.data.storage }}
+  storageClassName: rook-cephfs
