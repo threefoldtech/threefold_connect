@@ -85,7 +85,7 @@ class _PlanetaryNetworkScreenState extends State<PlanetaryNetworkScreen> {
               Padding(
                 padding: const EdgeInsets.only(top: 20, left: 40, right: 40),
                 child: Text(
-                    'The planetary network is an extra VPN (Virtual Private Network) on top of your existing internet connection. Everything still works the same, but you also gain access to all the extra services hosted exclusively on the planetary network.',
+                    "Enable to connect to ThreeFold's secure network",
                     style: const TextStyle(fontSize: 14)),
               ),
               Padding(
