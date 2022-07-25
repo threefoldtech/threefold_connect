@@ -43,6 +43,12 @@ Future<Map<String, dynamic>?> readScopeAsObject(String? scopePermissions, Uint8L
     scope['derivedSeed'] = base64Encode(dSeed);
   }
 
+  if (scopePermissionsDecoded['derivedSeedName'] != null) {
+    String customizedName = 'named_' + scopePermissionsDecoded['derivedSeedName'];
+    Uint8List dSeed = await getDerivedSeed(customizedName);
+    scope['derivedSeedName'] = base64Encode(dSeed);
+  }
+
   if (scopePermissionsDecoded['digitalTwin'] == true) {
     scope['digitalTwin'] = 'OK';
   }

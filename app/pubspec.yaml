@@ -44,7 +44,7 @@ dependencies:
   cupertino_icons: ^1.0.4
   google_fonts: 2.2.0
   intl_phone_field: ^2.1.0
-  flagsmith: ^2.0.1+2
+  flagsmith: ^2.0.0
   cryptography: ^2.0.2
   flutter_inappwebview: ^5.3.2
   flutter_sodium: ^0.2.0

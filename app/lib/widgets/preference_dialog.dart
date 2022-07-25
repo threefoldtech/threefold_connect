@@ -48,28 +48,30 @@ class _PreferenceDialogState extends State<PreferenceDialog> {
 
   Future _startup() async {
     if (widget.scope != null) {
-      scopeAsMap = widget.scope!
-          .toJson(); // Scope we received from the application the users wants to log into.
+      scopeAsMap = widget.scope!.toJson(); // Scope we received from the application the users wants to log into.
 
-      String? previousScopePermissions = await getPreviousScopePermissions(
-          widget.appId!); // Scope from our history based on the appId.
+      String? previousScopePermissions =
+          await getPreviousScopePermissions(widget.appId!); // Scope from our history based on the appId.
       Map<String, dynamic> previousScopePermissionsObject;
 
       if (previousScopePermissions != null) {
         previousScopePermissionsObject = jsonDecode(previousScopePermissions);
       } else {
         previousScopePermissionsObject = widget.scope!.toJson();
-        await savePreviousScopePermissions(
-            widget.appId!, jsonEncode(previousScopePermissionsObject));
+        await savePreviousScopePermissions(widget.appId!, jsonEncode(previousScopePermissionsObject));
       }
 
       if (!scopeIsEqual(scopeAsMap, previousScopePermissionsObject)) {
         previousScopePermissionsObject = widget.scope!.toJson();
-        await savePreviousScopePermissions(
-            widget.appId!, jsonEncode(previousScopePermissionsObject));
+        await savePreviousScopePermissions(widget.appId!, jsonEncode(previousScopePermissionsObject));
       }
 
       previousSelectedScope = previousScopePermissionsObject;
+
+      // Always refresh scopelist when derivedSeedName is given
+      if (scopeAsMap['derivedSeedName'] != null) {
+        await savePreviousScopePermissions(widget.appId!, jsonEncode(scopeAsMap));
+      }
     } else {
       await savePreviousScopePermissions(widget.appId!, '{}');
     }
@@ -148,8 +150,77 @@ class _PreferenceDialogState extends State<PreferenceDialog> {
                   String scopeItem = keyList[index];
 
                   if (scopeAsMap[scopeItem] != null) {
-                    bool mandatory = scopeAsMap[scopeItem];
+                    // Needs to be dynamic (no more bool) since we need to support String input too
+                    dynamic mandatory = scopeAsMap[scopeItem];
+
                     switch (scopeItem) {
+                      case "derivedSeedName":
+                        return Container(
+                            padding: EdgeInsets.only(bottom: 10),
+                            decoration: BoxDecoration(
+                              border: Border(
+                                  bottom: BorderSide(
+                                color: Colors.grey,
+                                width: 0.5,
+                              )),
+                            ),
+                            child: Column(
+                              children: [
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Padding(
+                                      padding: EdgeInsets.all(20),
+                                      child: Icon(
+                                        Icons.warning,
+                                        size: 24,
+                                        color: Colors.red,
+                                      ),
+                                    ),
+                                    Padding(
+                                      padding: EdgeInsets.all(20),
+                                      child: Text(
+                                        "NAMED DERIVED SEED",
+                                        style:
+                                            TextStyle(fontWeight: FontWeight.bold, color: Colors.black, fontSize: 16),
+                                      ),
+                                    ),
+                                    Padding(
+                                      padding: EdgeInsets.all(20),
+                                      child: Icon(
+                                        Icons.warning,
+                                        size: 24,
+                                        color: Colors.red,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Padding(padding: EdgeInsets.only(left: 20, right: 10)),
+                                    Flexible(
+                                        child: Text(
+                                      '"' + mandatory + '"',
+                                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+                                    ))
+                                  ],
+                                ),
+                                SizedBox(height: 10),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Padding(padding: EdgeInsets.only(left: 20, right: 10)),
+                                    Flexible(
+                                        child: Text(
+                                      'Please make sure this third party app is safe! If not, please cancel this request!',
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(fontWeight: FontWeight.bold, color: Colors.red, fontSize: 16),
+                                    ))
+                                  ],
+                                )
+                              ],
+                            ));
                       case "doubleName":
                         return FutureBuilder(
                           future: getDoubleName(),
@@ -174,8 +245,7 @@ class _PreferenceDialogState extends State<PreferenceDialog> {
                                         }),
                                   title: Text(
                                     "${scopeItem.toUpperCase()}" + (mandatory ? " *" : ""),
-                                    style:
-                                        TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
+                                    style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
                                   ),
                                 ),
                               );
@@ -210,8 +280,7 @@ class _PreferenceDialogState extends State<PreferenceDialog> {
                                         }),
                                   title: Text(
                                     "${scopeItem.toUpperCase()}" + (mandatory ? " *" : ""),
-                                    style:
-                                        TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
+                                    style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
                                   ),
                                 ),
                               );
@@ -263,8 +332,7 @@ class _PreferenceDialogState extends State<PreferenceDialog> {
                                         }),
                                   title: Text(
                                     "PHONE NUMBER" + (mandatory ? " *" : ""),
-                                    style:
-                                        TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
+                                    style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
                                   ),
                                 ),
                                 decoration: BoxDecoration(
@@ -305,8 +373,7 @@ class _PreferenceDialogState extends State<PreferenceDialog> {
                                         }),
                                   title: Text(
                                     "${scopeItem.toUpperCase()}" + (mandatory ? " *" : ""),
-                                    style:
-                                        TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
+                                    style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
                                   ),
                                 ),
                               );
@@ -341,8 +408,7 @@ class _PreferenceDialogState extends State<PreferenceDialog> {
                                         }),
                                   title: Text(
                                     "NAME (IDENTITY)" + (mandatory ? " *" : ""),
-                                    style:
-                                        TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
+                                    style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
                                   ),
                                 ),
                               );
@@ -377,8 +443,7 @@ class _PreferenceDialogState extends State<PreferenceDialog> {
                                         }),
                                   title: Text(
                                     "DATE OF BIRTH (IDENTITY)" + (mandatory ? " *" : ""),
-                                    style:
-                                        TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
+                                    style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
                                   ),
                                 ),
                               );
@@ -413,8 +478,7 @@ class _PreferenceDialogState extends State<PreferenceDialog> {
                                         }),
                                   title: Text(
                                     "GENDER (IDENTITY)" + (mandatory ? " *" : ""),
-                                    style:
-                                        TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
+                                    style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
                                   ),
                                 ),
                               );
@@ -449,8 +513,7 @@ class _PreferenceDialogState extends State<PreferenceDialog> {
                                         }),
                                   title: Text(
                                     "DOCUMENT META DATA (IDENTITY)" + (mandatory ? " *" : ""),
-                                    style:
-                                        TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
+                                    style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
                                   ),
                                 ),
                               );
@@ -485,8 +548,7 @@ class _PreferenceDialogState extends State<PreferenceDialog> {
                                         }),
                                   title: Text(
                                     "COUNTRY (IDENTITY)" + (mandatory ? " *" : ""),
-                                    style:
-                                        TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
+                                    style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
                                   ),
                                 ),
                               );
@@ -517,12 +579,9 @@ class _PreferenceDialogState extends State<PreferenceDialog> {
                                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                           children: [
                                             Text(
-                                              "${scopeItem.toUpperCase()}" +
-                                                  (mandatory ? " *" : ""),
+                                              "${scopeItem.toUpperCase()}" + (mandatory ? " *" : ""),
                                               style: TextStyle(
-                                                  fontWeight: FontWeight.bold,
-                                                  color: Colors.black,
-                                                  fontSize: 16),
+                                                  fontWeight: FontWeight.bold, color: Colors.black, fontSize: 16),
                                             ),
                                             Icon(
                                               Icons.warning,
@@ -570,10 +629,8 @@ class _PreferenceDialogState extends State<PreferenceDialog> {
                                                   toggleScope(scopeItem, value);
                                                 }),
                                           title: Text(
-                                            "${scopeItem.toUpperCase()}" +
-                                                (mandatory ? " *" : ""),
-                                            style: TextStyle(
-                                                fontWeight: FontWeight.bold, color: Colors.black),
+                                            "${scopeItem.toUpperCase()}" + (mandatory ? " *" : ""),
+                                            style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
                                           ),
                                         ))
                                       ],
