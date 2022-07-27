@@ -68,8 +68,11 @@ class _PreferenceDialogState extends State<PreferenceDialog> {
 
       previousSelectedScope = previousScopePermissionsObject;
 
-      // Always refresh scopelist when derivedSeedName is given
-      if (scopeAsMap['derivedSeedName'] != null) {
+      // Always refresh scopelist when derivedSeedName is given and different content
+      if (scopeAsMap['derivedSeedName'] != null &&
+          previousScopePermissionsObject['derivedSeedName'] != null &&
+          scopeAsMap['derivedSeedName'] != previousScopePermissionsObject['derivedSeedName']) {
+
         await savePreviousScopePermissions(widget.appId!, jsonEncode(scopeAsMap));
       }
     } else {
@@ -209,10 +212,11 @@ class _PreferenceDialogState extends State<PreferenceDialog> {
                                       shrinkWrap: true,
                                       itemCount: seedNames.length,
                                       itemBuilder: (BuildContext context, int index) {
-                                        print(seedNames);
                                         return Center(
-                                              child: Text("- " + seedNames[index] + ' ', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),)
-                                        );
+                                            child: Text(
+                                          "- " + seedNames[index] + ' ',
+                                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                                        ));
                                       }),
                                 ),
                                 SizedBox(height: 10),
@@ -704,7 +708,7 @@ class _PreferenceDialogState extends State<PreferenceDialog> {
 }
 
 List<dynamic> parseToArrayIfPossible(dynamic dataString) {
-  if(dataString is List<dynamic>) {
+  if (dataString is List<dynamic>) {
     return dataString;
   }
 
