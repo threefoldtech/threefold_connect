@@ -4,6 +4,7 @@ import 'package:flutter_sodium/flutter_sodium.dart';
 import 'package:threebotlogin/services/3bot_service.dart';
 import 'package:threebotlogin/services/crypto_service.dart';
 import 'package:threebotlogin/services/shared_preference_service.dart';
+import 'package:threebotlogin/widgets/preference_dialog.dart';
 
 int parseImageId(String imageId) {
   if (imageId == '') {
@@ -44,9 +45,19 @@ Future<Map<String, dynamic>?> readScopeAsObject(String? scopePermissions, Uint8L
   }
 
   if (scopePermissionsDecoded['derivedSeedName'] != null) {
-    String customizedName = 'named_' + scopePermissionsDecoded['derivedSeedName'];
-    Uint8List dSeed = await getDerivedSeed(customizedName);
-    scope['derivedSeedName'] = base64Encode(dSeed);
+    List<dynamic> seedNames = parseToArrayIfPossible(scopePermissionsDecoded['derivedSeedName']);
+    print(seedNames);
+
+    Map<String, String> derivedSeeds = {};
+
+    await Future.forEach(seedNames, (el) async {
+      String customizedName = 'named_' + el.toString();
+      Uint8List dSeed = await getDerivedSeed(customizedName);
+
+      derivedSeeds[el.toString()] = base64Encode(dSeed);
+    });
+
+    scope['derivedSeedName'] = derivedSeeds;
   }
 
   if (scopePermissionsDecoded['digitalTwin'] == true) {
@@ -59,10 +70,7 @@ Future<Map<String, dynamic>?> readScopeAsObject(String? scopePermissions, Uint8L
     String identityName = identityDetails['identityName'];
     String sIdentityName = identityDetails['signedIdentityNameIdentifier'];
 
-    scope['identityName'] = {
-      'identityName': identityName,
-      'signedIdentityNameIdentifier': sIdentityName
-    };
+    scope['identityName'] = {'identityName': identityName, 'signedIdentityNameIdentifier': sIdentityName};
   }
 
   if (scopePermissionsDecoded['identityDOB'] == true) {
@@ -116,10 +124,7 @@ Future<Map<String, dynamic>?> readScopeAsObject(String? scopePermissions, Uint8L
     String identityGender = identityDetails['identityGender'];
     String sIdentityGender = identityDetails['signedIdentityGender'];
 
-    scope['identityGender'] = {
-      'identityGender': identityGender,
-      'signedIdentityGender': sIdentityGender
-    };
+    scope['identityGender'] = {'identityGender': identityGender, 'signedIdentityGender': sIdentityGender};
   }
 
   if (scopePermissionsDecoded['walletAddress'] == true) {
@@ -129,7 +134,7 @@ Future<Map<String, dynamic>?> readScopeAsObject(String? scopePermissions, Uint8L
   return scope;
 }
 
-Future<Map<String, String>>  encryptLoginData (String publicKey, Map<String, dynamic>? scopeData) async {
+Future<Map<String, String>> encryptLoginData(String publicKey, Map<String, dynamic>? scopeData) async {
   Uint8List sk = await getPrivateKey();
   Uint8List pk = base64.decode(publicKey);
 

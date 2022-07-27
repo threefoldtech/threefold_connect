@@ -155,6 +155,8 @@ class _PreferenceDialogState extends State<PreferenceDialog> {
 
                     switch (scopeItem) {
                       case "derivedSeedName":
+                        List<dynamic> seedNames = parseToArrayIfPossible(mandatory);
+
                         return Container(
                             padding: EdgeInsets.only(bottom: 10),
                             decoration: BoxDecoration(
@@ -165,6 +167,7 @@ class _PreferenceDialogState extends State<PreferenceDialog> {
                               )),
                             ),
                             child: Column(
+                              mainAxisSize: MainAxisSize.min,
                               children: [
                                 Row(
                                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -199,12 +202,18 @@ class _PreferenceDialogState extends State<PreferenceDialog> {
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
                                     Padding(padding: EdgeInsets.only(left: 20, right: 10)),
-                                    Flexible(
-                                        child: Text(
-                                      '"' + mandatory + '"',
-                                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
-                                    ))
                                   ],
+                                ),
+                                Flexible(
+                                  child: ListView.builder(
+                                      shrinkWrap: true,
+                                      itemCount: seedNames.length,
+                                      itemBuilder: (BuildContext context, int index) {
+                                        print(seedNames);
+                                        return Center(
+                                              child: Text("- " + seedNames[index] + ' ', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),)
+                                        );
+                                      }),
                                 ),
                                 SizedBox(height: 10),
                                 Row(
@@ -692,4 +701,12 @@ class _PreferenceDialogState extends State<PreferenceDialog> {
       ),
     );
   }
+}
+
+List<dynamic> parseToArrayIfPossible(dynamic dataString) {
+  if(dataString is List<dynamic>) {
+    return dataString;
+  }
+
+  return [dataString];
 }
