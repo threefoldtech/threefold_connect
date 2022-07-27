@@ -46,8 +46,6 @@ Future<Map<String, dynamic>?> readScopeAsObject(String? scopePermissions, Uint8L
 
   if (scopePermissionsDecoded['derivedSeedName'] != null) {
     List<dynamic> seedNames = parseToArrayIfPossible(scopePermissionsDecoded['derivedSeedName']);
-    print(seedNames);
-
     Map<String, String> derivedSeeds = {};
 
     await Future.forEach(seedNames, (el) async {
@@ -67,8 +65,8 @@ Future<Map<String, dynamic>?> readScopeAsObject(String? scopePermissions, Uint8L
   if (scopePermissionsDecoded['identityName'] == true) {
     Map<String, dynamic> identityDetails = await getIdentity();
 
-    String identityName = identityDetails['identityName'];
-    String sIdentityName = identityDetails['signedIdentityNameIdentifier'];
+    String? identityName = identityDetails['identityName'];
+    String? sIdentityName = identityDetails['signedIdentityNameIdentifier'];
 
     scope['identityName'] = {'identityName': identityName, 'signedIdentityNameIdentifier': sIdentityName};
   }
@@ -76,8 +74,8 @@ Future<Map<String, dynamic>?> readScopeAsObject(String? scopePermissions, Uint8L
   if (scopePermissionsDecoded['identityDOB'] == true) {
     Map<String, dynamic> identityDetails = await getIdentity();
 
-    String identityDOB = identityDetails['identityDOB'];
-    String sIdentityDOB = identityDetails['signedIdentityDOBIdentifier'];
+    String? identityDOB = identityDetails['identityDOB'];
+    String? sIdentityDOB = identityDetails['signedIdentityDOBIdentifier'];
 
     scope['identityDOB'] = {'identityDOB': identityDOB, 'signedIdentityDOB': sIdentityDOB};
   }
@@ -85,8 +83,8 @@ Future<Map<String, dynamic>?> readScopeAsObject(String? scopePermissions, Uint8L
   if (scopePermissionsDecoded['identityCountry'] == true) {
     Map<String, dynamic> identityDetails = await getIdentity();
 
-    String identityCountry = identityDetails['identityCountry'];
-    String sIdentityCountryIdentifier = identityDetails['signedIdentityCountryIdentifier'];
+    String?  identityCountry = identityDetails['identityCountry'];
+    String? sIdentityCountryIdentifier = identityDetails['signedIdentityCountryIdentifier'];
 
     scope['identityCountry'] = {
       'identityCountry': identityCountry,
@@ -97,8 +95,8 @@ Future<Map<String, dynamic>?> readScopeAsObject(String? scopePermissions, Uint8L
   if (scopePermissionsDecoded['identityCountry'] == true) {
     Map<String, dynamic> identityDetails = await getIdentity();
 
-    String identityCountry = identityDetails['identityCountry'];
-    String sIdentityCountryIdentifier = identityDetails['signedIdentityCountryIdentifier'];
+    String? identityCountry = identityDetails['identityCountry'];
+    String? sIdentityCountryIdentifier = identityDetails['signedIdentityCountryIdentifier'];
 
     scope['identityCountry'] = {
       'identityCountry': identityCountry,
@@ -109,8 +107,8 @@ Future<Map<String, dynamic>?> readScopeAsObject(String? scopePermissions, Uint8L
   if (scopePermissionsDecoded['identityDocumentMeta'] == true) {
     Map<String, dynamic> identityDetails = await getIdentity();
 
-    String identityDocumentMeta = identityDetails['identityDocumentMeta'];
-    String sIdentityDocumentMeta = identityDetails['signedIdentityCountryIdentifier'];
+    String? identityDocumentMeta = identityDetails['identityDocumentMeta'];
+    String? sIdentityDocumentMeta = identityDetails['signedIdentityCountryIdentifier'];
 
     scope['identityDocumentMeta'] = {
       'identityDocumentMeta': identityDocumentMeta,
@@ -121,8 +119,8 @@ Future<Map<String, dynamic>?> readScopeAsObject(String? scopePermissions, Uint8L
   if (scopePermissionsDecoded['identityGender'] == true) {
     Map<String, dynamic> identityDetails = await getIdentity();
 
-    String identityGender = identityDetails['identityGender'];
-    String sIdentityGender = identityDetails['signedIdentityGender'];
+    String? identityGender = identityDetails['identityGender'];
+    String? sIdentityGender = identityDetails['signedIdentityGender'];
 
     scope['identityGender'] = {'identityGender': identityGender, 'signedIdentityGender': sIdentityGender};
   }
