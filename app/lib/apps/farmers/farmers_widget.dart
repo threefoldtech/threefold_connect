@@ -51,7 +51,8 @@ class _FarmersState extends State<FarmersWidget> with AutomaticKeepAliveClientMi
           url: Uri.parse(
               farmersUri + '?cache_buster=' + new DateTime.now().millisecondsSinceEpoch.toString())),
       initialOptions: InAppWebViewGroupOptions(
-          crossPlatform: InAppWebViewOptions(),
+          crossPlatform: InAppWebViewOptions(
+              cacheEnabled: Globals().isCacheClearedFarmer, clearCache: !Globals().isCacheClearedFarmer),
           android: AndroidInAppWebViewOptions(
               supportMultipleWindows: true, thirdPartyCookiesEnabled: true, useHybridComposition: true),
           ios: IOSInAppWebViewOptions()),
@@ -77,6 +78,8 @@ class _FarmersState extends State<FarmersWidget> with AutomaticKeepAliveClientMi
         print("Wallet console: " + consoleMessage.message);
       },
     );
+
+    Globals().isCacheClearedFarmer = true;
     Events().onEvent(FarmersBackEvent().runtimeType, _back);
   }
 

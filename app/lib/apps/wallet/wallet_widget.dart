@@ -50,7 +50,10 @@ class _WalletState extends State<WalletWidget> with AutomaticKeepAliveClientMixi
           url: Uri.parse(
               walletUri + '?cache_buster=' + new DateTime.now().millisecondsSinceEpoch.toString())),
       initialOptions: InAppWebViewGroupOptions(
-          crossPlatform: InAppWebViewOptions(),
+          crossPlatform: InAppWebViewOptions(
+            cacheEnabled: Globals().isCacheClearedWallet,
+            clearCache: !Globals().isCacheClearedWallet
+          ),
           android: AndroidInAppWebViewOptions(supportMultipleWindows: true, thirdPartyCookiesEnabled: true, useHybridComposition: true),
           ios: IOSInAppWebViewOptions()),
       onWebViewCreated: (InAppWebViewController controller) {
@@ -75,6 +78,9 @@ class _WalletState extends State<WalletWidget> with AutomaticKeepAliveClientMixi
         print("Wallet console: " + consoleMessage.message);
       },
     );
+
+    Globals().isCacheClearedWallet = true;
+
     Events().onEvent(WalletBackEvent().runtimeType, _back);
   }
 

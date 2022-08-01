@@ -57,6 +57,9 @@ class Globals {
   bool maintenance = false;
   bool phoneVerification = false;
 
+  bool isCacheClearedWallet = false;
+  bool isCacheClearedFarmer = false;
+
   VpnState vpnState = new VpnState();
 
   int smsSentOn = 0;
