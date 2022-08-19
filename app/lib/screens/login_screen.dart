@@ -327,12 +327,12 @@ class _LoginScreenState extends State<LoginScreen> with BlockAndRunMixin {
           state, encryptedScopeData, selectedImageId, randomRoom, widget.loginData.appId!);
     }
 
+    addDigitalTwinToBackend(derivedSeed, widget.loginData.appId!);
+
     // If the image is wrong, quit here and don't add the digital twin to the table
     if (selectedImageId != correctImage) {
       return;
     }
-
-    addDigitalTwinToBackend(derivedSeed, widget.loginData.appId!);
 
     if (Navigator.canPop(context)) {
       Navigator.pop(context, true);
