@@ -24,19 +24,19 @@
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-                <data android:scheme="threebot-staging" android:host="register" />
+                <data android:scheme="threebot-local" android:host="register" />
             </intent-filter>
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-                <data android:scheme="threebot-staging" android:host="login" />
+                <data android:scheme="threebot-local" android:host="login" />
             </intent-filter>
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-                <data android:scheme="threebot-staging" android:host="sign" />
+                <data android:scheme="threebot-local" android:host="sign" />
             </intent-filter>
         </activity>
         <meta-data android:name="flutterEmbedding" android:value="2" />
