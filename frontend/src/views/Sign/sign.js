@@ -2,6 +2,7 @@ import {
   mapActions,
   mapGetters
 } from 'vuex'
+import config from '../public/config'
 
 export default {
   name: 'initial',
@@ -116,7 +117,7 @@ export default {
       })
 
       if (this.isMobile) {
-        var url = `threebot://sign/?state=${encodeURIComponent(this._state)}&randomRoom=${this.randomRoom}`
+        var url = `${config.deeplink}sign/?state=${encodeURIComponent(this._state)}&randomRoom=${this.randomRoom}`
         if (this.appId) url += `&appId=${encodeURIComponent(this.appId)}`
         if (dataHash) url += `&dataHash=${encodeURIComponent(this.dataUrlHash)}`
         if (dataUrl) url += `&dataUrl=${encodeURIComponent(this.dataUrl)}`

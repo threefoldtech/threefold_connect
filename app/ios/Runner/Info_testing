@@ -29,7 +29,7 @@
 			<string>org.jimber.threebot</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>threebot-staging</string>
+				<string>threebot-testing</string>
 			</array>
 		</dict>
 	</array>
