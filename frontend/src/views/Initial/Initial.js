@@ -4,6 +4,8 @@ import {
 } from 'vuex'
 const cookies = require('vue-cookies')
 
+import config from '../public/config'
+
 export default {
   name: 'initial',
   components: {},
@@ -136,7 +138,7 @@ export default {
       })
       this.setRandomRoom(this.randomRoom)
 
-      var url = `threebot://login?state=${encodeURIComponent(this._state)}&randomRoom=${this.randomRoom}`
+      var url = `${config.deeplink}login?state=${encodeURIComponent(this._state)}&randomRoom=${this.randomRoom}`
       if (this.scope) url += `&scope=${encodeURIComponent(this.scope)}`
       if (this.appId) url += `&appId=${encodeURIComponent(this.appId)}`
       if (this.appPublicKey) url += `&appPublicKey=${encodeURIComponent(this.appPublicKey)}`
@@ -155,7 +157,7 @@ export default {
         firstTime: false
       })
       if (this.isMobile) {
-        var url = `threebot://login/?state=${encodeURIComponent(this._state)}`
+        var url = `${config.deeplink}login/?state=${encodeURIComponent(this._state)}`
         if (this.scope) url += `&scope=${encodeURIComponent(this.scope)}`
         if (this.appId) url += `&appId=${encodeURIComponent(this.appId)}`
         if (this.appPublicKey) url += `&appPublicKey=${encodeURIComponent(this.appPublicKey)}`
