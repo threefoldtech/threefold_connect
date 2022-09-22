@@ -2,8 +2,7 @@ import {
   mapActions,
   mapGetters
 } from 'vuex'
-import config from '../public/config'
-
+import config from '../../../public/config'
 export default {
   name: 'initial',
   components: {},

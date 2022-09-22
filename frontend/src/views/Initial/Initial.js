@@ -4,7 +4,7 @@ import {
 } from 'vuex'
 const cookies = require('vue-cookies')
 
-import config from '../public/config'
+import config from '../../../public/config'
 
 export default {
   name: 'initial',
@@ -71,9 +71,9 @@ export default {
       this.checkNameAvailability()
       setInterval(() => {
         console.log("Checking for availability and if username is set.")
-        if(this.$route.query.username 
-          && !nameCheckStatus.checking 
-          && nameCheckStatus.checked 
+        if(this.$route.query.username
+          && !nameCheckStatus.checking
+          && nameCheckStatus.checked
           && !nameCheckStatus.available) {
             console.log("Lets automaticly continue because we have username in our query parameter.")
             login();

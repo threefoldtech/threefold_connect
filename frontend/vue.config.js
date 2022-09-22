@@ -1,6 +1,7 @@
 // var fs = require('fs')
 
 module.exports = {
+  parallel: false,
   devServer: {
     // https: {
     //   key: process.env.NODE_ENV !== 'production' ? fs.readFileSync(process.env.VUE_APP_CERTS_LOCATION_KEY || '/certificates/key.pem') : '', // eslint-disable-line

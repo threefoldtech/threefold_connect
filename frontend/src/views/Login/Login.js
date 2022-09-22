@@ -1,5 +1,5 @@
 import { mapGetters, mapActions } from 'vuex'
-import config from '../public/config'
+import config from '../../../public/config'
 
 export default {
   name: 'login',
