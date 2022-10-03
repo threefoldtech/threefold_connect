@@ -1,4 +1,5 @@
 import { mapGetters, mapActions } from 'vuex'
+import config from '../../../public/config'
 
 export default {
   name: 'login',
@@ -46,7 +47,7 @@ export default {
     },
     openApp () {
       if (this.isMobile) {
-        var url = `threebot://login/?state=${encodeURIComponent(this._state)}`
+        var url = `${config.deeplink}login/?state=${encodeURIComponent(this._state)}`
         if (this.scope) url += `&scope=${encodeURIComponent(this.scope)}`
         if (this.appId) url += `&appId=${encodeURIComponent(this.appId)}`
         if (this.appPublicKey) url += `&appPublicKey=${encodeURIComponent(this.appPublicKey)}`

@@ -34,6 +34,10 @@ It is possible to have a a planetary network IPv6 address. Here you can enable t
 
 When you are using the secure 2FA authentication, some third party apps require certain information (eg. phone number). In this tab you can verify your email, phone number and identity to provide this data to the third party application. This allows you total granular control over which data you choose to share or not share.
 
+## New codebase
+
+In June 2022, a new codebase has been written for this project. It is built on turborepository. This codebase is still in development and not ready yet, you can find this under v2 branch.
+
 ## Local development
 
 ### External repositories

@@ -1,4 +1,5 @@
 import { mapActions, mapGetters } from 'vuex'
+import config from '../../../public/config'
 
 export default {
   name: 'verify-sms',
@@ -12,7 +13,7 @@ export default {
   },
   computed: {
     ...mapGetters([
-      'smsVerificationStatus',
+      'smsVerificationStatus'
     ])
   },
   mounted () {
@@ -33,7 +34,7 @@ export default {
     ]),
     openApp () {
       if (this.isMobile) {
-        var url = `threebot://login/?state=${encodeURIComponent(this.state)}`
+        var url = `${config.deeplink}login/?state=${encodeURIComponent(this.state)}`
         if (this.scope) url += `&scope=${encodeURIComponent(this.scope)}`
         if (this.appId) url += `&appId=${encodeURIComponent(this.appId)}`
         if (this.appPublicKey) url += `&appPublicKey=${encodeURIComponent(this.appPublicKey)}`
