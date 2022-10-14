@@ -356,7 +356,7 @@ Future openSign(BuildContext ctx, Sign signData, BackendConnection backendConnec
     ctx,
     MaterialPageRoute(
       builder: (context) => AuthenticationScreen(
-          correctPin: pin!, userMessage: "sign your attempt"),
+          correctPin: pin!, userMessage: "Please enter your PIN code"),
     ),
   );
 
@@ -399,7 +399,7 @@ Future openLogin(BuildContext ctx, Login loginData, BackendConnection backendCon
     ctx,
     MaterialPageRoute(
       builder: (context) => AuthenticationScreen(
-          correctPin: pin!, userMessage: "Sign your attempt.", loginData: loginData),
+          correctPin: pin!, userMessage: "Please enter your PIN code.", loginData: loginData),
     ),
   );
 

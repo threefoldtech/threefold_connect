@@ -79,7 +79,7 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
         MaterialPageRoute(
           builder: (context) => AuthenticationScreen(
             correctPin: pin!,
-            userMessage: 'Enter your pincode',
+            userMessage: 'Please enter your PIN code',
           ),
         ));
   }
@@ -115,7 +115,7 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
                         child: Icon(Icons.visibility),
                       ),
                       leading: Icon(Icons.vpn_key),
-                      title: Text("Show Phrase"),
+                      title: Text("Show phrase"),
                       onTap: () async {
                         _showPhrase();
                       },
@@ -246,7 +246,7 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
         image: Icons.error,
         title: "Are you sure?",
         description:
-            "If you confirm, your account will be removed from this device. You can always recover your account with your doublename, email and phrase.",
+            "If you confirm, your account will be removed from this device. You can always recover your account with your username and phrase.",
         actions: <Widget>[
           FlatButton(
             child: new Text("Cancel"),
@@ -353,7 +353,7 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
         MaterialPageRoute(
           builder: (context) => AuthenticationScreen(
             correctPin: pin!,
-            userMessage: "show your phrase.",
+            userMessage: "Please enter your PIN code",
           ),
         ));
 
@@ -390,7 +390,7 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
       MaterialPageRoute(
         builder: (context) => AuthenticationScreen(
           correctPin: pin!,
-          userMessage: "toggle " + biometricDeviceName.toString() + ".",
+          userMessage: "Please enter your PIN code",
         ),
       ),
     );
@@ -414,7 +414,7 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
         MaterialPageRoute(
           builder: (context) => AuthenticationScreen(
             correctPin: pin,
-            userMessage: "change your pincode.",
+            userMessage: "Please enter your PIN code",
           ),
         ),
       );

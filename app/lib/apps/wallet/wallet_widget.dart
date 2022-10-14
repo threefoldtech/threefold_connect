@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -13,6 +14,7 @@ import 'package:threebotlogin/events/go_home_event.dart';
 import 'package:threebotlogin/helpers/globals.dart';
 import 'package:threebotlogin/models/wallet_data.dart';
 import 'package:threebotlogin/screens/scan_screen.dart';
+import 'package:threebotlogin/services/crypto_service.dart';
 import 'package:threebotlogin/services/shared_preference_service.dart';
 import 'package:threebotlogin/widgets/layout_drawer.dart';
 
@@ -135,6 +137,22 @@ class _WalletState extends State<WalletWidget> with AutomaticKeepAliveClientMixi
     webView.addJavaScriptHandler(handlerName: "SCAN_QR", callback: scanQrCode);
     webView.addJavaScriptHandler(handlerName: "VUE_INITIALIZED", callback: vueInitialized);
     webView.addJavaScriptHandler(handlerName: "SAVE_WALLETS", callback: saveWalletCallback);
+    webView.addJavaScriptHandler(handlerName: "SIGNING", callback: signCallback);
+  }
+
+  signCallback(List<dynamic> params) async {
+    String data = params[0];
+
+    try {
+      Uint8List sk = await getPrivateKey();
+      String signedData = await signData(data, sk);
+      return signedData;
+    }
+
+    catch(e) {
+      print(e);
+      return '';
+    }
   }
 
   saveWalletCallback(List<dynamic> params) async {

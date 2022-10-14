@@ -209,7 +209,7 @@ class AuthenticationScreenState extends State<AuthenticationScreen> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: <Widget>[
             Container(
-              child: Text("Please authenticate to " + widget.userMessage),
+              child: Text(widget.userMessage),
               padding: const EdgeInsets.only(bottom: 50),
             ),
             Container(
