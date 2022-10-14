@@ -53,7 +53,7 @@ void handleLoginUniLink(Uri link, BuildContext context) async {
     context,
     MaterialPageRoute(
       builder: (context) => AuthenticationScreen(
-          correctPin: pin!, userMessage: "sign your attempt."),
+          correctPin: pin!, userMessage: "Please enter your PIN code"),
     ),
   );
 
@@ -123,7 +123,7 @@ Future<void> handleSignUniLink(Uri link, BuildContext context) async {
     context,
     MaterialPageRoute(
       builder: (context) => AuthenticationScreen(
-          correctPin: pin!, userMessage: "Sign your attempt."),
+          correctPin: pin!, userMessage: "Please enter your PIN code"),
     ),
   );
 

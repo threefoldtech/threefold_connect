@@ -61,7 +61,7 @@ class _HomeScreenState extends State<HomeScreen>
       MaterialPageRoute(
         builder: (context) => AuthenticationScreen(
           correctPin: pin!,
-          userMessage: "access the wallet.",
+          userMessage: "Please enter your PIN code",
         ),
       ),
     );

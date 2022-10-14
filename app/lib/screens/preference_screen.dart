@@ -79,7 +79,7 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
         MaterialPageRoute(
           builder: (context) => AuthenticationScreen(
             correctPin: pin!,
-            userMessage: 'Enter your pincode',
+            userMessage: 'Please enter your PIN code',
           ),
         ));
   }
@@ -353,7 +353,7 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
         MaterialPageRoute(
           builder: (context) => AuthenticationScreen(
             correctPin: pin!,
-            userMessage: "show your phrase.",
+            userMessage: "Please enter your PIN code",
           ),
         ));
 
@@ -390,7 +390,7 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
       MaterialPageRoute(
         builder: (context) => AuthenticationScreen(
           correctPin: pin!,
-          userMessage: "toggle " + biometricDeviceName.toString() + ".",
+          userMessage: "Please enter your PIN code",
         ),
       ),
     );
@@ -414,7 +414,7 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
         MaterialPageRoute(
           builder: (context) => AuthenticationScreen(
             correctPin: pin,
-            userMessage: "change your pincode.",
+            userMessage: "Please enter your PIN code",
           ),
         ),
       );
