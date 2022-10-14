@@ -115,7 +115,7 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
                         child: Icon(Icons.visibility),
                       ),
                       leading: Icon(Icons.vpn_key),
-                      title: Text("Show Phrase"),
+                      title: Text("Show phrase"),
                       onTap: () async {
                         _showPhrase();
                       },
