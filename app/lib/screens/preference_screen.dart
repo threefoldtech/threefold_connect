@@ -246,7 +246,7 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
         image: Icons.error,
         title: "Are you sure?",
         description:
-            "If you confirm, your account will be removed from this device. You can always recover your account with your doublename, email and phrase.",
+            "If you confirm, your account will be removed from this device. You can always recover your account with your username and phrase.",
         actions: <Widget>[
           FlatButton(
             child: new Text("Cancel"),
