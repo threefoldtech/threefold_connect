@@ -33,7 +33,7 @@ PODS:
   - shared_preferences_ios (0.0.1):
     - Flutter
   - ShuftiPro (1.1.5)
-  - shuftipro_sdk (1.1.4):
+  - shuftipro_sdk (2.0.4):
     - Flutter
     - ShuftiPro
   - SwiftSocket (2.0.2)
@@ -124,7 +124,7 @@ SPEC CHECKSUMS:
   redirection: 86a0674fdc4d10643d0a2b45d2b73a9aba1363b8
   shared_preferences_ios: 548a61f8053b9b8a49ac19c1ffbc8b92c50d68ad
   ShuftiPro: 8850ec667a807a772c6958c74499801bba76cdf9
-  shuftipro_sdk: 6f1eef3a64faf9a54fdeee7dbcdf55ad97164657
+  shuftipro_sdk: 423ec5be99f7c233d01575f47fbaaccdce7f28f4
   SwiftSocket: 6f4c9c63fbc5c1d61188936bb3c599fd546f40ae
   uni_links: d97da20c7701486ba192624d99bffaaffcfc298a
   url_launcher_ios: 839c58cdb4279282219f5e248c3321761ff3c4de
