@@ -26,6 +26,7 @@ export class DigitalTwinController {
         @Param('') username: UsernameDto,
         @Body() data: UpdateDigitalTwinIpDto
     ): Promise<UpdatedDigitalTwinDto> {
+        console.log('Coming here');
         return await this.digitalTwinService.updateYggdrasilOfTwin(username.username, data);
     }
 

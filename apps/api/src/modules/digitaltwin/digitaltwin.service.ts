@@ -72,6 +72,9 @@ export class DigitalTwinService {
         username: string,
         updateTwinDto: UpdateDigitalTwinIpDto
     ): Promise<UpdatedDigitalTwinDto> {
+        console.log('Username: ', username);
+        console.log('AppId: ', updateTwinDto.appId);
+
         const twin = await this.findByUsernameAndAppId(username, updateTwinDto.appId);
         if (!twin) {
             console.error(`There is no twin named ${username} with appId ${updateTwinDto.appId}`);
@@ -82,6 +85,7 @@ export class DigitalTwinService {
             decodeBase64(updateTwinDto.signedYggdrasilIp),
             decodeBase64(twin.derivedPublicKey)
         );
+        console.log(verifiedIp);
 
         const updatedTwin = await this.update(verifiedIp, twin.twinId);
         return {
