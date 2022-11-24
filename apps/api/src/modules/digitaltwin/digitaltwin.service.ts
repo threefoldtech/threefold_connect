@@ -152,7 +152,7 @@ export class DigitalTwinService {
 
         if (!user) return null;
 
-        const t = await this._prisma.digitalTwin.findFirst(findTwinByUsernameAndAppIdQuery(user.userId, appId));
+        const t = await this._prisma.digitalTwin.findFirst(findTwinByUsernameAndAppIdQuery(username, appId));
         if (!t && withException) {
             console.error(`No twins found for username ${username} in combination with ${appId}`);
             throw new NotFoundException(`No twins found for username ${username} in combination with ${appId}`);

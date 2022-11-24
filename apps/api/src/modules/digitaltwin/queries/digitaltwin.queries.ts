@@ -32,7 +32,7 @@ export const findAllTwinsByUsernameQuery = userId => {
     };
 };
 
-export const findTwinByUsernameAndAppIdQuery = (userId: string, appId: string) => {
+export const findTwinByUsernameAndAppIdQuery = (username: string, appId: string) => {
     return {
         select: {
             user: {
@@ -48,7 +48,7 @@ export const findTwinByUsernameAndAppIdQuery = (userId: string, appId: string) =
         where: {
             appId: appId,
             user: {
-                userId: userId,
+                username: username,
             },
         },
     };
