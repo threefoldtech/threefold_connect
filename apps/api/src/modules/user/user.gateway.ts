@@ -78,8 +78,6 @@ export class UserGateway {
         const socketId = client.id;
 
         const room = data.room.toLowerCase();
-
-        console.log('User ', room, ' joined the room');
         client.join(room);
 
         // User joined + we are sure he can get notifications inside the app
@@ -91,7 +89,6 @@ export class UserGateway {
             }
 
             this._socketRoom[socketId] = room;
-            console.log(this._socketRoom);
         }
 
         if (Object.keys(this._messageQueue).includes(room) && Object.values(this._socketRoom).includes(room)) {
@@ -111,8 +108,6 @@ export class UserGateway {
         if (Object.keys(this._socketRoom).includes(socketId)) {
             const room = this._socketRoom[socketId];
             this._socketRoom[socketId] = null;
-
-            console.log('User ', room, ' left the room');
             client.leave(room);
         }
     }
@@ -127,8 +122,6 @@ export class UserGateway {
         if (Object.keys(this._socketRoom).includes(socketId)) {
             const room = this._socketRoom[socketId];
             this._socketRoom[socketId] = null;
-
-            console.log('User ', room, ' left the room');
             client.leave(room);
         }
     }
@@ -180,7 +173,7 @@ export class UserGateway {
         }
 
         console.log('Putting message in queue');
-        let q = this._messageQueue[room] ? this._messageQueue[room] : [];
+        const q = this._messageQueue[room] ? this._messageQueue[room] : [];
         q.push(message);
 
         return (this._messageQueue[room] = q);
