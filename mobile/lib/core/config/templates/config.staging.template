@@ -1,0 +1,8 @@
+import 'package:threebotlogin/core/config/enums/config.enums.dart';
+
+abstract class EnvConfig {
+  Environment environment = Environment.Staging;
+
+  String gitHash = "githashvalue";
+  String time = "timevalue";
+}

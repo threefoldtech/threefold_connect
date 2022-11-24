@@ -1,0 +1,57 @@
+version: '3'
+services:
+    tfconnectv2-staging-db:
+        image: mariadb:latest
+        container_name: tfconnectv2-staging-db
+        restart: always
+        environment:
+            - MARIADB_ROOT_PASSWORD
+            - MARIADB_DATABASE=tfconnectv2
+        volumes:
+            - tfconnectv2_db_data_staging:/var/lib/mysql
+        healthcheck:
+            test: ['CMD', 'mysqladmin', 'ping', '-h', 'localhost']
+            timeout: 10s
+            retries: 10
+        networks:
+            - tfconnectv2-staging-network
+
+    tfconnectv2-staging-frontend:
+        image: ${FRONTEND_IMAGE}
+        depends_on:
+            - tfconnectv2-staging-backend
+        container_name: tfconnectv2-staging-frontend
+        restart: always
+        networks:
+            - tfconnectv2-staging-network
+            - proxy
+        environment:
+            - ENVIRONMENT=staging
+            - FLAGSMITH_URL
+            - FLAGSMITH_API_KEY
+            - BACKEND_URL
+
+    tfconnectv2-staging-backend:
+        depends_on:
+            - tfconnectv2-staging-db
+        environment:
+            - ENVIRONMENT=staging
+            - FLAGSMITH_URL
+            - FLAGSMITH_API_KEY
+            - DATABASE_URL=mysql://root:${MARIADB_ROOT_PASSWORD}@tfconnectv2-staging-db:3306/tfconnectv2?schema=public
+            - DATABASE_HOST=tfconnectv2-staging-db
+            - DATABASE_PORT=3306
+        image: ${BACKEND_IMAGE}
+        container_name: tfconnectv2-staging-backend
+        restart: always
+        networks:
+            - tfconnectv2-staging-network
+            - proxy
+
+volumes:
+    tfconnectv2_db_data_staging:
+
+networks:
+    tfconnectv2-staging-network:
+    proxy:
+        external: true

@@ -1,0 +1,53 @@
+{
+    "name": "web",
+    "version": "0.0.0",
+    "scripts": {
+        "dev": "vite --host",
+        "build": "vue-tsc --noEmit && vite build",
+        "build:docker": "cd ../.. && docker build -t web -f apps/web/Dockerfile .",
+        "serve": "vite preview",
+        "lint": "eslint --ext .js,.ts,.vue src",
+        "lint:fix": "yarn lint --fix"
+    },
+    "dependencies": {
+        "@headlessui/vue": "^1.5.0",
+        "@heroicons/vue": "^1.0.5",
+        "@tailwindcss/aspect-ratio": "^0.4.0",
+        "@tailwindcss/forms": "^0.4.0",
+        "@tailwindcss/line-clamp": "^0.3.1",
+        "@tailwindcss/typography": "^0.5.2",
+        "@vueuse/core": "^7.6.2",
+        "axios": "^0.27.2",
+        "libsodium-wrappers": "^0.7.9",
+        "nanoid": "^3.3.4",
+        "socket.io-client": "4.5.1",
+        "tailwindcss": "^3.0.23",
+        "tweetnacl-util": "^0.15.1",
+        "vue": "^3.2.31",
+        "vue-router": "^4.0.12"
+    },
+    "devDependencies": {
+        "types": "*",
+        "@types/libsodium-wrappers": "^0.7.9",
+        "@types/node": "^17.0.33",
+        "@types/socket.io-client": "^3.0.0",
+        "@types/tailwindcss": "^3.0.8",
+        "@typescript-eslint/eslint-plugin": "^5.12.1",
+        "@typescript-eslint/parser": "^5.12.1",
+        "@vitejs/plugin-vue": "^2.2.2",
+        "@vue/compiler-sfc": "^3.2.31",
+        "@vue/eslint-config-typescript": "^10.0.0",
+        "autoprefixer": "10.4.5",
+        "config": "*",
+        "eslint": "^8.9.0",
+        "eslint-plugin-vue": "^8.5.0",
+        "postcss": "^8.4.6",
+        "prettier": "^2.5.1",
+        "pretty-quick": "^3.1.3",
+        "tailwindcss-debug-screens": "^2.2.1",
+        "tsconfig": "*",
+        "typescript": "^4.5.5",
+        "vite": "^2.8.4",
+        "vue-tsc": "^0.31.4"
+    }
+}

@@ -1,0 +1,115 @@
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# dependencies
+node_modules
+.pnp
+.pnp.js
+
+# testing
+coverage
+
+# next.js
+.next/
+out/
+build
+
+# misc
+.DS_Store
+*.pem
+
+# debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# local env files
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# turbo
+.turbo
+
+.idea/
+.vscode/
+
+dist/
+
+# Miscellaneous
+mobile/*.class
+mobile/*.log
+mobile/*.pyc
+mobile/*.swp
+mobile/.DS_Store
+mobile/.atom/
+mobile/.buildlog/
+mobile/.history
+mobile/.svn/
+
+# IntelliJ related
+mobile/*.iml
+mobile/*.ipr
+mobile/*.iws
+mobile/.idea/
+
+# Visual Studio Code related
+mobile/.vscode/
+
+# Flutter/Dart/Pub related
+mobile/**/doc/api/
+mobile/.dart_tool/
+mobile/.flutter-plugins
+mobile/.packages
+mobile/.metadata
+mobile/.pub-cache/
+mobile/.pub/
+mobile/build/
+
+# Android related
+mobile/**/android/**/gradle-wrapper.jar
+mobile/**/android/.gradle
+mobile/**/android/captures/
+mobile/**/android/gradlew
+mobile/**/android/gradlew.bat
+mobile/**/android/local.properties
+mobile/**/android/**/GeneratedPluginRegistrant.java
+
+# iOS/XCode related
+mobile/**/ios/**/*.mode1v3
+mobile/**/ios/**/*.mode2v3
+mobile/**/ios/**/*.moved-aside
+mobile/**/ios/**/*.pbxuser
+mobile/**/ios/**/*.perspectivev3
+mobile/**/ios/**/*sync/
+mobile/**/ios/**/.sconsign.dblite
+mobile/**/ios/**/.tags*
+mobile/**/ios/**/.vagrant/
+mobile/**/ios/**/DerivedData/
+mobile/**/ios/**/Icon?
+mobile/**/ios/**/Pods/
+mobile/**/ios/**/.symlinks/
+mobile/**/ios/**/profile
+mobile/**/ios/**/xcuserdata
+mobile/**/ios/.generated/
+mobile/**/ios/Flutter/App.framework
+mobile/**/ios/Flutter/Flutter.framework
+mobile/**/ios/Flutter/Generated.xcconfig
+mobile/**/ios/Flutter/app.flx
+mobile/**/ios/Flutter/app.zip
+mobile/**/ios/Flutter/flutter_assets/
+mobile/**/ios/ServiceDefinitions.json
+mobile/**/ios/Runner/GeneratedPluginRegistrant.*
+
+# Exceptions to above rules.
+mobile/!**/ios/**/default.mode1v3
+mobile/!**/ios/**/default.mode2v3
+mobile/!**/ios/**/default.pbxuser
+mobile/!**/ios/**/default.perspectivev3
+mobile/!/packages/flutter_tools/test/data/dart_dependencies_test/**/.packages
+mobile/android/app-key\.keystore
+mobile/android/app-key.keystore
+
+mobile/android/key\.properties
+mobile/android/app-key.keystore

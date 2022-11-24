@@ -1,0 +1,24 @@
+export enum SocketEvents {
+    SIGN = 'SIGN',
+    LOGIN = 'LOGIN',
+    LOGIN_ATTEMPT = 'LOGIN_ATTEMPT',
+    SIGN_ATTEMPT = 'SIGN_ATTEMPT',
+}
+
+export enum SocketTypes {
+    CONNECT = 'connect',
+    DISCONNECT = 'disconnect',
+    JOIN = 'JOIN',
+    LEAVE = 'LEAVE',
+    CHECK_NAME = 'CHECK_NAME',
+    SIGN = 'SIGN',
+    LOGIN = 'LOGIN',
+    NAME_KNOWN = 'NAME_KNOWN',
+    NAME_UNKNOWN = 'NAME_UNKNOWN',
+    LOGIN_CANCEL = 'LOGIN_CANCEL',
+    LOGIN_CALLBACK = 'LOGIN_CALLBACK',
+    SIGN_CANCEL = 'SIGN_CANCEL',
+    SIGN_CALLBACK = 'SIGN_CALLBACK',
+    EMAIL_VERIFIED = 'EMAIL_VERIFIED',
+    PHONE_VERIFIED = 'PHONE_VERIFIED',
+}

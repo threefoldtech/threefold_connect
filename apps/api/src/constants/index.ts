@@ -1,0 +1,2 @@
+export const MAX_LENGTH_THREEBOT_NAME = 55;
+export const MIN_LENGTH_THREEBOT_NAME = 6;

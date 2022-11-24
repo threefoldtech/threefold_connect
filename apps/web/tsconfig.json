@@ -1,0 +1,14 @@
+{
+    "display": "Vue App",
+    "extends": "tsconfig/vue.json",
+    "compilerOptions": {
+        "baseUrl": ".",
+        "paths": {
+            "@/*": ["./src/*"]
+        }
+    },
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "include": ["src/**/*.ts", "src/**/*.tsx", "src/**/*.vue", "tests/**/*.ts", "tests/**/*.tsx"],
+    "exclude": ["node_modules"]
+}

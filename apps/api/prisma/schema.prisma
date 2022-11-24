@@ -1,0 +1,28 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  userId        String        @id @unique @default(uuid())
+  username      String        @unique
+  mainPublicKey String        @unique
+  email         String
+  digitalTwins  DigitalTwin[]
+}
+
+model DigitalTwin {
+  id               String  @id @unique @default(uuid())
+  user             User?   @relation(fields: [userId], references: [userId])
+  userId           String
+  derivedPublicKey String  @unique
+  appId            String
+  yggdrasilIp      String? @default("")
+}

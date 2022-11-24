@@ -1,0 +1,31 @@
+version: '3'
+services:
+    adminer:
+        image: adminer
+        container_name: development-adminer
+        restart: always
+        ports:
+            - 8080:8080
+        networks:
+            - threefold-network
+
+    threefold-development-db:
+        image: mariadb:latest
+        container_name: threefold-development-db
+        restart: always
+        environment:
+            - MARIADB_ROOT_PASSWORD=jimber
+            - MARIADB_DATABASE=threefold-db
+        volumes:
+            - db_data_development:/var/lib/mysql
+        healthcheck:
+            test: ['CMD', 'mysqladmin', 'ping', '-h', 'localhost']
+            timeout: 10s
+            retries: 10
+        networks:
+            - threefold-network
+
+volumes:
+    db_data_development:
+networks:
+    threefold-network:

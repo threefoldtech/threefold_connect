@@ -1,0 +1,57 @@
+version: '3'
+services:
+    project-production-db:
+        image: mariadb:latest
+        container_name: project-production-db
+        restart: always
+        environment:
+            - MARIADB_ROOT_PASSWORD
+            - MARIADB_DATABASE=project
+        volumes:
+            - db_data_production:/var/lib/mysql
+        healthcheck:
+            test: ['CMD', 'mysqladmin', 'ping', '-h', 'localhost']
+            timeout: 10s
+            retries: 10
+        networks:
+            - project-production-network
+
+    project-production-frontend:
+        image: ${FRONTEND_IMAGE}
+        depends_on:
+            - project-production-backend
+        container_name: project-production-frontend
+        restart: always
+        networks:
+            - project-production-network
+            - proxy
+        environment:
+            - ENVIRONMENT=production
+            - FLAGSMITH_URL
+            - FLAGSMITH_API_KEY
+            - BACKEND_URL
+
+    project-production-backend:
+        depends_on:
+            - project-production-db
+        environment:
+            - ENVIRONMENT=production
+            - FLAGSMITH_URL
+            - FLAGSMITH_API_KEY
+            - DATABASE_URL=mysql://root:${MARIADB_ROOT_PASSWORD}@project-production-db:3306/project?schema=public
+            - DATABASE_HOST=project-production-db
+            - DATABASE_PORT=3306
+        image: ${BACKEND_IMAGE}
+        container_name: project-production-backend
+        restart: always
+        networks:
+            - project-production-network
+            - proxy
+
+volumes:
+    db_data_production:
+
+networks:
+    project-production-network:
+    proxy:
+        external: true

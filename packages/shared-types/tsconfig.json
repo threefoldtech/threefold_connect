@@ -1,0 +1,29 @@
+{
+    "compilerOptions": {
+        "module": "esnext",
+        "declaration": true,
+        "declarationDir": "dist/types",
+        "removeComments": true,
+        "emitDecoratorMetadata": true,
+        "experimentalDecorators": true,
+        "esModuleInterop": true,
+        "target": "esnext",
+        "sourceMap": false,
+        "outDir": "./dist",
+        "baseUrl": "./src",
+        "rootDir": "./",
+        "incremental": true,
+        "moduleResolution": "node",
+        "paths": {
+            "@/*": ["./*"]
+        },
+        "plugins": [
+            {
+                "transform": "@zerollup/ts-transform-paths",
+                "exclude": ["*"]
+            }
+        ]
+    },
+    "include": ["src/**/*.ts"],
+    "exclude": ["node_modules"]
+}

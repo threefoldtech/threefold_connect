@@ -1,0 +1,9 @@
+framework module "Yggdrasil" {
+	header "ref.h"
+    header "Mobile.objc.h"
+    header "Config.objc.h"
+    header "Universe.objc.h"
+    header "Yggdrasil.h"
+
+    export *
+}
