@@ -113,3 +113,16 @@ mobile/android/app-key.keystore
 
 mobile/android/key\.properties
 mobile/android/app-key.keystore
+mobile/.flutter-plugins-dependencies
+mobile/android/app/build.gradle
+mobile/android/app/src/debug/AndroidManifest.xml
+mobile/android/app/src/main/AndroidManifest.xml
+mobile/android/app/src/main/kotlin/org/jimber/threebotlogin/MainActivity.kt
+
+mobile/android/app/src/main/res/mipmap-hdpi/ic_launcher.png
+mobile/android/app/src/main/res/mipmap-mdpi/ic_launcher.png
+mobile/android/app/src/main/res/mipmap-xhdpi/ic_launcher.png
+mobile/android/app/src/main/res/mipmap-xxhdpi/ic_launcher.png
+mobile/android/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png
+mobile/lib/core/config/classes/config.local.dart
+mobile/lib/core/config/config.dart
