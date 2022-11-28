@@ -24,7 +24,7 @@ Future<String?> getSignedPhoneIdentifier() async {
     return null;
   }
 
-  Map<String, String> body = jsonDecode(r.body);
+  Map<String, dynamic> body = jsonDecode(r.body);
   String? signedPhoneIdentifier = body["signed_phone_identifier"];
 
   if (signedPhoneIdentifier == null || signedPhoneIdentifier.isEmpty) {
