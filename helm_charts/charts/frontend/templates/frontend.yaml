@@ -13,7 +13,7 @@ spec:
         app: {{ include "frontend.fullname" . }}
     spec:
       containers:
-      - image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
+      - image: {{ include "frontend.IMAGE" . }}
         imagePullPolicy: Always
         name: {{ include "frontend.fullname" . }}
         ports:

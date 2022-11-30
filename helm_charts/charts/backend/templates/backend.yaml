@@ -6,22 +6,19 @@ spec:
   replicas: {{ .Values.replicaCount }}
   selector:
     matchLabels:
-      app: {{ include "backend.fullname" . }} 
+      app: {{ include "backend.fullname" . }}
   template:
     metadata:
       labels:
         app: {{ include "backend.fullname" . }}
     spec:
       containers:
-      - image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
+      - image: {{ include "backend.IMAGE" . }}
         imagePullPolicy: Always
         name: {{ include "backend.fullname" . }}
         ports:
         - name: http
           containerPort: 3001
         env:
-        - name: MARIADB_URI
-          valueFrom:
-            secretKeyRef:
-              name: {{ include "backend.fullname" . }}-secret
-              key: mariadb-uri
+          - name: "FLAGSMITH_API_KEY"
+            value: {{ include "backend.FLAGSMITH_API_KEY" . }}

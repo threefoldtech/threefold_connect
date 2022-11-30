@@ -15,3 +15,9 @@ ingress:
         path: /socket.io
         chart: backend
         service: dev-backend
+
+global:
+  FRONTEND_IMAGE: ""
+  BACKEND_IMAGE: ""
+  FLAGSMITH_API_KEY: ""
+  DATABASE_URL: ""
