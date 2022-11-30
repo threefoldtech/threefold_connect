@@ -1,0 +1,8 @@
+secret:
+  mariadbUsername: "jimber"
+  mariadbPassword: "jimber"
+service:
+  type: NodePort
+  port: 80
+volume:
+  storage: 100Mi

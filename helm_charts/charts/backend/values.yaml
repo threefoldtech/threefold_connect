@@ -1,0 +1,10 @@
+image:
+  repository: lennertdefauwjimber/v2-backend
+  tag: "latest"
+replicaCount: 1
+service:
+  type: ClusterIP
+  port: 80
+ingress:
+  enabled: true
+  host: backend.minikube.local
