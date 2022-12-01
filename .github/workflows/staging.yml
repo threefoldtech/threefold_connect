@@ -1,49 +1,48 @@
 name: Staging
 
-# Controls when the workflow will run
 on:
     push:
         tags: ['v[0-9]+.[0-9]+.[0-9]+-rc[0-9]+']
 
 jobs:
-    build_frontend:
-        runs-on: ubuntu-latest
-        outputs:
-            image: ${{ steps.image.outputs.lowercase }}
-        permissions:
-            contents: read
-            packages: write
-        env:
-            REGISTRY: ghcr.io
-            IMAGE_NAME: ghcr.io/threefoldtech/threefold_connect/frontend
-        steps:
-            - name: Checkout
-              uses: actions/checkout@v2
-            - id: image
-              uses: ASzc/change-string-case-action@v2
-              with:
-                  string: ${{ github.repository }}
+  build_frontend:
+    runs-on: ubuntu-latest
+    outputs:
+      image: ${{ steps.image.outputs.lowercase }}
+    permissions:
+      contents: read
+      packages: write
+    env:
+      REGISTRY: ghcr.io
+      IMAGE_NAME: ghcr.io/threefoldtech/threefold_connect/frontend
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - id: image
+        uses: ASzc/change-string-case-action@v2
+        with:
+          string: ${{ github.repository }}
 
-            - name: Build and push
-              uses: docker/login-action@v1
-              with:
-                  registry: ${{ env.REGISTRY }}
-                  username: ${{ github.actor }}
-                  password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build and push
+        uses: docker/login-action@v1
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
-            - name: Extract metadata for Docker
-              id: meta
-              uses: docker/metadata-action@98669ae865ea3cffbcbaa878cf57c20bbf1c6c38
-              with:
-                  images: ${{ env.IMAGE_NAME }}
+          - name: Extract metadata for Docker
+            id: meta
+            uses: docker/metadata-action@98669ae865ea3cffbcbaa878cf57c20bbf1c6c38
+            with:
+              images: ${{ env.IMAGE_NAME }}
 
-            - name: Build and push Docker image
+          - name: Build and push Docker image
               uses: docker/build-push-action@v2
               with:
-                  context: .
+                context: .
                   file: apps/web/Dockerfile
                   push: true
-                  tags: ${{ env.IMAGE_NAME }}:latest,${{ env.IMAGE_NAME }}:${{ github.ref_name}},${{ env.IMAGE_NAME }}:staging-latest
+                  tags: ${{ env.IMAGE_NAME }}:latest,${{ env.IMAGE_NAME }}:${{ github.sha}},${{ env.IMAGE_NAME }}:staging-latest
                   labels: ${{ steps.meta.outputs.labels }}
 
     build_backend:
@@ -75,38 +74,29 @@ jobs:
               id: meta
               uses: docker/metadata-action@98669ae865ea3cffbcbaa878cf57c20bbf1c6c38
               with:
-                  images: ${{ env.IMAGE_NAME }}
+                images: ${{ env.IMAGE_NAME }}
 
             - name: Build and push Docker image
               uses: docker/build-push-action@v2
               with:
-                  context: .
+                context: .
                   file: apps/api/Dockerfile
                   push: true
-                  tags: ${{ env.IMAGE_NAME }}:latest,${{ env.IMAGE_NAME }}:${{ github.ref_name}},${{ env.IMAGE_NAME }}:staging-latest
+                tags: ${{ env.IMAGE_NAME }}:staging-${{ github.github.sha}},${{ env.IMAGE_NAME }}:staging-latest
                   labels: ${{ steps.meta.outputs.labels }}
 
-    deploy:
-        runs-on: jimber-staging-server
-        needs:
-            - build_frontend
-            - build_backend
-        env:
-            FRONTEND_IMAGE: ghcr.io/threefoldtech/threefold_connect/frontend:${{ github.ref_name}}
-            BACKEND_IMAGE: ghcr.io/threefoldtech/threefold_connect/backend:${{ github.ref_name}}
-            FLAGSMITH_URL: ${{ secrets.FLAGSMITH_URL }}
-            FLAGSMITH_API_KEY: ${{ secrets.STAGING_FLAGSMITH_API_KEY }}
-            BACKEND_URL: /
-            MARIADB_ROOT_PASSWORD: ${{ secrets.STAGING_DATABASE_PASSWORD }}
-        steps:
-            - name: Login to GHCR
-              uses: docker/login-action@v1
-              with:
-                  registry: ghcr.io
-                  username: ${{ github.actor }}
-                  password: ${{ secrets.GITHUB_TOKEN }}
-            - uses: actions/checkout@v2
-            - name: Down
-              run: docker-compose -f docker-compose.staging.yml down
-            - name: Deploy
-              run: docker-compose -f docker-compose.staging.yml up -d
+  deploy:
+    needs: [ build_frontend, build_backend ]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setting configs
+        run: |
+          mkdir ${HOME}/.kube
+          echo ${{ secrets.STAGING_KUBE_KEY }} | base64 --decode > ${HOME}/.kube/jimber-staging.key
+          echo ${{ secrets.STAGING_KUBE_CRT }} | base64 --decode > ${HOME}/.kube/jimber-staging.crt
+          echo ${{ secrets.STAGING_KUBE_CONFIG }} | base64 --decode > ${HOME}/.kube/config
+      - name: Upgrade cluster
+        run: |
+          helm upgrade dev helm_charts --set global.FRONTEND_IMAGE=ghcr.io/threefoldtech/threefold_connect/frontend:staging-${{ github.sha }} --set global.BACKEND_IMAGE=ghcr.io/threefoldtech/threefold_connect/backend:staging-${{ github.sha }} --set global.FLAGSMITH_API_KEY="cu9Qkir3MHJSpihzsXB8Kw" --set global.DATABASE_URL="mysql://root:jimber@dev-database:3306/dev-database?schema=public" -n jimber
+
