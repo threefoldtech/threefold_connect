@@ -1,7 +1,7 @@
-import { Body, Controller, Get, Headers, Param, Post, Put, Query } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
 import { UserService } from './user.service';
 import { UserGateway } from './user.gateway';
-import { ChangeEmailDto, CreatedUserDto, CreateUserDto, GetUserDto, UpdatedUserDto, UsernameDto } from 'shared-types';
+import { CreatedUserDto, CreateUserDto, UsernameDto } from 'shared-types';
 import { UserDto } from 'shared-types/src/user/dtos/user.dtos';
 
 @Controller('users')
@@ -38,14 +38,5 @@ export class UserController {
     @Post(':username/phone/verified')
     async smsVerified(@Param() username: UsernameDto): Promise<void> {
         return this.userGateway.emitSmsVerified(username.username);
-    }
-
-    @Put(':username/email')
-    async changeEmail(
-        @Param() username: UsernameDto,
-        @Body() email: ChangeEmailDto,
-        @Headers() headers: string
-    ): Promise<UpdatedUserDto> {
-        return this.userService.changeEmail(username.username, email.email, headers);
     }
 }
