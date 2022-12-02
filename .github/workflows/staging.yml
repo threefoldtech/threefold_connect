@@ -49,7 +49,7 @@ jobs:
           contents: read
           packages: write
       env:
-          IMAGE_NAME: ghcr.io/threefoldtech/threefold_connect-backend
+          IMAGE_NAME: threefoldtech/threefold_connect-backend
       steps:
           - name: Checkout
             uses: actions/checkout@v2
