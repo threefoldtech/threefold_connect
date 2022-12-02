@@ -14,8 +14,7 @@ jobs:
       contents: read
       packages: write
     env:
-      REGISTRY: ghcr.io
-      IMAGE_NAME: ghcr.io/threefoldtech/threefold_connect/frontend
+      IMAGE_NAME: threefoldjimber/threefold_connect/frontend
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -24,12 +23,8 @@ jobs:
         with:
           string: ${{ github.repository }}
 
-      - name: Build and push
-        uses: docker/login-action@v1
-        with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Login to DockerHub
+        run: docker login --username ${{ secrets.DOCKER_USERNAME }} --password ${{ secrets.DOCKER_TOKEN }}
 
       - name: Extract metadata for Docker
         id: meta
@@ -54,7 +49,6 @@ jobs:
           contents: read
           packages: write
       env:
-          REGISTRY: ghcr.io
           IMAGE_NAME: ghcr.io/threefoldtech/threefold_connect/backend
       steps:
           - name: Checkout
@@ -64,12 +58,8 @@ jobs:
             with:
                 string: ${{ github.repository }}
 
-          - name: Build and push
-            uses: docker/login-action@v1
-            with:
-                registry: ${{ env.REGISTRY }}
-                username: ${{ github.actor }}
-                password: ${{ secrets.GITHUB_TOKEN }}
+          - name: Login to DockerHub
+            run: docker login --username ${{ secrets.DOCKER_USERNAME }} --password ${{ secrets.DOCKER_TOKEN }}
 
           - name: Extract metadata for Docker
             id: meta
