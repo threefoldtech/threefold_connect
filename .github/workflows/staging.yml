@@ -38,13 +38,13 @@ jobs:
           images: ${{ env.IMAGE_NAME }}
 
       - name: Build and push Docker image
-          uses: docker/build-push-action@v2
-          with:
-            context: .
-              file: apps/web/Dockerfile
-              push: true
-              tags: ${{ env.IMAGE_NAME }}:latest,${{ env.IMAGE_NAME }}:${{ github.sha}},${{ env.IMAGE_NAME }}:staging-latest
-              labels: ${{ steps.meta.outputs.labels }}
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+            file: apps/web/Dockerfile
+            push: true
+            tags: ${{ env.IMAGE_NAME }}:latest,${{ env.IMAGE_NAME }}:${{ github.sha}},${{ env.IMAGE_NAME }}:staging-latest
+            labels: ${{ steps.meta.outputs.labels }}
 
     build_backend:
         runs-on: ubuntu-latest
