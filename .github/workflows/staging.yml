@@ -97,6 +97,7 @@ jobs:
           echo ${{ secrets.STAGING_KUBE_KEY }} | base64 --decode > ${HOME}/.kube/jimber-staging.key
           echo ${{ secrets.STAGING_KUBE_CRT }} | base64 --decode > ${HOME}/.kube/jimber-staging.crt
           echo ${{ secrets.STAGING_KUBE_CONFIG }} | base64 --decode > ${HOME}/.kube/config
+          echo $(ls)
       - name: Upgrade cluster
         run: |
           helm upgrade dev helm_charts --set global.FRONTEND_IMAGE=ghcr.io/threefoldtech/threefold_connect/frontend:staging-${{ github.sha }} --set global.BACKEND_IMAGE=ghcr.io/threefoldtech/threefold_connect/backend:staging-${{ github.sha }} --set global.FLAGSMITH_API_KEY="cu9Qkir3MHJSpihzsXB8Kw" --set global.DATABASE_URL="mysql://root:jimber@dev-database:3306/dev-database?schema=public" -n jimber
