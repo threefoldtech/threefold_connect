@@ -14,7 +14,7 @@ jobs:
       contents: read
       packages: write
     env:
-      IMAGE_NAME: threefoldjimber/threefold_connect/frontend
+      IMAGE_NAME: threefoldjimber/threefold_connect-frontend
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -49,7 +49,7 @@ jobs:
           contents: read
           packages: write
       env:
-          IMAGE_NAME: ghcr.io/threefoldtech/threefold_connect/backend
+          IMAGE_NAME: ghcr.io/threefoldtech/threefold_connect-backend
       steps:
           - name: Checkout
             uses: actions/checkout@v2
@@ -90,5 +90,5 @@ jobs:
           echo $(ls ${HOME}/.kube)
       - name: Upgrade cluster
         run: |
-          helm upgrade dev helm_charts --set global.FRONTEND_IMAGE=ghcr.io/threefoldtech/threefold_connect/frontend:staging-${{ github.sha }} --set global.BACKEND_IMAGE=ghcr.io/threefoldtech/threefold_connect/backend:staging-${{ github.sha }} --set global.FLAGSMITH_API_KEY="cu9Qkir3MHJSpihzsXB8Kw" --set global.DATABASE_URL="mysql://root:jimber@dev-database:3306/dev-database?schema=public" -n jimber
+          helm upgrade dev helm_charts --set global.FRONTEND_IMAGE=threefoldtech/threefold_connect-frontend:staging-${{ github.sha }} --set global.BACKEND_IMAGE=threefoldtech/threefold_connect-backend:staging-${{ github.sha }} --set global.FLAGSMITH_API_KEY="cu9Qkir3MHJSpihzsXB8Kw" --set global.DATABASE_URL="mysql://root:jimber@dev-database:3306/dev-database?schema=public" -n jimber
 
