@@ -11,6 +11,9 @@
 {{- .Values.global.BACKEND_IMAGE -}}
 {{- end -}}
 
+{{- define "backend.CONFIG_NAME" -}}
+{{- printf "%s-%s" .Release.Name "docker-config-backend"  -}}
+{{- end -}}
 
 {{- define "backend.FLAGSMITH_API_KEY" -}}
 {{- .Values.global.FLAGSMITH_API_KEY -}}
@@ -22,6 +25,6 @@
 {{- end -}}
 
 
-{{- define "backend.imagePullSecret" -}}
+{{- define "backend.IMAGE_PULL_SECRET" -}}
 {{- printf "{\"auths\": {\"%s\": {\"auth\": \"%s\"}}}" .Values.global.DOCKER_REGISTRY (printf "%s:%s" .Values.global.DOCKER_USERNAME .Values.global.DOCKER_PASSWORD | b64enc) | b64enc }}
 {{- end }}
