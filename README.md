@@ -28,3 +28,9 @@ yarn && yarn dev
 
 
 ### Helm charts
+
+**Backend**
+
+**Database**
+
+**Frontend**
