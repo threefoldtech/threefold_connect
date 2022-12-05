@@ -1,17 +1,17 @@
 ingress:
   hosts:
     - host:
-        domain: frontend.minikube.local
+        domain: login-beta.threefold.me
         path: /api
         chart: backend
         service: dev-backend
     - host:
-        domain: frontend.minikube.local
+        domain: login-beta.threefold.me
         path: /
         chart: frontend
         service: dev-frontend
     - host:
-        domain: frontend.minikube.local
+        domain: login-beta.threefold.me
         path: /socket.io
         chart: backend
         service: dev-backend
