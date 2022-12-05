@@ -16,6 +16,9 @@ ingress:
         chart: backend
         service: dev-backend
 
+acme:
+  email: lennert.defauw@jimber.org
+
 global:
   FRONTEND_IMAGE: ""
   BACKEND_IMAGE: ""

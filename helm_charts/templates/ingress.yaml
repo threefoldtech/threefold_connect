@@ -5,7 +5,7 @@ metadata:
 spec:
   rules:
 {{- range .Values.ingress.hosts }}
-  - host: {{ $.Release.Name }}.{{ .host.domain }}
+  - host: {{ .host.domain }}
     http:
       paths:
       - path: {{ .host.path }}

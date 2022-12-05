@@ -3,6 +3,6 @@ Release name is {{ .Release.Name }}
 
 You can access the TFConnect v2 application at the following urls :
 {{- range .Values.ingress.hosts }}
-  http://{{ $.Release.Name }}.{{ .host.domain }}
+  https://{{ .host.domain }}
 {{- end }}
 Have fun !
