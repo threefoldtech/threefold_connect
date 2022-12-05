@@ -43,7 +43,7 @@ jobs:
           context: .
           file: apps/web/Dockerfile
           push: true
-          tags: ${{ env.IMAGE_NAME }}:latest,${{ env.IMAGE_NAME }}:${{ github.sha}},${{ env.IMAGE_NAME }}:staging-latest
+          tags: ${{ env.IMAGE_NAME }}:latest,${{ env.IMAGE_NAME }}:${{ github.sha }},${{ env.IMAGE_NAME }}:staging-latest
           labels: ${{ steps.meta.outputs.labels }}
 
   build_backend:
@@ -84,7 +84,7 @@ jobs:
           context: .
           file: apps/api/Dockerfile
           push: true
-          tags: ${{ env.IMAGE_NAME }}:staging-${{ github.github.sha}},${{ env.IMAGE_NAME }}:staging-latest
+          tags: ${{ env.IMAGE_NAME }}:staging-${{ github.sha }},${{ env.IMAGE_NAME }}:staging-latest
           labels: ${{ steps.meta.outputs.labels }}
 
   deploy:

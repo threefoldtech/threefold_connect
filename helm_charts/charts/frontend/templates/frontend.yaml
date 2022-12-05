@@ -20,7 +20,7 @@ spec:
         - name: http
           containerPort: 80
       imagePullSecrets:
-        - name: "docker-configs-frontend"
+        - name: "docker-config-frontend"
 
 
 
