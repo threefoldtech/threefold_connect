@@ -47,11 +47,15 @@ Future<void> saveEmailToPKid() async {
   Map<String, String?> email = await getEmail();
 
   if (email['sei'] != null) {
+    print('A');
+    print(email);
     await Globals().pkidClient?.setPKidDoc('email', json.encode({'email': email['email'], 'sei': email['sei']}));
     return;
   }
 
   if (email['email'] != null) {
+    print('B');
+    print(email);
     await Globals().pkidClient?.setPKidDoc('email', json.encode({'email': email['email']}));
     return;
   }
@@ -82,6 +86,7 @@ Future<dynamic> getPhoneFromPkid() async {
 Future<void> getEmailFromPkidAndStore() async {
   Map<String, dynamic> emailData = await getEmailFromPKid();
 
+  print(emailData);
   try {
     dynamic email = jsonDecode(emailData['data']);
 

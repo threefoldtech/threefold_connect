@@ -2,6 +2,7 @@ import 'package:threebotlogin/core/storage/globals.storage.dart';
 import 'package:threebotlogin/core/storage/kyc/kyc.storage.dart';
 import 'package:threebotlogin/email/helpers/email.helpers.dart';
 import 'package:threebotlogin/email/widgets/email.widgets.dart';
+import 'package:threebotlogin/pkid/helpers/pkid.helpers.dart';
 
 Future emailVerification() async {
   Map<String, String?> email = await getEmail();
@@ -14,6 +15,7 @@ Future emailVerification() async {
   if (verifiedEmail == null) return;
 
   await setEmail(verifiedEmail, sei);
+  await saveEmailToPKid();
   showSuccessEmailVerifiedDialog();
 
   Globals().emailVerified.value = true;
