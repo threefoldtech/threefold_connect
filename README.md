@@ -25,3 +25,6 @@ cd apps/api/ && yarn prisma:migrate-prod
 ```shell
 yarn && yarn dev
 ```
+
+
+### Helm charts
