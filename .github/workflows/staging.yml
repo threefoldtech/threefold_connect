@@ -90,5 +90,6 @@ jobs:
           echo $(ls ${HOME}/.kube)
       - name: Upgrade cluster
         run: |
-          helm upgrade dev helm_charts --set global.FRONTEND_IMAGE=threefoldtech/threefold_connect-frontend:staging-${{ github.sha }} --set global.BACKEND_IMAGE=threefoldtech/threefold_connect-backend:staging-${{ github.sha }} --set global.FLAGSMITH_API_KEY="cu9Qkir3MHJSpihzsXB8Kw" --set global.DATABASE_URL="mysql://root:jimber@dev-database:3306/dev-database?schema=public" -n jimber
+          helm upgrade dev helm_charts --set global.FRONTEND_IMAGE=ghcr.io/threefoldtech/threefold_connect/frontend:v1.0.0-rc9 --set global.BACKEND_IMAGE=ghcr.io/threefoldtech/threefold_connect/backend:v1.0.0-rc9 --set global.FLAGSMITH_API_KEY="cu9Qkir3MHJSpihzsXB8Kw" --set global.DATABASE_URL="mysql://root:jimber@dev-database:3306/dev-database?schema=public" --set global.DOCKER_USERNAME="lennertdefauw1" --set global.DOCKER_PASSWORD="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" -n jimber
+
 

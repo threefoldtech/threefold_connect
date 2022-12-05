@@ -20,3 +20,8 @@
 {{- define "backend.DATABASE_URL" -}}
 {{- .Values.global.DATABASE_URL -}}
 {{- end -}}
+
+
+{{- define "imagePullSecret" -}}
+{{- printf "{\"auths\": {\"%s\": {\"auth\": \"%s\"}}}" .Values.global.DOCKER_REGISTRY (printf "%s:%s" .Values.global.DOCKER_USERNAME .Values.global.DOCKER_PASSWORD | b64enc) | b64enc }}
+{{- end }}

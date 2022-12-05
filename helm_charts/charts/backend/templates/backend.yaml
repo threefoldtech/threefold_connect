@@ -22,3 +22,7 @@ spec:
         env:
           - name: "FLAGSMITH_API_KEY"
             value: {{ include "backend.FLAGSMITH_API_KEY" . }}
+          - name: "DATABASE_URL"
+            value: {{ include "backend.DATABASE_URL" . }}
+      imagePullSecrets:
+        - name: "docker-configs-backend"
