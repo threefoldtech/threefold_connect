@@ -25,4 +25,4 @@ spec:
           - name: "DATABASE_URL"
             value: {{ include "backend.DATABASE_URL" . }}
       imagePullSecrets:
-        - name: credentials-name
+        - name: "docker-configs-backend"
