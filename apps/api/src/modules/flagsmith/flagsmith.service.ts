@@ -6,7 +6,7 @@ export class FlagsmithService {
     constructor() {
         flagsmith.init({
             environmentID: process.env.FLAGSMITH_API_KEY,
-            api: process.env.FLAGSMITH_URL,
+            api: 'https://flagsmith.jimber.io/api/v1',
         });
     }
 

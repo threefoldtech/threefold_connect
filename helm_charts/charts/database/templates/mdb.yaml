@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "database.fullname" . }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ include "database.fullname" . }}
+  template:
+    metadata:
+      labels:
+        app: {{ include "database.fullname" . }}
+    spec:
+      containers:
+        - image: mariadb
+          env:
+          - name: MARIADB_DATABASE
+            value: {{ include "database.fullname" . }}
+          - name: MARIADB_ROOT_PASSWORD
+            value: {{ template "database.DATABASE_PASSWORD" . }}
+          name: {{ include "database.fullname" . }}
+          ports:
+            - name: mariadb
+              containerPort: 3306
+          volumeMounts:
+            - name: {{ include "database.fullname" . }}-volume
+              mountPath: /var/mysql/data/
+      volumes:
+        - name: {{ include "database.fullname" . }}-volume
+          persistentVolumeClaim:
+            claimName: {{ include "database.fullname" . }}-pvc

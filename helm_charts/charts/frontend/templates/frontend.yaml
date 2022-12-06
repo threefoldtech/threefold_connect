@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "frontend.fullname" . }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ include "frontend.fullname" . }}
+  template:
+    metadata:
+      labels:
+        app: {{ include "frontend.fullname" . }}
+    spec:
+      containers:
+      - image: {{ include "frontend.IMAGE" . }}
+        imagePullPolicy: Always
+        name: {{ include "frontend.fullname" . }}
+        ports:
+        - name: http
+          containerPort: 80
+      imagePullSecrets:
+        - name: {{ include "frontend.CONFIG_NAME" . }}
+
+
+

@@ -1,9 +1,9 @@
-name: Staging
+name: Beta
 
 # Controls when the workflow will run
 on:
   push:
-    tags: [ 'v[0-9]+.[0-9]+.[0-9]+-rc[0-9]+' ]
+    tags: ['beta-v[0-9]+.[0-9]+.[0-9]+']
 
 jobs:
   build_frontend:
@@ -43,7 +43,7 @@ jobs:
           context: .
           file: apps/web/Dockerfile
           push: true
-          tags: ${{ env.IMAGE_NAME }}:staging-${{ github.sha }},${{ env.IMAGE_NAME }}:staging-latest
+          tags: ${{ env.IMAGE_NAME }}:beta-${{ github.sha }},${{ env.IMAGE_NAME }}:beta-latest
           labels: ${{ steps.meta.outputs.labels }}
 
   build_backend:
@@ -84,7 +84,7 @@ jobs:
           context: .
           file: apps/api/Dockerfile
           push: true
-          tags: ${{ env.IMAGE_NAME }}:staging-${{ github.sha }},${{ env.IMAGE_NAME }}:staging-latest
+          tags: ${{ env.IMAGE_NAME }}:beta-${{ github.sha }},${{ env.IMAGE_NAME }}:beta-latest
           labels: ${{ steps.meta.outputs.labels }}
 
   deploy:
@@ -95,11 +95,11 @@ jobs:
       - name: Setting configs
         run: |
           mkdir ${HOME}/.kube
-          echo ${{ secrets.STAGING_KUBE_KEY }} | base64 --decode > ${HOME}/.kube/jimber-staging.key
-          echo ${{ secrets.STAGING_KUBE_CRT }} | base64 --decode > ${HOME}/.kube/jimber-staging.crt
-          echo ${{ secrets.STAGING_KUBE_CONFIG }} | base64 --decode > ${HOME}/.kube/config
+          echo ${{ secrets.BETA_KUBE_KEY }} | base64 --decode > ${HOME}/.kube/jimber-beta.key
+          echo ${{ secrets.BETA_KUBE_CRT }} | base64 --decode > ${HOME}/.kube/jimber-beta.crt
+          echo ${{ secrets.BETA_KUBE_CONFIG }} | base64 --decode > ${HOME}/.kube/config
           echo $(ls ${HOME}/.kube)
       - name: Upgrade cluster
         run: |
-          helm upgrade --install staging helm_charts -f helm_charts/values/values-staging.yaml --set global.FRONTEND_IMAGE=ghcr.io/threefoldtech/threefold_connect/frontend:staging-${{ github.sha }} --set global.BACKEND_IMAGE=ghcr.io/threefoldtech/threefold_connect/backend:staging-${{ github.sha }} --set global.FLAGSMITH_API_KEY="${{ secrets.STAGING_FLAGSMITH_API_KEY }}" --set global.DATABASE_URL="mysql://root:${{ secrets.STAGING_DATABASE_PASSWORD }}@staging-database:3306/staging-database?schema=public" --set global.DOCKER_USERNAME="${{ secrets.DOCKER_USERNAME }}" --set global.DOCKER_PASSWORD="${{ secrets.DOCKER_TOKEN }}" --set global.DATABASE_PASSWORD="${{ secrets.STAGING_DATABASE_PASSWORD }}" -n jimber
+          helm upgrade --install beta helm_charts -f helm_charts/values/values-beta.yaml --set global.FRONTEND_IMAGE=ghcr.io/threefoldtech/threefold_connect/frontend:beta-${{ github.sha }} --set global.BACKEND_IMAGE=ghcr.io/threefoldtech/threefold_connect/backend:beta-${{ github.sha }} --set global.FLAGSMITH_API_KEY="${{ secrets.BETA_FLAGSMITH_API_KEY }}" --set global.DATABASE_URL="mysql://root:${{ secrets.BETA_DATABASE_PASSWORD }}@beta-database:3306/beta-database?schema=public" --set global.DOCKER_USERNAME="${{ secrets.DOCKER_USERNAME }}" --set global.DOCKER_PASSWORD="${{ secrets.DOCKER_TOKEN }}" --set global.DATABASE_PASSWORD="${{ secrets.BETA_DATABASE_PASSWORD }}" -n jimber
 

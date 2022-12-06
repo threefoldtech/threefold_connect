@@ -1,0 +1,30 @@
+ingress:
+  hosts:
+    - host:
+        domain: login-beta.jimbertesting.be
+        path: /api
+        chart: backend
+        service: dev-backend
+    - host:
+        domain: login-beta.jimbertesting.be
+        path: /
+        chart: frontend
+        service: dev-frontend
+    - host:
+        domain: login-beta.jimbertesting.be
+        path: /socket.io
+        chart: backend
+        service: dev-backend
+
+acme:
+  email: lennert.defauw@jimber.org
+
+global:
+  FRONTEND_IMAGE: ""
+  BACKEND_IMAGE: ""
+  FLAGSMITH_API_KEY: ""
+  DATABASE_URL: ""
+  DATABASE_PASSWORD: ""
+  DOCKER_USERNAME: ""
+  DOCKER_PASSWORD: ""
+  DOCKER_REGISTRY: "ghcr.io"

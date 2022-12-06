@@ -16,7 +16,6 @@ Future<String?> getSignedEmailIdentifier() async {
     return null;
   }
 
-  print(r.body);
   Map<String, dynamic> body = jsonDecode(r.body);
   String? signedEmailIdentifier = body["signed_email_identifier"];
 

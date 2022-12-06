@@ -1,0 +1,30 @@
+ingress:
+  hosts:
+    - host:
+        domain: login.threefold.me
+        path: /api
+        chart: backend
+        service: prod-backend
+    - host:
+        domain: login.threefold.me
+        path: /
+        chart: frontend
+        service: prod-frontend
+    - host:
+        domain: login.threefold.me
+        path: /socket.io
+        chart: backend
+        service: prod-backend
+
+acme:
+  email: lennert.defauw@jimber.org
+
+global:
+  FRONTEND_IMAGE: ""
+  BACKEND_IMAGE: ""
+  FLAGSMITH_API_KEY: ""
+  DATABASE_URL: ""
+  DATABASE_PASSWORD: ""
+  DOCKER_USERNAME: ""
+  DOCKER_PASSWORD: ""
+  DOCKER_REGISTRY: "ghcr.io"
