@@ -1,17 +1,17 @@
 ingress:
   hosts:
     - host:
-        domain: login-threefold.jimber.io
+        domain: login-beta.jimbertesting.be
         path: /api
         chart: backend
         service: dev-backend
     - host:
-        domain: login-threefold.jimber.io
+        domain: login-beta.jimbertesting.be
         path: /
         chart: frontend
         service: dev-frontend
     - host:
-        domain: login-threefold.jimber.io
+        domain: login-beta.jimbertesting.be
         path: /socket.io
         chart: backend
         service: dev-backend
