@@ -8,8 +8,8 @@ metadata:
 
 spec:
   tls:
-    {{- range .Values.ingress.hosts }}
     - hosts:
+    {{- range .Values.ingress.hosts }}
         - {{ .host.domain }}
     {{- end }}
       secretName: {{ template "releaseName" . }}
