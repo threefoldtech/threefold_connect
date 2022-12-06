@@ -17,7 +17,7 @@ spec:
           service:
             name: {{ $.Release.Name}}-{{ .host.chart }}
             port:
-              number: 80
+              number: 443
 {{- end }}
 
 
