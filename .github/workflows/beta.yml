@@ -101,5 +101,5 @@ jobs:
           echo $(ls ${HOME}/.kube)
       - name: Upgrade cluster
         run: |
-          helm upgrade --install beta helm_charts -f helm_charts/values/values-beta.yaml --set global.FRONTEND_IMAGE=ghcr.io/threefoldtech/threefold_connect/frontend:beta-${{ github.sha }} --set global.BACKEND_IMAGE=ghcr.io/threefoldtech/threefold_connect/backend:beta-${{ github.sha }} --set global.FLAGSMITH_API_KEY="{{ secrets.BETA_FLAGSMITH_API_KEY }}" --set global.DATABASE_URL="mysql://root:${{ secrets.BETA_DATABASE_PASSWORD }}@beta-database:3306/beta-database?schema=public" --set global.DOCKER_USERNAME="${{ secrets.DOCKER_USERNAME }}" --set global.DOCKER_PASSWORD="${{ secrets.DOCKER_TOKEN }}" -n jimber
+          helm upgrade --install beta helm_charts -f helm_charts/values/values-beta.yaml --set global.FRONTEND_IMAGE=ghcr.io/threefoldtech/threefold_connect/frontend:beta-${{ github.sha }} --set global.BACKEND_IMAGE=ghcr.io/threefoldtech/threefold_connect/backend:beta-${{ github.sha }} --set global.FLAGSMITH_API_KEY="${{ secrets.BETA_FLAGSMITH_API_KEY }}" --set global.DATABASE_URL="mysql://root:${{ secrets.BETA_DATABASE_PASSWORD }}@beta-database:3306/beta-database?schema=public" --set global.DOCKER_USERNAME="${{ secrets.DOCKER_USERNAME }}" --set global.DOCKER_PASSWORD="${{ secrets.DOCKER_TOKEN }}" -n jimber
 
