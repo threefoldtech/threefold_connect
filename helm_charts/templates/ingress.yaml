@@ -4,6 +4,8 @@ metadata:
   name: {{ .Release.Name }}-{{ .Chart.Name }}-ingress
   annotations:
     kubernetes.io/ingress.class: nginx
+    cert-manager.io/cluster-issuer: letsencrypt
+
 spec:
   rules:
 {{- range .Values.ingress.hosts }}
