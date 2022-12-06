@@ -6,6 +6,10 @@ metadata:
     kubernetes.io/ingress.class: nginx
 
 spec:
+  tls:
+    - hosts:
+        - login-beta.jimbertesting.be
+      secretName: {{ template "releaseName" . }}
   rules:
 {{- range .Values.ingress.hosts }}
   - host: {{ .host.domain }}
@@ -19,5 +23,3 @@ spec:
             port:
               number: 80
 {{- end }}
-
-
