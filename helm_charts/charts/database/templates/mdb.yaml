@@ -18,7 +18,7 @@ spec:
           - name: MARIADB_DATABASE
             value: {{ include "database.fullname" . }}
           - name: MARIADB_ROOT_PASSWORD
-            value: jimber
+            value: {{ template "database.DATABASE_PASSWORD" . }}
           name: {{ include "database.fullname" . }}
           ports:
             - name: mariadb

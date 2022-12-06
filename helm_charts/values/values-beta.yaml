@@ -4,17 +4,17 @@ ingress:
         domain: login-beta.jimbertesting.be
         path: /api
         chart: backend
-        service: dev-backend
+        service: beta-backend
     - host:
         domain: login-beta.jimbertesting.be
         path: /
         chart: frontend
-        service: dev-frontend
+        service: beta-frontend
     - host:
         domain: login-beta.jimbertesting.be
         path: /socket.io
         chart: backend
-        service: dev-backend
+        service: beta-backend
 
 acme:
   email: lennert.defauw@jimber.org

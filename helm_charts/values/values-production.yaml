@@ -1,20 +1,20 @@
 ingress:
   hosts:
     - host:
-        domain: login-beta.jimbertesting.be
+        domain: login.threefold.me
         path: /api
         chart: backend
-        service: dev-backend
+        service: prod-backend
     - host:
-        domain: login-beta.jimbertesting.be
+        domain: login.threefold.me
         path: /
         chart: frontend
-        service: dev-frontend
+        service: prod-frontend
     - host:
-        domain: login-beta.jimbertesting.be
+        domain: login.threefold.me
         path: /socket.io
         chart: backend
-        service: dev-backend
+        service: prod-backend
 
 acme:
   email: lennert.defauw@jimber.org
