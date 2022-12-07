@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: {{ include "database.fullname" . }}-pvc
+  name: {{ include "database.FULL_NAME" . }}-pvc
   namespace: jimber
 spec:
   accessModes:

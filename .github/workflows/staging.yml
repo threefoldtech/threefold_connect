@@ -14,8 +14,7 @@ jobs:
       contents: read
       packages: write
     env:
-      REGISTRY: ghcr.io
-      IMAGE_NAME: ghcr.io/threefoldtech/threefold_connect/frontend
+      IMAGE_NAME: threefoldjimber/threefold_connect-frontend
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -54,8 +53,7 @@ jobs:
       contents: read
       packages: write
     env:
-      REGISTRY: ghcr.io
-      IMAGE_NAME: ghcr.io/threefoldtech/threefold_connect/backend
+      IMAGE_NAME: threefoldjimber/threefold_connect-backend
 
     steps:
       - name: Checkout
@@ -68,8 +66,7 @@ jobs:
       - name: Build and push
         uses: docker/login-action@v1
         with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ github.actor }}
+          username: ${{ secrets.GITHUB_USERNAME  }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Extract metadata for Docker
@@ -101,5 +98,5 @@ jobs:
           echo $(ls ${HOME}/.kube)
       - name: Upgrade cluster
         run: |
-          helm upgrade --install staging-login helm_charts -f helm_charts/values/values-staging.yaml --set global.FRONTEND_IMAGE=ghcr.io/threefoldtech/threefold_connect/frontend:staging-${{ github.sha }} --set global.BACKEND_IMAGE=ghcr.io/threefoldtech/threefold_connect/backend:staging-${{ github.sha }} --set global.FLAGSMITH_API_KEY="${{ secrets.STAGING_FLAGSMITH_API_KEY }}" --set global.DATABASE_URL="mysql://root:${{ secrets.STAGING_DATABASE_PASSWORD }}@staging-database:3306/staging-database?schema=public" --set global.DOCKER_USERNAME="${{ secrets.DOCKER_USERNAME }}" --set global.DOCKER_PASSWORD="${{ secrets.DOCKER_TOKEN }}" --set global.DATABASE_PASSWORD="${{ secrets.STAGING_DATABASE_PASSWORD }}" -n jimber
+          helm upgrade --install staging-login helm_charts -f helm_charts/values/values-staging.yaml --set global.FRONTEND_IMAGE=threefoldjimber/threefold_connect-frontend:staging-${{ github.sha }} --set global.BACKEND_IMAGE=threefoldjimber/threefold_connect-backend:staging-${{ github.sha }} --set global.FLAGSMITH_API_KEY="${{ secrets.STAGING_FLAGSMITH_API_KEY }}" --set global.DATABASE_URL="mysql://root:${{ secrets.STAGING_DATABASE_PASSWORD }}@staging-database:3306/staging-database?schema=public" --set global.DATABASE_PASSWORD="${{ secrets.STAGING_DATABASE_PASSWORD }}" -n jimber
 

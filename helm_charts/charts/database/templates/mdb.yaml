@@ -1,32 +1,32 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "database.fullname" . }}
+  name: {{ include "database.FULL_NAME" . }}
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: {{ include "database.fullname" . }}
+      app: {{ include "database.FULL_NAME" . }}
   template:
     metadata:
       labels:
-        app: {{ include "database.fullname" . }}
+        app: {{ include "database.FULL_NAME" . }}
     spec:
       containers:
         - image: mariadb
           env:
           - name: MARIADB_DATABASE
-            value: {{ include "database.fullname" . }}
+            value: {{ include "database.FULL_NAME" . }}
           - name: MARIADB_ROOT_PASSWORD
             value: {{ template "database.DATABASE_PASSWORD" . }}
-          name: {{ include "database.fullname" . }}
+          name: {{ include "database.FULL_NAME" . }}
           ports:
             - name: mariadb
               containerPort: 3306
           volumeMounts:
-            - name: {{ include "database.fullname" . }}-volume
+            - name: {{ include "database.FULL_NAME" . }}-volume
               mountPath: /var/mysql/data/
       volumes:
-        - name: {{ include "database.fullname" . }}-volume
+        - name: {{ include "database.FULL_NAME" . }}-volume
           persistentVolumeClaim:
-            claimName: {{ include "database.fullname" . }}-pvc
+            claimName: {{ include "database.FULL_NAME" . }}-pvc

@@ -1,4 +1,4 @@
-{{- define "database.fullname" -}}
+{{- define "database.FULL_NAME" -}}
 {{- if .Values.fullnameOverride -}}
 {{- .Values.fullnameOverride | trunc 63 | trimSuffix "-" -}}
 {{- else -}}

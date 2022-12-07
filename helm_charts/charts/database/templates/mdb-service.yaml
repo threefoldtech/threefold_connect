@@ -2,14 +2,14 @@ apiVersion: v1
 kind: Service
 metadata:
   labels:
-    name: {{ include "database.fullname" . }}
-  name: {{ include "database.fullname" . }}
+    name: {{ include "database.FULL_NAME" . }}
+  name: {{ include "database.FULL_NAME" . }}
 spec:
- 
+
   ports:
     - name: mariadb
       port: 3306
       targetPort: 3306
   selector:
-    app: {{ include "database.fullname" . }}
+    app: {{ include "database.FULL_NAME" . }}
 
