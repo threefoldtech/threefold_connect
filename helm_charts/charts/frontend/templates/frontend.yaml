@@ -19,8 +19,4 @@ spec:
         ports:
         - name: http
           containerPort: 80
-      imagePullSecrets:
-        - name: {{ include "frontend.CONFIG_NAME" . }}
-
-
 
