@@ -20,7 +20,7 @@ Future<void> saveEmailToPKidForMigration() async {
     }
   }
 
-  await Globals().pkidClient?.setPKidDoc('email', json.encode({'email': ''}));
+  // await Globals().pkidClient?.setPKidDoc('email', json.encode({'email': ''}));
 }
 
 Future<void> savePhoneToPKidForMigration() async {
@@ -40,7 +40,7 @@ Future<void> savePhoneToPKidForMigration() async {
     }
   }
 
-  await Globals().pkidClient?.setPKidDoc('phone', json.encode({'phone': ''}));
+  // await Globals().pkidClient?.setPKidDoc('phone', json.encode({'phone': ''}));
 }
 
 Future<void> saveEmailToPKid() async {
@@ -85,6 +85,7 @@ Future<dynamic> getPhoneFromPkid() async {
 
 Future<void> getEmailFromPkidAndStore() async {
   Map<String, dynamic> emailData = await getEmailFromPKid();
+  print(emailData);
 
   print(emailData);
   try {
