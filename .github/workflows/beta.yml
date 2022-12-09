@@ -97,5 +97,5 @@ jobs:
           echo $(ls ${HOME}/.kube)
       - name: Upgrade cluster
         run: |
-          helm upgrade --install beta-login helm_charts -f helm_charts/values/values-beta.yaml --set global.FRONTEND_IMAGE=threefoldjimber/threefold_connect-frontend:beta-${{ github.sha }} --set global.BACKEND_IMAGE=threefoldjimber/threefold_connect-backend:beta-${{ github.sha }} --set global.FLAGSMITH_API_KEY="${{ secrets.BETA_FLAGSMITH_API_KEY }}" --set global.DATABASE_URL="mysql://root:${{ secrets.BETA_DATABASE_PASSWORD }}@login-beta-database:3306/beta-database?schema=public" --set global.DATABASE_PASSWORD="${{ secrets.BETA_DATABASE_PASSWORD }}" -n jimber
+          helm upgrade --install beta-login helm_charts -f helm_charts/values/values-beta.yaml --set global.FRONTEND_IMAGE=threefoldjimber/threefold_connect-frontend:beta-${{ github.sha }} --set global.BACKEND_IMAGE=threefoldjimber/threefold_connect-backend:beta-${{ github.sha }} --set global.FLAGSMITH_API_KEY="${{ secrets.BETA_FLAGSMITH_API_KEY }}" --set global.DATABASE_URL="mysql://root:${{ secrets.BETA_DATABASE_PASSWORD }}@beta-login-database:3306/beta-database?schema=public" --set global.DATABASE_PASSWORD="${{ secrets.BETA_DATABASE_PASSWORD }}" -n jimber
 
