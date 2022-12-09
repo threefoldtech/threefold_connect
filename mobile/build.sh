@@ -71,7 +71,7 @@ generateFile () {
 
 if [[ $1 == "--help" ]]
 then
-    echo "Usage: ./build.sh --[run|build|switch] --[local|testing|staging|production]"
+    echo "Usage: ./build.sh --[run|build|switch] --[local|staging|beta|production]"
     echo "Usage: ./build.sh --init"
     exit 1
 fi
@@ -82,7 +82,7 @@ then
     AndroidManifestDebugPath=android/app/src/debug/AndroidManifest.xml
 
     env_configFilePath=lib/core/config/config.dart
-    AppConfigLocalFilePath=lib/core/config/config.local.dart
+    AppConfigLocalFilePath=lib/core/config/classes/config.local.dart
 
     BuildGradlePath=android/app/build.gradle
 
@@ -111,11 +111,11 @@ then
 fi
 
 compileAndUpload "$1" "$2" "$3" "$4" "local"
-compileAndUpload "$1" "$2" "$3" "$4" "testing"
 compileAndUpload "$1" "$2" "$3" "$4" "staging"
+compileAndUpload "$1" "$2" "$3" "$4" "beta"
 compileAndUpload "$1" "$2" "$3" "$4" "production"
 
 echo "Syntax error."
-echo "Usage: ./build.sh --[[run|build|switch]] --[[local|testing|staging|production]]"
+echo "Usage: ./build.sh --[[run|build|switch]] --[[local|staging|beta|production]]"
 echo "Usage: ./build.sh --init"
 exit 1

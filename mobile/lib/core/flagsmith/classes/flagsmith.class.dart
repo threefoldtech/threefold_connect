@@ -47,6 +47,7 @@ class Flags {
     Globals().enableCacheWallet = await Flags().hasFlagValueByFeatureName('enable-cache-wallet');
 
     Globals().newWalletUrl = (await Flags().getFlagValueByFeatureName('new-wallet-url'))!;
+    Globals().wizardUrl = (await Flags().getFlagValueByFeatureName('wizard-url'))!;
     Globals().newsUrl = (await Flags().getFlagValueByFeatureName('news-url'))!;
     Globals().oldWalletUrl = (await Flags().getFlagValueByFeatureName('old-wallet-url'))!;
     Globals().farmerUrl = (await Flags().getFlagValueByFeatureName('farmer-url'))!;

@@ -14,6 +14,9 @@ class AppConfig extends EnvConfig {
     } else if (environment == Environment.Local) {
       appConfig = AppConfigLocal();
     }
+    else if (environment == Environment.Beta) {
+      appConfig = AppConfigBeta();
+    }
   }
 
   String baseUrl() {
@@ -120,3 +123,34 @@ class AppConfigStaging extends AppConfigImpl {
     return {'url': 'https://flagsmith.jimber.io/api/v1/', 'apiKey': 'cu9Qkir3MHJSpihzsXB8Kw'};
   }
 }
+
+class AppConfigBeta extends AppConfigImpl {
+  String baseUrl() {
+    return Globals().baseUrl;
+  }
+
+  String openKycApiUrl() {
+    return Globals().kycUrl;
+  }
+
+  String threeBotApiUrl() {
+    return Globals().apiUrl;
+  }
+
+  String threeBotSocketUrl() {
+    return Globals().socketUrl;
+  }
+
+  String wizardUrl() {
+    return Globals().wizardUrl;
+  }
+
+  String pKidUrl() {
+    return Globals().pkidUrl;
+  }
+
+  Map<String, String> flagSmithConfig() {
+    return {'url': 'https://flagsmith.jimber.io/api/v1/', 'apiKey': 'nFBKwmtWYZvmF84m8HEaaZ'};
+  }
+}
+
