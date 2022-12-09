@@ -53,7 +53,7 @@ setConfigsAndBuild() {
 msgTelegramAndUploadToAppServer () {
     mv build/app/outputs/apk/release/app-release.apk "build/app/outputs/apk/release/$current_time-TF-Connect-$1-$githash.apk"
 
-    scp "build/app/outputs/apk/release/$current_time-TF-Connect-$1-$githash.apk" jimber@192.168.3.10:/opt/apps/threefold/$1/
+    scp "build/app/outputs/apk/release/$current_time-TF-Connect-$1-$githash.apk" jimber@10.10.0.2:/opt/apps/threefold/$1/
     
     curl --http1.1 -s -X POST "https://api.telegram.org/bot868129294:AAEd-UDDSru9zGeGklzWL6mPO33NovuXYqo/sendMessage" -d parse_mode=markdown -d chat_id=-1001186043363 -d parse_mode=markdown -d text="Type: *$1* %0AGit user: *$gituser* %0AGit branch: *$gitbranch* %0AGit hash: *$githash* %0ATime: *$logcurrent_time* %0AMessage: *$2* %0AURL: *https://apps.staging.jimber.io/threefold/$1/*"
     
