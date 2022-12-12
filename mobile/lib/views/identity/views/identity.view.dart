@@ -147,8 +147,8 @@ class _IdentityScreenState extends State<IdentityScreen> {
                       children: [
                         Container(
                             constraints: BoxConstraints(
-                                minWidth: MediaQuery.of(context).size.width * 0.55,
-                                maxWidth: MediaQuery.of(context).size.width * 0.55),
+                                minWidth: MediaQuery.of(context).size.width * 0.50,
+                                maxWidth: MediaQuery.of(context).size.width * 0.50),
                             child: Text(email == null || email == '' ? 'Unknown' : email,
                                 overflow: TextOverflow.clip,
                                 style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)))
@@ -166,7 +166,7 @@ class _IdentityScreenState extends State<IdentityScreen> {
                 )
               ],
             )),
-            Padding(padding: EdgeInsets.only(right: 10))
+            Padding(padding: EdgeInsets.only(right: 5))
           ],
         ),
       ),

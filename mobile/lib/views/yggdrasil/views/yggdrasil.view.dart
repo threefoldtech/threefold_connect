@@ -182,7 +182,7 @@ class _YggDrasilScreenState extends State<YggDrasilScreen> {
                 return disconnectVpn();
               }
 
-              setVpnDisconnectingLayout();
+              setVpnConnectingLayout();
               bool isVPNConnectionStarted = await _vpnState.plugin.startVpn(await getEdCurveKeys());
 
               if (!isVPNConnectionStarted) {
