@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
+import { Body, Controller, Get, NotFoundException, Param, Post, Query } from '@nestjs/common';
 import { UserService } from './user.service';
 import { UserGateway } from './user.gateway';
 import { CreatedUserDto, CreateUserDto, UsernameDto } from 'shared-types';
@@ -22,7 +22,7 @@ export class UserController {
             return await this.userService.findByUsername(query.username, true);
         }
 
-        return await this.userService.findAll();
+        throw new NotFoundException('');
     }
 
     @Get(':username')

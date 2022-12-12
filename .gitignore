@@ -35,6 +35,10 @@ yarn-error.log*
 .idea/
 .vscode/
 
+
+scripts/migration/venv
+scripts/transfer/pythonsqlite.db
+
 dist/
 
 # Miscellaneous

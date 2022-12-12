@@ -4,15 +4,15 @@ import uuid
 import mysql.connector
 
 mydb = mysql.connector.connect(
-    host="threefold-development-db",
+    host="localhost",
     user="root",
-    password="jimber",
-    database='dev-database'
+    password="PASSWORD",
+    database='beta-database'
 )
 
 sql_cursor = mydb.cursor()
 
-conn = sqlite3.connect("database.db", check_same_thread=False)
+conn = sqlite3.connect("pythonsqlite.db", check_same_thread=False)
 
 cursor = conn.cursor()
 cursor.execute("select * from users")
