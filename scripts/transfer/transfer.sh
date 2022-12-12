@@ -22,4 +22,4 @@ then
 fi
 
 
-kubectl exec $BETA_POD -n jimber -- sh -c "python3 sqlite-to-mysql.py"
+kubectl exec $BETA_POD -n jimber -- sh -c "python3 sqlite-to-mysql.py --password=PASSWORD"
