@@ -71,6 +71,7 @@ class _RecoverScreenState extends State<RecoverScreen> {
     Map<String, dynamic> validationMnemonic = await isValidMnemonic(formattedMnemonic);
     if (!validationMnemonic['valid']) {
       setState(() => recoverError = validationMnemonic['reason']);
+      Navigator.pop(context);
       return;
     }
 

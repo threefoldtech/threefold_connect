@@ -37,8 +37,12 @@ for item in res:
     email = item[2]
     pk = item[3]
 
-    sql_cursor.execute(
-        'INSERT into User(userId, username, mainPublicKey) VALUES ("%s", "%s", "%s")' % (user_id, name, pk))
+    try:
+        sql_cursor.execute(
+            'INSERT into User(userId, username, mainPublicKey) VALUES ("%s", "%s", "%s")' % (user_id, name, pk))
+
+    except Exception as e:
+        print(e)
 
     cursor.execute("select * from digitaltwin_dns where name = '%s'" % name)
     res = cursor.fetchall()
@@ -49,9 +53,13 @@ for item in res:
         app_id = dns[2]
         ip = dns[3]
 
-        sql_cursor.execute(
-            'INSERT into DigitalTwin(id, userId, derivedPublicKey, appId, yggdrasilIp) VALUES ("%s", "%s", "%s", '
-            '"%s", "%s") '
-            % (dns_id, user_id, derived_public_key, app_id, ip))
+        try:
+            sql_cursor.execute(
+                'INSERT into DigitalTwin(id, userId, derivedPublicKey, appId, yggdrasilIp) VALUES ("%s", "%s", "%s", '
+                '"%s", "%s") '
+                % (dns_id, user_id, derived_public_key, app_id, ip))
 
-    sql_db.commit()
+            sql_db.commit()
+        except Exception as e:
+            print(e)
+

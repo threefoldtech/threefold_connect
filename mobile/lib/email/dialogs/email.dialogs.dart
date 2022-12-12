@@ -14,13 +14,20 @@ Future<String?> showChangeEmailDialog() async {
         return StatefulBuilder(builder: (statefulContext, setCustomState) {
           return Dialog(
               child: Container(
+                constraints: BoxConstraints(
+                  maxWidth: MediaQuery.of(context).size.width * 0.75,
+                  minWidth: MediaQuery.of(context).size.width * 0.75,
+                ),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
                 Row(
                   children: [
                     Container(
-                      width: MediaQuery.of(context).size.width * 0.8,
+                      constraints: BoxConstraints(
+                        maxWidth: MediaQuery.of(context).size.width * 0.75,
+                        minWidth: MediaQuery.of(context).size.width * 0.75,
+                      ),
                       decoration: BoxDecoration(
                         border: Border(
                           bottom: BorderSide(width: 0.5, color: Colors.grey),
@@ -28,6 +35,7 @@ Future<String?> showChangeEmailDialog() async {
                         color: Colors.white,
                       ),
                       child: Container(
+                          width: MediaQuery.of(context).size.width * 0.75,
                           padding: EdgeInsets.all(28),
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -61,6 +69,10 @@ Future<String?> showChangeEmailDialog() async {
                 ),
                 SizedBox(height: 20),
                 Container(
+                  constraints:  BoxConstraints(
+                maxWidth: MediaQuery.of(context).size.width * 0.75,
+          minWidth: MediaQuery.of(context).size.width * 0.75,
+          ),
                   padding: EdgeInsets.only(left: 28, right: 28, bottom: 28),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -86,8 +98,11 @@ Future<String?> showChangeEmailDialog() async {
                   ),
                 ),
                 Container(
+                  constraints:  BoxConstraints(
+          maxWidth: MediaQuery.of(context).size.width * 0.75,
+          minWidth: MediaQuery.of(context).size.width * 0.75,
+          ),
                   padding: EdgeInsets.only(left: 28, right: 28, bottom: 28),
-                  width: MediaQuery.of(context).size.width * 0.8,
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
