@@ -3,14 +3,22 @@ import uuid
 
 import mysql.connector
 
-mydb = mysql.connector.connect(
+import argparse
+
+parser = argparse.ArgumentParser()
+
+parser.add_argument("-p", "--password", help="Password")
+
+args = parser.parse_args()
+
+sql_db = mysql.connector.connect(
     host="localhost",
     user="root",
-    password="PASSWORD",
+    password=args.password,
     database='beta-database'
 )
 
-sql_cursor = mydb.cursor()
+sql_cursor = sql_db.cursor()
 
 conn = sqlite3.connect("pythonsqlite.db", check_same_thread=False)
 
@@ -46,4 +54,4 @@ for item in res:
             '"%s", "%s") '
             % (dns_id, user_id, derived_public_key, app_id, ip))
 
-    mydb.commit()
+    sql_db.commit()
