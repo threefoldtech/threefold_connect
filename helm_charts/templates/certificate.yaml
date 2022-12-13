@@ -1,7 +1,7 @@
 apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
-  name: {{ template "releaseName" . }}
+  name: {{ template "releaseName" . }}-cert
 spec:
   dnsNames:
     {{- range $host := .Values.ingress.hosts }}
@@ -9,5 +9,5 @@ spec:
     {{- end }}
   secretName: {{ template "releaseName" . }}
   issuerRef:
-    name: {{ template "releaseName" . }}
+    name: {{ template "releaseName" . }}-cert
     kind: Issuer
