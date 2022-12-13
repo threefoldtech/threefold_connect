@@ -9,20 +9,20 @@ metadata:
 spec:
   tls:
     - hosts:
-    {{- range .Values.ingress.hosts }}
-        - {{ .host.domain }}
+    {{- range $host := .Values.ingress.hosts }}
+      - {{ $host.host.name }}
     {{- end }}
       secretName: {{ template "releaseName" . }}
   rules:
-{{- range .Values.ingress.hosts }}
-  - host: {{ .host.domain }}
+{{- range $host := .Values.ingress.hosts }}
+  - host: {{ $host.host.name }}
     http:
       paths:
-      - path: {{ .host.path }}
+      - path: {{ $host.host.path }}
         pathType: Prefix
         backend:
           service:
-            name: {{ $.Release.Name}}-{{ .host.chart }}
+            name: {{ $host.host.service }}
             port:
               number: 80
 {{- end }}

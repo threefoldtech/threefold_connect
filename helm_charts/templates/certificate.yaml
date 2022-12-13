@@ -5,7 +5,7 @@ metadata:
 spec:
   dnsNames:
     {{- range $host := .Values.ingress.hosts }}
-    - {{ $host.host.domain }}
+    - {{ $host.host.name }}
     {{- end }}
   secretName: {{ template "releaseName" . }}
   issuerRef:

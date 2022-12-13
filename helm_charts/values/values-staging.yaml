@@ -1,19 +1,19 @@
 ingress:
   hosts:
     - host:
-        domain: login-staging.jimbertesting.be
+        name: login-staging.jimbertesting.be
         path: /api
-        chart: backend
+        port: 80
         service: staging-backend
     - host:
-        domain: login-staging.jimbertesting.be
+        name: login-staging.jimbertesting.be
         path: /
-        chart: frontend
+        port: 80
         service: staging-frontend
     - host:
-        domain: login-staging.jimbertesting.be
+        name: login-staging.jimbertesting.be
         path: /socket.io
-        chart: backend
+        port: 80
         service: staging-backend
 
 acme:
