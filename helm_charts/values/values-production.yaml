@@ -1,20 +1,20 @@
 ingress:
   hosts:
     - host:
-        domain: login.threefold.me
+        name: login-production.jimbertesting.be
         path: /api
-        chart: backend
-        service: prod-backend
+        port: 80
+        service: login-production-backend
     - host:
-        domain: login.threefold.me
+        name: login-production.jimbertesting.be
         path: /
-        chart: frontend
-        service: prod-frontend
+        port: 80
+        service: login-production-frontend
     - host:
-        domain: login.threefold.me
+        name: login-production.jimbertesting.be
         path: /socket.io
-        chart: backend
-        service: prod-backend
+        port: 80
+        service: login-production-backend
 
 acme:
   email: lennert.defauw@jimber.org
