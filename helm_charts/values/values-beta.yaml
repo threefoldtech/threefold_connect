@@ -4,17 +4,17 @@ ingress:
         name: login-beta.jimbertesting.be
         path: /api
         port: 80
-        service: login-beta-backend
+        service: beta-login-backend
     - host:
         name: login-beta.jimbertesting.be
         path: /
         port: 80
-        service: login-beta-frontend
+        service: beta-login-frontend
     - host:
         name: login-beta.jimbertesting.be
         path: /socket.io
         port: 80
-        service: login-beta-backend
+        service: beta-login-backend
 
 acme:
   email: lennert.defauw@jimber.org

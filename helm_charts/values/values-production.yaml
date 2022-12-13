@@ -4,17 +4,17 @@ ingress:
         name: login-production.jimbertesting.be
         path: /api
         port: 80
-        service: login-production-backend
+        service: production-login-backend
     - host:
         name: login-production.jimbertesting.be
         path: /
         port: 80
-        service: login-production-frontend
+        service: production-login-frontend
     - host:
         name: login-production.jimbertesting.be
         path: /socket.io
         port: 80
-        service: login-production-backend
+        service: production-login-backend
 
 acme:
   email: lennert.defauw@jimber.org
