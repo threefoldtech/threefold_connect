@@ -1,18 +1,17 @@
-FROM node:18.12.1-alpine3.16 as builder
+FROM node:18.12.1-alpine3.17 as builder
 
 WORKDIR /app
-RUN apk add --no-cache openssl1.1-compat
-RUN apk add --no-cache libc6-compat
+RUN apk update && apk add openssl1.1-compat
+
 RUN yarn global add turbo
 COPY . .
 RUN yarn install --frozen-lockfile
 RUN yarn run build --scope=api
 
-FROM node:18.12.1-alpine3.16
+FROM node:18.12.1-alpine3.17
 USER root
+RUN apk update && apk add openssl1.1-compat
 RUN apk add --no-cache bash
-RUN apk add --no-cache openssl1.1-compat
-RUN apk add --no-cache libc6-compat
 
 WORKDIR /app
 COPY --from=builder /app/ /app/
