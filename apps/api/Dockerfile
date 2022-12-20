@@ -3,7 +3,6 @@ FROM node:18.12.1-alpine3.17 as builder
 WORKDIR /app
 RUN apk update && apk add openssl1.1-compat
 
-RUN yarn global add turbo
 COPY . .
 RUN yarn install --frozen-lockfile
 RUN yarn run build --scope=api
