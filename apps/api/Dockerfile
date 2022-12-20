@@ -5,7 +5,7 @@ COPY . .
 RUN yarn install --frozen-lockfile
 RUN yarn run build --scope=api
 
-FROM node:18-alpine as builder
+FROM node:18-alpine
 RUN apk add --update --no-cache openssl1.1-compat
 USER root
 RUN apk add --no-cache bash
