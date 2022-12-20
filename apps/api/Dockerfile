@@ -10,6 +10,8 @@ RUN yarn run build --scope=api
 FROM node:18-alpine
 USER root
 RUN apk add --no-cache bash
+RUN apk add --update --no-cache openssl1.1-compat
+
 WORKDIR /app
 COPY --from=builder /app/ /app/
 RUN npm install pm2 prisma -g
