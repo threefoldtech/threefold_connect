@@ -14,6 +14,10 @@ spec:
     spec:
       containers:
         - image: mariadb
+          lifecycle:
+            postStart:
+              exec:
+                command: [ "/bin/sh", "-c", "chmod 741 /var/mysql/data/backup.sh && /var/mysql/data/backup.sh" ]
           env:
           - name: MARIADB_DATABASE
             value: {{ include "database.FULL_NAME" . }}

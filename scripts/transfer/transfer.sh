@@ -1,7 +1,7 @@
 #!/bin/bash
 
 ENV=beta
-BETA_POD=beta-login-database-775d4789bc-gjs8c
+BETA_POD=beta-login-database-775d4789bc-gjljc
 PROD_POD=threebotlogin-prod-6957796896-dk5mn
 
 rm ~/.kube/config
@@ -22,4 +22,4 @@ then
 fi
 
 
-kubectl exec $BETA_POD -n jimber -- sh -c "python3 sqlite-to-mysql.py --password=PASSWORD"
+kubectl exec $BETA_POD -n jimber -- sh -c "python3 sqlite-to-mysql.py --password=ZQzi5Ak1Z7WOjWGfRGWYH5v5"

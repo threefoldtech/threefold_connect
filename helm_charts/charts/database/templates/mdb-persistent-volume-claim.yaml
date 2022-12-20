@@ -3,6 +3,9 @@ kind: PersistentVolumeClaim
 metadata:
   name: {{ include "database.FULL_NAME" . }}-pvc
   namespace: jimber
+  annotations:
+    helm.sh/resource-policy: "keep"
+
 spec:
   accessModes:
     - ReadWriteMany
