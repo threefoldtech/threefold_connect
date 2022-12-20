@@ -1,6 +1,7 @@
 FROM node:18.12.1-alpine3.16 as builder
 
 WORKDIR /app
+RUN apk add --no-cache openssl1.1-compat
 RUN apk add --no-cache libc6-compat
 RUN yarn global add turbo
 COPY . .
@@ -10,6 +11,7 @@ RUN yarn run build --scope=api
 FROM node:18.12.1-alpine3.16
 USER root
 RUN apk add --no-cache bash
+RUN apk add --no-cache openssl1.1-compat
 RUN apk add --no-cache libc6-compat
 
 WORKDIR /app
