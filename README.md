@@ -28,7 +28,7 @@ If you have Threefold related questions, we provide a support chat where we will
 
 #### Planetary network
 
-It is possible to have a a planetary network IPv6 address. Here you can enable the planety network connection and your phone will automatically be connected to the p2p network.
+It is possible to have a planetary network IPv6 address. Here you can enable the planety network connection and your phone will automatically be connected to the p2p network.
 
 #### Identity
 
@@ -59,7 +59,7 @@ Make sure the correct configuration is inside config.js. After that start the fr
 
 ## Backend
 
-Go inside virtual environement:
+Go inside virtual environment:
 
 `source ./venv/bin/activate 
 `
@@ -76,7 +76,7 @@ Make sure you have at least Flutter 2.8.1 installed. If everything is installed 
 
 Copy the file in /lib/app_config_local.template into /lib/app_config_local.dart and change the configuration to your local IP's
 
-After that, use the build.sh script to set up the right environement
+After that, use the build.sh script to set up the right environment
 
 `./build.sh --init && ./build.sh --switch --local`
 
