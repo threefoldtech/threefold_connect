@@ -28,7 +28,7 @@ If you have Threefold related questions, we provide a support chat where we will
 
 #### Planetary network
 
-It is possible to have a a planetary network IPv6 address. Here you can enable the planety network connection and your phone will automatically be connected to the p2p network.
+It is possible to have a a planetary network IPv6 address. Here you can enable the planetary network connection and your phone will automatically be connected to the p2p network.
 
 #### Identity
 
