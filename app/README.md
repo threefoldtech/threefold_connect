@@ -33,3 +33,7 @@ samples, guidance on mobile development, and a full API reference.
 ## Known issues
 
 - <https://github.com/threefoldtech/threefold_connect/issues/306>
+
+## TODO
+
+- signingConfigs

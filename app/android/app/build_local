@@ -55,21 +55,21 @@ android {
 				multiDexEnabled true
     }
 
-		// signingConfigs {
-    //     release {
-    //         keyAlias localProperties.getProperty('keyAlias')
-    //         keyPassword localProperties.getProperty('keyPassword')
-    //         storeFile file(localProperties.getProperty('storeFile'))
-    //         storePassword localProperties.getProperty('storePassword')
-    //     }
-    //     debug {
+		signingConfigs {
+        release {
+            // keyAlias localProperties.getProperty('keyAlias')
+            // keyPassword localProperties.getProperty('keyPassword')
+            // storeFile file(localProperties.getProperty('storeFile'))
+            // storePassword localProperties.getProperty('storePassword')
+        }
+        debug {
 
-    //     }
-    // }
+        }
+    }
 		
     buildTypes {
         release {
-            signingConfig signingConfigs.debug
+            signingConfig signingConfigs.release
         }
         debug {
             signingConfig signingConfigs.debug
