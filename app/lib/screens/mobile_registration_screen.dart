@@ -23,7 +23,8 @@ class MobileRegistrationScreen extends StatefulWidget {
 
   MobileRegistrationScreen({this.doubleName});
 
-  _MobileRegistrationScreenState createState() => _MobileRegistrationScreenState();
+  _MobileRegistrationScreenState createState() =>
+      _MobileRegistrationScreenState();
 }
 
 enum _State { DoubleName, Email, SeedPhrase, ConfirmSeedPhrase, Finish }
@@ -69,8 +70,10 @@ class _MobileRegistrationScreenState extends State<MobileRegistrationScreen> {
   }
 
   checkEmail() async {
-    String? emailValue =
-        emailController.text.toLowerCase().trim().replaceAll(new RegExp(r"\s+"), " ");
+    String? emailValue = emailController.text
+        .toLowerCase()
+        .trim()
+        .replaceAll(new RegExp(r"\s+"), " ");
 
     setState(() {
       emailController.text = emailValue;
@@ -89,8 +92,10 @@ class _MobileRegistrationScreenState extends State<MobileRegistrationScreen> {
   }
 
   checkDoubleName() async {
-    String? doubleNameValue =
-        doubleNameController.text.toLowerCase().trim().replaceAll(new RegExp(r"\s+"), " ");
+    String? doubleNameValue = doubleNameController.text
+        .toLowerCase()
+        .trim()
+        .replaceAll(new RegExp(r"\s+"), " ");
 
     setState(() {
       doubleNameController.text = doubleNameValue;
@@ -100,7 +105,8 @@ class _MobileRegistrationScreenState extends State<MobileRegistrationScreen> {
       _registrationData.doubleName = doubleNameController.text + '.3bot';
       bool doubleNameValidation = validateDoubleName(doubleNameController.text);
       if (doubleNameValidation) {
-        Response userInfoResult = await getUserInfo(_registrationData.doubleName);
+        Response userInfoResult =
+            await getUserInfo(_registrationData.doubleName);
         if (userInfoResult.statusCode != 200) {
           setState(() {
             state = _State.Email;
@@ -126,19 +132,22 @@ class _MobileRegistrationScreenState extends State<MobileRegistrationScreen> {
     setState(() {
       state = _State.ConfirmSeedPhrase;
     });
-    _registrationData.keyPair = await generateKeyPairFromSeedPhrase(_registrationData.phrase);
+    _registrationData.keyPair =
+        await generateKeyPairFromSeedPhrase(_registrationData.phrase);
   }
 
   checkConfirm() {
-    String? seedCheckValue =
-        seedConfirmationController.text.toLowerCase().trim().replaceAll(new RegExp(r"\s+"), " ");
+    String? seedCheckValue = seedConfirmationController.text
+        .toLowerCase()
+        .trim()
+        .replaceAll(new RegExp(r"\s+"), " ");
 
     setState(() {
       seedConfirmationController.text = seedCheckValue;
     });
 
-    bool seedWordConfirmationValidation =
-        validateSeedWords(_registrationData.phrase, seedConfirmationController.text);
+    bool seedWordConfirmationValidation = validateSeedWords(
+        _registrationData.phrase, seedConfirmationController.text);
 
     if (seedWordConfirmationValidation) {
       setState(() {
@@ -156,8 +165,11 @@ class _MobileRegistrationScreenState extends State<MobileRegistrationScreen> {
     // String deviceId = await _listener.getToken();
     // String signedDeviceId =
     //     await (signData(deviceId, _registrationData.keys['privateKey']));
-    Response response = await finishRegistration(doubleNameController.text, emailController.text,
-        'random', base64.encode(_registrationData.keyPair.pk));
+    Response response = await finishRegistration(
+        doubleNameController.text,
+        emailController.text,
+        'random',
+        base64.encode(_registrationData.keyPair.pk));
 
     if (response.statusCode == 200) {
       saveRegistration();
@@ -172,9 +184,10 @@ class _MobileRegistrationScreenState extends State<MobileRegistrationScreen> {
         builder: (BuildContext context) => CustomDialog(
           image: Icons.error,
           title: 'Error',
-          description: 'Something went wrong when trying to create your account.',
+          description:
+              'Something went wrong when trying to create your account.',
           actions: <Widget>[
-            FlatButton(
+            TextButton(
               child: Text('Ok'),
               onPressed: () {
                 Navigator.pop(context);
@@ -296,26 +309,35 @@ class _MobileRegistrationScreenState extends State<MobileRegistrationScreen> {
                 mainAxisSize: MainAxisSize.max,
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: <Widget>[
-                  FlatButton(
+                  TextButton(
+                    style: ButtonStyle(
+                      backgroundColor: MaterialStateProperty.all(
+                          Theme.of(context).accentColor),
+                    ),
                     onPressed: () {
                       details.onStepCancel!();
                     },
                     child: Text(
-                      state == _State.DoubleName ? 'CANCEL' :  'PREVIOUS',
+                      state == _State.DoubleName ? 'CANCEL' : 'PREVIOUS',
                       style: TextStyle(color: Colors.white),
                     ),
-                    color: Theme.of(context).accentColor,
                   ),
-                  FlatButton(
-                    disabledColor: Colors.grey,
-                    onPressed :state == _State.SeedPhrase && didWriteSeed == false ? null : () {
-                      details.onStepContinue!();
-                    },
+                  TextButton(
+                    style: ButtonStyle(
+                      backgroundColor: MaterialStateProperty.all(
+                          Theme.of(context).accentColor),
+                      foregroundColor: MaterialStateProperty.all(Colors.grey),
+                    ),
+                    onPressed:
+                        state == _State.SeedPhrase && didWriteSeed == false
+                            ? null
+                            : () {
+                                details.onStepContinue!();
+                              },
                     child: Text(
                       state == _State.Finish ? 'FINISH' : 'NEXT',
                       style: TextStyle(color: Colors.white),
                     ),
-                    color: Theme.of(context).accentColor,
                   )
                 ],
               ),
@@ -362,7 +384,8 @@ class _MobileRegistrationScreenState extends State<MobileRegistrationScreen> {
                         ),
                         controller: doubleNameController,
                         inputFormatters: <TextInputFormatter>[
-                          FilteringTextInputFormatter.allow(RegExp("[a-zA-Z0-9]"))
+                          FilteringTextInputFormatter.allow(
+                              RegExp("[a-zA-Z0-9]"))
                         ],
                         enableSuggestions: false,
                         autocorrect: false,
@@ -396,7 +419,9 @@ class _MobileRegistrationScreenState extends State<MobileRegistrationScreen> {
                     ? StepState.editing
                     : StepState.disabled,
             title: Text('Email'),
-            subtitle: state.index > _State.Email.index ? Text(emailController.text) : null,
+            subtitle: state.index > _State.Email.index
+                ? Text(emailController.text)
+                : null,
             content: Card(
               child: Padding(
                 padding: const EdgeInsets.all(16.0),
@@ -421,27 +446,30 @@ class _MobileRegistrationScreenState extends State<MobileRegistrationScreen> {
             title: Text('Seed phrase'),
             content: Card(
               child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  children: [
-                    ReuseableTextStep(
-                      titleText:
-                      'In order to ever retrieve your tokens in case of switching to a new device or app, you will have to enter your seedphrase in combination with your TF Connect username. \n\nPlease write this seedphrase and your username on a piece of paper and keep it in a secure place. Do not communicate this key to anyone. ThreeFold can not be held responsible in case of loss of this seedphrase.',
-                      extraText: _registrationData.phrase,
-                      errorStepperText: errorStepperText,
-                    ),
-                    CheckboxListTile(
-                      title: Text("I have written down my seedphrase and username", style: TextStyle(fontSize: 14 ),),
-                      value: didWriteSeed,
-                      onChanged: (newValue) {
-                        didWriteSeed = newValue!;
-                        setState(() {});
-                      },
-                      controlAffinity: ListTileControlAffinity.leading,  //  <-- leading Checkbox
-                    )
-                  ],
-                )
-              ),
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    children: [
+                      ReuseableTextStep(
+                        titleText:
+                            'In order to ever retrieve your tokens in case of switching to a new device or app, you will have to enter your seedphrase in combination with your TF Connect username. \n\nPlease write this seedphrase and your username on a piece of paper and keep it in a secure place. Do not communicate this key to anyone. ThreeFold can not be held responsible in case of loss of this seedphrase.',
+                        extraText: _registrationData.phrase,
+                        errorStepperText: errorStepperText,
+                      ),
+                      CheckboxListTile(
+                        title: Text(
+                          "I have written down my seedphrase and username",
+                          style: TextStyle(fontSize: 14),
+                        ),
+                        value: didWriteSeed,
+                        onChanged: (newValue) {
+                          didWriteSeed = newValue!;
+                          setState(() {});
+                        },
+                        controlAffinity: ListTileControlAffinity
+                            .leading, //  <-- leading Checkbox
+                      )
+                    ],
+                  )),
             ),
           ),
           Step(
@@ -457,7 +485,8 @@ class _MobileRegistrationScreenState extends State<MobileRegistrationScreen> {
                 padding: const EdgeInsets.all(16.0),
                 child: ReuseableTextFieldStep(
                   focusNode: seedFocus,
-                  titleText: 'Type 3 random words from your seed phrase, separated by a space.',
+                  titleText:
+                      'Type 3 random words from your seed phrase, separated by a space.',
                   labelText: 'Seed phrase words',
                   typeText: TextInputType.text,
                   errorStepperText: errorStepperText,

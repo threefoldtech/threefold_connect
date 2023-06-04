@@ -59,7 +59,8 @@ class BackendConnection {
       int currentTimestamp = new DateTime.now().millisecondsSinceEpoch;
 
       if (data['created'] != null &&
-          ((currentTimestamp - data['created']) / 1000) > Globals().loginTimeout) {
+          ((currentTimestamp - data['created']) / 1000) >
+              Globals().loginTimeout) {
         print('We received an expired login attempt, ignoring it.');
         return;
       }
@@ -124,8 +125,11 @@ Future emailVerification(BuildContext context) async {
     await saveEmail(email["email"]!, null);
   }
 
-  var vSei = jsonDecode((await verifySignedEmailIdentifier(signedEmailIdentifier!)).body);
-  if (vSei == null || vSei['email'] != email['email'] || vSei['identifier'] != doubleName) {
+  var vSei = jsonDecode(
+      (await verifySignedEmailIdentifier(signedEmailIdentifier!)).body);
+  if (vSei == null ||
+      vSei['email'] != email['email'] ||
+      vSei['identifier'] != doubleName) {
     return;
   }
 
@@ -139,7 +143,7 @@ Future emailVerification(BuildContext context) async {
       title: "Email verified",
       description: "Your email has been verified!",
       actions: <Widget>[
-        FlatButton(
+        TextButton(
           child: new Text("Ok"),
           onPressed: () {
             Navigator.pop(context);
@@ -169,8 +173,11 @@ Future phoneVerification(BuildContext context) async {
     await savePhone(phone["phone"]!, null);
   }
 
-  var vSpi = jsonDecode((await verifySignedPhoneIdentifier(signedPhoneIdentifier!)).body);
-  if (vSpi == null || vSpi['phone'] != phone['phone'] || vSpi['identifier'] != doubleName) {
+  var vSpi = jsonDecode(
+      (await verifySignedPhoneIdentifier(signedPhoneIdentifier!)).body);
+  if (vSpi == null ||
+      vSpi['phone'] != phone['phone'] ||
+      vSpi['identifier'] != doubleName) {
     return;
   }
 
@@ -184,7 +191,7 @@ Future phoneVerification(BuildContext context) async {
       title: "Phone verified",
       description: "Your phone has been verified!",
       actions: <Widget>[
-        FlatButton(
+        TextButton(
           child: new Text("Ok"),
           onPressed: () {
             Navigator.pop(context);
@@ -206,7 +213,7 @@ Future showIdentityMessage(BuildContext context, String type) async {
           description:
               "Your verification attempt has expired, please retry and finish the flow in under 10 minutes.",
           actions: <Widget>[
-            FlatButton(
+            TextButton(
               child: new Text("Ok"),
               onPressed: () {
                 Navigator.pop(context);
@@ -222,9 +229,10 @@ Future showIdentityMessage(BuildContext context, String type) async {
         builder: (BuildContext context) => CustomDialog(
           image: Icons.warning,
           title: "Identity verify failed",
-          description: "Something went wrong.\nIf this issue persist, please contact support",
+          description:
+              "Something went wrong.\nIf this issue persist, please contact support",
           actions: <Widget>[
-            FlatButton(
+            TextButton(
               child: new Text("Ok"),
               onPressed: () {
                 Navigator.pop(context);
@@ -242,7 +250,7 @@ Future showIdentityMessage(BuildContext context, String type) async {
         title: "Identity verified",
         description: "Your identity has been verified successfully",
         actions: <Widget>[
-          FlatButton(
+          TextButton(
             child: new Text("Ok"),
             onPressed: () {
               Navigator.pop(context);
@@ -264,12 +272,16 @@ Future identityVerification(String reference) async {
 
   Map<String, dynamic> identifiersData = json.decode(response.body);
 
-  String signedIdentityNameIdentifier = identifiersData["signed_identity_name_identifier"];
-  String signedIdentityCountryIdentifier = identifiersData["signed_identity_country_identifier"];
-  String signedIdentityDOBIdentifier = identifiersData["signed_identity_dob_identifier"];
+  String signedIdentityNameIdentifier =
+      identifiersData["signed_identity_name_identifier"];
+  String signedIdentityCountryIdentifier =
+      identifiersData["signed_identity_country_identifier"];
+  String signedIdentityDOBIdentifier =
+      identifiersData["signed_identity_dob_identifier"];
   String signedIdentityDocumentMetaIdentifier =
       identifiersData["signed_identity_document_meta_identifier"];
-  String signedIdentityGenderIdentifier = identifiersData["signed_identity_gender_identifier"];
+  String signedIdentityGenderIdentifier =
+      identifiersData["signed_identity_gender_identifier"];
 
   if (signedIdentityNameIdentifier.isEmpty ||
       signedIdentityCountryIdentifier.isEmpty ||
@@ -279,14 +291,15 @@ Future identityVerification(String reference) async {
     return;
   }
 
-  Map<String, dynamic> identifiers = jsonDecode((await verifySignedIdentityIdentifier(
-          signedIdentityNameIdentifier,
-          signedIdentityCountryIdentifier,
-          signedIdentityDOBIdentifier,
-          signedIdentityDocumentMetaIdentifier,
-          signedIdentityGenderIdentifier,
-          reference))
-      .body);
+  Map<String, dynamic> identifiers = jsonDecode(
+      (await verifySignedIdentityIdentifier(
+              signedIdentityNameIdentifier,
+              signedIdentityCountryIdentifier,
+              signedIdentityDOBIdentifier,
+              signedIdentityDocumentMetaIdentifier,
+              signedIdentityGenderIdentifier,
+              reference))
+          .body);
 
   var verifiedSignedIdentityNameIdentifier =
       jsonDecode(identifiers["signedIdentityNameIdentifierVerified"]);
@@ -300,27 +313,32 @@ Future identityVerification(String reference) async {
       jsonDecode(identifiers["signedIdentityGenderIdentifierVerified"]);
 
   if (verifiedSignedIdentityNameIdentifier == null ||
-      verifiedSignedIdentityNameIdentifier['identifier'].toString() != doubleName) {
+      verifiedSignedIdentityNameIdentifier['identifier'].toString() !=
+          doubleName) {
     return;
   }
 
   if (verifiedSignedIdentityCountryIdentifier == null ||
-      verifiedSignedIdentityCountryIdentifier['identifier'].toString() != doubleName) {
+      verifiedSignedIdentityCountryIdentifier['identifier'].toString() !=
+          doubleName) {
     return;
   }
 
   if (verifiedSignedIdentityDOBIdentifier == null ||
-      verifiedSignedIdentityDOBIdentifier['identifier'].toString() != doubleName) {
+      verifiedSignedIdentityDOBIdentifier['identifier'].toString() !=
+          doubleName) {
     return;
   }
 
   if (verifiedSignedIdentityDocumentMetaIdentifier == null ||
-      verifiedSignedIdentityDocumentMetaIdentifier['identifier'].toString() != doubleName) {
+      verifiedSignedIdentityDocumentMetaIdentifier['identifier'].toString() !=
+          doubleName) {
     return;
   }
 
   if (verifiedSignedIdentityGenderIdentifier == null ||
-      verifiedSignedIdentityGenderIdentifier['identifier'].toString() != doubleName) {
+      verifiedSignedIdentityGenderIdentifier['identifier'].toString() !=
+          doubleName) {
     return;
   }
 
@@ -341,8 +359,8 @@ Future identityVerification(String reference) async {
   return 'Verified';
 }
 
-
-Future openSign(BuildContext ctx, Sign signData, BackendConnection backendConnection) async {
+Future openSign(BuildContext ctx, Sign signData,
+    BackendConnection backendConnection) async {
   String? messageType = signData.type;
 
   if (messageType == null || messageType != 'sign') {
@@ -364,7 +382,6 @@ Future openSign(BuildContext ctx, Sign signData, BackendConnection backendConnec
     return;
   }
 
-
   backendConnection.leaveRoom(signData.doubleName);
 
   bool? signAccepted = await Navigator.push(
@@ -383,11 +400,13 @@ Future openSign(BuildContext ctx, Sign signData, BackendConnection backendConnec
   await showSignedInDialog(ctx);
 }
 
-
-Future openLogin(BuildContext ctx, Login loginData, BackendConnection backendConnection) async {
+Future openLogin(BuildContext ctx, Login loginData,
+    BackendConnection backendConnection) async {
   String? messageType = loginData.type;
 
-  if (messageType == null || messageType != 'login' || loginData.isMobile == true) {
+  if (messageType == null ||
+      messageType != 'login' ||
+      loginData.isMobile == true) {
     return;
   }
 
@@ -399,7 +418,9 @@ Future openLogin(BuildContext ctx, Login loginData, BackendConnection backendCon
     ctx,
     MaterialPageRoute(
       builder: (context) => AuthenticationScreen(
-          correctPin: pin!, userMessage: "Please enter your PIN code.", loginData: loginData),
+          correctPin: pin!,
+          userMessage: "Please enter your PIN code.",
+          loginData: loginData),
     ),
   );
 

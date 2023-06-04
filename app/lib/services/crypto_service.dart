@@ -8,7 +8,6 @@ import 'package:flutter_sodium/flutter_sodium.dart';
 import 'package:threebotlogin/services/shared_preference_service.dart';
 import 'package:pbkdf2ns/pbkdf2ns.dart';
 
-
 bool verifyHash(String data, String hash) {
   final List<int> codeUnits = data.codeUnits;
   final Uint8List unit8List = Uint8List.fromList(codeUnits);
@@ -24,7 +23,6 @@ String hashData(String data) {
 
   return base64.encode(Sodium.cryptoHash(unit8List));
 }
-
 
 // Helper method to convert a String input to hex used for entropy
 Uint8List _toHex(String input) {
@@ -67,33 +65,37 @@ bool verifySignature(Uint8List signedMessage, Uint8List pk) {
     Uint8List data = Sodium.cryptoSignOpen(signedMessage, pk);
     print(utf8.decode(data));
     return true;
-  }
-  catch(e) {
+  } catch (e) {
     print(e);
     return false;
   }
 }
 
 // Encrypt given data encrypted with a keypair
-Future<Map<String, String>> encrypt(String data, Uint8List pk, Uint8List sk) async {
+Future<Map<String, String>> encrypt(
+    String data, Uint8List pk, Uint8List sk) async {
   Uint8List nonce = CryptoBox.randomNonce();
   Uint8List private = Sodium.cryptoSignEd25519SkToCurve25519(sk);
   Uint8List message = Uint8List.fromList(data.codeUnits);
   Uint8List encryptedData = Sodium.cryptoBoxEasy(message, nonce, pk, private);
 
-  return {'nonce': base64.encode(nonce), 'ciphertext': base64.encode(encryptedData)};
+  return {
+    'nonce': base64.encode(nonce),
+    'ciphertext': base64.encode(encryptedData)
+  };
 }
 
 // Decrypt given ciphertext with a keypair
-Future<String> decrypt(String encodedCipherText, Uint8List pk, Uint8List sk) async {
+Future<String> decrypt(
+    String encodedCipherText, Uint8List pk, Uint8List sk) async {
   Uint8List cipherText = base64.decode(encodedCipherText);
   Uint8List publicKey = Sodium.cryptoSignEd25519PkToCurve25519(pk);
   Uint8List secretKey = Sodium.cryptoSignEd25519SkToCurve25519(sk);
 
-  Uint8List decryptedData = Sodium.cryptoBoxSealOpen(cipherText, publicKey, secretKey);
+  Uint8List decryptedData =
+      Sodium.cryptoBoxSealOpen(cipherText, publicKey, secretKey);
   return new String.fromCharCodes(decryptedData);
 }
-
 
 // Generate a new seed combined with a random salt => appId
 Future<Uint8List> generateDerivedSeed(String appId) async {

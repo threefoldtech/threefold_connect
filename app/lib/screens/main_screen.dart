@@ -41,7 +41,7 @@ class _AppState extends State<MainScreen> {
     super.initState();
     Events().reset();
     // _listener = FirebaseNotificationListener();
-    WidgetsBinding.instance?.addPostFrameCallback((_) => pushScreens());
+    WidgetsBinding.instance.addPostFrameCallback((_) => pushScreens());
   }
 
   @override
@@ -70,9 +70,13 @@ class _AppState extends State<MainScreen> {
         Container(
           padding: EdgeInsets.only(left: 12, right: 12),
           child: Text(
-            updateMessage != null ? updateMessage.toString() : errorMessage.toString(),
+            updateMessage != null
+                ? updateMessage.toString()
+                : errorMessage.toString(),
             style: TextStyle(
-                fontSize: 16, fontWeight: FontWeight.bold, color: errorMessage != null ? Colors.red : Colors.black),
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: errorMessage != null ? Colors.red : Colors.black),
           ),
         ),
         SizedBox(
@@ -90,11 +94,13 @@ class _AppState extends State<MainScreen> {
             maintainAnimation: true,
             maintainState: true,
             visible: errorMessage != null,
-            child: RaisedButton(
-              shape: new RoundedRectangleBorder(
-                borderRadius: new BorderRadius.circular(30),
+            child: ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Theme.of(context).accentColor,
+                shape: const RoundedRectangleBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(30)),
+                ),
               ),
-              color: Theme.of(context).accentColor,
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -150,7 +156,10 @@ class _AppState extends State<MainScreen> {
       print(e);
 
       updateMessage = null;
-      errorMessage = e.toString().split('Exception:')[1];
+      errorMessage = e.toString();
+      if (e.toString().split('Exception:').length > 1) {
+        errorMessage = e.toString().split('Exception:')[1];
+      }
       setState(() {});
       return;
     }
@@ -159,12 +168,15 @@ class _AppState extends State<MainScreen> {
       InitScreen init = InitScreen();
       bool accepted = false;
       while (!accepted) {
-        accepted = !(await Navigator.push(context, MaterialPageRoute(builder: (context) => init)) == null);
+        accepted = !(await Navigator.push(
+                context, MaterialPageRoute(builder: (context) => init)) ==
+            null);
       }
     }
 
     if (!widget.registered!) {
-      await Navigator.push(context, MaterialPageRoute(builder: (context) => UnregisteredScreen()));
+      await Navigator.push(context,
+          MaterialPageRoute(builder: (context) => UnregisteredScreen()));
     }
 
     await Globals().router.init();
@@ -184,7 +196,9 @@ class _AppState extends State<MainScreen> {
     await Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-            builder: (context) => HomeScreen(initialLink: initialLink, backendConnection: _backendConnection)));
+            builder: (context) => HomeScreen(
+                initialLink: initialLink,
+                backendConnection: _backendConnection)));
   }
 
   fetchPkidData() async {
@@ -192,7 +206,8 @@ class _AppState extends State<MainScreen> {
       String? seedPhrase = await getPhrase();
 
       if (seedPhrase != null &&
-          (await isPKidMigrationIssueSolved() == false || await isPKidMigrationIssueSolved() == null)) {
+          (await isPKidMigrationIssueSolved() == false ||
+              await isPKidMigrationIssueSolved() == null)) {
         fixPkidMigration();
       }
 
@@ -208,13 +223,15 @@ class _AppState extends State<MainScreen> {
   checkInternetConnection() async {
     try {
       final List<InternetAddress> result =
-          await InternetAddress.lookup('google.com').timeout(Duration(seconds: Globals().timeOutSeconds));
+          await InternetAddress.lookup('google.com')
+              .timeout(Duration(seconds: Globals().timeOutSeconds));
 
       if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
         print('Connected to the internet');
       }
     } catch (e) {
-      throw new Exception("No internet connection available, please make sure you have a stable internet connection.");
+      throw new Exception(
+          "No internet connection available, please make sure you have a stable internet connection.");
     }
   }
 
@@ -223,13 +240,15 @@ class _AppState extends State<MainScreen> {
       try {
         String baseUrl = AppConfig().baseUrl();
         final List<InternetAddress> result =
-            await InternetAddress.lookup('$baseUrl').timeout(Duration(seconds: Globals().timeOutSeconds));
+            await InternetAddress.lookup('$baseUrl')
+                .timeout(Duration(seconds: Globals().timeOutSeconds));
 
         if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
           print('Connected to the servers');
         }
       } catch (e) {
-        throw new Exception("Can't connect to our servers, please try again. Contact support if this issue persists.");
+        throw new Exception(
+            "Can't connect to our servers, please try again. Contact support if this issue persists.");
       }
     }
   }
@@ -264,10 +283,12 @@ class _AppState extends State<MainScreen> {
   checkIfAppIsUpToDate() async {
     try {
       if (!await isAppUpToDate()) {
-        throw new Exception('The app is outdated. Please, update it to the latest version');
+        throw new Exception(
+            'The app is outdated. Please, update it to the latest version');
       }
     } catch (e) {
-      throw new Exception("The app is outdated. Please, update it to the latest version");
+      throw new Exception(
+          "The app is outdated. Please, update it to the latest version");
     }
   }
 

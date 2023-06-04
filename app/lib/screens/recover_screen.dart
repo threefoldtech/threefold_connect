@@ -62,7 +62,8 @@ class _RecoverScreenState extends State<RecoverScreen> {
 
       var futures = keyWords.map((keyword) async {
         var pKidResult = await client.getPKidDoc(keyword);
-        return pKidResult.containsKey('data') && pKidResult.containsKey('success')
+        return pKidResult.containsKey('data') &&
+                pKidResult.containsKey('success')
             ? jsonDecode(pKidResult['data'])
             : {};
       });
@@ -77,7 +78,6 @@ class _RecoverScreenState extends State<RecoverScreen> {
       await handleKYCData(dataMap[0], dataMap[1], dataMap[2]);
 
       await fixPkidMigration();
-
     } catch (e) {
       print(e);
       throw Exception('Something went wrong');
@@ -157,7 +157,8 @@ class _RecoverScreenState extends State<RecoverScreen> {
               child: TextFormField(
                 keyboardType: TextInputType.multiline,
                 maxLines: null,
-                decoration: InputDecoration(border: OutlineInputBorder(), labelText: 'SEED PHRASE'),
+                decoration: InputDecoration(
+                    border: OutlineInputBorder(), labelText: 'SEED PHRASE'),
                 controller: seedPhraseController,
                 validator: (String? value) {
                   if (value!.isEmpty) {
@@ -174,16 +175,18 @@ class _RecoverScreenState extends State<RecoverScreen> {
               error,
               style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
             ),
-            RaisedButton(
-              shape: new RoundedRectangleBorder(
-                borderRadius: new BorderRadius.circular(10),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Theme.of(context).primaryColor,
+                shape: const RoundedRectangleBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(10)),
+                ),
+                padding: EdgeInsets.symmetric(horizontal: 11.0, vertical: 6.0),
               ),
-              padding: EdgeInsets.all(10),
               child: Text(
                 'Recover Account',
                 style: TextStyle(color: Colors.white),
               ),
-              color: Theme.of(context).primaryColor,
               onPressed: () async {
                 setState(() {
                   error = '';
@@ -196,8 +199,8 @@ class _RecoverScreenState extends State<RecoverScreen> {
                     .trim()
                     .replaceAll(new RegExp(r"\s+"), " ");
 
-                if(doubleNameValue.endsWith('.3bot')) {
-                  doubleNameValue  = doubleNameValue.replaceAll('.3bot', '');
+                if (doubleNameValue.endsWith('.3bot')) {
+                  doubleNameValue = doubleNameValue.replaceAll('.3bot', '');
                 }
 
                 String seedPhraseValue = seedPhraseController.text
@@ -220,8 +223,8 @@ class _RecoverScreenState extends State<RecoverScreen> {
                   await continueRecoverAccount();
 
                   Navigator.pop(context); // To dismiss the spinner
-                  Navigator.pop(context, true); // to dismiss the recovery screen.
-
+                  Navigator.pop(
+                      context, true); // to dismiss the recovery screen.
                 } catch (e) {
                   print(e);
                   Navigator.pop(context);

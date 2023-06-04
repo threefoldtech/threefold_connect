@@ -90,10 +90,10 @@ Future<Map<String, String>> getEdCurveKeys() async {
   final String? pkEd = prefs.getString('publickey');
   final String? skEd = prefs.getString('privatekey');
 
-  final String pkCurve =
-      base64.encode(Sodium.cryptoSignEd25519PkToCurve25519(base64.decode(pkEd!)));
-  final String skCurve =
-      base64.encode(Sodium.cryptoSignEd25519SkToCurve25519(base64.decode(skEd!)));
+  final String pkCurve = base64
+      .encode(Sodium.cryptoSignEd25519PkToCurve25519(base64.decode(pkEd!)));
+  final String skCurve = base64
+      .encode(Sodium.cryptoSignEd25519SkToCurve25519(base64.decode(skEd!)));
 
   return {
     'signingPublicKey': hex.encode(base64.decode(pkEd)),
@@ -133,7 +133,10 @@ Future<bool?> getIsEmailVerified() async {
 
 Future<Map<String, String?>> getEmail() async {
   final SharedPreferences prefs = await SharedPreferences.getInstance();
-  return {'email': prefs.getString('email'), 'sei': prefs.getString('signedEmailIdentifier')};
+  return {
+    'email': prefs.getString('email'),
+    'sei': prefs.getString('signedEmailIdentifier')
+  };
 }
 
 Future<void> saveEmail(String email, String? signedEmailIdentifier) async {
@@ -150,7 +153,8 @@ Future<void> saveEmail(String email, String? signedEmailIdentifier) async {
   if (signedEmailIdentifier != null) {
     Globals().emailVerified.value = true;
     prefs.setString('signedEmailIdentifier', signedEmailIdentifier);
-    client.setPKidDoc('email', json.encode({'email': email, 'sei': signedEmailIdentifier}));
+    client.setPKidDoc(
+        'email', json.encode({'email': email, 'sei': signedEmailIdentifier}));
     return;
   }
 
@@ -176,7 +180,10 @@ Future<bool?> getIsPhoneVerified() async {
 
 Future<Map<String, String?>> getPhone() async {
   final SharedPreferences prefs = await SharedPreferences.getInstance();
-  return {'phone': prefs.getString('phone'), 'spi': prefs.getString('signedPhoneIdentifier')};
+  return {
+    'phone': prefs.getString('phone'),
+    'spi': prefs.getString('signedPhoneIdentifier')
+  };
 }
 
 Future<void> savePhone(String phone, String? signedPhoneIdentifier) async {
@@ -193,7 +200,8 @@ Future<void> savePhone(String phone, String? signedPhoneIdentifier) async {
   if (signedPhoneIdentifier != null) {
     Globals().phoneVerified.value = true;
     prefs.setString('signedPhoneIdentifier', signedPhoneIdentifier);
-    client.setPKidDoc('phone', json.encode({'phone': phone, 'spi': signedPhoneIdentifier}));
+    client.setPKidDoc(
+        'phone', json.encode({'phone': phone, 'spi': signedPhoneIdentifier}));
     return;
   }
 
@@ -221,15 +229,20 @@ Future<Map<String, dynamic>> getIdentity() async {
   final SharedPreferences prefs = await SharedPreferences.getInstance();
   return {
     'identityName': prefs.getString('identityName'),
-    'signedIdentityNameIdentifier': prefs.getString('signedIdentityNameIdentifier'),
+    'signedIdentityNameIdentifier':
+        prefs.getString('signedIdentityNameIdentifier'),
     'identityCountry': prefs.getString('identityCountry'),
-    'signedIdentityCountryIdentifier': prefs.getString('signedIdentityCountryIdentifier'),
+    'signedIdentityCountryIdentifier':
+        prefs.getString('signedIdentityCountryIdentifier'),
     'identityDOB': prefs.getString('identityDOB'),
-    'signedIdentityDOBIdentifier': prefs.getString('signedIdentityDOBIdentifier'),
+    'signedIdentityDOBIdentifier':
+        prefs.getString('signedIdentityDOBIdentifier'),
     'identityDocumentMeta': prefs.getString('identityDocumentMeta'),
-    'signedIdentityDocumentMetaIdentifier': prefs.getString('signedIdentityDocumentMetaIdentifier'),
+    'signedIdentityDocumentMetaIdentifier':
+        prefs.getString('signedIdentityDocumentMetaIdentifier'),
     'identityGender': prefs.getString('identityGender'),
-    'signedIdentityGenderIdentifier': prefs.getString('signedIdentityGenderIdentifier'),
+    'signedIdentityGenderIdentifier':
+        prefs.getString('signedIdentityGenderIdentifier'),
   };
 }
 
@@ -258,10 +271,13 @@ Future<void> saveIdentity(
   prefs.setString('identityGender', identityGender);
 
   prefs.setString('signedIdentityNameIdentifier', signedIdentityNameIdentifier);
-  prefs.setString('signedIdentityCountryIdentifier', signedIdentityCountryIdentifier);
+  prefs.setString(
+      'signedIdentityCountryIdentifier', signedIdentityCountryIdentifier);
   prefs.setString('signedIdentityDOBIdentifier', signedIdentityDOBIdentifier);
-  prefs.setString('signedIdentityDocumentMetaIdentifier', signedIdentityDocumentMetaIdentifier);
-  prefs.setString('signedIdentityGenderIdentifier', signedIdentityGenderIdentifier);
+  prefs.setString('signedIdentityDocumentMetaIdentifier',
+      signedIdentityDocumentMetaIdentifier);
+  prefs.setString(
+      'signedIdentityGenderIdentifier', signedIdentityGenderIdentifier);
 
   prefs.remove('identityVerified');
 
@@ -277,7 +293,8 @@ Future<void> saveIdentity(
         'identityDOB': identityDOB,
         'signedIdentityDOBIdentifier': signedIdentityDOBIdentifier,
         'identityDocumentMeta': jsonEncode(identityDocumentMeta),
-        'signedIdentityDocumentMetaIdentifier': signedIdentityDocumentMetaIdentifier,
+        'signedIdentityDocumentMetaIdentifier':
+            signedIdentityDocumentMetaIdentifier,
         'identityGender': identityGender,
         'signedIdentityGenderIdentifier': signedIdentityGenderIdentifier
       }));
@@ -347,7 +364,8 @@ Future<String?> getScopePermissions() async {
   return prefs.getString('scopePermissions');
 }
 
-Future<void> savePreviousScopePermissions(String appId, String? scopePermissions) async {
+Future<void> savePreviousScopePermissions(
+    String appId, String? scopePermissions) async {
   final SharedPreferences prefs = await SharedPreferences.getInstance();
   await prefs.remove('$appId-scopePreviousPermissions');
   await prefs.setString('$appId-scopePreviousPermissions', scopePermissions!);
@@ -461,10 +479,9 @@ Future<List<dynamic>> getLocationIdList() async {
 
   List<dynamic> locationIdList = [];
 
-  if(locationIdListAsJson != null) {
+  if (locationIdListAsJson != null) {
     locationIdList = jsonDecode(locationIdListAsJson);
-  }
-  else {
+  } else {
     locationIdList = [];
   }
 
@@ -482,13 +499,11 @@ Future<String?> getDoubleName() async {
   return prefs.getString('doubleName');
 }
 
-
 ///
 ///
 /// Migration problems
 ///
 ///
-
 
 // In the past there was a mapping mistake by Lennert in the initial migration to PKID
 // This has been solved in a second patch but we want to make sure all the users get the right fix
@@ -501,5 +516,3 @@ Future<void> setPKidMigrationIssueSolved(bool isFixed) async {
   final SharedPreferences prefs = await SharedPreferences.getInstance();
   await prefs.setBool('isPkidMigrationIssueSolved', isFixed);
 }
-
-

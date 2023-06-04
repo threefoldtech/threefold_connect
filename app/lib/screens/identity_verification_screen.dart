@@ -24,10 +24,12 @@ import 'package:country_picker/country_picker.dart';
 import 'package:threebotlogin/widgets/phone_widget.dart';
 
 class IdentityVerificationScreen extends StatefulWidget {
-  _IdentityVerificationScreenState createState() => _IdentityVerificationScreenState();
+  _IdentityVerificationScreenState createState() =>
+      _IdentityVerificationScreenState();
 }
 
-class _IdentityVerificationScreenState extends State<IdentityVerificationScreen> {
+class _IdentityVerificationScreenState
+    extends State<IdentityVerificationScreen> {
   String doubleName = '';
   String email = '';
   String phone = '';
@@ -205,7 +207,8 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
     getIdentity().then((identityMap) {
       setState(() {
         if (identityMap['signedIdentityNameIdentifier'] != null) {
-          identityVerified = (identityMap['signedIdentityNameIdentifier'] != null);
+          identityVerified =
+              (identityMap['signedIdentityNameIdentifier'] != null);
         }
       });
     });
@@ -253,23 +256,34 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
                                         // Step one: verify email
                                         _fillCard(
                                             getCorrectState(
-                                                1, emailVerified, phoneVerified, identityVerified),
+                                                1,
+                                                emailVerified,
+                                                phoneVerified,
+                                                identityVerified),
                                             1,
                                             email,
                                             Icons.email),
 
                                         // Step two: verify phone
-                                        Globals().phoneVerification == true ? _fillCard(
-                                            getCorrectState(
-                                                2, emailVerified, phoneVerified, identityVerified),
-                                            2,
-                                            phone,
-                                            Icons.phone) : Container(),
+                                        Globals().phoneVerification == true
+                                            ? _fillCard(
+                                                getCorrectState(
+                                                    2,
+                                                    emailVerified,
+                                                    phoneVerified,
+                                                    identityVerified),
+                                                2,
+                                                phone,
+                                                Icons.phone)
+                                            : Container(),
 
                                         // Step three: verify identity
                                         Globals().isOpenKYCEnabled
                                             ? _fillCard(
-                                                getCorrectState(3, emailVerified, phoneVerified,
+                                                getCorrectState(
+                                                    3,
+                                                    emailVerified,
+                                                    phoneVerified,
                                                     identityVerified),
                                                 3,
                                                 extract3Bot(doubleName),
@@ -282,7 +296,8 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
                                                 onPressed: () async {
                                                   await verifyIdentityProcess();
                                                 },
-                                                child: Text('Redo identity verification'))
+                                                child: Text(
+                                                    'Redo identity verification'))
                                             : Container(),
                                         Globals().debugMode == true
                                             ? ElevatedButton(
@@ -295,15 +310,21 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
                                                       await getIsIdentityVerified();
 
                                                   kycLogs = '';
-                                                  kycLogs += 'Email verified: ' +
-                                                      isEmailVerified.toString() +
-                                                      '\n';
-                                                  kycLogs += 'Phone verified: ' +
-                                                      isPhoneVerified.toString() +
-                                                      '\n';
-                                                  kycLogs += 'Identity verified: ' +
-                                                      isIdentityVerified.toString() +
-                                                      '\n';
+                                                  kycLogs +=
+                                                      'Email verified: ' +
+                                                          isEmailVerified
+                                                              .toString() +
+                                                          '\n';
+                                                  kycLogs +=
+                                                      'Phone verified: ' +
+                                                          isPhoneVerified
+                                                              .toString() +
+                                                          '\n';
+                                                  kycLogs +=
+                                                      'Identity verified: ' +
+                                                          isIdentityVerified
+                                                              .toString() +
+                                                          '\n';
 
                                                   setState(() {});
                                                 },
@@ -338,14 +359,14 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
         title: "Are you sure",
         description: "Are you sure you want to exit the verification process",
         actions: <Widget>[
-          FlatButton(
+          TextButton(
             child: new Text("No"),
             onPressed: () async {
               Navigator.pop(customContext);
               showCountryPopup();
             },
           ),
-          FlatButton(
+          TextButton(
             child: new Text("Yes"),
             onPressed: () async {
               Navigator.pop(customContext);
@@ -367,7 +388,8 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
         }
       },
       context: context,
-      showPhoneCode: false, // optional. Shows phone code before the country name.
+      showPhoneCode:
+          false, // optional. Shows phone code before the country name.
       onSelect: (Country country) async {
         setState(() {
           createdPayload['country'] = country.countryCode;
@@ -376,7 +398,9 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
         print('Select country: ${country.displayName}');
 
         String r = await ShuftiproSdk.sendRequest(
-            authObject: authObject, createdPayload: createdPayload, configObject: configObj);
+            authObject: authObject,
+            createdPayload: createdPayload,
+            configObject: configObj);
 
         print('Receiving response');
         debugPrint(r);
@@ -400,7 +424,7 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
               title: "Request canceled",
               description: "Verification process has been canceled.",
               actions: [
-                FlatButton(
+                TextButton(
                     onPressed: () {
                       Navigator.pop(dialogContext);
                     },
@@ -417,9 +441,10 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
             builder: (BuildContext dialogContext) => CustomDialog(
               image: Icons.close,
               title: "Request canceled",
-              description: "Please make sure your internet connection is stable.",
+              description:
+                  "Please make sure your internet connection is stable.",
               actions: [
-                FlatButton(
+                TextButton(
                     onPressed: () {
                       Navigator.pop(dialogContext);
                     },
@@ -527,6 +552,7 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
       },
     );
   }
+
   Widget _fillCard(String phase, int step, String text, IconData icon) {
     switch (phase) {
       case 'Unverified':
@@ -561,7 +587,8 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
         child: Opacity(
           opacity: 0.5,
           child: Container(
-            decoration: BoxDecoration(border: Border.all(width: 0.5, color: Colors.grey)),
+            decoration: BoxDecoration(
+                border: Border.all(width: 0.5, color: Colors.grey)),
             height: 75,
             width: MediaQuery.of(context).size.width * 100,
             child: Row(
@@ -575,7 +602,9 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
                     children: [
                       Text('0' + step.toString(),
                           style: TextStyle(
-                              color: Colors.blue, fontWeight: FontWeight.bold, fontSize: 12))
+                              color: Colors.blue,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 12))
                     ],
                   ),
                   decoration: new BoxDecoration(
@@ -592,38 +621,42 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
                 Padding(padding: EdgeInsets.only(left: 15)),
                 Flexible(
                     child: Container(
-                        child:
-                            Column(mainAxisAlignment: MainAxisAlignment.center, children: <Widget>[
-                  Row(
-                    children: <Widget>[
-                      Expanded(
-                        child: Text(
-                          text == '' ? 'Unknown' : text,
-                          overflow: TextOverflow.clip,
-                          style: TextStyle(fontSize: 12.0, fontWeight: FontWeight.bold),
-                        ),
-                      )
-                    ],
-                  ),
-                  SizedBox(
-                    height: 5,
-                  ),
-                  Row(
-                    children: <Widget>[
-                      Icon(
-                        Icons.close,
-                        color: Colors.red,
-                        size: 18.0,
+                        child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: <Widget>[
+                      Row(
+                        children: <Widget>[
+                          Expanded(
+                            child: Text(
+                              text == '' ? 'Unknown' : text,
+                              overflow: TextOverflow.clip,
+                              style: TextStyle(
+                                  fontSize: 12.0, fontWeight: FontWeight.bold),
+                            ),
+                          )
+                        ],
                       ),
-                      Padding(padding: EdgeInsets.only(left: 5)),
-                      Text(
-                        'Not verified',
-                        style:
-                            TextStyle(color: Colors.red, fontWeight: FontWeight.bold, fontSize: 12),
-                      )
-                    ],
-                  ),
-                ]))),
+                      SizedBox(
+                        height: 5,
+                      ),
+                      Row(
+                        children: <Widget>[
+                          Icon(
+                            Icons.close,
+                            color: Colors.red,
+                            size: 18.0,
+                          ),
+                          Padding(padding: EdgeInsets.only(left: 5)),
+                          Text(
+                            'Not verified',
+                            style: TextStyle(
+                                color: Colors.red,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 12),
+                          )
+                        ],
+                      ),
+                    ]))),
                 Padding(padding: EdgeInsets.only(right: 10))
               ],
             ),
@@ -687,7 +720,9 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
                   children: [
                     Text('0' + step.toString(),
                         style: TextStyle(
-                            color: Colors.blue, fontWeight: FontWeight.bold, fontSize: 12))
+                            color: Colors.blue,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 12))
                   ],
                 ),
                 decoration: new BoxDecoration(
@@ -707,14 +742,20 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
                 children: [
                   Flexible(
                       child: Container(
-                          constraints: Globals().hidePhoneButton.value == false ||
-                                  (step != 2 && Globals().hidePhoneButton.value == true)
+                          constraints: Globals().hidePhoneButton.value ==
+                                      false ||
+                                  (step != 2 &&
+                                      Globals().hidePhoneButton.value == true)
                               ? BoxConstraints(
-                                  minWidth: MediaQuery.of(context).size.width * 0.4,
-                                  maxWidth: MediaQuery.of(context).size.width * 0.4)
+                                  minWidth:
+                                      MediaQuery.of(context).size.width * 0.4,
+                                  maxWidth:
+                                      MediaQuery.of(context).size.width * 0.4)
                               : BoxConstraints(
-                                  minWidth: MediaQuery.of(context).size.width * 0.6,
-                                  maxWidth: MediaQuery.of(context).size.width * 0.6),
+                                  minWidth:
+                                      MediaQuery.of(context).size.width * 0.6,
+                                  maxWidth:
+                                      MediaQuery.of(context).size.width * 0.6),
                           padding: EdgeInsets.all(10),
                           child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
@@ -725,18 +766,21 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
                                       child: Text(
                                         text == '' ? 'Unknown' : text,
                                         overflow: TextOverflow.clip,
-                                        style:
-                                            TextStyle(fontSize: 12.0, fontWeight: FontWeight.bold),
+                                        style: TextStyle(
+                                            fontSize: 12.0,
+                                            fontWeight: FontWeight.bold),
                                       ),
                                     )
                                   ],
                                 ),
-                                step == 2 && Globals().hidePhoneButton.value == true
+                                step == 2 &&
+                                        Globals().hidePhoneButton.value == true
                                     ? SizedBox(
                                         height: 5,
                                       )
                                     : Container(),
-                                step == 2 && Globals().hidePhoneButton.value == true
+                                step == 2 &&
+                                        Globals().hidePhoneButton.value == true
                                     ? Row(
                                         children: <Widget>[
                                           Text(
@@ -792,8 +836,10 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
 
   String calculateMinutes() {
     int currentTime = new DateTime.now().millisecondsSinceEpoch;
-    int lockedUntill = Globals().smsSentOn + (Globals().smsMinutesCoolDown * 60 * 1000);
-    String difference = ((lockedUntill - currentTime) / 1000 / 60).round().toString();
+    int lockedUntill =
+        Globals().smsSentOn + (Globals().smsMinutesCoolDown * 60 * 1000);
+    String difference =
+        ((lockedUntill - currentTime) / 1000 / 60).round().toString();
 
     if (int.parse(difference) >= 0) {
       return difference;
@@ -816,7 +862,8 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
         return showIdentityDetails();
       },
       child: Container(
-        decoration: BoxDecoration(border: Border.all(width: 0.5, color: Colors.grey)),
+        decoration:
+            BoxDecoration(border: Border.all(width: 0.5, color: Colors.grey)),
         height: 75,
         width: MediaQuery.of(context).size.width * 100,
         child: Row(
@@ -835,7 +882,8 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
                   ),
                 ],
               ),
-              decoration: BoxDecoration(shape: BoxShape.circle, color: Colors.green),
+              decoration:
+                  BoxDecoration(shape: BoxShape.circle, color: Colors.green),
             ),
             Padding(padding: EdgeInsets.only(left: 20)),
             Icon(
@@ -856,11 +904,14 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
                       children: [
                         Container(
                             constraints: BoxConstraints(
-                                minWidth: MediaQuery.of(context).size.width * 0.55,
-                                maxWidth: MediaQuery.of(context).size.width * 0.55),
+                                minWidth:
+                                    MediaQuery.of(context).size.width * 0.55,
+                                maxWidth:
+                                    MediaQuery.of(context).size.width * 0.55),
                             child: Text(text == '' ? 'Unknown' : text,
                                 overflow: TextOverflow.clip,
-                                style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)))
+                                style: TextStyle(
+                                    fontSize: 12, fontWeight: FontWeight.bold)))
                       ],
                     ),
                     SizedBox(height: 5),
@@ -869,7 +920,9 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
                         Text(
                           'Verified',
                           style: TextStyle(
-                              color: Colors.green, fontSize: 12, fontWeight: FontWeight.bold),
+                              color: Colors.green,
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold),
                         )
                       ],
                     )
@@ -878,13 +931,18 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
                 step == 1
                     ? Column(
                         mainAxisAlignment: MainAxisAlignment.center,
-                        children: [Icon(Icons.edit, size: 20, color: Colors.black)],
+                        children: [
+                          Icon(Icons.edit, size: 20, color: Colors.black)
+                        ],
                       )
                     : Column(),
                 step == 3
                     ? Column(
                         mainAxisAlignment: MainAxisAlignment.center,
-                        children: [Icon(Icons.chevron_right, size: 20, color: Colors.black)],
+                        children: [
+                          Icon(Icons.chevron_right,
+                              size: 20, color: Colors.black)
+                        ],
                       )
                     : Column()
               ],
@@ -903,7 +961,8 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
 
     try {
       Response accessTokenResponse = await getShuftiAccessToken();
-      if (accessTokenResponse.statusCode == 403 || accessTokenResponse == null) {
+      if (accessTokenResponse.statusCode == 403 ||
+          accessTokenResponse == null) {
         setState(() {
           this.isLoading = false;
         });
@@ -916,7 +975,7 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
                   description:
                       "You already had 5 requests in last 24 hours. \nPlease try again in 24 hours.",
                   actions: <Widget>[
-                    FlatButton(
+                    TextButton(
                       child: new Text("Ok"),
                       onPressed: () {
                         Navigator.pop(context);
@@ -941,7 +1000,7 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
                   description:
                       "Something went wrong. Please contact support if this issue persists.",
                   actions: <Widget>[
-                    FlatButton(
+                    TextButton(
                       child: new Text("Ok"),
                       onPressed: () {
                         Navigator.pop(context);
@@ -980,9 +1039,10 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
         builder: (BuildContext context) => CustomDialog(
           image: Icons.warning,
           title: "Failed to setup process",
-          description: "Something went wrong. \n If this issue persist, please contact support",
+          description:
+              "Something went wrong. \n If this issue persist, please contact support",
           actions: <Widget>[
-            FlatButton(
+            TextButton(
               child: new Text("Ok"),
               onPressed: () {
                 Navigator.pop(context);
@@ -1000,12 +1060,14 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
         builder: (BuildContext context) => Dialog(
               child: FutureBuilder(
                 future: getIdentity(),
-                builder: (BuildContext customContext, AsyncSnapshot<dynamic> snapshot) {
+                builder: (BuildContext customContext,
+                    AsyncSnapshot<dynamic> snapshot) {
                   if (!snapshot.hasData) {
                     return _pleaseWait();
                   }
 
-                  String name = getFullNameOfObject(jsonDecode(snapshot.data['identityName']));
+                  String name = getFullNameOfObject(
+                      jsonDecode(snapshot.data['identityName']));
                   return Container(
                       child: Column(
                     mainAxisSize: MainAxisSize.min,
@@ -1022,7 +1084,9 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
                                 children: [
                                   Text(
                                     'OpenKYC ID CARD',
-                                    style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
+                                    style: TextStyle(
+                                        fontSize: 18.0,
+                                        fontWeight: FontWeight.bold),
                                     textAlign: TextAlign.left,
                                   ),
                                 ],
@@ -1031,7 +1095,8 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
                               Row(children: [
                                 Text(
                                   'Your own personal KYC ID CARD',
-                                  style: TextStyle(fontSize: 13, color: Colors.grey),
+                                  style: TextStyle(
+                                      fontSize: 13, color: Colors.grey),
                                 ),
                               ]),
                             ],
@@ -1045,7 +1110,10 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
                               children: [
                                 Text(
                                   'Full name',
-                                  style: TextStyle(fontSize: 13, color: HexColor('#787878')),
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    color: HexColor('#787878'),
+                                  ),
                                 )
                               ],
                             ),
@@ -1063,8 +1131,11 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
                               children: [
                                 Text(
                                   'Birthday',
-                                  style: TextStyle(fontSize: 13, color: HexColor('#787878')),
-                                )
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    color: HexColor('#787878'),
+                                  ),
+                                ),
                               ],
                             ),
                             Row(
@@ -1086,7 +1157,10 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
                               children: [
                                 Text(
                                   'Country',
-                                  style: TextStyle(fontSize: 13, color: HexColor('#787878')),
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    color: HexColor('#787878'),
+                                  ),
                                 )
                               ],
                             ),
@@ -1108,7 +1182,10 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
                               children: [
                                 Text(
                                   'Gender',
-                                  style: TextStyle(fontSize: 13, color: HexColor('#787878')),
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    color: HexColor('#787878'),
+                                  ),
                                 )
                               ],
                             ),
@@ -1125,7 +1202,7 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          FlatButton(
+                          TextButton(
                               onPressed: () {
                                 Navigator.pop(customContext);
                               },
@@ -1151,7 +1228,7 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
         title: "Email has been resent.",
         description: "A new verification email has been sent.",
         actions: <Widget>[
-          FlatButton(
+          TextButton(
             child: new Text("Ok"),
             onPressed: () {
               Navigator.pop(context);
@@ -1174,7 +1251,9 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
         builder: (BuildContext dialogContext) {
           return StatefulBuilder(builder: (statefulContext, setCustomState) {
             return AlertDialog(
-              title: emailWasEmpty == true ? Text('Add email') : Text('Change email'),
+              title: emailWasEmpty == true
+                  ? Text('Add email')
+                  : Text('Change email'),
               contentPadding: EdgeInsets.all(24),
               content: Container(
                 child: Column(
@@ -1188,7 +1267,8 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
                       controller: controller,
                       decoration: InputDecoration(
                           focusedBorder: UnderlineInputBorder(
-                            borderSide: BorderSide(color: Theme.of(context).primaryColor),
+                            borderSide: BorderSide(
+                                color: Theme.of(context).primaryColor),
                           ),
                           labelText: 'Email',
                           errorText: validEmail == true ? null : errorEmail),
@@ -1201,17 +1281,19 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
                 ),
               ),
               actions: [
-                FlatButton(
+                TextButton(
                     onPressed: () {
                       Navigator.pop(dialogContext);
                     },
                     child: Text('Cancel')),
-                FlatButton(
+                TextButton(
                     onPressed: () async {
                       _loadingDialog();
 
-                      String emailValue =
-                          controller.text.toLowerCase().trim().replaceAll(new RegExp(r"\s+"), " ");
+                      String emailValue = controller.text
+                          .toLowerCase()
+                          .trim()
+                          .replaceAll(new RegExp(r"\s+"), " ");
                       bool isValidEmail = validateEmail(emailValue);
 
                       var oldEmail = await getEmail();
@@ -1262,7 +1344,9 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
                         await saveEmailToPKid();
 
                         statusMessage = Text('Something went wrong',
-                            style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold));
+                            style: TextStyle(
+                                color: Colors.red,
+                                fontWeight: FontWeight.bold));
 
                         setState(() {});
                         setCustomState(() {});
@@ -1295,13 +1379,15 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
                   controller: changeEmailController,
                   decoration: InputDecoration(
                       labelText: 'Email',
-                      errorText: emailInputValidated ? null : 'Please enter a valid email'),
+                      errorText: emailInputValidated
+                          ? null
+                          : 'Please enter a valid email'),
                 ),
               ],
             ),
           ),
           actions: <Widget>[
-            FlatButton(
+            TextButton(
               child: new Text("OK"),
               onPressed: () async {
                 bool isValid = checkEmail(changeEmailController.text);
@@ -1380,10 +1466,12 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
         builder: (BuildContext context) {
           return AlertDialog(
             title: new Text('Too many attempts please wait ' +
-                ((globals.lockedSmsUntill - currentTime) / 1000).round().toString() +
+                ((globals.lockedSmsUntill - currentTime) / 1000)
+                    .round()
+                    .toString() +
                 ' seconds.'),
             actions: <Widget>[
-              FlatButton(
+              TextButton(
                 child: new Text("OK"),
                 onPressed: () {
                   Navigator.of(context).pop();
@@ -1407,7 +1495,7 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
           return AlertDialog(
             title: new Text('Too many attempts please wait one minute.'),
             actions: <Widget>[
-              FlatButton(
+              TextButton(
                 child: new Text("OK"),
                 onPressed: () {
                   Navigator.of(context).pop();

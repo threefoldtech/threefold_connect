@@ -12,7 +12,7 @@ import 'package:threebotlogin/events/close_vpn_event.dart';
 import 'package:threebotlogin/events/events.dart';
 import 'package:threebotlogin/helpers/environment.dart';
 import 'package:threebotlogin/helpers/globals.dart';
-import 'package:threebotlogin/helpers/hex_color.dart';
+
 import 'package:threebotlogin/screens/authentication_screen.dart';
 import 'package:threebotlogin/screens/change_pin_screen.dart';
 import 'package:threebotlogin/screens/main_screen.dart';
@@ -214,9 +214,10 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
       builder: (BuildContext context) => CustomDialog(
         image: Icons.error,
         title: "Disable Fingerprint",
-        description: "Are you sure you want to deactivate fingerprint as authentication method?",
+        description:
+            "Are you sure you want to deactivate fingerprint as authentication method?",
         actions: <Widget>[
-          FlatButton(
+          TextButton(
             child: new Text("Cancel"),
             onPressed: () async {
               Navigator.pop(context);
@@ -225,7 +226,7 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
               setState(() {});
             },
           ),
-          FlatButton(
+          TextButton(
             child: new Text("Yes"),
             onPressed: () async {
               Navigator.pop(context);
@@ -248,13 +249,13 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
         description:
             "If you confirm, your account will be removed from this device. You can always recover your account with your username and phrase.",
         actions: <Widget>[
-          FlatButton(
+          TextButton(
             child: new Text("Cancel"),
             onPressed: () {
               Navigator.pop(context);
             },
           ),
-          FlatButton(
+          TextButton(
             child: new Text("Yes"),
             onPressed: () async {
               // try {
@@ -268,15 +269,19 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
               if (result) {
                 Navigator.pop(context);
                 await Navigator.pushReplacement(
-                    context, MaterialPageRoute(builder: (context) => MainScreen(initDone: true, registered: false)));
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) =>
+                            MainScreen(initDone: true, registered: false)));
               } else {
                 showDialog(
                   context: preferenceContext!,
                   builder: (BuildContext context) => CustomDialog(
                     title: 'Error',
-                    description: 'Something went wrong when trying to remove your account.',
+                    description:
+                        'Something went wrong when trying to remove your account.',
                     actions: <Widget>[
-                      FlatButton(
+                      TextButton(
                         child: Text('Ok'),
                         onPressed: () {
                           Navigator.pop(context);
@@ -301,7 +306,7 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
       duration: Duration(seconds: 1),
     );
 
-    Scaffold.of(context).showSnackBar(seedCopied);
+    ScaffoldMessenger.of(context).showSnackBar(seedCopied);
   }
 
   void checkPin(pin, callbackParam) async {
@@ -317,7 +322,7 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
       }
     } else {
       Navigator.pop(context);
-      Scaffold.of(context).showSnackBar(SnackBar(
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         content: Text('Pin invalid'),
       ));
     }
@@ -369,7 +374,7 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
           description: phrase.toString(),
           actions: <Widget>[
             // usually buttons at the bottom of the dialog
-            FlatButton(
+            TextButton(
               child: new Text("Close"),
               onPressed: () {
                 Navigator.pop(context);
@@ -439,7 +444,7 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
             title: "Success",
             description: "Your pincode was successfully changed.",
             actions: <Widget>[
-              FlatButton(
+              TextButton(
                 child: new Text("Ok"),
                 onPressed: () async {
                   Navigator.pop(context);
@@ -472,9 +477,10 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
           builder: (BuildContext context) => CustomDialog(
             image: Icons.perm_device_information,
             title: "Build information",
-            description: "Type: ${appConfig.environment}\nGit hash: ${appConfig.githash}\nTime: ${appConfig.time}",
+            description:
+                "Type: ${appConfig.environment}\nGit hash: ${appConfig.githash}\nTime: ${appConfig.time}",
             actions: <Widget>[
-              FlatButton(
+              TextButton(
                 child: new Text("Ok"),
                 onPressed: () {
                   Navigator.pop(context);

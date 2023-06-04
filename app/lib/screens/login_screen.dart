@@ -8,6 +8,7 @@ import 'package:threebotlogin/events/events.dart';
 import 'package:threebotlogin/events/pop_all_login_event.dart';
 import 'package:threebotlogin/helpers/block_and_run_mixin.dart';
 import 'package:threebotlogin/helpers/globals.dart';
+import 'package:threebotlogin/helpers/hex_color.dart';
 import 'package:threebotlogin/helpers/login_helpers.dart';
 import 'package:threebotlogin/models/login.dart';
 import 'package:threebotlogin/services/3bot_service.dart';
@@ -27,8 +28,10 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> with BlockAndRunMixin {
-  String scopeTextMobile = 'Please select the data you want to share and press Accept';
-  String scopeText = 'Please select the data you want to share and press the corresponding emoji';
+  String scopeTextMobile =
+      'Please select the data you want to share and press Accept';
+  String scopeText =
+      'Please select the data you want to share and press the corresponding emoji';
 
   List<int> imageList = [];
 
@@ -67,7 +70,8 @@ class _LoginScreenState extends State<LoginScreen> with BlockAndRunMixin {
     created = widget.loginData.created;
     currentTimestamp = new DateTime.now().millisecondsSinceEpoch;
 
-    timeLeft = Globals().loginTimeout - ((currentTimestamp! - created!) / 1000).round();
+    timeLeft = Globals().loginTimeout -
+        ((currentTimestamp! - created!) / 1000).round();
 
     timer = new Timer.periodic(oneSec, (Timer t) async {
       timeoutTimer();
@@ -83,10 +87,12 @@ class _LoginScreenState extends State<LoginScreen> with BlockAndRunMixin {
     currentTimestamp = new DateTime.now().millisecondsSinceEpoch;
 
     setState(() {
-      timeLeft = Globals().loginTimeout - ((currentTimestamp! - created!) / 1000).round();
+      timeLeft = Globals().loginTimeout -
+          ((currentTimestamp! - created!) / 1000).round();
     });
 
-    if (created == null || ((currentTimestamp! - created!) / 1000) < Globals().loginTimeout) {
+    if (created == null ||
+        ((currentTimestamp! - created!) / 1000) < Globals().loginTimeout) {
       return;
     }
 
@@ -121,7 +127,9 @@ class _LoginScreenState extends State<LoginScreen> with BlockAndRunMixin {
                   scope: widget.loginData.scope,
                   appId: widget.loginData.appId,
                   callback: cancelIt,
-                  type: widget.loginData.isMobile == true ? 'mobilelogin' : 'login',
+                  type: widget.loginData.isMobile == true
+                      ? 'mobilelogin'
+                      : 'login',
                 ),
               ),
             ),
@@ -134,10 +142,14 @@ class _LoginScreenState extends State<LoginScreen> with BlockAndRunMixin {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: <Widget>[
-                      ImageButton(imageList[0], selectedImageId, imageSelectedCallback),
-                      ImageButton(imageList[1], selectedImageId, imageSelectedCallback),
-                      ImageButton(imageList[2], selectedImageId, imageSelectedCallback),
-                      ImageButton(imageList[3], selectedImageId, imageSelectedCallback),
+                      ImageButton(
+                          imageList[0], selectedImageId, imageSelectedCallback),
+                      ImageButton(
+                          imageList[1], selectedImageId, imageSelectedCallback),
+                      ImageButton(
+                          imageList[2], selectedImageId, imageSelectedCallback),
+                      ImageButton(
+                          imageList[3], selectedImageId, imageSelectedCallback),
                     ],
                   ),
                 ),
@@ -147,12 +159,15 @@ class _LoginScreenState extends State<LoginScreen> with BlockAndRunMixin {
               visible: isMobileCheck,
               child: Padding(
                 padding: const EdgeInsets.only(bottom: 30.0),
-                child: RaisedButton(
-                  shape: new RoundedRectangleBorder(
-                    borderRadius: new BorderRadius.circular(30),
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Theme.of(context).accentColor,
+                    shape: const RoundedRectangleBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(30)),
+                    ),
+                    padding:
+                        EdgeInsets.symmetric(horizontal: 11.0, vertical: 6.0),
                   ),
-                  padding: EdgeInsets.symmetric(horizontal: 11.0, vertical: 6.0),
-                  color: Theme.of(context).accentColor,
                   child: Text(
                     'Accept',
                     style: TextStyle(color: Colors.white, fontSize: 22),
@@ -162,7 +177,6 @@ class _LoginScreenState extends State<LoginScreen> with BlockAndRunMixin {
                     if (Navigator.canPop(context)) {
                       Navigator.pop(context, true);
                     }
-
                   },
                 ),
               ),
@@ -213,10 +227,11 @@ class _LoginScreenState extends State<LoginScreen> with BlockAndRunMixin {
                 flex: 0,
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
-                  child: FlatButton(
+                  child: TextButton(
                     child: Text(
                       "It wasn\'t me - cancel",
-                      style: TextStyle(fontSize: 16.0, color: Color(0xff0f296a)),
+                      style:
+                          TextStyle(fontSize: 16.0, color: HexColor('#0f296a')),
                     ),
                     onPressed: () {
                       cancelIt();
@@ -290,9 +305,11 @@ class _LoginScreenState extends State<LoginScreen> with BlockAndRunMixin {
       int? created = widget.loginData.created;
       int currentTimestamp = new DateTime.now().millisecondsSinceEpoch;
 
-      if (created != null && ((currentTimestamp - created) / 1000) > Globals().loginTimeout) {
+      if (created != null &&
+          ((currentTimestamp - created) / 1000) > Globals().loginTimeout) {
         await showExpiredDialog(context);
-        await sendData(state!, null, selectedImageId, null, widget.loginData.appId!);
+        await sendData(
+            state!, null, selectedImageId, null, widget.loginData.appId!);
 
         if (Navigator.canPop(context)) {
           Navigator.pop(context, false);
@@ -314,17 +331,21 @@ class _LoginScreenState extends State<LoginScreen> with BlockAndRunMixin {
     Uint8List derivedSeed = await getDerivedSeed(appId);
 
     // Get the selected scope permissions and get the required data
-    var scopePermissions = await getPreviousScopePermissions(widget.loginData.appId!);
-    Map<String, dynamic>? scopeData = await readScopeAsObject(scopePermissions, derivedSeed);
+    var scopePermissions =
+        await getPreviousScopePermissions(widget.loginData.appId!);
+    Map<String, dynamic>? scopeData =
+        await readScopeAsObject(scopePermissions, derivedSeed);
 
     // Encrypt the scope data
-    Map<String, String> encryptedScopeData = await encryptLoginData(publicKey, scopeData);
+    Map<String, String> encryptedScopeData =
+        await encryptLoginData(publicKey, scopeData);
 
     if (!includeData) {
-      await sendData(state, null, selectedImageId, null, widget.loginData.appId!);
-    } else {
       await sendData(
-          state, encryptedScopeData, selectedImageId, randomRoom, widget.loginData.appId!);
+          state, null, selectedImageId, null, widget.loginData.appId!);
+    } else {
+      await sendData(state, encryptedScopeData, selectedImageId, randomRoom,
+          widget.loginData.appId!);
     }
 
     addDigitalTwinToBackend(derivedSeed, widget.loginData.appId!);
@@ -342,10 +363,9 @@ class _LoginScreenState extends State<LoginScreen> with BlockAndRunMixin {
   }
 
   void generateEmojiImageList() {
-    if(widget.loginData.randomImageId == null) {
+    if (widget.loginData.randomImageId == null) {
       correctImage = 1;
-    }
-    else {
+    } else {
       correctImage = parseImageId(widget.loginData.randomImageId!);
     }
 

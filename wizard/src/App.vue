@@ -335,8 +335,6 @@ h2 {
     border-radius: 80px;
     background: #57be8e;
   }
-  .v-btn--disabled {
-  }
   .spacer {
     height: 20vh;
     width: 100%;

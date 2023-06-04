@@ -26,7 +26,8 @@ Future<void> setGlobalValues() async {
 
   Globals().emailVerified.value = (email['sei'] != null);
   Globals().phoneVerified.value = (phone['spi'] != null);
-  Globals().identityVerified.value = (identity['signedIdentityNameIdentifier'] != null);
+  Globals().identityVerified.value =
+      (identity['signedIdentityNameIdentifier'] != null);
 }
 
 class MyApp extends StatelessWidget {
@@ -47,12 +48,15 @@ class MyApp extends StatelessWidget {
     var textStyle = GoogleFonts.lato();
     return MaterialApp(
       theme: ThemeData(
-        primaryColor: HexColor("#0a73b8"),
-        accentColor: HexColor("#57BE8E"),
+        primaryColor: HexColor('#0a73b8'),
+        accentColor: HexColor('#57BE8E'),
         textTheme: textTheme,
-        tabBarTheme: TabBarTheme(labelStyle: textStyle, unselectedLabelStyle: textStyle),
+        tabBarTheme:
+            TabBarTheme(labelStyle: textStyle, unselectedLabelStyle: textStyle),
         appBarTheme: AppBarTheme(
-            color: Colors.white, textTheme: accentTextTheme, brightness: Brightness.dark),
+            color: Colors.white,
+            textTheme: accentTextTheme,
+            brightness: Brightness.dark),
       ),
       home: MainScreen(initDone: initDone, registered: registered),
     );

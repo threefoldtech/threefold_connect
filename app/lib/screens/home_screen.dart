@@ -49,8 +49,7 @@ class _HomeScreenState extends State<HomeScreen>
   int lastCheck = 0;
   final int pinCheckTimeout = 60000 * 5;
 
-  _HomeScreenState() {
-  }
+  _HomeScreenState() {}
 
   void checkPinAndNavigateIfSuccess(int indexIfAuthIsSuccess) async {
     String? pin = await getPin();
@@ -152,7 +151,8 @@ class _HomeScreenState extends State<HomeScreen>
       globals.tabController.animateTo(4, duration: Duration(seconds: 0));
     });
 
-    Events().onEvent(GoReservationsEvent().runtimeType, (GoReservationsEvent event) {
+    Events().onEvent(GoReservationsEvent().runtimeType,
+        (GoReservationsEvent event) {
       globals.tabController.animateTo(5, duration: Duration(seconds: 0));
     });
 
@@ -168,7 +168,8 @@ class _HomeScreenState extends State<HomeScreen>
       emailVerification(context);
     });
 
-    Events().onEvent(IdentityCallbackEvent().runtimeType, (IdentityCallbackEvent event) async {
+    Events().onEvent(IdentityCallbackEvent().runtimeType,
+        (IdentityCallbackEvent event) async {
       Future(() {
         globals.tabController.animateTo(0, duration: Duration(seconds: 0));
         showIdentityMessage(context, event.type!);
@@ -179,13 +180,13 @@ class _HomeScreenState extends State<HomeScreen>
       phoneVerification(context);
     });
 
-    WidgetsBinding.instance?.addObserver(this);
+    WidgetsBinding.instance.addObserver(this);
   }
 
   @override
   void dispose() {
     _sub?.cancel();
-    WidgetsBinding.instance?.removeObserver(this);
+    WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }
 
@@ -196,13 +197,15 @@ class _HomeScreenState extends State<HomeScreen>
         return;
       }
 
-      int timeSpendWithPausedApp = new DateTime.now().millisecondsSinceEpoch - lastCheck;
+      int timeSpendWithPausedApp =
+          new DateTime.now().millisecondsSinceEpoch - lastCheck;
 
       if (timeSpendWithPausedApp >= pinCheckTimeout) {
         timeoutExpiredInBackground = true;
       }
 
-      if (Globals().router.pinRequired(globals.tabController.index) && timeoutExpiredInBackground) {
+      if (Globals().router.pinRequired(globals.tabController.index) &&
+          timeoutExpiredInBackground) {
         int homeTab = 0;
         globals.tabController.animateTo(homeTab);
       }
@@ -213,7 +216,8 @@ class _HomeScreenState extends State<HomeScreen>
   }
 
   Future<Null> initUniLinks() async {
-    Events().onEvent(UniLinkEvent(null, null).runtimeType, UniLinkService.handleUniLink);
+    Events().onEvent(
+        UniLinkEvent(null, null).runtimeType, UniLinkService.handleUniLink);
     initialLink = widget.initialLink;
 
     if (initialLink != null) {

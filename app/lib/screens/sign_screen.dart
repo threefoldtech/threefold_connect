@@ -11,6 +11,7 @@ import 'package:flutter/material.dart';
 import 'package:threebotlogin/events/pop_all_sign_event.dart';
 import 'package:threebotlogin/helpers/block_and_run_mixin.dart';
 import 'package:threebotlogin/helpers/download_helper.dart';
+import 'package:threebotlogin/helpers/hex_color.dart';
 import 'package:threebotlogin/models/sign.dart';
 import 'package:threebotlogin/services/3bot_service.dart';
 import 'package:threebotlogin/services/crypto_service.dart';
@@ -45,7 +46,7 @@ class _SignScreenState extends State<SignScreen> with BlockAndRunMixin {
   void initState() {
     super.initState();
     Events().onEvent(PopAllSignEvent("").runtimeType, close);
-    WidgetsBinding.instance?.addPostFrameCallback((_) => fetchNecessaryData());
+    WidgetsBinding.instance.addPostFrameCallback((_) => fetchNecessaryData());
   }
 
   void fetchNecessaryData() async {
@@ -126,10 +127,10 @@ class _SignScreenState extends State<SignScreen> with BlockAndRunMixin {
   }
 
   Widget wasNotMeButton() {
-    return FlatButton(
+    return TextButton(
       child: Text(
         "It wasn\'t me - cancel",
-        style: TextStyle(fontSize: 16.0, color: Color(0xff0f296a)),
+        style: TextStyle(fontSize: 16.0, color: HexColor('#0f296a')),
       ),
       onPressed: () {
         cancelSignAttempt();
@@ -149,8 +150,12 @@ class _SignScreenState extends State<SignScreen> with BlockAndRunMixin {
           ),
           children: <TextSpan>[
             TextSpan(children: <TextSpan>[
-              new TextSpan(text: widget.signData.appId!, style: TextStyle(fontWeight: FontWeight.bold)),
-              new TextSpan(text: ' wants you to sign a data document. The Title of the document is: \n \n'),
+              new TextSpan(
+                  text: widget.signData.appId!,
+                  style: TextStyle(fontWeight: FontWeight.bold)),
+              new TextSpan(
+                  text:
+                      ' wants you to sign a data document. The Title of the document is: \n \n'),
               new TextSpan(
                   text: widget.signData.friendlyName! + '\n',
                   style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
@@ -174,9 +179,10 @@ class _SignScreenState extends State<SignScreen> with BlockAndRunMixin {
         errorMessage = 'Cant verify hash';
         return Container(
             child: Text(
-              "Can't verify hash, please cancel this sign attempt",
-              style: TextStyle(fontWeight: FontWeight.bold, color: Colors.red, fontSize: 15),
-            ));
+          "Can't verify hash, please cancel this sign attempt",
+          style: TextStyle(
+              fontWeight: FontWeight.bold, color: Colors.red, fontSize: 15),
+        ));
       }
 
       if (errorMessage == null) {
@@ -186,13 +192,15 @@ class _SignScreenState extends State<SignScreen> with BlockAndRunMixin {
       return Container(
           child: Text(
         'Failed to load the data',
-        style: TextStyle(fontWeight: FontWeight.bold, color: Colors.red, fontSize: 15),
+        style: TextStyle(
+            fontWeight: FontWeight.bold, color: Colors.red, fontSize: 15),
       ));
     } catch (e) {
       return Container(
           child: Text(
         'Failed to parse the data',
-        style: TextStyle(fontWeight: FontWeight.bold, color: Colors.red, fontSize: 15),
+        style: TextStyle(
+            fontWeight: FontWeight.bold, color: Colors.red, fontSize: 15),
       ));
     }
   }
@@ -262,7 +270,8 @@ class _SignScreenState extends State<SignScreen> with BlockAndRunMixin {
               Uint8List sk = await getPrivateKey();
               String signedData = await signData(widget.signData.dataUrl!, sk);
 
-              await sendSignedData(state, randomRoom, signedData, appId, newHash);
+              await sendSignedData(
+                  state, randomRoom, signedData, appId, newHash);
 
               Navigator.pop(context, true);
               Events().emit(PopAllSignEvent(emitCode));
@@ -281,18 +290,24 @@ class _SignScreenState extends State<SignScreen> with BlockAndRunMixin {
           ElevatedButton(
             style: ButtonStyle(
                 backgroundColor: MaterialStateProperty.all<Color>(Colors.white),
-                padding: MaterialStateProperty.all<EdgeInsets>(EdgeInsets.all(12))),
+                padding:
+                    MaterialStateProperty.all<EdgeInsets>(EdgeInsets.all(12))),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Icon(
-                  downloadedFile != null ? Icons.remove_red_eye_outlined : Icons.download,
+                  downloadedFile != null
+                      ? Icons.remove_red_eye_outlined
+                      : Icons.download,
                   color: Colors.grey,
                 ),
                 Padding(padding: EdgeInsets.only(left: 20)),
                 Text(
                   downloadedFile != null ? 'OPEN FILE' : 'DOWNLOAD FILE',
-                  style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: Colors.grey),
+                  style: TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.grey),
                 )
               ],
             ),
@@ -325,7 +340,8 @@ class _SignScreenState extends State<SignScreen> with BlockAndRunMixin {
               try {
                 String fileName = extractFileName(widget.signData.dataUrl!);
 
-                downloadedFile = await downloadFile(widget.signData.dataUrl!, fileName);
+                downloadedFile =
+                    await downloadFile(widget.signData.dataUrl!, fileName);
                 if (downloadedFile == null) {
                   updateMessage = 'Failed to download the file';
                   isBusy = false;
@@ -352,7 +368,8 @@ class _SignScreenState extends State<SignScreen> with BlockAndRunMixin {
   Widget loadContainer() {
     return Center(
       child: Container(
-        constraints: BoxConstraints(minHeight: MediaQuery.of(context).size.height * 0.8),
+        constraints:
+            BoxConstraints(minHeight: MediaQuery.of(context).size.height * 0.8),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -396,15 +413,16 @@ class _SignScreenState extends State<SignScreen> with BlockAndRunMixin {
       builder: (BuildContext customContext) => CustomDialog(
         image: Icons.warning,
         title: "Are you sure",
-        description: "Are you sure you want to sign the data, even if the data has been failed to load?",
+        description:
+            "Are you sure you want to sign the data, even if the data has been failed to load?",
         actions: <Widget>[
-          FlatButton(
+          TextButton(
             child: new Text("No"),
             onPressed: () {
               Navigator.pop(customContext);
             },
           ),
-          FlatButton(
+          TextButton(
             child: new Text("Yes"),
             onPressed: () async {
               String randomRoom = widget.signData.randomRoom!;
@@ -414,7 +432,8 @@ class _SignScreenState extends State<SignScreen> with BlockAndRunMixin {
               Uint8List sk = await getPrivateKey();
               String signedData = await signData(widget.signData.dataUrl!, sk);
 
-              await sendSignedData(state, randomRoom, signedData, appId, newHash);
+              await sendSignedData(
+                  state, randomRoom, signedData, appId, newHash);
               Navigator.pop(customContext);
               Navigator.pop(context, true);
             },

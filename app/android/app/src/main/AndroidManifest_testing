@@ -1,20 +1,17 @@
 <manifest xmlns:tools="http://schemas.android.com/tools" xmlns:android="http://schemas.android.com/apk/res/android" package="org.jimber.threebotlogin.testing">
-    <application  tools:replace="android:label" android:label="3Bot Testing" android:icon="@mipmap/ic_launcher" android:usesCleartextTraffic="true">
-        <service
-            android:name="org.threefold.yggdrasil_plugin.PacketTunnelProvider"
-            android:enabled="true"
-            android:exported="true"
-            android:permission="android.permission.BIND_VPN_SERVICE">
+    <application tools:replace="android:label" android:label="3Bot Testing" android:icon="@mipmap/ic_launcher" android:usesCleartextTraffic="true">
+        <service android:name="org.threefold.yggdrasil_plugin.PacketTunnelProvider" android:enabled="true" android:exported="true" android:permission="android.permission.BIND_VPN_SERVICE">
             <intent-filter>
                 <action android:name="android.net.VpnService" />
             </intent-filter>
         </service>
-        <activity android:name=".MainActivity" android:launchMode="singleTop" android:theme="@style/LaunchTheme" android:configChanges="orientation|keyboardHidden|keyboard|screenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode" android:hardwareAccelerated="true" android:windowSoftInputMode="adjustResize">
+        <activity android:name=".MainActivity" android:exported="true" android:launchMode="singleTop" android:theme="@style/LaunchTheme" android:configChanges="orientation|keyboardHidden|keyboard|screenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"
+            android:hardwareAccelerated="true" android:windowSoftInputMode="adjustResize">
             <meta-data android:name="io.flutter.embedding.android.NormalTheme" android:resource="@style/NormalTheme" />
             <meta-data android:name="io.flutter.embedding.android.SplashScreenDrawable" android:resource="@drawable/launch_background" />
             <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
-                <category android:name="android.intent.category.LAUNCHER"/>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
             <intent-filter>
                 <action android:name="FLUTTER_NOTIFICATION_CLICK" />
@@ -42,7 +39,7 @@
         <meta-data android:name="flutterEmbedding" android:value="2" />
     </application>
 
-    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
