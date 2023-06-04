@@ -5,29 +5,36 @@ The frontend for 3Bot login
 ## Project setup
 
 ```bash
-npm install
+yarn install
 ```
 
 ### Configuration
 
 ```bash
-make prod/staging/testing
+# prod:
+cp public/config.prod.js public/config.js
+
+# staging:
+cp public/config.staging.js public/config.js
+
+# testing:
+cp public/config.testing.js public/config.js
 ```
 
 ### Compiles and hot-reloads for development
 
 ```bash
-npm run serve
+yarn serve
 ```
 
 ### Compiles and minifies for production
 
 ```bash
-npm run build
+yarn build
 ```
 
 ### Lints and fixes files
 
 ```bash
-npm run lint
+yarn lint
 ```

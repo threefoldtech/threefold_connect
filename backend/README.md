@@ -30,7 +30,8 @@ When a user tries to log in, an entry is added
 
 ## Run in dev mode
 
-To run the backend in devmode simply execute following command
+- Check [configurations](##config-file)
+- To run the backend in devmode simply execute following command
 
 ```bash
 python3 .
