@@ -6,7 +6,6 @@ import 'package:http/http.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
 import 'package:intl_phone_field/phone_number.dart';
 import 'package:threebotlogin/helpers/globals.dart';
-import 'package:threebotlogin/services/crypto_service.dart';
 import 'package:threebotlogin/services/open_kyc_service.dart';
 import 'package:threebotlogin/services/phone_service.dart';
 import 'package:threebotlogin/services/pkid_service.dart';
@@ -16,7 +15,7 @@ import 'custom_dialog.dart';
 
 Future<void> addPhoneNumberDialog(context) async {
   Response res = await getCountry();
-  var countryCode = res.body.replaceAll("\n", "");
+  var countryCode = res.body.replaceAll('\n', '');
 
   await showDialog(
     context: context,
@@ -32,11 +31,11 @@ phoneSendDialog(context) {
     barrierDismissible: false,
     builder: (BuildContext context) => CustomDialog(
       image: Icons.check,
-      title: "Sms has been sent.",
-      description: "A verification sms has been sent.",
+      title: 'Sms has been sent.',
+      description: 'A verification sms has been sent.',
       actions: <Widget>[
         TextButton(
-          child: new Text("Ok"),
+          child: const Text('Ok'),
           onPressed: () {
             Navigator.pop(context);
           },
@@ -54,7 +53,7 @@ class PhoneAlertDialog extends StatefulWidget {
 
   @override
   State<StatefulWidget> createState() {
-    return new PhoneAlertDialogState();
+    return PhoneAlertDialogState();
   }
 }
 
@@ -65,7 +64,7 @@ class PhoneAlertDialogState extends State<PhoneAlertDialog> {
   @override
   void initState() {
     valid = false;
-    verificationPhoneNumber = "";
+    verificationPhoneNumber = '';
     super.initState();
   }
 
@@ -73,7 +72,7 @@ class PhoneAlertDialogState extends State<PhoneAlertDialog> {
   Widget build(BuildContext context) {
     return CustomDialog(
         image: Icons.phone,
-        title: "Add phone number",
+        title: 'Add phone number',
         widgetDescription: SizedBox(
           height: 100,
           child: Row(
@@ -83,7 +82,7 @@ class PhoneAlertDialogState extends State<PhoneAlertDialog> {
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   child: IntlPhoneField(
                     initialCountryCode: widget.defaultCountryCode,
-                    decoration: InputDecoration(
+                    decoration: const InputDecoration(
                       labelText: 'Phone Number',
                       border: OutlineInputBorder(
                         borderSide: BorderSide(),
@@ -91,10 +90,8 @@ class PhoneAlertDialogState extends State<PhoneAlertDialog> {
                     ),
                     onChanged: (phone) {
                       PhoneNumber p = phone;
-                      print(p.completeNumber);
-
-                      RegExp regExp = new RegExp(
-                        r"^(\+[0-9]{1,3}|0)[0-9]{3}( ){0,1}[0-9]{7,8}\b$",
+                      RegExp regExp = RegExp(
+                        r'^(\+[0-9]{1,3}|0)[0-9]{3}( ){0,1}[0-9]{7,8}\b$',
                         caseSensitive: false,
                         multiLine: false,
                       );
@@ -112,25 +109,23 @@ class PhoneAlertDialogState extends State<PhoneAlertDialog> {
           ),
         ),
         actions: <Widget>[
-          new TextButton(
+          TextButton(
               child: const Text(
                 'Cancel',
               ),
               onPressed: () {
                 Navigator.pop(context);
               }),
-          new TextButton(
+          TextButton(
               style: ButtonStyle(
                 foregroundColor: valid
                     ? MaterialStateProperty.all(Theme.of(context).primaryColor)
                     : MaterialStateProperty.all(Colors.grey),
               ),
+              onPressed: verifyButton,
               child: valid
-                  ? const Text('Add',
-                      style: const TextStyle(color: Colors.white))
-                  : const Text('Ok',
-                      style: const TextStyle(color: Colors.black)),
-              onPressed: verifyButton)
+                  ? const Text('Add', style: TextStyle(color: Colors.white))
+                  : const Text('Ok', style: TextStyle(color: Colors.black)))
         ]);
   }
 
@@ -140,22 +135,22 @@ class PhoneAlertDialogState extends State<PhoneAlertDialog> {
       barrierDismissible: false,
       builder: (BuildContext dialogContext) => CustomDialog(
         image: Icons.info,
-        title: "Verify phone number",
-        description: "Do you want to verify your phone number now?",
+        title: 'Verify phone number',
+        description: 'Do you want to verify your phone number now?',
         actions: [
           TextButton(
               onPressed: () {
                 Navigator.pop(dialogContext);
                 Navigator.pop(context);
               },
-              child: Text('No')),
+              child: const Text('No')),
           TextButton(
               onPressed: () async {
                 Navigator.pop(dialogContext);
                 Navigator.pop(context);
                 await sendPhoneVerification();
               },
-              child: Text('Yes'))
+              child: const Text('Yes'))
         ],
       ),
     );
@@ -175,23 +170,20 @@ class PhoneAlertDialogState extends State<PhoneAlertDialog> {
   }
 
   sendPhoneVerification() async {
-    int currentTime = new DateTime.now().millisecondsSinceEpoch;
+    int currentTime = DateTime.now().millisecondsSinceEpoch;
 
     if (Globals().tooManySmsAttempts &&
-        Globals().lockedSmsUntill > currentTime) {
+        Globals().lockedSmsUntil > currentTime) {
       Globals().sendSmsAttempts = 0;
       showDialog(
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: new Text('Too many attempts please wait ' +
-                ((Globals().lockedSmsUntill - currentTime) / 1000)
-                    .round()
-                    .toString() +
-                ' seconds.'),
+            title: Text(
+                'Too many attempts please wait ${((Globals().lockedSmsUntil - currentTime) / 1000).round()} seconds.'),
             actions: <Widget>[
               TextButton(
-                child: new Text("OK"),
+                child: const Text('OK'),
                 onPressed: () {
                   Navigator.of(context).pop();
                 },
@@ -207,16 +199,16 @@ class PhoneAlertDialogState extends State<PhoneAlertDialog> {
 
     if (Globals().sendSmsAttempts >= 3) {
       Globals().tooManySmsAttempts = true;
-      Globals().lockedSmsUntill = currentTime + 60000;
+      Globals().lockedSmsUntil = currentTime + 60000;
 
       showDialog(
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: new Text('Too many attempts please wait one minute.'),
+            title: const Text('Too many attempts please wait one minute.'),
             actions: <Widget>[
               TextButton(
-                child: new Text("OK"),
+                child: const Text('OK'),
                 onPressed: () {
                   Navigator.of(context).pop();
                 },
@@ -233,7 +225,7 @@ class PhoneAlertDialogState extends State<PhoneAlertDialog> {
     sendVerificationSms();
 
     Globals().hidePhoneButton.value = true;
-    Globals().smsSentOn = new DateTime.now().millisecondsSinceEpoch;
+    Globals().smsSentOn = DateTime.now().millisecondsSinceEpoch;
 
     phoneSendDialog(context);
 

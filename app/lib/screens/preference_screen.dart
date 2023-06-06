@@ -1,10 +1,7 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:http/http.dart';
-import 'package:package_info/package_info.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:threebotlogin/app_config.dart';
 import 'package:threebotlogin/apps/free_flow_pages/ffp_events.dart';
 import 'package:threebotlogin/events/close_socket_event.dart';
@@ -17,11 +14,8 @@ import 'package:threebotlogin/screens/authentication_screen.dart';
 import 'package:threebotlogin/screens/change_pin_screen.dart';
 import 'package:threebotlogin/screens/main_screen.dart';
 import 'package:threebotlogin/services/fingerprint_service.dart';
-import 'package:threebotlogin/services/open_kyc_service.dart';
-import 'package:threebotlogin/services/socket_service.dart';
 import 'package:threebotlogin/services/shared_preference_service.dart';
 import 'package:threebotlogin/widgets/custom_dialog.dart';
-import 'package:threebotlogin/widgets/email_verification_needed.dart';
 import 'package:threebotlogin/widgets/layout_drawer.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -142,7 +136,8 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
                                   secondary: Icon(Icons.fingerprint),
                                   value: finger,
                                   title: Text(snapshot.data.toString()),
-                                  activeColor: Theme.of(context).accentColor,
+                                  activeColor:
+                                      Theme.of(context).colorScheme.secondary,
                                   onChanged: (bool? newValue) async {
                                     _toggleFingerprint(newValue!);
                                   },
@@ -299,10 +294,10 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
   }
 
   Future copySeedPhrase() async {
-    Clipboard.setData(new ClipboardData(text: await getPhrase()));
+    Clipboard.setData(ClipboardData(text: (await getPhrase()).toString()));
 
-    final seedCopied = SnackBar(
-      content: Text('Seedphrase copied to clipboard'),
+    const seedCopied = SnackBar(
+      content: Text('Seed phrase copied to clipboard'),
       duration: Duration(seconds: 1),
     );
 
@@ -464,7 +459,7 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
       return;
     }
 
-    await launch(url);
+    await launchUrl(Uri.parse(url));
   }
 
   void _showVersionInfo() {
@@ -476,12 +471,12 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
           context: context,
           builder: (BuildContext context) => CustomDialog(
             image: Icons.perm_device_information,
-            title: "Build information",
+            title: 'Build information',
             description:
-                "Type: ${appConfig.environment}\nGit hash: ${appConfig.githash}\nTime: ${appConfig.time}",
+                'Type: ${appConfig.environment}\nGit hash: ${appConfig.githash}\nTime: ${appConfig.time}',
             actions: <Widget>[
               TextButton(
-                child: new Text("Ok"),
+                child: const Text('Ok'),
                 onPressed: () {
                   Navigator.pop(context);
                   setState(() {});
@@ -491,7 +486,7 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
           ),
         );
       }
-    } catch (Exception) {
+    } on Exception {
       // Doesn't matter, just needs to be caught.
     }
   }

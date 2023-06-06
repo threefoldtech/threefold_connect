@@ -7,7 +7,7 @@ final LocalAuthentication auth = LocalAuthentication();
 
 Future<bool> authenticate() async {
   bool didAuthenticate = false;
-  String _localizedReason = "";
+  String localizedReason = '';
 
   try {
     List<BiometricType> availableBiometrics =
@@ -15,21 +15,25 @@ Future<bool> authenticate() async {
 
     if (Platform.isIOS) {
       if (availableBiometrics.contains(BiometricType.face)) {
-        _localizedReason = "Please authenticate with Face ID.";
+        localizedReason = 'Please authenticate with Face ID.';
       } else if (availableBiometrics.contains(BiometricType.fingerprint)) {
-        _localizedReason = "Please authenticate with Touch ID.";
+        localizedReason = 'Please authenticate with Touch ID.';
       }
     } else if (Platform.isAndroid) {
       if (availableBiometrics.contains(BiometricType.face)) {
-        _localizedReason = "Please authenticate with face unlock.";
+        localizedReason = 'Please authenticate with face unlock.';
       } else if (availableBiometrics.contains(BiometricType.fingerprint)) {
-        _localizedReason = "Please authenticate with your fingerprint.";
+        localizedReason = 'Please authenticate with your fingerprint.';
       }
     }
 
-    didAuthenticate = await auth.authenticateWithBiometrics(
-        localizedReason: _localizedReason,
-        useErrorDialogs: true);
+    didAuthenticate = await auth.authenticate(
+      localizedReason: localizedReason,
+      options: const AuthenticationOptions(
+        useErrorDialogs: true,
+        biometricOnly: true,
+      ),
+    );
   } on PlatformException catch (e) {
     print(e);
     return false;
@@ -39,24 +43,23 @@ Future<bool> authenticate() async {
 }
 
 Future<String> getBiometricDeviceName() async {
-  List<BiometricType> availableBiometrics =
-        await auth.getAvailableBiometrics();
-        
-  if (Platform.isIOS) {
-      if (availableBiometrics.contains(BiometricType.face)) {
-        return "Face ID";
-      } else if (availableBiometrics.contains(BiometricType.fingerprint)) {
-        return "Touch ID";
-      }
-    } else if (Platform.isAndroid) {
-      if (availableBiometrics.contains(BiometricType.face)) {
-        return "Face unlock";
-      } else if (availableBiometrics.contains(BiometricType.fingerprint)) {
-        return "Fingerprint";
-      }
-    }
+  List<BiometricType> availableBiometrics = await auth.getAvailableBiometrics();
 
-    return "Not found";
+  if (Platform.isIOS) {
+    if (availableBiometrics.contains(BiometricType.face)) {
+      return 'Face ID';
+    } else if (availableBiometrics.contains(BiometricType.fingerprint)) {
+      return 'Touch ID';
+    }
+  } else if (Platform.isAndroid) {
+    if (availableBiometrics.contains(BiometricType.face)) {
+      return 'Face unlock';
+    } else if (availableBiometrics.contains(BiometricType.fingerprint)) {
+      return 'Fingerprint';
+    }
+  }
+
+  return 'Not found';
 }
 
 Future<bool> checkBiometricsAvailable() async {

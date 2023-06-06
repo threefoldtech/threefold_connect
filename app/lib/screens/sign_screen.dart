@@ -45,7 +45,7 @@ class _SignScreenState extends State<SignScreen> with BlockAndRunMixin {
   @override
   void initState() {
     super.initState();
-    Events().onEvent(PopAllSignEvent("").runtimeType, close);
+    Events().onEvent(PopAllSignEvent('').runtimeType, close);
     WidgetsBinding.instance.addPostFrameCallback((_) => fetchNecessaryData());
   }
 
@@ -74,12 +74,12 @@ class _SignScreenState extends State<SignScreen> with BlockAndRunMixin {
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
-      child: new Scaffold(
+      child: Scaffold(
         key: _scaffoldKey,
-        appBar: new AppBar(
+        appBar: AppBar(
           // automaticallyImplyLeading: false,
           backgroundColor: Theme.of(context).primaryColor,
-          title: new Text("Sign"),
+          title: const Text('Sign'),
         ),
         body: Container(
           child: Column(
@@ -88,7 +88,7 @@ class _SignScreenState extends State<SignScreen> with BlockAndRunMixin {
                 constraints: BoxConstraints(
                     minHeight: MediaQuery.of(context).size.height * 0.85,
                     minWidth: MediaQuery.of(context).size.width * 0.85),
-                padding: EdgeInsets.all(20),
+                padding: const EdgeInsets.all(20),
                 child: isDataLoading == true ? loadContainer() : mainLayout(),
               ),
             ],
@@ -116,7 +116,7 @@ class _SignScreenState extends State<SignScreen> with BlockAndRunMixin {
         Column(
           children: [
             signButton(),
-            SizedBox(
+            const SizedBox(
               height: 5,
             ),
             wasNotMeButton()
@@ -143,22 +143,23 @@ class _SignScreenState extends State<SignScreen> with BlockAndRunMixin {
   Widget leadingText() {
     return RichText(
       textAlign: TextAlign.center,
-      text: new TextSpan(
-          style: new TextStyle(
+      text: TextSpan(
+          style: const TextStyle(
             fontSize: 15.0,
             color: Colors.black,
           ),
           children: <TextSpan>[
             TextSpan(children: <TextSpan>[
-              new TextSpan(
+              TextSpan(
                   text: widget.signData.appId!,
-                  style: TextStyle(fontWeight: FontWeight.bold)),
-              new TextSpan(
+                  style: const TextStyle(fontWeight: FontWeight.bold)),
+              const TextSpan(
                   text:
                       ' wants you to sign a data document. The Title of the document is: \n \n'),
-              new TextSpan(
+              TextSpan(
                   text: widget.signData.friendlyName! + '\n',
-                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
+                  style: const TextStyle(
+                      fontSize: 14, fontWeight: FontWeight.bold)),
             ]),
           ]),
     );
@@ -170,7 +171,7 @@ class _SignScreenState extends State<SignScreen> with BlockAndRunMixin {
       updateMessage = 'Verifying hash.. ';
       setState(() {});
 
-      newHash = hashData(widget.signData.dataUrl!);
+      newHash = hashData(widget.signData.dataUrl!).toString();
 
       if (newHash != widget.signData.hashedDataUrl!) {
         // updateMessage = 'Could not verify hash ';
@@ -178,7 +179,7 @@ class _SignScreenState extends State<SignScreen> with BlockAndRunMixin {
         setState(() {});
         errorMessage = 'Cant verify hash';
         return Container(
-            child: Text(
+            child: const Text(
           "Can't verify hash, please cancel this sign attempt",
           style: TextStyle(
               fontWeight: FontWeight.bold, color: Colors.red, fontSize: 15),
@@ -190,14 +191,14 @@ class _SignScreenState extends State<SignScreen> with BlockAndRunMixin {
       }
 
       return Container(
-          child: Text(
+          child: const Text(
         'Failed to load the data',
         style: TextStyle(
             fontWeight: FontWeight.bold, color: Colors.red, fontSize: 15),
       ));
     } catch (e) {
       return Container(
-          child: Text(
+          child: const Text(
         'Failed to parse the data',
         style: TextStyle(
             fontWeight: FontWeight.bold, color: Colors.red, fontSize: 15),
@@ -209,29 +210,30 @@ class _SignScreenState extends State<SignScreen> with BlockAndRunMixin {
     return Container(
       child: Column(
         children: [
-          SizedBox(
+          const SizedBox(
             height: 40,
           ),
-          Text(
+          const Text(
             'You can download the document for review here',
             style: TextStyle(fontWeight: FontWeight.w600),
           ),
-          SizedBox(
+          const SizedBox(
             height: 15,
           ),
           downloadButton(),
-          SizedBox(
+          const SizedBox(
             height: 15,
           ),
-          isBusy ? CircularProgressIndicator() : Container(),
+          isBusy ? const CircularProgressIndicator() : Container(),
           isBusy
-              ? SizedBox(
+              ? const SizedBox(
                   height: 10,
                 )
               : Container(),
           Text(
             updateMessage,
-            style: TextStyle(color: Colors.orange, fontWeight: FontWeight.bold),
+            style: const TextStyle(
+                color: Colors.orange, fontWeight: FontWeight.bold),
           )
         ],
       ),
@@ -242,12 +244,12 @@ class _SignScreenState extends State<SignScreen> with BlockAndRunMixin {
     return Container(
       child: Column(
         children: [
-          SizedBox(height: 20),
+          const SizedBox(height: 20),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
-              minimumSize: Size.fromHeight(50),
+              minimumSize: const Size.fromHeight(50),
             ),
-            child: Row(
+            child: const Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Icon(Icons.assignment_turned_in_outlined),
@@ -290,8 +292,8 @@ class _SignScreenState extends State<SignScreen> with BlockAndRunMixin {
           ElevatedButton(
             style: ButtonStyle(
                 backgroundColor: MaterialStateProperty.all<Color>(Colors.white),
-                padding:
-                    MaterialStateProperty.all<EdgeInsets>(EdgeInsets.all(12))),
+                padding: MaterialStateProperty.all<EdgeInsets>(
+                    const EdgeInsets.all(12))),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -301,10 +303,10 @@ class _SignScreenState extends State<SignScreen> with BlockAndRunMixin {
                       : Icons.download,
                   color: Colors.grey,
                 ),
-                Padding(padding: EdgeInsets.only(left: 20)),
+                const Padding(padding: EdgeInsets.only(left: 20)),
                 Text(
                   downloadedFile != null ? 'OPEN FILE' : 'DOWNLOAD FILE',
-                  style: TextStyle(
+                  style: const TextStyle(
                       fontSize: 15,
                       fontWeight: FontWeight.bold,
                       color: Colors.grey),
@@ -325,7 +327,7 @@ class _SignScreenState extends State<SignScreen> with BlockAndRunMixin {
               updateMessage = 'Verifying hash.. ';
               setState(() {});
 
-              newHash = hashData(widget.signData.dataUrl!);
+              newHash = await hashData(widget.signData.dataUrl!);
 
               if (newHash != widget.signData.hashedDataUrl!) {
                 updateMessage = 'Could not verify hash ';
@@ -370,7 +372,7 @@ class _SignScreenState extends State<SignScreen> with BlockAndRunMixin {
       child: Container(
         constraints:
             BoxConstraints(minHeight: MediaQuery.of(context).size.height * 0.8),
-        child: Column(
+        child: const Column(
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
@@ -412,18 +414,18 @@ class _SignScreenState extends State<SignScreen> with BlockAndRunMixin {
       barrierDismissible: false,
       builder: (BuildContext customContext) => CustomDialog(
         image: Icons.warning,
-        title: "Are you sure",
+        title: 'Are you sure',
         description:
-            "Are you sure you want to sign the data, even if the data has been failed to load?",
+            'Are you sure you want to sign the data, even if the data has been failed to load?',
         actions: <Widget>[
           TextButton(
-            child: new Text("No"),
+            child: const Text('No'),
             onPressed: () {
               Navigator.pop(customContext);
             },
           ),
           TextButton(
-            child: new Text("Yes"),
+            child: const Text('Yes'),
             onPressed: () async {
               String randomRoom = widget.signData.randomRoom!;
               String appId = widget.signData.appId!;

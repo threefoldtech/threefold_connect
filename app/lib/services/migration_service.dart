@@ -1,8 +1,5 @@
-import 'package:flutter_pkid/flutter_pkid.dart';
 import 'package:threebotlogin/services/pkid_service.dart';
 import 'package:threebotlogin/services/shared_preference_service.dart';
-
-import 'crypto_service.dart';
 
 Future<void> fixPkidMigration() async {
   try {
@@ -11,13 +8,13 @@ Future<void> fixPkidMigration() async {
     await savePhoneToPKidForMigration();
 
     await setPKidMigrationIssueSolved(true);
-  }
-  catch(e) {
+  } catch (e) {
     await setPKidMigrationIssueSolved(false);
   }
 }
 
-Future<void> saveEmailInCorrectFormatPKid(Map<dynamic, dynamic> emailData) async {
+Future<void> saveEmailInCorrectFormatPKid(
+    Map<dynamic, dynamic> emailData) async {
   try {
     if (emailData['email']['email'] != null) {
       if (emailData['email']['sei'] != null) {
@@ -39,7 +36,8 @@ Future<void> saveEmailInCorrectFormatPKid(Map<dynamic, dynamic> emailData) async
   }
 }
 
-Future<void> savePhoneInCorrectFormatPKid(Map<dynamic, dynamic> phoneData) async {
+Future<void> savePhoneInCorrectFormatPKid(
+    Map<dynamic, dynamic> phoneData) async {
   try {
     if (phoneData['phone']['phone'] != null) {
       if (phoneData['phone']['spi'] != null) {

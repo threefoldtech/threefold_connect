@@ -15,7 +15,9 @@ Future<void> fetchPKidData() async {
 
   var futures = keyWords.map((keyword) async {
     var pKidResult = await client.getPKidDoc(keyword);
-    return pKidResult.containsKey('data') && pKidResult.containsKey('success') ? jsonDecode(pKidResult['data']) : {};
+    return pKidResult.containsKey('data') && pKidResult.containsKey('success')
+        ? jsonDecode(pKidResult['data'])
+        : {};
   });
 
   var pKidResult = await Future.wait(futures);
@@ -24,8 +26,8 @@ Future<void> fetchPKidData() async {
   await handleKYCData(dataMap[0], dataMap[1], dataMap[2]);
 }
 
-Future<void> handleKYCData(
-    Map<dynamic, dynamic> emailData, Map<dynamic, dynamic> phoneData, Map<dynamic, dynamic> identityData) async {
+Future<void> handleKYCData(Map<dynamic, dynamic> emailData,
+    Map<dynamic, dynamic> phoneData, Map<dynamic, dynamic> identityData) async {
   await saveCorrectVerificationStates(emailData, phoneData, identityData);
 
   bool? isEmailVerified = await getIsEmailVerified();
@@ -71,8 +73,8 @@ Future<void> handleKYCData(
   }
 }
 
-Future<void> saveCorrectVerificationStates(
-    Map<dynamic, dynamic> emailData, Map<dynamic, dynamic> phoneData, Map<dynamic, dynamic> identityData) async {
+Future<void> saveCorrectVerificationStates(Map<dynamic, dynamic> emailData,
+    Map<dynamic, dynamic> phoneData, Map<dynamic, dynamic> identityData) async {
   if (identityData.containsKey('signedIdentityNameIdentifier')) {
     await setIsIdentityVerified(true);
   } else {
@@ -93,6 +95,7 @@ Future<void> saveCorrectVerificationStates(
 }
 
 bool checkEmail(String email) {
-  String? emailValue = email.toLowerCase().trim().replaceAll(new RegExp(r"\s+"), " ");
+  String? emailValue =
+      email.toLowerCase().trim().replaceAll(RegExp(r'\s+'), ' ');
   return validateEmail(emailValue);
 }

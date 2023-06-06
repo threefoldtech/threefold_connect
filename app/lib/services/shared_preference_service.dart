@@ -3,14 +3,14 @@ import 'dart:core';
 import 'dart:typed_data';
 import 'package:convert/convert.dart';
 import 'package:flutter_pkid/flutter_pkid.dart';
-
-import 'package:flutter_sodium/flutter_sodium.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:threebotlogin/helpers/globals.dart';
 import 'package:threebotlogin/models/wallet_data.dart';
 import 'package:threebotlogin/services/3bot_service.dart';
 import 'package:threebotlogin/services/crypto_service.dart';
 import 'package:threebotlogin/services/pkid_service.dart';
+import 'package:pinenacl/api.dart';
+import 'package:pinenacl/tweetnacl.dart' show TweetNaClExt;
 
 ///
 ///
@@ -90,16 +90,21 @@ Future<Map<String, String>> getEdCurveKeys() async {
   final String? pkEd = prefs.getString('publickey');
   final String? skEd = prefs.getString('privatekey');
 
-  final String pkCurve = base64
-      .encode(Sodium.cryptoSignEd25519PkToCurve25519(base64.decode(pkEd!)));
-  final String skCurve = base64
-      .encode(Sodium.cryptoSignEd25519SkToCurve25519(base64.decode(skEd!)));
+  final pkCurve = Uint8List(32);
+  TweetNaClExt.crypto_sign_ed25519_pk_to_x25519_pk(
+      pkCurve, base64.decode(pkEd!));
+  final String pkCurveEncoded = base64.encode(Uint8List.fromList(pkCurve));
+
+  final skCurve = Uint8List(32);
+  TweetNaClExt.crypto_sign_ed25519_sk_to_x25519_sk(
+      skCurve, base64.decode(skEd!));
+  final String skCurveEncoded = base64.encode(Uint8List.fromList(skCurve));
 
   return {
     'signingPublicKey': hex.encode(base64.decode(pkEd)),
     'signingPrivateKey': hex.encode(base64.decode(skEd)),
-    'encryptionPublicKey': hex.encode(base64.decode(pkCurve)),
-    'encryptionPrivateKey': hex.encode(base64.decode(skCurve))
+    'encryptionPublicKey': hex.encode(base64.decode(pkCurveEncoded)),
+    'encryptionPrivateKey': hex.encode(base64.decode(skCurveEncoded))
   };
 }
 

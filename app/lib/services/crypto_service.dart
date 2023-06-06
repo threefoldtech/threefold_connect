@@ -2,32 +2,34 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:typed_data';
 
-import 'package:crypto/crypto.dart';
+import 'package:crypto/crypto.dart' show sha256;
 import 'package:bip39/bip39.dart' as bip39;
-import 'package:flutter_sodium/flutter_sodium.dart';
+import 'package:sodium_libs/sodium_libs.dart';
 import 'package:threebotlogin/services/shared_preference_service.dart';
 import 'package:pbkdf2ns/pbkdf2ns.dart';
 
-bool verifyHash(String data, String hash) {
+Future<bool> verifyHash(String data, String hash) async {
   final List<int> codeUnits = data.codeUnits;
   final Uint8List unit8List = Uint8List.fromList(codeUnits);
 
-  Uint8List hashedData = Sodium.cryptoHash(unit8List);
+  Sodium sodium = await SodiumInit.init();
+  Uint8List hashedData = sodium.crypto.genericHash.call(message: unit8List);
 
   return hash == base64.encode(hashedData);
 }
 
-String hashData(String data) {
+Future<String> hashData(String data) async {
   final List<int> codeUnits = data.codeUnits;
   final Uint8List unit8List = Uint8List.fromList(codeUnits);
 
-  return base64.encode(Sodium.cryptoHash(unit8List));
+  Sodium sodium = await SodiumInit.init();
+  return base64.encode(sodium.crypto.genericHash.call(message: unit8List));
 }
 
 // Helper method to convert a String input to hex used for entropy
 Uint8List _toHex(String input) {
   double length = input.length / 2;
-  Uint8List bytes = new Uint8List(length.ceil());
+  Uint8List bytes = Uint8List(length.ceil());
 
   for (int i = 0; i < bytes.length; i++) {
     String x = input.substring(i * 2, i * 2 + 2);
@@ -44,25 +46,34 @@ Future<String> generateSeedPhrase() async {
 
 // Generate a signing keypair from a given seed
 Future<KeyPair> generateKeyPairFromSeedPhrase(String seedPhrase) async {
+  Sodium sodium = await SodiumInit.init();
   String entropy = bip39.mnemonicToEntropy(seedPhrase);
-  return Sodium.cryptoSignSeedKeypair(_toHex(entropy));
+
+  return sodium.crypto.sign.seedKeyPair(sodium.secureCopy(_toHex(entropy)));
 }
 
 // Generate a signing keypair from a given entropy
 Future<KeyPair> generateKeyPairFromEntropy(Uint8List entropy) async {
-  return Sodium.cryptoSignSeedKeypair(entropy);
+  Sodium sodium = await SodiumInit.init();
+  return sodium.crypto.sign.seedKeyPair(sodium.secureCopy(entropy));
 }
 
 // Sign given data with the secret signing key
 Future<String> signData(String data, Uint8List sk) async {
-  Uint8List signed = Sodium.cryptoSign(Uint8List.fromList(data.codeUnits), sk);
+  Sodium sodium = await SodiumInit.init();
+  Uint8List signed = sodium.crypto.sign.call(
+      message: Uint8List.fromList(data.codeUnits),
+      secretKey: sodium.secureCopy(sk));
   return base64.encode(signed);
 }
 
 // Verify signed data
-bool verifySignature(Uint8List signedMessage, Uint8List pk) {
+Future<bool> verifySignature(Uint8List signedMessage, Uint8List pk) async {
   try {
-    Uint8List data = Sodium.cryptoSignOpen(signedMessage, pk);
+    Sodium sodium = await SodiumInit.init();
+    Uint8List data =
+        sodium.crypto.sign.open(signedMessage: signedMessage, publicKey: pk);
+
     print(utf8.decode(data));
     return true;
   } catch (e) {
@@ -74,10 +85,14 @@ bool verifySignature(Uint8List signedMessage, Uint8List pk) {
 // Encrypt given data encrypted with a keypair
 Future<Map<String, String>> encrypt(
     String data, Uint8List pk, Uint8List sk) async {
-  Uint8List nonce = CryptoBox.randomNonce();
-  Uint8List private = Sodium.cryptoSignEd25519SkToCurve25519(sk);
+  Sodium sodium = await SodiumInit.init();
+  Uint8List nonce = sodium.randombytes.buf(24);
   Uint8List message = Uint8List.fromList(data.codeUnits);
-  Uint8List encryptedData = Sodium.cryptoBoxEasy(message, nonce, pk, private);
+  Uint8List encryptedData = sodium.crypto.box.easy(
+      message: message,
+      nonce: nonce,
+      publicKey: pk,
+      secretKey: sodium.secureCopy(sk));
 
   return {
     'nonce': base64.encode(nonce),
@@ -89,15 +104,14 @@ Future<Map<String, String>> encrypt(
 Future<String> decrypt(
     String encodedCipherText, Uint8List pk, Uint8List sk) async {
   Uint8List cipherText = base64.decode(encodedCipherText);
-  Uint8List publicKey = Sodium.cryptoSignEd25519PkToCurve25519(pk);
-  Uint8List secretKey = Sodium.cryptoSignEd25519SkToCurve25519(sk);
+  Sodium sodium = await SodiumInit.init();
 
-  Uint8List decryptedData =
-      Sodium.cryptoBoxSealOpen(cipherText, publicKey, secretKey);
-  return new String.fromCharCodes(decryptedData);
+  Uint8List decryptedData = sodium.crypto.box.sealOpen(
+      cipherText: cipherText, publicKey: pk, secretKey: sodium.secureCopy(sk));
+  return String.fromCharCodes(decryptedData);
 }
 
-// Generate a new seed combined with a random salt => appId
+// Generate a seed combined with a random salt => appId
 Future<Uint8List> generateDerivedSeed(String appId) async {
   Uint8List privateKey = await getPrivateKey();
   String encodedPrivateKey = base64.encode(privateKey);
@@ -105,5 +119,5 @@ Future<Uint8List> generateDerivedSeed(String appId) async {
   PBKDF2NS generator = PBKDF2NS(hash: sha256);
   List<int> hashKey = generator.generateKey(encodedPrivateKey, appId, 1000, 32);
 
-  return new Uint8List.fromList(hashKey);
+  return Uint8List.fromList(hashKey);
 }

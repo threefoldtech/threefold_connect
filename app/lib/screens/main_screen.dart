@@ -101,10 +101,10 @@ class _AppState extends State<MainScreen> {
                   borderRadius: BorderRadius.all(Radius.circular(30)),
                 ),
               ),
-              child: Row(
+              child: const Row(
                 mainAxisSize: MainAxisSize.min,
                 mainAxisAlignment: MainAxisAlignment.center,
-                children: const [
+                children: [
                   Text(
                     'RETRY',
                     style: TextStyle(color: Colors.white, fontSize: 16),
@@ -203,7 +203,7 @@ class _AppState extends State<MainScreen> {
   fetchPkidData() async {
     try {
       String? seedPhrase = await getPhrase();
-
+      
       if (seedPhrase != null &&
           (await isPKidMigrationIssueSolved() == false ||
               await isPKidMigrationIssueSolved() == null)) {

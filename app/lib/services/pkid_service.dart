@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter_pkid/flutter_pkid.dart';
-import 'package:flutter_sodium/flutter_sodium.dart';
+import 'package:sodium_libs/sodium_libs.dart';
 import 'package:threebotlogin/services/shared_preference_service.dart';
 
 import '../app_config.dart';
@@ -21,10 +21,10 @@ Future<void> saveEmailToPKidForMigration() async {
 
   Map<String, String?> email = await getEmail();
   var emailPKidResult = await client.getPKidDoc('email');
-
   if (!emailPKidResult.containsKey('success') && email['email'] != null) {
     if (email['sei'] != null) {
-      await client.setPKidDoc('email', json.encode({'email': email['email'], 'sei': email['sei']}));
+      await client.setPKidDoc(
+          'email', json.encode({'email': email['email'], 'sei': email['sei']}));
       return;
     }
 
@@ -43,7 +43,8 @@ Future<void> savePhoneToPKidForMigration() async {
 
   if (!phonePKidResult.containsKey('success') && phone['phone'] != null) {
     if (phone['spi'] != null) {
-      await client.setPKidDoc('phone', json.encode({'phone': phone['phone'], 'spi': phone['spi']}));
+      await client.setPKidDoc(
+          'phone', json.encode({'phone': phone['phone'], 'spi': phone['spi']}));
       return;
     }
 
@@ -60,7 +61,8 @@ Future<void> saveEmailToPKid() async {
   Map<String, String?> email = await getEmail();
 
   if (email['sei'] != null) {
-    await client.setPKidDoc('email', json.encode({'email': email['email'], 'sei': email['sei']}));
+    await client.setPKidDoc(
+        'email', json.encode({'email': email['email'], 'sei': email['sei']}));
     return;
   }
 
@@ -76,7 +78,8 @@ Future<void> savePhoneToPKid() async {
   Map<String, String?> phone = await getPhone();
 
   if (phone['spi'] != null) {
-    await client.setPKidDoc('phone', json.encode({'phone': phone['phone'], 'spi': phone['spi']}));
+    await client.setPKidDoc(
+        'phone', json.encode({'phone': phone['phone'], 'spi': phone['spi']}));
     return;
   }
 

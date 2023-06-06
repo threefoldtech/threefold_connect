@@ -1,10 +1,9 @@
 import 'dart:convert';
 import 'dart:core';
-import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_pkid/flutter_pkid.dart';
-import 'package:flutter_sodium/flutter_sodium.dart';
+import 'package:sodium_libs/sodium_libs.dart';
 import 'package:http/http.dart';
 import 'package:threebotlogin/helpers/kyc_helpers.dart';
 import 'package:threebotlogin/helpers/globals.dart';
@@ -41,21 +40,20 @@ class _RecoverScreenState extends State<RecoverScreen> {
     Response userInfoResult = await getUserInfo(doubleName);
 
     if (userInfoResult.statusCode != 200) {
-      throw new Exception('Name was not found.');
+      throw Exception('Name was not found.');
     }
 
     Map<String, dynamic> body = json.decode(userInfoResult.body);
-
-    if (body['publicKey'] != base64.encode(keyPair.pk)) {
-      throw new Exception('Seed phrase does not match with $doubleName');
+    if (body['publicKey'] != base64.encode(keyPair.publicKey)) {
+      throw Exception('Seed phrase does not match with $doubleName');
     }
   }
 
   continueRecoverAccount() async {
     try {
       KeyPair keyPair = await generateKeyPairFromSeedPhrase(seedPhrase);
-      await savePrivateKey(keyPair.sk);
-      await savePublicKey(keyPair.pk);
+      await savePrivateKey(keyPair.secretKey.extractBytes());
+      await savePublicKey(keyPair.publicKey);
 
       FlutterPkid client = await getPkidClient(seedPhrase: seedPhrase);
       List<String> keyWords = ['email', 'phone', 'identity'];
@@ -85,11 +83,11 @@ class _RecoverScreenState extends State<RecoverScreen> {
   }
 
   checkSeedLength(seedPhrase) {
-    int seedLength = seedPhrase.split(" ").length;
+    int seedLength = seedPhrase.split(' ').length;
     if (seedLength <= 23) {
-      throw new Exception('Seed phrase is too short');
+      throw Exception('Seed phrase is too short');
     } else if (seedLength > 24) {
-      throw new Exception('Seed phrase is too long');
+      throw Exception('Seed phrase is too long');
     }
   }
 
@@ -109,10 +107,10 @@ class _RecoverScreenState extends State<RecoverScreen> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Globals.color,
-        title: Text('Recover Account'),
+        title: const Text('Recover Account'),
       ),
       body: Container(
-        padding: EdgeInsets.all(20.0),
+        padding: const EdgeInsets.all(20.0),
         child: Center(
           child: recoverForm(),
         ),
@@ -121,14 +119,14 @@ class _RecoverScreenState extends State<RecoverScreen> {
   }
 
   Widget recoverForm() {
-    return new Form(
+    return Form(
       key: _formKey,
       child: SingleChildScrollView(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            Padding(
-              padding: const EdgeInsets.only(bottom: 12.0),
+            const Padding(
+              padding: EdgeInsets.only(bottom: 12.0),
               child: Text(
                 'Please insert your info',
                 style: TextStyle(fontWeight: FontWeight.bold),
@@ -138,7 +136,7 @@ class _RecoverScreenState extends State<RecoverScreen> {
               padding: const EdgeInsets.only(top: 8.5),
               child: TextFormField(
                   keyboardType: TextInputType.text,
-                  decoration: InputDecoration(
+                  decoration: const InputDecoration(
                     border: OutlineInputBorder(),
                     labelText: 'NAME',
                     // suffixText: '.3bot',
@@ -157,7 +155,7 @@ class _RecoverScreenState extends State<RecoverScreen> {
               child: TextFormField(
                 keyboardType: TextInputType.multiline,
                 maxLines: null,
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                     border: OutlineInputBorder(), labelText: 'SEED PHRASE'),
                 controller: seedPhraseController,
                 validator: (String? value) {
@@ -168,12 +166,13 @@ class _RecoverScreenState extends State<RecoverScreen> {
                 },
               ),
             ),
-            SizedBox(
+            const SizedBox(
               height: 10,
             ),
             Text(
               error,
-              style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+              style: const TextStyle(
+                  color: Colors.red, fontWeight: FontWeight.bold),
             ),
             ElevatedButton(
               style: ElevatedButton.styleFrom(
@@ -181,9 +180,10 @@ class _RecoverScreenState extends State<RecoverScreen> {
                 shape: const RoundedRectangleBorder(
                   borderRadius: BorderRadius.all(Radius.circular(10)),
                 ),
-                padding: EdgeInsets.symmetric(horizontal: 11.0, vertical: 6.0),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 11.0, vertical: 6.0),
               ),
-              child: Text(
+              child: const Text(
                 'Recover Account',
                 style: TextStyle(color: Colors.white),
               ),
@@ -192,12 +192,12 @@ class _RecoverScreenState extends State<RecoverScreen> {
                   error = '';
                 });
 
-                FocusScope.of(context).requestFocus(new FocusNode());
+                FocusScope.of(context).requestFocus(FocusNode());
 
                 String doubleNameValue = doubleNameController.text
                     .toLowerCase()
                     .trim()
-                    .replaceAll(new RegExp(r"\s+"), " ");
+                    .replaceAll(RegExp(r'\s+'), ' ');
 
                 if (doubleNameValue.endsWith('.3bot')) {
                   doubleNameValue = doubleNameValue.replaceAll('.3bot', '');
@@ -206,13 +206,13 @@ class _RecoverScreenState extends State<RecoverScreen> {
                 String seedPhraseValue = seedPhraseController.text
                     .toLowerCase()
                     .trim()
-                    .replaceAll(new RegExp(r"\s+"), " ");
+                    .replaceAll(RegExp(r'\s+'), ' ');
 
                 setState(() {
                   doubleNameController.text = doubleNameValue;
                   seedPhraseController.text = seedPhraseValue;
 
-                  doubleName = doubleNameController.text + '.3bot';
+                  doubleName = '${doubleNameController.text}.3bot';
                   seedPhrase = seedPhraseController.text;
                 });
 
@@ -222,9 +222,10 @@ class _RecoverScreenState extends State<RecoverScreen> {
                   await checkSeedPhrase(doubleName, seedPhrase);
                   await continueRecoverAccount();
 
-                  Navigator.pop(context); // To dismiss the spinner
-                  Navigator.pop(
-                      context, true); // to dismiss the recovery screen.
+                  // To dismiss the spinner
+                  Navigator.pop(context);
+                  // to dismiss the recovery screen.
+                  Navigator.pop(context, true);
                 } catch (e) {
                   print(e);
                   Navigator.pop(context);
@@ -243,18 +244,18 @@ class _RecoverScreenState extends State<RecoverScreen> {
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (BuildContext context) => Dialog(
+      builder: (BuildContext context) => const Dialog(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             SizedBox(
               height: 10,
             ),
-            new CircularProgressIndicator(),
+            CircularProgressIndicator(),
             SizedBox(
               height: 10,
             ),
-            new Text("Loading"),
+            Text('Loading'),
             SizedBox(
               height: 10,
             ),

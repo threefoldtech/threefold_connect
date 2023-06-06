@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_pkid/flutter_pkid.dart';
-import 'package:flutter_sodium/flutter_sodium.dart';
+import 'package:sodium_libs/sodium_libs.dart';
 import 'package:http/http.dart';
 import 'package:threebotlogin/helpers/flags.dart';
 import 'package:threebotlogin/helpers/globals.dart';
@@ -73,7 +73,7 @@ class _MobileRegistrationScreenState extends State<MobileRegistrationScreen> {
     String? emailValue = emailController.text
         .toLowerCase()
         .trim()
-        .replaceAll(new RegExp(r"\s+"), " ");
+        .replaceAll(RegExp(r'\s+'), ' ');
 
     setState(() {
       emailController.text = emailValue;
@@ -86,7 +86,7 @@ class _MobileRegistrationScreenState extends State<MobileRegistrationScreen> {
         _registrationData.email = emailValue;
         state = _State.SeedPhrase;
       } else {
-        errorStepperText = "Please enter a valid email.";
+        errorStepperText = 'Please enter a valid email.';
       }
     });
   }
@@ -95,7 +95,7 @@ class _MobileRegistrationScreenState extends State<MobileRegistrationScreen> {
     String? doubleNameValue = doubleNameController.text
         .toLowerCase()
         .trim()
-        .replaceAll(new RegExp(r"\s+"), " ");
+        .replaceAll(RegExp(r'\s+'), ' ');
 
     setState(() {
       doubleNameController.text = doubleNameValue;
@@ -140,7 +140,7 @@ class _MobileRegistrationScreenState extends State<MobileRegistrationScreen> {
     String? seedCheckValue = seedConfirmationController.text
         .toLowerCase()
         .trim()
-        .replaceAll(new RegExp(r"\s+"), " ");
+        .replaceAll(RegExp(r'\s+'), ' ');
 
     setState(() {
       seedConfirmationController.text = seedCheckValue;
@@ -169,7 +169,7 @@ class _MobileRegistrationScreenState extends State<MobileRegistrationScreen> {
         doubleNameController.text,
         emailController.text,
         'random',
-        base64.encode(_registrationData.keyPair.pk));
+        base64.encode(_registrationData.keyPair.publicKey));
 
     if (response.statusCode == 200) {
       saveRegistration();
@@ -252,8 +252,8 @@ class _MobileRegistrationScreenState extends State<MobileRegistrationScreen> {
   }
 
   void saveRegistration() async {
-    savePrivateKey(_registrationData.keyPair.sk);
-    savePublicKey(_registrationData.keyPair.pk);
+    savePrivateKey(_registrationData.keyPair.secretKey.extractBytes());
+    savePublicKey(_registrationData.keyPair.publicKey);
     saveFingerprint(false);
     saveEmail(_registrationData.email, null);
     saveDoubleName(_registrationData.doubleName);
@@ -274,18 +274,18 @@ class _MobileRegistrationScreenState extends State<MobileRegistrationScreen> {
     return showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (BuildContext context) => Dialog(
+      builder: (BuildContext context) => const Dialog(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             SizedBox(
               height: 10,
             ),
-            new CircularProgressIndicator(),
+            CircularProgressIndicator(),
             SizedBox(
               height: 10,
             ),
-            new Text("Loading"),
+            Text('Loading'),
             SizedBox(
               height: 10,
             ),
@@ -299,7 +299,9 @@ class _MobileRegistrationScreenState extends State<MobileRegistrationScreen> {
     return Theme(
       data: ThemeData(
         primaryColor: Globals.color,
-        accentColor: Globals.color,
+        colorScheme: ColorScheme.fromSwatch().copyWith(
+          secondary: Globals.color,
+        ),
       ),
       child: Stepper(
         controlsBuilder: (BuildContext context, ControlsDetails details) {
@@ -312,20 +314,20 @@ class _MobileRegistrationScreenState extends State<MobileRegistrationScreen> {
                   TextButton(
                     style: ButtonStyle(
                       backgroundColor: MaterialStateProperty.all(
-                          Theme.of(context).accentColor),
+                          Theme.of(context).colorScheme.secondary),
                     ),
                     onPressed: () {
                       details.onStepCancel!();
                     },
                     child: Text(
                       state == _State.DoubleName ? 'CANCEL' : 'PREVIOUS',
-                      style: TextStyle(color: Colors.white),
+                      style: const TextStyle(color: Colors.white),
                     ),
                   ),
                   TextButton(
                     style: ButtonStyle(
                       backgroundColor: MaterialStateProperty.all(
-                          Theme.of(context).accentColor),
+                          Theme.of(context).colorScheme.secondary),
                       foregroundColor: MaterialStateProperty.all(Colors.grey),
                     ),
                     onPressed:
@@ -336,7 +338,7 @@ class _MobileRegistrationScreenState extends State<MobileRegistrationScreen> {
                               },
                     child: Text(
                       state == _State.Finish ? 'FINISH' : 'NEXT',
-                      style: TextStyle(color: Colors.white),
+                      style: const TextStyle(color: Colors.white),
                     ),
                   )
                 ],
@@ -354,7 +356,7 @@ class _MobileRegistrationScreenState extends State<MobileRegistrationScreen> {
                 : state == _State.DoubleName
                     ? StepState.editing
                     : StepState.disabled,
-            title: Text('ThreeFold Connect Id.'),
+            title: const Text('ThreeFold Connect Id.'),
             subtitle: state.index > 0 ? Text(doubleNameController.text) : null,
             content: Card(
               child: Padding(
@@ -362,11 +364,11 @@ class _MobileRegistrationScreenState extends State<MobileRegistrationScreen> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
-                    Text(
+                    const Text(
                       'Hi, please choose a ThreeFold Connect username.',
                       style: TextStyle(fontWeight: FontWeight.bold),
                     ),
-                    Divider(
+                    const Divider(
                       height: 50,
                     ),
                     Padding(
@@ -376,7 +378,7 @@ class _MobileRegistrationScreenState extends State<MobileRegistrationScreen> {
                         maxLength: 50,
                         autofocus: true,
                         keyboardType: TextInputType.text,
-                        decoration: InputDecoration(
+                        decoration: const InputDecoration(
                           border: OutlineInputBorder(),
                           labelText: 'Name',
                           // suffixText: '.3bot',
@@ -385,7 +387,7 @@ class _MobileRegistrationScreenState extends State<MobileRegistrationScreen> {
                         controller: doubleNameController,
                         inputFormatters: <TextInputFormatter>[
                           FilteringTextInputFormatter.allow(
-                              RegExp("[a-zA-Z0-9]"))
+                              RegExp('[a-zA-Z0-9]'))
                         ],
                         enableSuggestions: false,
                         autocorrect: false,
@@ -394,16 +396,16 @@ class _MobileRegistrationScreenState extends State<MobileRegistrationScreen> {
                     Row(
                       children: <Widget>[
                         Padding(
-                          padding: EdgeInsets.only(top: 10),
+                          padding: const EdgeInsets.only(top: 10),
                           child: Text(
                             errorStepperText,
-                            style: TextStyle(color: Colors.red),
+                            style: const TextStyle(color: Colors.red),
                             textAlign: TextAlign.left,
                           ),
                         ),
                       ],
                     ),
-                    Divider(
+                    const Divider(
                       height: 50,
                     ),
                   ],
@@ -418,7 +420,7 @@ class _MobileRegistrationScreenState extends State<MobileRegistrationScreen> {
                 : state == _State.Email
                     ? StepState.editing
                     : StepState.disabled,
-            title: Text('Email'),
+            title: const Text('Email'),
             subtitle: state.index > _State.Email.index
                 ? Text(emailController.text)
                 : null,
@@ -443,7 +445,7 @@ class _MobileRegistrationScreenState extends State<MobileRegistrationScreen> {
                 : state == _State.SeedPhrase
                     ? StepState.editing
                     : StepState.disabled,
-            title: Text('Seed phrase'),
+            title: const Text('Seed phrase'),
             content: Card(
               child: Padding(
                   padding: const EdgeInsets.all(16.0),
@@ -451,13 +453,13 @@ class _MobileRegistrationScreenState extends State<MobileRegistrationScreen> {
                     children: [
                       ReuseableTextStep(
                         titleText:
-                            'In order to ever retrieve your tokens in case of switching to a new device or app, you will have to enter your seedphrase in combination with your TF Connect username. \n\nPlease write this seedphrase and your username on a piece of paper and keep it in a secure place. Do not communicate this key to anyone. ThreeFold can not be held responsible in case of loss of this seedphrase.',
+                            'In order to ever retrieve your tokens in case of switching to a device or app, you will have to enter your seedphrase in combination with your TF Connect username. \n\nPlease write this seedphrase and your username on a piece of paper and keep it in a secure place. Do not communicate this key to anyone. ThreeFold can not be held responsible in case of loss of this seedphrase.',
                         extraText: _registrationData.phrase,
                         errorStepperText: errorStepperText,
                       ),
                       CheckboxListTile(
-                        title: Text(
-                          "I have written down my seedphrase and username",
+                        title: const Text(
+                          'I have written down my seedphrase and username',
                           style: TextStyle(fontSize: 14),
                         ),
                         value: didWriteSeed,
@@ -479,7 +481,7 @@ class _MobileRegistrationScreenState extends State<MobileRegistrationScreen> {
                 : state == _State.ConfirmSeedPhrase
                     ? StepState.editing
                     : StepState.disabled,
-            title: Text('Confirm seed phrase'),
+            title: const Text('Confirm seed phrase'),
             content: Card(
               child: Padding(
                 padding: const EdgeInsets.all(16.0),
@@ -502,21 +504,21 @@ class _MobileRegistrationScreenState extends State<MobileRegistrationScreen> {
                 : state == _State.Finish
                     ? StepState.editing
                     : StepState.disabled,
-            title: Text('Finishing'),
+            title: const Text('Finishing'),
             content: Card(
               child: Column(
                 children: <Widget>[
-                  SizedBox(
+                  const SizedBox(
                     height: 10.0,
                   ),
-                  Padding(
-                    padding: const EdgeInsets.all(16.0),
+                  const Padding(
+                    padding: EdgeInsets.all(16.0),
                     child: Text(
                       'Please check the data below, press finish if it is correct. Otherwise click the pencil icon to edit them.',
                       style: TextStyle(fontWeight: FontWeight.bold),
                     ),
                   ),
-                  SizedBox(
+                  const SizedBox(
                     height: 15.0,
                   ),
                   Padding(
@@ -597,7 +599,7 @@ class _MobileRegistrationScreenState extends State<MobileRegistrationScreen> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Globals.color,
-        title: Text('ThreeFold Connect - Registration'),
+        title: const Text('ThreeFold Connect - Registration'),
       ),
       body: registrationStepper(),
     );

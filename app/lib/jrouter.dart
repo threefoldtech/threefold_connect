@@ -4,10 +4,8 @@ import 'package:threebotlogin/apps/chatbot/chatbot.dart';
 import 'package:threebotlogin/apps/wallet/wallet.dart';
 import 'package:threebotlogin/screens/identity_verification_screen.dart';
 import 'package:threebotlogin/screens/planetary_network_screen.dart';
-// import 'package:threebotlogin/screens/planetary_network_screen.dart';
 import 'package:threebotlogin/screens/preference_screen.dart';
 import 'package:threebotlogin/screens/registered_screen.dart';
-import 'package:threebotlogin/screens/reservation_screen.dart';
 
 import 'apps/farmers/farmers.dart';
 import 'apps/news/news.dart';
@@ -16,7 +14,7 @@ class AppInfo {
   Route route;
   App? app;
 
-  AppInfo({required this.route,  this.app});
+  AppInfo({required this.route, this.app});
 }
 
 class JRouter {
@@ -147,5 +145,9 @@ class Route {
   final String path;
   final Widget view;
 
-  Route({required this.path, required this.name, required this.icon, required this.view});
+  Route(
+      {required this.path,
+      required this.name,
+      required this.icon,
+      required this.view});
 }

@@ -3,7 +3,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:redirection/redirection.dart';
+import 'package:threebotlogin/services/redirection.dart';
 import 'package:threebotlogin/events/uni_link_event.dart';
 import 'package:threebotlogin/models/login.dart';
 import 'package:threebotlogin/models/scope.dart';
@@ -13,7 +13,6 @@ import 'package:threebotlogin/screens/login_screen.dart';
 import 'package:threebotlogin/screens/sign_screen.dart';
 import 'package:threebotlogin/services/shared_preference_service.dart';
 import 'package:threebotlogin/widgets/login_dialogs.dart';
-
 
 class UniLinkService {
   static void handleUniLink(UniLinkEvent e) async {
@@ -74,15 +73,14 @@ void handleLoginUniLink(Uri link, BuildContext context) async {
 
   print(loggedIn);
   bool stateSaved = await savePreviousState(login.state.toString());
-  
+
   await showLoggedInDialog(context);
 
   if (stateSaved) {
     if (Platform.isAndroid) {
       await SystemNavigator.pop();
     } else if (Platform.isIOS) {
-      bool didRedirect = await Redirection.redirect();
-      print(didRedirect);
+      await Redirection.redirect();
     }
   }
 }
@@ -145,7 +143,7 @@ Future<void> handleSignUniLink(Uri link, BuildContext context) async {
   if (Platform.isAndroid) {
     await SystemNavigator.pop();
   } else if (Platform.isIOS) {
-    bool didRedirect = await Redirection.redirect();
+    await Redirection.redirect();
   }
 }
 

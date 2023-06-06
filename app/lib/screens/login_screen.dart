@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:convert';
 import 'dart:math';
 import 'dart:typed_data';
 
@@ -12,7 +11,6 @@ import 'package:threebotlogin/helpers/hex_color.dart';
 import 'package:threebotlogin/helpers/login_helpers.dart';
 import 'package:threebotlogin/models/login.dart';
 import 'package:threebotlogin/services/3bot_service.dart';
-import 'package:threebotlogin/services/crypto_service.dart';
 import 'package:threebotlogin/services/tools_service.dart';
 import 'package:threebotlogin/services/shared_preference_service.dart';
 import 'package:threebotlogin/widgets/image_button.dart';
@@ -56,7 +54,7 @@ class _LoginScreenState extends State<LoginScreen> with BlockAndRunMixin {
   @override
   void initState() {
     super.initState();
-    Events().onEvent(PopAllLoginEvent("").runtimeType, close);
+    Events().onEvent(PopAllLoginEvent('').runtimeType, close);
     isMobileCheck = widget.loginData.isMobile == true;
     generateEmojiImageList();
 
@@ -64,16 +62,16 @@ class _LoginScreenState extends State<LoginScreen> with BlockAndRunMixin {
       return;
     }
 
-    const oneSec = const Duration(seconds: 1);
+    const oneSec = Duration(seconds: 1);
     print('Starting timer ... ');
 
     created = widget.loginData.created;
-    currentTimestamp = new DateTime.now().millisecondsSinceEpoch;
+    currentTimestamp = DateTime.now().millisecondsSinceEpoch;
 
     timeLeft = Globals().loginTimeout -
         ((currentTimestamp! - created!) / 1000).round();
 
-    timer = new Timer.periodic(oneSec, (Timer t) async {
+    timer = Timer.periodic(oneSec, (Timer t) async {
       timeoutTimer();
     });
   }
@@ -84,7 +82,7 @@ class _LoginScreenState extends State<LoginScreen> with BlockAndRunMixin {
       return;
     }
 
-    currentTimestamp = new DateTime.now().millisecondsSinceEpoch;
+    currentTimestamp = DateTime.now().millisecondsSinceEpoch;
 
     setState(() {
       timeLeft = Globals().loginTimeout -
@@ -102,105 +100,100 @@ class _LoginScreenState extends State<LoginScreen> with BlockAndRunMixin {
   }
 
   Widget scopeEmojiView() {
-    return Container(
-      child: Padding(
-        padding: const EdgeInsets.only(top: 8.0),
-        child: Column(
-          children: <Widget>[
-            Expanded(
+    return Padding(
+      padding: const EdgeInsets.only(top: 8.0),
+      child: Column(
+        children: <Widget>[
+          Expanded(
+            flex: 1,
+            child: Center(
+              child: Padding(
+                padding: const EdgeInsets.only(right: 24.0, left: 24.0),
+                child: Text(
+                  isMobileCheck ? scopeTextMobile : scopeText,
+                  style: const TextStyle(fontSize: 14.0),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            ),
+          ),
+          Expanded(
+            flex: 7,
+            child: SizedBox(
+              child: PreferenceDialog(
+                scope: widget.loginData.scope,
+                appId: widget.loginData.appId,
+                callback: cancelIt,
+                type:
+                    widget.loginData.isMobile == true ? 'mobilelogin' : 'login',
+              ),
+            ),
+          ),
+          Visibility(
+            visible: !isMobileCheck,
+            child: Expanded(
+              flex: 2,
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: <Widget>[
+                    ImageButton(
+                        imageList[0], selectedImageId, imageSelectedCallback),
+                    ImageButton(
+                        imageList[1], selectedImageId, imageSelectedCallback),
+                    ImageButton(
+                        imageList[2], selectedImageId, imageSelectedCallback),
+                    ImageButton(
+                        imageList[3], selectedImageId, imageSelectedCallback),
+                  ],
+                ),
+              ),
+            ),
+          ),
+          Visibility(
+            visible: isMobileCheck,
+            child: Padding(
+              padding: const EdgeInsets.only(bottom: 30.0),
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Theme.of(context).colorScheme.secondary,
+                  shape: const RoundedRectangleBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(30)),
+                  ),
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 11.0, vertical: 6.0),
+                ),
+                child: const Text(
+                  'Accept',
+                  style: TextStyle(color: Colors.white, fontSize: 22),
+                ),
+                onPressed: () async {
+                  await sendIt(true);
+                  if (Navigator.canPop(context)) {
+                    Navigator.pop(context, true);
+                  }
+                },
+              ),
+            ),
+          ),
+          Visibility(
+            visible: widget.loginData.isMobile == false,
+            child: Expanded(
               flex: 1,
               child: Center(
                 child: Padding(
                   padding: const EdgeInsets.only(right: 24.0, left: 24.0),
                   child: Text(
-                    isMobileCheck ? scopeTextMobile : scopeText,
-                    style: TextStyle(fontSize: 14.0),
+                    'Attempt expires in ${(timeLeft >= 0) ? timeLeft.toString() : '0'} second(s).',
+                    style: const TextStyle(fontSize: 12),
                     textAlign: TextAlign.center,
                   ),
                 ),
               ),
             ),
-            Expanded(
-              flex: 7,
-              child: SizedBox(
-                child: PreferenceDialog(
-                  scope: widget.loginData.scope,
-                  appId: widget.loginData.appId,
-                  callback: cancelIt,
-                  type: widget.loginData.isMobile == true
-                      ? 'mobilelogin'
-                      : 'login',
-                ),
-              ),
-            ),
-            Visibility(
-              visible: !isMobileCheck,
-              child: Expanded(
-                flex: 2,
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: <Widget>[
-                      ImageButton(
-                          imageList[0], selectedImageId, imageSelectedCallback),
-                      ImageButton(
-                          imageList[1], selectedImageId, imageSelectedCallback),
-                      ImageButton(
-                          imageList[2], selectedImageId, imageSelectedCallback),
-                      ImageButton(
-                          imageList[3], selectedImageId, imageSelectedCallback),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-            Visibility(
-              visible: isMobileCheck,
-              child: Padding(
-                padding: const EdgeInsets.only(bottom: 30.0),
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Theme.of(context).accentColor,
-                    shape: const RoundedRectangleBorder(
-                      borderRadius: BorderRadius.all(Radius.circular(30)),
-                    ),
-                    padding:
-                        EdgeInsets.symmetric(horizontal: 11.0, vertical: 6.0),
-                  ),
-                  child: Text(
-                    'Accept',
-                    style: TextStyle(color: Colors.white, fontSize: 22),
-                  ),
-                  onPressed: () async {
-                    await sendIt(true);
-                    if (Navigator.canPop(context)) {
-                      Navigator.pop(context, true);
-                    }
-                  },
-                ),
-              ),
-            ),
-            Visibility(
-              visible: widget.loginData.isMobile == false,
-              child: Expanded(
-                flex: 1,
-                child: Center(
-                  child: Padding(
-                    padding: const EdgeInsets.only(right: 24.0, left: 24.0),
-                    child: Text(
-                      "Attempt expires in " +
-                          ((timeLeft >= 0) ? timeLeft.toString() : "0") +
-                          " second(s).",
-                      style: TextStyle(fontSize: 12),
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
@@ -208,12 +201,12 @@ class _LoginScreenState extends State<LoginScreen> with BlockAndRunMixin {
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
-      child: new Scaffold(
+      child: Scaffold(
         key: _scaffoldKey,
-        appBar: new AppBar(
+        appBar: AppBar(
           // automaticallyImplyLeading: false,
           backgroundColor: Theme.of(context).primaryColor,
-          title: new Text("Login"),
+          title: const Text('Login'),
         ),
         body: Column(
           children: <Widget>[
@@ -229,7 +222,7 @@ class _LoginScreenState extends State<LoginScreen> with BlockAndRunMixin {
                   padding: const EdgeInsets.all(8.0),
                   child: TextButton(
                     child: Text(
-                      "It wasn\'t me - cancel",
+                      "It wasn't me - cancel",
                       style:
                           TextStyle(fontSize: 16.0, color: HexColor('#0f296a')),
                     ),
@@ -303,7 +296,7 @@ class _LoginScreenState extends State<LoginScreen> with BlockAndRunMixin {
 
     if (widget.loginData.isMobile == false) {
       int? created = widget.loginData.created;
-      int currentTimestamp = new DateTime.now().millisecondsSinceEpoch;
+      int currentTimestamp = DateTime.now().millisecondsSinceEpoch;
 
       if (created != null &&
           ((currentTimestamp - created) / 1000) > Globals().loginTimeout) {
@@ -320,14 +313,14 @@ class _LoginScreenState extends State<LoginScreen> with BlockAndRunMixin {
     }
 
     // If the state is not passed through the regEx
-    bool stateCheck = RegExp(r"[^A-Za-z0-9]+").hasMatch(state!);
+    bool stateCheck = RegExp(r'[^A-Za-z0-9]+').hasMatch(state!);
     if (stateCheck) {
       print('States can only be alphanumeric [^A-Za-z0-9]');
       return;
     }
 
     String appId = widget.loginData.appId!;
-    String publicKey = widget.loginData.appPublicKey!.replaceAll(" ", "+");
+    String publicKey = widget.loginData.appPublicKey!.replaceAll(' ', '+');
     Uint8List derivedSeed = await getDerivedSeed(appId);
 
     // Get the selected scope permissions and get the required data
@@ -372,7 +365,7 @@ class _LoginScreenState extends State<LoginScreen> with BlockAndRunMixin {
     imageList.add(correctImage);
 
     int generated = 1;
-    Random rng = new Random();
+    Random rng = Random();
 
     while (generated <= 3) {
       int x = rng.nextInt(266) + 1;

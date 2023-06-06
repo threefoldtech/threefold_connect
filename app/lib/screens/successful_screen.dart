@@ -38,7 +38,7 @@ class _SuccessfulScreenState extends State<SuccessfulScreen> {
               Icon(
                 Icons.check_circle,
                 size: 42.0,
-                color: Theme.of(context).accentColor,
+                color: Theme.of(context).colorScheme.secondary,
               ),
               SizedBox(
                 height: 20.0,

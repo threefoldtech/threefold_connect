@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'dart:typed_data';
-import 'package:flutter_sodium/flutter_sodium.dart';
+import 'package:sodium_libs/sodium_libs.dart';
 import 'package:threebotlogin/services/3bot_service.dart';
 import 'package:threebotlogin/services/crypto_service.dart';
 import 'package:threebotlogin/services/shared_preference_service.dart';
@@ -17,12 +17,14 @@ void addDigitalTwinToBackend(Uint8List derivedSeed, String appId) async {
   String? doubleName = await getDoubleName();
 
   KeyPair dtKeyPair = await generateKeyPairFromEntropy(derivedSeed);
-  String dtEncodedPublicKey = base64.encode(dtKeyPair.pk);
+  String dtEncodedPublicKey = base64.encode(dtKeyPair.publicKey);
 
-  addDigitalTwinDerivedPublicKeyToBackend(doubleName, dtEncodedPublicKey, appId);
+  addDigitalTwinDerivedPublicKeyToBackend(
+      doubleName, dtEncodedPublicKey, appId);
 }
 
-Future<Map<String, dynamic>?> readScopeAsObject(String? scopePermissions, Uint8List dSeed) async {
+Future<Map<String, dynamic>?> readScopeAsObject(
+    String? scopePermissions, Uint8List dSeed) async {
   Map<String, dynamic>? scopePermissionsDecoded = jsonDecode(scopePermissions!);
 
   Map<String, dynamic> scope = {};
@@ -65,14 +67,18 @@ Future<Map<String, dynamic>?> readScopeAsObject(String? scopePermissions, Uint8L
     String identityDOB = identityDetails['identityDOB'];
     String sIdentityDOB = identityDetails['signedIdentityDOBIdentifier'];
 
-    scope['identityDOB'] = {'identityDOB': identityDOB, 'signedIdentityDOB': sIdentityDOB};
+    scope['identityDOB'] = {
+      'identityDOB': identityDOB,
+      'signedIdentityDOB': sIdentityDOB
+    };
   }
 
   if (scopePermissionsDecoded['identityCountry'] == true) {
     Map<String, dynamic> identityDetails = await getIdentity();
 
     String identityCountry = identityDetails['identityCountry'];
-    String sIdentityCountryIdentifier = identityDetails['signedIdentityCountryIdentifier'];
+    String sIdentityCountryIdentifier =
+        identityDetails['signedIdentityCountryIdentifier'];
 
     scope['identityCountry'] = {
       'identityCountry': identityCountry,
@@ -84,7 +90,8 @@ Future<Map<String, dynamic>?> readScopeAsObject(String? scopePermissions, Uint8L
     Map<String, dynamic> identityDetails = await getIdentity();
 
     String identityCountry = identityDetails['identityCountry'];
-    String sIdentityCountryIdentifier = identityDetails['signedIdentityCountryIdentifier'];
+    String sIdentityCountryIdentifier =
+        identityDetails['signedIdentityCountryIdentifier'];
 
     scope['identityCountry'] = {
       'identityCountry': identityCountry,
@@ -96,7 +103,8 @@ Future<Map<String, dynamic>?> readScopeAsObject(String? scopePermissions, Uint8L
     Map<String, dynamic> identityDetails = await getIdentity();
 
     String identityDocumentMeta = identityDetails['identityDocumentMeta'];
-    String sIdentityDocumentMeta = identityDetails['signedIdentityCountryIdentifier'];
+    String sIdentityDocumentMeta =
+        identityDetails['signedIdentityCountryIdentifier'];
 
     scope['identityDocumentMeta'] = {
       'identityDocumentMeta': identityDocumentMeta,
@@ -117,13 +125,16 @@ Future<Map<String, dynamic>?> readScopeAsObject(String? scopePermissions, Uint8L
   }
 
   if (scopePermissionsDecoded['walletAddress'] == true) {
-    scope['walletAddressData'] = {'address': scopePermissionsDecoded['walletAddressData']};
+    scope['walletAddressData'] = {
+      'address': scopePermissionsDecoded['walletAddressData']
+    };
   }
 
   return scope;
 }
 
-Future<Map<String, String>>  encryptLoginData (String publicKey, Map<String, dynamic>? scopeData) async {
+Future<Map<String, String>> encryptLoginData(
+    String publicKey, Map<String, dynamic>? scopeData) async {
   Uint8List sk = await getPrivateKey();
   Uint8List pk = base64.decode(publicKey);
 
