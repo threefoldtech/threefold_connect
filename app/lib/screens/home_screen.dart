@@ -215,7 +215,7 @@ class _HomeScreenState extends State<HomeScreen>
     }
   }
 
-  Future<Null> initUniLinks() async {
+  Future<void> initUniLinks() async {
     Events().onEvent(
         UniLinkEvent(null, null).runtimeType, UniLinkService.handleUniLink);
     initialLink = widget.initialLink;

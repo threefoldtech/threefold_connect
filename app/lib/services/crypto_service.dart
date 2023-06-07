@@ -7,6 +7,8 @@ import 'package:bip39/bip39.dart' as bip39;
 import 'package:sodium_libs/sodium_libs.dart';
 import 'package:threebotlogin/services/shared_preference_service.dart';
 import 'package:pbkdf2ns/pbkdf2ns.dart';
+import 'package:pinenacl/api.dart';
+import 'package:pinenacl/tweetnacl.dart' show TweetNaClExt;
 
 Future<bool> verifyHash(String data, String hash) async {
   final List<int> codeUnits = data.codeUnits;
@@ -87,12 +89,17 @@ Future<Map<String, String>> encrypt(
     String data, Uint8List pk, Uint8List sk) async {
   Sodium sodium = await SodiumInit.init();
   Uint8List nonce = sodium.randombytes.buf(24);
+
+  final secretKey = Uint8List(32);
+  TweetNaClExt.crypto_sign_ed25519_sk_to_x25519_sk(
+      secretKey, sk);
+
   Uint8List message = Uint8List.fromList(data.codeUnits);
   Uint8List encryptedData = sodium.crypto.box.easy(
       message: message,
       nonce: nonce,
       publicKey: pk,
-      secretKey: sodium.secureCopy(sk));
+      secretKey: sodium.secureCopy(secretKey));
 
   return {
     'nonce': base64.encode(nonce),
@@ -106,8 +113,16 @@ Future<String> decrypt(
   Uint8List cipherText = base64.decode(encodedCipherText);
   Sodium sodium = await SodiumInit.init();
 
+  final publicKey = Uint8List(32);
+  TweetNaClExt.crypto_sign_ed25519_pk_to_x25519_pk(
+      publicKey, pk);
+
+  final secretKey = Uint8List(32);
+  TweetNaClExt.crypto_sign_ed25519_sk_to_x25519_sk(
+      secretKey, sk);
+
   Uint8List decryptedData = sodium.crypto.box.sealOpen(
-      cipherText: cipherText, publicKey: pk, secretKey: sodium.secureCopy(sk));
+      cipherText: cipherText, publicKey: publicKey, secretKey: sodium.secureCopy(secretKey));
   return String.fromCharCodes(decryptedData);
 }
 

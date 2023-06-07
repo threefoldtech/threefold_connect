@@ -203,7 +203,7 @@ class _AppState extends State<MainScreen> {
   fetchPkidData() async {
     try {
       String? seedPhrase = await getPhrase();
-      
+
       if (seedPhrase != null &&
           (await isPKidMigrationIssueSolved() == false ||
               await isPKidMigrationIssueSolved() == null)) {

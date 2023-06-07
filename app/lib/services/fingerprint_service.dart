@@ -29,10 +29,8 @@ Future<bool> authenticate() async {
 
     didAuthenticate = await auth.authenticate(
       localizedReason: localizedReason,
-      options: const AuthenticationOptions(
-        useErrorDialogs: true,
-        biometricOnly: true,
-      ),
+      useErrorDialogs: true,
+      biometricOnly: true,
     );
   } on PlatformException catch (e) {
     print(e);
