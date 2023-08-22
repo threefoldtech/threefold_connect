@@ -140,7 +140,6 @@ class _PreferenceDialogState extends State<PreferenceDialog> {
       ),
       child: widget.scope != null
           ? RawScrollbar(
-              isAlwaysShown: true,
               thumbColor: Theme.of(context).primaryColor,
               thickness: 3,
               child: ListView.builder(
