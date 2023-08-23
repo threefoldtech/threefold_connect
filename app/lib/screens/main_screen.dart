@@ -138,7 +138,7 @@ class _AppState extends State<MainScreen> {
 
       updateMessage = 'Checking if app is under maintenance';
       setState(() {});
-      // await checkIfAppIsUnderMaintenance();
+      await checkIfAppIsUnderMaintenance();
 
       updateMessage = 'Checking if app is up to date';
       setState(() {});
