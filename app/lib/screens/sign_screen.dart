@@ -390,7 +390,6 @@ class _SignScreenState extends State<SignScreen> with BlockAndRunMixin {
 
   Widget jsonDataView() {
     return RawScrollbar(
-      isAlwaysShown: true,
       thumbColor: Theme.of(context).primaryColor,
       thickness: 3,
       child: Container(
