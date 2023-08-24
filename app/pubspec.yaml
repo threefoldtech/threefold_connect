@@ -3,7 +3,7 @@ description: A decentralized login application
 
 publish_to: "none"
 
-version: 3.7.3+172
+version: 3.8.0+173
 
 environment:
   sdk: ">=2.12.0<3.0.0"
@@ -12,56 +12,48 @@ dependencies:
   flutter:
     sdk: flutter
 
-  country_picker:
-    git:
-      url: git@github.com:jimbertools/flutter-country-picker.git
-      ref: main
-
   yggdrasil_plugin:
     git:
-      url: https://github.com/threefoldtech/yggdrasil_flutter
+      url: https://github.com/threefoldtech/planetary_network_flutter
       ref: main
 
   flutter_pkid:
     git:
-      url: git@github.com:threefoldtech/flutter-pkid-client.git
-      ref: main_null-safety
-
-  redirection:
-    git:
-      url: https://github.com/jimbertools/redirection
-      ref: main_null-safety
+      url: https://github.com/threefoldtech/threefold_connect_flutter_pkid_client
+      ref: master
 
   shuftipro_sdk: ^1.0.5
-  flutter_svg: ^1.0.0
+  flutter_svg: ^2.0.6
   bip39: ^1.0.6
   socket_io_client: ^1.0.2
   local_auth: ^1.1.7
   url_launcher: ^6.0.10
   shared_preferences: ^2.0.7
-  http: ^0.13.3
-  package_info: ^2.0.2
+  http: ^1.0.0
+  package_info_plus: ^4.0.2
   cupertino_icons: ^1.0.4
-  google_fonts: 2.2.0
-  intl_phone_field: ^2.1.0
-  flagsmith: ^2.0.1+2
-  cryptography: ^2.0.2
+  google_fonts: ^5.0.0
+  intl_phone_field: ^3.1.0
+  flagsmith: ^3.1.0
   flutter_inappwebview: ^5.3.2
-  flutter_sodium: ^0.2.0
+  sodium_libs: ^2.1.0+1
   uni_links: ^0.5.1
   pbkdf2ns: ^0.0.2
-  qr_code_scanner: ^0.7.0
+  qr_code_scanner: ^1.0.1
   flutter_json_viewer: ^1.0.1
-  device_info_plus: ^3.2.2
-  permission_handler: ^8.3.0
+  device_info_plus: ^9.0.2
+  permission_handler: ^10.2.0
   path_provider: ^2.0.2
-  dio: ^4.0.4
-  open_filex: ^3.4.0
+  dio: ^5.0.0
+  open_filex: ^4.3.2
+  country_picker: ^2.0.20
+  pinenacl: ^0.5.1
 
 dev_dependencies:
-  flutter_native_splash: ^1.3.3
+  flutter_native_splash: ^2.3.1
   flutter_test:
     sdk: flutter
+  flutter_lints: ^2.0.0
 
 flutter_native_splash:
   color: "#FFFFFF"

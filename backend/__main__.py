@@ -33,5 +33,4 @@ logging.getLogger("engineio").setLevel(level=logging.ERROR)
 sio.init_app(app, cors_allowed_origins="*")
 
 if __name__ == "__main__":
-
     sio.run(app, host="0.0.0.0", port=5000)

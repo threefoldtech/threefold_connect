@@ -1,8 +1,6 @@
 import 'dart:convert';
 import 'dart:core';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_pkid/flutter_pkid.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:http/http.dart';
@@ -24,10 +22,12 @@ import 'package:country_picker/country_picker.dart';
 import 'package:threebotlogin/widgets/phone_widget.dart';
 
 class IdentityVerificationScreen extends StatefulWidget {
-  _IdentityVerificationScreenState createState() => _IdentityVerificationScreenState();
+  _IdentityVerificationScreenState createState() =>
+      _IdentityVerificationScreenState();
 }
 
-class _IdentityVerificationScreenState extends State<IdentityVerificationScreen> {
+class _IdentityVerificationScreenState
+    extends State<IdentityVerificationScreen> {
   String doubleName = '';
   String email = '';
   String phone = '';
@@ -53,82 +53,82 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
   bool emailInputValidated = false;
 
   Map<String, Object> configObj = {
-    "open_webview": false,
-    "asyncRequest": false,
-    "captureEnabled": false,
+    'open_webview': false,
+    'asyncRequest': false,
+    'captureEnabled': false,
   };
 
   Map<String, Object> authObject = {
-    "access_token": '',
+    'access_token': '',
   };
 
   // Default values for accessing the Shufti API
   Map<String, Object> createdPayload = {
-    "country": "",
-    "language": "EN",
-    "email": "",
-    "callback_url": "http://www.example.com",
-    "redirect_url": "https://www.dummyurl.com/",
-    "show_consent": 1,
-    "show_results": 1,
-    "show_privacy_policy": 1,
+    'country': '',
+    'language': 'EN',
+    'email': '',
+    'callback_url': 'http://www.example.com',
+    'redirect_url': 'https://www.dummyurl.com/',
+    'show_consent': 1,
+    'show_results': 1,
+    'show_privacy_policy': 1,
   };
 
   // Template for Shufti API verification object
   Map<String, Object?> verificationObj = {
-    "face": {},
-    "background_checks": {},
-    "phone": {},
-    "document": {
-      "supported_types": [
-        "passport",
-        "id_card",
-        "driving_license",
+    'face': {},
+    'background_checks': {},
+    'phone': {},
+    'document': {
+      'supported_types': [
+        'passport',
+        'id_card',
+        'driving_license',
       ],
-      "name": {
-        "first_name": "",
-        "last_name": "",
-        "middle_name": "",
+      'name': {
+        'first_name': '',
+        'last_name': '',
+        'middle_name': '',
       },
-      "dob": "",
-      "document_number": "",
-      "expiry_date": "",
-      "issue_date": "",
-      "fetch_enhanced_data": "",
-      "gender": "",
-      "backside_proof_required": "1",
+      'dob': '',
+      'document_number': '',
+      'expiry_date': '',
+      'issue_date': '',
+      'fetch_enhanced_data': '',
+      'gender': '',
+      'backside_proof_required': '1',
     },
-    "document_two": {
-      "supported_types": ["passport", "id_card", "driving_license"],
-      "name": {"first_name": "", "last_name": "", "middle_name": ""},
-      "dob": "",
-      "document_number": "",
-      "expiry_date": "",
-      "issue_date": "",
-      "fetch_enhanced_data": "",
-      "gender": "",
-      "backside_proof_required": "0",
+    'document_two': {
+      'supported_types': ['passport', 'id_card', 'driving_license'],
+      'name': {'first_name': '', 'last_name': '', 'middle_name': ''},
+      'dob': '',
+      'document_number': '',
+      'expiry_date': '',
+      'issue_date': '',
+      'fetch_enhanced_data': '',
+      'gender': '',
+      'backside_proof_required': '0',
     },
-    "address": {
-      "full_address": "",
-      "name": {
-        "first_name": "",
-        "last_name": "",
-        "middle_name": "",
-        "fuzzy_match": "",
+    'address': {
+      'full_address': '',
+      'name': {
+        'first_name': '',
+        'last_name': '',
+        'middle_name': '',
+        'fuzzy_match': '',
       },
-      "supported_types": ["id_card", "utility_bill", "bank_statement"],
+      'supported_types': ['id_card', 'utility_bill', 'bank_statement'],
     },
-    "consent": {
-      "supported_types": ["printed", "handwritten"],
-      "text": "My name is John Doe and I authorize this transaction of \$100/-",
+    'consent': {
+      'supported_types': ['printed', 'handwritten'],
+      'text': 'My name is John Doe and I authorize this transaction of \$100/-',
     },
   };
 
   setEmailVerified() {
     if (mounted) {
       setState(() {
-        this.emailVerified = Globals().emailVerified.value;
+        emailVerified = Globals().emailVerified.value;
       });
     }
   }
@@ -136,7 +136,7 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
   setPhoneVerified() {
     if (mounted) {
       setState(() {
-        this.phoneVerified = Globals().phoneVerified.value;
+        phoneVerified = Globals().phoneVerified.value;
         Globals().smsSentOn = 0;
       });
     }
@@ -145,7 +145,7 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
   setIdentityVerified() {
     if (mounted) {
       setState(() {
-        this.identityVerified = Globals().identityVerified.value;
+        identityVerified = Globals().identityVerified.value;
       });
     }
   }
@@ -153,11 +153,12 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
   setHidePhoneVerify() {
     if (mounted) {
       setState(() {
-        this.hidePhoneVerifyButton = Globals().identityVerified.value;
+        hidePhoneVerifyButton = Globals().identityVerified.value;
       });
     }
   }
 
+  @override
   void initState() {
     super.initState();
 
@@ -172,7 +173,7 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
 
   checkPhoneStatus() {
     if (Globals().smsSentOn + (Globals().smsMinutesCoolDown * 60 * 1000) >
-        new DateTime.now().millisecondsSinceEpoch) {
+        DateTime.now().millisecondsSinceEpoch) {
       return Globals().hidePhoneButton.value = true;
     }
 
@@ -205,7 +206,8 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
     getIdentity().then((identityMap) {
       setState(() {
         if (identityMap['signedIdentityNameIdentifier'] != null) {
-          identityVerified = (identityMap['signedIdentityNameIdentifier'] != null);
+          identityVerified =
+              (identityMap['signedIdentityNameIdentifier'] != null);
         }
       });
     });
@@ -223,8 +225,7 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
             width: MediaQuery.of(context).size.width,
             height: MediaQuery.of(context).size.height,
           ),
-          Container(
-              child: FutureBuilder(
+          FutureBuilder(
             future: getEmail(),
             builder: (ctx, snapshot) {
               if (snapshot.connectionState == ConnectionState.done) {
@@ -235,87 +236,89 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
                 return Column(
                   mainAxisSize: MainAxisSize.max,
                   children: [
-                    Container(
-                      child: Padding(
-                        padding: EdgeInsets.all(15),
-                        child: Column(
-                          children: [
-                            AnimatedBuilder(
-                                animation: Listenable.merge([
-                                  Globals().emailVerified,
-                                  Globals().phoneVerified,
-                                  Globals().identityVerified
-                                ]),
-                                builder: (BuildContext context, _) {
-                                  return Container(
-                                    child: Column(
-                                      children: [
-                                        // Step one: verify email
-                                        _fillCard(
-                                            getCorrectState(
-                                                1, emailVerified, phoneVerified, identityVerified),
-                                            1,
-                                            email,
-                                            Icons.email),
+                    Padding(
+                      padding: const EdgeInsets.all(15),
+                      child: Column(
+                        children: [
+                          AnimatedBuilder(
+                              animation: Listenable.merge([
+                                Globals().emailVerified,
+                                Globals().phoneVerified,
+                                Globals().identityVerified
+                              ]),
+                              builder: (BuildContext context, _) {
+                                return Column(
+                                  children: [
+                                    // Step one: verify email
+                                    _fillCard(
+                                        getCorrectState(1, emailVerified,
+                                            phoneVerified, identityVerified),
+                                        1,
+                                        email,
+                                        Icons.email),
 
-                                        // Step two: verify phone
-                                        Globals().phoneVerification == true ? _fillCard(
+                                    // Step two: verify phone
+                                    Globals().phoneVerification == true
+                                        ? _fillCard(
                                             getCorrectState(
-                                                2, emailVerified, phoneVerified, identityVerified),
+                                                2,
+                                                emailVerified,
+                                                phoneVerified,
+                                                identityVerified),
                                             2,
                                             phone,
-                                            Icons.phone) : Container(),
+                                            Icons.phone)
+                                        : Container(),
 
-                                        // Step three: verify identity
-                                        Globals().isOpenKYCEnabled
-                                            ? _fillCard(
-                                                getCorrectState(3, emailVerified, phoneVerified,
-                                                    identityVerified),
+                                    // Step three: verify identity
+                                    Globals().isOpenKYCEnabled
+                                        ? _fillCard(
+                                            getCorrectState(
                                                 3,
-                                                extract3Bot(doubleName),
-                                                Icons.perm_identity)
-                                            : Container(),
+                                                emailVerified,
+                                                phoneVerified,
+                                                identityVerified),
+                                            3,
+                                            extract3Bot(doubleName),
+                                            Icons.perm_identity)
+                                        : Container(),
 
-                                        Globals().redoIdentityVerification &&
-                                                identityVerified == true
-                                            ? ElevatedButton(
-                                                onPressed: () async {
-                                                  await verifyIdentityProcess();
-                                                },
-                                                child: Text('Redo identity verification'))
-                                            : Container(),
-                                        Globals().debugMode == true
-                                            ? ElevatedButton(
-                                                onPressed: () async {
-                                                  bool? isEmailVerified =
-                                                      await getIsEmailVerified();
-                                                  bool? isPhoneVerified =
-                                                      await getIsPhoneVerified();
-                                                  bool? isIdentityVerified =
-                                                      await getIsIdentityVerified();
+                                    Globals().redoIdentityVerification &&
+                                            identityVerified == true
+                                        ? ElevatedButton(
+                                            onPressed: () async {
+                                              await verifyIdentityProcess();
+                                            },
+                                            child: const Text(
+                                                'Redo identity verification'))
+                                        : Container(),
+                                    Globals().debugMode == true
+                                        ? ElevatedButton(
+                                            onPressed: () async {
+                                              bool? isEmailVerified =
+                                                  await getIsEmailVerified();
+                                              bool? isPhoneVerified =
+                                                  await getIsPhoneVerified();
+                                              bool? isIdentityVerified =
+                                                  await getIsIdentityVerified();
 
-                                                  kycLogs = '';
-                                                  kycLogs += 'Email verified: ' +
-                                                      isEmailVerified.toString() +
-                                                      '\n';
-                                                  kycLogs += 'Phone verified: ' +
-                                                      isPhoneVerified.toString() +
-                                                      '\n';
-                                                  kycLogs += 'Identity verified: ' +
-                                                      isIdentityVerified.toString() +
-                                                      '\n';
+                                              kycLogs = '';
+                                              kycLogs +=
+                                                  'Email verified: $isEmailVerified\n';
+                                              kycLogs +=
+                                                  'Phone verified: $isPhoneVerified\n';
+                                              kycLogs +=
+                                                  'Identity verified: $isIdentityVerified\n';
 
-                                                  setState(() {});
-                                                },
-                                                child: Text('KYC Status'))
-                                            : Container(),
-                                        Text(kycLogs),
-                                      ],
-                                    ),
-                                  );
-                                })
-                          ],
-                        ),
+                                              setState(() {});
+                                            },
+                                            child: const Text('KYC Status'))
+                                        : Container(),
+                                    Text(kycLogs),
+                                  ],
+                                );
+                              })
+                        ],
                       ),
                     )
                   ],
@@ -323,7 +326,7 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
               }
               return _pleaseWait();
             },
-          )),
+          ),
         ],
       ),
     );
@@ -335,22 +338,22 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
       barrierDismissible: false,
       builder: (BuildContext customContext) => CustomDialog(
         image: Icons.info,
-        title: "Are you sure",
-        description: "Are you sure you want to exit the verification process",
+        title: 'Are you sure',
+        description: 'Are you sure you want to exit the verification process',
         actions: <Widget>[
-          FlatButton(
-            child: new Text("No"),
+          TextButton(
+            child: const Text('No'),
             onPressed: () async {
               Navigator.pop(customContext);
               showCountryPopup();
             },
           ),
-          FlatButton(
-            child: new Text("Yes"),
+          TextButton(
+            child: const Text('Yes'),
             onPressed: () async {
               Navigator.pop(customContext);
               setState(() {
-                this.isInIdentityProcess = false;
+                isInIdentityProcess = false;
               });
             },
           ),
@@ -367,7 +370,8 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
         }
       },
       context: context,
-      showPhoneCode: false, // optional. Shows phone code before the country name.
+      showPhoneCode:
+          false, // optional. Shows phone code before the country name.
       onSelect: (Country country) async {
         setState(() {
           createdPayload['country'] = country.countryCode;
@@ -376,7 +380,9 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
         print('Select country: ${country.displayName}');
 
         String r = await ShuftiproSdk.sendRequest(
-            authObject: authObject, createdPayload: createdPayload, configObject: configObj);
+            authObject: authObject,
+            createdPayload: createdPayload,
+            configObject: configObj);
 
         print('Receiving response');
         debugPrint(r);
@@ -397,14 +403,14 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
             barrierDismissible: false,
             builder: (BuildContext dialogContext) => CustomDialog(
               image: Icons.close,
-              title: "Request canceled",
-              description: "Verification process has been canceled.",
+              title: 'Request canceled',
+              description: 'Verification process has been canceled.',
               actions: [
-                FlatButton(
+                TextButton(
                     onPressed: () {
                       Navigator.pop(dialogContext);
                     },
-                    child: Text('OK'))
+                    child: const Text('OK'))
               ],
             ),
           );
@@ -416,14 +422,15 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
             barrierDismissible: false,
             builder: (BuildContext dialogContext) => CustomDialog(
               image: Icons.close,
-              title: "Request canceled",
-              description: "Please make sure your internet connection is stable.",
+              title: 'Request canceled',
+              description:
+                  'Please make sure your internet connection is stable.',
               actions: [
-                FlatButton(
+                TextButton(
                     onPressed: () {
                       Navigator.pop(dialogContext);
                     },
-                    child: Text('OK'))
+                    child: const Text('OK'))
               ],
             ),
           );
@@ -468,7 +475,6 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
           {
             return;
           }
-          break;
       }
     } catch (e) {
       print(e);
@@ -478,18 +484,18 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
   }
 
   Widget _pleaseWait() {
-    return Dialog(
+    return const Dialog(
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           SizedBox(
             height: 10,
           ),
-          new CircularProgressIndicator(),
+          CircularProgressIndicator(),
           SizedBox(
             height: 10,
           ),
-          new Text("One moment please"),
+          Text('One moment please'),
           SizedBox(
             height: 10,
           ),
@@ -505,18 +511,18 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
       builder: (BuildContext context) {
         return WillPopScope(
           onWillPop: () => Future.value(false),
-          child: Dialog(
+          child: const Dialog(
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
                 SizedBox(
                   height: 10,
                 ),
-                new CircularProgressIndicator(),
+                CircularProgressIndicator(),
                 SizedBox(
                   height: 10,
                 ),
-                new Text("One moment please"),
+                Text('One moment please'),
                 SizedBox(
                   height: 10,
                 ),
@@ -527,31 +533,28 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
       },
     );
   }
+
   Widget _fillCard(String phase, int step, String text, IconData icon) {
     switch (phase) {
       case 'Unverified':
         {
           return unVerifiedWidget(step, text, icon);
         }
-        break;
 
       case 'Verified':
         {
           return verifiedWidget(step, text, icon);
         }
-        break;
 
       case 'CurrentPhase':
         {
           return currentPhaseWidget(step, text, icon);
         }
-        break;
 
       default:
         {
           return Container();
         }
-        break;
     }
   }
 
@@ -561,70 +564,76 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
         child: Opacity(
           opacity: 0.5,
           child: Container(
-            decoration: BoxDecoration(border: Border.all(width: 0.5, color: Colors.grey)),
+            decoration: BoxDecoration(
+                border: Border.all(width: 0.5, color: Colors.grey)),
             height: 75,
             width: MediaQuery.of(context).size.width * 100,
             child: Row(
               children: [
-                Padding(padding: EdgeInsets.only(left: 10)),
+                const Padding(padding: EdgeInsets.only(left: 10)),
                 Container(
                   width: 30.0,
                   height: 30.0,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text('0' + step.toString(),
-                          style: TextStyle(
-                              color: Colors.blue, fontWeight: FontWeight.bold, fontSize: 12))
-                    ],
-                  ),
-                  decoration: new BoxDecoration(
+                  decoration: BoxDecoration(
                       border: Border.all(color: Colors.blue, width: 2),
                       shape: BoxShape.circle,
                       color: Colors.white),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text('0$step',
+                          style: const TextStyle(
+                              color: Colors.blue,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 12))
+                    ],
+                  ),
                 ),
-                Padding(padding: EdgeInsets.only(left: 20)),
+                const Padding(padding: EdgeInsets.only(left: 20)),
                 Icon(
                   icon,
                   size: 20,
                   color: Colors.black,
                 ),
-                Padding(padding: EdgeInsets.only(left: 15)),
+                const Padding(padding: EdgeInsets.only(left: 15)),
                 Flexible(
-                    child: Container(
-                        child:
-                            Column(mainAxisAlignment: MainAxisAlignment.center, children: <Widget>[
-                  Row(
-                    children: <Widget>[
-                      Expanded(
-                        child: Text(
-                          text == '' ? 'Unknown' : text,
-                          overflow: TextOverflow.clip,
-                          style: TextStyle(fontSize: 12.0, fontWeight: FontWeight.bold),
-                        ),
-                      )
-                    ],
-                  ),
-                  SizedBox(
-                    height: 5,
-                  ),
-                  Row(
-                    children: <Widget>[
-                      Icon(
-                        Icons.close,
-                        color: Colors.red,
-                        size: 18.0,
+                    child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                      Row(
+                        children: <Widget>[
+                          Expanded(
+                            child: Text(
+                              text == '' ? 'Unknown' : text,
+                              overflow: TextOverflow.clip,
+                              style: const TextStyle(
+                                  fontSize: 12.0, fontWeight: FontWeight.bold),
+                            ),
+                          )
+                        ],
                       ),
-                      Padding(padding: EdgeInsets.only(left: 5)),
-                      Text(
-                        'Not verified',
-                        style:
-                            TextStyle(color: Colors.red, fontWeight: FontWeight.bold, fontSize: 12),
-                      )
-                    ],
-                  ),
-                ]))),
-                Padding(padding: EdgeInsets.only(right: 10))
+                      const SizedBox(
+                        height: 5,
+                      ),
+                      const Row(
+                        children: <Widget>[
+                          Icon(
+                            Icons.close,
+                            color: Colors.red,
+                            size: 18.0,
+                          ),
+                          Padding(padding: EdgeInsets.only(left: 5)),
+                          Text(
+                            'Not verified',
+                            style: TextStyle(
+                                color: Colors.red,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 12),
+                          )
+                        ],
+                      ),
+                    ])),
+                const Padding(padding: EdgeInsets.only(right: 10))
               ],
             ),
           ),
@@ -668,7 +677,7 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
           }
         },
         child: Container(
-          decoration: BoxDecoration(
+          decoration: const BoxDecoration(
               border: Border(
                   left: BorderSide(color: Colors.blue, width: 5),
                   right: BorderSide(color: Colors.grey, width: 0.5),
@@ -678,44 +687,52 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
           width: MediaQuery.of(context).size.width * 100,
           child: Row(
             children: [
-              Padding(padding: EdgeInsets.only(left: 10)),
+              const Padding(padding: EdgeInsets.only(left: 10)),
               Container(
                 width: 30.0,
                 height: 30.0,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text('0' + step.toString(),
-                        style: TextStyle(
-                            color: Colors.blue, fontWeight: FontWeight.bold, fontSize: 12))
-                  ],
-                ),
-                decoration: new BoxDecoration(
+                decoration: BoxDecoration(
                     border: Border.all(color: Colors.blue, width: 2),
                     shape: BoxShape.circle,
                     color: Colors.white),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text('0$step',
+                        style: const TextStyle(
+                            color: Colors.blue,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 12))
+                  ],
+                ),
               ),
-              Padding(padding: EdgeInsets.only(left: 15)),
+              const Padding(padding: EdgeInsets.only(left: 15)),
               Icon(
                 icon,
                 size: 20,
                 color: Colors.black,
               ),
-              Padding(padding: EdgeInsets.only(left: 10)),
+              const Padding(padding: EdgeInsets.only(left: 10)),
               Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Flexible(
                       child: Container(
-                          constraints: Globals().hidePhoneButton.value == false ||
-                                  (step != 2 && Globals().hidePhoneButton.value == true)
+                          constraints: Globals().hidePhoneButton.value ==
+                                      false ||
+                                  (step != 2 &&
+                                      Globals().hidePhoneButton.value == true)
                               ? BoxConstraints(
-                                  minWidth: MediaQuery.of(context).size.width * 0.4,
-                                  maxWidth: MediaQuery.of(context).size.width * 0.4)
+                                  minWidth:
+                                      MediaQuery.of(context).size.width * 0.4,
+                                  maxWidth:
+                                      MediaQuery.of(context).size.width * 0.4)
                               : BoxConstraints(
-                                  minWidth: MediaQuery.of(context).size.width * 0.6,
-                                  maxWidth: MediaQuery.of(context).size.width * 0.6),
-                          padding: EdgeInsets.all(10),
+                                  minWidth:
+                                      MediaQuery.of(context).size.width * 0.6,
+                                  maxWidth:
+                                      MediaQuery.of(context).size.width * 0.6),
+                          padding: const EdgeInsets.all(10),
                           child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: <Widget>[
@@ -725,24 +742,27 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
                                       child: Text(
                                         text == '' ? 'Unknown' : text,
                                         overflow: TextOverflow.clip,
-                                        style:
-                                            TextStyle(fontSize: 12.0, fontWeight: FontWeight.bold),
+                                        style: const TextStyle(
+                                            fontSize: 12.0,
+                                            fontWeight: FontWeight.bold),
                                       ),
                                     )
                                   ],
                                 ),
-                                step == 2 && Globals().hidePhoneButton.value == true
-                                    ? SizedBox(
+                                step == 2 &&
+                                        Globals().hidePhoneButton.value == true
+                                    ? const SizedBox(
                                         height: 5,
                                       )
                                     : Container(),
-                                step == 2 && Globals().hidePhoneButton.value == true
+                                step == 2 &&
+                                        Globals().hidePhoneButton.value == true
                                     ? Row(
                                         children: <Widget>[
                                           Text(
                                             'SMS sent, retry in ${calculateMinutes()} minute${calculateMinutes() == '1' ? '' : 's'}',
                                             overflow: TextOverflow.clip,
-                                            style: TextStyle(
+                                            style: const TextStyle(
                                                 color: Colors.orange,
                                                 fontWeight: FontWeight.bold,
                                                 fontSize: 12),
@@ -781,19 +801,21 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
                                 break;
                             }
                           },
-                          child: Text('Verify'))
+                          child: const Text('Verify'))
                 ],
               ),
-              Padding(padding: EdgeInsets.only(right: 10)),
+              const Padding(padding: EdgeInsets.only(right: 10)),
             ],
           ),
         ));
   }
 
   String calculateMinutes() {
-    int currentTime = new DateTime.now().millisecondsSinceEpoch;
-    int lockedUntill = Globals().smsSentOn + (Globals().smsMinutesCoolDown * 60 * 1000);
-    String difference = ((lockedUntill - currentTime) / 1000 / 60).round().toString();
+    int currentTime = DateTime.now().millisecondsSinceEpoch;
+    int lockedUntil =
+        Globals().smsSentOn + (Globals().smsMinutesCoolDown * 60 * 1000);
+    String difference =
+        ((lockedUntil - currentTime) / 1000 / 60).round().toString();
 
     if (int.parse(difference) >= 0) {
       return difference;
@@ -810,22 +832,25 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
         }
         // Only make this section clickable if it is Identity Verification + Current Phase
         if (step != 3) {
-          return null;
+          return;
         }
 
         return showIdentityDetails();
       },
       child: Container(
-        decoration: BoxDecoration(border: Border.all(width: 0.5, color: Colors.grey)),
+        decoration:
+            BoxDecoration(border: Border.all(width: 0.5, color: Colors.grey)),
         height: 75,
         width: MediaQuery.of(context).size.width * 100,
         child: Row(
           children: [
-            Padding(padding: EdgeInsets.only(left: 10)),
+            const Padding(padding: EdgeInsets.only(left: 10)),
             Container(
               width: 30.0,
               height: 30.0,
-              child: Column(
+              decoration: const BoxDecoration(
+                  shape: BoxShape.circle, color: Colors.green),
+              child: const Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Icon(
@@ -835,17 +860,15 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
                   ),
                 ],
               ),
-              decoration: BoxDecoration(shape: BoxShape.circle, color: Colors.green),
             ),
-            Padding(padding: EdgeInsets.only(left: 20)),
+            const Padding(padding: EdgeInsets.only(left: 20)),
             Icon(
               icon,
               size: 20,
               color: Colors.black,
             ),
-            Padding(padding: EdgeInsets.only(left: 15)),
-            Container(
-                child: Row(
+            const Padding(padding: EdgeInsets.only(left: 15)),
+            Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Column(
@@ -856,40 +879,50 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
                       children: [
                         Container(
                             constraints: BoxConstraints(
-                                minWidth: MediaQuery.of(context).size.width * 0.55,
-                                maxWidth: MediaQuery.of(context).size.width * 0.55),
+                                minWidth:
+                                    MediaQuery.of(context).size.width * 0.55,
+                                maxWidth:
+                                    MediaQuery.of(context).size.width * 0.55),
                             child: Text(text == '' ? 'Unknown' : text,
                                 overflow: TextOverflow.clip,
-                                style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)))
+                                style: const TextStyle(
+                                    fontSize: 12, fontWeight: FontWeight.bold)))
                       ],
                     ),
-                    SizedBox(height: 5),
-                    Row(
+                    const SizedBox(height: 5),
+                    const Row(
                       children: [
                         Text(
                           'Verified',
                           style: TextStyle(
-                              color: Colors.green, fontSize: 12, fontWeight: FontWeight.bold),
+                              color: Colors.green,
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold),
                         )
                       ],
                     )
                   ],
                 ),
                 step == 1
-                    ? Column(
+                    ? const Column(
                         mainAxisAlignment: MainAxisAlignment.center,
-                        children: [Icon(Icons.edit, size: 20, color: Colors.black)],
+                        children: [
+                          Icon(Icons.edit, size: 20, color: Colors.black)
+                        ],
                       )
-                    : Column(),
+                    : const Column(),
                 step == 3
-                    ? Column(
+                    ? const Column(
                         mainAxisAlignment: MainAxisAlignment.center,
-                        children: [Icon(Icons.chevron_right, size: 20, color: Colors.black)],
+                        children: [
+                          Icon(Icons.chevron_right,
+                              size: 20, color: Colors.black)
+                        ],
                       )
-                    : Column()
+                    : const Column()
               ],
-            )),
-            Padding(padding: EdgeInsets.only(right: 10))
+            ),
+            const Padding(padding: EdgeInsets.only(right: 10))
           ],
         ),
       ),
@@ -898,26 +931,27 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
 
   Future verifyIdentityProcess() async {
     setState(() {
-      this.isLoading = true;
+      isLoading = true;
     });
 
     try {
       Response accessTokenResponse = await getShuftiAccessToken();
-      if (accessTokenResponse.statusCode == 403 || accessTokenResponse == null) {
+      if (accessTokenResponse.statusCode == 403 ||
+          accessTokenResponse == null) {
         setState(() {
-          this.isLoading = false;
+          isLoading = false;
         });
 
         return showDialog(
             context: context,
             builder: (BuildContext context) => CustomDialog(
                   image: Icons.warning,
-                  title: "Maximum requests Reached",
+                  title: 'Maximum requests Reached',
                   description:
-                      "You already had 5 requests in last 24 hours. \nPlease try again in 24 hours.",
+                      'You already had 5 requests in last 24 hours. \nPlease try again in 24 hours.',
                   actions: <Widget>[
-                    FlatButton(
-                      child: new Text("Ok"),
+                    TextButton(
+                      child: const Text('Ok'),
                       onPressed: () {
                         Navigator.pop(context);
                       },
@@ -930,7 +964,7 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
 
       if (accessTokenResponse.statusCode != 200) {
         setState(() {
-          this.isLoading = false;
+          isLoading = false;
         });
 
         return showDialog(
@@ -939,10 +973,10 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
                   image: Icons.warning,
                   title: "Couldn't setup verification process",
                   description:
-                      "Something went wrong. Please contact support if this issue persists.",
+                      'Something went wrong. Please contact support if this issue persists.',
                   actions: <Widget>[
-                    FlatButton(
-                      child: new Text("Ok"),
+                    TextButton(
+                      child: const Text('Ok'),
                       onPressed: () {
                         Navigator.pop(context);
                       },
@@ -960,18 +994,18 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
 
       reference = verificationCode;
 
-      createdPayload["reference"] = reference;
-      createdPayload["document"] = verificationObj['document']!;
-      createdPayload["face"] = verificationObj['face']!;
-      createdPayload["verification_mode"] = "image_only";
+      createdPayload['reference'] = reference;
+      createdPayload['document'] = verificationObj['document']!;
+      createdPayload['face'] = verificationObj['face']!;
+      createdPayload['verification_mode'] = 'image_only';
 
       setState(() {
-        this.isLoading = false;
-        this.isInIdentityProcess = true;
+        isLoading = false;
+        isInIdentityProcess = true;
       });
     } catch (e) {
       setState(() {
-        this.isLoading = false;
+        isLoading = false;
       });
 
       print(e);
@@ -979,11 +1013,12 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
         context: context,
         builder: (BuildContext context) => CustomDialog(
           image: Icons.warning,
-          title: "Failed to setup process",
-          description: "Something went wrong. \n If this issue persist, please contact support",
+          title: 'Failed to setup process',
+          description:
+              'Something went wrong. \n If this issue persist, please contact support',
           actions: <Widget>[
-            FlatButton(
-              child: new Text("Ok"),
+            TextButton(
+              child: const Text('Ok'),
               onPressed: () {
                 Navigator.pop(context);
               },
@@ -1000,29 +1035,32 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
         builder: (BuildContext context) => Dialog(
               child: FutureBuilder(
                 future: getIdentity(),
-                builder: (BuildContext customContext, AsyncSnapshot<dynamic> snapshot) {
+                builder: (BuildContext customContext,
+                    AsyncSnapshot<dynamic> snapshot) {
                   if (!snapshot.hasData) {
                     return _pleaseWait();
                   }
 
-                  String name = getFullNameOfObject(jsonDecode(snapshot.data['identityName']));
-                  return Container(
-                      child: Column(
+                  String name = getFullNameOfObject(
+                      jsonDecode(snapshot.data['identityName']));
+                  return Column(
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      SizedBox(
+                      const SizedBox(
                         height: 10,
                       ),
                       Container(
-                          padding: EdgeInsets.fromLTRB(15, 10, 15, 10),
-                          child: Column(
+                          padding: const EdgeInsets.fromLTRB(15, 10, 15, 10),
+                          child: const Column(
                             children: [
                               Row(
                                 children: [
                                   Text(
                                     'OpenKYC ID CARD',
-                                    style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
+                                    style: TextStyle(
+                                        fontSize: 18.0,
+                                        fontWeight: FontWeight.bold),
                                     textAlign: TextAlign.left,
                                   ),
                                 ],
@@ -1031,13 +1069,14 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
                               Row(children: [
                                 Text(
                                   'Your own personal KYC ID CARD',
-                                  style: TextStyle(fontSize: 13, color: Colors.grey),
+                                  style: TextStyle(
+                                      fontSize: 13, color: Colors.grey),
                                 ),
                               ]),
                             ],
                           )),
                       Container(
-                        padding: EdgeInsets.fromLTRB(15, 20, 15, 20),
+                        padding: const EdgeInsets.fromLTRB(15, 20, 15, 20),
                         color: HexColor('#f2f5f3'),
                         child: Column(
                           children: [
@@ -1045,7 +1084,10 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
                               children: [
                                 Text(
                                   'Full name',
-                                  style: TextStyle(fontSize: 13, color: HexColor('#787878')),
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    color: HexColor('#787878'),
+                                  ),
                                 )
                               ],
                             ),
@@ -1056,15 +1098,18 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
                         ),
                       ),
                       Container(
-                        padding: EdgeInsets.fromLTRB(15, 20, 15, 20),
+                        padding: const EdgeInsets.fromLTRB(15, 20, 15, 20),
                         child: Column(
                           children: [
                             Row(
                               children: [
                                 Text(
                                   'Birthday',
-                                  style: TextStyle(fontSize: 13, color: HexColor('#787878')),
-                                )
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    color: HexColor('#787878'),
+                                  ),
+                                ),
                               ],
                             ),
                             Row(
@@ -1078,7 +1123,7 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
                         ),
                       ),
                       Container(
-                        padding: EdgeInsets.fromLTRB(15, 20, 15, 20),
+                        padding: const EdgeInsets.fromLTRB(15, 20, 15, 20),
                         color: HexColor('#f2f5f3'),
                         child: Column(
                           children: [
@@ -1086,7 +1131,10 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
                               children: [
                                 Text(
                                   'Country',
-                                  style: TextStyle(fontSize: 13, color: HexColor('#787878')),
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    color: HexColor('#787878'),
+                                  ),
                                 )
                               ],
                             ),
@@ -1101,14 +1149,17 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
                         ),
                       ),
                       Container(
-                        padding: EdgeInsets.fromLTRB(15, 20, 15, 20),
+                        padding: const EdgeInsets.fromLTRB(15, 20, 15, 20),
                         child: Column(
                           children: [
                             Row(
                               children: [
                                 Text(
                                   'Gender',
-                                  style: TextStyle(fontSize: 13, color: HexColor('#787878')),
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    color: HexColor('#787878'),
+                                  ),
                                 )
                               ],
                             ),
@@ -1125,18 +1176,18 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          FlatButton(
+                          TextButton(
                               onPressed: () {
                                 Navigator.pop(customContext);
                               },
-                              child: Text('OK')),
-                          SizedBox(
+                              child: const Text('OK')),
+                          const SizedBox(
                             height: 10,
                           ),
                         ],
                       )
                     ],
-                  ));
+                  );
                 },
               ),
             ));
@@ -1148,11 +1199,11 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
       barrierDismissible: false,
       builder: (BuildContext context) => CustomDialog(
         image: Icons.check,
-        title: "Email has been resent.",
-        description: "A new verification email has been sent.",
+        title: 'Email has been resent.',
+        description: 'A verification email has been sent.',
         actions: <Widget>[
-          FlatButton(
-            child: new Text("Ok"),
+          TextButton(
+            child: const Text('Ok'),
             onPressed: () {
               Navigator.pop(context);
             },
@@ -1163,7 +1214,7 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
   }
 
   void _changeEmailDialog(bool emailWasEmpty) {
-    TextEditingController controller = new TextEditingController();
+    TextEditingController controller = TextEditingController();
 
     bool validEmail = false;
     String? errorEmail;
@@ -1174,26 +1225,29 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
         builder: (BuildContext dialogContext) {
           return StatefulBuilder(builder: (statefulContext, setCustomState) {
             return AlertDialog(
-              title: emailWasEmpty == true ? Text('Add email') : Text('Change email'),
-              contentPadding: EdgeInsets.all(24),
+              title: emailWasEmpty == true
+                  ? const Text('Add email')
+                  : const Text('Change email'),
+              contentPadding: const EdgeInsets.all(24),
               content: Container(
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     emailWasEmpty == true
-                        ? Text('Please pass us your email address')
-                        : Text(
+                        ? const Text('Please pass us your email address')
+                        : const Text(
                             'Changing your email will require you to go through the email verification process again.'),
                     TextField(
                       controller: controller,
                       decoration: InputDecoration(
                           focusedBorder: UnderlineInputBorder(
-                            borderSide: BorderSide(color: Theme.of(context).primaryColor),
+                            borderSide: BorderSide(
+                                color: Theme.of(context).primaryColor),
                           ),
                           labelText: 'Email',
                           errorText: validEmail == true ? null : errorEmail),
                     ),
-                    SizedBox(
+                    const SizedBox(
                       height: 20,
                     ),
                     statusMessage
@@ -1201,24 +1255,26 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
                 ),
               ),
               actions: [
-                FlatButton(
+                TextButton(
                     onPressed: () {
                       Navigator.pop(dialogContext);
                     },
-                    child: Text('Cancel')),
-                FlatButton(
+                    child: const Text('Cancel')),
+                TextButton(
                     onPressed: () async {
                       _loadingDialog();
 
-                      String emailValue =
-                          controller.text.toLowerCase().trim().replaceAll(new RegExp(r"\s+"), " ");
+                      String emailValue = controller.text
+                          .toLowerCase()
+                          .trim()
+                          .replaceAll(RegExp(r'\s+'), ' ');
                       bool isValidEmail = validateEmail(emailValue);
 
                       var oldEmail = await getEmail();
 
                       if (oldEmail['email'] == emailValue) {
                         validEmail = false;
-                        errorEmail = "Please enter a different email";
+                        errorEmail = 'Please enter a different email';
                         setCustomState(() {});
                         Navigator.pop(context);
                         return;
@@ -1261,14 +1317,16 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
                         await saveEmail(oldEmail['email']!, oldEmail['sei']);
                         await saveEmailToPKid();
 
-                        statusMessage = Text('Something went wrong',
-                            style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold));
+                        statusMessage = const Text('Something went wrong',
+                            style: TextStyle(
+                                color: Colors.red,
+                                fontWeight: FontWeight.bold));
 
                         setState(() {});
                         setCustomState(() {});
                       }
                     },
-                    child: Text('Ok'))
+                    child: const Text('Ok'))
               ],
             );
           });
@@ -1284,25 +1342,27 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: new Text('Change your email'),
+          title: const Text('Change your email'),
           content: Container(
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text('Please pass us your new email address'),
-                SizedBox(height: 16),
+                const Text('Please pass us your email address'),
+                const SizedBox(height: 16),
                 TextField(
                   controller: changeEmailController,
                   decoration: InputDecoration(
                       labelText: 'Email',
-                      errorText: emailInputValidated ? null : 'Please enter a valid email'),
+                      errorText: emailInputValidated
+                          ? null
+                          : 'Please enter a valid email'),
                 ),
               ],
             ),
           ),
           actions: <Widget>[
-            FlatButton(
-              child: new Text("OK"),
+            TextButton(
+              child: const Text('OK'),
               onPressed: () async {
                 bool isValid = checkEmail(changeEmailController.text);
                 if (!isValid) {
@@ -1372,19 +1432,18 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
       return;
     }
 
-    int currentTime = new DateTime.now().millisecondsSinceEpoch;
-    if (globals.tooManySmsAttempts && globals.lockedSmsUntill > currentTime) {
+    int currentTime = DateTime.now().millisecondsSinceEpoch;
+    if (globals.tooManySmsAttempts && globals.lockedSmsUntil > currentTime) {
       globals.sendSmsAttempts = 0;
       showDialog(
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: new Text('Too many attempts please wait ' +
-                ((globals.lockedSmsUntill - currentTime) / 1000).round().toString() +
-                ' seconds.'),
+            title: Text(
+                'Too many attempts please wait ${((globals.lockedSmsUntil - currentTime) / 1000).round()} seconds.'),
             actions: <Widget>[
-              FlatButton(
-                child: new Text("OK"),
+              TextButton(
+                child: const Text('OK'),
                 onPressed: () {
                   Navigator.of(context).pop();
                 },
@@ -1399,16 +1458,16 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
     globals.tooManySmsAttempts = false;
     if (globals.sendSmsAttempts >= 2) {
       globals.tooManySmsAttempts = true;
-      globals.lockedSmsUntill = currentTime + 60000;
+      globals.lockedSmsUntil = currentTime + 60000;
 
       showDialog(
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: new Text('Too many attempts please wait one minute.'),
+            title: const Text('Too many attempts please wait one minute.'),
             actions: <Widget>[
-              FlatButton(
-                child: new Text("OK"),
+              TextButton(
+                child: const Text('OK'),
                 onPressed: () {
                   Navigator.of(context).pop();
                 },
@@ -1424,7 +1483,7 @@ class _IdentityVerificationScreenState extends State<IdentityVerificationScreen>
 
     sendVerificationSms();
     Globals().hidePhoneButton.value = true;
-    Globals().smsSentOn = new DateTime.now().millisecondsSinceEpoch;
+    Globals().smsSentOn = DateTime.now().millisecondsSinceEpoch;
 
     phoneSendDialog(context);
   }

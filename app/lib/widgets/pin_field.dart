@@ -48,9 +48,10 @@ class _PinFieldState extends State<PinField> {
     double height = MediaQuery.of(context).size.height;
 
     if (buttonText == 'OK')
-      onPressedMethod = (input.length >= widget.pinLength ? () => onOk() : (){});
+      onPressedMethod =
+          (input.length >= widget.pinLength ? () => onOk() : () {});
     if (buttonText == 'C')
-      onPressedMethod = (input.length >= 1 ? () => onClear() : (){});
+      onPressedMethod = (input.length >= 1 ? () => onClear() : () {});
     return Container(
         padding: EdgeInsets.only(top: height / 136, bottom: height / 136),
         child: Center(
@@ -85,15 +86,17 @@ class _PinFieldState extends State<PinField> {
       String buttonText = possibleInput[i];
       if (buttonText == 'C')
         return buildNumberPin(possibleInput[i], context,
-            backgroundColor:
-                input.length >= 1 ? Colors.yellow.shade700 : Colors.yellow.shade200);
+            backgroundColor: input.length >= 1
+                ? Colors.yellow.shade700
+                : Colors.yellow.shade200);
       else if (buttonText == 'OK')
         return buildNumberPin(possibleInput[i], context,
             backgroundColor: input.length >= widget.pinLength
                 ? Colors.green.shade600
                 : Colors.green.shade100);
       else
-        return buildNumberPin(possibleInput[i], context,  backgroundColor: HexColor("#0a73b8"));
+        return buildNumberPin(possibleInput[i], context,
+            backgroundColor: HexColor('#0a73b8'));
     });
     return Container(
       width: double.infinity,

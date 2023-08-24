@@ -22,7 +22,7 @@ class MainScreen extends StatefulWidget {
   final bool? initDone;
   final bool? registered;
 
-  MainScreen({this.initDone, this.registered});
+  const MainScreen({this.initDone, this.registered});
 
   @override
   _AppState createState() => _AppState();
@@ -41,7 +41,7 @@ class _AppState extends State<MainScreen> {
     super.initState();
     Events().reset();
     // _listener = FirebaseNotificationListener();
-    WidgetsBinding.instance?.addPostFrameCallback((_) => pushScreens());
+    WidgetsBinding.instance.addPostFrameCallback((_) => pushScreens());
   }
 
   @override
@@ -64,41 +64,47 @@ class _AppState extends State<MainScreen> {
           'assets/logo.png',
           height: 100,
         ),
-        SizedBox(
+        const SizedBox(
           height: 40,
         ),
         Container(
-          padding: EdgeInsets.only(left: 12, right: 12),
+          padding: const EdgeInsets.only(left: 12, right: 12),
           child: Text(
-            updateMessage != null ? updateMessage.toString() : errorMessage.toString(),
+            updateMessage != null
+                ? updateMessage.toString()
+                : errorMessage.toString(),
             style: TextStyle(
-                fontSize: 16, fontWeight: FontWeight.bold, color: errorMessage != null ? Colors.red : Colors.black),
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: errorMessage != null ? Colors.red : Colors.black),
           ),
         ),
-        SizedBox(
+        const SizedBox(
           height: 40,
         ),
         Transform.scale(
           scale: 0.5,
-          child: CircularProgressIndicator(
+          child: const CircularProgressIndicator(
             color: Color.fromRGBO(0, 174, 239, 1),
           ),
         ),
-        SizedBox(height: 20),
+        const SizedBox(height: 20),
         Visibility(
             maintainSize: true,
             maintainAnimation: true,
             maintainState: true,
             visible: errorMessage != null,
-            child: RaisedButton(
-              shape: new RoundedRectangleBorder(
-                borderRadius: new BorderRadius.circular(30),
+            child: ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Theme.of(context).colorScheme.secondary,
+                shape: const RoundedRectangleBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(30)),
+                ),
               ),
-              color: Theme.of(context).accentColor,
-              child: Row(
+              child: const Row(
                 mainAxisSize: MainAxisSize.min,
                 mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
+                children: [
                   Text(
                     'RETRY',
                     style: TextStyle(color: Colors.white, fontSize: 16),
@@ -146,11 +152,13 @@ class _AppState extends State<MainScreen> {
       setState(() {});
       await fetchPkidData();
     } catch (e) {
-      print('Error in main screen');
-      print(e);
+      print('Error in main screen: $e');
 
       updateMessage = null;
-      errorMessage = e.toString().split('Exception:')[1];
+      errorMessage = e.toString();
+      if (e.toString().split('Exception:').length > 1) {
+        errorMessage = e.toString().split('Exception:')[1];
+      }
       setState(() {});
       return;
     }
@@ -159,12 +167,15 @@ class _AppState extends State<MainScreen> {
       InitScreen init = InitScreen();
       bool accepted = false;
       while (!accepted) {
-        accepted = !(await Navigator.push(context, MaterialPageRoute(builder: (context) => init)) == null);
+        accepted = !(await Navigator.push(
+                context, MaterialPageRoute(builder: (context) => init)) ==
+            null);
       }
     }
 
     if (!widget.registered!) {
-      await Navigator.push(context, MaterialPageRoute(builder: (context) => UnregisteredScreen()));
+      await Navigator.push(context,
+          MaterialPageRoute(builder: (context) => UnregisteredScreen()));
     }
 
     await Globals().router.init();
@@ -184,7 +195,9 @@ class _AppState extends State<MainScreen> {
     await Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-            builder: (context) => HomeScreen(initialLink: initialLink, backendConnection: _backendConnection)));
+            builder: (context) => HomeScreen(
+                initialLink: initialLink,
+                backendConnection: _backendConnection)));
   }
 
   fetchPkidData() async {
@@ -192,7 +205,8 @@ class _AppState extends State<MainScreen> {
       String? seedPhrase = await getPhrase();
 
       if (seedPhrase != null &&
-          (await isPKidMigrationIssueSolved() == false || await isPKidMigrationIssueSolved() == null)) {
+          (await isPKidMigrationIssueSolved() == false ||
+              await isPKidMigrationIssueSolved() == null)) {
         fixPkidMigration();
       }
 
@@ -208,13 +222,15 @@ class _AppState extends State<MainScreen> {
   checkInternetConnection() async {
     try {
       final List<InternetAddress> result =
-          await InternetAddress.lookup('google.com').timeout(Duration(seconds: Globals().timeOutSeconds));
+          await InternetAddress.lookup('google.com')
+              .timeout(Duration(seconds: Globals().timeOutSeconds));
 
       if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
         print('Connected to the internet');
       }
     } catch (e) {
-      throw new Exception("No internet connection available, please make sure you have a stable internet connection.");
+      throw Exception(
+          'No internet connection available, please make sure you have a stable internet connection.');
     }
   }
 
@@ -223,13 +239,15 @@ class _AppState extends State<MainScreen> {
       try {
         String baseUrl = AppConfig().baseUrl();
         final List<InternetAddress> result =
-            await InternetAddress.lookup('$baseUrl').timeout(Duration(seconds: Globals().timeOutSeconds));
+            await InternetAddress.lookup('$baseUrl')
+                .timeout(Duration(seconds: Globals().timeOutSeconds));
 
         if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
           print('Connected to the servers');
         }
       } catch (e) {
-        throw new Exception("Can't connect to our servers, please try again. Contact support if this issue persists.");
+        throw Exception(
+            'Cannot connect to our servers, please try again. Contact support if this issue persists.');
       }
     }
   }
@@ -237,45 +255,47 @@ class _AppState extends State<MainScreen> {
   checkConnectionToPkid() async {
     try {
       if (!!await checkIfPkidIsAvailable()) {
-        throw new Exception(
-            "Can't connect to our pkid service, please try again. Contact support if this issue persists.");
+        throw Exception(
+            'Cannot connect to our pkid service, please try again. Contact support if this issue persists.');
       }
     } catch (e) {
-      throw new Exception(
-          "Can't connect to our pkid service, please try again. Contact support if this issue persists.");
+      throw Exception(
+          'Cannot connect to our pkid service, please try again. Contact support if this issue persists.');
     }
   }
 
   checkIfAppIsUnderMaintenance() async {
     bool isUnderMaintenanceInFlagSmith = Globals().maintenance;
     if (isUnderMaintenanceInFlagSmith == true) {
-      throw new Exception('App is being rolled out. Please try again later.');
+      throw Exception('App is being rolled out. Please try again later.');
     }
 
     try {
       if (await isAppUnderMaintenance()) {
-        throw new Exception('App is being rolled out. Please try again later.');
+        throw Exception('App is being rolled out. Please try again later.');
       }
     } catch (e) {
-      throw new Exception("App is being rolled out. Please try again later.");
+      throw Exception('App is being rolled out. Please try again later.');
     }
   }
 
   checkIfAppIsUpToDate() async {
     try {
       if (!await isAppUpToDate()) {
-        throw new Exception('The app is outdated. Please, update it to the latest version');
+        throw Exception(
+            'The app is outdated. Please, update it to the latest version');
       }
     } catch (e) {
-      throw new Exception("The app is outdated. Please, update it to the latest version");
+      throw Exception(
+          'The app is outdated. Please, update it to the latest version');
     }
   }
 
-  Future<Null> initUniLinks() async {
+  Future<void> initUniLinks() async {
     initialLink = await getInitialLink();
 
     // Doesn't seem needed in this scenario. Might be removed in the future.
-    _sub = getLinksStream().listen((String? incomingLink) {
+    _sub = linkStream.listen((String? incomingLink) {
       if (!mounted) {
         return;
       }

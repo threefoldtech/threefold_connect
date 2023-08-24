@@ -45,10 +45,9 @@ class _UnregisteredScreenState extends State<UnregisteredScreen>
       await Navigator.push(
           context,
           MaterialPageRoute(
-              builder: (context) =>
-                  SuccessfulScreen(
-                      title: "Recovered",
-                      text: "Your account has been recovered.")));
+              builder: (context) => SuccessfulScreen(
+                  title: "Recovered",
+                  text: "Your account has been recovered.")));
 
       Navigator.pop(context);
 
@@ -61,111 +60,109 @@ class _UnregisteredScreenState extends State<UnregisteredScreen>
   Widget build(BuildContext context) {
     return Material(
         child: Scaffold(
-          body: Stack(
-            children: <Widget>[
-              SvgPicture.asset(
-                'assets/bg.svg',
-                alignment: Alignment.center,
-                width: MediaQuery
-                    .of(context)
-                    .size
-                    .width,
-                height: MediaQuery
-                    .of(context)
-                    .size
-                    .height,
-              ),
-              Container(
-                child: WillPopScope(
-                  child: Container(
-                    child: ConstrainedBox(
-                      constraints: const BoxConstraints(
-                          maxHeight: double.infinity,
-                          maxWidth: double.infinity,
-                          minHeight: 250,
-                          minWidth: 250),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      body: Stack(
+        children: <Widget>[
+          SvgPicture.asset(
+            'assets/bg.svg',
+            alignment: Alignment.center,
+            width: MediaQuery.of(context).size.width,
+            height: MediaQuery.of(context).size.height,
+          ),
+          Container(
+            child: WillPopScope(
+              child: Container(
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(
+                      maxHeight: double.infinity,
+                      maxWidth: double.infinity,
+                      minHeight: 250,
+                      minWidth: 250),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: <Widget>[
+                      Container(),
+                      Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
                         children: <Widget>[
-                          Container(),
-                          Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: <Widget>[
-                              Container(
-                                width: 360.0,
-                                height: 108.0,
-                                decoration: BoxDecoration(
-                                  image: DecorationImage(
-                                      fit: BoxFit.cover,
-                                      image: AssetImage('assets/logo.png')),
-                                ),
-                              ),
-                              SizedBox(height: 10.0),
-                            ],
-                          ),
-                          SizedBox(
-                            width: 250,
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.stretch,
-                              children: <Widget>[
-                                RaisedButton(
-                                  shape: new RoundedRectangleBorder(
-                                    borderRadius: new BorderRadius.circular(30),
-                                  ),
-                                  color: Theme
-                                      .of(context)
-                                      .accentColor,
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: <Widget>[
-                                      Text(
-                                        'SIGN UP',
-                                        style: TextStyle(
-                                            color: Colors.white, fontSize: 16),
-                                      ),
-                                    ],
-                                  ),
-                                  onPressed: () {
-                                    startRegistration();
-                                  },
-                                ),
-                                SizedBox(height: 20),
-                                RaisedButton(
-                                  shape: new RoundedRectangleBorder(
-                                    borderRadius: new BorderRadius.circular(30),
-                                  ),
-                                  color: Theme
-                                      .of(context)
-                                      .accentColor,
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: <Widget>[
-                                      Text(
-                                        'RECOVER ACCOUNT',
-                                        style: TextStyle(
-                                            color: Colors.white, fontSize: 16),
-                                      ),
-                                    ],
-                                  ),
-                                  onPressed: () {
-                                    startRecovery();
-                                  },
-                                ),
-                              ],
+                          Container(
+                            width: 360.0,
+                            height: 108.0,
+                            decoration: BoxDecoration(
+                              image: DecorationImage(
+                                  fit: BoxFit.cover,
+                                  image: AssetImage('assets/logo.png')),
                             ),
                           ),
-                          Container(),
+                          SizedBox(height: 10.0),
                         ],
                       ),
-                    ),
+                      SizedBox(
+                        width: 250,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: <Widget>[
+                            ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor:
+                                    Theme.of(context).colorScheme.secondary,
+                                shape: const RoundedRectangleBorder(
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(30)),
+                                ),
+                              ),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: <Widget>[
+                                  Text(
+                                    'SIGN UP',
+                                    style: TextStyle(
+                                        color: Colors.white, fontSize: 16),
+                                  ),
+                                ],
+                              ),
+                              onPressed: () {
+                                startRegistration();
+                              },
+                            ),
+                            SizedBox(height: 20),
+                            ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor:
+                                    Theme.of(context).colorScheme.secondary,
+                                shape: const RoundedRectangleBorder(
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(30)),
+                                ),
+                              ),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: <Widget>[
+                                  Text(
+                                    'RECOVER ACCOUNT',
+                                    style: TextStyle(
+                                        color: Colors.white, fontSize: 16),
+                                  ),
+                                ],
+                              ),
+                              onPressed: () {
+                                startRecovery();
+                              },
+                            ),
+                          ],
+                        ),
+                      ),
+                      Container(),
+                    ],
                   ),
-                  onWillPop: () {
-                    return Future.value(false);
-                  },
                 ),
               ),
-            ],
+              onWillPop: () {
+                return Future.value(false);
+              },
+            ),
           ),
-        ));
+        ],
+      ),
+    ));
   }
 }

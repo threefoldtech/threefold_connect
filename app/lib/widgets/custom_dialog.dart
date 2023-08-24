@@ -29,7 +29,7 @@ class CustomDialog extends StatefulWidget {
         widgetDescription: this.widgetDescription,
         actions: <Widget>[
           //@todo make this configurable, ok;okcancel
-          FlatButton(
+          TextButton(
             child: new Text("Ok"),
             onPressed: () {
               Navigator.pop(context);
@@ -56,7 +56,7 @@ class _CustomDialogState extends State<CustomDialog> {
         widgetDescription: this.widget.widgetDescription,
         actions: <Widget>[
           //@todo make this configurable, ok;okcancel
-          FlatButton(
+          TextButton(
             child: new Text("Ok"),
             onPressed: () {
               Navigator.pop(context);
@@ -91,9 +91,10 @@ class _CustomDialogState extends State<CustomDialog> {
     return Positioned(
       left: 20.0,
       right: 20.0,
-      child: FlatButton(
-        splashColor: Colors.transparent,
-        highlightColor: Colors.transparent,
+      child: TextButton(
+        style: ButtonStyle(
+          overlayColor: MaterialStateProperty.all(Colors.transparent),
+        ),
         onPressed: () {
           if (widget.hiddenaction != null) {
             timesPressed++;
@@ -120,7 +121,8 @@ class _CustomDialogState extends State<CustomDialog> {
 
   card(context) {
     return ConstrainedBox(
-      constraints: BoxConstraints(maxHeight: double.infinity, maxWidth: double.infinity),
+      constraints:
+          BoxConstraints(maxHeight: double.infinity, maxWidth: double.infinity),
       child: Container(
         padding: EdgeInsets.only(top: 30.0 + 20.0),
         margin: EdgeInsets.only(top: 30.0),

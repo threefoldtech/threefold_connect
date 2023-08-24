@@ -1,22 +1,40 @@
 # 3Botlogin frontend
+
 The frontend for 3Bot login
 
 ## Project setup
+
+```bash
+yarn install
 ```
-npm install
+
+### Configuration
+
+```bash
+# prod:
+cp public/config.prod.js public/config.js
+
+# staging:
+cp public/config.staging.js public/config.js
+
+# testing:
+cp public/config.testing.js public/config.js
 ```
 
 ### Compiles and hot-reloads for development
-```
-npm run serve
+
+```bash
+yarn serve
 ```
 
 ### Compiles and minifies for production
-```
-npm run build
+
+```bash
+yarn build
 ```
 
 ### Lints and fixes files
-```
-npm run lint
+
+```bash
+yarn lint
 ```

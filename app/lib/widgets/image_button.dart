@@ -23,15 +23,17 @@ class _ImageButtonState extends State<ImageButton> {
       ),
       width: 50,
       height: 50,
-      child: FlatButton(
+      child: OutlinedButton(
+        style: OutlinedButton.styleFrom(
+          padding: EdgeInsets.all(10),
+          shape: CircleBorder(),
+        ),
         onPressed: () {
           widget.callback(widget.imageId);
         },
         child: Image.asset(
           'assets/icons/' + widget.imageId.toString() + '.png',
         ),
-        padding: EdgeInsets.all(10),
-        shape: new CircleBorder(),
       ),
     );
   }

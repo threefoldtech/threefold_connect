@@ -38,7 +38,7 @@ class Globals {
   late TabController tabController;
 
   int lockedUntill = 0;
-  int lockedSmsUntill = 0;
+  int lockedSmsUntil = 0;
   int loginTimeout = 120;
   PaymentRequest? paymentRequest;
   bool paymentRequestIsUsed = false;

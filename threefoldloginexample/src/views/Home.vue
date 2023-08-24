@@ -18,8 +18,8 @@
 </template>
 
 <script lang="ts">
-  import { ThreefoldLogin, generateRandomString } from '@threefoldjimber/threefold_login/dist';
-  import { threefoldBackend, redirect_url, appId, seedPhrase } from '@/config/config'
+  import { ThreefoldLogin, generateRandomString } from '@threefoldjimber/threefold_login';
+import { threefoldBackend, redirect_url, appId, seedPhrase, kycBackend } from '../config/config'
   import { defineComponent, ref } from 'vue'
 
   const profile = ref({});
@@ -54,7 +54,8 @@
     const login = new ThreefoldLogin(threefoldBackend,
         appId,
         seedPhrase,
-        redirect_url);
+        redirect_url,
+        kycBackend);
 
     await login.init();
 

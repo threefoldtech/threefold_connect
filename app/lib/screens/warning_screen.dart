@@ -20,7 +20,7 @@ class _WarningScreenState extends State<WarningScreen> {
       title: 'Login from a new location',
       home: Scaffold(
         appBar: AppBar(
-          backgroundColor: HexColor("#2d4052"),
+          backgroundColor: HexColor('#2d4052'),
           title: Text('Login from a new location'),
         ),
         body: Padding(
@@ -88,22 +88,28 @@ class _WarningScreenState extends State<WarningScreen> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: <Widget>[
-                    FlatButton(
+                    TextButton(
                       child: Text(
                         'No, it doesn\'t',
                         style: TextStyle(color: Colors.white),
                       ),
-                      color: Colors.redAccent,
+                      style: ButtonStyle(
+                        backgroundColor:
+                            MaterialStateProperty.all(Colors.redAccent),
+                      ),
                       onPressed: () {
                         Navigator.pop(context, false);
                       },
                     ),
-                    FlatButton(
+                    TextButton(
                       child: Text(
                         'Yes, it does',
                         style: TextStyle(color: Colors.white),
                       ),
-                      color: HexColor("#2d4052"),
+                      style: ButtonStyle(
+                        backgroundColor:
+                            MaterialStateProperty.all(HexColor('#2d4052')),
+                      ),
                       onPressed: () {
                         Navigator.pop(context, true);
                       },

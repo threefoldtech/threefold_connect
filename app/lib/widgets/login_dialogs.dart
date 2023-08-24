@@ -8,9 +8,10 @@ Future<void> showExpiredDialog(BuildContext ctx) async {
     builder: (BuildContext context) => CustomDialog(
       image: Icons.timer,
       title: 'Login attempt expired',
-      description: 'Your login attempt has expired, please request a new one in your browser.',
+      description:
+          'Your login attempt has expired, please request a new one in your browser.',
       actions: <Widget>[
-        FlatButton(
+        TextButton(
           child: Text('Ok'),
           onPressed: () {
             Navigator.pop(context);
@@ -22,14 +23,15 @@ Future<void> showExpiredDialog(BuildContext ctx) async {
 }
 
 Future<void> showWrongEmojiDialog(BuildContext ctx) async {
-   await showDialog(
+  await showDialog(
     context: ctx,
     builder: (BuildContext context) => CustomDialog(
       image: Icons.warning,
       title: 'Wrong emoji',
-      description: 'You selected the wrong emoji, please check your browser for the new one.',
+      description:
+          'You selected the wrong emoji, please check your browser for the new one.',
       actions: <Widget>[
-        FlatButton(
+        TextButton(
           child: Text('Retry'),
           onPressed: () {
             Navigator.pop(context);
@@ -48,7 +50,7 @@ Future<void> showLoggedInDialog(BuildContext ctx) async {
       title: 'Logged in',
       description: 'You are now logged in. Please return to your browser.',
       actions: <Widget>[
-        FlatButton(
+        TextButton(
           child: Text('Ok'),
           onPressed: () {
             Navigator.pop(context);
@@ -65,9 +67,10 @@ Future<void> showSignedInDialog(BuildContext ctx) async {
     builder: (BuildContext context) => CustomDialog(
       image: Icons.check,
       title: 'Successfully signed',
-      description: 'The data has been successfully signed. Please return to your browser.',
+      description:
+          'The data has been successfully signed. Please return to your browser.',
       actions: <Widget>[
-        FlatButton(
+        TextButton(
           child: Text('Ok'),
           onPressed: () {
             Navigator.pop(context);

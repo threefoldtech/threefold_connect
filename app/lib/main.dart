@@ -26,7 +26,8 @@ Future<void> setGlobalValues() async {
 
   Globals().emailVerified.value = (email['sei'] != null);
   Globals().phoneVerified.value = (phone['spi'] != null);
-  Globals().identityVerified.value = (identity['signedIdentityNameIdentifier'] != null);
+  Globals().identityVerified.value =
+      (identity['signedIdentityNameIdentifier'] != null);
 }
 
 class MyApp extends StatelessWidget {
@@ -41,18 +42,28 @@ class MyApp extends StatelessWidget {
     var textTheme = GoogleFonts.latoTextTheme(
       Theme.of(context).textTheme,
     );
-    var accentTextTheme = GoogleFonts.latoTextTheme(
-      Theme.of(context).accentTextTheme,
+
+    var accentTextStyle = GoogleFonts.lato(
+      textStyle: Theme.of(context).appBarTheme.titleTextStyle,
     );
+
     var textStyle = GoogleFonts.lato();
     return MaterialApp(
       theme: ThemeData(
-        primaryColor: HexColor("#0a73b8"),
-        accentColor: HexColor("#57BE8E"),
+        primaryColor: HexColor('#0a73b8'),
+        colorScheme: ColorScheme.fromSwatch().copyWith(
+          secondary: HexColor('#57BE8E'),
+          brightness: Brightness.light,
+        ),
+        brightness: Brightness.light,
         textTheme: textTheme,
-        tabBarTheme: TabBarTheme(labelStyle: textStyle, unselectedLabelStyle: textStyle),
+        tabBarTheme:
+            TabBarTheme(labelStyle: textStyle, unselectedLabelStyle: textStyle),
         appBarTheme: AppBarTheme(
-            color: Colors.white, textTheme: accentTextTheme, brightness: Brightness.dark),
+          color: Colors.white,
+          titleTextStyle: accentTextStyle,
+          toolbarTextStyle: accentTextStyle,
+        ),
       ),
       home: MainScreen(initDone: initDone, registered: registered),
     );
