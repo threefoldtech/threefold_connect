@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:threebotlogin/helpers/hex_color.dart';
-import 'package:threebotlogin/helpers/vpn_state.dart';
 import 'package:threebotlogin/jrouter.dart';
 import 'package:threebotlogin/models/paymentRequest.dart';
 
@@ -59,8 +58,6 @@ class Globals {
 
   bool isCacheClearedWallet = false;
   bool isCacheClearedFarmer = false;
-
-  VpnState vpnState = new VpnState();
 
   int smsSentOn = 0;
   int smsMinutesCoolDown = 5;
