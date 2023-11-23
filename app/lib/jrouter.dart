@@ -61,28 +61,20 @@ class JRouter {
             view: await Chatbot().widget(),
           ),
           app: Chatbot()),
-      // AppInfo(
-      //     route: Route(
-      //       path: '/reservations',
-      //       name: 'Reservations',
-      //       icon: Icons.book_online,
-      //       view: ReservationScreen(),
-      //     ),
-      //     app: null),
-      AppInfo(
-          route: Route(
-            path: '/settings',
-            name: 'Settings',
-            icon: Icons.settings,
-            view: PreferenceScreen(),
-          ),
-          app: null),
       AppInfo(
           route: Route(
             path: '/identityverification',
             name: 'IdentityVerification',
             icon: Icons.lock,
             view: IdentityVerificationScreen(),
+          ),
+          app: null),
+      AppInfo(
+          route: Route(
+            path: '/settings',
+            name: 'Settings',
+            icon: Icons.settings,
+            view: PreferenceScreen(),
           ),
           app: null),
     ];

@@ -133,21 +133,6 @@ class _LayoutDrawerState extends State<LayoutDrawer> {
                 globals.tabController.animateTo(4);
               },
             ),
-            // ListTile(
-            //   minLeadingWidth: 10,
-            //   leading: Column(
-            //     mainAxisAlignment: MainAxisAlignment.center,
-            //     children: <Widget>[
-            //       Padding(padding: const EdgeInsets.only(left: 30)),
-            //       Icon(Icons.book_online, color: Colors.black, size: 18)
-            //     ],
-            //   ),
-            //   title: Text('Reserve Digital Twin'),
-            //   onTap: () {
-            //     Navigator.pop(context);
-            //     globals.tabController.animateTo(4);
-            //   },
-            // ),
             ListTile(
               minLeadingWidth: 10,
               leading: Column(
@@ -160,7 +145,7 @@ class _LayoutDrawerState extends State<LayoutDrawer> {
               title: Text('Identity'),
               onTap: () {
                 Navigator.pop(context);
-                globals.tabController.animateTo(7);
+                globals.tabController.animateTo(5);
               },
             ),
             ListTile(
