@@ -5,7 +5,6 @@ import 'package:package_info_plus/package_info_plus.dart';
 import 'package:threebotlogin/app_config.dart';
 import 'package:threebotlogin/apps/free_flow_pages/ffp_events.dart';
 import 'package:threebotlogin/events/close_socket_event.dart';
-import 'package:threebotlogin/events/close_vpn_event.dart';
 import 'package:threebotlogin/events/events.dart';
 import 'package:threebotlogin/helpers/environment.dart';
 import 'package:threebotlogin/helpers/globals.dart';
@@ -259,7 +258,6 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
               // } catch (e) {}
               Events().emit(CloseSocketEvent());
               Events().emit(FfpClearCacheEvent());
-              Events().emit(CloseVpnEvent());
               bool result = await clearData();
               if (result) {
                 Navigator.pop(context);
