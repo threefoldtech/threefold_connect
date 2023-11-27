@@ -185,7 +185,6 @@ void setFallbackConfigs() {
   print("Can't connect to FlagSmith, setting default configs... ");
 
   Globals().isOpenKYCEnabled = false;
-  Globals().isYggdrasilEnabled = false;
   Globals().debugMode = false;
   Globals().useNewWallet = false;
   Globals().newWalletUrl = '';
