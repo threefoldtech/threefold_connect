@@ -43,7 +43,7 @@ class _PinFieldState extends State<PinField> {
   }
 
   Widget buildNumberPin(String buttonText, BuildContext context,
-      {Color backgroundColor: Colors.blueGrey}) {
+      {Color backgroundColor= Colors.blueGrey}) {
     var onPressedMethod = () => handleInput(buttonText);
     double height = MediaQuery.of(context).size.height;
 
