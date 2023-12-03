@@ -71,34 +71,42 @@ abstract class AppConfigImpl {
 }
 
 class AppConfigProduction extends AppConfigImpl {
+  @override
   String baseUrl() {
-    return "login.threefold.me";
+    return 'login.threefold.me';
   }
 
+  @override
   String openKycApiUrl() {
-    return "https://openkyc.live";
+    return 'https://openkyc.live';
   }
 
+  @override
   String threeBotApiUrl() {
-    return "https://login.threefold.me/api";
+    return 'https://login.threefold.me/api';
   }
 
+  @override
   String threeBotFrontEndUrl() {
-    return "https://login.threefold.me/";
+    return 'https://login.threefold.me/';
   }
 
+  @override
   String threeBotSocketUrl() {
-    return "wss://login.threefold.me";
+    return 'wss://login.threefold.me';
   }
 
+  @override
   String wizardUrl() {
     return 'https://wizard.jimber.org/';
   }
 
+  @override
   String pKidUrl() {
     return 'https://pkid.jimber.org/v1';
   }
 
+  @override
   Map<String, String> flagSmithConfig() {
     return {
       'url': 'https://flagsmith.jimber.io/api/v1/',
@@ -108,34 +116,42 @@ class AppConfigProduction extends AppConfigImpl {
 }
 
 class AppConfigStaging extends AppConfigImpl {
+  @override
   String baseUrl() {
-    return "login.staging.jimber.io";
+    return 'login.staging.jimber.io';
   }
 
+  @override
   String openKycApiUrl() {
     return 'https://openkyc.staging.jimber.io';
   }
 
+  @override
   String threeBotApiUrl() {
-    return "https://login.staging.jimber.io/api";
+    return 'https://login.staging.jimber.io/api';
   }
 
+  @override
   String threeBotFrontEndUrl() {
-    return "https://login.staging.jimber.io/";
+    return 'https://login.staging.jimber.io/';
   }
 
+  @override
   String threeBotSocketUrl() {
-    return "wss://login.staging.jimber.io";
+    return 'wss://login.staging.jimber.io';
   }
 
+  @override
   String wizardUrl() {
     return 'https://wizard.staging.jimber.io/';
   }
 
+  @override
   String pKidUrl() {
     return 'https://pkid.staging.jimber.io/v1';
   }
 
+  @override
   Map<String, String> flagSmithConfig() {
     return {
       'url': 'https://flagsmith.jimber.io/api/v1/',
@@ -145,34 +161,42 @@ class AppConfigStaging extends AppConfigImpl {
 }
 
 class AppConfigTesting extends AppConfigImpl {
+  @override
   String baseUrl() {
-    return "login.testing.jimber.org";
+    return 'login.testing.jimber.org';
   }
 
+  @override
   String openKycApiUrl() {
-    return "https://openkyc.testing.jimber.org";
+    return 'https://openkyc.testing.jimber.org';
   }
 
+  @override
   String threeBotApiUrl() {
-    return "https://login.testing.jimber.org/api";
+    return 'https://login.testing.jimber.org/api';
   }
 
+  @override
   String threeBotFrontEndUrl() {
-    return "https://login.testing.jimber.org/";
+    return 'https://login.testing.jimber.org/';
   }
 
+  @override
   String threeBotSocketUrl() {
-    return "wss://login.testing.jimber.org";
+    return 'wss://login.testing.jimber.org';
   }
 
+  @override
   String wizardUrl() {
     return 'https://wizard.staging.jimber.org/';
   }
 
+  @override
   String pKidUrl() {
     return 'https://pkid.staging.jimber.io/v1';
   }
 
+  @override
   Map<String, String> flagSmithConfig() {
     return {
       'url': 'https://flagsmith.jimber.io/api/v1/',

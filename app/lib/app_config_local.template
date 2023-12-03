@@ -1,39 +1,46 @@
 import 'package:threebotlogin/app_config.dart';
 
 class AppConfigLocal extends AppConfigImpl {
-
+  @override
   String baseUrl() {
-    return "192.168.0.0:5000";
+    return '192.168.0.0:5000';
   }
 
+  @override
   String openKycApiUrl() {
-    return "http://192.168.0.0:5005";
+    return 'http://192.168.0.0:5005';
   }
 
+  @override
   String threeBotApiUrl() {
-    return "http://192.168.0.0:5000/api";
+    return 'http://192.168.0.0:5000/api';
   }
 
+  @override
   String threeBotFrontEndUrl() {
-    return "http://192.168.0.0:8080/";
+    return 'http://192.168.0.0:8080/';
   }
 
+  @override
   String threeBotSocketUrl() {
-    return "ws://192.168.0.0:5000";
+    return 'ws://192.168.0.0:5000';
   }
 
+  @override
   String wizardUrl() {
     return 'https://wizard.jimber.org/';
   }
 
+  @override
   String pKidUrl() {
-      return 'http://192.168.2.174:8080/v1';
+    return 'http://192.168.2.174:8080/v1';
   }
 
+  @override
   Map<String, String> flagSmithConfig() {
-      return {
-        'url': 'https://flagsmith.jimber.io/api/v1/',
-        'apiKey': 'm3L3gTcQYcFwCzSGxFJJWd'
-      };
+    return {
+      'url': 'https://flagsmith.jimber.io/api/v1/',
+      'apiKey': 'm3L3gTcQYcFwCzSGxFJJWd'
+    };
   }
 }

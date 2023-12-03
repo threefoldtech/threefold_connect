@@ -106,17 +106,16 @@ class JRouter {
     return containers;
   }
 
-  List<Container> getAppButtons() {
-    List<Container> iconButtons = [];
+  List<Tab> getAppButtons() {
+    List<Tab> iconButtons = [];
     routes.forEach((r) {
-      iconButtons.add(Container(
-          child: Tab(
+      iconButtons.add(Tab(
         icon: Icon(
           r.route.icon,
           size: 40,
         ),
         text: r.route.name,
-      )));
+      ));
     });
     return iconButtons;
   }

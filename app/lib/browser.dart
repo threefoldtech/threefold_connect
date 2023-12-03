@@ -4,13 +4,13 @@ class MyInAppBrowser extends InAppBrowser {
   @override
   void onLoadStart(Uri? url) {
     super.onLoadStart(url);
-    print("\n\nStarted $url\n\n");
+    print('\n\nStarted $url\n\n');
   }
 
   @override
   void onLoadStop(Uri? url) {
     super.onLoadStop(url);
-    print("\n\nStopped $url\n\n");
+    print('\n\nStopped $url\n\n');
   }
 
   // @override
@@ -22,8 +22,8 @@ class MyInAppBrowser extends InAppBrowser {
   @override
   void onExit() {
     super.onExit();
-    print("\n\nBrowser closed!\n\n");
+    print('\n\nBrowser closed!\n\n');
   }
 }
 
-MyInAppBrowser inAppBrowser = new MyInAppBrowser();
+MyInAppBrowser inAppBrowser = MyInAppBrowser();

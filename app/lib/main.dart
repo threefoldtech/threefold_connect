@@ -31,7 +31,12 @@ Future<void> setGlobalValues() async {
 }
 
 class MyApp extends StatelessWidget {
-  MyApp({required this.initDone, this.doubleName, required this.registered});
+  const MyApp({
+    super.key,
+    required this.initDone,
+    this.doubleName,
+    required this.registered,
+  });
 
   final bool initDone;
   final String? doubleName;
