@@ -54,6 +54,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSwatch().copyWith(
           secondary: HexColor('#57BE8E'),
           brightness: Brightness.light,
+          background: Colors.white,
         ),
         brightness: Brightness.light,
         textTheme: textTheme,
