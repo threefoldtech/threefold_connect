@@ -18,7 +18,7 @@ Future<Response> sendSignedData(String state, String socketRoom,
   Uri url = Uri.parse('$threeBotApiUrl/signedSignDataAttempt');
   print('Sending call: ${url.toString()}');
 
-  String timestamp = new DateTime.now().millisecondsSinceEpoch.toString();
+  String timestamp = DateTime.now().millisecondsSinceEpoch.toString();
 
   Uint8List sk = await getPrivateKey();
   String encodedBody = jsonEncode({
@@ -78,12 +78,12 @@ Future<Response> sendPublicKey(Map<String, Object> data) async {
   Uri url = Uri.parse('$threeBotApiUrl/savederivedpublickey');
   print('Sending call: ${url.toString()}');
 
-  String timestamp = new DateTime.now().millisecondsSinceEpoch.toString();
+  String timestamp = DateTime.now().millisecondsSinceEpoch.toString();
   Uint8List sk = await getPrivateKey();
 
   Map<String, String> headers = {
-    "timestamp": timestamp,
-    "intention": "post-savederivedpublickey"
+    'timestamp': timestamp,
+    'intention': 'post-savederivedpublickey'
   };
   String signedHeaders = await signData(jsonEncode(headers), sk);
 
@@ -104,7 +104,7 @@ Future<Response> sendProductReservation(Map<String, Object> data) async {
 
   String signedData = await signData(jsonEncode(data), sk);
 
-  var body = json.encode({"doubleName": doubleName, "data": signedData});
+  var body = json.encode({'doubleName': doubleName, 'data': signedData});
   return await http
       .put(url, body: body, headers: {'Content-type': 'application/json'});
 }
@@ -193,7 +193,7 @@ Future<Response> finishRegistration(
 
   return http.post(url,
       body: json.encode({
-        'doubleName': doubleName + '.3bot',
+        'doubleName': '${doubleName}.3bot',
         'sid': sid,
         'email': email.toLowerCase().trim(),
         'public_key': publicKey
@@ -240,7 +240,7 @@ Future<Response> activateDigitalTwin(
   Uint8List privateKey = await getPrivateKey();
   String signedData = await signData(jsonEncode(jsonObject), privateKey);
 
-  var body = json.encode({"doubleName": doubleName, "data": signedData});
+  var body = json.encode({'doubleName': doubleName, 'data': signedData});
   return await http
       .post(url, body: body, headers: {'Content-type': 'application/json'});
 }

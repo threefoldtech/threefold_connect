@@ -30,11 +30,11 @@ Future<Uint8List> getPublicKey() async {
 
   var userInfoResponse = await getUserInfo(await getDoubleName());
   if (userInfoResponse.statusCode != 200) {
-    throw new Exception('User not found');
+    throw Exception('User not found');
   }
 
   var userInfo = json.decode(userInfoResponse.body);
-  var done = await prefs.setString("publickey", userInfo['publicKey']);
+  var done = await prefs.setString('publickey', userInfo['publicKey']);
 
   if (done && prefs.getString('publickey') == userInfo['publicKey']) {
     setPublicKeyFixed();
@@ -413,12 +413,12 @@ Future<bool> getInitDone() async {
 
 Future<bool> savePreviousState(String state) async {
   final SharedPreferences prefs = await SharedPreferences.getInstance();
-  return await prefs.setString("previousState", state);
+  return await prefs.setString('previousState', state);
 }
 
 Future<String?> getPreviousState() async {
   final SharedPreferences prefs = await SharedPreferences.getInstance();
-  return prefs.getString("previousState");
+  return prefs.getString('previousState');
 }
 
 ///

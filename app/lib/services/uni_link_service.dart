@@ -35,7 +35,7 @@ void handleLoginUniLink(Uri link, BuildContext context) async {
   String? jsonScope = link.queryParameters['scope'];
   String? state = link.queryParameters['state'];
 
-  if (jsonScope == null && (state == null || state == "undefined")) {
+  if (jsonScope == null && (state == null || state == 'undefined')) {
     return;
   }
 
@@ -52,7 +52,7 @@ void handleLoginUniLink(Uri link, BuildContext context) async {
     context,
     MaterialPageRoute(
       builder: (context) => AuthenticationScreen(
-          correctPin: pin!, userMessage: "Please enter your PIN code"),
+          correctPin: pin!, userMessage: 'Please enter your PIN code'),
     ),
   );
 
@@ -121,7 +121,7 @@ Future<void> handleSignUniLink(Uri link, BuildContext context) async {
     context,
     MaterialPageRoute(
       builder: (context) => AuthenticationScreen(
-          correctPin: pin!, userMessage: "Please enter your PIN code"),
+          correctPin: pin!, userMessage: 'Please enter your PIN code'),
     ),
   );
 
