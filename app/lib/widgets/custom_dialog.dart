@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 
 class CustomDialog extends StatefulWidget {
   final String? description;
@@ -7,15 +6,16 @@ class CustomDialog extends StatefulWidget {
   final List<Widget>? actions;
   final String title;
   final IconData image;
-  final dynamic hiddenaction;
+  final dynamic hiddenAction;
 
-  CustomDialog({
+  const CustomDialog({
+    super.key,
     required this.title,
     this.description,
     this.widgetDescription,
     this.actions,
     this.image = Icons.person,
-    this.hiddenaction,
+    this.hiddenAction,
   });
 
   show(context) {
@@ -24,13 +24,13 @@ class CustomDialog extends StatefulWidget {
       barrierDismissible: false,
       builder: (BuildContext context) => CustomDialog(
         image: Icons.error,
-        title: this.title,
-        description: this.description,
-        widgetDescription: this.widgetDescription,
+        title: title,
+        description: description,
+        widgetDescription: widgetDescription,
         actions: <Widget>[
           //@todo make this configurable, ok;okcancel
           TextButton(
-            child: new Text("Ok"),
+            child: const Text('Ok'),
             onPressed: () {
               Navigator.pop(context);
             },
@@ -41,7 +41,7 @@ class CustomDialog extends StatefulWidget {
   }
 
   @override
-  _CustomDialogState createState() => _CustomDialogState();
+  State<CustomDialog> createState() => _CustomDialogState();
 }
 
 class _CustomDialogState extends State<CustomDialog> {
@@ -51,13 +51,13 @@ class _CustomDialogState extends State<CustomDialog> {
       barrierDismissible: false,
       builder: (BuildContext context) => CustomDialog(
         image: Icons.error,
-        title: this.widget.title,
-        description: this.widget.description,
-        widgetDescription: this.widget.widgetDescription,
+        title: widget.title,
+        description: widget.description,
+        widgetDescription: widget.widgetDescription,
         actions: <Widget>[
           //@todo make this configurable, ok;okcancel
           TextButton(
-            child: new Text("Ok"),
+            child: const Text('Ok'),
             onPressed: () {
               Navigator.pop(context);
             },
@@ -96,12 +96,12 @@ class _CustomDialogState extends State<CustomDialog> {
           overlayColor: MaterialStateProperty.all(Colors.transparent),
         ),
         onPressed: () {
-          if (widget.hiddenaction != null) {
+          if (widget.hiddenAction != null) {
             timesPressed++;
             // logger.log('= ' + hiddenaction.toString());
             // logger.log('--------------+++++++++ ' + timesPressed.toString());
             if (timesPressed >= timesPressedToReveal) {
-              widget.hiddenaction();
+              widget.hiddenAction();
               timesPressed = 0;
             }
           }
@@ -121,20 +121,20 @@ class _CustomDialogState extends State<CustomDialog> {
 
   card(context) {
     return ConstrainedBox(
-      constraints:
-          BoxConstraints(maxHeight: double.infinity, maxWidth: double.infinity),
+      constraints: const BoxConstraints(
+          maxHeight: double.infinity, maxWidth: double.infinity),
       child: Container(
-        padding: EdgeInsets.only(top: 30.0 + 20.0),
-        margin: EdgeInsets.only(top: 30.0),
-        decoration: new BoxDecoration(
+        padding: const EdgeInsets.only(top: 30.0 + 20.0),
+        margin: const EdgeInsets.only(top: 30.0),
+        decoration: BoxDecoration(
           color: Colors.white,
           shape: BoxShape.rectangle,
           borderRadius: BorderRadius.circular(20.0),
-          boxShadow: [
+          boxShadow: const [
             BoxShadow(
               color: Colors.black26,
               blurRadius: 10.0,
-              offset: const Offset(0.0, 10.0),
+              offset: Offset(0.0, 10.0),
             ),
           ],
         ),
@@ -143,21 +143,21 @@ class _CustomDialogState extends State<CustomDialog> {
           // mainAxisSize: MainAxisSize.min, // To make the card compact
           children: <Widget>[
             Container(
-              padding: EdgeInsets.symmetric(horizontal: 20.0),
+              padding: const EdgeInsets.symmetric(horizontal: 20.0),
               child: Text(
                 widget.title,
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 20.0,
                   fontWeight: FontWeight.bold,
                 ),
                 textAlign: TextAlign.center,
               ),
             ),
-            SizedBox(height: 16.0),
+            const SizedBox(height: 16.0),
             ConstrainedBox(
               constraints: const BoxConstraints(maxHeight: 300, maxWidth: 310),
               child: Container(
-                padding: EdgeInsets.symmetric(horizontal: 5.0),
+                padding: const EdgeInsets.symmetric(horizontal: 5.0),
                 child: (widget.widgetDescription == null)
                     ? Text(
                         widget.description!,
@@ -166,20 +166,20 @@ class _CustomDialogState extends State<CustomDialog> {
                     : widget.widgetDescription,
               ),
             ),
-            SizedBox(height: 24.0),
-            widget.actions != null && widget.actions!.length > 0
+            const SizedBox(height: 24.0),
+            widget.actions != null && widget.actions!.isNotEmpty
                 ? Container(
-                    decoration: new BoxDecoration(
+                    decoration: BoxDecoration(
                       color: Theme.of(context).scaffoldBackgroundColor,
                       shape: BoxShape.rectangle,
-                      borderRadius: BorderRadius.vertical(
+                      borderRadius: const BorderRadius.vertical(
                         bottom: Radius.circular(20),
                       ),
-                      boxShadow: [
+                      boxShadow: const [
                         BoxShadow(
                           color: Colors.black26,
                           blurRadius: 10.0,
-                          offset: const Offset(0.0, 10.0),
+                          offset: Offset(0.0, 10.0),
                         ),
                       ],
                     ),

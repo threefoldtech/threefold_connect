@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 
 class ReuseableTextFieldStep extends StatelessWidget {
-  ReuseableTextFieldStep(
-      {required this.titleText,
+  const ReuseableTextFieldStep(
+      {super.key,
+      required this.titleText,
       required this.labelText,
       required this.focusNode,
       required this.controller,
@@ -25,9 +26,9 @@ class ReuseableTextFieldStep extends StatelessWidget {
       children: <Widget>[
         Text(
           titleText,
-          style: TextStyle(fontWeight: FontWeight.bold),
+          style: const TextStyle(fontWeight: FontWeight.bold),
         ),
-        Divider(
+        const Divider(
           height: 50,
         ),
         Padding(
@@ -40,7 +41,7 @@ class ReuseableTextFieldStep extends StatelessWidget {
               border: OutlineInputBorder(),
               labelText: labelText,
               suffixText: suffixText,
-              suffixStyle: TextStyle(fontWeight: FontWeight.bold),
+              suffixStyle: const TextStyle(fontWeight: FontWeight.bold),
             ),
             controller: controller,
           ),
@@ -48,16 +49,16 @@ class ReuseableTextFieldStep extends StatelessWidget {
         Row(
           children: <Widget>[
             Padding(
-              padding: EdgeInsets.only(top: 10),
+              padding: const EdgeInsets.only(top: 10),
               child: Text(
                 errorStepperText,
-                style: TextStyle(color: Colors.red),
+                style: const TextStyle(color: Colors.red),
                 textAlign: TextAlign.left,
               ),
             ),
           ],
         ),
-        Divider(
+        const Divider(
           height: 50,
         ),
       ],

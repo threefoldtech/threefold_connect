@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 
 class ReuseableTextStep extends StatelessWidget {
-  ReuseableTextStep(
-      {required this.titleText,
+  const ReuseableTextStep(
+      {super.key,
+      required this.titleText,
       required this.extraText,
       required this.errorStepperText});
 
@@ -17,20 +18,19 @@ class ReuseableTextStep extends StatelessWidget {
         Text(
           titleText,
         ),
-        Divider(
+        const Divider(
           height: 50,
         ),
         Padding(
           padding: const EdgeInsets.only(top: 8.5),
-          child: Container(
-            child: Center(
-              child: Card(
-                child: Padding(
-                  padding: const EdgeInsets.all(5),
-                  child: Text(
-                    extraText,
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24),
-                  ),
+          child: Center(
+            child: Card(
+              child: Padding(
+                padding: const EdgeInsets.all(5),
+                child: Text(
+                  extraText,
+                  style: const TextStyle(
+                      fontWeight: FontWeight.bold, fontSize: 24),
                 ),
               ),
             ),
@@ -39,22 +39,21 @@ class ReuseableTextStep extends StatelessWidget {
         Row(
           children: <Widget>[
             Padding(
-              padding: EdgeInsets.only(top: 10),
+              padding: const EdgeInsets.only(top: 10),
               child: Text(
                 errorStepperText,
-                style: TextStyle(color: Colors.red),
+                style: const TextStyle(color: Colors.red),
                 textAlign: TextAlign.left,
               ),
             ),
           ],
         ),
-        Divider(
+        const Divider(
           height: 5,
         ),
-        Row(
+        const Row(
           mainAxisAlignment: MainAxisAlignment.start,
-          children: const <Widget>[
-          ],
+          children: <Widget>[],
         )
       ],
     );

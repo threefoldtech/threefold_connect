@@ -2,13 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:threebotlogin/helpers/globals.dart';
 
 class LayoutDrawer extends StatefulWidget {
-  LayoutDrawer({required this.titleText, required this.content});
+  const LayoutDrawer(
+      {super.key, required this.titleText, required this.content});
 
   final String titleText;
   final Widget content;
 
   @override
-  _LayoutDrawerState createState() => _LayoutDrawerState();
+  State<LayoutDrawer> createState() => _LayoutDrawerState();
 }
 
 class _LayoutDrawerState extends State<LayoutDrawer> {
@@ -22,7 +23,7 @@ class _LayoutDrawerState extends State<LayoutDrawer> {
         // the App.build method, and use it to set our appbar title.
         title: Text(widget.titleText),
         backgroundColor: Theme.of(context).primaryColor,
-        iconTheme: IconThemeData(color: Colors.white),
+        iconTheme: const IconThemeData(color: Colors.white),
         toolbarHeight: 60,
       ),
       body: widget.content,
@@ -33,16 +34,16 @@ class _LayoutDrawerState extends State<LayoutDrawer> {
           // Important: Remove any padding from the ListView.
           padding: EdgeInsets.zero,
           children: <Widget>[
-            Container(
+            const SizedBox(
               width: 200,
               height: 100,
               child: Padding(
-                  padding: const EdgeInsets.all(20),
+                  padding: EdgeInsets.all(20),
                   child: DrawerHeader(
                     decoration: BoxDecoration(
-                      image: new DecorationImage(
+                      image: DecorationImage(
                         alignment: Alignment.center,
-                        image: AssetImage("assets/logo.png"),
+                        image: AssetImage('assets/logo.png'),
                         fit: BoxFit.contain,
                       ),
                     ),
@@ -51,14 +52,14 @@ class _LayoutDrawerState extends State<LayoutDrawer> {
             ),
             ListTile(
               minLeadingWidth: 10,
-              leading: Column(
+              leading: const Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
-                  Padding(padding: const EdgeInsets.only(left: 30)),
+                  Padding(padding: EdgeInsets.only(left: 30)),
                   Icon(Icons.home, color: Colors.black, size: 18)
                 ],
               ),
-              title: Text('Home'),
+              title: const Text('Home'),
               onTap: () {
                 Navigator.pop(context);
                 globals.tabController.animateTo(0);
@@ -66,14 +67,14 @@ class _LayoutDrawerState extends State<LayoutDrawer> {
             ),
             ListTile(
               minLeadingWidth: 10,
-              leading: Column(
+              leading: const Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
-                  Padding(padding: const EdgeInsets.only(left: 30)),
+                  Padding(padding: EdgeInsets.only(left: 30)),
                   Icon(Icons.article, color: Colors.black, size: 18)
                 ],
               ),
-              title: Text('News'),
+              title: const Text('News'),
               onTap: () {
                 Navigator.pop(context);
                 globals.tabController.animateTo(1);
@@ -81,15 +82,15 @@ class _LayoutDrawerState extends State<LayoutDrawer> {
             ),
             ListTile(
               minLeadingWidth: 10,
-              leading: Column(
+              leading: const Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
-                  Padding(padding: const EdgeInsets.only(left: 30)),
+                  Padding(padding: EdgeInsets.only(left: 30)),
                   Icon(Icons.account_balance_wallet,
                       color: Colors.black, size: 18)
                 ],
               ),
-              title: Text('Wallet'),
+              title: const Text('Wallet'),
               onTap: () {
                 Navigator.pop(context);
                 globals.tabController.animateTo(2);
@@ -101,7 +102,7 @@ class _LayoutDrawerState extends State<LayoutDrawer> {
                 leading: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
-                    Padding(padding: const EdgeInsets.only(left: 30)),
+                    const Padding(padding: EdgeInsets.only(left: 30)),
                     Image.asset(
                       'assets/server.png',
                       scale: 1.0,
@@ -110,7 +111,7 @@ class _LayoutDrawerState extends State<LayoutDrawer> {
                     ),
                   ],
                 ),
-                title: Text('Farming'),
+                title: const Text('Farming'),
                 onTap: () {
                   Navigator.pop(context);
                   globals.tabController.animateTo(3);
@@ -120,14 +121,14 @@ class _LayoutDrawerState extends State<LayoutDrawer> {
               Container(),
             ListTile(
               minLeadingWidth: 10,
-              leading: Column(
+              leading: const Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
-                  Padding(padding: const EdgeInsets.only(left: 30)),
+                  Padding(padding: EdgeInsets.only(left: 30)),
                   Icon(Icons.chat, color: Colors.black, size: 18)
                 ],
               ),
-              title: Text('Support'),
+              title: const Text('Support'),
               onTap: () {
                 Navigator.pop(context);
                 globals.tabController.animateTo(4);
@@ -135,14 +136,14 @@ class _LayoutDrawerState extends State<LayoutDrawer> {
             ),
             ListTile(
               minLeadingWidth: 10,
-              leading: Column(
+              leading: const Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
-                  Padding(padding: const EdgeInsets.only(left: 30)),
+                  Padding(padding: EdgeInsets.only(left: 30)),
                   Icon(Icons.person_outlined, color: Colors.black, size: 18)
                 ],
               ),
-              title: Text('Identity'),
+              title: const Text('Identity'),
               onTap: () {
                 Navigator.pop(context);
                 globals.tabController.animateTo(5);
@@ -150,14 +151,14 @@ class _LayoutDrawerState extends State<LayoutDrawer> {
             ),
             ListTile(
               minLeadingWidth: 10,
-              leading: Column(
+              leading: const Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
-                  Padding(padding: const EdgeInsets.only(left: 30)),
+                  Padding(padding: EdgeInsets.only(left: 30)),
                   Icon(Icons.settings, color: Colors.black, size: 18)
                 ],
               ),
-              title: Text('Settings'),
+              title: const Text('Settings'),
               onTap: () {
                 Navigator.pop(context);
                 globals.tabController.animateTo(6);

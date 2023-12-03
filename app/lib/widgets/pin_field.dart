@@ -8,17 +8,18 @@ class PinField extends StatefulWidget {
   final callbackParam;
   final Function? callbackFunction;
 
-  PinField(
-      {Key? key,
-      @required this.callback,
+  const PinField(
+      {super.key,
+      required this.callback,
       this.callbackParam,
-      this.callbackFunction})
-      : super(key: key);
+      this.callbackFunction});
 
-  _PinFieldState createState() => _PinFieldState();
+  @override
+  State<PinField> createState() => _PinFieldState();
 }
 
 class _PinFieldState extends State<PinField> {
+  @override
   void initState() {
     super.initState();
     if (widget.callbackFunction != null) {
@@ -36,34 +37,37 @@ class _PinFieldState extends State<PinField> {
       margin: EdgeInsets.all(height / 120),
       height: height / 50,
       width: size,
-      decoration: BoxDecoration(color: Colors.black, shape: BoxShape.circle),
-      duration: Duration(milliseconds: 100),
+      decoration:
+          const BoxDecoration(color: Colors.black, shape: BoxShape.circle),
+      duration: const Duration(milliseconds: 100),
       curve: Curves.bounceInOut,
     );
   }
 
   Widget buildNumberPin(String buttonText, BuildContext context,
-      {Color backgroundColor= Colors.blueGrey}) {
+      {Color backgroundColor = Colors.blueGrey}) {
     var onPressedMethod = () => handleInput(buttonText);
     double height = MediaQuery.of(context).size.height;
 
-    if (buttonText == 'OK')
+    if (buttonText == 'OK') {
       onPressedMethod =
           (input.length >= widget.pinLength ? () => onOk() : () {});
-    if (buttonText == 'C')
-      onPressedMethod = (input.length >= 1 ? () => onClear() : () {});
+    }
+    if (buttonText == 'C') {
+      onPressedMethod = (input.isNotEmpty ? () => onClear() : () {});
+    }
     return Container(
         padding: EdgeInsets.only(top: height / 136, bottom: height / 136),
         child: Center(
             child: RawMaterialButton(
-          padding: EdgeInsets.all(12),
-          child: Text(
-            buttonText,
-            style: TextStyle(color: Colors.white, fontSize: 20),
-          ),
+          padding: const EdgeInsets.all(12),
           onPressed: onPressedMethod,
           fillColor: backgroundColor,
-          shape: CircleBorder(),
+          shape: const CircleBorder(),
+          child: Text(
+            buttonText,
+            style: const TextStyle(color: Colors.white, fontSize: 20),
+          ),
         )));
   }
 
@@ -84,21 +88,22 @@ class _PinFieldState extends State<PinField> {
     ];
     List<Widget> pins = List.generate(possibleInput.length, (int i) {
       String buttonText = possibleInput[i];
-      if (buttonText == 'C')
+      if (buttonText == 'C') {
         return buildNumberPin(possibleInput[i], context,
-            backgroundColor: input.length >= 1
+            backgroundColor: input.isNotEmpty
                 ? Colors.yellow.shade700
                 : Colors.yellow.shade200);
-      else if (buttonText == 'OK')
+      } else if (buttonText == 'OK') {
         return buildNumberPin(possibleInput[i], context,
             backgroundColor: input.length >= widget.pinLength
                 ? Colors.green.shade600
                 : Colors.green.shade100);
-      else
+      } else {
         return buildNumberPin(possibleInput[i], context,
             backgroundColor: HexColor('#0a73b8'));
+      }
     });
-    return Container(
+    return SizedBox(
       width: double.infinity,
       child: Center(
         child: Column(
@@ -140,7 +145,7 @@ class _PinFieldState extends State<PinField> {
   Widget build(BuildContext context) {
     return Column(children: [
       generateTextFields(context),
-      SizedBox(height: 25),
+      const SizedBox(height: 25),
       generateNumbers(context),
     ]);
   }

@@ -361,7 +361,7 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
       showDialog(
         context: context,
         builder: (BuildContext context) => CustomDialog(
-          hiddenaction: copySeedPhrase,
+          hiddenAction: copySeedPhrase,
           image: Icons.create,
           title: "Please write this down on a piece of paper",
           description: phrase.toString(),
