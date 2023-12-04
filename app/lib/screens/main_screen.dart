@@ -19,13 +19,13 @@ import 'package:threebotlogin/widgets/error_widget.dart';
 import 'package:uni_links/uni_links.dart';
 
 class MainScreen extends StatefulWidget {
+  const MainScreen({super.key, this.initDone, this.registered});
+
   final bool? initDone;
   final bool? registered;
 
-  const MainScreen({this.initDone, this.registered});
-
   @override
-  _AppState createState() => _AppState();
+  State<MainScreen> createState() => _AppState();
 }
 
 class _AppState extends State<MainScreen> {
@@ -239,7 +239,7 @@ class _AppState extends State<MainScreen> {
       try {
         String baseUrl = AppConfig().baseUrl();
         final List<InternetAddress> result =
-            await InternetAddress.lookup('$baseUrl')
+            await InternetAddress.lookup(baseUrl)
                 .timeout(Duration(seconds: Globals().timeOutSeconds));
 
         if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {

@@ -18,11 +18,12 @@ import 'package:threebotlogin/widgets/login_dialogs.dart';
 import 'package:threebotlogin/widgets/preference_dialog.dart';
 
 class LoginScreen extends StatefulWidget {
+  const LoginScreen(this.loginData, {super.key});
+
   final Login loginData;
 
-  LoginScreen(this.loginData);
-
-  _LoginScreenState createState() => _LoginScreenState();
+  @override
+  State<LoginScreen> createState() => _LoginScreenState();
 }
 
 class _LoginScreenState extends State<LoginScreen> with BlockAndRunMixin {

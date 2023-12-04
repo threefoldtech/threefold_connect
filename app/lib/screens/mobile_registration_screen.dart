@@ -19,11 +19,12 @@ import 'package:threebotlogin/widgets/reusable_text_field_step.dart';
 import 'package:threebotlogin/widgets/reusable_text_step.dart';
 
 class MobileRegistrationScreen extends StatefulWidget {
+  const MobileRegistrationScreen({super.key, this.doubleName});
+
   final String? doubleName;
 
-  MobileRegistrationScreen({this.doubleName});
-
-  _MobileRegistrationScreenState createState() =>
+  @override
+  State<MobileRegistrationScreen> createState() =>
       _MobileRegistrationScreenState();
 }
 
@@ -52,7 +53,7 @@ class _MobileRegistrationScreenState extends State<MobileRegistrationScreen> {
   final FocusNode emailFocus = FocusNode();
   final FocusNode seedFocus = FocusNode();
 
-  RegistrationData _registrationData = RegistrationData();
+  final RegistrationData _registrationData = RegistrationData();
 
   @override
   void initState() {
@@ -101,8 +102,8 @@ class _MobileRegistrationScreenState extends State<MobileRegistrationScreen> {
       doubleNameController.text = doubleNameValue;
     });
 
-    if (doubleNameController.text != null || doubleNameController.text != '') {
-      _registrationData.doubleName = doubleNameController.text + '.3bot';
+    if (doubleNameController.text.isNotEmpty) {
+      _registrationData.doubleName = '${doubleNameController.text}.3bot';
       bool doubleNameValidation = validateDoubleName(doubleNameController.text);
       if (doubleNameValidation) {
         Response userInfoResult =
@@ -200,7 +201,7 @@ class _MobileRegistrationScreenState extends State<MobileRegistrationScreen> {
   }
 
   initKeys() async {
-    if (_registrationData.phrase == null || _registrationData.phrase == '') {
+    if (_registrationData.phrase == '') {
       _registrationData.phrase = await generateSeedPhrase();
     }
   }
@@ -524,9 +525,9 @@ class _MobileRegistrationScreenState extends State<MobileRegistrationScreen> {
                   Padding(
                     padding: const EdgeInsets.only(top: 8.0, bottom: 4.0),
                     child: ListTile(
-                      leading: Icon(Icons.person),
+                      leading: const Icon(Icons.person),
                       title: Text(doubleNameController.text),
-                      trailing: Icon(Icons.edit),
+                      trailing: const Icon(Icons.edit),
                       onTap: () => setState(() {
                         state = _State.DoubleName;
                         FocusScope.of(context).requestFocus(nameFocus);
@@ -536,9 +537,9 @@ class _MobileRegistrationScreenState extends State<MobileRegistrationScreen> {
                   Padding(
                     padding: const EdgeInsets.only(top: 4.0, bottom: 15.0),
                     child: ListTile(
-                        leading: Icon(Icons.email),
+                        leading: const Icon(Icons.email),
                         title: Text(emailController.text),
-                        trailing: Icon(Icons.edit),
+                        trailing: const Icon(Icons.edit),
                         onTap: () => setState(() {
                               state = _State.Email;
                               FocusScope.of(context).requestFocus(emailFocus);
@@ -582,10 +583,10 @@ class _MobileRegistrationScreenState extends State<MobileRegistrationScreen> {
         ? Row(
             children: <Widget>[
               Padding(
-                padding: EdgeInsets.only(top: 10),
+                padding: const EdgeInsets.only(top: 10),
                 child: Text(
                   errorStepperText,
-                  style: TextStyle(color: Colors.red),
+                  style: const TextStyle(color: Colors.red),
                   textAlign: TextAlign.left,
                 ),
               ),

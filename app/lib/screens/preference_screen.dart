@@ -19,10 +19,10 @@ import 'package:threebotlogin/widgets/layout_drawer.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class PreferenceScreen extends StatefulWidget {
-  PreferenceScreen({Key? key}) : super(key: key);
+  const PreferenceScreen({super.key});
 
   @override
-  _PreferenceScreenState createState() => _PreferenceScreenState();
+  State<PreferenceScreen> createState() => _PreferenceScreenState();
 }
 
 class _PreferenceScreenState extends State<PreferenceScreen> {
@@ -31,11 +31,7 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
   String doubleName = '';
   String phrase = '';
   bool showAdvancedOptions = false;
-  Icon showAdvancedOptionsIcon = Icon(Icons.keyboard_arrow_down);
-
-  String emailAdress = '';
-  String phoneAdress = '';
-  String identity = '';
+  Icon showAdvancedOptionsIcon = const Icon(Icons.keyboard_arrow_down);
 
   BuildContext? preferenceContext;
   bool biometricsCheck = false;
@@ -91,11 +87,11 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
           ),
           ListView(
             children: <Widget>[
-              ListTile(
-                title: Text("Global settings"),
+              const ListTile(
+                title: Text('Global settings'),
               ),
               ListTile(
-                leading: Icon(Icons.person),
+                leading: const Icon(Icons.person),
                 title: Text(doubleName),
               ),
               FutureBuilder(
@@ -103,12 +99,12 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
                 builder: (context, snapshot) {
                   if (snapshot.hasData) {
                     return ListTile(
-                      trailing: Padding(
-                        padding: new EdgeInsets.only(right: 7.5),
+                      trailing: const Padding(
+                        padding: EdgeInsets.only(right: 7.5),
                         child: Icon(Icons.visibility),
                       ),
-                      leading: Icon(Icons.vpn_key),
-                      title: Text("Show phrase"),
+                      leading: const Icon(Icons.vpn_key),
+                      title: const Text('Show phrase'),
                       onTap: () async {
                         _showPhrase();
                       },
@@ -127,7 +123,7 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
                             future: getBiometricDeviceName(),
                             builder: (context, snapshot) {
                               if (snapshot.hasData) {
-                                if (snapshot.data == "Not found") {
+                                if (snapshot.data == 'Not found') {
                                   return Container();
                                 }
                                 biometricDeviceName = snapshot.data;
@@ -153,37 +149,37 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
                     }
                   }),
               ListTile(
-                leading: Icon(Icons.lock),
-                title: Text("Change pincode"),
+                leading: const Icon(Icons.lock),
+                title: const Text('Change pincode'),
                 onTap: () async {
                   _changePincode();
                 },
               ),
               ListTile(
-                leading: Icon(Icons.perm_device_information),
-                title: Text("Version: " + version + " - " + buildNumber),
+                leading: const Icon(Icons.perm_device_information),
+                title: Text('Version: $version - $buildNumber'),
                 onTap: () {
                   _showVersionInfo();
                 },
               ),
               ListTile(
-                leading: Icon(Icons.info_outline),
-                title: Text("Terms and conditions"),
+                leading: const Icon(Icons.info_outline),
+                title: const Text('Terms and conditions'),
                 onTap: () async => {await _showTermsAndConds()},
               ),
               ExpansionTile(
-                title: Text(
-                  "Advanced settings",
+                title: const Text(
+                  'Advanced settings',
                   style: TextStyle(color: Colors.black),
                 ),
                 children: <Widget>[
                   ListTile(
-                    leading: Icon(Icons.person),
-                    title: Text(
-                      "Remove Account From Device",
+                    leading: const Icon(Icons.person),
+                    title: const Text(
+                      'Remove Account From Device',
                       style: TextStyle(color: Colors.red),
                     ),
-                    trailing: Icon(
+                    trailing: const Icon(
                       Icons.remove_circle,
                       color: Colors.red,
                     ),
@@ -207,12 +203,12 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
       context: context,
       builder: (BuildContext context) => CustomDialog(
         image: Icons.error,
-        title: "Disable Fingerprint",
+        title: 'Disable Fingerprint',
         description:
-            "Are you sure you want to deactivate fingerprint as authentication method?",
+            'Are you sure you want to deactivate fingerprint as authentication method?',
         actions: <Widget>[
           TextButton(
-            child: new Text("Cancel"),
+            child: const Text('Cancel'),
             onPressed: () async {
               Navigator.pop(context);
               finger = true;
@@ -221,7 +217,7 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
             },
           ),
           TextButton(
-            child: new Text("Yes"),
+            child: const Text('Yes'),
             onPressed: () async {
               Navigator.pop(context);
               finger = false;
@@ -239,18 +235,18 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
       context: context,
       builder: (BuildContext context) => CustomDialog(
         image: Icons.error,
-        title: "Are you sure?",
+        title: 'Are you sure?',
         description:
-            "If you confirm, your account will be removed from this device. You can always recover your account with your username and phrase.",
+            'If you confirm, your account will be removed from this device. You can always recover your account with your username and phrase.',
         actions: <Widget>[
           TextButton(
-            child: new Text("Cancel"),
+            child: const Text('Cancel'),
             onPressed: () {
               Navigator.pop(context);
             },
           ),
           TextButton(
-            child: new Text("Yes"),
+            child: const Text('Yes'),
             onPressed: () async {
               // try {
               //   String deviceID = await _listener.getToken();
@@ -351,7 +347,7 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
         MaterialPageRoute(
           builder: (context) => AuthenticationScreen(
             correctPin: pin!,
-            userMessage: "Please enter your PIN code",
+            userMessage: 'Please enter your PIN code',
           ),
         ));
 
@@ -363,12 +359,12 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
         builder: (BuildContext context) => CustomDialog(
           hiddenAction: copySeedPhrase,
           image: Icons.create,
-          title: "Please write this down on a piece of paper",
+          title: 'Please write this down on a piece of paper',
           description: phrase.toString(),
           actions: <Widget>[
             // usually buttons at the bottom of the dialog
             TextButton(
-              child: new Text("Close"),
+              child: new Text('Close'),
               onPressed: () {
                 Navigator.pop(context);
                 setState(() {});
@@ -388,7 +384,7 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
       MaterialPageRoute(
         builder: (context) => AuthenticationScreen(
           correctPin: pin!,
-          userMessage: "Please enter your PIN code",
+          userMessage: 'Please enter your PIN code',
         ),
       ),
     );
@@ -412,7 +408,7 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
         MaterialPageRoute(
           builder: (context) => AuthenticationScreen(
             correctPin: pin,
-            userMessage: "Please enter your PIN code",
+            userMessage: 'Please enter your PIN code',
           ),
         ),
       );
@@ -434,11 +430,11 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
           context: context,
           builder: (BuildContext context) => CustomDialog(
             image: Icons.check,
-            title: "Success",
-            description: "Your pincode was successfully changed.",
+            title: 'Success',
+            description: 'Your pincode was successfully changed.',
             actions: <Widget>[
               TextButton(
-                child: new Text("Ok"),
+                child: new Text('Ok'),
                 onPressed: () async {
                   Navigator.pop(context);
                 },

@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:threebotlogin/helpers/hex_color.dart';
 
 class WarningScreen extends StatefulWidget {
-  WarningScreen();
+  const WarningScreen({super.key});
 
   @override
-  _WarningScreenState createState() => _WarningScreenState();
+  State<WarningScreen> createState() => _WarningScreenState();
 }
 
 class _WarningScreenState extends State<WarningScreen> {
@@ -21,13 +21,13 @@ class _WarningScreenState extends State<WarningScreen> {
       home: Scaffold(
         appBar: AppBar(
           backgroundColor: HexColor('#2d4052'),
-          title: Text('Login from a new location'),
+          title: const Text('Login from a new location'),
         ),
         body: Padding(
           padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
           child: Column(
             children: <Widget>[
-              Row(
+              const Row(
                 children: <Widget>[
                   Icon(
                     Icons.warning,
@@ -35,7 +35,7 @@ class _WarningScreenState extends State<WarningScreen> {
                     size: 48,
                   ),
                   Padding(
-                    padding: const EdgeInsets.fromLTRB(10, 0, 0, 0),
+                    padding: EdgeInsets.fromLTRB(10, 0, 0, 0),
                     child: Text(
                       'Security warning!',
                       style: TextStyle(fontWeight: FontWeight.bold),
@@ -43,11 +43,11 @@ class _WarningScreenState extends State<WarningScreen> {
                   )
                 ],
               ),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(0, 16, 0, 16),
+              const Padding(
+                padding: EdgeInsets.fromLTRB(0, 16, 0, 16),
                 child: Divider(),
               ),
-              Wrap(
+              const Wrap(
                 direction: Axis.horizontal,
                 children: <Widget>[
                   Text(
@@ -71,11 +71,11 @@ class _WarningScreenState extends State<WarningScreen> {
                   )
                 ],
               ),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(0, 16, 0, 0),
+              const Padding(
+                padding: EdgeInsets.fromLTRB(0, 16, 0, 0),
                 child: Divider(),
               ),
-              Wrap(
+              const Wrap(
                 direction: Axis.horizontal,
                 children: <Widget>[
                   Text(
@@ -89,10 +89,6 @@ class _WarningScreenState extends State<WarningScreen> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: <Widget>[
                     TextButton(
-                      child: Text(
-                        'No, it doesn\'t',
-                        style: TextStyle(color: Colors.white),
-                      ),
                       style: ButtonStyle(
                         backgroundColor:
                             MaterialStateProperty.all(Colors.redAccent),
@@ -100,12 +96,12 @@ class _WarningScreenState extends State<WarningScreen> {
                       onPressed: () {
                         Navigator.pop(context, false);
                       },
-                    ),
-                    TextButton(
-                      child: Text(
-                        'Yes, it does',
+                      child: const Text(
+                        "No, it doesn't",
                         style: TextStyle(color: Colors.white),
                       ),
+                    ),
+                    TextButton(
                       style: ButtonStyle(
                         backgroundColor:
                             MaterialStateProperty.all(HexColor('#2d4052')),
@@ -113,6 +109,10 @@ class _WarningScreenState extends State<WarningScreen> {
                       onPressed: () {
                         Navigator.pop(context, true);
                       },
+                      child: const Text(
+                        'Yes, it does',
+                        style: TextStyle(color: Colors.white),
+                      ),
                     ),
                   ],
                 ),

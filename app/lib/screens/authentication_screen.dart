@@ -179,7 +179,7 @@ class AuthenticationScreenState extends State<AuthenticationScreen> {
             backgroundColor: HexColor('#0a73b8'));
       }
     });
-    return Container(
+    return SizedBox(
       width: double.infinity,
       child: Center(
         child: Column(
@@ -260,7 +260,7 @@ class AuthenticationScreenState extends State<AuthenticationScreen> {
       pin += char;
     }
 
-    int currentTime = new DateTime.now().millisecondsSinceEpoch;
+    int currentTime = DateTime.now().millisecondsSinceEpoch;
 
     if (globals.incorrectPincodeAttempts >= 3 &&
         (globals.tooManyAuthenticationAttempts &&
@@ -296,7 +296,7 @@ class AuthenticationScreenState extends State<AuthenticationScreen> {
             'Too many incorrect attempts, please wait ${((globals.lockedUntill - currentTime) / 1000).toStringAsFixed(0)} seconds',
       );
     } else {
-      dialog = CustomDialog(
+      dialog = const CustomDialog(
         title: 'Incorrect pin',
         description: 'Your pin code is incorrect.',
       );

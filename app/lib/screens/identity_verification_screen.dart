@@ -22,7 +22,10 @@ import 'package:country_picker/country_picker.dart';
 import 'package:threebotlogin/widgets/phone_widget.dart';
 
 class IdentityVerificationScreen extends StatefulWidget {
-  _IdentityVerificationScreenState createState() =>
+  const IdentityVerificationScreen({super.key});
+
+  @override
+  State<IdentityVerificationScreen> createState() =>
       _IdentityVerificationScreenState();
 }
 
@@ -936,8 +939,7 @@ class _IdentityVerificationScreenState
 
     try {
       Response accessTokenResponse = await getShuftiAccessToken();
-      if (accessTokenResponse.statusCode == 403 ||
-          accessTokenResponse == null) {
+      if (accessTokenResponse.statusCode == 403) {
         setState(() {
           isLoading = false;
         });

@@ -14,11 +14,12 @@ import 'package:threebotlogin/services/pkid_service.dart';
 import 'package:threebotlogin/services/shared_preference_service.dart';
 
 class RecoverScreen extends StatefulWidget {
+  const RecoverScreen({super.key, this.recoverScreen});
+
   final Widget? recoverScreen;
 
-  RecoverScreen({Key? key, this.recoverScreen}) : super(key: key);
-
-  _RecoverScreenState createState() => _RecoverScreenState();
+  @override
+  State<RecoverScreen> createState() => _RecoverScreenState();
 }
 
 class _RecoverScreenState extends State<RecoverScreen> {
@@ -91,6 +92,7 @@ class _RecoverScreenState extends State<RecoverScreen> {
     }
   }
 
+  @override
   void initState() {
     super.initState();
   }

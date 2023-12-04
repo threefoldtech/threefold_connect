@@ -1,14 +1,15 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
 
 class ScanScreen extends StatefulWidget {
-  _ScanScreenState createState() => _ScanScreenState();
+  const ScanScreen({super.key});
+
+  @override
+  State<ScanScreen> createState() => _ScanScreenState();
 }
 
 class _ScanScreenState extends State<ScanScreen> {
-  String helperText = "Aim at QR code to scan";
+  String helperText = 'Aim at QR code to scan';
   bool popped = false;
 
   final GlobalKey qrKey = GlobalKey(debugLabel: 'QR');
@@ -52,25 +53,26 @@ class _ScanScreenState extends State<ScanScreen> {
           child: Container(
             decoration: BoxDecoration(
                 color: Theme.of(context).primaryColor,
-                borderRadius: BorderRadius.only(
+                borderRadius: const BorderRadius.only(
                     topLeft: Radius.circular(20.0),
                     topRight: Radius.circular(20.0))),
-            padding: EdgeInsets.symmetric(vertical: 18.0, horizontal: 24.0),
+            padding:
+                const EdgeInsets.symmetric(vertical: 18.0, horizontal: 24.0),
             width: double.infinity,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: <Widget>[
                 FloatingActionButton(
-                  tooltip: "Go back",
+                  tooltip: 'Go back',
                   backgroundColor: Colors.transparent,
                   elevation: 0.0,
                   mini: true,
                   onPressed: () {
                     Navigator.pop(context);
                   },
-                  child: Icon(Icons.arrow_back_ios),
+                  child: const Icon(Icons.arrow_back_ios),
                 ),
-                Text(
+                const Text(
                   'Scan QR',
                   textAlign: TextAlign.center,
                   style: TextStyle(
@@ -78,7 +80,7 @@ class _ScanScreenState extends State<ScanScreen> {
                       fontWeight: FontWeight.bold,
                       fontSize: 21.0),
                 ),
-                SizedBox(
+                const SizedBox(
                   width: 60.0,
                 )
               ],
@@ -92,10 +94,10 @@ class _ScanScreenState extends State<ScanScreen> {
             child: Container(
               decoration: BoxDecoration(
                   color: Theme.of(context).scaffoldBackgroundColor,
-                  borderRadius: BorderRadius.only(
+                  borderRadius: const BorderRadius.only(
                       topLeft: Radius.circular(20.0),
                       topRight: Radius.circular(20.0))),
-              padding: EdgeInsets.only(top: 12.0, bottom: 12.0),
+              padding: const EdgeInsets.only(top: 12.0, bottom: 12.0),
               width: double.infinity,
               child: Column(
                 children: <Widget>[
@@ -105,13 +107,13 @@ class _ScanScreenState extends State<ScanScreen> {
                     child: Center(
                       child: Text(
                         helperText,
-                        style: TextStyle(fontSize: 16.0),
+                        style: const TextStyle(fontSize: 16.0),
                       ),
                     ),
                   ),
                   AnimatedContainer(
-                    duration: Duration(milliseconds: 100),
-                    padding: EdgeInsets.only(bottom: 12),
+                    duration: const Duration(milliseconds: 100),
+                    padding: const EdgeInsets.only(bottom: 12),
                     curve: Curves.bounceInOut,
                     width: double.infinity,
                     child: null,

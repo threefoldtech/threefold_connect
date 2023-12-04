@@ -4,10 +4,10 @@ import 'package:threebotlogin/app_config.dart';
 import 'package:threebotlogin/services/shared_preference_service.dart';
 
 class InitScreen extends StatefulWidget {
-  InitScreen();
+  const InitScreen({super.key});
 
   @override
-  _InitState createState() => _InitState();
+  State<InitScreen> createState() => _InitState();
 }
 
 class _InitState extends State<InitScreen> {
@@ -15,29 +15,30 @@ class _InitState extends State<InitScreen> {
   late InAppWebView iaWebView;
 
   finish(List<dynamic> params) async {
-    print("**** LOAD DONE ");
+    print('**** LOAD DONE ');
     saveInitDone();
     Navigator.pop(context, true);
   }
 
   addHandler() {
-    webView.addJavaScriptHandler(handlerName: "FINISH", callback: finish);
+    webView.addJavaScriptHandler(handlerName: 'FINISH', callback: finish);
   }
 
   _InitState() {
     iaWebView = InAppWebView(
       initialUrlRequest: URLRequest(
-          url: Uri.parse(AppConfig().wizardUrl() +
-              '?cache_buster=' +
-              new DateTime.now().millisecondsSinceEpoch.toString())),
+          url: Uri.parse(
+              '${AppConfig().wizardUrl()}?cache_buster=${DateTime.now().millisecondsSinceEpoch}')),
       initialOptions: InAppWebViewGroupOptions(
-        android: AndroidInAppWebViewOptions(supportMultipleWindows: true, useHybridComposition: true),
+        android: AndroidInAppWebViewOptions(
+            supportMultipleWindows: true, useHybridComposition: true),
       ),
       onWebViewCreated: (InAppWebViewController controller) {
         webView = controller;
         addHandler();
       },
-      onCreateWindow: (InAppWebViewController controller, CreateWindowAction req) {
+      onCreateWindow:
+          (InAppWebViewController controller, CreateWindowAction req) {
         return Future.value(true);
       },
       onLoadStart: (InAppWebViewController controller, Uri? url) {},

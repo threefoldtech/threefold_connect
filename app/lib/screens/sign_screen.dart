@@ -20,11 +20,12 @@ import 'package:threebotlogin/services/tools_service.dart';
 import 'package:threebotlogin/widgets/custom_dialog.dart';
 
 class SignScreen extends StatefulWidget {
+  const SignScreen(this.signData, {super.key});
+
   final Sign signData;
 
-  SignScreen(this.signData);
-
-  _SignScreenState createState() => _SignScreenState();
+  @override
+  State<SignScreen> createState() => _SignScreenState();
 }
 
 class _SignScreenState extends State<SignScreen> with BlockAndRunMixin {
@@ -81,18 +82,16 @@ class _SignScreenState extends State<SignScreen> with BlockAndRunMixin {
           backgroundColor: Theme.of(context).primaryColor,
           title: const Text('Sign'),
         ),
-        body: Container(
-          child: Column(
-            children: <Widget>[
-              Container(
-                constraints: BoxConstraints(
-                    minHeight: MediaQuery.of(context).size.height * 0.85,
-                    minWidth: MediaQuery.of(context).size.width * 0.85),
-                padding: const EdgeInsets.all(20),
-                child: isDataLoading == true ? loadContainer() : mainLayout(),
-              ),
-            ],
-          ),
+        body: Column(
+          children: <Widget>[
+            Container(
+              constraints: BoxConstraints(
+                  minHeight: MediaQuery.of(context).size.height * 0.85,
+                  minWidth: MediaQuery.of(context).size.width * 0.85),
+              padding: const EdgeInsets.all(20),
+              child: isDataLoading == true ? loadContainer() : mainLayout(),
+            ),
+          ],
         ),
       ),
       onWillPop: () {
@@ -129,7 +128,7 @@ class _SignScreenState extends State<SignScreen> with BlockAndRunMixin {
   Widget wasNotMeButton() {
     return TextButton(
       child: Text(
-        "It wasn\'t me - cancel",
+        "It wasn't me - cancel",
         style: TextStyle(fontSize: 16.0, color: HexColor('#0f296a')),
       ),
       onPressed: () {
@@ -157,7 +156,7 @@ class _SignScreenState extends State<SignScreen> with BlockAndRunMixin {
                   text:
                       ' wants you to sign a data document. The Title of the document is: \n \n'),
               TextSpan(
-                  text: widget.signData.friendlyName! + '\n',
+                  text: '${widget.signData.friendlyName!}\n',
                   style: const TextStyle(
                       fontSize: 14, fontWeight: FontWeight.bold)),
             ]),
@@ -178,109 +177,101 @@ class _SignScreenState extends State<SignScreen> with BlockAndRunMixin {
         isBusy = false;
         setState(() {});
         errorMessage = 'Cant verify hash';
-        return Container(
-            child: const Text(
+        return const Text(
           "Can't verify hash, please cancel this sign attempt",
           style: TextStyle(
               fontWeight: FontWeight.bold, color: Colors.red, fontSize: 15),
-        ));
+        );
       }
 
       if (errorMessage == null) {
         return jsonDataView();
       }
 
-      return Container(
-          child: const Text(
+      return const Text(
         'Failed to load the data',
         style: TextStyle(
             fontWeight: FontWeight.bold, color: Colors.red, fontSize: 15),
-      ));
+      );
     } catch (e) {
-      return Container(
-          child: const Text(
+      return const Text(
         'Failed to parse the data',
         style: TextStyle(
             fontWeight: FontWeight.bold, color: Colors.red, fontSize: 15),
-      ));
+      );
     }
   }
 
   Widget fileLayout() {
-    return Container(
-      child: Column(
-        children: [
-          const SizedBox(
-            height: 40,
-          ),
-          const Text(
-            'You can download the document for review here',
-            style: TextStyle(fontWeight: FontWeight.w600),
-          ),
-          const SizedBox(
-            height: 15,
-          ),
-          downloadButton(),
-          const SizedBox(
-            height: 15,
-          ),
-          isBusy ? const CircularProgressIndicator() : Container(),
-          isBusy
-              ? const SizedBox(
-                  height: 10,
-                )
-              : Container(),
-          Text(
-            updateMessage,
-            style: const TextStyle(
-                color: Colors.orange, fontWeight: FontWeight.bold),
-          )
-        ],
-      ),
+    return Column(
+      children: [
+        const SizedBox(
+          height: 40,
+        ),
+        const Text(
+          'You can download the document for review here',
+          style: TextStyle(fontWeight: FontWeight.w600),
+        ),
+        const SizedBox(
+          height: 15,
+        ),
+        downloadButton(),
+        const SizedBox(
+          height: 15,
+        ),
+        isBusy ? const CircularProgressIndicator() : Container(),
+        isBusy
+            ? const SizedBox(
+                height: 10,
+              )
+            : Container(),
+        Text(
+          updateMessage,
+          style: const TextStyle(
+              color: Colors.orange, fontWeight: FontWeight.bold),
+        )
+      ],
     );
   }
 
   Widget signButton() {
-    return Container(
-      child: Column(
-        children: [
-          const SizedBox(height: 20),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              minimumSize: const Size.fromHeight(50),
-            ),
-            child: const Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(Icons.assignment_turned_in_outlined),
-                Padding(padding: EdgeInsets.only(left: 20)),
-                Text(
-                  'SIGN',
-                  style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
-                )
-              ],
-            ),
-            onPressed: () async {
-              if (errorMessage != null) {
-                return await areYouSure();
-              }
+    return Column(
+      children: [
+        const SizedBox(height: 20),
+        ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            minimumSize: const Size.fromHeight(50),
+          ),
+          child: const Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(Icons.assignment_turned_in_outlined),
+              Padding(padding: EdgeInsets.only(left: 20)),
+              Text(
+                'SIGN',
+                style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+              )
+            ],
+          ),
+          onPressed: () async {
+            if (errorMessage != null) {
+              return await areYouSure();
+            }
 
-              String randomRoom = widget.signData.randomRoom!;
-              String appId = widget.signData.appId!;
-              String state = widget.signData.state!;
+            String randomRoom = widget.signData.randomRoom!;
+            String appId = widget.signData.appId!;
+            String state = widget.signData.state!;
 
-              Uint8List sk = await getPrivateKey();
-              String signedData = await signData(widget.signData.dataUrl!, sk);
+            Uint8List sk = await getPrivateKey();
+            String signedData = await signData(widget.signData.dataUrl!, sk);
 
-              await sendSignedData(
-                  state, randomRoom, signedData, appId, newHash);
+            await sendSignedData(state, randomRoom, signedData, appId, newHash);
 
-              Navigator.pop(context, true);
-              Events().emit(PopAllSignEvent(emitCode));
-            },
-          )
-        ],
-      ),
+            Navigator.pop(context, true);
+            Events().emit(PopAllSignEvent(emitCode));
+          },
+        )
+      ],
     );
   }
 

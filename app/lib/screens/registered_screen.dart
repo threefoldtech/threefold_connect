@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:threebotlogin/widgets/layout_drawer.dart';
 
 class RegisteredScreen extends StatefulWidget {
-  static final RegisteredScreen _singleton = new RegisteredScreen._internal();
+  static final RegisteredScreen _singleton = RegisteredScreen._internal();
 
   factory RegisteredScreen() {
     return _singleton;
@@ -13,7 +12,8 @@ class RegisteredScreen extends StatefulWidget {
     //init
   }
 
-  _RegisteredScreenState createState() => _RegisteredScreenState();
+  @override
+  State<RegisteredScreen> createState() => _RegisteredScreenState();
 }
 
 class _RegisteredScreenState extends State<RegisteredScreen>
@@ -30,7 +30,7 @@ class _RegisteredScreenState extends State<RegisteredScreen>
         content: Column(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: <Widget>[
-            Container(
+            SizedBox(
               height: MediaQuery.of(context).size.height * 0.8,
               width: MediaQuery.of(context).size.width,
               child: Column(
@@ -39,44 +39,42 @@ class _RegisteredScreenState extends State<RegisteredScreen>
                   Container(
                     width: 300.0,
                     height: 90.0,
-                    decoration: BoxDecoration(
+                    decoration: const BoxDecoration(
                       image: DecorationImage(
                           fit: BoxFit.fill,
                           image: AssetImage('assets/logo.png')),
                     ),
                   ),
-                  SizedBox(height: 30),
+                  const SizedBox(height: 30),
                   Container(
                     width: 200.0,
                     height: 200.0,
-                    decoration: BoxDecoration(
+                    decoration: const BoxDecoration(
                       image: DecorationImage(
                           fit: BoxFit.fill,
                           image: AssetImage('assets/threefold_registered.png')),
                     ),
                   ),
-                  SizedBox(height: 30),
-                  Container(
+                  const SizedBox(height: 30),
+                  SizedBox(
                     width: MediaQuery.of(context).size.width / 1.75,
                     child: RichText(
                       textAlign: TextAlign.center,
-                      text: new TextSpan(
-                          style: new TextStyle(
+                      text: const TextSpan(
+                          style: TextStyle(
                             fontSize: 18.0,
                             color: Colors.black,
                           ),
                           children: <TextSpan>[
-                            new TextSpan(text: 'Welcome to the\n'),
-                            new TextSpan(
+                            TextSpan(text: 'Welcome to the\n'),
+                            TextSpan(
                                 text: 'ThreeFold Connect App! \n',
-                                style:
-                                    new TextStyle(fontWeight: FontWeight.bold)),
-                            new TextSpan(text: 'Click on the '),
-                            new TextSpan(
+                                style: TextStyle(fontWeight: FontWeight.bold)),
+                            TextSpan(text: 'Click on the '),
+                            TextSpan(
                                 text: 'menu ',
-                                style:
-                                    new TextStyle(fontWeight: FontWeight.bold)),
-                            new TextSpan(text: 'icon \n to get started'),
+                                style: TextStyle(fontWeight: FontWeight.bold)),
+                            TextSpan(text: 'icon \n to get started'),
                           ]),
                     ),
                   ),
@@ -89,7 +87,7 @@ class _RegisteredScreenState extends State<RegisteredScreen>
 
   void updatePreference(bool preference) {
     setState(() {
-      this.showPreference = preference;
+      showPreference = preference;
     });
   }
 }

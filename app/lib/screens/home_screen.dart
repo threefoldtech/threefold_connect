@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
-import 'package:flutter/widgets.dart';
 import 'package:flutter_svg/svg.dart';
 
 //import 'package:threebotlogin/apps/free_flow_pages/ffp.dart';
@@ -31,12 +30,12 @@ import 'package:uni_links/uni_links.dart';
 
 /* Screen shows tab bar and all pages defined in router.dart */
 class HomeScreen extends StatefulWidget {
+  const HomeScreen({super.key, this.initialLink, this.backendConnection});
   final String? initialLink;
   final BackendConnection? backendConnection;
 
-  HomeScreen({this.initialLink, this.backendConnection});
-
-  _HomeScreenState createState() => _HomeScreenState();
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
 }
 
 class _HomeScreenState extends State<HomeScreen>
@@ -60,7 +59,7 @@ class _HomeScreenState extends State<HomeScreen>
       MaterialPageRoute(
         builder: (context) => AuthenticationScreen(
           correctPin: pin!,
-          userMessage: "Please enter your PIN code",
+          userMessage: 'Please enter your PIN code',
         ),
       ),
     );
@@ -68,7 +67,7 @@ class _HomeScreenState extends State<HomeScreen>
     pinCheckOpen = false;
 
     if (authenticated != null && authenticated) {
-      lastCheck = new DateTime.now().millisecondsSinceEpoch;
+      lastCheck = DateTime.now().millisecondsSinceEpoch;
       timeoutExpiredInBackground = false;
       globals.tabController.animateTo(indexIfAuthIsSuccess);
     }
@@ -123,11 +122,11 @@ class _HomeScreenState extends State<HomeScreen>
     Events().onEvent(GoHomeEvent().runtimeType, close);
 
     Events().onEvent(GoHomeEvent().runtimeType, (GoHomeEvent event) {
-      globals.tabController.animateTo(0, duration: Duration(seconds: 0));
+      globals.tabController.animateTo(0, duration: const Duration(seconds: 0));
     });
 
     Events().onEvent(GoNewsEvent().runtimeType, (GoNewsEvent event) {
-      globals.tabController.animateTo(1, duration: Duration(seconds: 0));
+      globals.tabController.animateTo(1, duration: const Duration(seconds: 0));
     });
 
     // Needed to hardcode this to prevent double tapping and gaining access without knowing the pincode with the current logic that was implemented.
@@ -144,16 +143,16 @@ class _HomeScreenState extends State<HomeScreen>
     });
 
     Events().onEvent(GoSupportEvent().runtimeType, (GoSupportEvent event) {
-      globals.tabController.animateTo(3, duration: Duration(seconds: 0));
+      globals.tabController.animateTo(3, duration: const Duration(seconds: 0));
     });
 
     Events().onEvent(GoSettingsEvent().runtimeType, (GoSettingsEvent event) {
-      globals.tabController.animateTo(4, duration: Duration(seconds: 0));
+      globals.tabController.animateTo(4, duration: const Duration(seconds: 0));
     });
 
     Events().onEvent(GoReservationsEvent().runtimeType,
         (GoReservationsEvent event) {
-      globals.tabController.animateTo(5, duration: Duration(seconds: 0));
+      globals.tabController.animateTo(5, duration: const Duration(seconds: 0));
     });
 
     Events().onEvent(NewLoginEvent().runtimeType, (NewLoginEvent event) {
@@ -171,7 +170,8 @@ class _HomeScreenState extends State<HomeScreen>
     Events().onEvent(IdentityCallbackEvent().runtimeType,
         (IdentityCallbackEvent event) async {
       Future(() {
-        globals.tabController.animateTo(0, duration: Duration(seconds: 0));
+        globals.tabController
+            .animateTo(0, duration: const Duration(seconds: 0));
         showIdentityMessage(context, event.type!);
       });
     });
@@ -198,7 +198,7 @@ class _HomeScreenState extends State<HomeScreen>
       }
 
       int timeSpendWithPausedApp =
-          new DateTime.now().millisecondsSinceEpoch - lastCheck;
+          DateTime.now().millisecondsSinceEpoch - lastCheck;
 
       if (timeSpendWithPausedApp >= pinCheckTimeout) {
         timeoutExpiredInBackground = true;
@@ -211,7 +211,7 @@ class _HomeScreenState extends State<HomeScreen>
       }
     } else if (state == AppLifecycleState.inactive) {
     } else if (state == AppLifecycleState.paused) {
-      lastCheck = new DateTime.now().millisecondsSinceEpoch;
+      lastCheck = DateTime.now().millisecondsSinceEpoch;
     }
   }
 
@@ -234,16 +234,18 @@ class _HomeScreenState extends State<HomeScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       appBar: PreferredSize(
-        child: new AppBar(
+        preferredSize: const Size.fromHeight(0),
+        child: AppBar(
           automaticallyImplyLeading: true,
-          backgroundColor: HexColor("#2d4052"),
+          backgroundColor: HexColor('#2d4052'),
         ),
-        preferredSize: Size.fromHeight(0),
       ),
       body: DefaultTabController(
         length: Globals().router.routes.length,
         child: WillPopScope(
+          onWillPop: onWillPop,
           child: Scaffold(
             body: Stack(
               children: <Widget>[
@@ -256,16 +258,14 @@ class _HomeScreenState extends State<HomeScreen>
                 SafeArea(
                     child: TabBarView(
                   controller: globals.tabController,
-                  physics: NeverScrollableScrollPhysics(),
+                  physics: const NeverScrollableScrollPhysics(),
                   children: Globals().router.getContent(),
                 )),
               ],
             ),
           ),
-          onWillPop: onWillPop,
         ),
       ),
-      resizeToAvoidBottomInset: false,
     );
   }
 
