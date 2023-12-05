@@ -6,7 +6,7 @@ import 'package:threebotlogin/services/tools_service.dart';
 import 'globals.dart';
 
 class Flags {
-  static final Flags _singleton = new Flags._internal();
+  static final Flags _singleton = Flags._internal();
 
   late FlagsmithClient client;
 
@@ -85,7 +85,7 @@ class Flags {
   Future<dynamic> setDeviceTrait(Identity user) async {
     String info = await getDeviceInfo();
     TraitWithIdentity trait =
-        new TraitWithIdentity(identity: user, key: 'device', value: info);
+        TraitWithIdentity(identity: user, key: 'device', value: info);
     return (await client.createTrait(value: trait));
   }
 

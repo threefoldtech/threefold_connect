@@ -280,7 +280,7 @@ class AuthenticationScreenState extends State<AuthenticationScreen> {
       globals.incorrectPincodeAttempts++;
     }
 
-    var dialog;
+    CustomDialog dialog;
 
     if (globals.incorrectPincodeAttempts >= 3 ||
         (globals.tooManyAuthenticationAttempts &&

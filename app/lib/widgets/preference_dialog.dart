@@ -16,6 +16,7 @@ class PreferenceDialog extends StatefulWidget {
   const PreferenceDialog(
       {super.key, this.scope, this.appId, this.callback, this.type});
 
+  @override
   State<PreferenceDialog> createState() => _PreferenceDialogState();
 }
 

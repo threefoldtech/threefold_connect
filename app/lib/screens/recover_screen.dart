@@ -157,8 +157,7 @@ class _RecoverScreenState extends State<RecoverScreen> {
               child: TextFormField(
                 keyboardType: TextInputType.multiline,
                 maxLines: null,
-                decoration: const InputDecoration(
-                    border: OutlineInputBorder(), labelText: 'SEED PHRASE'),
+                decoration: const InputDecoration(labelText: 'SEED PHRASE'),
                 controller: seedPhraseController,
                 validator: (String? value) {
                   if (value!.isEmpty) {

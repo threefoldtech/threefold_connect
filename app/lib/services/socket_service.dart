@@ -43,7 +43,7 @@ class BackendConnection {
       print('[connect]');
 
       socket.emit('join', {'room': doubleName.toLowerCase(), 'app': true});
-      print('Joined room: ' + doubleName.toLowerCase());
+      print('Joined room: ${doubleName.toLowerCase()}');
     });
 
     socket.on('email_verification', (_) {
@@ -83,7 +83,7 @@ class BackendConnection {
   void closeSocketConnection(CloseSocketEvent event) {
     print('Closing socket connection');
 
-    print('Leaving room: ' + doubleName);
+    print('Leaving room: $doubleName');
     socket.emit('leave', {'room': doubleName});
 
     socket.clearListeners();
@@ -143,7 +143,7 @@ Future emailVerification(BuildContext context) async {
       description: 'Your email has been verified!',
       actions: <Widget>[
         TextButton(
-          child: new Text('Ok'),
+          child: const Text('Ok'),
           onPressed: () {
             Navigator.pop(context);
           },
@@ -191,7 +191,7 @@ Future phoneVerification(BuildContext context) async {
       description: 'Your phone has been verified!',
       actions: <Widget>[
         TextButton(
-          child: new Text('Ok'),
+          child: const Text('Ok'),
           onPressed: () {
             Navigator.pop(context);
           },
@@ -431,7 +431,7 @@ Future openLogin(BuildContext ctx, Login loginData,
     bool? warningScreenCompleted = await Navigator.push(
       ctx,
       MaterialPageRoute(
-        builder: (context) => WarningScreen(),
+        builder: (context) => const WarningScreen(),
       ),
     );
 

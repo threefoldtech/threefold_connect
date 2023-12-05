@@ -18,10 +18,11 @@ class PaymentRequest {
         'message': message,
       };
 
+  @override
   String toString() {
-    var encodedAmount = base64Encode(utf8.encode(this.amount.toString()));
-    var encodedMessage = base64Encode(utf8.encode(this.message));
-    var encodedAddress = base64Encode(utf8.encode(this.address));
+    var encodedAmount = base64Encode(utf8.encode(amount.toString()));
+    var encodedMessage = base64Encode(utf8.encode(message));
+    var encodedAddress = base64Encode(utf8.encode(address));
     return '{"encodedAddress": "$encodedAddress", "encodedAmount": "$encodedAmount", "encodedMessage": "$encodedMessage"}';
   }
 }

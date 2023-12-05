@@ -193,7 +193,7 @@ Future<Response> finishRegistration(
 
   return http.post(url,
       body: json.encode({
-        'doubleName': '${doubleName}.3bot',
+        'doubleName': '$doubleName.3bot',
         'sid': sid,
         'email': email.toLowerCase().trim(),
         'public_key': publicKey

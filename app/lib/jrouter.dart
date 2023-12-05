@@ -66,7 +66,7 @@ class JRouter {
             path: '/identityverification',
             name: 'IdentityVerification',
             icon: Icons.lock,
-            view: IdentityVerificationScreen(),
+            view: const IdentityVerificationScreen(),
           ),
           app: null),
       AppInfo(
@@ -74,14 +74,10 @@ class JRouter {
             path: '/settings',
             name: 'Settings',
             icon: Icons.settings,
-            view: PreferenceScreen(),
+            view: const PreferenceScreen(),
           ),
           app: null),
     ];
-  }
-
-  Map<String, Widget Function(BuildContext)> getRoutes() {
-    return Map.fromIterable(routes, key: (v) => v.path, value: (v) => v.view);
   }
 
   bool emailMustBeVerified(int index) {
@@ -100,15 +96,15 @@ class JRouter {
 
   List<Widget> getContent() {
     List<Widget> containers = [];
-    routes.forEach((r) {
+    for (var r in routes) {
       containers.add(r.route.view);
-    });
+    }
     return containers;
   }
 
   List<Tab> getAppButtons() {
     List<Tab> iconButtons = [];
-    routes.forEach((r) {
+    for (var r in routes) {
       iconButtons.add(Tab(
         icon: Icon(
           r.route.icon,
@@ -116,7 +112,7 @@ class JRouter {
         ),
         text: r.route.name,
       ));
-    });
+    }
     return iconButtons;
   }
 }

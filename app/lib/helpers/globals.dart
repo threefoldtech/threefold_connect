@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:threebotlogin/helpers/hex_color.dart';
 import 'package:threebotlogin/jrouter.dart';
-import 'package:threebotlogin/models/paymentRequest.dart';
+import 'package:threebotlogin/models/payment_request.dart';
 
 class NoAnimationTabController extends TabController {
   NoAnimationTabController(
@@ -19,14 +19,14 @@ class NoAnimationTabController extends TabController {
 }
 
 class Globals {
-  static final bool isInDebugMode = true;
-  static final HexColor color = HexColor("#0a73b8");
+  static const bool isInDebugMode = true;
+  static final HexColor color = HexColor('#0a73b8');
 
   ValueNotifier<bool> emailVerified = ValueNotifier(false);
   ValueNotifier<bool> phoneVerified = ValueNotifier(false);
   ValueNotifier<bool> identityVerified = ValueNotifier(false);
 
-  final JRouter router = new JRouter();
+  final JRouter router = JRouter();
 
   int incorrectPincodeAttempts = 0;
   int sendSmsAttempts = 0;
@@ -63,7 +63,7 @@ class Globals {
 
   ValueNotifier<bool> hidePhoneButton = ValueNotifier(false);
 
-  static final Globals _singleton = new Globals._internal();
+  static final Globals _singleton = Globals._internal();
 
   factory Globals() {
     return _singleton;

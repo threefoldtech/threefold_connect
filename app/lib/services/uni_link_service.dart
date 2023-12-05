@@ -102,11 +102,11 @@ Future<void> handleSignUniLink(Uri link, BuildContext context) async {
 
   bool isValidSignAttempt = true;
 
-  req.forEach((element) {
+  for (var element in req) {
     if (queryParams[element] == null || queryParams[element] == 'undefined') {
       isValidSignAttempt = false;
     }
-  });
+  }
 
   if (!isValidSignAttempt) {
     print('One or more parameters are missing');

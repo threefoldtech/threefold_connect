@@ -6,8 +6,8 @@ import 'package:threebotlogin/apps/farmers/farmers_widget.dart';
 import 'package:threebotlogin/events/events.dart';
 
 class Farmers implements App {
-  static final Farmers _singleton = new Farmers._internal();
-  static final FarmersWidget _farmersWidget = FarmersWidget();
+  static final Farmers _singleton = Farmers._internal();
+  static const FarmersWidget _farmersWidget = FarmersWidget();
 
   factory Farmers() {
     return _singleton;
@@ -15,10 +15,12 @@ class Farmers implements App {
 
   Farmers._internal();
 
+  @override
   Future<Widget> widget() async {
     return _farmersWidget;
   }
 
+  @override
   void clearData() {
     clearAllData();
   }

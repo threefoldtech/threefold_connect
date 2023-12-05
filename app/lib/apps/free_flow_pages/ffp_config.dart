@@ -38,56 +38,68 @@ abstract class FfpConfigImpls {
 }
 
 class FfpConfigStaging extends FfpConfigImpls {
+  @override
   String appId() {
     return 'staging.freeflowpages.com';
   }
 
+  @override
   String url() {
     return 'https://staging.freeflowpages.com/';
   }
 
+  @override
   String cookieUrl() {
     return 'https://staging.freeflowpages.com/user/auth/external?authclient=3bot';
   }
 }
 
 class FfpConfigProduction extends FfpConfigImpls {
+  @override
   String appId() {
     return 'freeflowpages.com';
   }
 
+  @override
   String url() {
     return 'https://freeflowpages.com/';
   }
 
+  @override
   String cookieUrl() {
     return 'https://freeflowpages.com/user/auth/external?authclient=3bot';
   }
 }
 
 class FfpConfigTesting extends FfpConfigImpls {
+  @override
   String appId() {
     return 'testing.freeflowpages.com';
   }
 
+  @override
   String url() {
     return 'https://testing.freeflowpages.com/';
   }
 
+  @override
   String cookieUrl() {
     return 'https://testing.freeflowpages.com/user/auth/external?authclient=3bot';
   }
 }
 
 class FfpConfigLocal extends FfpConfigImpls {
+  @override
   String appId() {
     return 'staging.freeflowpages.com';
   }
 
+  @override
   String url() {
     return 'https://staging.freeflowpages.com/';
   }
 
+  @override
   String cookieUrl() {
     return 'https://freeflowpages.com/user/auth/external?authclient=3bot';
   }

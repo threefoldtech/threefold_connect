@@ -48,7 +48,7 @@ class _HomeScreenState extends State<HomeScreen>
   int lastCheck = 0;
   final int pinCheckTimeout = 60000 * 5;
 
-  _HomeScreenState() {}
+  _HomeScreenState();
 
   void checkPinAndNavigateIfSuccess(int indexIfAuthIsSuccess) async {
     String? pin = await getPin();

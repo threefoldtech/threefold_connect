@@ -128,7 +128,7 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
                                 }
                                 biometricDeviceName = snapshot.data;
                                 return CheckboxListTile(
-                                  secondary: Icon(Icons.fingerprint),
+                                  secondary: const Icon(Icons.fingerprint),
                                   value: finger,
                                   title: Text(snapshot.data.toString()),
                                   activeColor:
@@ -261,7 +261,7 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
                     context,
                     MaterialPageRoute(
                         builder: (context) =>
-                            MainScreen(initDone: true, registered: false)));
+                            const MainScreen(initDone: true, registered: false)));
               } else {
                 showDialog(
                   context: preferenceContext!,
@@ -271,7 +271,7 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
                         'Something went wrong when trying to remove your account.',
                     actions: <Widget>[
                       TextButton(
-                        child: Text('Ok'),
+                        child: const Text('Ok'),
                         onPressed: () {
                           Navigator.pop(context);
                         },
@@ -311,7 +311,7 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
       }
     } else {
       Navigator.pop(context);
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
         content: Text('Pin invalid'),
       ));
     }
@@ -364,7 +364,7 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
           actions: <Widget>[
             // usually buttons at the bottom of the dialog
             TextButton(
-              child: new Text('Close'),
+              child: const Text('Close'),
               onPressed: () {
                 Navigator.pop(context);
                 setState(() {});
@@ -425,7 +425,7 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
         ),
       );
 
-      if (pinChanged != null && pinChanged) {
+      if (pinChanged) {
         showDialog(
           context: context,
           builder: (BuildContext context) => CustomDialog(
@@ -434,7 +434,7 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
             description: 'Your pincode was successfully changed.',
             actions: <Widget>[
               TextButton(
-                child: new Text('Ok'),
+                child: const Text('Ok'),
                 onPressed: () async {
                   Navigator.pop(context);
                 },

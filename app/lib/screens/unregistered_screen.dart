@@ -50,8 +50,8 @@ class _UnregisteredScreenState extends State<UnregisteredScreen>
           context,
           MaterialPageRoute(
               builder: (context) => const SuccessfulScreen(
-                  title: "Recovered",
-                  text: "Your account has been recovered.")));
+                  title: 'Recovered',
+                  text: 'Your account has been recovered.')));
 
       Navigator.pop(context);
 
@@ -80,7 +80,7 @@ class _UnregisteredScreenState extends State<UnregisteredScreen>
                   minHeight: 250,
                   minWidth: 250),
               child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
                   Container(),
                   Column(
@@ -95,7 +95,7 @@ class _UnregisteredScreenState extends State<UnregisteredScreen>
                               image: AssetImage('assets/logo.png')),
                         ),
                       ),
-                      const SizedBox(height: 10.0),
+                      const SizedBox(height: 100),
                     ],
                   ),
                   SizedBox(

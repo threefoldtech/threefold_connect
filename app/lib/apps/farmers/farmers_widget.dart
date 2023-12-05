@@ -18,6 +18,8 @@ import 'package:threebotlogin/widgets/layout_drawer.dart';
 bool created = false;
 
 class FarmersWidget extends StatefulWidget {
+  const FarmersWidget({super.key});
+
   @override
   _FarmersState createState() => _FarmersState();
 }
@@ -35,12 +37,12 @@ class _FarmersState extends State<FarmersWidget> with AutomaticKeepAliveClientMi
 
   _back(FarmersBackEvent event) async {
     Uri? url = await webView.getUrl();
-    String rootUrl = Globals().farmersUrl + 'farmer';
+    String rootUrl = '${Globals().farmersUrl}farmer';
     if (url.toString() == rootUrl.toString()) {
       Events().emit(GoHomeEvent());
       return;
     }
-    this.webView.goBack();
+    webView.goBack();
   }
 
   _FarmersState() {
@@ -49,7 +51,7 @@ class _FarmersState extends State<FarmersWidget> with AutomaticKeepAliveClientMi
     iaWebView = InAppWebView(
       initialUrlRequest: URLRequest(
           url: Uri.parse(
-              farmersUri + '?cache_buster=' + new DateTime.now().millisecondsSinceEpoch.toString())),
+              '$farmersUri?cache_buster=${DateTime.now().millisecondsSinceEpoch}')),
       initialOptions: InAppWebViewGroupOptions(
           crossPlatform: InAppWebViewOptions(
               cacheEnabled: Globals().isCacheClearedFarmer, clearCache: !Globals().isCacheClearedFarmer),
@@ -58,7 +60,7 @@ class _FarmersState extends State<FarmersWidget> with AutomaticKeepAliveClientMi
           ios: IOSInAppWebViewOptions()),
       onWebViewCreated: (InAppWebViewController controller) {
         webView = controller;
-        this.addHandler();
+        addHandler();
       },
       onCreateWindow: (InAppWebViewController controller, CreateWindowAction req) {
         return Future.value(true);
@@ -75,7 +77,7 @@ class _FarmersState extends State<FarmersWidget> with AutomaticKeepAliveClientMi
         });
       },
       onConsoleMessage: (InAppWebViewController controller, ConsoleMessage consoleMessage) {
-        print("Wallet console: " + consoleMessage.message);
+        print('Wallet console: ${consoleMessage.message}');
       },
     );
 
@@ -108,18 +110,18 @@ class _FarmersState extends State<FarmersWidget> with AutomaticKeepAliveClientMi
 
     String? result;
     if (slept) {
-      result = await Navigator.push(context, MaterialPageRoute(builder: (context) => ScanScreen()));
+      result = await Navigator.push(context, MaterialPageRoute(builder: (context) => const ScanScreen()));
     }
 
     return result;
   }
 
   addHandler() {
-    webView.addJavaScriptHandler(handlerName: "ADD_IMPORT_WALLET", callback: saveImportedWallet);
-    webView.addJavaScriptHandler(handlerName: "ADD_APP_WALLET", callback: saveAppWallet);
-    webView.addJavaScriptHandler(handlerName: "SCAN_QR", callback: scanQrCode);
-    webView.addJavaScriptHandler(handlerName: "VUE_INITIALIZED", callback: vueInitialized);
-    webView.addJavaScriptHandler(handlerName: "SAVE_WALLETS", callback: saveWalletCallback);
+    webView.addJavaScriptHandler(handlerName: 'ADD_IMPORT_WALLET', callback: saveImportedWallet);
+    webView.addJavaScriptHandler(handlerName: 'ADD_APP_WALLET', callback: saveAppWallet);
+    webView.addJavaScriptHandler(handlerName: 'SCAN_QR', callback: scanQrCode);
+    webView.addJavaScriptHandler(handlerName: 'VUE_INITIALIZED', callback: vueInitialized);
+    webView.addJavaScriptHandler(handlerName: 'SAVE_WALLETS', callback: saveWalletCallback);
   }
 
   saveWalletCallback(List<dynamic> params) async {

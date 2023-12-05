@@ -38,7 +38,7 @@ class ReuseableTextFieldStep extends StatelessWidget {
             autofocus: true,
             keyboardType: typeText,
             decoration: InputDecoration(
-              border: OutlineInputBorder(),
+              border: const OutlineInputBorder(),
               labelText: labelText,
               suffixText: suffixText,
               suffixStyle: const TextStyle(fontWeight: FontWeight.bold),

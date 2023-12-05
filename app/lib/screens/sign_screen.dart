@@ -276,7 +276,7 @@ class _SignScreenState extends State<SignScreen> with BlockAndRunMixin {
   }
 
   Widget downloadButton() {
-    return Container(
+    return SizedBox(
       width: MediaQuery.of(context).size.width * 0.9,
       child: Column(
         children: [

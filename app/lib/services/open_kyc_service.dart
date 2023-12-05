@@ -201,7 +201,7 @@ Future<Response> verifyIdentity(String reference) async {
 }
 
 Future<Response> updateEmailAddressOfUser() async {
-  String timestamp = new DateTime.now().millisecondsSinceEpoch.toString();
+  String timestamp = DateTime.now().millisecondsSinceEpoch.toString();
   Uint8List sk = await getPrivateKey();
 
   Map<String, String> payload = {

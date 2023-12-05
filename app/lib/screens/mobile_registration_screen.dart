@@ -66,6 +66,7 @@ class _MobileRegistrationScreenState extends State<MobileRegistrationScreen> {
     super.initState();
   }
 
+  @override
   void dispose() {
     super.dispose();
   }
@@ -189,7 +190,7 @@ class _MobileRegistrationScreenState extends State<MobileRegistrationScreen> {
               'Something went wrong when trying to create your account.',
           actions: <Widget>[
             TextButton(
-              child: Text('Ok'),
+              child: const Text('Ok'),
               onPressed: () {
                 Navigator.pop(context);
               },

@@ -5,8 +5,8 @@ import 'package:threebotlogin/events/events.dart';
 import 'package:threebotlogin/apps/news/news_events.dart';
 
 class News implements App {
-  static final News _singleton = new News._internal();
-  static final NewsWidget _newsWidget = NewsWidget();
+  static final News _singleton = News._internal();
+  static const NewsWidget _newsWidget = NewsWidget();
 
   factory News() {
     return _singleton;
@@ -14,10 +14,12 @@ class News implements App {
 
   News._internal();
 
+  @override
   Future<Widget> widget() async {
     return _newsWidget;
   }
 
+  @override
   void clearData() {}
 
   @override

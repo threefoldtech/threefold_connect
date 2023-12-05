@@ -152,8 +152,10 @@ class _PinFieldState extends State<PinField> {
 
   void onOk() {
     HapticFeedback.mediumImpact();
-    String pin = "";
-    input.forEach((char) => pin += char);
+    String pin = '';
+    for (var char in input) {
+      pin += char;
+    }
     if (widget.callbackParam != null) {
       widget.callback(pin, widget.callbackParam);
     } else {
