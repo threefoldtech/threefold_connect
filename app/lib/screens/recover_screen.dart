@@ -140,7 +140,8 @@ class _RecoverScreenState extends State<RecoverScreen> {
                   keyboardType: TextInputType.text,
                   decoration: const InputDecoration(
                     border: OutlineInputBorder(),
-                    labelText: 'NAME',
+                    labelText: 'Name',
+                    filled: true,
                     // suffixText: '.3bot',
                     suffixStyle: TextStyle(fontWeight: FontWeight.bold),
                   ),
@@ -157,7 +158,11 @@ class _RecoverScreenState extends State<RecoverScreen> {
               child: TextFormField(
                 keyboardType: TextInputType.multiline,
                 maxLines: null,
-                decoration: const InputDecoration(labelText: 'SEED PHRASE'),
+                decoration: const InputDecoration(
+                  labelText: 'Seed Phrase',
+                  border: OutlineInputBorder(),
+                  filled: true,
+                ),
                 controller: seedPhraseController,
                 validator: (String? value) {
                   if (value!.isEmpty) {
