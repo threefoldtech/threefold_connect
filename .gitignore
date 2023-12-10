@@ -316,7 +316,7 @@ example/public/config.js
 
 openkyc/*
 Makefile
-*pubspec.lock
+# *pubspec.lock
 app/lib/app_config_local.dart
 app/android/app/src/main/AndroidManifest.xml
 app/lib/helpers/env_config.dart

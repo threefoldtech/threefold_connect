@@ -39,8 +39,6 @@ class Flags {
 
   Future<void> setFlagSmithDefaultValues() async {
     Globals().isOpenKYCEnabled = await Flags().hasFlagValueByFeatureName('kyc');
-    Globals().isYggdrasilEnabled =
-        await Flags().hasFlagValueByFeatureName('yggdrasil');
     Globals().debugMode = await Flags().hasFlagValueByFeatureName('debug');
     Globals().useNewWallet =
         await Flags().hasFlagValueByFeatureName('use-new-wallet');
