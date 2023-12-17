@@ -3,7 +3,7 @@ description: A decentralized login application
 
 publish_to: "none"
 
-version: 3.8.0+173
+version: 3.9.0+176
 
 environment:
   sdk: ">=2.12.0<3.0.0"
@@ -12,17 +12,12 @@ dependencies:
   flutter:
     sdk: flutter
 
-  yggdrasil_plugin:
-    git:
-      url: https://github.com/threefoldtech/planetary_network_flutter
-      ref: main
-
   flutter_pkid:
     git:
       url: https://github.com/threefoldtech/threefold_connect_flutter_pkid_client
       ref: master
 
-  shuftipro_sdk: ^1.0.5
+  shuftipro_sdk: ^1.2.5
   flutter_svg: ^2.0.6
   bip39: ^1.0.6
   socket_io_client: ^1.0.2
