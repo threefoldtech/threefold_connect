@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:threebotlogin/helpers/hex_color.dart';
 import 'package:threebotlogin/services/shared_preference_service.dart';
 import 'package:threebotlogin/widgets/pin_field.dart';
 
@@ -42,7 +41,7 @@ class _ChangePinScreenState extends State<ChangePinScreen> {
     return WillPopScope(
       child: Scaffold(
         appBar: AppBar(
-            backgroundColor: HexColor('#0a73b8'),
+            backgroundColor: Theme.of(context).colorScheme.background,
             title: widget.currentPin == null
                 ? const Text('Choose your pincode')
                 : const Text('Change pincode'),
@@ -57,6 +56,10 @@ class _ChangePinScreenState extends State<ChangePinScreen> {
               child: Center(
                   child: Text(
                 getText(),
+                style: Theme.of(context)
+                  .textTheme
+                  .bodyLarge!
+                  .copyWith(color: Theme.of(context).colorScheme.onBackground),
               )),
             ),
             PinField(

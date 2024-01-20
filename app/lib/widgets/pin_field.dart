@@ -37,8 +37,9 @@ class _PinFieldState extends State<PinField> {
       margin: EdgeInsets.all(height / 120),
       height: height / 50,
       width: size,
-      decoration:
-          const BoxDecoration(color: Colors.black, shape: BoxShape.circle),
+      decoration: BoxDecoration(
+          color: Theme.of(context).colorScheme.onBackground,
+          shape: BoxShape.circle),
       duration: const Duration(milliseconds: 100),
       curve: Curves.bounceInOut,
     );

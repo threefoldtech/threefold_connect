@@ -114,7 +114,7 @@ class AuthenticationScreenState extends State<AuthenticationScreen> {
       height: height / 50,
       width: size,
       decoration:
-          const BoxDecoration(color: Colors.black, shape: BoxShape.circle),
+           BoxDecoration(color: Theme.of(context).colorScheme.onBackground, shape: BoxShape.circle),
       duration: const Duration(milliseconds: 100),
       curve: Curves.bounceInOut,
     );
@@ -222,32 +222,34 @@ class AuthenticationScreenState extends State<AuthenticationScreen> {
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: true,
-        backgroundColor: HexColor('#0a73b8'),
         title: const Text('Authentication'),
+        backgroundColor: Theme.of(context).colorScheme.background,
       ),
-      body: Container(
-        color: Colors.white,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: <Widget>[
-            Container(
-              padding: const EdgeInsets.only(bottom: 50),
-              child: Text(widget.userMessage),
+      body: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: <Widget>[
+          Container(
+            padding: const EdgeInsets.only(bottom: 50),
+            child: Text(
+              widget.userMessage,
+              style: Theme.of(context)
+                  .textTheme
+                  .bodyLarge!
+                  .copyWith(color: Theme.of(context).colorScheme.onBackground),
             ),
-            Container(
-              alignment: Alignment.center,
-              color: Colors.white,
-              child: Column(
-                children: [
-                  generateTextFields(context),
-                  const SizedBox(height: 25),
-                  generateNumbers(context),
-                ],
-              ),
+          ),
+          Container(
+            alignment: Alignment.center,
+            child: Column(
+              children: [
+                generateTextFields(context),
+                const SizedBox(height: 25),
+                generateNumbers(context),
+              ],
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
