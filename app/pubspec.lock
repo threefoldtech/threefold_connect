@@ -669,10 +669,10 @@ packages:
     dependency: "direct main"
     description:
       name: shuftipro_sdk
-      sha256: "25de8738561c48b1c4cbf4fc56d43ed1c0c512d7c05fdb9f4844bb28a4ca5969"
+      sha256: "869b9d67191c671f1ea5b229a994173520381cc0524994496c61523592a45a0a"
       url: "https://pub.dev"
     source: hosted
-    version: "1.2.5"
+    version: "1.3.7"
   sky_engine:
     dependency: transitive
     description: flutter
@@ -951,5 +951,5 @@ packages:
     source: hosted
     version: "3.1.2"
 sdks:
-  dart: ">=3.2.0-194.0.dev <=3.2.2"
+  dart: ">=3.2.0-194.0.dev <4.0.0"
   flutter: ">=3.7.0"
