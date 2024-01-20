@@ -60,12 +60,12 @@ class _RegisteredScreenState extends State<RegisteredScreen>
                     width: MediaQuery.of(context).size.width / 1.75,
                     child: RichText(
                       textAlign: TextAlign.center,
-                      text: const TextSpan(
+                      text: TextSpan(
                           style: TextStyle(
                             fontSize: 18.0,
-                            color: Colors.black,
+                            color: Theme.of(context).colorScheme.onBackground,
                           ),
-                          children: <TextSpan>[
+                          children: const <TextSpan>[
                             TextSpan(text: 'Welcome to the\n'),
                             TextSpan(
                                 text: 'ThreeFold Connect App! \n',
