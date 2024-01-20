@@ -70,9 +70,17 @@ class MyApp extends StatelessWidget {
         tabBarTheme:
             TabBarTheme(labelStyle: textStyle, unselectedLabelStyle: textStyle),
         appBarTheme: AppBarTheme(
-          color: Colors.white,
+          color: kColorScheme.primary,
+          iconTheme: const IconThemeData(color: Colors.white),
           titleTextStyle: accentTextStyle,
           toolbarTextStyle: accentTextStyle,
+        ),
+        cardTheme: const CardTheme().copyWith(
+            color: kColorScheme.secondaryContainer,
+            margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8)),
+        elevatedButtonTheme: ElevatedButtonThemeData(
+          style: ElevatedButton.styleFrom(
+              backgroundColor: kDarkColorScheme.primaryContainer),
         ),
       ),
       darkTheme: ThemeData(
@@ -83,9 +91,17 @@ class MyApp extends StatelessWidget {
         tabBarTheme:
             TabBarTheme(labelStyle: textStyle, unselectedLabelStyle: textStyle),
         appBarTheme: AppBarTheme(
-          color: Colors.white,
+          color: kColorScheme.primary,
+          iconTheme: const IconThemeData(color: Colors.white),
           titleTextStyle: accentTextStyle,
           toolbarTextStyle: accentTextStyle,
+        ),
+        cardTheme: const CardTheme().copyWith(
+            color: kDarkColorScheme.secondaryContainer,
+            margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8)),
+        elevatedButtonTheme: ElevatedButtonThemeData(
+          style: ElevatedButton.styleFrom(
+              backgroundColor: kDarkColorScheme.primaryContainer),
         ),
       ),
       themeMode: ThemeMode.system,
