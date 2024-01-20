@@ -22,8 +22,6 @@ class _LayoutDrawerState extends State<LayoutDrawer> {
         // Here we take the value from the MyHomePage object that was created by
         // the App.build method, and use it to set our appbar title.
         title: Text(widget.titleText),
-        backgroundColor: Theme.of(context).primaryColor,
-        iconTheme: const IconThemeData(color: Colors.white),
         toolbarHeight: 60,
       ),
       body: widget.content,

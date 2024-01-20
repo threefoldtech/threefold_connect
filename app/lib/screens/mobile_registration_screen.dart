@@ -600,7 +600,6 @@ class _MobileRegistrationScreenState extends State<MobileRegistrationScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Globals.color,
         title: const Text('ThreeFold Connect - Registration'),
       ),
       body: registrationStepper(),

@@ -20,7 +20,6 @@ class _WarningScreenState extends State<WarningScreen> {
       title: 'Login from a new location',
       home: Scaffold(
         appBar: AppBar(
-          backgroundColor: HexColor('#2d4052'),
           title: const Text('Login from a new location'),
         ),
         body: Padding(

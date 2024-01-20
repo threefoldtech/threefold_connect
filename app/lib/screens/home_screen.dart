@@ -238,7 +238,6 @@ class _HomeScreenState extends State<HomeScreen>
         preferredSize: const Size.fromHeight(0),
         child: AppBar(
           automaticallyImplyLeading: true,
-          backgroundColor: Theme.of(context).colorScheme.background,
         ),
       ),
       body: DefaultTabController(

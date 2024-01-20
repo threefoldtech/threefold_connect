@@ -206,7 +206,6 @@ class _LoginScreenState extends State<LoginScreen> with BlockAndRunMixin {
         key: _scaffoldKey,
         appBar: AppBar(
           // automaticallyImplyLeading: false,
-          backgroundColor: Theme.of(context).primaryColor,
           title: const Text('Login'),
         ),
         body: Column(

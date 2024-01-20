@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:threebotlogin/helpers/hex_color.dart';
 
 Widget getErrorWidget(BuildContext context, FlutterErrorDetails error) {
-  return SafeArea(
+  return const SafeArea(
     child: Scaffold(
-      backgroundColor: HexColor('#0f296a'),
-      body: const Column(
+      body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
           Center(

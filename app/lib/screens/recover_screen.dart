@@ -108,7 +108,6 @@ class _RecoverScreenState extends State<RecoverScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Globals.color,
         title: const Text('Recover Account'),
       ),
       body: Container(
@@ -182,7 +181,6 @@ class _RecoverScreenState extends State<RecoverScreen> {
             ),
             ElevatedButton(
               style: ElevatedButton.styleFrom(
-                backgroundColor: Theme.of(context).primaryColor,
                 shape: const RoundedRectangleBorder(
                   borderRadius: BorderRadius.all(Radius.circular(10)),
                 ),

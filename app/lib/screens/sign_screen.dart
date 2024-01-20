@@ -79,7 +79,6 @@ class _SignScreenState extends State<SignScreen> with BlockAndRunMixin {
         key: _scaffoldKey,
         appBar: AppBar(
           // automaticallyImplyLeading: false,
-          backgroundColor: Theme.of(context).primaryColor,
           title: const Text('Sign'),
         ),
         body: Column(
