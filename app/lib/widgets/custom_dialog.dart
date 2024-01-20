@@ -107,7 +107,7 @@ class _CustomDialogState extends State<CustomDialog> {
           }
         },
         child: CircleAvatar(
-          backgroundColor: Theme.of(context).primaryColor,
+          backgroundColor: Theme.of(context).colorScheme.primaryContainer,
           radius: 30.0,
           child: Icon(
             widget.image,
@@ -127,12 +127,11 @@ class _CustomDialogState extends State<CustomDialog> {
         padding: const EdgeInsets.only(top: 30.0 + 20.0),
         margin: const EdgeInsets.only(top: 30.0),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: Theme.of(context).colorScheme.background,
           shape: BoxShape.rectangle,
           borderRadius: BorderRadius.circular(20.0),
           boxShadow: const [
             BoxShadow(
-              color: Colors.black26,
               blurRadius: 10.0,
               offset: Offset(0.0, 10.0),
             ),
@@ -146,10 +145,9 @@ class _CustomDialogState extends State<CustomDialog> {
               padding: const EdgeInsets.symmetric(horizontal: 20.0),
               child: Text(
                 widget.title,
-                style: const TextStyle(
-                  fontSize: 20.0,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: Theme.of(context).textTheme.titleLarge!.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: Theme.of(context).colorScheme.onBackground),
                 textAlign: TextAlign.center,
               ),
             ),
@@ -162,6 +160,9 @@ class _CustomDialogState extends State<CustomDialog> {
                     ? Text(
                         widget.description!,
                         textAlign: TextAlign.center,
+                        style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                            fontWeight: FontWeight.bold,
+                            color: Theme.of(context).colorScheme.onBackground),
                       )
                     : widget.widgetDescription,
               ),
@@ -177,7 +178,6 @@ class _CustomDialogState extends State<CustomDialog> {
                       ),
                       boxShadow: const [
                         BoxShadow(
-                          color: Colors.black26,
                           blurRadius: 10.0,
                           offset: Offset(0.0, 10.0),
                         ),
