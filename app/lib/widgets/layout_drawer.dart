@@ -56,7 +56,7 @@ class _LayoutDrawerState extends State<LayoutDrawer> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
                   Padding(padding: EdgeInsets.only(left: 30)),
-                  Icon(Icons.home, color: Colors.black, size: 18)
+                  Icon(Icons.home, size: 18)
                 ],
               ),
               title: const Text('Home'),
@@ -71,7 +71,7 @@ class _LayoutDrawerState extends State<LayoutDrawer> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
                   Padding(padding: EdgeInsets.only(left: 30)),
-                  Icon(Icons.article, color: Colors.black, size: 18)
+                  Icon(Icons.article, size: 18)
                 ],
               ),
               title: const Text('News'),
@@ -86,8 +86,7 @@ class _LayoutDrawerState extends State<LayoutDrawer> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
                   Padding(padding: EdgeInsets.only(left: 30)),
-                  Icon(Icons.account_balance_wallet,
-                      color: Colors.black, size: 18)
+                  Icon(Icons.account_balance_wallet, size: 18)
                 ],
               ),
               title: const Text('Wallet'),
@@ -125,7 +124,7 @@ class _LayoutDrawerState extends State<LayoutDrawer> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
                   Padding(padding: EdgeInsets.only(left: 30)),
-                  Icon(Icons.chat, color: Colors.black, size: 18)
+                  Icon(Icons.chat, size: 18)
                 ],
               ),
               title: const Text('Support'),
@@ -140,7 +139,7 @@ class _LayoutDrawerState extends State<LayoutDrawer> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
                   Padding(padding: EdgeInsets.only(left: 30)),
-                  Icon(Icons.person_outlined, color: Colors.black, size: 18)
+                  Icon(Icons.person_outlined, size: 18)
                 ],
               ),
               title: const Text('Identity'),
@@ -155,7 +154,7 @@ class _LayoutDrawerState extends State<LayoutDrawer> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
                   Padding(padding: EdgeInsets.only(left: 30)),
-                  Icon(Icons.settings, color: Colors.black, size: 18)
+                  Icon(Icons.settings, size: 18)
                 ],
               ),
               title: const Text('Settings'),
