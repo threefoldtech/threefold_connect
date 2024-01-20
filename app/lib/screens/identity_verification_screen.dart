@@ -227,6 +227,9 @@ class _IdentityVerificationScreenState
             alignment: Alignment.center,
             width: MediaQuery.of(context).size.width,
             height: MediaQuery.of(context).size.height,
+            colorFilter: ColorFilter.mode(
+                Theme.of(context).colorScheme.primary.withOpacity(0.2),
+                BlendMode.srcIn),
           ),
           FutureBuilder(
             future: getEmail(),
