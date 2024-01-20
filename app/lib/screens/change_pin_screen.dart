@@ -41,7 +41,6 @@ class _ChangePinScreenState extends State<ChangePinScreen> {
     return WillPopScope(
       child: Scaffold(
         appBar: AppBar(
-            backgroundColor: Theme.of(context).colorScheme.background,
             title: widget.currentPin == null
                 ? const Text('Choose your pincode')
                 : const Text('Change pincode'),

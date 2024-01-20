@@ -223,7 +223,6 @@ class AuthenticationScreenState extends State<AuthenticationScreen> {
       appBar: AppBar(
         automaticallyImplyLeading: true,
         title: const Text('Authentication'),
-        backgroundColor: Theme.of(context).colorScheme.background,
       ),
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
