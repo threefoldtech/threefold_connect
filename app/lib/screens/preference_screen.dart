@@ -84,6 +84,9 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
             alignment: Alignment.center,
             width: MediaQuery.of(context).size.width,
             height: MediaQuery.of(context).size.height,
+            colorFilter: ColorFilter.mode(
+                Theme.of(context).colorScheme.primary.withOpacity(0.2),
+                BlendMode.srcIn),
           ),
           ListView(
             children: <Widget>[
@@ -170,18 +173,20 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
               ExpansionTile(
                 title: const Text(
                   'Advanced settings',
-                  style: TextStyle(color: Colors.black),
                 ),
                 children: <Widget>[
                   ListTile(
                     leading: const Icon(Icons.person),
-                    title: const Text(
+                    title: Text(
                       'Remove Account From Device',
-                      style: TextStyle(color: Colors.red),
+                      style: Theme.of(context)
+                          .textTheme
+                          .bodyLarge!
+                          .copyWith(color: Theme.of(context).colorScheme.error),
                     ),
-                    trailing: const Icon(
+                    trailing: Icon(
                       Icons.remove_circle,
-                      color: Colors.red,
+                      color: Theme.of(context).colorScheme.error,
                     ),
                     onTap: _showDialog,
                   ),
@@ -260,8 +265,8 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
                 await Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(
-                        builder: (context) =>
-                            const MainScreen(initDone: true, registered: false)));
+                        builder: (context) => const MainScreen(
+                            initDone: true, registered: false)));
               } else {
                 showDialog(
                   context: preferenceContext!,
