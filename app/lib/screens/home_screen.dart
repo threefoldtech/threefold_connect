@@ -20,7 +20,6 @@ import 'package:threebotlogin/events/go_wallet_event.dart';
 import 'package:threebotlogin/events/new_login_event.dart';
 import 'package:threebotlogin/events/uni_link_event.dart';
 import 'package:threebotlogin/helpers/globals.dart';
-import 'package:threebotlogin/helpers/hex_color.dart';
 import 'package:threebotlogin/screens/authentication_screen.dart';
 import 'package:threebotlogin/services/socket_service.dart';
 import 'package:threebotlogin/services/uni_link_service.dart';
@@ -239,7 +238,7 @@ class _HomeScreenState extends State<HomeScreen>
         preferredSize: const Size.fromHeight(0),
         child: AppBar(
           automaticallyImplyLeading: true,
-          backgroundColor: HexColor('#2d4052'),
+          backgroundColor: Theme.of(context).colorScheme.background,
         ),
       ),
       body: DefaultTabController(
@@ -254,6 +253,9 @@ class _HomeScreenState extends State<HomeScreen>
                   alignment: Alignment.center,
                   width: MediaQuery.of(context).size.width,
                   height: MediaQuery.of(context).size.height,
+                  colorFilter: ColorFilter.mode(
+                Theme.of(context).colorScheme.primary.withOpacity(0.2),
+                BlendMode.srcIn),
                 ),
                 SafeArea(
                     child: TabBarView(
