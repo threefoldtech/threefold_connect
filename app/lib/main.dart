@@ -44,6 +44,15 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    var kColorScheme = ColorScheme.fromSeed(
+        brightness: Brightness.light,
+        seedColor: const Color.fromARGB(255, 10, 115, 184),
+        secondary: const Color.fromARGB(255, 87, 190, 142));
+
+    var kDarkColorScheme = ColorScheme.fromSeed(
+        brightness: Brightness.dark,
+        seedColor: const Color.fromARGB(255, 10, 115, 184),
+        secondary: const Color.fromARGB(255, 87, 190, 142));
     var textTheme = GoogleFonts.latoTextTheme(
       Theme.of(context).textTheme,
     );
@@ -55,12 +64,8 @@ class MyApp extends StatelessWidget {
     var textStyle = GoogleFonts.lato();
     return MaterialApp(
       theme: ThemeData(
-        primaryColor: HexColor('#0a73b8'),
-        colorScheme: ColorScheme.fromSwatch().copyWith(
-          secondary: HexColor('#57BE8E'),
-          brightness: Brightness.light,
-          background: Colors.white,
-        ),
+        useMaterial3: true,
+        colorScheme: kColorScheme,
         brightness: Brightness.light,
         textTheme: textTheme,
         tabBarTheme:
@@ -71,6 +76,20 @@ class MyApp extends StatelessWidget {
           toolbarTextStyle: accentTextStyle,
         ),
       ),
+      darkTheme: ThemeData(
+        useMaterial3: true,
+        colorScheme: kDarkColorScheme,
+        brightness: Brightness.dark,
+        textTheme: textTheme,
+        tabBarTheme:
+            TabBarTheme(labelStyle: textStyle, unselectedLabelStyle: textStyle),
+        appBarTheme: AppBarTheme(
+          color: Colors.white,
+          titleTextStyle: accentTextStyle,
+          toolbarTextStyle: accentTextStyle,
+        ),
+      ),
+      themeMode: ThemeMode.system,
       home: MainScreen(initDone: initDone, registered: registered),
     );
   }
