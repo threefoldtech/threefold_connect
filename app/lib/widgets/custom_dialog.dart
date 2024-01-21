@@ -107,12 +107,12 @@ class _CustomDialogState extends State<CustomDialog> {
           }
         },
         child: CircleAvatar(
-          backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+          backgroundColor: Theme.of(context).colorScheme.primary,
           radius: 30.0,
           child: Icon(
             widget.image,
             size: 42.0,
-            color: Colors.white,
+            color: Theme.of(context).colorScheme.onPrimary,
           ),
         ),
       ),
