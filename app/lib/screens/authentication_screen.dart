@@ -5,7 +5,6 @@ import 'package:flutter/services.dart';
 import 'package:threebotlogin/events/close_auth_event.dart';
 import 'package:threebotlogin/events/events.dart';
 import 'package:threebotlogin/helpers/globals.dart';
-import 'package:threebotlogin/helpers/hex_color.dart';
 import 'package:threebotlogin/models/login.dart';
 import 'package:threebotlogin/services/fingerprint_service.dart';
 import 'package:threebotlogin/services/shared_preference_service.dart';
@@ -113,8 +112,9 @@ class AuthenticationScreenState extends State<AuthenticationScreen> {
       margin: EdgeInsets.all(height / 120),
       height: height / 50,
       width: size,
-      decoration:
-           BoxDecoration(color: Theme.of(context).colorScheme.onBackground, shape: BoxShape.circle),
+      decoration: BoxDecoration(
+          color: Theme.of(context).colorScheme.onBackground,
+          shape: BoxShape.circle),
       duration: const Duration(milliseconds: 100),
       curve: Curves.bounceInOut,
     );
@@ -142,7 +142,9 @@ class AuthenticationScreenState extends State<AuthenticationScreen> {
           shape: const CircleBorder(),
           child: Text(
             buttonText,
-            style: const TextStyle(color: Colors.white, fontSize: 20),
+            style: Theme.of(context).textTheme.titleLarge!.copyWith(
+                color: Theme.of(context).colorScheme.onPrimaryContainer,
+                ),
           ),
         )));
   }
@@ -167,16 +169,16 @@ class AuthenticationScreenState extends State<AuthenticationScreen> {
       if (buttonText == 'C') {
         return buildNumberPin(possibleInput[i], context,
             backgroundColor: input.isNotEmpty
-                ? Colors.yellow.shade700
-                : Colors.yellow.shade200);
+                ? Theme.of(context).colorScheme.primaryContainer
+                : Theme.of(context).colorScheme.secondaryContainer.withOpacity(0.5));
       } else if (buttonText == 'OK') {
         return buildNumberPin(possibleInput[i], context,
             backgroundColor: input.length >= widget.pinLength
-                ? Colors.green.shade600
-                : Colors.green.shade100);
+                ? Colors.green.shade700
+                : Colors.green.shade300);
       } else {
         return buildNumberPin(possibleInput[i], context,
-            backgroundColor: HexColor('#0a73b8'));
+            backgroundColor: Theme.of(context).colorScheme.primaryContainer);
       }
     });
     return SizedBox(

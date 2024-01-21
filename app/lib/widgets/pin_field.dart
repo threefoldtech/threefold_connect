@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:threebotlogin/helpers/hex_color.dart';
 
 class PinField extends StatefulWidget {
   final int pinLength = 4;
@@ -67,7 +66,9 @@ class _PinFieldState extends State<PinField> {
           shape: const CircleBorder(),
           child: Text(
             buttonText,
-            style: const TextStyle(color: Colors.white, fontSize: 20),
+            style: Theme.of(context).textTheme.titleLarge!.copyWith(
+                  color: Theme.of(context).colorScheme.onPrimaryContainer,
+                ),
           ),
         )));
   }
@@ -92,16 +93,19 @@ class _PinFieldState extends State<PinField> {
       if (buttonText == 'C') {
         return buildNumberPin(possibleInput[i], context,
             backgroundColor: input.isNotEmpty
-                ? Colors.yellow.shade700
-                : Colors.yellow.shade200);
+                ? Theme.of(context).colorScheme.primaryContainer
+                : Theme.of(context)
+                    .colorScheme
+                    .secondaryContainer
+                    .withOpacity(0.5));
       } else if (buttonText == 'OK') {
         return buildNumberPin(possibleInput[i], context,
             backgroundColor: input.length >= widget.pinLength
-                ? Colors.green.shade600
-                : Colors.green.shade100);
+                ? Colors.green.shade700
+                : Colors.green.shade300);
       } else {
         return buildNumberPin(possibleInput[i], context,
-            backgroundColor: HexColor('#0a73b8'));
+            backgroundColor: Theme.of(context).colorScheme.primaryContainer);
       }
     });
     return SizedBox(
