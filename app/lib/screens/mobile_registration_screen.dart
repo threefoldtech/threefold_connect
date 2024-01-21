@@ -6,7 +6,6 @@ import 'package:flutter_pkid/flutter_pkid.dart';
 import 'package:sodium_libs/sodium_libs.dart';
 import 'package:http/http.dart';
 import 'package:threebotlogin/helpers/flags.dart';
-import 'package:threebotlogin/helpers/globals.dart';
 import 'package:threebotlogin/helpers/kyc_helpers.dart';
 import 'package:threebotlogin/services/3bot_service.dart';
 import 'package:threebotlogin/services/crypto_service.dart';
@@ -307,10 +306,7 @@ class _MobileRegistrationScreenState extends State<MobileRegistrationScreen> {
   Widget registrationStepper() {
     return Theme(
       data: ThemeData(
-        primaryColor: Globals.color,
-        colorScheme: ColorScheme.fromSwatch().copyWith(
-          secondary: Globals.color,
-        ),
+        colorScheme: Theme.of(context).colorScheme
       ),
       child: Stepper(
         controlsBuilder: (BuildContext context, ControlsDetails details) {
@@ -607,7 +603,7 @@ class _MobileRegistrationScreenState extends State<MobileRegistrationScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('ThreeFold Connect - Registration'),
+        title: const Text('Registration'),
       ),
       body: registrationStepper(),
     );
