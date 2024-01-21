@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'dart:core';
 import 'package:flutter/material.dart';
 import 'package:flutter_pkid/flutter_pkid.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:http/http.dart';
 import 'package:shuftipro_sdk/shuftipro_sdk.dart';
 import 'package:threebotlogin/events/events.dart';
@@ -220,120 +219,101 @@ class _IdentityVerificationScreenState
   Widget build(BuildContext context) {
     return LayoutDrawer(
       titleText: 'Identity',
-      content: Stack(
-        children: [
-          SvgPicture.asset(
-            'assets/bg.svg',
-            alignment: Alignment.center,
-            width: MediaQuery.of(context).size.width,
-            height: MediaQuery.of(context).size.height,
-            colorFilter: ColorFilter.mode(
-                Theme.of(context).colorScheme.primary.withOpacity(0.2),
-                BlendMode.srcIn),
-          ),
-          FutureBuilder(
-            future: getEmail(),
-            builder: (ctx, snapshot) {
-              if (snapshot.connectionState == ConnectionState.done) {
-                if (isLoading) {
-                  return _pleaseWait();
-                }
-
-                return Column(
-                  mainAxisSize: MainAxisSize.max,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.all(15),
-                      child: Column(
-                        children: [
-                          AnimatedBuilder(
-                              animation: Listenable.merge([
-                                Globals().emailVerified,
-                                Globals().phoneVerified,
-                                Globals().identityVerified
-                              ]),
-                              builder: (BuildContext context, _) {
-                                return Column(
-                                  children: [
-                                    // Step one: verify email
-                                    _fillCard(
-                                        getCorrectState(1, emailVerified,
-                                            phoneVerified, identityVerified),
-                                        1,
-                                        email,
-                                        Icons.email),
-
-                                    // Step two: verify phone
-                                    Globals().phoneVerification == true
-                                        ? _fillCard(
-                                            getCorrectState(
-                                                2,
-                                                emailVerified,
-                                                phoneVerified,
-                                                identityVerified),
-                                            2,
-                                            phone,
-                                            Icons.phone)
-                                        : Container(),
-
-                                    // Step three: verify identity
-                                    Globals().isOpenKYCEnabled
-                                        ? _fillCard(
-                                            getCorrectState(
-                                                3,
-                                                emailVerified,
-                                                phoneVerified,
-                                                identityVerified),
-                                            3,
-                                            extract3Bot(doubleName),
-                                            Icons.perm_identity)
-                                        : Container(),
-
-                                    Globals().redoIdentityVerification &&
-                                            identityVerified == true
-                                        ? ElevatedButton(
-                                            onPressed: () async {
-                                              await verifyIdentityProcess();
-                                            },
-                                            child: const Text(
-                                                'Redo identity verification'))
-                                        : Container(),
-                                    Globals().debugMode == true
-                                        ? ElevatedButton(
-                                            onPressed: () async {
-                                              bool? isEmailVerified =
-                                                  await getIsEmailVerified();
-                                              bool? isPhoneVerified =
-                                                  await getIsPhoneVerified();
-                                              bool? isIdentityVerified =
-                                                  await getIsIdentityVerified();
-
-                                              kycLogs = '';
-                                              kycLogs +=
-                                                  'Email verified: $isEmailVerified\n';
-                                              kycLogs +=
-                                                  'Phone verified: $isPhoneVerified\n';
-                                              kycLogs +=
-                                                  'Identity verified: $isIdentityVerified\n';
-
-                                              setState(() {});
-                                            },
-                                            child: const Text('KYC Status'))
-                                        : Container(),
-                                    Text(kycLogs),
-                                  ],
-                                );
-                              })
-                        ],
-                      ),
-                    )
-                  ],
-                );
-              }
+      content: FutureBuilder(
+        future: getEmail(),
+        builder: (ctx, snapshot) {
+          if (snapshot.connectionState == ConnectionState.done) {
+            if (isLoading) {
               return _pleaseWait();
-            },
-          ),
-        ],
+            }
+
+            return Column(
+              mainAxisSize: MainAxisSize.max,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(15),
+                  child: Column(
+                    children: [
+                      AnimatedBuilder(
+                          animation: Listenable.merge([
+                            Globals().emailVerified,
+                            Globals().phoneVerified,
+                            Globals().identityVerified
+                          ]),
+                          builder: (BuildContext context, _) {
+                            return Column(
+                              children: [
+                                // Step one: verify email
+                                _fillCard(
+                                    getCorrectState(1, emailVerified,
+                                        phoneVerified, identityVerified),
+                                    1,
+                                    email,
+                                    Icons.email),
+
+                                // Step two: verify phone
+                                Globals().phoneVerification == true
+                                    ? _fillCard(
+                                        getCorrectState(2, emailVerified,
+                                            phoneVerified, identityVerified),
+                                        2,
+                                        phone,
+                                        Icons.phone)
+                                    : Container(),
+
+                                // Step three: verify identity
+                                Globals().isOpenKYCEnabled
+                                    ? _fillCard(
+                                        getCorrectState(3, emailVerified,
+                                            phoneVerified, identityVerified),
+                                        3,
+                                        extract3Bot(doubleName),
+                                        Icons.perm_identity)
+                                    : Container(),
+
+                                Globals().redoIdentityVerification &&
+                                        identityVerified == true
+                                    ? ElevatedButton(
+                                        onPressed: () async {
+                                          await verifyIdentityProcess();
+                                        },
+                                        child: const Text(
+                                            'Redo identity verification'))
+                                    : Container(),
+                                Globals().debugMode == true
+                                    ? ElevatedButton(
+                                        onPressed: () async {
+                                          bool? isEmailVerified =
+                                              await getIsEmailVerified();
+                                          bool? isPhoneVerified =
+                                              await getIsPhoneVerified();
+                                          bool? isIdentityVerified =
+                                              await getIsIdentityVerified();
+
+                                          kycLogs = '';
+                                          kycLogs +=
+                                              'Email verified: $isEmailVerified\n';
+                                          kycLogs +=
+                                              'Phone verified: $isPhoneVerified\n';
+                                          kycLogs +=
+                                              'Identity verified: $isIdentityVerified\n';
+
+                                          setState(() {});
+                                        },
+                                        child: const Text('KYC Status'))
+                                    : Container(),
+                                Text(kycLogs),
+                              ],
+                            );
+                          })
+                    ],
+                  ),
+                )
+              ],
+            );
+          }
+          return _pleaseWait();
+        },
       ),
     );
   }

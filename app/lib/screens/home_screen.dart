@@ -2,8 +2,6 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
-import 'package:flutter_svg/svg.dart';
-
 //import 'package:threebotlogin/apps/free_flow_pages/ffp.dart';
 //import 'package:threebotlogin/apps/free_flow_pages/ffp_events.dart';
 import 'package:threebotlogin/events/email_event.dart';
@@ -245,25 +243,12 @@ class _HomeScreenState extends State<HomeScreen>
         child: WillPopScope(
           onWillPop: onWillPop,
           child: Scaffold(
-            body: Stack(
-              children: <Widget>[
-                SvgPicture.asset(
-                  'assets/bg.svg',
-                  alignment: Alignment.center,
-                  width: MediaQuery.of(context).size.width,
-                  height: MediaQuery.of(context).size.height,
-                  colorFilter: ColorFilter.mode(
-                Theme.of(context).colorScheme.primary.withOpacity(0.2),
-                BlendMode.srcIn),
-                ),
-                SafeArea(
-                    child: TabBarView(
-                  controller: globals.tabController,
-                  physics: const NeverScrollableScrollPhysics(),
-                  children: Globals().router.getContent(),
-                )),
-              ],
-            ),
+            body: SafeArea(
+                child: TabBarView(
+              controller: globals.tabController,
+              physics: const NeverScrollableScrollPhysics(),
+              children: Globals().router.getContent(),
+            )),
           ),
         ),
       ),

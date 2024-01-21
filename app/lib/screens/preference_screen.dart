@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:threebotlogin/app_config.dart';
 import 'package:threebotlogin/apps/free_flow_pages/ffp_events.dart';
@@ -77,120 +76,107 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
   Widget build(BuildContext context) {
     return LayoutDrawer(
       titleText: 'Settings',
-      content: Stack(
+      content: ListView(
         children: <Widget>[
-          SvgPicture.asset(
-            'assets/bg.svg',
-            alignment: Alignment.center,
-            width: MediaQuery.of(context).size.width,
-            height: MediaQuery.of(context).size.height,
-            colorFilter: ColorFilter.mode(
-                Theme.of(context).colorScheme.primary.withOpacity(0.2),
-                BlendMode.srcIn),
+          const ListTile(
+            title: Text('Global settings'),
           ),
-          ListView(
-            children: <Widget>[
-              const ListTile(
-                title: Text('Global settings'),
-              ),
-              ListTile(
-                leading: const Icon(Icons.person),
-                title: Text(doubleName),
-              ),
-              FutureBuilder(
-                future: getPhrase(),
-                builder: (context, snapshot) {
-                  if (snapshot.hasData) {
-                    return ListTile(
-                      trailing: const Padding(
-                        padding: EdgeInsets.only(right: 7.5),
-                        child: Icon(Icons.visibility),
-                      ),
-                      leading: const Icon(Icons.vpn_key),
-                      title: const Text('Show phrase'),
-                      onTap: () async {
-                        _showPhrase();
-                      },
-                    );
+          ListTile(
+            leading: const Icon(Icons.person),
+            title: Text(doubleName),
+          ),
+          FutureBuilder(
+            future: getPhrase(),
+            builder: (context, snapshot) {
+              if (snapshot.hasData) {
+                return ListTile(
+                  trailing: const Padding(
+                    padding: EdgeInsets.only(right: 7.5),
+                    child: Icon(Icons.visibility),
+                  ),
+                  leading: const Icon(Icons.vpn_key),
+                  title: const Text('Show phrase'),
+                  onTap: () async {
+                    _showPhrase();
+                  },
+                );
+              } else {
+                return Container();
+              }
+            },
+          ),
+          FutureBuilder(
+              future: checkBiometrics(),
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  if (snapshot.data == true) {
+                    return FutureBuilder(
+                        future: getBiometricDeviceName(),
+                        builder: (context, snapshot) {
+                          if (snapshot.hasData) {
+                            if (snapshot.data == 'Not found') {
+                              return Container();
+                            }
+                            biometricDeviceName = snapshot.data;
+                            return CheckboxListTile(
+                              secondary: const Icon(Icons.fingerprint),
+                              value: finger,
+                              title: Text(snapshot.data.toString()),
+                              activeColor:
+                                  Theme.of(context).colorScheme.primary,
+                              onChanged: (bool? newValue) async {
+                                _toggleFingerprint(newValue!);
+                              },
+                            );
+                          } else {
+                            return Container();
+                          }
+                        });
                   } else {
                     return Container();
                   }
-                },
-              ),
-              FutureBuilder(
-                  future: checkBiometrics(),
-                  builder: (context, snapshot) {
-                    if (snapshot.hasData) {
-                      if (snapshot.data == true) {
-                        return FutureBuilder(
-                            future: getBiometricDeviceName(),
-                            builder: (context, snapshot) {
-                              if (snapshot.hasData) {
-                                if (snapshot.data == 'Not found') {
-                                  return Container();
-                                }
-                                biometricDeviceName = snapshot.data;
-                                return CheckboxListTile(
-                                  secondary: const Icon(Icons.fingerprint),
-                                  value: finger,
-                                  title: Text(snapshot.data.toString()),
-                                  activeColor:
-                                      Theme.of(context).colorScheme.primary,
-                                  onChanged: (bool? newValue) async {
-                                    _toggleFingerprint(newValue!);
-                                  },
-                                );
-                              } else {
-                                return Container();
-                              }
-                            });
-                      } else {
-                        return Container();
-                      }
-                    } else {
-                      return Container();
-                    }
-                  }),
+                } else {
+                  return Container();
+                }
+              }),
+          ListTile(
+            leading: const Icon(Icons.lock),
+            title: const Text('Change pincode'),
+            onTap: () async {
+              _changePincode();
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.perm_device_information),
+            title: Text('Version: $version - $buildNumber'),
+            onTap: () {
+              _showVersionInfo();
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.info_outline),
+            title: const Text('Terms and conditions'),
+            onTap: () async => {await _showTermsAndConds()},
+          ),
+          ExpansionTile(
+            title: const Text(
+              'Advanced settings',
+            ),
+            children: <Widget>[
               ListTile(
-                leading: const Icon(Icons.lock),
-                title: const Text('Change pincode'),
-                onTap: () async {
-                  _changePincode();
-                },
-              ),
-              ListTile(
-                leading: const Icon(Icons.perm_device_information),
-                title: Text('Version: $version - $buildNumber'),
-                onTap: () {
-                  _showVersionInfo();
-                },
-              ),
-              ListTile(
-                leading: const Icon(Icons.info_outline),
-                title: const Text('Terms and conditions'),
-                onTap: () async => {await _showTermsAndConds()},
-              ),
-              ExpansionTile(
-                title: const Text(
-                  'Advanced settings',
+                leading: const Icon(Icons.person),
+                title: Text(
+                  'Remove Account From Device',
+                  style: Theme.of(context)
+                      .textTheme
+                      .bodyLarge!
+                      .copyWith(color: Theme.of(context).colorScheme.error),
                 ),
-                children: <Widget>[
-                  ListTile(
-                    leading: const Icon(Icons.person),
-                    title: Text(
-                      'Remove Account From Device',
-                      style: Theme.of(context)
-                          .textTheme
-                          .bodyLarge!
-                          .copyWith(color: Theme.of(context).colorScheme.error),
-                    ),
-                    trailing: Icon(
-                      Icons.remove_circle,
-                      color: Theme.of(context).colorScheme.error,
-                    ),
-                    onTap: _showDialog,
-                  ),
-                ],
+                trailing: Icon(
+                  Icons.remove_circle,
+                  color: Theme.of(context).colorScheme.error,
+                ),
+                onTap: _showDialog,
               ),
             ],
           ),
