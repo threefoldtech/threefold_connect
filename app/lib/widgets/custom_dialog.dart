@@ -155,7 +155,7 @@ class _CustomDialogState extends State<CustomDialog> {
             ConstrainedBox(
               constraints: const BoxConstraints(maxHeight: 300, maxWidth: 310),
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 5.0),
+                padding: const EdgeInsets.symmetric(horizontal: 10.0),
                 child: (widget.widgetDescription == null)
                     ? Text(
                         widget.description!,
