@@ -90,12 +90,15 @@ class _UnregisteredScreenState extends State<UnregisteredScreen>
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: <Widget>[
                       Container(
-                        width: 360.0,
-                        height: 108.0,
-                        decoration: const BoxDecoration(
+                        width: 300.0,
+                        height: 35.0,
+                        decoration: BoxDecoration(
                           image: DecorationImage(
-                              fit: BoxFit.cover,
-                              image: AssetImage('assets/logo.png')),
+                              colorFilter: ColorFilter.mode(
+                                  Theme.of(context).colorScheme.onBackground,
+                                  BlendMode.srcIn),
+                              fit: BoxFit.fill,
+                              image: const AssetImage('assets/logoTF.png')),
                         ),
                       ),
                       const SizedBox(height: 100),
@@ -109,19 +112,24 @@ class _UnregisteredScreenState extends State<UnregisteredScreen>
                         ElevatedButton(
                           style: ElevatedButton.styleFrom(
                             backgroundColor:
-                                Theme.of(context).colorScheme.secondary,
+                                Theme.of(context).colorScheme.primaryContainer,
                             shape: const RoundedRectangleBorder(
                               borderRadius:
                                   BorderRadius.all(Radius.circular(30)),
                             ),
                           ),
-                          child: const Row(
+                          child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: <Widget>[
                               Text(
-                                'SIGN UP',
-                                style: TextStyle(
-                                    color: Colors.white, fontSize: 16),
+                                'Sign Up',
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .titleMedium!
+                                    .copyWith(
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .onPrimaryContainer),
                               ),
                             ],
                           ),
@@ -133,19 +141,24 @@ class _UnregisteredScreenState extends State<UnregisteredScreen>
                         ElevatedButton(
                           style: ElevatedButton.styleFrom(
                             backgroundColor:
-                                Theme.of(context).colorScheme.secondary,
+                                Theme.of(context).colorScheme.primaryContainer,
                             shape: const RoundedRectangleBorder(
                               borderRadius:
                                   BorderRadius.all(Radius.circular(30)),
                             ),
                           ),
-                          child: const Row(
+                          child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: <Widget>[
                               Text(
-                                'RECOVER ACCOUNT',
-                                style: TextStyle(
-                                    color: Colors.white, fontSize: 16),
+                                'Recover Account',
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .titleMedium!
+                                    .copyWith(
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .onPrimaryContainer),
                               ),
                             ],
                           ),

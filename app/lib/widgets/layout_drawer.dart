@@ -32,20 +32,23 @@ class _LayoutDrawerState extends State<LayoutDrawer> {
           // Important: Remove any padding from the ListView.
           padding: EdgeInsets.zero,
           children: <Widget>[
-            const SizedBox(
+            SizedBox(
               width: 200,
               height: 100,
               child: Padding(
-                  padding: EdgeInsets.all(20),
+                  padding: const EdgeInsets.all(20),
                   child: DrawerHeader(
                     decoration: BoxDecoration(
                       image: DecorationImage(
+                        colorFilter: ColorFilter.mode(
+                            Theme.of(context).colorScheme.onBackground,
+                            BlendMode.srcIn),
                         alignment: Alignment.center,
-                        image: AssetImage('assets/logo.png'),
+                        image: const AssetImage('assets/logoTF.png'),
                         fit: BoxFit.contain,
                       ),
                     ),
-                    child: Text(''),
+                    child: const Text(''),
                   )),
             ),
             ListTile(

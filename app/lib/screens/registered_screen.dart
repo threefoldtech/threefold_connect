@@ -38,14 +38,17 @@ class _RegisteredScreenState extends State<RegisteredScreen>
                 children: <Widget>[
                   Container(
                     width: 300.0,
-                    height: 90.0,
-                    decoration: const BoxDecoration(
+                    height: 35,
+                    decoration: BoxDecoration(
                       image: DecorationImage(
+                         colorFilter: ColorFilter.mode(
+                                  Theme.of(context).colorScheme.onBackground,
+                                  BlendMode.srcIn),
                           fit: BoxFit.fill,
-                          image: AssetImage('assets/logo.png')),
+                          image: const AssetImage('assets/logoTF.png')),
                     ),
                   ),
-                  const SizedBox(height: 30),
+                  const SizedBox(height: 50),
                   Container(
                     width: 200.0,
                     height: 200.0,
@@ -55,7 +58,7 @@ class _RegisteredScreenState extends State<RegisteredScreen>
                           image: AssetImage('assets/threefold_registered.png')),
                     ),
                   ),
-                  const SizedBox(height: 30),
+                  const SizedBox(height: 50),
                   SizedBox(
                     width: MediaQuery.of(context).size.width / 1.75,
                     child: RichText(

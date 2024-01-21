@@ -61,8 +61,11 @@ class _AppState extends State<MainScreen> {
       mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
         Image.asset(
-          'assets/logo.png',
+          'assets/logoTF.png',
           height: 100,
+          colorBlendMode: BlendMode.srcIn,
+          width: 300,
+          color: Theme.of(context).colorScheme.onBackground,
         ),
         const SizedBox(
           height: 40,
@@ -73,10 +76,9 @@ class _AppState extends State<MainScreen> {
             updateMessage != null
                 ? updateMessage.toString()
                 : errorMessage.toString(),
-            style: TextStyle(
-                fontSize: 16,
+            style: Theme.of(context).textTheme.bodyMedium!.copyWith(
                 fontWeight: FontWeight.bold,
-                color: errorMessage != null ? Colors.red : Colors.black),
+                color: errorMessage != null ? Theme.of(context).colorScheme.error : Theme.of(context).colorScheme.onBackground),
           ),
         ),
         const SizedBox(
