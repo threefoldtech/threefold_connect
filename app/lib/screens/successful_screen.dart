@@ -38,14 +38,16 @@ class _SuccessfulScreenState extends State<SuccessfulScreen> {
               Icon(
                 Icons.check_circle,
                 size: 42.0,
-                color: Theme.of(context).colorScheme.secondary,
+                color: Theme.of(context).colorScheme.primary,
               ),
               const SizedBox(
                 height: 20.0,
               ),
               Text(
                 widget.text,
-                style: const TextStyle(fontSize: 18),
+                style: Theme.of(context).textTheme.bodyLarge!.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: Theme.of(context).colorScheme.onBackground),
               ),
               const SizedBox(
                 height: 60.0,
