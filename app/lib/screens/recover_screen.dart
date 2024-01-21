@@ -135,6 +135,8 @@ class _RecoverScreenState extends State<RecoverScreen> {
             Padding(
               padding: const EdgeInsets.only(top: 8.5),
               child: TextFormField(
+                  style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                      color: Theme.of(context).colorScheme.onBackground),
                   keyboardType: TextInputType.text,
                   decoration: const InputDecoration(
                     border: OutlineInputBorder(),
@@ -154,6 +156,8 @@ class _RecoverScreenState extends State<RecoverScreen> {
             Padding(
               padding: const EdgeInsets.only(top: 8.5),
               child: TextFormField(
+                style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                    color: Theme.of(context).colorScheme.onBackground),
                 keyboardType: TextInputType.multiline,
                 maxLines: null,
                 decoration: const InputDecoration(
@@ -175,8 +179,9 @@ class _RecoverScreenState extends State<RecoverScreen> {
             ),
             Text(
               error,
-              style: const TextStyle(
-                  color: Colors.red, fontWeight: FontWeight.bold),
+              style: Theme.of(context).textTheme.bodyLarge!.copyWith(
+                  color: Theme.of(context).colorScheme.error,
+                  fontWeight: FontWeight.bold),
             ),
             ElevatedButton(
               style: ElevatedButton.styleFrom(
@@ -186,9 +191,12 @@ class _RecoverScreenState extends State<RecoverScreen> {
                 padding:
                     const EdgeInsets.symmetric(horizontal: 11.0, vertical: 6.0),
               ),
-              child: const Text(
+              child: Text(
                 'Recover Account',
-                style: TextStyle(color: Colors.white),
+                style: Theme.of(context)
+                    .textTheme
+                    .bodyMedium!
+                    .copyWith(color: Theme.of(context).colorScheme.onPrimaryContainer),
               ),
               onPressed: () async {
                 setState(() {

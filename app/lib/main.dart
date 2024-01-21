@@ -80,7 +80,7 @@ class MyApp extends StatelessWidget {
             margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8)),
         elevatedButtonTheme: ElevatedButtonThemeData(
           style: ElevatedButton.styleFrom(
-              backgroundColor: kDarkColorScheme.primaryContainer),
+              backgroundColor: kColorScheme.primaryContainer),
         ),
       ),
       darkTheme: ThemeData(
