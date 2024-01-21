@@ -1238,33 +1238,59 @@ class _IdentityVerificationScreenState
           return StatefulBuilder(builder: (statefulContext, setCustomState) {
             return AlertDialog(
               title: emailWasEmpty == true
-                  ? const Text('Add email')
-                  : const Text('Change email'),
+                  ? Text(
+                      'Add email',
+                      style: Theme.of(context)
+                          .textTheme
+                          .headlineMedium!
+                          .copyWith(
+                              color:
+                                  Theme.of(context).colorScheme.onBackground),
+                    )
+                  : Text('Change email',
+                      style: Theme.of(context)
+                          .textTheme
+                          .headlineMedium!
+                          .copyWith(
+                              color:
+                                  Theme.of(context).colorScheme.onBackground)),
               contentPadding: const EdgeInsets.all(24),
-              content: Container(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    emailWasEmpty == true
-                        ? const Text('Please pass us your email address')
-                        : const Text(
-                            'Changing your email will require you to go through the email verification process again.'),
-                    TextField(
-                      controller: controller,
-                      decoration: InputDecoration(
-                          focusedBorder: UnderlineInputBorder(
-                            borderSide: BorderSide(
-                                color: Theme.of(context).primaryColor),
-                          ),
-                          labelText: 'Email',
-                          errorText: validEmail == true ? null : errorEmail),
-                    ),
-                    const SizedBox(
-                      height: 20,
-                    ),
-                    statusMessage
-                  ],
-                ),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  emailWasEmpty == true
+                      ? Text('Please pass us your email address',
+                          style: Theme.of(context)
+                              .textTheme
+                              .bodyLarge!
+                              .copyWith(
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .onBackground))
+                      : Text(
+                          'Changing your email will require you to go through the email verification process again.',
+                          style: Theme.of(context)
+                              .textTheme
+                              .bodyLarge!
+                              .copyWith(
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .onBackground)),
+                  TextField(
+                    controller: controller,
+                    decoration: InputDecoration(
+                        focusedBorder: UnderlineInputBorder(
+                          borderSide:
+                              BorderSide(color: Theme.of(context).primaryColor),
+                        ),
+                        labelText: 'Email',
+                        errorText: validEmail == true ? null : errorEmail),
+                  ),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  statusMessage
+                ],
               ),
               actions: [
                 TextButton(
