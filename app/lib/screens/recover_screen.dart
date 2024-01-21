@@ -139,12 +139,13 @@ class _RecoverScreenState extends State<RecoverScreen> {
               padding: const EdgeInsets.only(top: 8.5),
               child: TextFormField(
                   style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                      color: Theme.of(context).colorScheme.onBackground),
+                      color: Theme.of(context).colorScheme.onBackground,
+                    decorationColor: Theme.of(context).colorScheme.onBackground
+                      ),
                   keyboardType: TextInputType.text,
                   decoration: const InputDecoration(
                     border: OutlineInputBorder(),
                     labelText: 'Name',
-                    filled: true,
                     // suffixText: '.3bot',
                     suffixStyle: TextStyle(fontWeight: FontWeight.bold),
                   ),
@@ -160,13 +161,14 @@ class _RecoverScreenState extends State<RecoverScreen> {
               padding: const EdgeInsets.only(top: 8.5),
               child: TextFormField(
                 style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                    color: Theme.of(context).colorScheme.onBackground),
+                    color: Theme.of(context).colorScheme.onBackground,
+                    decorationColor: Theme.of(context).colorScheme.onBackground
+                    ),
                 keyboardType: TextInputType.multiline,
                 maxLines: null,
                 decoration: const InputDecoration(
                   labelText: 'Seed Phrase',
                   border: OutlineInputBorder(),
-                  filled: true,
                 ),
                 controller: seedPhraseController,
                 validator: (String? value) {
