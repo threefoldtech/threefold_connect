@@ -17,9 +17,13 @@ class ReuseableTextStep extends StatelessWidget {
       children: <Widget>[
         Text(
           titleText,
+          style: Theme.of(context)
+              .textTheme
+              .bodyMedium!
+              .copyWith(color: Theme.of(context).colorScheme.onSecondaryContainer),
         ),
         const Divider(
-          height: 50,
+          height: 30,
         ),
         Padding(
           padding: const EdgeInsets.only(top: 8.5),
@@ -29,8 +33,10 @@ class ReuseableTextStep extends StatelessWidget {
                 padding: const EdgeInsets.all(5),
                 child: Text(
                   extraText,
-                  style: const TextStyle(
-                      fontWeight: FontWeight.bold, fontSize: 24),
+                  style: Theme.of(context).textTheme.titleLarge!.copyWith(
+                        color: Theme.of(context).colorScheme.onSecondaryContainer,
+                        fontWeight: FontWeight.bold,
+                      ),
                 ),
               ),
             ),
@@ -42,7 +48,10 @@ class ReuseableTextStep extends StatelessWidget {
               padding: const EdgeInsets.only(top: 10),
               child: Text(
                 errorStepperText,
-                style: const TextStyle(color: Colors.red),
+                style: Theme.of(context)
+                    .textTheme
+                    .bodyMedium!
+                    .copyWith(color: Theme.of(context).colorScheme.error),
                 textAlign: TextAlign.left,
               ),
             ),

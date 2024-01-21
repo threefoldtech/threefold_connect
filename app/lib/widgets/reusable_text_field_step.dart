@@ -26,7 +26,10 @@ class ReuseableTextFieldStep extends StatelessWidget {
       children: <Widget>[
         Text(
           titleText,
-          style: const TextStyle(fontWeight: FontWeight.bold),
+          style: Theme.of(context)
+              .textTheme
+              .titleMedium!
+              .copyWith(color: Theme.of(context).colorScheme.onSecondaryContainer),
         ),
         const Divider(
           height: 50,
@@ -34,6 +37,11 @@ class ReuseableTextFieldStep extends StatelessWidget {
         Padding(
           padding: const EdgeInsets.only(top: 8.5),
           child: TextFormField(
+            style: Theme.of(context)
+                .textTheme
+                .bodyLarge!
+                .copyWith(color: Theme.of(context).colorScheme.onSecondaryContainer,
+                decorationColor: Theme.of(context).colorScheme.onSecondaryContainer),
             focusNode: focusNode,
             autofocus: true,
             keyboardType: typeText,
@@ -52,7 +60,10 @@ class ReuseableTextFieldStep extends StatelessWidget {
               padding: const EdgeInsets.only(top: 10),
               child: Text(
                 errorStepperText,
-                style: const TextStyle(color: Colors.red),
+                style: Theme.of(context)
+                    .textTheme
+                    .bodyMedium!
+                    .copyWith(color: Theme.of(context).colorScheme.error),
                 textAlign: TextAlign.left,
               ),
             ),
