@@ -218,7 +218,11 @@ class _SignScreenState extends State<SignScreen> with BlockAndRunMixin {
         const SizedBox(
           height: 15,
         ),
-        isBusy ? const CircularProgressIndicator() : Container(),
+        isBusy
+            ? CircularProgressIndicator(
+                color: Theme.of(context).colorScheme.primary,
+              )
+            : Container(),
         isBusy
             ? const SizedBox(
                 height: 10,
@@ -362,15 +366,19 @@ class _SignScreenState extends State<SignScreen> with BlockAndRunMixin {
       child: Container(
         constraints:
             BoxConstraints(minHeight: MediaQuery.of(context).size.height * 0.8),
-        child: const Column(
+        child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            CircularProgressIndicator(),
-            SizedBox(height: 20),
+            CircularProgressIndicator(
+              color: Theme.of(context).colorScheme.primary,
+            ),
+            const SizedBox(height: 20),
             Text(
               'Loading ...',
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+              style: Theme.of(context).textTheme.bodyLarge!.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
             )
           ],
         ),

@@ -490,19 +490,27 @@ class _IdentityVerificationScreenState
   }
 
   Widget _pleaseWait() {
-    return const Dialog(
+    return Dialog(
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          SizedBox(
+          const SizedBox(
             height: 10,
           ),
-          CircularProgressIndicator(),
-          SizedBox(
+          CircularProgressIndicator(
+            color: Theme.of(context).colorScheme.primary,
+          ),
+          const SizedBox(
             height: 10,
           ),
-          Text('One moment please'),
-          SizedBox(
+          Text(
+            'One moment please',
+            style: Theme.of(context)
+                .textTheme
+                .bodyMedium!
+                .copyWith(color: Theme.of(context).colorScheme.onBackground),
+          ),
+          const SizedBox(
             height: 10,
           ),
         ],
@@ -517,19 +525,25 @@ class _IdentityVerificationScreenState
       builder: (BuildContext context) {
         return WillPopScope(
           onWillPop: () => Future.value(false),
-          child: const Dialog(
+          child: Dialog(
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                SizedBox(
+                const SizedBox(
                   height: 10,
                 ),
-                CircularProgressIndicator(),
-                SizedBox(
+                CircularProgressIndicator(
+                  color: Theme.of(context).colorScheme.primary,
+                ),
+                const SizedBox(
                   height: 10,
                 ),
-                Text('One moment please'),
-                SizedBox(
+                Text(
+                  'One moment please',
+                  style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                      color: Theme.of(context).colorScheme.onBackground),
+                ),
+                const SizedBox(
                   height: 10,
                 ),
               ],
@@ -857,7 +871,7 @@ class _IdentityVerificationScreenState
               decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   color: Theme.of(context).colorScheme.primary),
-              child:  Column(
+              child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Icon(

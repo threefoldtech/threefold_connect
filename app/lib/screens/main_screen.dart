@@ -78,7 +78,9 @@ class _AppState extends State<MainScreen> {
                 : errorMessage.toString(),
             style: Theme.of(context).textTheme.bodyMedium!.copyWith(
                 fontWeight: FontWeight.bold,
-                color: errorMessage != null ? Theme.of(context).colorScheme.error : Theme.of(context).colorScheme.onBackground),
+                color: errorMessage != null
+                    ? Theme.of(context).colorScheme.error
+                    : Theme.of(context).colorScheme.onBackground),
           ),
         ),
         const SizedBox(
@@ -86,8 +88,8 @@ class _AppState extends State<MainScreen> {
         ),
         Transform.scale(
           scale: 0.5,
-          child: const CircularProgressIndicator(
-            color: Color.fromRGBO(0, 174, 239, 1),
+          child: CircularProgressIndicator(
+            color: Theme.of(context).colorScheme.primary,
           ),
         ),
         const SizedBox(height: 20),

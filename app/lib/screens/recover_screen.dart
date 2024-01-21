@@ -247,19 +247,27 @@ class _RecoverScreenState extends State<RecoverScreen> {
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (BuildContext context) => const Dialog(
+      builder: (BuildContext context) => Dialog(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            SizedBox(
+            const SizedBox(
               height: 10,
             ),
-            CircularProgressIndicator(),
-            SizedBox(
+            CircularProgressIndicator(
+              color: Theme.of(context).colorScheme.primary,
+            ),
+            const SizedBox(
               height: 10,
             ),
-            Text('Loading'),
-            SizedBox(
+            Text(
+              'Loading',
+              style: Theme.of(context)
+                  .textTheme
+                  .bodyMedium!
+                  .copyWith(color: Theme.of(context).colorScheme.onBackground),
+            ),
+            const SizedBox(
               height: 10,
             ),
           ],
