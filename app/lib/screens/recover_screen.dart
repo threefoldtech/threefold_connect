@@ -6,7 +6,6 @@ import 'package:flutter_pkid/flutter_pkid.dart';
 import 'package:sodium_libs/sodium_libs.dart';
 import 'package:http/http.dart';
 import 'package:threebotlogin/helpers/kyc_helpers.dart';
-import 'package:threebotlogin/helpers/globals.dart';
 import 'package:threebotlogin/services/3bot_service.dart';
 import 'package:threebotlogin/services/crypto_service.dart';
 import 'package:threebotlogin/services/migration_service.dart';

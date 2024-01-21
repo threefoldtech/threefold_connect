@@ -854,14 +854,14 @@ class _IdentityVerificationScreenState
             Container(
               width: 30.0,
               height: 30.0,
-              decoration: const BoxDecoration(
-                  shape: BoxShape.circle, color: Colors.green),
+              decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Theme.of(context).colorScheme.primaryContainer),
               child: const Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Icon(
                     Icons.check,
-                    color: Colors.white,
                     size: 15.0,
                   ),
                 ],
@@ -871,7 +871,6 @@ class _IdentityVerificationScreenState
             Icon(
               icon,
               size: 20,
-              color: Colors.black,
             ),
             const Padding(padding: EdgeInsets.only(left: 15)),
             Row(
@@ -891,19 +890,27 @@ class _IdentityVerificationScreenState
                                     MediaQuery.of(context).size.width * 0.55),
                             child: Text(text == '' ? 'Unknown' : text,
                                 overflow: TextOverflow.clip,
-                                style: const TextStyle(
-                                    fontSize: 12, fontWeight: FontWeight.bold)))
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodySmall!
+                                    .copyWith(
+                                        fontWeight: FontWeight.bold,
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .onBackground)))
                       ],
                     ),
                     const SizedBox(height: 5),
-                    const Row(
+                    Row(
                       children: [
                         Text(
                           'Verified',
-                          style: TextStyle(
-                              color: Colors.green,
-                              fontSize: 12,
-                              fontWeight: FontWeight.bold),
+                          style: Theme.of(context)
+                              .textTheme
+                              .bodySmall!
+                              .copyWith(
+                                  color: Theme.of(context).colorScheme.primary,
+                                  fontWeight: FontWeight.bold),
                         )
                       ],
                     )
@@ -912,17 +919,17 @@ class _IdentityVerificationScreenState
                 step == 1
                     ? const Column(
                         mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(Icons.edit, size: 20, color: Colors.black)
-                        ],
+                        children: [Icon(Icons.edit, size: 20)],
                       )
                     : const Column(),
                 step == 3
                     ? const Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Icon(Icons.chevron_right,
-                              size: 20, color: Colors.black)
+                          Icon(
+                            Icons.chevron_right,
+                            size: 20,
+                          )
                         ],
                       )
                     : const Column()
