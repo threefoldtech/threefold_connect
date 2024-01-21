@@ -125,11 +125,14 @@ class _RecoverScreenState extends State<RecoverScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            const Padding(
-              padding: EdgeInsets.only(bottom: 12.0),
+            Padding(
+              padding: const EdgeInsets.only(bottom: 12.0),
               child: Text(
                 'Please insert your info',
-                style: TextStyle(fontWeight: FontWeight.bold),
+                style: Theme.of(context)
+                    .textTheme
+                    .titleMedium!
+                    .copyWith(fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onBackground),
               ),
             ),
             Padding(
@@ -193,10 +196,8 @@ class _RecoverScreenState extends State<RecoverScreen> {
               ),
               child: Text(
                 'Recover Account',
-                style: Theme.of(context)
-                    .textTheme
-                    .bodyMedium!
-                    .copyWith(color: Theme.of(context).colorScheme.onPrimaryContainer),
+                style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                    color: Theme.of(context).colorScheme.onPrimaryContainer),
               ),
               onPressed: () async {
                 setState(() {
