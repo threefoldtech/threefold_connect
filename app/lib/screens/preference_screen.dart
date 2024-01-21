@@ -135,7 +135,7 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
                                   value: finger,
                                   title: Text(snapshot.data.toString()),
                                   activeColor:
-                                      Theme.of(context).colorScheme.secondary,
+                                      Theme.of(context).colorScheme.primary,
                                   onChanged: (bool? newValue) async {
                                     _toggleFingerprint(newValue!);
                                   },
