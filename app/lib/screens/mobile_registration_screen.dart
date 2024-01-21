@@ -306,8 +306,8 @@ class _MobileRegistrationScreenState extends State<MobileRegistrationScreen> {
   Widget registrationStepper() {
     return Theme(
       data: ThemeData(
-        colorScheme: Theme.of(context).colorScheme
-      ),
+          colorScheme: Theme.of(context).colorScheme,
+          elevatedButtonTheme: Theme.of(context).elevatedButtonTheme),
       child: Stepper(
         controlsBuilder: (BuildContext context, ControlsDetails details) {
           return Column(
@@ -316,25 +316,15 @@ class _MobileRegistrationScreenState extends State<MobileRegistrationScreen> {
                 mainAxisSize: MainAxisSize.max,
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: <Widget>[
-                  TextButton(
-                    style: ButtonStyle(
-                      backgroundColor: MaterialStateProperty.all(
-                          Theme.of(context).colorScheme.secondary),
-                    ),
+                  ElevatedButton(
                     onPressed: () {
                       details.onStepCancel!();
                     },
                     child: Text(
                       state == _State.DoubleName ? 'CANCEL' : 'PREVIOUS',
-                      style: const TextStyle(color: Colors.white),
                     ),
                   ),
-                  TextButton(
-                    style: ButtonStyle(
-                      backgroundColor: MaterialStateProperty.all(
-                          Theme.of(context).colorScheme.secondary),
-                      foregroundColor: MaterialStateProperty.all(Colors.grey),
-                    ),
+                  ElevatedButton(
                     onPressed:
                         state == _State.SeedPhrase && didWriteSeed == false
                             ? null
@@ -343,7 +333,6 @@ class _MobileRegistrationScreenState extends State<MobileRegistrationScreen> {
                               },
                     child: Text(
                       state == _State.Finish ? 'FINISH' : 'NEXT',
-                      style: const TextStyle(color: Colors.white),
                     ),
                   )
                 ],
