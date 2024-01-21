@@ -856,13 +856,14 @@ class _IdentityVerificationScreenState
               height: 30.0,
               decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: Theme.of(context).colorScheme.primaryContainer),
-              child: const Column(
+                  color: Theme.of(context).colorScheme.primary),
+              child:  Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Icon(
                     Icons.check,
                     size: 15.0,
+                    color: Theme.of(context).colorScheme.onPrimary,
                   ),
                 ],
               ),
