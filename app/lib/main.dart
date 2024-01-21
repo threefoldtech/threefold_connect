@@ -44,14 +44,14 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var kColorScheme = ColorScheme.fromSeed(
-        brightness: Brightness.light,
-        seedColor: const Color.fromARGB(255, 10, 115, 184),
-        secondary: const Color.fromARGB(255, 87, 190, 142));
+      brightness: Brightness.light,
+      seedColor: const Color.fromARGB(255, 26, 161, 143),
+    );
 
     var kDarkColorScheme = ColorScheme.fromSeed(
-        brightness: Brightness.dark,
-        seedColor: const Color.fromARGB(255, 10, 115, 184),
-        secondary: const Color.fromARGB(255, 87, 190, 142));
+      brightness: Brightness.dark,
+      seedColor: const Color.fromARGB(255, 26, 161, 143),
+    );
     var textTheme = GoogleFonts.latoTextTheme(
       Theme.of(context).textTheme,
     );
