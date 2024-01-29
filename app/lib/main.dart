@@ -5,6 +5,12 @@ import 'package:threebotlogin/screens/main_screen.dart';
 import 'package:threebotlogin/services/shared_preference_service.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+extension ColorSchemeExtension on ColorScheme {
+  Color get warning => brightness == Brightness.light
+      ? const Color.fromARGB(255, 255, 208, 0)
+      : const Color.fromARGB(255, 255, 219, 61);
+}
+
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
