@@ -7,7 +7,6 @@ import 'package:threebotlogin/events/events.dart';
 import 'package:threebotlogin/events/pop_all_login_event.dart';
 import 'package:threebotlogin/helpers/block_and_run_mixin.dart';
 import 'package:threebotlogin/helpers/globals.dart';
-import 'package:threebotlogin/helpers/hex_color.dart';
 import 'package:threebotlogin/helpers/login_helpers.dart';
 import 'package:threebotlogin/models/login.dart';
 import 'package:threebotlogin/services/3bot_service.dart';
@@ -112,7 +111,8 @@ class _LoginScreenState extends State<LoginScreen> with BlockAndRunMixin {
                 padding: const EdgeInsets.only(right: 24.0, left: 24.0),
                 child: Text(
                   isMobileCheck ? scopeTextMobile : scopeText,
-                  style: const TextStyle(fontSize: 14.0),
+                  style: Theme.of(context).textTheme.bodyLarge!.copyWith(
+                      color: Theme.of(context).colorScheme.onBackground),
                   textAlign: TextAlign.center,
                 ),
               ),
@@ -187,7 +187,7 @@ class _LoginScreenState extends State<LoginScreen> with BlockAndRunMixin {
                   padding: const EdgeInsets.only(right: 24.0, left: 24.0),
                   child: Text(
                     'Attempt expires in ${(timeLeft >= 0) ? timeLeft.toString() : '0'} second(s).',
-                    style: const TextStyle(fontSize: 12),
+                    style: Theme.of(context).textTheme.bodyMedium!.copyWith(color: Theme.of(context).colorScheme.onBackground),
                     textAlign: TextAlign.center,
                   ),
                 ),
@@ -221,11 +221,9 @@ class _LoginScreenState extends State<LoginScreen> with BlockAndRunMixin {
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: TextButton(
-                    child: Text(
-                      "It wasn't me - cancel",
-                      style:
-                          TextStyle(fontSize: 16.0, color: HexColor('#0f296a')),
-                    ),
+                    child: Text("It wasn't me - cancel",
+                        style: Theme.of(context).textTheme.bodyLarge!.copyWith(
+                            color: Theme.of(context).colorScheme.error)),
                     onPressed: () {
                       cancelIt();
                       Navigator.pop(context, false);
