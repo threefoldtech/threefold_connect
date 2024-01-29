@@ -162,10 +162,10 @@ class _PreferenceDialogState extends State<PreferenceDialog> {
                               (BuildContext context, AsyncSnapshot snapshot) {
                             if (snapshot.hasData) {
                               return Container(
-                                decoration: const BoxDecoration(
+                                decoration:  BoxDecoration(
                                   border: Border(
                                       bottom: BorderSide(
-                                    color: Colors.grey,
+                                    color:Theme.of(context).colorScheme.onBackground,
                                     width: 0.5,
                                   )),
                                 ),
@@ -182,9 +182,15 @@ class _PreferenceDialogState extends State<PreferenceDialog> {
                                   title: Text(
                                     scopeItem.toUpperCase() +
                                         (mandatory ? ' *' : ''),
-                                    style: const TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.black),
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .bodyLarge!
+                                        .copyWith(
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .onBackground,
+                                          fontWeight: FontWeight.bold,
+                                        ),
                                   ),
                                 ),
                               );
@@ -201,10 +207,10 @@ class _PreferenceDialogState extends State<PreferenceDialog> {
                               (BuildContext context, AsyncSnapshot snapshot) {
                             if (snapshot.hasData) {
                               return Container(
-                                decoration: const BoxDecoration(
+                                decoration:  BoxDecoration(
                                   border: Border(
                                       bottom: BorderSide(
-                                    color: Colors.grey,
+                                    color: Theme.of(context).colorScheme.onBackground,
                                     width: 0.5,
                                   )),
                                 ),
@@ -221,9 +227,15 @@ class _PreferenceDialogState extends State<PreferenceDialog> {
                                   title: Text(
                                     scopeItem.toUpperCase() +
                                         (mandatory ? ' *' : ''),
-                                    style: const TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.black),
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .bodyLarge!
+                                        .copyWith(
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .onBackground,
+                                          fontWeight: FontWeight.bold,
+                                        ),
                                   ),
                                 ),
                               );
@@ -235,10 +247,10 @@ class _PreferenceDialogState extends State<PreferenceDialog> {
 
                       case 'digitalTwin':
                         return Container(
-                          decoration: const BoxDecoration(
+                          decoration:  BoxDecoration(
                             border: Border(
                                 bottom: BorderSide(
-                              color: Colors.grey,
+                              color: Theme.of(context).colorScheme.onBackground,
                               width: 0.5,
                             )),
                           ),
@@ -253,9 +265,15 @@ class _PreferenceDialogState extends State<PreferenceDialog> {
                                   }),
                             title: Text(
                               scopeItem.toUpperCase() + (mandatory ? ' *' : ''),
-                              style: const TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.black),
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodyLarge!
+                                  .copyWith(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onBackground,
+                                    fontWeight: FontWeight.bold,
+                                  ),
                             ),
                           ),
                         );
@@ -267,10 +285,10 @@ class _PreferenceDialogState extends State<PreferenceDialog> {
                               (BuildContext context, AsyncSnapshot snapshot) {
                             if (snapshot.hasData) {
                               return Container(
-                                decoration: const BoxDecoration(
+                                decoration:  BoxDecoration(
                                   border: Border(
                                       bottom: BorderSide(
-                                    color: Colors.grey,
+                                    color: Theme.of(context).colorScheme.onBackground,
                                     width: 0.5,
                                   )),
                                 ),
@@ -286,9 +304,15 @@ class _PreferenceDialogState extends State<PreferenceDialog> {
                                         }),
                                   title: Text(
                                     'PHONE NUMBER${(mandatory ? " *" : "")}',
-                                    style: const TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.black),
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .bodyLarge!
+                                        .copyWith(
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .onBackground,
+                                          fontWeight: FontWeight.bold,
+                                        ),
                                   ),
                                 ),
                               );
@@ -305,10 +329,10 @@ class _PreferenceDialogState extends State<PreferenceDialog> {
                               (BuildContext context, AsyncSnapshot snapshot) {
                             if (snapshot.hasData) {
                               return Container(
-                                decoration: const BoxDecoration(
+                                decoration:  BoxDecoration(
                                   border: Border(
                                       bottom: BorderSide(
-                                    color: Colors.grey,
+                                    color: Theme.of(context).colorScheme.onBackground,
                                     width: 0.5,
                                   )),
                                 ),
@@ -325,9 +349,15 @@ class _PreferenceDialogState extends State<PreferenceDialog> {
                                   title: Text(
                                     scopeItem.toUpperCase() +
                                         (mandatory ? ' *' : ''),
-                                    style: const TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.black),
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .bodyLarge!
+                                        .copyWith(
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .onBackground,
+                                          fontWeight: FontWeight.bold,
+                                        ),
                                   ),
                                 ),
                               );
@@ -344,10 +374,10 @@ class _PreferenceDialogState extends State<PreferenceDialog> {
                               (BuildContext context, AsyncSnapshot snapshot) {
                             if (snapshot.hasData) {
                               return Container(
-                                decoration: const BoxDecoration(
+                                decoration:  BoxDecoration(
                                   border: Border(
                                       bottom: BorderSide(
-                                    color: Colors.grey,
+                                    color: Theme.of(context).colorScheme.onBackground,
                                     width: 0.5,
                                   )),
                                 ),
@@ -363,9 +393,15 @@ class _PreferenceDialogState extends State<PreferenceDialog> {
                                         }),
                                   title: Text(
                                     'NAME (IDENTITY)${(mandatory ? " *" : "")}',
-                                    style: const TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.black),
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .bodyLarge!
+                                        .copyWith(
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .onBackground,
+                                          fontWeight: FontWeight.bold,
+                                        ),
                                   ),
                                 ),
                               );
@@ -382,10 +418,10 @@ class _PreferenceDialogState extends State<PreferenceDialog> {
                               (BuildContext context, AsyncSnapshot snapshot) {
                             if (snapshot.hasData) {
                               return Container(
-                                decoration: const BoxDecoration(
+                                decoration:  BoxDecoration(
                                   border: Border(
                                       bottom: BorderSide(
-                                    color: Colors.grey,
+                                    color: Theme.of(context).colorScheme.onBackground,
                                     width: 0.5,
                                   )),
                                 ),
@@ -401,9 +437,15 @@ class _PreferenceDialogState extends State<PreferenceDialog> {
                                         }),
                                   title: Text(
                                     'DATE OF BIRTH (IDENTITY)${(mandatory ? " *" : "")}',
-                                    style: const TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.black),
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .bodyLarge!
+                                        .copyWith(
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .onBackground,
+                                          fontWeight: FontWeight.bold,
+                                        ),
                                   ),
                                 ),
                               );
@@ -420,10 +462,10 @@ class _PreferenceDialogState extends State<PreferenceDialog> {
                               (BuildContext context, AsyncSnapshot snapshot) {
                             if (snapshot.hasData) {
                               return Container(
-                                decoration: const BoxDecoration(
+                                decoration:  BoxDecoration(
                                   border: Border(
                                       bottom: BorderSide(
-                                    color: Colors.grey,
+                                    color: Theme.of(context).colorScheme.onBackground,
                                     width: 0.5,
                                   )),
                                 ),
@@ -439,9 +481,15 @@ class _PreferenceDialogState extends State<PreferenceDialog> {
                                         }),
                                   title: Text(
                                     'GENDER (IDENTITY)${(mandatory ? " *" : "")}',
-                                    style: const TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.black),
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .bodyLarge!
+                                        .copyWith(
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .onBackground,
+                                          fontWeight: FontWeight.bold,
+                                        ),
                                   ),
                                 ),
                               );
@@ -458,10 +506,10 @@ class _PreferenceDialogState extends State<PreferenceDialog> {
                               (BuildContext context, AsyncSnapshot snapshot) {
                             if (snapshot.hasData) {
                               return Container(
-                                decoration: const BoxDecoration(
+                                decoration:  BoxDecoration(
                                   border: Border(
                                       bottom: BorderSide(
-                                    color: Colors.grey,
+                                    color: Theme.of(context).colorScheme.onBackground,
                                     width: 0.5,
                                   )),
                                 ),
@@ -477,9 +525,15 @@ class _PreferenceDialogState extends State<PreferenceDialog> {
                                         }),
                                   title: Text(
                                     'DOCUMENT META DATA (IDENTITY)${(mandatory ? " *" : "")}',
-                                    style: const TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.black),
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .bodyLarge!
+                                        .copyWith(
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .onBackground,
+                                          fontWeight: FontWeight.bold,
+                                        ),
                                   ),
                                 ),
                               );
@@ -496,10 +550,10 @@ class _PreferenceDialogState extends State<PreferenceDialog> {
                               (BuildContext context, AsyncSnapshot snapshot) {
                             if (snapshot.hasData) {
                               return Container(
-                                decoration: const BoxDecoration(
+                                decoration:  BoxDecoration(
                                   border: Border(
                                       bottom: BorderSide(
-                                    color: Colors.grey,
+                                    color: Theme.of(context).colorScheme.onBackground,
                                     width: 0.5,
                                   )),
                                 ),
@@ -515,9 +569,15 @@ class _PreferenceDialogState extends State<PreferenceDialog> {
                                         }),
                                   title: Text(
                                     'COUNTRY (IDENTITY)${(mandatory ? " *" : "")}',
-                                    style: const TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.black),
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .bodyLarge!
+                                        .copyWith(
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .onBackground,
+                                          fontWeight: FontWeight.bold,
+                                        ),
                                   ),
                                 ),
                               );
@@ -535,10 +595,10 @@ class _PreferenceDialogState extends State<PreferenceDialog> {
                               if (!snapshot.hasData ||
                                   snapshot.data.length == 0) {
                                 return Container(
-                                    decoration: const BoxDecoration(
+                                    decoration:  BoxDecoration(
                                       border: Border(
                                           bottom: BorderSide(
-                                        color: Colors.grey,
+                                        color: Theme.of(context).colorScheme.onBackground,
                                         width: 0.5,
                                       )),
                                     ),
@@ -553,10 +613,15 @@ class _PreferenceDialogState extends State<PreferenceDialog> {
                                             Text(
                                               scopeItem.toUpperCase() +
                                                   (mandatory ? ' *' : ''),
-                                              style: const TextStyle(
-                                                  fontWeight: FontWeight.bold,
-                                                  color: Colors.black,
-                                                  fontSize: 16),
+                                              style: Theme.of(context)
+                                                  .textTheme
+                                                  .bodyLarge!
+                                                  .copyWith(
+                                                    color: Theme.of(context)
+                                                        .colorScheme
+                                                        .onBackground,
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
                                             ),
                                             const Icon(
                                               Icons.warning,
@@ -581,10 +646,10 @@ class _PreferenceDialogState extends State<PreferenceDialog> {
                               }
 
                               return Container(
-                                decoration: const BoxDecoration(
+                                decoration:  BoxDecoration(
                                   border: Border(
                                       bottom: BorderSide(
-                                    color: Colors.grey,
+                                    color: Theme.of(context).colorScheme.onBackground,
                                     width: 0.5,
                                   )),
                                 ),
@@ -614,9 +679,15 @@ class _PreferenceDialogState extends State<PreferenceDialog> {
                                           title: Text(
                                             scopeItem.toUpperCase() +
                                                 (mandatory ? ' *' : ''),
-                                            style: const TextStyle(
-                                                fontWeight: FontWeight.bold,
-                                                color: Colors.black),
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .bodyLarge!
+                                                .copyWith(
+                                                  color: Theme.of(context)
+                                                      .colorScheme
+                                                      .onBackground,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
                                           ),
                                         ))
                                       ],
@@ -671,7 +742,9 @@ class _PreferenceDialogState extends State<PreferenceDialog> {
           padding: const EdgeInsets.all(8),
           child: Text(
             '${widget.appId}  would like to access',
-            style: const TextStyle(fontWeight: FontWeight.bold),
+            style: Theme.of(context).textTheme.bodyLarge!.copyWith(
+                fontWeight: FontWeight.bold,
+                color: Theme.of(context).colorScheme.onBackground),
             textAlign: TextAlign.center,
           ),
         ),
