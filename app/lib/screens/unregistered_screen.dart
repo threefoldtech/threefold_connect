@@ -1,6 +1,5 @@
 //import 'package:community_material_icon/community_material_icon.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:threebotlogin/helpers/flags.dart';
 import 'package:threebotlogin/screens/change_pin_screen.dart';
 import 'package:threebotlogin/screens/mobile_registration_screen.dart';
@@ -64,119 +63,104 @@ class _UnregisteredScreenState extends State<UnregisteredScreen>
   Widget build(BuildContext context) {
     return Material(
         child: Scaffold(
-      body: Stack(
-        children: <Widget>[
-          SvgPicture.asset(
-            'assets/bg.svg',
-            alignment: Alignment.center,
-            width: MediaQuery.of(context).size.width,
-            height: MediaQuery.of(context).size.height,
-            colorFilter: ColorFilter.mode(
-                Theme.of(context).colorScheme.primary.withOpacity(0.2),
-                BlendMode.srcIn),
-          ),
-          WillPopScope(
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(
-                  maxHeight: double.infinity,
-                  maxWidth: double.infinity,
-                  minHeight: 250,
-                  minWidth: 250),
-              child: Column(
+      body: WillPopScope(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(
+              maxHeight: double.infinity,
+              maxWidth: double.infinity,
+              minHeight: 250,
+              minWidth: 250),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              Container(),
+              Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
-                  Container(),
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-                      Container(
-                        width: 300.0,
-                        height: 35.0,
-                        decoration: BoxDecoration(
-                          image: DecorationImage(
-                              colorFilter: ColorFilter.mode(
-                                  Theme.of(context).colorScheme.onBackground,
-                                  BlendMode.srcIn),
-                              fit: BoxFit.fill,
-                              image: const AssetImage('assets/logoTF.png')),
-                        ),
-                      ),
-                      const SizedBox(height: 100),
-                    ],
-                  ),
-                  SizedBox(
-                    width: 250,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: <Widget>[
-                        ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor:
-                                Theme.of(context).colorScheme.primaryContainer,
-                            shape: const RoundedRectangleBorder(
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(30)),
-                            ),
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: <Widget>[
-                              Text(
-                                'Sign Up',
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .titleMedium!
-                                    .copyWith(
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .onPrimaryContainer),
-                              ),
-                            ],
-                          ),
-                          onPressed: () {
-                            startRegistration();
-                          },
-                        ),
-                        const SizedBox(height: 20),
-                        ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor:
-                                Theme.of(context).colorScheme.primaryContainer,
-                            shape: const RoundedRectangleBorder(
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(30)),
-                            ),
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: <Widget>[
-                              Text(
-                                'Recover Account',
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .titleMedium!
-                                    .copyWith(
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .onPrimaryContainer),
-                              ),
-                            ],
-                          ),
-                          onPressed: () {
-                            startRecovery();
-                          },
-                        ),
-                      ],
+                  Container(
+                    width: 250.0,
+                    height: 28.33,
+                    decoration: BoxDecoration(
+                      image: DecorationImage(
+                          colorFilter: ColorFilter.mode(
+                              Theme.of(context).colorScheme.onBackground,
+                              BlendMode.srcIn),
+                          fit: BoxFit.fill,
+                          image: const AssetImage('assets/logoTF.png')),
                     ),
                   ),
+                  const SizedBox(height: 100),
                 ],
               ),
-            ),
-            onWillPop: () {
-              return Future.value(false);
-            },
+              SizedBox(
+                width: 250,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: <Widget>[
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor:
+                            Theme.of(context).colorScheme.primaryContainer,
+                        shape: const RoundedRectangleBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(30)),
+                        ),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          Text(
+                            'Sign Up',
+                            style: Theme.of(context)
+                                .textTheme
+                                .titleMedium!
+                                .copyWith(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onPrimaryContainer),
+                          ),
+                        ],
+                      ),
+                      onPressed: () {
+                        startRegistration();
+                      },
+                    ),
+                    const SizedBox(height: 20),
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor:
+                            Theme.of(context).colorScheme.primaryContainer,
+                        shape: const RoundedRectangleBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(30)),
+                        ),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          Text(
+                            'Recover Account',
+                            style: Theme.of(context)
+                                .textTheme
+                                .titleMedium!
+                                .copyWith(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onPrimaryContainer),
+                          ),
+                        ],
+                      ),
+                      onPressed: () {
+                        startRecovery();
+                      },
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
-        ],
+        ),
+        onWillPop: () {
+          return Future.value(false);
+        },
       ),
     ));
   }

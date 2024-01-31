@@ -62,9 +62,9 @@ class _AppState extends State<MainScreen> {
       children: <Widget>[
         Image.asset(
           'assets/logoTF.png',
-          height: 100,
+          height: 28.33,
           colorBlendMode: BlendMode.srcIn,
-          width: 300,
+          width: 250,
           color: Theme.of(context).colorScheme.onBackground,
         ),
         const SizedBox(

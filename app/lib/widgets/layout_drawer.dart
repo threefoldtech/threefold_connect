@@ -28,28 +28,20 @@ class _LayoutDrawerState extends State<LayoutDrawer> {
       drawer: Drawer(
         elevation: 5,
         // space to fit everything.
-        child: ListView(
-          // Important: Remove any padding from the ListView.
-          padding: EdgeInsets.zero,
-          children: <Widget>[
+        child: Column(
+          children: [
             SizedBox(
-              width: 200,
               height: 100,
-              child: Padding(
-                  padding: const EdgeInsets.all(20),
-                  child: DrawerHeader(
-                    decoration: BoxDecoration(
-                      image: DecorationImage(
-                        colorFilter: ColorFilter.mode(
-                            Theme.of(context).colorScheme.onBackground,
-                            BlendMode.srcIn),
-                        alignment: Alignment.center,
-                        image: const AssetImage('assets/logoTF.png'),
-                        fit: BoxFit.contain,
-                      ),
-                    ),
-                    child: const Text(''),
-                  )),
+              child: DrawerHeader(
+                padding: const EdgeInsets.all(20),
+                child: Image.asset(
+                  'assets/logoTF.png',
+                  height: 18.13,
+                  colorBlendMode: BlendMode.srcIn,
+                  width: 160,
+                  color: Theme.of(context).colorScheme.onBackground,
+                ),
+              ),
             ),
             ListTile(
               minLeadingWidth: 10,

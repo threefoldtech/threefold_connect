@@ -37,8 +37,8 @@ class _RegisteredScreenState extends State<RegisteredScreen>
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
                   Container(
-                    width: 300.0,
-                    height: 35,
+                    width: 250.0,
+                    height: 28.33,
                     decoration: BoxDecoration(
                       image: DecorationImage(
                          colorFilter: ColorFilter.mode(
