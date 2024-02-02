@@ -26,22 +26,23 @@ class ReuseableTextFieldStep extends StatelessWidget {
       children: <Widget>[
         Text(
           titleText,
-          style: Theme.of(context)
-              .textTheme
-              .titleMedium!
-              .copyWith(color: Theme.of(context).colorScheme.onSecondaryContainer),
+          style: Theme.of(context).textTheme.titleMedium!.copyWith(
+              color: Theme.of(context).colorScheme.onSecondaryContainer),
         ),
-        const Divider(
-          height: 50,
+        Divider(
+          height: 40,
+          color: Theme.of(context)
+              .colorScheme
+              .onSecondaryContainer
+              .withOpacity(0.2),
         ),
         Padding(
           padding: const EdgeInsets.only(top: 8.5),
           child: TextFormField(
-            style: Theme.of(context)
-                .textTheme
-                .bodyLarge!
-                .copyWith(color: Theme.of(context).colorScheme.onSecondaryContainer,
-                decorationColor: Theme.of(context).colorScheme.onSecondaryContainer),
+            style: Theme.of(context).textTheme.bodyLarge!.copyWith(
+                color: Theme.of(context).colorScheme.onSecondaryContainer,
+                decorationColor:
+                    Theme.of(context).colorScheme.onSecondaryContainer),
             focusNode: focusNode,
             autofocus: true,
             keyboardType: typeText,
@@ -68,9 +69,6 @@ class ReuseableTextFieldStep extends StatelessWidget {
               ),
             ),
           ],
-        ),
-        const Divider(
-          height: 50,
         ),
       ],
     );

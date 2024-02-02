@@ -310,7 +310,7 @@ class _MobileRegistrationScreenState extends State<MobileRegistrationScreen> {
           children: <Widget>[
             Row(
               mainAxisSize: MainAxisSize.max,
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: <Widget>[
                 ElevatedButton(
                   onPressed: () {
@@ -371,8 +371,12 @@ class _MobileRegistrationScreenState extends State<MobileRegistrationScreen> {
                         color:
                             Theme.of(context).colorScheme.onSecondaryContainer),
                   ),
-                  const Divider(
-                    height: 50,
+                  Divider(
+                    height: 40,
+                    color: Theme.of(context)
+                        .colorScheme
+                        .onSecondaryContainer
+                        .withOpacity(0.2),
                   ),
                   Padding(
                     padding: const EdgeInsets.only(top: 8.5),
@@ -414,9 +418,6 @@ class _MobileRegistrationScreenState extends State<MobileRegistrationScreen> {
                         ),
                       ),
                     ],
-                  ),
-                  const Divider(
-                    height: 50,
                   ),
                 ],
               ),
@@ -526,27 +527,27 @@ class _MobileRegistrationScreenState extends State<MobileRegistrationScreen> {
                   : StepState.disabled,
           title: const Text('Finishing'),
           content: Card(
-            child: Column(
-              children: <Widget>[
-                const SizedBox(
-                  height: 10.0,
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Text(
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Text(
                     'Please check the data below, press finish if it is correct. Otherwise click the pencil icon to edit them.',
                     style: Theme.of(context).textTheme.bodyMedium!.copyWith(
                         color:
                             Theme.of(context).colorScheme.onSecondaryContainer,
                         fontWeight: FontWeight.bold),
                   ),
-                ),
-                const SizedBox(
-                  height: 15.0,
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(top: 8.0, bottom: 4.0),
-                  child: ListTile(
+                  Divider(
+                    height: 40,
+                    color: Theme.of(context)
+                        .colorScheme
+                        .onSecondaryContainer
+                        .withOpacity(0.2),
+                  ),
+                  ListTile(
+                    contentPadding: EdgeInsets.zero,
                     leading: const Icon(Icons.person),
                     title: Text(doubleNameController.text),
                     trailing: const Icon(Icons.edit),
@@ -555,10 +556,8 @@ class _MobileRegistrationScreenState extends State<MobileRegistrationScreen> {
                       FocusScope.of(context).requestFocus(nameFocus);
                     }),
                   ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(top: 4.0, bottom: 15.0),
-                  child: ListTile(
+                  ListTile(
+                      contentPadding: EdgeInsets.zero,
                       leading: const Icon(Icons.email),
                       title: Text(emailController.text),
                       trailing: const Icon(Icons.edit),
@@ -566,8 +565,8 @@ class _MobileRegistrationScreenState extends State<MobileRegistrationScreen> {
                             state = _State.Email;
                             FocusScope.of(context).requestFocus(emailFocus);
                           })),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         )
