@@ -174,8 +174,8 @@ class AuthenticationScreenState extends State<AuthenticationScreen> {
       } else if (buttonText == 'OK') {
         return buildNumberPin(possibleInput[i], context,
             backgroundColor: input.length >= widget.pinLength
-                ? Colors.green.shade700
-                : Colors.green.shade300);
+                ? Colors.green.shade600
+                : Theme.of(context).colorScheme.secondaryContainer.withOpacity(0.5));
       } else {
         return buildNumberPin(possibleInput[i], context,
             backgroundColor: Theme.of(context).colorScheme.primaryContainer);
