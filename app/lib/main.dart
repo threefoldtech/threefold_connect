@@ -86,6 +86,8 @@ class MyApp extends StatelessWidget {
             margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8)),
         elevatedButtonTheme: ElevatedButtonThemeData(
           style: ElevatedButton.styleFrom(
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(5)),
               backgroundColor: kColorScheme.primaryContainer),
         ),
       ),
@@ -107,6 +109,8 @@ class MyApp extends StatelessWidget {
             margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8)),
         elevatedButtonTheme: ElevatedButtonThemeData(
           style: ElevatedButton.styleFrom(
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(5)),
               backgroundColor: kDarkColorScheme.primaryContainer),
         ),
       ),
