@@ -16,9 +16,9 @@ class HomeCardWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     Globals globals = Globals();
     final size = MediaQuery.of(context).size.width;
-    return Card(
+    return  Card(
       margin: const EdgeInsets.all(3),
-      shape: const RoundedRectangleBorder(),
+      shape:  RoundedRectangleBorder(borderRadius: BorderRadius.circular(3)),
       clipBehavior: Clip.hardEdge,
       elevation: 2,
       child: InkWell(

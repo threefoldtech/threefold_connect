@@ -51,8 +51,8 @@ class _RegisteredScreenState extends State<RegisteredScreen>
                           BlendMode.srcIn),
                     ),
                     SizedBox(
-                      height: 30,
-                      width: 240,
+                      height: MediaQuery.of(context).size.height * 0.04,
+                      width: MediaQuery.of(context).size.width * 0.6,
                       child: Divider(
                         thickness: 2,
                         color: Theme.of(context).colorScheme.primary,
