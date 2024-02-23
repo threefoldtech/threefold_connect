@@ -16,6 +16,7 @@ import 'package:threebotlogin/services/migration_service.dart';
 import 'package:threebotlogin/services/socket_service.dart';
 import 'package:threebotlogin/services/shared_preference_service.dart';
 import 'package:threebotlogin/widgets/error_widget.dart';
+import 'package:threebotlogin/widgets/home_logo.dart';
 import 'package:uni_links/uni_links.dart';
 
 class MainScreen extends StatefulWidget {
@@ -56,71 +57,69 @@ class _AppState extends State<MainScreen> {
     };
 
     return Scaffold(
-        body: Center(
-            child: Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: <Widget>[
-        Image.asset(
-          'assets/logoTF.png',
-          height: 28.33,
-          colorBlendMode: BlendMode.srcIn,
-          width: 250,
-          color: Theme.of(context).colorScheme.onBackground,
-        ),
-        const SizedBox(
-          height: 40,
-        ),
-        Container(
-          padding: const EdgeInsets.only(left: 12, right: 12),
-          child: Text(
-            updateMessage != null
-                ? updateMessage.toString()
-                : errorMessage.toString(),
-            style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                fontWeight: FontWeight.bold,
-                color: errorMessage != null
-                    ? Theme.of(context).colorScheme.error
-                    : Theme.of(context).colorScheme.onBackground),
-          ),
-        ),
-        const SizedBox(
-          height: 40,
-        ),
-        Transform.scale(
-          scale: 0.5,
-          child: CircularProgressIndicator(
-            color: Theme.of(context).colorScheme.primary,
-          ),
-        ),
-        const SizedBox(height: 20),
-        Visibility(
-            maintainSize: true,
-            maintainAnimation: true,
-            maintainState: true,
-            visible: errorMessage != null,
-            child: ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Theme.of(context).colorScheme.secondary,
-                shape: const RoundedRectangleBorder(
-                  borderRadius: BorderRadius.all(Radius.circular(30)),
-                ),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            const Hero(
+              tag: 'logo',
+              child: HomeLogoWidget(),
+            ),
+            const SizedBox(height: 50),
+            Container(
+              padding: const EdgeInsets.only(left: 12, right: 12),
+              child: Text(
+                updateMessage != null
+                    ? updateMessage.toString()
+                    : errorMessage.toString(),
+                style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: errorMessage != null
+                        ? Theme.of(context).colorScheme.error
+                        : Theme.of(context).colorScheme.onBackground),
               ),
-              child: const Row(
-                mainAxisSize: MainAxisSize.min,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    'RETRY',
-                    style: TextStyle(color: Colors.white, fontSize: 16),
+            ),
+            const SizedBox(
+              height: 40,
+            ),
+            Transform.scale(
+              scale: 0.5,
+              child: CircularProgressIndicator(
+                color: Theme.of(context).colorScheme.primary,
+              ),
+            ),
+            const SizedBox(height: 20),
+            Visibility(
+                maintainSize: true,
+                maintainAnimation: true,
+                maintainState: true,
+                visible: errorMessage != null,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Theme.of(context).colorScheme.secondary,
+                    shape: const RoundedRectangleBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(30)),
+                    ),
                   ),
-                ],
-              ),
-              onPressed: () async {
-                await pushScreens();
-              },
-            ))
-      ],
-    )));
+                  child: const Row(
+                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        'RETRY',
+                        style: TextStyle(color: Colors.white, fontSize: 16),
+                      ),
+                    ],
+                  ),
+                  onPressed: () async {
+                    await pushScreens();
+                  },
+                ))
+          ],
+        ),
+      ),
+    );
   }
 
   pushScreens() async {
@@ -198,8 +197,9 @@ class _AppState extends State<MainScreen> {
     // await Navigator.push(context, MaterialPageRoute(builder: (context) => UnregisteredScreen()));
     await Navigator.pushReplacement(
         context,
-        MaterialPageRoute(
-            builder: (context) => HomeScreen(
+        PageRouteBuilder(
+            transitionDuration: Duration(seconds: 1),
+            pageBuilder: (_, __, ___) => HomeScreen(
                 initialLink: initialLink,
                 backendConnection: _backendConnection)));
   }
