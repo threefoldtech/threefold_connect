@@ -85,7 +85,7 @@ class _RegisteredScreenState extends State<RegisteredScreen>
                       pageNumber: 2),
                   HomeCardWidget(
                       name: 'Farming',
-                      icon: Icons.fire_truck_outlined,
+                      icon: Icons.storage,
                       pageNumber: 3),
                 ],
               ),
@@ -94,7 +94,7 @@ class _RegisteredScreenState extends State<RegisteredScreen>
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   HomeCardWidget(
-                      name: 'Support', icon: Icons.chat, pageNumber: 4),
+                      name: 'Support', icon: Icons.build, pageNumber: 4),
                   HomeCardWidget(
                       name: 'Identity', icon: Icons.person, pageNumber: 5),
                   HomeCardWidget(

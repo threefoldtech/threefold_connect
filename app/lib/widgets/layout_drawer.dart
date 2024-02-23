@@ -34,11 +34,11 @@ class _LayoutDrawerState extends State<LayoutDrawer> {
           children: [
             SizedBox(
               height: 70,
-              child: DrawerHeader( 
+              child: DrawerHeader(
                 decoration: BoxDecoration(
                   border: Border(
-                    bottom:
-                        BorderSide(color: Theme.of(context).colorScheme.primary),
+                    bottom: BorderSide(
+                        color: Theme.of(context).colorScheme.primary),
                   ),
                 ),
                 child: SvgPicture.asset(
@@ -51,13 +51,9 @@ class _LayoutDrawerState extends State<LayoutDrawer> {
             ),
             ListTile(
               minLeadingWidth: 10,
-              leading: const Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  Padding(padding: EdgeInsets.only(left: 30)),
-                  Icon(Icons.home, size: 18)
-                ],
-              ),
+              leading: const Padding(
+                  padding: EdgeInsets.only(left: 10),
+                  child: Icon(Icons.home, size: 18)),
               title: const Text('Home'),
               onTap: () {
                 Navigator.pop(context);
@@ -66,13 +62,9 @@ class _LayoutDrawerState extends State<LayoutDrawer> {
             ),
             ListTile(
               minLeadingWidth: 10,
-              leading: const Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  Padding(padding: EdgeInsets.only(left: 30)),
-                  Icon(Icons.article, size: 18)
-                ],
-              ),
+              leading: const Padding(
+                  padding: EdgeInsets.only(left: 10),
+                  child: Icon(Icons.article, size: 18)),
               title: const Text('News'),
               onTap: () {
                 Navigator.pop(context);
@@ -81,13 +73,9 @@ class _LayoutDrawerState extends State<LayoutDrawer> {
             ),
             ListTile(
               minLeadingWidth: 10,
-              leading: const Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  Padding(padding: EdgeInsets.only(left: 30)),
-                  Icon(Icons.account_balance_wallet, size: 18)
-                ],
-              ),
+              leading: const Padding(
+                  padding: EdgeInsets.only(left: 10),
+                  child: Icon(Icons.account_balance_wallet, size: 18)),
               title: const Text('Wallet'),
               onTap: () {
                 Navigator.pop(context);
@@ -97,18 +85,9 @@ class _LayoutDrawerState extends State<LayoutDrawer> {
             if (Globals().canSeeFarmers)
               ListTile(
                 minLeadingWidth: 10,
-                leading: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    const Padding(padding: EdgeInsets.only(left: 30)),
-                    Image.asset(
-                      'assets/server.png',
-                      scale: 1.0,
-                      height: 18.0,
-                      width: 18.0,
-                    ),
-                  ],
-                ),
+                leading: const Padding(
+                    padding: EdgeInsets.only(left: 10),
+                    child: Icon(Icons.storage, size: 18)),
                 title: const Text('Farming'),
                 onTap: () {
                   Navigator.pop(context);
@@ -119,12 +98,9 @@ class _LayoutDrawerState extends State<LayoutDrawer> {
               Container(),
             ListTile(
               minLeadingWidth: 10,
-              leading: const Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  Padding(padding: EdgeInsets.only(left: 30)),
-                  Icon(Icons.chat, size: 18)
-                ],
+              leading: const Padding(
+                padding: EdgeInsets.only(left: 10),
+                child: Icon(Icons.build, size: 18),
               ),
               title: const Text('Support'),
               onTap: () {
@@ -134,13 +110,9 @@ class _LayoutDrawerState extends State<LayoutDrawer> {
             ),
             ListTile(
               minLeadingWidth: 10,
-              leading: const Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  Padding(padding: EdgeInsets.only(left: 30)),
-                  Icon(Icons.person_outlined, size: 18)
-                ],
-              ),
+              leading: const Padding(
+                  padding: EdgeInsets.only(left: 10),
+                  child: Icon(Icons.person, size: 18)),
               title: const Text('Identity'),
               onTap: () {
                 Navigator.pop(context);
@@ -149,13 +121,9 @@ class _LayoutDrawerState extends State<LayoutDrawer> {
             ),
             ListTile(
               minLeadingWidth: 10,
-              leading: const Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  Padding(padding: EdgeInsets.only(left: 30)),
-                  Icon(Icons.settings, size: 18)
-                ],
-              ),
+              leading: const Padding(
+                  padding: EdgeInsets.only(left: 10),
+                  child: Icon(Icons.settings, size: 18)),
               title: const Text('Settings'),
               onTap: () {
                 Navigator.pop(context);
