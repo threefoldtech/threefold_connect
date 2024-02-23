@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:threebotlogin/helpers/globals.dart';
 
 class LayoutDrawer extends StatefulWidget {
@@ -27,19 +28,24 @@ class _LayoutDrawerState extends State<LayoutDrawer> {
       body: widget.content,
       drawer: Drawer(
         elevation: 5,
+        width: MediaQuery.of(context).size.width * 2 / 3,
         // space to fit everything.
         child: Column(
           children: [
             SizedBox(
-              height: 100,
-              child: DrawerHeader(
-                padding: const EdgeInsets.all(20),
-                child: Image.asset(
-                  'assets/logoTF.png',
-                  height: 18.13,
-                  colorBlendMode: BlendMode.srcIn,
-                  width: 160,
-                  color: Theme.of(context).colorScheme.onBackground,
+              height: 70,
+              child: DrawerHeader( 
+                decoration: BoxDecoration(
+                  border: Border(
+                    bottom:
+                        BorderSide(color: Theme.of(context).colorScheme.primary),
+                  ),
+                ),
+                child: SvgPicture.asset(
+                  'assets/TF_log_horizontal.svg',
+                  colorFilter: ColorFilter.mode(
+                      Theme.of(context).colorScheme.onBackground,
+                      BlendMode.srcIn),
                 ),
               ),
             ),
