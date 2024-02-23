@@ -62,24 +62,14 @@ class MyApp extends StatelessWidget {
       Theme.of(context).textTheme,
     );
 
-    var accentTextStyle = GoogleFonts.lato(
-      textStyle: Theme.of(context).appBarTheme.titleTextStyle,
-    );
-
-    var textStyle = GoogleFonts.lato();
     return MaterialApp(
-      theme: ThemeData(
-        useMaterial3: true,
+      theme: ThemeData().copyWith(
         colorScheme: kColorScheme,
         brightness: Brightness.light,
         textTheme: textTheme,
-        tabBarTheme:
-            TabBarTheme(labelStyle: textStyle, unselectedLabelStyle: textStyle),
-        appBarTheme: AppBarTheme(
-          color: kColorScheme.primary,
-          iconTheme: const IconThemeData(color: Colors.white),
-          titleTextStyle: accentTextStyle,
-          toolbarTextStyle: accentTextStyle,
+        appBarTheme: const AppBarTheme().copyWith(
+          backgroundColor: kColorScheme.primary,
+          foregroundColor: kColorScheme.onPrimary,
         ),
         cardTheme: const CardTheme().copyWith(
             color: kColorScheme.secondaryContainer,
@@ -96,13 +86,9 @@ class MyApp extends StatelessWidget {
         colorScheme: kDarkColorScheme,
         brightness: Brightness.dark,
         textTheme: textTheme,
-        tabBarTheme:
-            TabBarTheme(labelStyle: textStyle, unselectedLabelStyle: textStyle),
-        appBarTheme: AppBarTheme(
-          color: kColorScheme.primary,
-          iconTheme: const IconThemeData(color: Colors.white),
-          titleTextStyle: accentTextStyle,
-          toolbarTextStyle: accentTextStyle,
+        appBarTheme: const AppBarTheme().copyWith(
+          backgroundColor: kDarkColorScheme.primaryContainer,
+          foregroundColor: kDarkColorScheme.onPrimaryContainer,
         ),
         cardTheme: const CardTheme().copyWith(
             color: kDarkColorScheme.secondaryContainer,
