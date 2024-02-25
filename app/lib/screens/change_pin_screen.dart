@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:threebotlogin/services/shared_preference_service.dart';
-import 'package:threebotlogin/widgets/pin_field.dart';
+import 'package:threebotlogin/widgets/pin_code.dart';
 
 class ChangePinScreen extends StatefulWidget {
   const ChangePinScreen({super.key, this.currentPin, this.hideBackButton});
@@ -38,41 +38,11 @@ class _ChangePinScreenState extends State<ChangePinScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      child: Scaffold(
-        appBar: AppBar(
-            title: widget.currentPin == null
-                ? const Text('Choose your pincode')
-                : const Text('Change pincode'),
-            elevation: 0.0,
-            automaticallyImplyLeading: widget.hideBackButton == false),
-        body: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          mainAxisSize: MainAxisSize.max,
-          children: <Widget>[
-            Container(
-              padding: const EdgeInsets.only(top: 0.0, bottom: 32.0),
-              child: Center(
-                  child: Text(
-                getText(),
-                style: Theme.of(context)
-                  .textTheme
-                  .bodyLarge!
-                  .copyWith(color: Theme.of(context).colorScheme.onBackground),
-              )),
-            ),
-            PinField(
-              callback: (p) => changePin(p),
-            )
-          ],
-        ),
-      ),
-      onWillPop: () {
-        if (state != _State.done && widget.hideBackButton == true) {
-          return Future(() => false);
-        }
-        return Future(() => true);
-      },
+    return PincodeWidget(
+      title:
+          widget.currentPin == null ? 'Choose your pincode' : 'Change pincode',
+      userMessage: getText(),
+      handler: changePin,
     );
   }
 
