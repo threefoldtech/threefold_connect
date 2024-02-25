@@ -46,16 +46,9 @@ dependencies:
   pinput: 3.0.1
 
 dev_dependencies:
-  flutter_native_splash: ^2.3.1
   flutter_test:
     sdk: flutter
   flutter_lints: ^2.0.0
-
-flutter_native_splash:
-  color: "#FFFFFF"
-  image: assets/logoTF.png
-  android: true
-  ios: true
 
 flutter:
   uses-material-design: true
