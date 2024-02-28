@@ -4,7 +4,7 @@ import 'package:threebotlogin/helpers/flags.dart';
 import 'package:threebotlogin/screens/change_pin_screen.dart';
 import 'package:threebotlogin/screens/mobile_registration_screen.dart';
 import 'package:threebotlogin/screens/recover_screen.dart';
-import 'package:threebotlogin/screens/successful_screen.dart';
+import 'package:threebotlogin/widgets/custom_dialog.dart';
 import 'package:threebotlogin/widgets/home_logo.dart';
 
 class UnregisteredScreen extends StatefulWidget {
@@ -46,13 +46,21 @@ class _UnregisteredScreenState extends State<UnregisteredScreen>
               builder: (context) =>
                   const ChangePinScreen(hideBackButton: true)));
 
-      await Navigator.push(
-          context,
-          MaterialPageRoute(
-              builder: (context) => const SuccessfulScreen(
-                  title: 'Recovered',
-                  text: 'Your account has been recovered.')));
-
+      showDialog(
+        barrierDismissible: false,
+        context: context,
+        builder: (BuildContext context) => CustomDialog(
+          image: Icons.check,
+          title: 'Recovered',
+          description: 'Your account has been recovered.',
+        ),
+      );
+      await Future.delayed(
+        const Duration(seconds: 3),
+        () {
+          Navigator.pop(context);
+        },
+      );
       Navigator.pop(context);
 
       await Flags().initFlagSmith();

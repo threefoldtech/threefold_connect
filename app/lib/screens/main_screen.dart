@@ -167,8 +167,7 @@ class _AppState extends State<MainScreen> {
     }
 
     if (!widget.registered!) {
-      Navigator.of(context).popUntil((route) => route.isFirst);
-      await Navigator.pushReplacement(context,
+      await Navigator.push(context,
           MaterialPageRoute(builder: (context) => const UnregisteredScreen()));
     }
 

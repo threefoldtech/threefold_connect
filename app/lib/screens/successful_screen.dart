@@ -27,7 +27,7 @@ class _SuccessfulScreenState extends State<SuccessfulScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Recovered'),
+        title: Text(widget.title),
       ),
       body: Container(
         padding: const EdgeInsets.only(top: 24.0, bottom: 38.0),
