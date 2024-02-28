@@ -83,10 +83,13 @@ class _AppState extends State<MainScreen> {
             const SizedBox(
               height: 40,
             ),
-            Transform.scale(
-              scale: 0.5,
-              child: CircularProgressIndicator(
-                color: Theme.of(context).colorScheme.primary,
+            Visibility(
+              visible: errorMessage == null,
+              child: Transform.scale(
+                scale: 0.5,
+                child: CircularProgressIndicator(
+                  color: Theme.of(context).colorScheme.primary,
+                ),
               ),
             ),
             const SizedBox(height: 20),
@@ -96,21 +99,8 @@ class _AppState extends State<MainScreen> {
                 maintainState: true,
                 visible: errorMessage != null,
                 child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Theme.of(context).colorScheme.secondary,
-                    shape: const RoundedRectangleBorder(
-                      borderRadius: BorderRadius.all(Radius.circular(30)),
-                    ),
-                  ),
-                  child: const Row(
-                    mainAxisSize: MainAxisSize.min,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        'RETRY',
-                        style: TextStyle(color: Colors.white, fontSize: 16),
-                      ),
-                    ],
+                  child: const Text(
+                    'RETRY',
                   ),
                   onPressed: () async {
                     await pushScreens();
@@ -177,7 +167,8 @@ class _AppState extends State<MainScreen> {
     }
 
     if (!widget.registered!) {
-      await Navigator.push(context,
+      Navigator.of(context).popUntil((route) => route.isFirst);
+      await Navigator.pushReplacement(context,
           MaterialPageRoute(builder: (context) => const UnregisteredScreen()));
     }
 
@@ -193,15 +184,13 @@ class _AppState extends State<MainScreen> {
     }
 
     print(mounted);
+    Navigator.of(context).popUntil((route) => route.isFirst);
 
     // await Navigator.push(context, MaterialPageRoute(builder: (context) => UnregisteredScreen()));
-    await Navigator.pushReplacement(
-        context,
-        PageRouteBuilder(
-            transitionDuration: Duration(seconds: 1),
-            pageBuilder: (_, __, ___) => HomeScreen(
-                initialLink: initialLink,
-                backendConnection: _backendConnection)));
+    await Navigator.of(context).pushReplacement(PageRouteBuilder(
+        transitionDuration: Duration(seconds: 1),
+        pageBuilder: (_, __, ___) => HomeScreen(
+            initialLink: initialLink, backendConnection: _backendConnection)));
   }
 
   fetchPkidData() async {
