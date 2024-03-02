@@ -131,12 +131,12 @@ class _RecoverScreenState extends State<RecoverScreen> {
                 'Please insert your info',
                 style: Theme.of(context)
                     .textTheme
-                    .titleMedium!
-                    .copyWith(fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onBackground),
+                    .titleLarge!
+                    .copyWith(color: Theme.of(context).colorScheme.onBackground),
               ),
             ),
             Padding(
-              padding: const EdgeInsets.only(top: 8.5),
+              padding: const EdgeInsets.all(20),
               child: TextFormField(
                   style: Theme.of(context).textTheme.bodyMedium!.copyWith(
                       color: Theme.of(context).colorScheme.onBackground,
@@ -144,7 +144,6 @@ class _RecoverScreenState extends State<RecoverScreen> {
                       ),
                   keyboardType: TextInputType.text,
                   decoration: const InputDecoration(
-                    border: OutlineInputBorder(),
                     labelText: 'Name',
                     // suffixText: '.3bot',
                     suffixStyle: TextStyle(fontWeight: FontWeight.bold),
@@ -158,7 +157,7 @@ class _RecoverScreenState extends State<RecoverScreen> {
                   }),
             ),
             Padding(
-              padding: const EdgeInsets.only(top: 8.5),
+              padding: const EdgeInsets.all(20),
               child: TextFormField(
                 style: Theme.of(context).textTheme.bodyMedium!.copyWith(
                     color: Theme.of(context).colorScheme.onBackground,
@@ -168,7 +167,6 @@ class _RecoverScreenState extends State<RecoverScreen> {
                 maxLines: null,
                 decoration: const InputDecoration(
                   labelText: 'Seed Phrase',
-                  border: OutlineInputBorder(),
                 ),
                 controller: seedPhraseController,
                 validator: (String? value) {
@@ -198,7 +196,7 @@ class _RecoverScreenState extends State<RecoverScreen> {
               ),
               child: Text(
                 'Recover Account',
-                style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                style: Theme.of(context).textTheme.bodyLarge!.copyWith(
                     color: Theme.of(context).colorScheme.onPrimaryContainer),
               ),
               onPressed: () async {
