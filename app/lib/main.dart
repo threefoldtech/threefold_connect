@@ -7,8 +7,20 @@ import 'package:google_fonts/google_fonts.dart';
 
 extension ColorSchemeExtension on ColorScheme {
   Color get warning => brightness == Brightness.light
-      ? const Color.fromARGB(255, 255, 208, 0)
-      : const Color.fromARGB(255, 255, 219, 61);
+      ? const Color.fromARGB(255, 128, 102, 0)
+      : const Color.fromARGB(255, 255, 204, 0);
+
+  Color get onWarning => brightness == Brightness.light
+      ? const Color.fromARGB(255, 255, 204, 0)
+      : const Color.fromARGB(255, 64, 51, 0);
+
+  Color get warningContainer => brightness == Brightness.light
+      ? const Color.fromARGB(255, 255, 204, 0).withOpacity(0.3)
+      : const Color.fromARGB(64, 255, 204, 0);
+
+  Color get onWarningContainer => brightness == Brightness.light
+      ? const Color.fromARGB(255, 64, 51, 0)
+      : const Color.fromARGB(255, 255, 204, 0);
 }
 
 Future<void> main() async {

@@ -37,7 +37,7 @@ class _WarningScreenState extends State<WarningScreen> {
                     'Security warning!',
                     style: Theme.of(context).textTheme.titleMedium!.copyWith(
                         fontWeight: FontWeight.bold,
-                        color: Theme.of(context).colorScheme.onBackground),
+                        color: Theme.of(context).colorScheme.warning),
                   ),
                 )
               ],
