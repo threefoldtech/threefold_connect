@@ -21,6 +21,10 @@ extension ColorSchemeExtension on ColorScheme {
   Color get onWarningContainer => brightness == Brightness.light
       ? const Color.fromARGB(255, 64, 51, 0)
       : const Color.fromARGB(255, 255, 204, 0);
+
+  Color get backgroundDarker => brightness == Brightness.light
+      ? const Color.fromARGB(255, 240, 240, 240)
+      : const Color.fromARGB(255, 15, 15, 15);
 }
 
 Future<void> main() async {
@@ -92,6 +96,9 @@ class MyApp extends StatelessWidget {
                   borderRadius: BorderRadius.circular(5)),
               backgroundColor: kColorScheme.primaryContainer),
         ),
+        expansionTileTheme: const ExpansionTileThemeData().copyWith(
+            backgroundColor: kColorScheme.backgroundDarker,
+            collapsedBackgroundColor: ThemeData().colorScheme.background),
       ),
       darkTheme: ThemeData(
         useMaterial3: true,
@@ -111,6 +118,9 @@ class MyApp extends StatelessWidget {
                   borderRadius: BorderRadius.circular(5)),
               backgroundColor: kDarkColorScheme.primaryContainer),
         ),
+        expansionTileTheme: const ExpansionTileThemeData().copyWith(
+            backgroundColor: kDarkColorScheme.backgroundDarker,
+            collapsedBackgroundColor: kDarkColorScheme.background),
       ),
       themeMode: ThemeMode.system,
       home: SplashScreen(initDone: initDone, registered: registered),
