@@ -15,9 +15,37 @@ class LayoutDrawer extends StatefulWidget {
 
 class _LayoutDrawerState extends State<LayoutDrawer> {
   Globals globals = Globals();
+  int currentScreenIndex = 0;
+
+  void _selectScreen(index) {
+    setState(() {
+      currentScreenIndex = index;
+      if (index == 0) {
+        globals.tabController.animateTo(0);
+      } else if (index == 1) {
+        globals.tabController.animateTo(2);
+      } else if (index == 2) {
+        globals.tabController.animateTo(3);
+      } else if (index == 3) {
+        globals.tabController.animateTo(6);
+      } else {
+        return;
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
+    if (widget.titleText == 'Home') {
+      currentScreenIndex = 0;
+    } else if (widget.titleText == 'Wallet') {
+      currentScreenIndex = 1;
+    } else if (widget.titleText == 'Farming') {
+      currentScreenIndex = 2;
+    } else if (widget.titleText == 'Settings') {
+      currentScreenIndex = 3;
+    }
+
     return Scaffold(
       appBar: AppBar(
         // Here we take the value from the MyHomePage object that was created by
@@ -132,6 +160,18 @@ class _LayoutDrawerState extends State<LayoutDrawer> {
             ),
           ],
         ),
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        onTap: _selectScreen,
+        currentIndex: currentScreenIndex,
+        items: const [
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.account_balance_wallet), label: 'Wallet'),
+          BottomNavigationBarItem(icon: Icon(Icons.storage), label: 'Farms'),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.settings), label: 'Settings'),
+        ],
       ),
     );
   }

@@ -99,6 +99,10 @@ class MyApp extends StatelessWidget {
         expansionTileTheme: const ExpansionTileThemeData().copyWith(
             backgroundColor: kColorScheme.backgroundDarker,
             collapsedBackgroundColor: ThemeData().colorScheme.background),
+        bottomNavigationBarTheme: const BottomNavigationBarThemeData().copyWith(
+          selectedItemColor: kColorScheme.primary,
+          unselectedItemColor: kColorScheme.secondary,
+        ),
       ),
       darkTheme: ThemeData(
         useMaterial3: true,
@@ -121,6 +125,10 @@ class MyApp extends StatelessWidget {
         expansionTileTheme: const ExpansionTileThemeData().copyWith(
             backgroundColor: kDarkColorScheme.backgroundDarker,
             collapsedBackgroundColor: kDarkColorScheme.background),
+        bottomNavigationBarTheme: const BottomNavigationBarThemeData().copyWith(
+          selectedItemColor: kDarkColorScheme.primary,
+          unselectedItemColor: kDarkColorScheme.secondary,
+        ),
       ),
       themeMode: ThemeMode.system,
       home: SplashScreen(initDone: initDone, registered: registered),
