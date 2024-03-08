@@ -17,6 +17,7 @@ class _FarmItemWidgetState extends State<FarmItemWidget> {
   final walletNameController = TextEditingController();
   final twinIdController = TextEditingController();
   final farmIdController = TextEditingController();
+  bool showTfchainSecret = false;
 
   @override
   void dispose() {
@@ -48,17 +49,16 @@ class _FarmItemWidgetState extends State<FarmItemWidget> {
         ListTile(
           title: TextField(
               readOnly: true,
-              style: Theme.of(context)
-                  .textTheme
-                  .bodyMedium!
-                  .copyWith(color: Theme.of(context).colorScheme.onBackground),
+              style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                    color: Theme.of(context).colorScheme.onBackground,
+                  ),
               controller: walletAddressController,
               decoration: const InputDecoration(
                 labelText: 'Stellar Payout Address',
               )),
           subtitle: const Text('This address will be used for payout.'),
           trailing: IconButton(
-              onPressed: () async {
+              onPressed: () {
                 Clipboard.setData(
                     ClipboardData(text: walletAddressController.text));
                 ScaffoldMessenger.of(context).clearSnackBars();
@@ -70,14 +70,22 @@ class _FarmItemWidgetState extends State<FarmItemWidget> {
         ListTile(
           title: TextField(
               readOnly: true,
-              obscureText: true,
-              style: Theme.of(context)
-                  .textTheme
-                  .bodyMedium!
-                  .copyWith(color: Theme.of(context).colorScheme.onBackground),
+              obscureText: !showTfchainSecret,
+              style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                    color: Theme.of(context).colorScheme.onBackground,
+                  ),
               controller: tfchainWalletSecretController,
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                 labelText: 'TFChain Secret',
+                suffixIcon: IconButton(
+                    onPressed: () {
+                      setState(() {
+                        showTfchainSecret = !showTfchainSecret;
+                      });
+                    },
+                    icon: Icon(showTfchainSecret
+                        ? Icons.visibility_off
+                        : Icons.visibility)),
               )),
           subtitle: const Text(
               'You can login into ThreeFold Dashboard using this secret for more farm management.'),
@@ -94,10 +102,9 @@ class _FarmItemWidgetState extends State<FarmItemWidget> {
         ListTile(
           title: TextField(
               readOnly: true,
-              style: Theme.of(context)
-                  .textTheme
-                  .bodyMedium!
-                  .copyWith(color: Theme.of(context).colorScheme.onBackground),
+              style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                    color: Theme.of(context).colorScheme.onBackground,
+                  ),
               controller: walletNameController,
               decoration: const InputDecoration(
                 labelText: 'Wallet Name',
@@ -106,10 +113,9 @@ class _FarmItemWidgetState extends State<FarmItemWidget> {
         ListTile(
           title: TextField(
               readOnly: true,
-              style: Theme.of(context)
-                  .textTheme
-                  .bodyMedium!
-                  .copyWith(color: Theme.of(context).colorScheme.onBackground),
+              style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                    color: Theme.of(context).colorScheme.onBackground,
+                  ),
               controller: twinIdController,
               decoration: const InputDecoration(
                 labelText: 'Twin ID',
@@ -118,10 +124,9 @@ class _FarmItemWidgetState extends State<FarmItemWidget> {
         ListTile(
           title: TextField(
               readOnly: true,
-              style: Theme.of(context)
-                  .textTheme
-                  .bodyMedium!
-                  .copyWith(color: Theme.of(context).colorScheme.onBackground),
+              style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                    color: Theme.of(context).colorScheme.onBackground,
+                  ),
               controller: farmIdController,
               decoration: const InputDecoration(
                 labelText: 'Farm ID',
