@@ -84,8 +84,8 @@ class _FarmItemWidgetState extends State<FarmItemWidget> {
                       });
                     },
                     icon: Icon(showTfchainSecret
-                        ? Icons.visibility_off
-                        : Icons.visibility)),
+                        ? Icons.visibility
+                        : Icons.visibility_off)),
               )),
           subtitle: const Text(
               'You can login into ThreeFold Dashboard using this secret for more farm management.'),
