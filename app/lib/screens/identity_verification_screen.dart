@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:core';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter_pkid/flutter_pkid.dart';
 import 'package:http/http.dart';
 import 'package:shuftipro_sdk/shuftipro_sdk.dart';
@@ -58,6 +59,7 @@ class _IdentityVerificationScreenState
     'open_webview': false,
     'asyncRequest': false,
     'captureEnabled': false,
+    'dark_mode': false,
   };
 
   Map<String, Object> authObject = {
@@ -364,7 +366,9 @@ class _IdentityVerificationScreenState
         });
 
         print('Select country: ${country.displayName}');
-
+        var brightness =
+            SchedulerBinding.instance.platformDispatcher.platformBrightness;
+        configObj['dark_mode'] = brightness == Brightness.dark;
         String r = await ShuftiproSdk.sendRequest(
             authObject: authObject,
             createdPayload: createdPayload,
@@ -424,9 +428,7 @@ class _IdentityVerificationScreenState
       }
 
       // Close your eyes for one second
-      String bodyText = res.split('body=')[1].split(', verification_url')[0];
-      Map<String, dynamic> data = jsonDecode(bodyText);
-
+      Map<String, dynamic> data = jsonDecode(res);
       switch (data['event']) {
         // AUTHORIZATION IS WRONG
         case 'request.unauthorized':
@@ -967,8 +969,6 @@ class _IdentityVerificationScreenState
                 ));
       }
 
-      showCountryPopup();
-
       if (accessTokenResponse.statusCode != 200) {
         setState(() {
           isLoading = false;
@@ -1005,6 +1005,8 @@ class _IdentityVerificationScreenState
       createdPayload['document'] = verificationObj['document']!;
       createdPayload['face'] = verificationObj['face']!;
       createdPayload['verification_mode'] = 'image_only';
+
+      showCountryPopup();
 
       setState(() {
         isLoading = false;
@@ -1048,8 +1050,8 @@ class _IdentityVerificationScreenState
                     return _pleaseWait();
                   }
 
-                  String name = getFullNameOfObject(
-                      jsonDecode(snapshot.data['identityName']));
+                  String name =
+                      jsonDecode(snapshot.data['identityName'])['full_name'];
                   return Column(
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.start,
