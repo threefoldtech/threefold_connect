@@ -7,10 +7,10 @@ replicaCount: 1
 #tags vary per environment (staging/testing/production) change in according value files.
 images:
   login:
-    repo: jimber/3botlogin
+    repo: threefolddev/3botlogin
     containerPort: 80
   wizard:
-    repo: jimber/wizard
+    repo: threefolddev/wizard
     containerPort: 80
 
 services:
@@ -42,7 +42,7 @@ claims:
 
 
 acme:
-      email: laudr1997@gmail.com
+      email: operations@threefold.io
 
 
 serviceAccount:
