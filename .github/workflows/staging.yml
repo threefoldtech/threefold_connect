@@ -9,6 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+      - name: Log into Docker Hub
         uses: docker/login-action@v2
         with:
           username: ${{ secrets.TFDOCKERHUB_USERNAME }}
@@ -16,16 +17,12 @@ jobs:
 
       - name: Set config
         run: mv frontend/public/config.prod.js frontend/public/config.js
-      
       - name: Build the 3botlogin Docker image
         run: docker build . --file Dockerfile --tag threefolddev/3botlogin:staging-${{ github.sha }}
-      
       - name: Push the 3botlogin Docker image
         run: docker push threefolddev/3botlogin:staging-${{ github.sha }}
-      
       - name: Build wizard Docker image
         run: docker build wizard/ --file wizard/Dockerfile --tag threefolddev/wizard:staging-${{ github.sha }}
-      
       - name: Push wizard Docker image
         run: docker push threefolddev/wizard:staging-${{ github.sha }}
 
