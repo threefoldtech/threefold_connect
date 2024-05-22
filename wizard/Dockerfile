@@ -1,11 +1,9 @@
-FROM ubuntu:latest as builder
+FROM python:2.7 as builder
 RUN apt-get update
 
 # Is optional, but if you are not going to use this then you will need to install
 # 'gnupg' for nodesource so it can setup node install
-RUN apt-get install -y build-essential python make gcc g++
-
-RUN apt-get -y install curl
+RUN apt-get install -y build-essential python make gcc g++ curl
 
 # The next 2 steps will install node
 RUN curl -sL https://deb.nodesource.com/setup_15.x | bash -
