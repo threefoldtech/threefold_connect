@@ -10,17 +10,14 @@ RUN curl -sL https://deb.nodesource.com/setup_15.x | bash -
 
 RUN apt-get install -y nodejs
 
-# The next 3 steps are for installing yarn
-RUN curl -sL https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add -
+# The next step is for installing yarn
 
-RUN echo "deb https://dl.yarnpkg.com/debian/ stable main" > /etc/apt/sources.list.d/yarn.list
-
-RUN apt-get update && apt-get install yarn
+RUN npm install -g yarn
 
 WORKDIR /app
 COPY package.json package.json
 COPY yarn.lock yarn.lock
-RUN yarn install
+RUN yarn install --ignore-engines
 COPY . .
 RUN yarn build
 

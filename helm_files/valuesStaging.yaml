@@ -7,10 +7,10 @@ environment: staging
 images:
   login:
     name: threebotlogin-staging
-    tag: staging-2
+    repo: threefolddev/3botlogin
   wizard:
     name: wizard-staging
-    tag: latest
+    repo: threefolddev/wizard
 
 
 ingress:
