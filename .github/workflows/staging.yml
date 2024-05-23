@@ -16,7 +16,7 @@ jobs:
           password: ${{ secrets.TFDOCKERHUB_PASSWORD }}
 
       - name: Set config
-        run: mv frontend/public/config.prod.js frontend/public/config.js
+        run: mv frontend/public/config.staging.js frontend/public/config.js
       - name: Build the 3botlogin Docker image
         run: docker build . --file Dockerfile --tag threefolddev/3botlogin:staging-${{ github.sha }}
       - name: Push the 3botlogin Docker image
