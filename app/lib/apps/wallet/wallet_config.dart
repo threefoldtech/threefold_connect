@@ -33,7 +33,7 @@ abstract class WalletConfigImpls {
 
 class WalletConfigStaging extends WalletConfigImpls {
   String appId() {
-    return 'wallet.staging.jimber.io';
+    return 'wallet.staging.threefold.me';
   }
 
   String redirectUrl() {
@@ -53,7 +53,7 @@ class WalletConfigProduction extends WalletConfigImpls {
 
 class WalletConfigTesting extends WalletConfigImpls {
   String appId() {
-    return 'wallet.testing.jimber.org';
+    return 'wallet.testing.threefold.me';
   }
 
   String redirectUrl() {
@@ -64,7 +64,7 @@ class WalletConfigTesting extends WalletConfigImpls {
 class WalletConfigLocal extends WalletConfigImpls {
   String appId() {
     return 'localhost:8080';
-    // return 'wallet.staging.jimber.org';
+    // return 'wallet.staging.threefold.me';
   }
 
   String redirectUrl() {
