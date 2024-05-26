@@ -76,7 +76,7 @@ class AppConfigProduction extends AppConfigImpl {
   }
 
   String openKycApiUrl() {
-    return "https://openkyc.live";
+    return "https://openkyc.threefold.me";
   }
 
   String threeBotApiUrl() {
@@ -92,16 +92,16 @@ class AppConfigProduction extends AppConfigImpl {
   }
 
   String wizardUrl() {
-    return 'https://wizard.jimber.org/';
+    return 'https://wizard.threefold.me/';
   }
 
   String pKidUrl() {
-    return 'https://pkid.jimber.org/v1';
+    return 'https://pkid.threefold.me/v1';
   }
 
   Map<String, String> flagSmithConfig() {
     return {
-      'url': 'https://flagsmith.jimber.io/api/v1/',
+      'url': 'https://flagsmith.threefold.me/api/v1/',
       'apiKey': 'BuzktmbcnMJ77vznU7WhJB'
     };
   }
@@ -109,36 +109,36 @@ class AppConfigProduction extends AppConfigImpl {
 
 class AppConfigStaging extends AppConfigImpl {
   String baseUrl() {
-    return "login.staging.jimber.io";
+    return "login.staging.threefold.me";
   }
 
   String openKycApiUrl() {
-    return 'https://openkyc.staging.jimber.io';
+    return 'https://kyc.staging.threefold.me';
   }
 
   String threeBotApiUrl() {
-    return "https://login.staging.jimber.io/api";
+    return "https://login.staging.threefold.me/api";
   }
 
   String threeBotFrontEndUrl() {
-    return "https://login.staging.jimber.io/";
+    return "https://login.staging.threefold.me/";
   }
 
   String threeBotSocketUrl() {
-    return "wss://login.staging.jimber.io";
+    return "wss://login.staging.threefold.me";
   }
 
   String wizardUrl() {
-    return 'https://wizard.staging.jimber.io/';
+    return 'https://wizard.staging.threefold.me/';
   }
 
   String pKidUrl() {
-    return 'https://pkid.staging.jimber.io/v1';
+    return 'https://pkid.staging.threefold.me/v1';
   }
 
   Map<String, String> flagSmithConfig() {
     return {
-      'url': 'https://flagsmith.jimber.io/api/v1/',
+      'url': 'https://flagsmith.threefold.me/api/v1/',
       'apiKey': 'n6YyxDdrePqwAF49KCYx7S'
     };
   }
@@ -146,36 +146,36 @@ class AppConfigStaging extends AppConfigImpl {
 
 class AppConfigTesting extends AppConfigImpl {
   String baseUrl() {
-    return "login.testing.jimber.org";
+    return "login.testing.threefold.me";
   }
 
   String openKycApiUrl() {
-    return "https://openkyc.testing.jimber.org";
+    return "https://openkyc.testing.threefold.me";
   }
 
   String threeBotApiUrl() {
-    return "https://login.testing.jimber.org/api";
+    return "https://login.testing.threefold.me/api";
   }
 
   String threeBotFrontEndUrl() {
-    return "https://login.testing.jimber.org/";
+    return "https://login.testing.threefold.me/";
   }
 
   String threeBotSocketUrl() {
-    return "wss://login.testing.jimber.org";
+    return "wss://login.testing.threefold.me";
   }
 
   String wizardUrl() {
-    return 'https://wizard.staging.jimber.org/';
+    return 'https://wizard.staging.threefold.me/';
   }
 
   String pKidUrl() {
-    return 'https://pkid.staging.jimber.io/v1';
+    return 'https://pkid.staging.threefold.me/v1';
   }
 
   Map<String, String> flagSmithConfig() {
     return {
-      'url': 'https://flagsmith.jimber.io/api/v1/',
+      'url': 'https://flagsmith.threefold.me/api/v1/',
       'apiKey': 'VtTsMwJwiF69QWFWHGEMKM'
     };
   }

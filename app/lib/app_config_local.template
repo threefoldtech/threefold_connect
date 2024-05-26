@@ -23,7 +23,7 @@ class AppConfigLocal extends AppConfigImpl {
   }
 
   String wizardUrl() {
-    return 'https://wizard.jimber.org/';
+    return 'https://wizard.threefold.me/';
   }
 
   String pKidUrl() {
@@ -32,7 +32,7 @@ class AppConfigLocal extends AppConfigImpl {
 
   Map<String, String> flagSmithConfig() {
       return {
-        'url': 'https://flagsmith.jimber.io/api/v1/',
+        'url': 'https://flagsmith.threefold.me/api/v1/',
         'apiKey': 'm3L3gTcQYcFwCzSGxFJJWd'
       };
   }
