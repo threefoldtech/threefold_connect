@@ -10,7 +10,7 @@
 export default {
   botFrontEnd: "http://192.168.1.2:8080",
   botBackend: "http://192.168.1.2:5000",
-  kycBackend: "https://openkyc.staging.jimber.org",
+  kycBackend: "https://openkyc.staging.threefold.me",
   redirect_url: `/callback`,
   appId: window.location.host,
   seedPhrase:
@@ -32,7 +32,7 @@ export default {
 ```javascript
 export default {
   apiurl: "http://192.168.1.2:5000/",
-  openkycurl: "https://openkyc.staging.jimber.org/",
+  openkycurl: "https://openkyc.staging.threefold.me/",
 };
 ```
 
@@ -83,7 +83,7 @@ class AppConfigLocal extends AppConfigImpl {
     }
 
     String openKycApiUrl() {
-        return "https://openkyc.staging.jimber.org";
+        return "https://openkyc.staging.threefold.me";
     }
 
     String threeBotApiUrl() {
@@ -99,7 +99,7 @@ class AppConfigLocal extends AppConfigImpl {
     }
 
     String wizardUrl() {
-        return 'https://wizard.staging.jimber.org/';
+        return 'https://wizard.staging.threefold.me/';
     }
 }
 ```
