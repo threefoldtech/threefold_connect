@@ -10,6 +10,7 @@ import 'package:threebotlogin/events/identity_callback_event.dart';
 import 'package:threebotlogin/helpers/globals.dart';
 import 'package:threebotlogin/helpers/hex_color.dart';
 import 'package:threebotlogin/helpers/kyc_helpers.dart';
+import 'package:threebotlogin/main.dart';
 import 'package:threebotlogin/services/identity_service.dart';
 import 'package:threebotlogin/services/open_kyc_service.dart';
 import 'package:threebotlogin/services/pkid_service.dart';
@@ -577,15 +578,17 @@ class _IdentityVerificationScreenState
                   width: 30.0,
                   height: 30.0,
                   decoration: BoxDecoration(
-                      border: Border.all(color: Colors.blue, width: 2),
+                      border: Border.all(
+                          color: Theme.of(context).colorScheme.primary,
+                          width: 2),
                       shape: BoxShape.circle,
-                      color: Colors.white),
+                      color: Theme.of(context).colorScheme.background),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text('0$step',
-                          style: const TextStyle(
-                              color: Colors.blue,
+                          style: TextStyle(
+                              color: Theme.of(context).colorScheme.primary,
                               fontWeight: FontWeight.bold,
                               fontSize: 12))
                     ],
@@ -595,7 +598,6 @@ class _IdentityVerificationScreenState
                 Icon(
                   icon,
                   size: 20,
-                  color: Colors.black,
                 ),
                 const Padding(padding: EdgeInsets.only(left: 15)),
                 Flexible(
@@ -608,8 +610,14 @@ class _IdentityVerificationScreenState
                             child: Text(
                               text == '' ? 'Unknown' : text,
                               overflow: TextOverflow.clip,
-                              style: const TextStyle(
-                                  fontSize: 12.0, fontWeight: FontWeight.bold),
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodySmall!
+                                  .copyWith(
+                                      fontWeight: FontWeight.bold,
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onBackground),
                             ),
                           )
                         ],
@@ -617,18 +625,18 @@ class _IdentityVerificationScreenState
                       const SizedBox(
                         height: 5,
                       ),
-                      const Row(
+                      Row(
                         children: <Widget>[
                           Icon(
                             Icons.close,
-                            color: Colors.red,
+                            color: Theme.of(context).colorScheme.error,
                             size: 18.0,
                           ),
-                          Padding(padding: EdgeInsets.only(left: 5)),
+                          const Padding(padding: EdgeInsets.only(left: 5)),
                           Text(
                             'Not verified',
                             style: TextStyle(
-                                color: Colors.red,
+                                color: Theme.of(context).colorScheme.error,
                                 fontWeight: FontWeight.bold,
                                 fontSize: 12),
                           )
@@ -679,12 +687,13 @@ class _IdentityVerificationScreenState
           }
         },
         child: Container(
-          decoration: const BoxDecoration(
+          decoration: BoxDecoration(
               border: Border(
-                  left: BorderSide(color: Colors.blue, width: 5),
-                  right: BorderSide(color: Colors.grey, width: 0.5),
-                  bottom: BorderSide(color: Colors.grey, width: 0.5),
-                  top: BorderSide(color: Colors.grey, width: 0.5))),
+                  left: BorderSide(
+                      color: Theme.of(context).colorScheme.primary, width: 5),
+                  right: const BorderSide(color: Colors.grey, width: 0.5),
+                  bottom: const BorderSide(color: Colors.grey, width: 0.5),
+                  top: const BorderSide(color: Colors.grey, width: 0.5))),
           height: 75,
           width: MediaQuery.of(context).size.width * 100,
           child: Row(
@@ -694,15 +703,16 @@ class _IdentityVerificationScreenState
                 width: 30.0,
                 height: 30.0,
                 decoration: BoxDecoration(
-                    border: Border.all(color: Colors.blue, width: 2),
+                    border: Border.all(
+                        color: Theme.of(context).colorScheme.primary, width: 2),
                     shape: BoxShape.circle,
-                    color: Colors.white),
+                    color: Theme.of(context).colorScheme.background),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text('0$step',
-                        style: const TextStyle(
-                            color: Colors.blue,
+                        style: TextStyle(
+                            color: Theme.of(context).colorScheme.primary,
                             fontWeight: FontWeight.bold,
                             fontSize: 12))
                   ],
@@ -712,7 +722,6 @@ class _IdentityVerificationScreenState
               Icon(
                 icon,
                 size: 20,
-                color: Colors.black,
               ),
               const Padding(padding: EdgeInsets.only(left: 10)),
               Row(
@@ -744,9 +753,14 @@ class _IdentityVerificationScreenState
                                       child: Text(
                                         text == '' ? 'Unknown' : text,
                                         overflow: TextOverflow.clip,
-                                        style: const TextStyle(
-                                            fontSize: 12.0,
-                                            fontWeight: FontWeight.bold),
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .bodySmall!
+                                            .copyWith(
+                                                fontWeight: FontWeight.bold,
+                                                color: Theme.of(context)
+                                                    .colorScheme
+                                                    .onBackground),
                                       ),
                                     )
                                   ],
@@ -764,10 +778,14 @@ class _IdentityVerificationScreenState
                                           Text(
                                             'SMS sent, retry in ${calculateMinutes()} minute${calculateMinutes() == '1' ? '' : 's'}',
                                             overflow: TextOverflow.clip,
-                                            style: const TextStyle(
-                                                color: Colors.orange,
-                                                fontWeight: FontWeight.bold,
-                                                fontSize: 12),
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .bodySmall!
+                                                .copyWith(
+                                                    fontWeight: FontWeight.bold,
+                                                    color: Theme.of(context)
+                                                        .colorScheme
+                                                        .warning),
                                           )
                                         ],
                                       )
