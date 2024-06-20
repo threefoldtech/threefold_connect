@@ -2,8 +2,9 @@ String getFullNameOfObject(Map<String, dynamic> identityName) {
   String firstName = identityName['first_name'] ?? '';
   String middleName = identityName['middle_name'] ?? '';
   String lastName = identityName['last_name'] ?? '';
+  String fullName = identityName['full_name'] ?? '';
 
-  return '$firstName $middleName $lastName';
+  return fullName != '' ? fullName : '$firstName $middleName $lastName';
 }
 
 String getCorrectState(
