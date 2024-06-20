@@ -17,13 +17,12 @@ class NewsWidget extends StatefulWidget {
   _NewsState createState() => _NewsState();
 }
 
-class _NewsState extends State<NewsWidget>
-    with AutomaticKeepAliveClientMixin {
+class _NewsState extends State<NewsWidget> with AutomaticKeepAliveClientMixin {
   late InAppWebViewController webView;
   late InAppWebView iaWebView;
 
   String url = '';
-  String initialEndsWith= '';
+  String initialEndsWith = '';
   double progress = 0;
   var config = NewsConfig();
 
@@ -38,15 +37,17 @@ class _NewsState extends State<NewsWidget>
   }
 
   _NewsState() {
-    initialEndsWith =  DateTime.now().millisecondsSinceEpoch.toString();
+    this.initialEndsWith = new DateTime.now().millisecondsSinceEpoch.toString();
     iaWebView = InAppWebView(
-      initialUrlRequest: URLRequest(url:Uri.parse('https://news.threefoldconnect.jimber.org?cache_buster=$initialEndsWith'
-         )),
-
+      initialUrlRequest: URLRequest(
+          url: Uri.parse(
+              'https://news.threefold.me?cache_buster=' + initialEndsWith)),
       initialOptions: InAppWebViewGroupOptions(
           crossPlatform: InAppWebViewOptions(),
           android: AndroidInAppWebViewOptions(
-              supportMultipleWindows: true, thirdPartyCookiesEnabled: true, useHybridComposition: true),
+              supportMultipleWindows: true,
+              thirdPartyCookiesEnabled: true,
+              useHybridComposition: true),
           ios: IOSInAppWebViewOptions()),
       onWebViewCreated: (InAppWebViewController controller) {
         webView = controller;
@@ -81,14 +82,15 @@ class _NewsState extends State<NewsWidget>
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    return LayoutDrawer(titleText: 'News', content:
-    Column(
-      children: <Widget>[
-        Expanded(
-          child: Container(child: iaWebView),
-        ),
-      ],
-    ));
+    return LayoutDrawer(
+        titleText: 'News',
+        content: Column(
+          children: <Widget>[
+            Expanded(
+              child: Container(child: iaWebView),
+            ),
+          ],
+        ));
   }
 
   @override

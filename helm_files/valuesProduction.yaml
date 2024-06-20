@@ -25,4 +25,7 @@ ingress:
       path: /
       service: wizard-prod
       port: 82
-
+    - name: wizard.threefold.me
+      path: /
+      service: wizard-prod
+      port: 82

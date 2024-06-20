@@ -34,7 +34,7 @@ abstract class WalletConfigImpls {
 class WalletConfigStaging extends WalletConfigImpls {
   @override
   String appId() {
-    return 'wallet.staging.jimber.io';
+    return 'wallet.staging.threefold.me';
   }
 
   @override
@@ -58,7 +58,7 @@ class WalletConfigProduction extends WalletConfigImpls {
 class WalletConfigTesting extends WalletConfigImpls {
   @override
   String appId() {
-    return 'wallet.testing.jimber.org';
+    return 'wallet.testing.threefold.me';
   }
 
   @override
@@ -71,7 +71,7 @@ class WalletConfigLocal extends WalletConfigImpls {
   @override
   String appId() {
     return 'localhost:8080';
-    // return 'wallet.staging.jimber.org';
+    // return 'wallet.staging.threefold.me';
   }
 
   @override

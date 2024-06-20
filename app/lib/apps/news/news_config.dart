@@ -34,7 +34,7 @@ abstract class NewsConfigImpls {
 class NewsConfigStaging extends NewsConfigImpls {
   @override
   String appId() {
-    return 'news.threefoldconnect.jimber.org';
+    return 'news.staging.threefold.me';
   }
 
   @override
@@ -46,7 +46,7 @@ class NewsConfigStaging extends NewsConfigImpls {
 class NewsConfigProduction extends NewsConfigImpls {
   @override
   String appId() {
-    return 'news.threefoldconnect.jimber.org';
+    return 'news.threefold.me';
   }
 
   @override
@@ -58,7 +58,7 @@ class NewsConfigProduction extends NewsConfigImpls {
 class NewsConfigTesting extends NewsConfigImpls {
   @override
   String appId() {
-    return 'news.testing.jimber.org';
+    return 'news.testing.threefold.me';
   }
 
   @override

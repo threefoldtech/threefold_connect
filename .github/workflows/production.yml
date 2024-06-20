@@ -49,7 +49,6 @@ jobs:
       - name: context
         run: |
           echo ${{ secrets.KUBE_CONFIG }} | base64 --decode > ${HOME}/.kube/config
-          cat ${HOME}/.kube/config
       - name: Upgrade production on cluster
         run: |
           echo production-${{ github.sha }}
