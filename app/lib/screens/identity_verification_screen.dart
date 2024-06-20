@@ -8,7 +8,6 @@ import 'package:shuftipro_sdk/shuftipro_sdk.dart';
 import 'package:threebotlogin/events/events.dart';
 import 'package:threebotlogin/events/identity_callback_event.dart';
 import 'package:threebotlogin/helpers/globals.dart';
-import 'package:threebotlogin/helpers/hex_color.dart';
 import 'package:threebotlogin/helpers/kyc_helpers.dart';
 import 'package:threebotlogin/main.dart';
 import 'package:threebotlogin/services/identity_service.dart';
@@ -359,6 +358,13 @@ class _IdentityVerificationScreenState
         }
       },
       context: context,
+      countryListTheme: CountryListThemeData(
+        backgroundColor: Theme.of(context).colorScheme.secondaryContainer,
+        textStyle: Theme.of(context).textTheme.bodySmall!.copyWith(
+            color: Theme.of(context).colorScheme.onSecondaryContainer),
+        searchTextStyle: Theme.of(context).textTheme.bodySmall!.copyWith(
+            color: Theme.of(context).colorScheme.onSecondaryContainer),
+      ),
       showPhoneCode:
           false, // optional. Shows phone code before the country name.
       onSelect: (Country country) async {
@@ -1068,8 +1074,8 @@ class _IdentityVerificationScreenState
                     return _pleaseWait();
                   }
 
-                  String name =
-                      jsonDecode(snapshot.data['identityName'])['full_name'];
+                  String name = getFullNameOfObject(
+                      jsonDecode(snapshot.data['identityName']));
                   return Column(
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -1079,47 +1085,69 @@ class _IdentityVerificationScreenState
                       ),
                       Container(
                           padding: const EdgeInsets.fromLTRB(15, 10, 15, 10),
-                          child: const Column(
+                          child: Column(
                             children: [
-                              Row(
-                                children: [
-                                  Text(
-                                    'OpenKYC ID CARD',
-                                    style: TextStyle(
-                                        fontSize: 18.0,
-                                        fontWeight: FontWeight.bold),
-                                    textAlign: TextAlign.left,
-                                  ),
-                                ],
+                              Text(
+                                'OpenKYC ID CARD',
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .titleLarge!
+                                    .copyWith(
+                                        fontWeight: FontWeight.bold,
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .onSecondaryContainer),
+                                textAlign: TextAlign.center,
                               ),
-                              SizedBox(height: 5),
+                              const SizedBox(height: 5),
                               Row(children: [
                                 Text(
                                   'Your own personal KYC ID CARD',
-                                  style: TextStyle(
-                                      fontSize: 13, color: Colors.grey),
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .titleMedium!
+                                      .copyWith(
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .onSecondaryContainer),
                                 ),
                               ]),
                             ],
                           )),
                       Container(
+                        color: Theme.of(context).colorScheme.secondaryContainer,
                         padding: const EdgeInsets.fromLTRB(15, 20, 15, 20),
-                        color: HexColor('#f2f5f3'),
                         child: Column(
                           children: [
                             Row(
                               children: [
                                 Text(
                                   'Full name',
-                                  style: TextStyle(
-                                    fontSize: 13,
-                                    color: HexColor('#787878'),
-                                  ),
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .bodyMedium!
+                                      .copyWith(
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .primary,
+                                      ),
                                 )
                               ],
                             ),
                             Row(
-                              children: [Text(name)],
+                              children: [
+                                Text(
+                                  name,
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .bodyMedium!
+                                      .copyWith(
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .onSecondaryContainer,
+                                      ),
+                                )
+                              ],
                             )
                           ],
                         ),
@@ -1132,44 +1160,72 @@ class _IdentityVerificationScreenState
                               children: [
                                 Text(
                                   'Birthday',
-                                  style: TextStyle(
-                                    fontSize: 13,
-                                    color: HexColor('#787878'),
-                                  ),
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .bodyMedium!
+                                      .copyWith(
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .primary,
+                                      ),
                                 ),
                               ],
                             ),
                             Row(
                               children: [
-                                Text(snapshot.data['identityDOB'] != 'None'
-                                    ? snapshot.data['identityDOB']
-                                    : 'Unknown')
+                                Text(
+                                  snapshot.data['identityDOB'] != 'None'
+                                      ? snapshot.data['identityDOB']
+                                      : 'Unknown',
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .bodyMedium!
+                                      .copyWith(
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .onSecondaryContainer,
+                                      ),
+                                )
                               ],
                             )
                           ],
                         ),
                       ),
                       Container(
+                        color: Theme.of(context).colorScheme.secondaryContainer,
                         padding: const EdgeInsets.fromLTRB(15, 20, 15, 20),
-                        color: HexColor('#f2f5f3'),
                         child: Column(
                           children: [
                             Row(
                               children: [
                                 Text(
                                   'Country',
-                                  style: TextStyle(
-                                    fontSize: 13,
-                                    color: HexColor('#787878'),
-                                  ),
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .bodyMedium!
+                                      .copyWith(
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .primary,
+                                      ),
                                 )
                               ],
                             ),
                             Row(
                               children: [
-                                Text(snapshot.data['identityCountry'] != 'None'
-                                    ? snapshot.data['identityCountry']
-                                    : 'Unknown')
+                                Text(
+                                  snapshot.data['identityCountry'] != 'None'
+                                      ? snapshot.data['identityCountry']
+                                      : 'Unknown',
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .bodyMedium!
+                                      .copyWith(
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .onSecondaryContainer,
+                                      ),
+                                )
                               ],
                             )
                           ],
@@ -1183,18 +1239,32 @@ class _IdentityVerificationScreenState
                               children: [
                                 Text(
                                   'Gender',
-                                  style: TextStyle(
-                                    fontSize: 13,
-                                    color: HexColor('#787878'),
-                                  ),
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .bodyMedium!
+                                      .copyWith(
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .primary,
+                                      ),
                                 )
                               ],
                             ),
                             Row(
                               children: [
-                                Text(snapshot.data['identityGender'] != 'None'
-                                    ? snapshot.data['identityGender']
-                                    : 'Unknown')
+                                Text(
+                                  snapshot.data['identityGender'] != 'None'
+                                      ? snapshot.data['identityGender']
+                                      : 'Unknown',
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .bodyMedium!
+                                      .copyWith(
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .onSecondaryContainer,
+                                      ),
+                                )
                               ],
                             )
                           ],
