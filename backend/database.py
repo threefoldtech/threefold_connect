@@ -618,12 +618,15 @@ def use_productkey(key):
         pass
 
 
-def update_user_email(double_name, email):
-    update_sql = 'UPDATE users set email =? where double_name =?'
+def update_user(double_name, field, value):
+    if field not in ["twin_id", "email", "phone", "identity_reference"]:
+        raise Exception(f"This field {field} doesn't exist on the users table")
+
+    update_sql = f'UPDATE users set {field} =? where double_name =?'
 
     try:
         cursor = conn.cursor()
-        cursor.execute(update_sql, (email, double_name))
+        cursor.execute(update_sql, (value, double_name))
         conn.commit()
 
     except Error as e:
