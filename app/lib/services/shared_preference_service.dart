@@ -8,6 +8,7 @@ import 'package:threebotlogin/helpers/globals.dart';
 import 'package:threebotlogin/models/wallet_data.dart';
 import 'package:threebotlogin/services/3bot_service.dart';
 import 'package:threebotlogin/services/crypto_service.dart';
+import 'package:threebotlogin/services/open_kyc_service.dart';
 import 'package:threebotlogin/services/pkid_service.dart';
 import 'package:pinenacl/api.dart';
 import 'package:pinenacl/tweetnacl.dart' show TweetNaClExt;
@@ -160,6 +161,7 @@ Future<void> saveEmail(String email, String? signedEmailIdentifier) async {
     prefs.setString('signedEmailIdentifier', signedEmailIdentifier);
     client.setPKidDoc(
         'email', json.encode({'email': email, 'sei': signedEmailIdentifier}));
+    updateUserData("email", email);
     return;
   }
 
@@ -207,6 +209,7 @@ Future<void> savePhone(String phone, String? signedPhoneIdentifier) async {
     prefs.setString('signedPhoneIdentifier', signedPhoneIdentifier);
     client.setPKidDoc(
         'phone', json.encode({'phone': phone, 'spi': signedPhoneIdentifier}));
+    updateUserData("phone", phone);
     return;
   }
 
@@ -261,7 +264,8 @@ Future<void> saveIdentity(
     Map<String, dynamic> identityDocumentMeta,
     String signedIdentityDocumentMetaIdentifier,
     String identityGender,
-    String signedIdentityGenderIdentifier) async {
+    String signedIdentityGenderIdentifier,
+    String referenceId) async {
   final SharedPreferences prefs = await SharedPreferences.getInstance();
   prefs.remove('identityName');
   prefs.remove('identityCountry');
@@ -301,8 +305,10 @@ Future<void> saveIdentity(
         'signedIdentityDocumentMetaIdentifier':
             signedIdentityDocumentMetaIdentifier,
         'identityGender': identityGender,
-        'signedIdentityGenderIdentifier': signedIdentityGenderIdentifier
+        'signedIdentityGenderIdentifier': signedIdentityGenderIdentifier,
+        'referenceId': referenceId
       }));
+  updateUserData("identity_reference", referenceId);
 
   Globals().identityVerified.value = true;
 }

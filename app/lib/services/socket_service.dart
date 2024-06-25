@@ -353,7 +353,8 @@ Future identityVerification(String reference) async {
       verifiedSignedIdentityDocumentMetaIdentifier['document_meta_data'],
       signedIdentityDocumentMetaIdentifier,
       verifiedSignedIdentityGenderIdentifier['gender_data'],
-      signedIdentityGenderIdentifier);
+      signedIdentityGenderIdentifier,
+      reference);
 
   return 'Verified';
 }
