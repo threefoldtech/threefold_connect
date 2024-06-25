@@ -200,6 +200,7 @@ Future<Response> verifyIdentity(String reference) async {
   return http.post(url, body: encodedBody, headers: requestHeaders);
 }
 
+// TODO: Remove this method and user update user data
 Future<Response> updateEmailAddressOfUser() async {
   String timestamp = DateTime.now().millisecondsSinceEpoch.toString();
   Uint8List sk = await getPrivateKey();
@@ -217,10 +218,37 @@ Future<Response> updateEmailAddressOfUser() async {
     'Jimber-Authorization': signedPayload
   };
 
-  String encodedBody =
-      jsonEncode({'username': await getDoubleName(), 'email': email['email']});
+  String encodedBody = jsonEncode({
+    'username': await getDoubleName(),
+    'field': 'email',
+    'value': email['email']
+  });
 
-  Uri url = Uri.parse('$threeBotApiUrl/users/change-email');
+  Uri url = Uri.parse('$threeBotApiUrl/users/update');
+  print('Sending call: ${url.toString()}');
+
+  return http.post(url, headers: loginRequestHeaders, body: encodedBody);
+}
+
+Future<Response> updateUserData(String field, String value) async {
+  String timestamp = DateTime.now().millisecondsSinceEpoch.toString();
+  Uint8List sk = await getPrivateKey();
+
+  Map<String, String> payload = {
+    'timestamp': timestamp,
+    'intention': 'change-$field'
+  };
+  String signedPayload = await signData(jsonEncode(payload), sk);
+
+  Map<String, String> loginRequestHeaders = {
+    'Content-type': 'application/json',
+    'Jimber-Authorization': signedPayload
+  };
+
+  String encodedBody = jsonEncode(
+      {'username': await getDoubleName(), 'field': field, 'value': value});
+
+  Uri url = Uri.parse('$threeBotApiUrl/users/update');
   print('Sending call: ${url.toString()}');
 
   return http.post(url, headers: loginRequestHeaders, body: encodedBody);
