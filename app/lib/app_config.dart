@@ -215,4 +215,5 @@ void setFallbackConfigs() {
   Globals().redoIdentityVerification = false;
   Globals().timeOutSeconds = 10;
   Globals().phoneVerification = false;
+  Globals().chainUrl = '';
 }

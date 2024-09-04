@@ -60,6 +60,8 @@ class Flags {
         await Flags().hasFlagValueByFeatureName('redo-identity-verification');
     Globals().phoneVerification =
         await Flags().hasFlagValueByFeatureName('phone-verification');
+    Globals().chainUrl =
+        (await Flags().getFlagValueByFeatureName('chain-url'))!;
   }
 
   Future<bool> hasFlagValueByFeatureName(String name) async {

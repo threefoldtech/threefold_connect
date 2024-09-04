@@ -54,6 +54,7 @@ class Globals {
   String tosUrl = '';
   bool maintenance = false;
   bool phoneVerification = false;
+  String chainUrl = '';
 
   bool isCacheClearedWallet = false;
   bool isCacheClearedFarmer = false;
