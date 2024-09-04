@@ -16,7 +16,16 @@ dependencies:
     git:
       url: https://github.com/threefoldtech/threefold_connect_flutter_pkid_client
       ref: master
-
+  tfchain_client:
+    git:
+      url: https://github.com/codescalers/tfgrid-sdk-dart
+      ref: main
+      path: packages/tfchain_client
+  stellar_client:
+    git:
+      url: https://github.com/codescalers/tfgrid-sdk-dart
+      ref: main
+      path: packages/stellar_client
   shuftipro_sdk: ^1.2.5
   flutter_svg: ^2.0.6
   bip39: ^1.0.6
@@ -49,6 +58,9 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^2.0.0
+
+dependency_overrides:
+  intl: 0.19.0
 
 flutter:
   uses-material-design: true
