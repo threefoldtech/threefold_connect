@@ -121,6 +121,19 @@ Future<String?> getPhrase() async {
   return prefs.getString('phrase');
 }
 
+Future<void> saveTwinId(int twinId) async {
+  final SharedPreferences prefs = await SharedPreferences.getInstance();
+  prefs.remove('twinId');
+
+  prefs.setInt('twinId', twinId);
+  updateUserData("twinId", twinId as String);
+}
+
+Future<int?> getTwinId() async {
+  final SharedPreferences prefs = await SharedPreferences.getInstance();
+  return prefs.getInt('twinId');
+}
+
 ///
 ///
 /// Email methods in Shared Preferences
