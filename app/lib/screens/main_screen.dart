@@ -300,7 +300,7 @@ class _AppState extends State<MainScreen> {
 
   Future<void> loadTwinId() async {
     int? twinId = await getTwinId();
-    if (twinId != null) {
+    if (twinId == null || twinId == 0) {
       twinId = await TFChain.getTwinId();
       if (twinId != null) {
         await saveTwinId(twinId);
