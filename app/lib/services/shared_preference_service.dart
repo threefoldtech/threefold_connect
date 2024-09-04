@@ -126,7 +126,7 @@ Future<void> saveTwinId(int twinId) async {
   prefs.remove('twinId');
 
   prefs.setInt('twinId', twinId);
-  updateUserData("twinId", twinId as String);
+  updateUserData("twinId", twinId.toString());
 }
 
 Future<int?> getTwinId() async {
