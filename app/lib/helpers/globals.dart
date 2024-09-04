@@ -60,6 +60,7 @@ class Globals {
 
   int smsSentOn = 0;
   int smsMinutesCoolDown = 5;
+  int twinId = 0;
 
   ValueNotifier<bool> hidePhoneButton = ValueNotifier(false);
 

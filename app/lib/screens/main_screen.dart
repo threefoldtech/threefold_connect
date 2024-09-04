@@ -18,6 +18,7 @@ import 'package:threebotlogin/services/shared_preference_service.dart';
 import 'package:threebotlogin/widgets/error_widget.dart';
 import 'package:threebotlogin/widgets/home_logo.dart';
 import 'package:uni_links/uni_links.dart';
+import 'package:threebotlogin/services/tfchain_service.dart' as TFChain;
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key, this.initDone, this.registered});
@@ -185,6 +186,8 @@ class _AppState extends State<MainScreen> {
     print(mounted);
     Navigator.of(context).popUntil((route) => route.isFirst);
 
+    await loadTwinId();
+
     // await Navigator.push(context, MaterialPageRoute(builder: (context) => UnregisteredScreen()));
     await Navigator.of(context).pushReplacement(PageRouteBuilder(
         transitionDuration: Duration(seconds: 1),
@@ -293,5 +296,16 @@ class _AppState extends State<MainScreen> {
       }
       initialLink = incomingLink;
     });
+  }
+
+  Future<void> loadTwinId() async {
+    int? twinId = await getTwinId();
+    if (twinId != null) {
+      twinId = await TFChain.getTwinId();
+      if (twinId != null) {
+        await saveTwinId(twinId);
+        Globals().twinId = twinId;
+      }
+    }
   }
 }
