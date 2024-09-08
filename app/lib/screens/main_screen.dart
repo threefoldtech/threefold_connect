@@ -301,11 +301,11 @@ class _AppState extends State<MainScreen> {
   Future<void> loadTwinId() async {
     int? twinId = await getTwinId();
     if (twinId == null || twinId == 0) {
-      twinId = await TFChain.getTwinId();
+      twinId = await TFChain.getMyTwinId();
       if (twinId != null) {
         await saveTwinId(twinId);
-        Globals().twinId = twinId;
       }
     }
+    Globals().twinId = twinId ?? 0;
   }
 }

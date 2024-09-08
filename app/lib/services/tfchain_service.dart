@@ -4,7 +4,7 @@ import 'package:stellar_client/stellar_client.dart' as Stellar;
 import 'package:convert/convert.dart';
 import 'package:tfchain_client/tfchain_client.dart' as TFChain;
 
-Future<int?> getTwinId() async {
+Future<int?> getMyTwinId() async {
   final chainUrl = Globals().chainUrl;
   if (chainUrl == '') return null;
   final phrase = await getPhrase();
