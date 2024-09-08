@@ -10,6 +10,7 @@ import 'package:threebotlogin/events/identity_callback_event.dart';
 import 'package:threebotlogin/helpers/globals.dart';
 import 'package:threebotlogin/helpers/kyc_helpers.dart';
 import 'package:threebotlogin/main.dart';
+import 'package:threebotlogin/services/gridproxy_service.dart';
 import 'package:threebotlogin/services/identity_service.dart';
 import 'package:threebotlogin/services/open_kyc_service.dart';
 import 'package:threebotlogin/services/pkid_service.dart';
@@ -128,6 +129,7 @@ class _IdentityVerificationScreenState
       'text': 'My name is John Doe and I authorize this transaction of \$100/-',
     },
   };
+  double spending = 0.0;
 
   setEmailVerified() {
     if (mounted) {
@@ -254,7 +256,9 @@ class _IdentityVerificationScreenState
                                     Icons.email),
 
                                 // Step two: verify phone
-                                Globals().phoneVerification == true
+                                (Globals().phoneVerification == true ||
+                                        (Globals().spendingLimit > 0 &&
+                                            spending > Globals().spendingLimit))
                                     ? _fillCard(
                                         getCorrectState(2, emailVerified,
                                             phoneVerified, identityVerified),
@@ -264,7 +268,9 @@ class _IdentityVerificationScreenState
                                     : Container(),
 
                                 // Step three: verify identity
-                                Globals().isOpenKYCEnabled
+                                (Globals().isOpenKYCEnabled ||
+                                        (Globals().spendingLimit > 0 &&
+                                            spending > Globals().spendingLimit))
                                     ? _fillCard(
                                         getCorrectState(3, emailVerified,
                                             phoneVerified, identityVerified),
@@ -1609,5 +1615,20 @@ class _IdentityVerificationScreenState
     Globals().smsSentOn = DateTime.now().millisecondsSinceEpoch;
 
     phoneSendDialog(context);
+  }
+
+  Future<void> getSpending() async {
+    try {
+      final mySpending = await getMySpending();
+      setState(() {
+        spending = mySpending;
+      });
+    } catch (e) {
+      const loadingSpendingFailure = SnackBar(
+        content: Text('Failed to load user spending'),
+        duration: Duration(seconds: 1),
+      );
+      ScaffoldMessenger.of(context).showSnackBar(loadingSpendingFailure);
+    }
   }
 }
