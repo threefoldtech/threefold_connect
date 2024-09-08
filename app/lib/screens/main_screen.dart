@@ -186,13 +186,22 @@ class _AppState extends State<MainScreen> {
     print(mounted);
     Navigator.of(context).popUntil((route) => route.isFirst);
 
+    updateMessage = 'Fetching user data';
+    setState(() {});
     try {
       await loadTwinId();
     } catch (e) {
-      const loadingTwinFailure = SnackBar(
-        content: Text('Failed to load twin information'),
-        duration: Duration(seconds: 1),
+      final loadingTwinFailure = SnackBar(
+        content: Text(
+          'Failed to load twin information',
+          style: Theme.of(context)
+              .textTheme
+              .bodyMedium!
+              .copyWith(color: Theme.of(context).colorScheme.errorContainer),
+        ),
+        duration: Duration(seconds: 2),
       );
+      ScaffoldMessenger.of(context).clearSnackBars();
       ScaffoldMessenger.of(context).showSnackBar(loadingTwinFailure);
       print('Failed to load twin information due to $e');
     }

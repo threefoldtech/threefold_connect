@@ -217,6 +217,11 @@ class _IdentityVerificationScreenState
         }
       });
     });
+    getSpending().then((mySpending) => {
+          setState(() {
+            spending = mySpending;
+          })
+        });
   }
 
   @override
@@ -1617,18 +1622,23 @@ class _IdentityVerificationScreenState
     phoneSendDialog(context);
   }
 
-  Future<void> getSpending() async {
+  Future<double> getSpending() async {
     try {
-      final mySpending = await getMySpending();
-      setState(() {
-        spending = mySpending;
-      });
+      return await getMySpending();
     } catch (e) {
-      const loadingSpendingFailure = SnackBar(
-        content: Text('Failed to load user spending'),
-        duration: Duration(seconds: 1),
+      final loadingSpendingFailure = SnackBar(
+        content: Text(
+          'Failed to load user spending',
+          style: Theme.of(context)
+              .textTheme
+              .bodyMedium!
+              .copyWith(color: Theme.of(context).colorScheme.errorContainer),
+        ),
+        duration: Duration(seconds: 2),
       );
+      ScaffoldMessenger.of(context).clearSnackBars();
       ScaffoldMessenger.of(context).showSnackBar(loadingSpendingFailure);
+      return 0.0;
     }
   }
 }
