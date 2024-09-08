@@ -186,7 +186,16 @@ class _AppState extends State<MainScreen> {
     print(mounted);
     Navigator.of(context).popUntil((route) => route.isFirst);
 
-    await loadTwinId();
+    try {
+      await loadTwinId();
+    } catch (e) {
+      const loadingTwinFailure = SnackBar(
+        content: Text('Failed to load twin information'),
+        duration: Duration(seconds: 1),
+      );
+      ScaffoldMessenger.of(context).showSnackBar(loadingTwinFailure);
+      print('Failed to load twin information due to $e');
+    }
 
     // await Navigator.push(context, MaterialPageRoute(builder: (context) => UnregisteredScreen()));
     await Navigator.of(context).pushReplacement(PageRouteBuilder(
