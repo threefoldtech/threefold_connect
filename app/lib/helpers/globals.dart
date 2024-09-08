@@ -55,6 +55,7 @@ class Globals {
   bool maintenance = false;
   bool phoneVerification = false;
   String chainUrl = '';
+  String gridproxyUrl = '';
 
   bool isCacheClearedWallet = false;
   bool isCacheClearedFarmer = false;
