@@ -1634,10 +1634,11 @@ class _IdentityVerificationScreenState
               .bodyMedium!
               .copyWith(color: Theme.of(context).colorScheme.errorContainer),
         ),
-        duration: Duration(seconds: 2),
+        duration: const Duration(seconds: 3),
       );
       ScaffoldMessenger.of(context).clearSnackBars();
       ScaffoldMessenger.of(context).showSnackBar(loadingSpendingFailure);
+      print('Failed to load user spending due to $e');
       return 0.0;
     }
   }

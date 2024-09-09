@@ -199,7 +199,7 @@ class _AppState extends State<MainScreen> {
               .bodyMedium!
               .copyWith(color: Theme.of(context).colorScheme.errorContainer),
         ),
-        duration: Duration(seconds: 2),
+        duration: const Duration(seconds: 3),
       );
       ScaffoldMessenger.of(context).clearSnackBars();
       ScaffoldMessenger.of(context).showSnackBar(loadingTwinFailure);
