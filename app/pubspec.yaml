@@ -58,6 +58,7 @@ dependencies:
   country_picker: ^2.0.20
   pinenacl: ^0.5.1
   pinput: 3.0.1
+  build_runner: ^2.4.9
 
 dev_dependencies:
   flutter_test:
