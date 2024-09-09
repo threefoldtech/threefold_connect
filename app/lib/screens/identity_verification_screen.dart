@@ -218,9 +218,12 @@ class _IdentityVerificationScreenState
       });
     });
     getSpending().then((mySpending) => {
-          setState(() {
-            spending = mySpending;
-          })
+          if (Globals().spendingLimit > 0)
+            {
+              setState(() {
+                spending = mySpending;
+              })
+            }
         });
   }
 
