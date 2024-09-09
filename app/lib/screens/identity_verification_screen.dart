@@ -217,14 +217,7 @@ class _IdentityVerificationScreenState
         }
       });
     });
-    getSpending().then((mySpending) => {
-          if (Globals().spendingLimit > 0)
-            {
-              setState(() {
-                spending = mySpending;
-              })
-            }
-        });
+    getSpending();
   }
 
   @override
@@ -1625,9 +1618,13 @@ class _IdentityVerificationScreenState
     phoneSendDialog(context);
   }
 
-  Future<double> getSpending() async {
+  Future<void> getSpending() async {
+    if (Globals().spendingLimit <= 0) return;
     try {
-      return await getMySpending();
+      setState(() {
+        isLoading = true;
+      });
+      spending = await getMySpending();
     } catch (e) {
       final loadingSpendingFailure = SnackBar(
         content: Text(
@@ -1642,7 +1639,11 @@ class _IdentityVerificationScreenState
       ScaffoldMessenger.of(context).clearSnackBars();
       ScaffoldMessenger.of(context).showSnackBar(loadingSpendingFailure);
       print('Failed to load user spending due to $e');
-      return 0.0;
+      spending = 0.0;
+    } finally {
+      setState(() {
+        isLoading = false;
+      });
     }
   }
 }
