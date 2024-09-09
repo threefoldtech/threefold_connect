@@ -217,5 +217,5 @@ void setFallbackConfigs() {
   Globals().phoneVerification = false;
   Globals().chainUrl = '';
   Globals().gridproxyUrl = '';
-  Globals().timeOutSeconds = 0;
+  Globals().spendingLimit = 0;
 }
