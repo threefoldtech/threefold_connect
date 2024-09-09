@@ -324,6 +324,5 @@ class _AppState extends State<MainScreen> {
         await saveTwinId(twinId);
       }
     }
-    Globals().twinId = twinId ?? 0;
   }
 }
