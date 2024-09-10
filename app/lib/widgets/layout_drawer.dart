@@ -36,6 +36,11 @@ class _LayoutDrawerState extends State<LayoutDrawer> {
 
   @override
   Widget build(BuildContext context) {
+    IconThemeData? selectedIconTheme =
+        BottomNavigationBarTheme.of(context).selectedIconTheme;
+    Color? selectedItemColor =
+        BottomNavigationBarTheme.of(context).selectedItemColor;
+    double selectedFontSize = 14;
     if (widget.titleText == 'Home') {
       currentScreenIndex = 0;
     } else if (widget.titleText == 'Wallet') {
@@ -44,8 +49,13 @@ class _LayoutDrawerState extends State<LayoutDrawer> {
       currentScreenIndex = 2;
     } else if (widget.titleText == 'Settings') {
       currentScreenIndex = 3;
+    } else {
+      selectedIconTheme =
+          BottomNavigationBarTheme.of(context).unselectedIconTheme;
+      selectedItemColor =
+          BottomNavigationBarTheme.of(context).unselectedItemColor;
+      selectedFontSize = 12;
     }
-
     return Scaffold(
       appBar: AppBar(
         // Here we take the value from the MyHomePage object that was created by
@@ -163,6 +173,11 @@ class _LayoutDrawerState extends State<LayoutDrawer> {
       ),
       bottomNavigationBar: BottomNavigationBar(
         onTap: _selectScreen,
+        selectedIconTheme: selectedIconTheme,
+        selectedItemColor: selectedItemColor,
+        showUnselectedLabels: true,
+        selectedFontSize: selectedFontSize,
+        unselectedFontSize: 12,
         currentIndex: currentScreenIndex,
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
