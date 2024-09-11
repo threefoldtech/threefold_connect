@@ -1091,7 +1091,8 @@ class _IdentityVerificationScreenState
                         height: 10,
                       ),
                       Container(
-                          padding: const EdgeInsets.fromLTRB(15, 10, 15, 10),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 15, vertical: 10),
                           child: Column(
                             children: [
                               Text(
@@ -1123,7 +1124,8 @@ class _IdentityVerificationScreenState
                           )),
                       Container(
                         color: Theme.of(context).colorScheme.secondaryContainer,
-                        padding: const EdgeInsets.fromLTRB(15, 20, 15, 20),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 15, vertical: 20),
                         child: Column(
                           children: [
                             Row(
@@ -1160,7 +1162,8 @@ class _IdentityVerificationScreenState
                         ),
                       ),
                       Container(
-                        padding: const EdgeInsets.fromLTRB(15, 20, 15, 20),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 15, vertical: 20),
                         child: Column(
                           children: [
                             Row(
@@ -1200,7 +1203,8 @@ class _IdentityVerificationScreenState
                       ),
                       Container(
                         color: Theme.of(context).colorScheme.secondaryContainer,
-                        padding: const EdgeInsets.fromLTRB(15, 20, 15, 20),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 15, vertical: 20),
                         child: Column(
                           children: [
                             Row(
@@ -1239,7 +1243,8 @@ class _IdentityVerificationScreenState
                         ),
                       ),
                       Container(
-                        padding: const EdgeInsets.fromLTRB(15, 20, 15, 20),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 15, vertical: 20),
                         child: Column(
                           children: [
                             Row(
