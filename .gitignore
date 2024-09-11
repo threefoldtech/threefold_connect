@@ -348,3 +348,9 @@ backend/services/__pycache__/socket.cpython-39.pyc
 
 *.pyc
 .vscode
+
+# reflected files
+app/lib/main.reflectable.dart
+
+# pubSpec override
+app/pubspec_overrides.yaml

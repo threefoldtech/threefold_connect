@@ -54,12 +54,15 @@ class Globals {
   String tosUrl = '';
   bool maintenance = false;
   bool phoneVerification = false;
+  String chainUrl = '';
+  String gridproxyUrl = '';
 
   bool isCacheClearedWallet = false;
   bool isCacheClearedFarmer = false;
 
   int smsSentOn = 0;
   int smsMinutesCoolDown = 5;
+  int spendingLimit = 0;
 
   ValueNotifier<bool> hidePhoneButton = ValueNotifier(false);
 

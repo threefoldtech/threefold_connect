@@ -18,6 +18,7 @@ import 'package:threebotlogin/services/shared_preference_service.dart';
 import 'package:threebotlogin/widgets/error_widget.dart';
 import 'package:threebotlogin/widgets/home_logo.dart';
 import 'package:uni_links/uni_links.dart';
+import 'package:threebotlogin/services/tfchain_service.dart' as TFChain;
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key, this.initDone, this.registered});
@@ -185,6 +186,26 @@ class _AppState extends State<MainScreen> {
     print(mounted);
     Navigator.of(context).popUntil((route) => route.isFirst);
 
+    updateMessage = 'Fetching user data';
+    setState(() {});
+    try {
+      await loadTwinId();
+    } catch (e) {
+      final loadingTwinFailure = SnackBar(
+        content: Text(
+          'Failed to load twin information',
+          style: Theme.of(context)
+              .textTheme
+              .bodyMedium!
+              .copyWith(color: Theme.of(context).colorScheme.errorContainer),
+        ),
+        duration: const Duration(seconds: 3),
+      );
+      ScaffoldMessenger.of(context).clearSnackBars();
+      ScaffoldMessenger.of(context).showSnackBar(loadingTwinFailure);
+      print('Failed to load twin information due to $e');
+    }
+
     // await Navigator.push(context, MaterialPageRoute(builder: (context) => UnregisteredScreen()));
     await Navigator.of(context).pushReplacement(PageRouteBuilder(
         transitionDuration: Duration(seconds: 1),
@@ -293,5 +314,15 @@ class _AppState extends State<MainScreen> {
       }
       initialLink = incomingLink;
     });
+  }
+
+  Future<void> loadTwinId() async {
+    int? twinId = await getTwinId();
+    if (twinId == null || twinId == 0) {
+      twinId = await TFChain.getMyTwinId();
+      if (twinId != null) {
+        await saveTwinId(twinId);
+      }
+    }
   }
 }

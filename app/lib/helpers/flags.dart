@@ -60,6 +60,12 @@ class Flags {
         await Flags().hasFlagValueByFeatureName('redo-identity-verification');
     Globals().phoneVerification =
         await Flags().hasFlagValueByFeatureName('phone-verification');
+    Globals().chainUrl =
+        (await Flags().getFlagValueByFeatureName('chain-url'))!;
+    Globals().gridproxyUrl =
+        (await Flags().getFlagValueByFeatureName('gridproxy-url'))!;
+    Globals().spendingLimit = int.parse(
+        (await Flags().getFlagValueByFeatureName('spending-limit')).toString());
   }
 
   Future<bool> hasFlagValueByFeatureName(String name) async {
