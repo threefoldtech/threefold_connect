@@ -5,7 +5,7 @@ import 'package:path_provider/path_provider.dart';
 
 // https://www.youtube.com/watch?v=6tfBflFUO7s
 Future openFile(File? file) async {
-  if (file != null && file.path != null) {
+  if (file != null && file.path.isNotEmpty) {
     OpenFilex.open(file.path);
   }
 }
