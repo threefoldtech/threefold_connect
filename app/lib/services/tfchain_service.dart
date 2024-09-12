@@ -14,8 +14,8 @@ Future<int?> getMyTwinId() async {
     final token = RootIsolateToken.instance;
     return await compute((dynamic token) async {
       BackgroundIsolateBinaryMessenger.ensureInitialized(token);
-      final wallet = await Stellar.Client.createFromMnemonic(
-          Stellar.NetworkType.PUBLIC, phrase);
+      final wallet =
+          await Stellar.Client.fromMnemonic(Stellar.NetworkType.PUBLIC, phrase);
       final privateKey = wallet.privateKey;
       if (privateKey != null) {
         final hexSecret = hex.encode(privateKey.toList().sublist(0, 32));
