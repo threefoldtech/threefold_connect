@@ -42,12 +42,12 @@ class _WalletScreenState extends State<WalletScreen> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           const CircularProgressIndicator(),
+          const SizedBox(height: 15),
           Text(
             "Loading Wallets...",
-            style: Theme.of(context)
-                .textTheme
-                .bodyLarge!
-                .copyWith(color: Theme.of(context).colorScheme.onBackground),
+            style: Theme.of(context).textTheme.bodyLarge!.copyWith(
+                color: Theme.of(context).colorScheme.onBackground,
+                fontWeight: FontWeight.bold),
           ),
         ],
       ));
