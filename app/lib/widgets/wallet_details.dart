@@ -31,10 +31,11 @@ class _WalletDetailsWidgetState extends State<WalletDetailsWidget> {
 
   @override
   Widget build(BuildContext context) {
-    stellarSecretController.text = widget.wallet.stellarSecret;
-    stellarAddressController.text = widget.wallet.stellarAddress;
-    tfchainSecretController.text = widget.wallet.tfchainSecret;
-    tfchainAddressController.text = widget.wallet.tfchainAddress;
+    stellarSecretController.text = widget.wallet.stellarClient.secretSeed;
+    stellarAddressController.text = widget.wallet.stellarClient.accountId;
+    tfchainSecretController.text =
+        widget.wallet.tfchainClient.mnemonicOrSecretSeed;
+    tfchainAddressController.text = widget.wallet.tfchainClient.address;
     walletNameController.text = widget.wallet.name;
 
     return Padding(
