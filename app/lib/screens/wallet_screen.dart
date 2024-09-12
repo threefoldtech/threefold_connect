@@ -76,41 +76,51 @@ class _WalletScreenState extends State<WalletScreen> {
     Map<int, dynamic> dataMap = result.asMap();
     final chainUrl = Globals().chainUrl;
     for (final w in dataMap.values) {
+      Stellar.Client stellarClient;
+      TFChain.Client tfchainClient;
       if (" ".allMatches(w["seed"]).length == 11) {
-        // tfchain account mnemonic 12 words
+        tfchainClient = TFChain.Client(chainUrl, w["seed"], "sr25519");
+        final entropy = bip39.mnemonicToEntropy(w["seed"]);
+        final seed = entropy.padRight(64, "0");
+        stellarClient =
+            Stellar.Client.fromSecretSeedHex(Stellar.NetworkType.PUBLIC, seed);
       } else if (" ".allMatches(w["seed"]).length == 23) {
-        // stellar mnemonic 24 words
-      } else {
-        final stellarClient = Stellar.Client.fromSecretSeedHex(
+        stellarClient = await Stellar.Client.fromMnemonic(
             Stellar.NetworkType.PUBLIC, w["seed"]);
-        String stellarBalance = "0.0";
-        try {
-          final stellarBalances = await stellarClient.getBalance();
-          for (final balance in stellarBalances) {
-            if (balance.assetCode == "TFT") ;
-            stellarBalance = balance.balance;
-          }
-        } catch (e) {
-          print("Couldn't load the account balance.");
-        }
         final hexSecret =
             hex.encode(stellarClient.privateKey!.toList().sublist(0, 32));
-        final tfchainClient =
-            TFChain.Client(chainUrl, '0x$hexSecret', "sr25519");
-        await tfchainClient.connect();
-        final tfchainBalance =
-            (await tfchainClient.balances.getMyBalance())!.data.free /
-                BigInt.from(10).pow(7);
-        final wallet = Wallet(
-          name: w["name"],
-          stellarClient: stellarClient,
-          tfchainClient: tfchainClient,
-          stellarBalance: stellarBalance,
-          tfchainBalance: tfchainBalance.toString(),
-          type: w["type"] == "Native" ? WalletType.Native : WalletType.Imported,
-        );
-        wallets.add(wallet);
+        tfchainClient = TFChain.Client(chainUrl, '0x$hexSecret', "sr25519");
+      } else {
+        stellarClient = Stellar.Client.fromSecretSeedHex(
+            Stellar.NetworkType.PUBLIC, w["seed"]);
+        final hexSecret =
+            hex.encode(stellarClient.privateKey!.toList().sublist(0, 32));
+        tfchainClient = TFChain.Client(chainUrl, '0x$hexSecret', "sr25519");
       }
+      String stellarBalance = "0.0";
+      try {
+        final stellarBalances = await stellarClient.getBalance();
+        for (final balance in stellarBalances) {
+          if (balance.assetCode == "TFT") ;
+          stellarBalance = balance.balance;
+        }
+      } catch (e) {
+        print("Couldn't load the account balance.");
+      }
+
+      await tfchainClient.connect();
+      final tfchainBalance =
+          (await tfchainClient.balances.getMyBalance())!.data.free /
+              BigInt.from(10).pow(7);
+      final wallet = Wallet(
+        name: w["name"],
+        stellarClient: stellarClient,
+        tfchainClient: tfchainClient,
+        stellarBalance: stellarBalance,
+        tfchainBalance: tfchainBalance.toString(),
+        type: w["type"] == "Native" ? WalletType.Native : WalletType.Imported,
+      );
+      wallets.add(wallet);
     }
     setState(() {
       loading = false;
