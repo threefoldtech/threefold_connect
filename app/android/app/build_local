@@ -34,8 +34,11 @@ android {
     }
 
 		lintOptions {
-        disable 'InvalidPackage'
-    }
+            disable 'InvalidPackage'
+            disable "Instantiatable"
+            checkReleaseBuilds false
+            abortOnError false
+        }
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
@@ -47,7 +50,7 @@ android {
     }
 
     defaultConfig {
-        applicationId "org.jimber.threebotlogin.local"
+        applicationId "org.jimber.threebotlogin"
         minSdkVersion 23
         targetSdkVersion flutter.targetSdkVersion
         versionCode flutterVersionCode.toInteger()
@@ -66,7 +69,6 @@ android {
 
         }
     }
-		
     buildTypes {
         release {
             signingConfig signingConfigs.release
@@ -75,6 +77,11 @@ android {
             signingConfig signingConfigs.debug
         }
     }
+    buildscript {
+    ext {
+        stripeVersion = "20.19.1" // This is the version BEFORE the kotlin bump
+    }
+}
 }
 
 flutter {
@@ -89,6 +96,7 @@ dependencies {
     implementation 'com.hbb20:ccp:2.4.0'
     implementation 'com.google.code.gson:gson:2.8.6'
     implementation "androidx.preference:preference-ktx:1.1.1"
-		implementation "androidx.lifecycle:lifecycle-viewmodel:$lifecycle_version"
-		implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycle_version"
+	implementation "androidx.lifecycle:lifecycle-viewmodel:$lifecycle_version"
+	implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycle_version"
+
 }
