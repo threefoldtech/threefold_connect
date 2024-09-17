@@ -20,3 +20,12 @@ class Wallet {
   String tfchainBalance;
   final WalletType type;
 }
+
+class SimpleWallet {
+  SimpleWallet({
+    required this.name,
+    required this.secret,
+  });
+  final String name;
+  final String secret;
+}

@@ -1,9 +1,12 @@
 import 'dart:ui';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:threebotlogin/helpers/globals.dart';
 import 'package:threebotlogin/models/wallet.dart';
 import 'package:threebotlogin/services/wallet_service.dart';
+import 'package:threebotlogin/widgets/add_wallet.dart';
 import 'package:threebotlogin/widgets/layout_drawer.dart';
 import 'package:threebotlogin/widgets/wallet_card.dart';
 
@@ -50,7 +53,16 @@ class _WalletScreenState extends State<WalletScreen> {
       );
     }
 
-    return LayoutDrawer(titleText: 'Wallet', content: mainWidget);
+    return LayoutDrawer(
+      titleText: 'Wallet',
+      content: mainWidget,
+      appBarActions: [
+        IconButton(
+            // TODO: disable clicks till the wallets are loading.
+            onPressed: _openAddWalletOverlay,
+            icon: const Icon(Icons.add))
+      ],
+    );
   }
 
   listMyWallets() async {
@@ -63,4 +75,38 @@ class _WalletScreenState extends State<WalletScreen> {
       loading = false;
     });
   }
+
+  _openAddWalletOverlay() {
+    showModalBottomSheet(
+        isScrollControlled: true,
+        useSafeArea: true,
+        constraints: const BoxConstraints(maxWidth: double.infinity),
+        context: context,
+        builder: (ctx) => NewWallet(
+              onAddWallet: _addWallet,
+            ));
+  }
+
+  Future<void> _addWallet(SimpleWallet wallet) async {
+    setState(() {
+      loading = true;
+    });
+
+    final w = await loadAddWallet(wallet.name, wallet.secret);
+    wallets.add(w);
+
+    setState(() {
+      loading = false;
+    });
+  }
+}
+
+Future<Wallet> loadAddWallet(String walletName, String walletSecret) async {
+  final chainUrl = Globals().chainUrl;
+  final Wallet wallet = await compute((void _) async {
+    final wallet = await loadWallet(
+        walletName, walletSecret, WalletType.Imported, chainUrl);
+    return wallet;
+  }, null);
+  return wallet;
 }
