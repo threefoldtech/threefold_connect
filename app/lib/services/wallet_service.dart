@@ -29,9 +29,7 @@ Future<List<Wallet>> listWallets() async {
   Map<int, dynamic> dataMap = result.asMap();
   final String chainUrl = Globals().chainUrl;
 
-  final token = RootIsolateToken.instance;
-  final List<Wallet> wallets = await compute((dynamic token) async {
-    BackgroundIsolateBinaryMessenger.ensureInitialized(token);
+  final List<Wallet> wallets = await compute((void _) async {
     final List<Future<Wallet>> walletFutures = [];
     for (final w in dataMap.values) {
       final String walletSeed = w['seed'];
@@ -43,7 +41,7 @@ Future<List<Wallet>> listWallets() async {
       walletFutures.add(walletFuture);
     }
     return await Future.wait(walletFutures);
-  }, token);
+  }, null);
 
   return wallets;
 }
@@ -93,7 +91,8 @@ Future<Wallet> loadWallet(String walletName, String walletSeed,
     tfchainSecret: tfchainClient.mnemonicOrSecretSeed,
     tfchainAddress: tfchainClient.address,
     stellarBalance: stellarBalance,
-    tfchainBalance: tfchainBalance.toString(),
+    tfchainBalance:
+        tfchainBalance.toString() == '0.0' ? '0' : tfchainBalance.toString(),
     type: walletType,
   );
   return wallet;
