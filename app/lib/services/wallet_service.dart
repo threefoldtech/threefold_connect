@@ -71,7 +71,7 @@ Future<Wallet> loadWallet(String walletName, String walletSeed,
         hex.encode(stellarClient.privateKey!.toList().sublist(0, 32));
     tfchainClient = TFChain.Client(chainUrl, '0x$hexSecret', "sr25519");
   }
-  String stellarBalance = '0.0';
+  String stellarBalance = '0';
   try {
     final stellarBalances = await stellarClient.getBalance();
     for (final balance in stellarBalances) {

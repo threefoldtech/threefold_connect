@@ -4,10 +4,14 @@ import 'package:threebotlogin/helpers/globals.dart';
 
 class LayoutDrawer extends StatefulWidget {
   const LayoutDrawer(
-      {super.key, required this.titleText, required this.content});
+      {super.key,
+      required this.titleText,
+      required this.content,
+      this.appBarActions});
 
   final String titleText;
   final Widget content;
+  final List<Widget>? appBarActions;
 
   @override
   State<LayoutDrawer> createState() => _LayoutDrawerState();
@@ -56,10 +60,12 @@ class _LayoutDrawerState extends State<LayoutDrawer> {
           BottomNavigationBarTheme.of(context).unselectedItemColor;
       selectedFontSize = 12;
     }
+
     return Scaffold(
       appBar: AppBar(
         // Here we take the value from the MyHomePage object that was created by
         // the App.build method, and use it to set our appbar title.
+        actions: widget.appBarActions ?? [],
         title: Text(widget.titleText),
         toolbarHeight: 60,
       ),
