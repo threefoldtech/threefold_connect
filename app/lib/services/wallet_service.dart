@@ -37,7 +37,7 @@ Future<List<Wallet>> listWallets() async {
       final String walletSeed = w['seed'];
       final String walletName = w['name'];
       final WalletType walletType =
-          w['type'] == 'Native' ? WalletType.Native : WalletType.Imported;
+          w['type'] == 'NATIVE' ? WalletType.Native : WalletType.Imported;
       final walletFuture =
           loadWallet(walletName, walletSeed, walletType, chainUrl);
       walletFutures.add(walletFuture);

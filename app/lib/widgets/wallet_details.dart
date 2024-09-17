@@ -173,25 +173,26 @@ class _WalletDetailsWidgetState extends State<WalletDetailsWidget> {
                 icon: const Icon(Icons.edit)),
           ),
           const SizedBox(height: 40),
-          Center(
-            child: SizedBox(
-              width: MediaQuery.of(context).size.width - 40,
-              child: ElevatedButton(
-                onPressed: () {
-                  //TODO: delete the wallet with warning dialog
-                },
-                style: ElevatedButton.styleFrom(
-                    backgroundColor:
-                        Theme.of(context).colorScheme.errorContainer),
-                child: Text(
-                  'Delete',
-                  style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                        color: Theme.of(context).colorScheme.onErrorContainer,
-                      ),
+          if (widget.wallet.type == WalletType.Imported)
+            Center(
+              child: SizedBox(
+                width: MediaQuery.of(context).size.width - 40,
+                child: ElevatedButton(
+                  onPressed: () {
+                    //TODO: delete the wallet with warning dialog
+                  },
+                  style: ElevatedButton.styleFrom(
+                      backgroundColor:
+                          Theme.of(context).colorScheme.errorContainer),
+                  child: Text(
+                    'Delete',
+                    style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                          color: Theme.of(context).colorScheme.onErrorContainer,
+                        ),
+                  ),
                 ),
               ),
-            ),
-          )
+            )
         ],
       ),
     );

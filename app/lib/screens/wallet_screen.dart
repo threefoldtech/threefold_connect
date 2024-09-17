@@ -20,7 +20,6 @@ class _WalletScreenState extends State<WalletScreen> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     listMyWallets();
   }
