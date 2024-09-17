@@ -1,5 +1,4 @@
 import 'package:flutter/foundation.dart';
-import 'package:flutter/services.dart';
 import 'package:threebotlogin/helpers/globals.dart';
 import 'package:threebotlogin/services/shared_preference_service.dart';
 import 'package:stellar_client/stellar_client.dart' as Stellar;
@@ -11,9 +10,7 @@ Future<int?> getMyTwinId() async {
   if (chainUrl == '') return null;
   final phrase = await getPhrase();
   if (phrase != null) {
-    final token = RootIsolateToken.instance;
-    return await compute((dynamic token) async {
-      BackgroundIsolateBinaryMessenger.ensureInitialized(token);
+    return await compute((void _) async {
       final wallet =
           await Stellar.Client.fromMnemonic(Stellar.NetworkType.PUBLIC, phrase);
       final privateKey = wallet.privateKey;
@@ -27,7 +24,14 @@ Future<int?> getMyTwinId() async {
         return twinId;
       }
       return null;
-    }, token);
+    }, null);
   }
   return null;
+}
+
+Future<double> getBalance(String chainUrl, String address) async {
+  final tfchainQueryClient = TFChain.QueryClient(chainUrl);
+  await tfchainQueryClient.connect();
+  final balances = await tfchainQueryClient.balances.get(address: address);
+  return balances!.data.free / BigInt.from(10).pow(7);
 }
