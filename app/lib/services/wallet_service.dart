@@ -13,6 +13,7 @@ import 'package:stellar_client/stellar_client.dart' as Stellar;
 import 'package:tfchain_client/tfchain_client.dart' as TFChain;
 import 'package:bip39/bip39.dart' as bip39;
 import 'package:convert/convert.dart';
+import 'package:threebotlogin/services/stellar_service.dart';
 
 Future<FlutterPkid> _getPkidClient() async {
   Uint8List seed = await getDerivedSeed(WalletConfig().appId());
@@ -69,7 +70,16 @@ Future<Wallet> loadWallet(String walletName, String walletSeed,
     final hexSecret =
         hex.encode(stellarClient.privateKey!.toList().sublist(0, 32));
     tfchainClient = TFChain.Client(chainUrl, '0x$hexSecret', "sr25519");
+  } else if (isValidStellarSecret(walletSeed)) {
+    stellarClient = Stellar.Client(Stellar.NetworkType.PUBLIC, walletSeed);
+    final hexSecret =
+        hex.encode(stellarClient.privateKey!.toList().sublist(0, 32));
+    tfchainClient = TFChain.Client(chainUrl, '0x$hexSecret', "sr25519");
   } else {
+    if (walletSeed.startsWith(RegExp(r'0[xX]')))
+      walletSeed = walletSeed.substring(2);
+    print("++++++++++++++++++++++++++++++++");
+    print(walletSeed);
     stellarClient = Stellar.Client.fromSecretSeedHex(
         Stellar.NetworkType.PUBLIC, walletSeed);
     final hexSecret =

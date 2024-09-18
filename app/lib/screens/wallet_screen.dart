@@ -70,6 +70,8 @@ class _WalletScreenState extends State<WalletScreen> {
     setState(() {
       loading = true;
     });
+    // TODO: handle empty list wallets
+    // TODO: show error on failure
     final myWallets = await listWallets();
     wallets.addAll(myWallets);
     setState(() {

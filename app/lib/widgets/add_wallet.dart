@@ -87,15 +87,19 @@ class _NewWalletState extends State<NewWallet> {
       setState(() {});
       return;
     }
+    Wallet wallet;
     try {
-      final wallet = await loadAddedWallet(walletName, walletSecret);
-      widget.onAddWallet(wallet);
-      if (!context.mounted) return;
-      Navigator.pop(context);
+      wallet = await loadAddedWallet(walletName, walletSecret);
     } catch (e) {
       print(e);
       _showDialog('Error', 'Failed to load wallet. Please try again.');
+      saveLoading = false;
+      setState(() {});
+      return;
     }
+    widget.onAddWallet(wallet);
+    if (!context.mounted) return;
+    Navigator.pop(context);
     // TODO: save wallet to pkid
   }
 
