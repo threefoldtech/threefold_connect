@@ -122,6 +122,22 @@ Future<void> addWallet(String walletName, String walletSecret) async {
   await _saveWalletsToPkid(newWallets);
 }
 
+Future<void> editWallet(String oldName, String newName) async {
+  Map<int, dynamic> wallets = await _getPkidWallets();
+  int key = -1;
+  for (final entry in wallets.entries) {
+    if (entry.value['name'] == oldName) {
+      key = entry.key;
+    }
+  }
+  if (key >= 0) {
+    final wallet = wallets[key];
+    wallet['name'] = newName;
+    wallets[key] = wallet;
+    await _saveWalletsToPkid(wallets);
+  }
+}
+
 Future<void> _saveWalletsToPkid(Map<int, dynamic> wallets) async {
   FlutterPkid client = await _getPkidClient();
   await client.setPKidDoc('purse', json.encode(wallets));
