@@ -138,6 +138,18 @@ Future<void> editWallet(String oldName, String newName) async {
   }
 }
 
+Future<void> deleteWallet(String walletName) async {
+  Map<int, dynamic> wallets = await _getPkidWallets();
+  Map<int, dynamic> newWallets = {};
+  int i = 0;
+  for (final wallet in wallets.values) {
+    if (wallet['name'] == walletName) continue;
+    newWallets[i] = wallet;
+    i++;
+  }
+  await _saveWalletsToPkid(newWallets);
+}
+
 Future<void> _saveWalletsToPkid(Map<int, dynamic> wallets) async {
   FlutterPkid client = await _getPkidClient();
   await client.setPKidDoc('purse', json.encode(wallets));
