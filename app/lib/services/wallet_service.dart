@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'dart:typed_data';
-import 'dart:ui';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
@@ -15,11 +14,15 @@ import 'package:tfchain_client/tfchain_client.dart' as TFChain;
 import 'package:bip39/bip39.dart' as bip39;
 import 'package:convert/convert.dart';
 
-Future<List<Wallet>> listWallets() async {
+Future<FlutterPkid> _getPkidClient() async {
   Uint8List seed = await getDerivedSeed(WalletConfig().appId());
   final mnemonic = bip39.entropyToMnemonic(hex.encode(seed));
   FlutterPkid client = await getPkidClient(seedPhrase: mnemonic);
+  return client;
+}
 
+Future<Map<int, dynamic>> _getPkidWallets() async {
+  FlutterPkid client = await _getPkidClient();
   final pKidResult = await client.getPKidDoc('purse');
   final result =
       pKidResult.containsKey('data') && pKidResult.containsKey('success')
@@ -27,8 +30,12 @@ Future<List<Wallet>> listWallets() async {
           : {};
 
   Map<int, dynamic> dataMap = result.asMap();
-  final String chainUrl = Globals().chainUrl;
+  return dataMap;
+}
 
+Future<List<Wallet>> listWallets() async {
+  Map<int, dynamic> dataMap = await _getPkidWallets();
+  final String chainUrl = Globals().chainUrl;
   final List<Wallet> wallets = await compute((void _) async {
     final List<Future<Wallet>> walletFutures = [];
     for (final w in dataMap.values) {
@@ -50,13 +57,13 @@ Future<Wallet> loadWallet(String walletName, String walletSeed,
     WalletType walletType, String chainUrl) async {
   Stellar.Client stellarClient;
   TFChain.Client tfchainClient;
-  if (" ".allMatches(walletSeed).length == 11) {
+  if (' '.allMatches(walletSeed).length == 11) {
     tfchainClient = TFChain.Client(chainUrl, walletSeed, "sr25519");
     final entropy = bip39.mnemonicToEntropy(walletSeed);
     final seed = entropy.padRight(64, "0");
     stellarClient =
         Stellar.Client.fromSecretSeedHex(Stellar.NetworkType.PUBLIC, seed);
-  } else if (" ".allMatches(walletSeed).length == 23) {
+  } else if (' '.allMatches(walletSeed).length == 23) {
     stellarClient = await Stellar.Client.fromMnemonic(
         Stellar.NetworkType.PUBLIC, walletSeed);
     final hexSecret =
@@ -96,4 +103,26 @@ Future<Wallet> loadWallet(String walletName, String walletSeed,
     type: walletType,
   );
   return wallet;
+}
+
+Future<void> addWallet(String walletName, String walletSecret) async {
+  Map<int, dynamic> wallets = await _getPkidWallets();
+  Map<int, dynamic> newWallets = {};
+  int i = 0;
+  for (final wallet in wallets.values) {
+    newWallets[i] = wallet;
+    i++;
+  }
+  newWallets[i] = {
+    'type': 'IMPORTED',
+    'index': -1,
+    'name': walletName,
+    'seed': walletSecret
+  };
+  await _saveWalletsToPkid(newWallets);
+}
+
+Future<void> _saveWalletsToPkid(Map<int, dynamic> wallets) async {
+  FlutterPkid client = await _getPkidClient();
+  await client.setPKidDoc('purse', json.encode(wallets));
 }
