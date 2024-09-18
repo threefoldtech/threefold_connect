@@ -1,9 +1,7 @@
 import 'dart:ui';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:threebotlogin/helpers/globals.dart';
 import 'package:threebotlogin/models/wallet.dart';
 import 'package:threebotlogin/services/wallet_service.dart';
 import 'package:threebotlogin/widgets/add_wallet.dart';
@@ -87,26 +85,8 @@ class _WalletScreenState extends State<WalletScreen> {
             ));
   }
 
-  Future<void> _addWallet(SimpleWallet wallet) async {
-    setState(() {
-      loading = true;
-    });
-
-    final w = await loadAddWallet(wallet.name, wallet.secret);
-    wallets.add(w);
-
-    setState(() {
-      loading = false;
-    });
+  void _addWallet(Wallet wallet) {
+    wallets.add(wallet);
+    setState(() {});
   }
-}
-
-Future<Wallet> loadAddWallet(String walletName, String walletSecret) async {
-  final chainUrl = Globals().chainUrl;
-  final Wallet wallet = await compute((void _) async {
-    final wallet = await loadWallet(
-        walletName, walletSecret, WalletType.Imported, chainUrl);
-    return wallet;
-  }, null);
-  return wallet;
 }

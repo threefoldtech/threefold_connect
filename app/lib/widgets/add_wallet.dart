@@ -1,8 +1,11 @@
 import 'package:bip39/bip39.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:threebotlogin/helpers/globals.dart';
 import 'package:threebotlogin/models/wallet.dart';
+import 'package:threebotlogin/services/wallet_service.dart';
 import 'package:threebotlogin/widgets/custom_dialog.dart';
 
 class NewWallet extends StatefulWidget {
@@ -10,7 +13,7 @@ class NewWallet extends StatefulWidget {
     super.key,
     required this.onAddWallet,
   });
-  final Future<void> Function(SimpleWallet addedWallet) onAddWallet;
+  final void Function(Wallet addedWallet) onAddWallet;
 
   @override
   State<StatefulWidget> createState() {
@@ -21,6 +24,7 @@ class NewWallet extends StatefulWidget {
 class _NewWalletState extends State<NewWallet> {
   final _nameController = TextEditingController();
   final _secretController = TextEditingController();
+  bool saveLoading = false;
 
   void _showDialog(String message) {
     showDialog(
@@ -42,25 +46,28 @@ class _NewWalletState extends State<NewWallet> {
     );
   }
 
-  void _validateAddSubmitData() {
+  Future<void> _validateAddSubmitData() async {
     //TODO: validate name is not used
-    if (_nameController.text.trim().isEmpty) {
+
+    final walletName = _nameController.text.trim();
+    final walletSecret = _secretController.text.trim();
+    if (walletName.isEmpty) {
       _showDialog("Name can't be empty");
       return;
     }
-    if (_secretController.text.trim().isEmpty) {
+    if (walletSecret.isEmpty) {
       _showDialog("Secret can't be empty");
       return;
     }
-    if (!validateMnemonic(_secretController.text.trim())) {
+    if (!validateMnemonic(walletSecret)) {
       _showDialog('Secret is invalid');
       return;
     }
-    // TODO: save the wallet to pkid
+    saveLoading = true;
+    setState(() {});
+    final wallet = await loadAddWallet(walletName, walletSecret);
 
-    widget.onAddWallet(SimpleWallet(
-        name: _nameController.text.trim(),
-        secret: _secretController.text.trim()));
+    widget.onAddWallet(wallet);
     Navigator.pop(context);
   }
 
@@ -118,8 +125,14 @@ class _NewWalletState extends State<NewWallet> {
                     ),
                     ElevatedButton(
                         onPressed: _validateAddSubmitData,
-                        child: const Text(
-                            'Save')) //TODO: show loading when clicking on save
+                        child: saveLoading
+                            ? const SizedBox(
+                                width: 20,
+                                height: 20,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                ))
+                            : const Text('Save'))
                   ],
                 ),
               ],
@@ -129,4 +142,14 @@ class _NewWalletState extends State<NewWallet> {
       );
     });
   }
+}
+
+Future<Wallet> loadAddWallet(String walletName, String walletSecret) async {
+  final chainUrl = Globals().chainUrl;
+  final Wallet wallet = await compute((void _) async {
+    final wallet = await loadWallet(
+        walletName, walletSecret, WalletType.Imported, chainUrl);
+    return wallet;
+  }, null);
+  return wallet;
 }
