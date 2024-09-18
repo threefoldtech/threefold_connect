@@ -54,12 +54,15 @@ class _WalletScreenState extends State<WalletScreen> {
     return LayoutDrawer(
       titleText: 'Wallet',
       content: mainWidget,
-      appBarActions: [
-        IconButton(
-            // TODO: disable clicks till the wallets are loading.
-            onPressed: _openAddWalletOverlay,
-            icon: const Icon(Icons.add))
-      ],
+      appBarActions: loading
+          ? []
+          : [
+              IconButton(
+                  onPressed: _openAddWalletOverlay,
+                  icon: const Icon(
+                    Icons.add,
+                  ))
+            ],
     );
   }
 
