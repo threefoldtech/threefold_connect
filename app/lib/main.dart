@@ -23,8 +23,8 @@ extension ColorSchemeExtension on ColorScheme {
       : const Color.fromARGB(255, 255, 204, 0);
 
   Color get backgroundDarker => brightness == Brightness.light
-      ? const Color.fromARGB(255, 240, 240, 240)
-      : const Color.fromARGB(255, 15, 15, 15);
+      ? const Color.fromARGB(255, 255, 255, 255)
+      : const Color.fromARGB(255, 0, 0, 0);
 }
 
 Future<void> main() async {

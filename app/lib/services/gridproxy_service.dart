@@ -2,6 +2,7 @@ import 'package:gridproxy_client/gridproxy_client.dart';
 import 'package:threebotlogin/helpers/globals.dart';
 import 'package:threebotlogin/main.reflectable.dart';
 import 'package:threebotlogin/services/shared_preference_service.dart';
+import 'package:gridproxy_client/models/farms.dart';
 
 Future<double> getMySpending() async {
   initializeReflectable();
@@ -12,4 +13,17 @@ Future<double> getMySpending() async {
   final gridProxyClient = GridProxyClient(gridproxyUrl);
   final spending = await gridProxyClient.twins.getConsumption(twinID: twinId);
   return spending.overall_consumption;
+}
+
+Future<List<Farm>> getMyFarms(int twinId) async {
+  try {
+    initializeReflectable();
+    final gridproxyUrl = Globals().gridproxyUrl;
+    GridProxyClient client = GridProxyClient(gridproxyUrl);
+    final farms =
+        await client.farms.list(ListFarmsQueryParameters(twin_id: twinId));
+    return farms;
+  } catch (e) {
+    throw Exception("Error occurred: $e");
+  }
 }

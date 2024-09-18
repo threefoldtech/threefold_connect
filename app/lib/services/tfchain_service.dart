@@ -4,6 +4,8 @@ import 'package:threebotlogin/services/shared_preference_service.dart';
 import 'package:stellar_client/stellar_client.dart' as Stellar;
 import 'package:convert/convert.dart';
 import 'package:tfchain_client/tfchain_client.dart' as TFChain;
+import 'package:tfchain_client/models/dao.dart';
+import 'package:tfchain_client/generated/dev/types/pallet_dao/proposal/dao_votes.dart';
 
 Future<int?> getMyTwinId() async {
   final chainUrl = Globals().chainUrl;
@@ -34,4 +36,42 @@ Future<double> getBalance(String chainUrl, String address) async {
   await tfchainQueryClient.connect();
   final balances = await tfchainQueryClient.balances.get(address: address);
   return balances!.data.free / BigInt.from(10).pow(7);
+}
+
+Future<Map<String, List<Proposal>?>> getProposals() async {
+  try {
+    final chainUrl = Globals().chainUrl;
+    final client = TFChain.QueryClient(chainUrl);
+    await client.connect();
+    final proposals = await client.dao.get();
+    return proposals;
+  } catch (e) {
+    throw Exception('Error occurred: $e');
+  }
+}
+
+Future<DaoVotes> getProposalVotes(String hash) async {
+  try {
+    final chainUrl = Globals().chainUrl;
+    final client = TFChain.QueryClient(chainUrl);
+    await client.connect();
+    final votes = await client.dao.getProposalVotes(hash: hash);
+    return votes;
+  } catch (e) {
+    throw Exception('Error occurred: $e');
+  }
+}
+
+Future<DaoVotes> vote(bool vote, String hash, int farmId) async {
+  try {
+    final chainUrl = Globals().chainUrl;
+    // TODO: set the mnrmonic based on the wallet
+    final client = TFChain.Client(chainUrl, "mnemonic", 'sr25519');
+    client.connect();
+    final daoVotes =
+        await client.dao.vote(farmId: farmId, hash: hash, approve: vote);
+    return daoVotes;
+  } catch (e) {
+    throw Exception('Error occurred: $e');
+  }
 }

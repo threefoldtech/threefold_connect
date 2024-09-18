@@ -78,8 +78,6 @@ Future<Wallet> loadWallet(String walletName, String walletSeed,
   } else {
     if (walletSeed.startsWith(RegExp(r'0[xX]')))
       walletSeed = walletSeed.substring(2);
-    print("++++++++++++++++++++++++++++++++");
-    print(walletSeed);
     stellarClient = Stellar.Client.fromSecretSeedHex(
         Stellar.NetworkType.PUBLIC, walletSeed);
     final hexSecret =

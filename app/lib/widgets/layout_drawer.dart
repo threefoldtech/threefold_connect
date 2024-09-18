@@ -31,7 +31,7 @@ class _LayoutDrawerState extends State<LayoutDrawer> {
       } else if (index == 2) {
         globals.tabController.animateTo(3);
       } else if (index == 3) {
-        globals.tabController.animateTo(6);
+        globals.tabController.animateTo(7);
       } else {
         return;
       }
@@ -143,13 +143,24 @@ class _LayoutDrawerState extends State<LayoutDrawer> {
             ListTile(
               minLeadingWidth: 10,
               leading: const Padding(
+                  padding: EdgeInsets.only(left: 10),
+                  child: Icon(Icons.how_to_vote_outlined, size: 18)),
+              title: const Text('Dao'),
+              onTap: () {
+                Navigator.pop(context);
+                globals.tabController.animateTo(4);
+              },
+            ),
+            ListTile(
+              minLeadingWidth: 10,
+              leading: const Padding(
                 padding: EdgeInsets.only(left: 10),
                 child: Icon(Icons.build, size: 18),
               ),
               title: const Text('Support'),
               onTap: () {
                 Navigator.pop(context);
-                globals.tabController.animateTo(4);
+                globals.tabController.animateTo(5);
               },
             ),
             ListTile(
@@ -160,7 +171,7 @@ class _LayoutDrawerState extends State<LayoutDrawer> {
               title: const Text('Identity'),
               onTap: () {
                 Navigator.pop(context);
-                globals.tabController.animateTo(5);
+                globals.tabController.animateTo(6);
               },
             ),
             ListTile(
@@ -171,7 +182,7 @@ class _LayoutDrawerState extends State<LayoutDrawer> {
               title: const Text('Settings'),
               onTap: () {
                 Navigator.pop(context);
-                globals.tabController.animateTo(6);
+                globals.tabController.animateTo(7);
               },
             ),
           ],

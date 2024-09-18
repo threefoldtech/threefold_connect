@@ -84,9 +84,7 @@ class _RegisteredScreenState extends State<RegisteredScreen>
                       icon: Icons.account_balance_wallet,
                       pageNumber: 2),
                   HomeCardWidget(
-                      name: 'Farming',
-                      icon: Icons.storage,
-                      pageNumber: 3),
+                      name: 'Farming', icon: Icons.storage, pageNumber: 3),
                 ],
               ),
               const Row(
@@ -94,11 +92,11 @@ class _RegisteredScreenState extends State<RegisteredScreen>
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   HomeCardWidget(
-                      name: 'Support', icon: Icons.build, pageNumber: 4),
+                      name: 'Support', icon: Icons.build, pageNumber: 5),
                   HomeCardWidget(
-                      name: 'Identity', icon: Icons.person, pageNumber: 5),
+                      name: 'Identity', icon: Icons.person, pageNumber: 6),
                   HomeCardWidget(
-                      name: 'Settings', icon: Icons.settings, pageNumber: 6),
+                      name: 'Settings', icon: Icons.settings, pageNumber: 7),
                 ],
               ),
             ],
