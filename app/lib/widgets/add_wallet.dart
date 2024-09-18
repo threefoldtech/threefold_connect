@@ -5,7 +5,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:threebotlogin/helpers/globals.dart';
 import 'package:threebotlogin/models/wallet.dart';
+import 'package:threebotlogin/services/stellar_service.dart';
 import 'package:threebotlogin/services/wallet_service.dart';
+import 'package:tfchain_client/src/utils.dart';
 import 'package:threebotlogin/widgets/custom_dialog.dart';
 
 class NewWallet extends StatefulWidget {
@@ -24,7 +26,8 @@ class _NewWalletState extends State<NewWallet> {
   final _nameController = TextEditingController();
   final _secretController = TextEditingController();
   bool saveLoading = false;
-
+  String? nameError;
+  String? secretError;
   void _showDialog(String message) {
     showDialog(
       context: context,
@@ -48,29 +51,47 @@ class _NewWalletState extends State<NewWallet> {
   Future<void> _validateAddSubmitData() async {
     final walletName = _nameController.text.trim();
     final walletSecret = _secretController.text.trim();
+    nameError = null;
+    secretError = null;
+    saveLoading = true;
+    setState(() {});
+
     if (walletName.isEmpty) {
-      _showDialog("Name can't be empty");
+      nameError = "Name can't be empty";
+      saveLoading = false;
+      setState(() {});
       return;
     }
     final w = widget.wallets.where((element) => element.name == walletName);
     if (w.isNotEmpty) {
-      _showDialog('Name exists');
+      nameError = 'Name exists';
+      saveLoading = false;
+      setState(() {});
       return;
     }
     if (walletSecret.isEmpty) {
-      _showDialog("Secret can't be empty");
+      secretError = "Secret can't be empty";
+      saveLoading = false;
+      setState(() {});
       return;
     }
-    // TODO: OR validate it's a valid seed
-    if (!validateMnemonic(walletSecret)) {
-      _showDialog('Secret is invalid');
+    if (!(validateMnemonic(walletSecret) ||
+        (!validateMnemonic(walletSecret) && walletSecret.contains(' ')) ||
+        (isValidStellarSecret(walletSecret)) ||
+        (isValidSeed(walletSecret) &&
+            ((!walletSecret.startsWith('0x') && walletSecret.length == 64) ||
+                (walletSecret.startsWith('0x') &&
+                    walletSecret.length == 66))))) {
+      secretError = 'Secret is invalid';
+      saveLoading = false;
+      setState(() {});
       return;
     }
-    saveLoading = true;
-    setState(() {});
+
     final wallet = await loadAddedWallet(walletName, walletSecret);
     // TODO: save wallet to pkid
     widget.onAddWallet(wallet);
+    if (!context.mounted) return;
     Navigator.pop(context);
   }
 
@@ -97,7 +118,8 @@ class _NewWalletState extends State<NewWallet> {
                       decorationColor:
                           Theme.of(context).colorScheme.onBackground),
                   maxLength: 50,
-                  decoration: const InputDecoration(label: Text('Name')),
+                  decoration: InputDecoration(
+                      label: const Text('Name'), errorText: nameError),
                   controller: _nameController,
                 ),
                 TextField(
@@ -107,8 +129,9 @@ class _NewWalletState extends State<NewWallet> {
                           Theme.of(context).colorScheme.onBackground),
                   keyboardType: TextInputType.multiline,
                   maxLines: null,
-                  decoration: const InputDecoration(
-                    label: Text('Secret'),
+                  decoration: InputDecoration(
+                    label: const Text('Secret'),
+                    errorText: secretError,
                   ),
                   controller: _secretController,
                 ),
