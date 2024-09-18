@@ -28,12 +28,12 @@ class _NewWalletState extends State<NewWallet> {
   bool saveLoading = false;
   String? nameError;
   String? secretError;
-  void _showDialog(String message) {
+  void _showDialog(String title, String message) {
     showDialog(
       context: context,
       builder: (BuildContext context) => CustomDialog(
         image: Icons.error,
-        title: 'Invalid Input',
+        title: title,
         description: message,
         actions: <Widget>[
           TextButton(
@@ -87,12 +87,16 @@ class _NewWalletState extends State<NewWallet> {
       setState(() {});
       return;
     }
-
-    final wallet = await loadAddedWallet(walletName, walletSecret);
+    try {
+      final wallet = await loadAddedWallet(walletName, walletSecret);
+      widget.onAddWallet(wallet);
+      if (!context.mounted) return;
+      Navigator.pop(context);
+    } catch (e) {
+      print(e);
+      _showDialog('Error', 'Failed to load wallet. Please try again.');
+    }
     // TODO: save wallet to pkid
-    widget.onAddWallet(wallet);
-    if (!context.mounted) return;
-    Navigator.pop(context);
   }
 
   @override
