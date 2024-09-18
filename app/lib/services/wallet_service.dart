@@ -28,7 +28,7 @@ Future<Map<int, dynamic>> _getPkidWallets() async {
       pKidResult.containsKey('data') && pKidResult.containsKey('success')
           ? jsonDecode(pKidResult['data'])
           : {};
-
+  // TODO: add pkid wallet model
   Map<int, dynamic> dataMap = result.asMap();
   return dataMap;
 }

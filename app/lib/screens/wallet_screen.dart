@@ -85,6 +85,7 @@ class _WalletScreenState extends State<WalletScreen> {
         context: context,
         builder: (ctx) => NewWallet(
               onAddWallet: _addWallet,
+              wallets: wallets,
             ));
   }
 

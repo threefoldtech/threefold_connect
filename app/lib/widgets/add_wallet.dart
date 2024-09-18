@@ -9,11 +9,10 @@ import 'package:threebotlogin/services/wallet_service.dart';
 import 'package:threebotlogin/widgets/custom_dialog.dart';
 
 class NewWallet extends StatefulWidget {
-  const NewWallet({
-    super.key,
-    required this.onAddWallet,
-  });
+  const NewWallet(
+      {super.key, required this.onAddWallet, required this.wallets});
   final void Function(Wallet addedWallet) onAddWallet;
+  final List<Wallet> wallets;
 
   @override
   State<StatefulWidget> createState() {
@@ -47,26 +46,30 @@ class _NewWalletState extends State<NewWallet> {
   }
 
   Future<void> _validateAddSubmitData() async {
-    //TODO: validate name is not used
-
     final walletName = _nameController.text.trim();
     final walletSecret = _secretController.text.trim();
     if (walletName.isEmpty) {
       _showDialog("Name can't be empty");
       return;
     }
+    final w = widget.wallets.where((element) => element.name == walletName);
+    if (w.isNotEmpty) {
+      _showDialog('Name exists');
+      return;
+    }
     if (walletSecret.isEmpty) {
       _showDialog("Secret can't be empty");
       return;
     }
+    // TODO: OR validate it's a valid seed
     if (!validateMnemonic(walletSecret)) {
       _showDialog('Secret is invalid');
       return;
     }
     saveLoading = true;
     setState(() {});
-    final wallet = await loadAddWallet(walletName, walletSecret);
-
+    final wallet = await loadAddedWallet(walletName, walletSecret);
+    // TODO: save wallet to pkid
     widget.onAddWallet(wallet);
     Navigator.pop(context);
   }
@@ -144,7 +147,7 @@ class _NewWalletState extends State<NewWallet> {
   }
 }
 
-Future<Wallet> loadAddWallet(String walletName, String walletSecret) async {
+Future<Wallet> loadAddedWallet(String walletName, String walletSecret) async {
   final chainUrl = Globals().chainUrl;
   final Wallet wallet = await compute((void _) async {
     final wallet = await loadWallet(
