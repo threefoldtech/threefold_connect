@@ -28,23 +28,21 @@ class _NewWalletState extends State<NewWallet> {
   bool saveLoading = false;
   String? nameError;
   String? secretError;
-  void _showDialog(String title, String message) {
+  Future<void> _showDialog(String title, String message, IconData icon) async {
     showDialog(
+      barrierDismissible: false,
       context: context,
       builder: (BuildContext context) => CustomDialog(
-        image: Icons.error,
+        image: icon,
         title: title,
         description: message,
-        actions: <Widget>[
-          TextButton(
-            child: const Text('Close'),
-            onPressed: () {
-              Navigator.pop(context);
-              setState(() {});
-            },
-          ),
-        ],
       ),
+    );
+    await Future.delayed(
+      const Duration(seconds: 3),
+      () {
+        Navigator.pop(context);
+      },
     );
   }
 
@@ -92,15 +90,29 @@ class _NewWalletState extends State<NewWallet> {
       wallet = await loadAddedWallet(walletName, walletSecret);
     } catch (e) {
       print(e);
-      _showDialog('Error', 'Failed to load wallet. Please try again.');
+      _showDialog(
+          'Error', 'Failed to load wallet. Please try again.', Icons.error);
+      saveLoading = false;
+      setState(() {});
+      return;
+    }
+    try {
+      await addWallet(walletName, walletSecret);
+      await _showDialog('Wallet Added!',
+          '$walletName has been added successfully', Icons.check);
+    } catch (e) {
+      print(e);
+      _showDialog(
+          'Error', 'Failed to save wallet. Please try again.', Icons.error);
       saveLoading = false;
       setState(() {});
       return;
     }
     widget.onAddWallet(wallet);
+    saveLoading = false;
+    setState(() {});
     if (!context.mounted) return;
     Navigator.pop(context);
-    // TODO: save wallet to pkid
   }
 
   @override
