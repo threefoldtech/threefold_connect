@@ -44,10 +44,10 @@ Future<double> getBalanceByClient(TFChain.Client client) async {
   return balance / BigInt.from(10).pow(7);
 }
 
-Future<int?> getTwinIdByClient(TFChain.Client client) async {
+Future<int> getTwinIdByClient(TFChain.Client client) async {
   await client.connect();
   final twinId = await client.twins.getMyTwinId();
-  return twinId;
+  return twinId ?? 0;
 }
 
 Future<Map<String, List<Proposal>>> getProposals() async {
@@ -74,11 +74,10 @@ Future<DaoVotes> getProposalVotes(String hash) async {
   }
 }
 
-Future<DaoVotes> vote(bool vote, String hash, int farmId) async {
+Future<DaoVotes> vote(bool vote, String hash, int farmId, String seed) async {
   try {
     final chainUrl = Globals().chainUrl;
-    // TODO: set the mnrmonic based on the wallet
-    final client = TFChain.Client(chainUrl, "mnemonic", 'sr25519');
+    final client = TFChain.Client(chainUrl, seed, 'sr25519');
     client.connect();
     final daoVotes =
         await client.dao.vote(farmId: farmId, hash: hash, approve: vote);
