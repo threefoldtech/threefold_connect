@@ -159,30 +159,40 @@ Future<void> _saveWalletsToPkid(Map<int, dynamic> wallets) async {
   await client.setPKidDoc('purse', json.encode(wallets));
 }
 
-Future<int?> getWalletTwinId(String walletName, String walletSeed,
+Future<Map<int, String>> getWalletTwinId(String walletName, String walletSeed,
     WalletType walletType, String chainUrl) async {
   final (_, tfchainClient) =
       await loadWalletClients(walletName, walletSeed, walletType, chainUrl);
-  return await TFChainService.getTwinIdByClient(tfchainClient);
+  final twinId = await TFChainService.getTwinIdByClient(tfchainClient);
+  final Map<int, String> twinIdWallet = {
+    twinId: tfchainClient.mnemonicOrSecretSeed
+  };
+  return twinIdWallet;
 }
 
-Future<List<int>> getWalletsTwinIds() async {
+Future<Map<int, String>> getWalletsTwinIds() async {
   Map<int, dynamic> dataMap = await _getPkidWallets();
   final String chainUrl = Globals().chainUrl;
-  final List<int?> twins = await compute((void _) async {
-    final List<Future<int?>> twinIdFutures = [];
+  final Map<int, String> twinWallets = await compute((void _) async {
+    final List<Future<Map<int, String>>> twinIdWalletFutures = [];
+    final Map<int, String> twinWallets = {};
     for (final w in dataMap.values) {
       final String walletSeed = w['seed'];
       final String walletName = w['name'];
       final WalletType walletType =
           w['type'] == 'NATIVE' ? WalletType.Native : WalletType.Imported;
-      final twinIdFuture =
+      final twinIdWalletFuture =
           getWalletTwinId(walletName, walletSeed, walletType, chainUrl);
-      twinIdFutures.add(twinIdFuture);
+      twinIdWalletFutures.add(twinIdWalletFuture);
     }
-    return await Future.wait(twinIdFutures);
+
+    final twinWalletMaps = await Future.wait(twinIdWalletFutures);
+    twinWalletMaps.forEach((element) {
+      twinWallets.addAll(element);
+    });
+    return twinWallets;
   }, null);
-  final twinIds =
-      twins.where((element) => element != null).toList() as List<int>;
-  return {...twinIds}.toList();
+
+  twinWallets.removeWhere((key, value) => key == 0);
+  return twinWallets;
 }
