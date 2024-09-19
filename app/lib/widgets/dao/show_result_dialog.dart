@@ -127,7 +127,10 @@ class _ShowResultDialogState extends State<ShowResultDialog>
                   style: Theme.of(context).textTheme.bodyLarge!.copyWith(
                         color: Theme.of(context).colorScheme.onBackground,
                       )),
-              Text(totalVotes == 0 ? '0%' : '${(yesVotes / totalVotes) * 100}%',
+              Text(
+                  totalVotes == 0
+                      ? '0%'
+                      : '${((yesVotes / totalVotes) * 100).toStringAsFixed(0)}%',
                   style: Theme.of(context).textTheme.bodyLarge!.copyWith(
                         color: Theme.of(context).colorScheme.onBackground,
                       )),
@@ -151,7 +154,10 @@ class _ShowResultDialogState extends State<ShowResultDialog>
                   style: Theme.of(context).textTheme.bodyLarge!.copyWith(
                         color: Theme.of(context).colorScheme.onBackground,
                       )),
-              Text(totalVotes == 0 ? '0%' : '${noVotes / totalVotes * 100}%',
+              Text(
+                  totalVotes == 0
+                      ? '0%'
+                      : '${(noVotes / totalVotes * 100).toStringAsFixed(0)}%',
                   style: Theme.of(context).textTheme.bodyLarge!.copyWith(
                         color: Theme.of(context).colorScheme.onBackground,
                       )),
