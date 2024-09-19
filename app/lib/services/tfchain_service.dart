@@ -38,6 +38,12 @@ Future<double> getBalance(String chainUrl, String address) async {
   return balances!.data.free / BigInt.from(10).pow(7);
 }
 
+Future<double> getBalanceByClient(TFChain.Client client) async {
+  await client.connect();
+  final balance = (await client.balances.getMyBalance())!.data.free;
+  return balance / BigInt.from(10).pow(7);
+}
+
 Future<Map<String, List<Proposal>>> getProposals() async {
   try {
     final chainUrl = Globals().chainUrl;

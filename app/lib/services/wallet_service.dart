@@ -13,7 +13,8 @@ import 'package:stellar_client/stellar_client.dart' as Stellar;
 import 'package:tfchain_client/tfchain_client.dart' as TFChain;
 import 'package:bip39/bip39.dart' as bip39;
 import 'package:convert/convert.dart';
-import 'package:threebotlogin/services/stellar_service.dart';
+import 'package:threebotlogin/services/stellar_service.dart' as StellarService;
+import 'package:threebotlogin/services/tfchain_service.dart' as TFChainService;
 
 Future<FlutterPkid> _getPkidClient() async {
   Uint8List seed = await getDerivedSeed(WalletConfig().appId());
@@ -54,8 +55,8 @@ Future<List<Wallet>> listWallets() async {
   return wallets;
 }
 
-Future<Wallet> loadWallet(String walletName, String walletSeed,
-    WalletType walletType, String chainUrl) async {
+Future<(Stellar.Client, TFChain.Client)> loadWalletClients(String walletName,
+    String walletSeed, WalletType walletType, String chainUrl) async {
   Stellar.Client stellarClient;
   TFChain.Client tfchainClient;
   if (' '.allMatches(walletSeed).length == 11) {
@@ -70,35 +71,30 @@ Future<Wallet> loadWallet(String walletName, String walletSeed,
     final hexSecret =
         hex.encode(stellarClient.privateKey!.toList().sublist(0, 32));
     tfchainClient = TFChain.Client(chainUrl, '0x$hexSecret', "sr25519");
-  } else if (isValidStellarSecret(walletSeed)) {
+  } else if (StellarService.isValidStellarSecret(walletSeed)) {
     stellarClient = Stellar.Client(Stellar.NetworkType.PUBLIC, walletSeed);
     final hexSecret =
         hex.encode(stellarClient.privateKey!.toList().sublist(0, 32));
     tfchainClient = TFChain.Client(chainUrl, '0x$hexSecret', "sr25519");
   } else {
-    if (walletSeed.startsWith(RegExp(r'0[xX]')))
+    if (walletSeed.startsWith(RegExp(r'0[xX]'))) {
       walletSeed = walletSeed.substring(2);
+    }
     stellarClient = Stellar.Client.fromSecretSeedHex(
         Stellar.NetworkType.PUBLIC, walletSeed);
     final hexSecret =
         hex.encode(stellarClient.privateKey!.toList().sublist(0, 32));
     tfchainClient = TFChain.Client(chainUrl, '0x$hexSecret', "sr25519");
   }
-  String stellarBalance = '0';
-  try {
-    final stellarBalances = await stellarClient.getBalance();
-    for (final balance in stellarBalances) {
-      if (balance.assetCode == 'TFT') {
-        stellarBalance = balance.balance;
-      }
-    }
-  } catch (e) {
-    print("Couldn't load the account balance.");
-  }
-  await tfchainClient.connect();
-  final tfchainBalance =
-      (await tfchainClient.balances.getMyBalance())!.data.free /
-          BigInt.from(10).pow(7);
+  return (stellarClient, tfchainClient);
+}
+
+Future<Wallet> loadWallet(String walletName, String walletSeed,
+    WalletType walletType, String chainUrl) async {
+  final (stellarClient, tfchainClient) =
+      await loadWalletClients(walletName, walletSeed, walletType, chainUrl);
+  final stellarBalance = await StellarService.getBalanceByClient(stellarClient);
+  final tfchainBalance = await TFChainService.getBalanceByClient(tfchainClient);
   final wallet = Wallet(
     name: walletName,
     stellarSecret: stellarClient.secretSeed,
