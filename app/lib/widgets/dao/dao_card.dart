@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:tfchain_client/models/dao.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:threebotlogin/services/tfchain_service.dart';
 import 'show_result_dialog.dart';
 import 'vote_dialog.dart';
 
@@ -20,11 +19,6 @@ class DaoCard extends StatefulWidget {
 }
 
 class _DaoCardState extends State<DaoCard> {
-  @override
-  void initState() {
-    super.initState();
-  }
-
   Future<void> _launchUrl() async {
     if (widget.proposal.link != "") {
       final Uri url = Uri.parse(widget.proposal.link);
@@ -137,13 +131,7 @@ class _DaoCardState extends State<DaoCard> {
                 ),
                 if (widget.active)
                   ElevatedButton(
-                    onPressed: () {
-                      showDialog(
-                          context: context,
-                          builder: (_) => VoteDialog(
-                                proposal: widget.proposal,
-                              ));
-                    },
+                    onPressed: _showVoteDialog,
                     child: Text(
                       'Vote',
                       style: Theme.of(context).textTheme.bodyLarge!.copyWith(
@@ -160,16 +148,19 @@ class _DaoCardState extends State<DaoCard> {
     );
   }
 
-  _showVoteResult() async {
-    final votes = await getProposalVotes(widget.proposal.hash);
-    // ignore: use_build_context_synchronously
+  _showVoteResult() {
     showDialog(
         context: context,
         builder: (_) => ShowResultDialog(
-              totalVotes: votes.ayes.length + votes.nays.length,
-              noVotes: votes.nays.length,
-              yesVotes: votes.ayes.length,
-              threshold: votes.threshold,
+              proposalHash: widget.proposal.hash,
+            ));
+  }
+
+  _showVoteDialog() {
+    showDialog(
+        context: context,
+        builder: (_) => VoteDialog(
+              proposal: widget.proposal,
             ));
   }
 }
