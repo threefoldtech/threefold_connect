@@ -20,3 +20,33 @@ class Wallet {
   String tfchainBalance;
   final WalletType type;
 }
+
+class PkidWallet {
+  PkidWallet({
+    required this.name,
+    required this.index,
+    required this.seed,
+    required this.type,
+  });
+  String name;
+  final int index;
+  final String seed;
+  final WalletType type;
+
+  factory PkidWallet.fromJson(Map<String, dynamic> json) {
+    return PkidWallet(
+        index: json["index"],
+        name: json['name'],
+        seed: json['seed'],
+        type:
+            json['type'] == 'NATIVE' ? WalletType.Native : WalletType.Imported);
+  }
+  toMap() {
+    return {
+      'name': name,
+      'index': index,
+      'seed': seed,
+      'type': type.toString()
+    };
+  }
+}
