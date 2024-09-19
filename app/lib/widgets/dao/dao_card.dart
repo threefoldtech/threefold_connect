@@ -160,7 +160,7 @@ class _DaoCardState extends State<DaoCard> {
     showDialog(
         context: context,
         builder: (_) => VoteDialog(
-              proposal: widget.proposal,
+              proposalHash: widget.proposal.hash,
             ));
   }
 }

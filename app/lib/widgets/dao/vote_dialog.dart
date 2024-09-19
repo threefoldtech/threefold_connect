@@ -1,15 +1,14 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:gridproxy_client/models/farms.dart';
-import 'package:tfchain_client/models/dao.dart';
 
 import 'package:threebotlogin/services/tfchain_service.dart';
 import 'package:threebotlogin/services/gridproxy_service.dart';
 
 class VoteDialog extends StatefulWidget {
-  final Proposal proposal;
+  final String proposalHash;
   const VoteDialog({
-    required this.proposal,
+    required this.proposalHash,
     super.key,
   });
 
@@ -19,19 +18,24 @@ class VoteDialog extends StatefulWidget {
 
 class _VoteDialogState extends State<VoteDialog> {
   int? farmId;
-  List<Farm> farms = [];
+  final List<Farm> farms = [];
+  bool loading = true;
 
-  void setFarms() async {
+  void getFarms() async {
+    setState(() {
+      loading = true;
+    });
     List<Farm> farmsList =
         await getMyFarms(26); //TODO: replace with actual twin id
+    farms.addAll(farmsList);
     setState(() {
-      farms = farmsList;
+      loading = false;
     });
   }
 
   @override
   void initState() {
-    setFarms();
+    getFarms();
     super.initState();
   }
 
@@ -50,11 +54,28 @@ class _VoteDialogState extends State<VoteDialog> {
 
   @override
   Widget build(BuildContext context) {
-    return Dialog(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(10),
-      ),
-      child: Padding(
+    Widget content;
+    if (loading) {
+      content = Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            const CircularProgressIndicator(),
+            const SizedBox(height: 15),
+            Text(
+              'Loading Farms...',
+              style: Theme.of(context).textTheme.bodyLarge!.copyWith(
+                  color: Theme.of(context).colorScheme.onBackground,
+                  fontWeight: FontWeight.bold),
+            ),
+          ],
+        ),
+      );
+    } else {
+      content = Padding(
         padding: const EdgeInsets.all(30),
         child: Flex(
           direction: Axis.vertical,
@@ -113,7 +134,7 @@ class _VoteDialogState extends State<VoteDialog> {
                 ElevatedButton(
                   onPressed: () {
                     if (farmId != null) {
-                      vote(true, widget.proposal.hash, farmId!);
+                      vote(true, widget.proposalHash, farmId!);
                     }
                     Navigator.pop(context);
                   },
@@ -128,7 +149,7 @@ class _VoteDialogState extends State<VoteDialog> {
                 ElevatedButton(
                   onPressed: () {
                     if (farmId != null) {
-                      vote(false, widget.proposal.hash, farmId!);
+                      vote(false, widget.proposalHash, farmId!);
                     }
                     Navigator.pop(context);
                   },
@@ -144,7 +165,12 @@ class _VoteDialogState extends State<VoteDialog> {
             ),
           ],
         ),
-      ),
-    );
+      );
+    }
+    return Dialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: content);
   }
 }
