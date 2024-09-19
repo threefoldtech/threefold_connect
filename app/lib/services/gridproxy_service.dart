@@ -15,7 +15,7 @@ Future<double> getMySpending() async {
   return spending.overall_consumption;
 }
 
-Future<List<Farm>> getMyFarms(int twinId) async {
+Future<List<Farm>> getFarmsByTwinId(int twinId) async {
   try {
     initializeReflectable();
     final gridproxyUrl = Globals().gridproxyUrl;
@@ -26,4 +26,14 @@ Future<List<Farm>> getMyFarms(int twinId) async {
   } catch (e) {
     throw Exception("Error occurred: $e");
   }
+}
+
+Future<List<Farm>> getFarmsByTwinIds(List<int> twinIds) async {
+  final List<Future<List<Farm>>> farmFutures = [];
+  for (final twinId in twinIds) {
+    farmFutures.add(getFarmsByTwinId(twinId));
+  }
+  final listFarms = await Future.wait(farmFutures);
+  final farms = listFarms.expand((i) => i).toList(); //flat
+  return farms;
 }
