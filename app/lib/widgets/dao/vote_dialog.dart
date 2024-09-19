@@ -52,9 +52,8 @@ class _VoteDialogState extends State<VoteDialog> {
   Widget build(BuildContext context) {
     return Dialog(
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(5),
+        borderRadius: BorderRadius.circular(10),
       ),
-      // backgroundColor: secondaryColor,
       child: Padding(
         padding: const EdgeInsets.all(30),
         child: Flex(
@@ -70,43 +69,34 @@ class _VoteDialogState extends State<VoteDialog> {
                   ),
               trailingIcon: const Icon(
                 CupertinoIcons.chevron_down,
-                // color: white,
                 size: 18,
               ),
               selectedTrailingIcon: const Icon(
                 CupertinoIcons.chevron_up,
-                // color: white,
                 size: 18,
               ),
               inputDecorationTheme: InputDecorationTheme(
                 filled: true,
-                fillColor: Theme.of(context).colorScheme.background,
+                fillColor: Theme.of(context).colorScheme.secondaryContainer,
                 enabledBorder: UnderlineInputBorder(
                   borderRadius: const BorderRadius.all(Radius.circular(4)),
                   borderSide: BorderSide(
-                    color: Theme.of(context).colorScheme.background,
+                    color: Theme.of(context).colorScheme.secondaryContainer,
                     width: 8.0,
                   ),
                 ),
-                contentPadding: EdgeInsets.only(right: 5, left: 15),
               ),
               menuStyle: MenuStyle(
-                backgroundColor: MaterialStateProperty.all<Color>(
-                    Theme.of(context).colorScheme.background),
-                surfaceTintColor:
-                    MaterialStateProperty.all<Color>(Colors.transparent),
                 shape: MaterialStateProperty.all<RoundedRectangleBorder>(
                   const RoundedRectangleBorder(
                     borderRadius: BorderRadius.all(Radius.circular(4)),
                   ),
                 ),
-                padding: MaterialStateProperty.all<EdgeInsets>(
-                    const EdgeInsets.only(right: 5, left: 15, bottom: 5)),
               ),
               label: Text(
                 'Select Farm',
                 style: Theme.of(context).textTheme.bodyLarge!.copyWith(
-                      color: Theme.of(context).colorScheme.onBackground,
+                      color: Theme.of(context).colorScheme.onSecondaryContainer,
                     ),
               ),
               dropdownMenuEntries: _buildDropdownMenuEntries(farms),
@@ -120,20 +110,13 @@ class _VoteDialogState extends State<VoteDialog> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                TextButton(
+                ElevatedButton(
                   onPressed: () {
                     if (farmId != null) {
                       vote(true, widget.proposal.hash, farmId!);
                     }
                     Navigator.pop(context);
                   },
-                  style: TextButton.styleFrom(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(4),
-                    ),
-                    backgroundColor:
-                        Theme.of(context).colorScheme.primaryContainer,
-                  ),
                   child: Text(
                     'Yes',
                     style: Theme.of(context).textTheme.bodyLarge!.copyWith(
@@ -142,20 +125,13 @@ class _VoteDialogState extends State<VoteDialog> {
                         ),
                   ),
                 ),
-                TextButton(
+                ElevatedButton(
                   onPressed: () {
                     if (farmId != null) {
                       vote(false, widget.proposal.hash, farmId!);
                     }
                     Navigator.pop(context);
                   },
-                  style: TextButton.styleFrom(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(4),
-                    ),
-                    backgroundColor:
-                        Theme.of(context).colorScheme.primaryContainer,
-                  ),
                   child: Text(
                     'No',
                     style: Theme.of(context).textTheme.bodyLarge!.copyWith(

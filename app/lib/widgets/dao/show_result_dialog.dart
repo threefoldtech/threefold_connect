@@ -64,8 +64,9 @@ class _ShowResultDialogState extends State<ShowResultDialog>
   Widget build(BuildContext context) {
     return Dialog(
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(0),
+        borderRadius: BorderRadius.circular(10),
       ),
+      backgroundColor: Theme.of(context).colorScheme.background,
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 30, horizontal: 20),
         child: Column(mainAxisSize: MainAxisSize.min, children: [
@@ -117,7 +118,6 @@ class _ShowResultDialogState extends State<ShowResultDialog>
               return LinearProgressIndicator(
                 value: _yesAnimation.value,
                 color: Theme.of(context).colorScheme.primary,
-                // backgroundColor: grey,
               );
             },
           ),
@@ -144,8 +144,7 @@ class _ShowResultDialogState extends State<ShowResultDialog>
             builder: (context, child) {
               return LinearProgressIndicator(
                 value: _noAnimation.value,
-                color: Theme.of(context).colorScheme.errorContainer,
-                // // backgroundColor: Theme.of(context).colorScheme.background,
+                color: Theme.of(context).colorScheme.error,
               );
             },
           ),

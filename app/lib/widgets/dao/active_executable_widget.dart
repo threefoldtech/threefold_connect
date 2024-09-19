@@ -4,8 +4,10 @@ import 'package:tfchain_client/models/dao.dart';
 import 'dao_card.dart';
 
 class ActiveOrExecutableWidget extends StatefulWidget {
-  List<Proposal>? proposals;
-  ActiveOrExecutableWidget({super.key, required this.proposals});
+  final List<Proposal>? proposals;
+  final bool active;
+  const ActiveOrExecutableWidget(
+      {super.key, required this.proposals, this.active = false});
 
   @override
   State<ActiveOrExecutableWidget> createState() =>
@@ -34,7 +36,7 @@ class _ActiveOrExecutableWidgetState extends State<ActiveOrExecutableWidget> {
   void search(String searchWord) {
     setState(() {
       final String filterText = searchWord.toLowerCase();
-      if (searchWord == "") {
+      if (searchWord == '') {
         setState(() {
           proposals = widget.proposals;
         });
@@ -42,7 +44,7 @@ class _ActiveOrExecutableWidgetState extends State<ActiveOrExecutableWidget> {
         setState(() {
           proposals = widget.proposals
               ?.where((Proposal entry) =>
-                  entry.action.toLowerCase().contains(filterText))
+                  entry.description.toLowerCase().contains(filterText))
               .toList();
         });
       }
@@ -71,7 +73,7 @@ class _ActiveOrExecutableWidgetState extends State<ActiveOrExecutableWidget> {
               hintText: 'Search by proposal description',
               hintStyle: MaterialStateProperty.all<TextStyle>(
                 Theme.of(context).textTheme.bodyLarge!.copyWith(
-                      color: Theme.of(context).colorScheme.onBackground,
+                      color: Theme.of(context).colorScheme.onSecondaryContainer,
                     ),
               ),
               textStyle: MaterialStateProperty.all<TextStyle>(
@@ -92,12 +94,12 @@ class _ActiveOrExecutableWidgetState extends State<ActiveOrExecutableWidget> {
       body: SingleChildScrollView(
         child: Column(
           mainAxisSize: MainAxisSize.min,
-          children: _buildDaoCardList(proposals) ??
+          children: _buildDaoCardList(proposals, widget.active) ??
               [
-                const Text(
+                Text(
                   'No active proposal at the moment',
-                  // style: Theme.of(context).textTheme.bodyLarge!.copyWith(
-                  //     color: Theme.of(context).colorScheme.onBackground),
+                  style: Theme.of(context).textTheme.bodyLarge!.copyWith(
+                      color: Theme.of(context).colorScheme.onBackground),
                 )
               ],
         ),
@@ -106,10 +108,11 @@ class _ActiveOrExecutableWidgetState extends State<ActiveOrExecutableWidget> {
   }
 }
 
-List<DaoCard>? _buildDaoCardList(List<Proposal>? list) {
+List<DaoCard>? _buildDaoCardList(List<Proposal>? list, bool active) {
   return list?.map((item) {
     return DaoCard(
       proposal: item,
+      active: active,
     );
   }).toList();
 }

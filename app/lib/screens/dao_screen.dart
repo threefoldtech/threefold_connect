@@ -57,7 +57,7 @@ class _DaoPageState extends State<DaoPage> {
             Expanded(
               child: TabBarView(
                 children: [
-                  ActiveOrExecutableWidget(proposals: activeList),
+                  ActiveOrExecutableWidget(proposals: activeList, active: true),
                   ActiveOrExecutableWidget(
                     proposals: inactiveList,
                   ),
