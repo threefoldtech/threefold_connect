@@ -3,18 +3,17 @@ import 'package:tfchain_client/models/dao.dart';
 
 import 'dao_card.dart';
 
-class ActiveOrExecutableWidget extends StatefulWidget {
+class ProposalsWidget extends StatefulWidget {
   final List<Proposal>? proposals;
   final bool active;
-  const ActiveOrExecutableWidget(
+  const ProposalsWidget(
       {super.key, required this.proposals, this.active = false});
 
   @override
-  State<ActiveOrExecutableWidget> createState() =>
-      _ActiveOrExecutableWidgetState();
+  State<ProposalsWidget> createState() => _ProposalsWidgetState();
 }
 
-class _ActiveOrExecutableWidgetState extends State<ActiveOrExecutableWidget> {
+class _ProposalsWidgetState extends State<ProposalsWidget> {
   List<Proposal>? proposals = [];
 
   @override
@@ -24,7 +23,7 @@ class _ActiveOrExecutableWidgetState extends State<ActiveOrExecutableWidget> {
   }
 
   @override
-  void didUpdateWidget(covariant ActiveOrExecutableWidget oldWidget) {
+  void didUpdateWidget(covariant ProposalsWidget oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (widget.proposals != oldWidget.proposals) {
       setState(() {

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:tfchain_client/models/dao.dart';
 import 'package:threebotlogin/widgets/layout_drawer.dart';
-import 'package:threebotlogin/widgets/dao/active_executable_widget.dart';
+import 'package:threebotlogin/widgets/dao/proposals.dart';
 import 'package:threebotlogin/services/tfchain_service.dart';
 
 class DaoPage extends StatefulWidget {
@@ -20,6 +20,7 @@ class _DaoPageState extends State<DaoPage> {
     setState(() {
       loading = true;
     });
+    // TODO: show error in case of failure
     final proposals = await getProposals();
     activeList.addAll(proposals['activeProposals']!);
     inactiveList.addAll(proposals['inactiveProposals']!);
@@ -77,8 +78,8 @@ class _DaoPageState extends State<DaoPage> {
             Expanded(
               child: TabBarView(
                 children: [
-                  ActiveOrExecutableWidget(proposals: activeList, active: true),
-                  ActiveOrExecutableWidget(
+                  ProposalsWidget(proposals: activeList, active: true),
+                  ProposalsWidget(
                     proposals: inactiveList,
                   ),
                 ],
