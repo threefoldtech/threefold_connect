@@ -1,9 +1,12 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:gridproxy_client/models/farms.dart';
+import 'package:tfchain_client/tfchain_client.dart';
 
 import 'package:threebotlogin/services/tfchain_service.dart';
 import 'package:threebotlogin/services/gridproxy_service.dart';
+import 'package:threebotlogin/services/wallet_service.dart';
+import 'package:threebotlogin/widgets/custom_dialog.dart';
 
 class VoteDialog extends StatefulWidget {
   final String proposalHash;
@@ -19,14 +22,17 @@ class VoteDialog extends StatefulWidget {
 class _VoteDialogState extends State<VoteDialog> {
   int? farmId;
   final List<Farm> farms = [];
+  Map<int, String> twinIdWallets = {};
   bool loading = true;
+  bool yesLoading = false;
+  bool noLoading = false;
 
   void getFarms() async {
     setState(() {
       loading = true;
     });
-    List<Farm> farmsList =
-        await getMyFarms(26); //TODO: replace with actual twin id
+    twinIdWallets = await getWalletsTwinIds();
+    List<Farm> farmsList = await getFarmsByTwinIds(twinIdWallets.keys.toList());
     farms.addAll(farmsList);
     setState(() {
       loading = false;
@@ -133,33 +139,45 @@ class _VoteDialogState extends State<VoteDialog> {
               children: [
                 ElevatedButton(
                   onPressed: () {
-                    if (farmId != null) {
-                      vote(true, widget.proposalHash, farmId!);
-                    }
-                    Navigator.pop(context);
+                    _vote(true);
                   },
-                  child: Text(
-                    'Yes',
-                    style: Theme.of(context).textTheme.bodyLarge!.copyWith(
-                          color:
-                              Theme.of(context).colorScheme.onPrimaryContainer,
+                  child: yesLoading
+                      ? const SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                          ))
+                      : Text(
+                          'Yes',
+                          style:
+                              Theme.of(context).textTheme.bodyLarge!.copyWith(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onPrimaryContainer,
+                                  ),
                         ),
-                  ),
                 ),
                 ElevatedButton(
                   onPressed: () {
-                    if (farmId != null) {
-                      vote(false, widget.proposalHash, farmId!);
-                    }
-                    Navigator.pop(context);
+                    _vote(false);
                   },
-                  child: Text(
-                    'No',
-                    style: Theme.of(context).textTheme.bodyLarge!.copyWith(
-                          color:
-                              Theme.of(context).colorScheme.onPrimaryContainer,
+                  child: noLoading
+                      ? const SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                          ))
+                      : Text(
+                          'No',
+                          style:
+                              Theme.of(context).textTheme.bodyLarge!.copyWith(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onPrimaryContainer,
+                                  ),
                         ),
-                  ),
                 ),
               ],
             ),
@@ -172,5 +190,47 @@ class _VoteDialogState extends State<VoteDialog> {
           borderRadius: BorderRadius.circular(10),
         ),
         child: content);
+  }
+
+  void _vote(bool approve) async {
+    if (yesLoading || noLoading || farmId == null) return;
+    setState(() {
+      approve ? (yesLoading = true) : (noLoading = true);
+    });
+    final farm = farms.firstWhere((farm) => farm.farmID == farmId);
+    final twinId = farm.twinId;
+    final seed = twinIdWallets[twinId];
+    try {
+      await vote(approve, widget.proposalHash, farmId!, seed!);
+
+      _showDialog('Vote', 'You have voted successfully.', Icons.check);
+    } catch (e) {
+      _showDialog('Vote', 'Failed to Vote.', Icons.error);
+    } finally {
+      setState(() {
+        yesLoading = false;
+        noLoading = false;
+      });
+    }
+  }
+
+  _showDialog(String title, String description, IconData icon) async {
+    if (context.mounted) {
+      showDialog(
+        barrierDismissible: false,
+        context: context,
+        builder: (BuildContext context) => CustomDialog(
+          image: icon,
+          title: title,
+          description: description,
+        ),
+      );
+      await Future.delayed(
+        const Duration(seconds: 3),
+        () {
+          Navigator.pop(context);
+        },
+      );
+    }
   }
 }
