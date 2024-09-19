@@ -158,3 +158,31 @@ Future<void> _saveWalletsToPkid(Map<int, dynamic> wallets) async {
   FlutterPkid client = await _getPkidClient();
   await client.setPKidDoc('purse', json.encode(wallets));
 }
+
+Future<int?> getWalletTwinId(String walletName, String walletSeed,
+    WalletType walletType, String chainUrl) async {
+  final (_, tfchainClient) =
+      await loadWalletClients(walletName, walletSeed, walletType, chainUrl);
+  return await TFChainService.getTwinIdByClient(tfchainClient);
+}
+
+Future<List<int>> getWalletsTwinIds() async {
+  Map<int, dynamic> dataMap = await _getPkidWallets();
+  final String chainUrl = Globals().chainUrl;
+  final List<int?> twins = await compute((void _) async {
+    final List<Future<int?>> twinIdFutures = [];
+    for (final w in dataMap.values) {
+      final String walletSeed = w['seed'];
+      final String walletName = w['name'];
+      final WalletType walletType =
+          w['type'] == 'NATIVE' ? WalletType.Native : WalletType.Imported;
+      final twinIdFuture =
+          getWalletTwinId(walletName, walletSeed, walletType, chainUrl);
+      twinIdFutures.add(twinIdFuture);
+    }
+    return await Future.wait(twinIdFutures);
+  }, null);
+  final twinIds =
+      twins.where((element) => element != null).toList() as List<int>;
+  return {...twinIds}.toList();
+}

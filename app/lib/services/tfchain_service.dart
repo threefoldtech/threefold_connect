@@ -44,6 +44,12 @@ Future<double> getBalanceByClient(TFChain.Client client) async {
   return balance / BigInt.from(10).pow(7);
 }
 
+Future<int?> getTwinIdByClient(TFChain.Client client) async {
+  await client.connect();
+  final twinId = await client.twins.getMyTwinId();
+  return twinId;
+}
+
 Future<Map<String, List<Proposal>>> getProposals() async {
   try {
     final chainUrl = Globals().chainUrl;
