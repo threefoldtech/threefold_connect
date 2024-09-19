@@ -12,28 +12,48 @@ class DaoPage extends StatefulWidget {
 }
 
 class _DaoPageState extends State<DaoPage> {
-  List<Proposal>? activeList = [];
-  List<Proposal>? inactiveList = [];
+  final List<Proposal> activeList = [];
+  final List<Proposal> inactiveList = [];
+  bool loading = true;
 
-  void setActiveList() async {
-    final proposals = await getProposals();
+  void loadProposals() async {
     setState(() {
-      activeList = proposals['activeProposals'];
-      inactiveList = proposals['inactiveProposals'];
+      loading = true;
+    });
+    final proposals = await getProposals();
+    activeList.addAll(proposals['activeProposals']!);
+    inactiveList.addAll(proposals['inactiveProposals']!);
+    setState(() {
+      loading = false;
     });
   }
 
   @override
   void initState() {
-    setActiveList();
+    loadProposals();
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    return LayoutDrawer(
-      titleText: 'Dao',
-      content: DefaultTabController(
+    Widget content;
+    if (loading) {
+      content = Center(
+          child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const CircularProgressIndicator(),
+          const SizedBox(height: 15),
+          Text(
+            'Loading Proposals...',
+            style: Theme.of(context).textTheme.bodyLarge!.copyWith(
+                color: Theme.of(context).colorScheme.onBackground,
+                fontWeight: FontWeight.bold),
+          ),
+        ],
+      ));
+    } else {
+      content = DefaultTabController(
         length: 2,
         child: Column(
           children: [
@@ -66,7 +86,8 @@ class _DaoPageState extends State<DaoPage> {
             ),
           ],
         ),
-      ),
-    );
+      );
+    }
+    return LayoutDrawer(titleText: 'Dao', content: content);
   }
 }

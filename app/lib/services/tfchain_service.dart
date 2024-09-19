@@ -38,7 +38,7 @@ Future<double> getBalance(String chainUrl, String address) async {
   return balances!.data.free / BigInt.from(10).pow(7);
 }
 
-Future<Map<String, List<Proposal>?>> getProposals() async {
+Future<Map<String, List<Proposal>>> getProposals() async {
   try {
     final chainUrl = Globals().chainUrl;
     final client = TFChain.QueryClient(chainUrl);
