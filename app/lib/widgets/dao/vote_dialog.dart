@@ -1,7 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:gridproxy_client/models/farms.dart';
-import 'package:tfchain_client/tfchain_client.dart';
 
 import 'package:threebotlogin/services/tfchain_service.dart';
 import 'package:threebotlogin/services/gridproxy_service.dart';
