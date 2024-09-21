@@ -24,6 +24,15 @@ class _WalletScreenState extends State<WalletScreen> {
     setState(() {});
   }
 
+  onEditWallet(String oldName, String newName) {
+    for (final w in wallets) {
+      if (w.name == oldName) {
+        w.name = newName;
+      }
+    }
+    setState(() {});
+  }
+
   @override
   void initState() {
     super.initState();
@@ -55,6 +64,7 @@ class _WalletScreenState extends State<WalletScreen> {
             WalletCardWidget(
               wallet: wallet,
               onDeleteWallet: onDeleteWallet,
+              onEditWallet: onEditWallet,
             )
         ],
       );

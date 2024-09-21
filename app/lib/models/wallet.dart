@@ -11,7 +11,7 @@ class Wallet {
     required this.tfchainBalance,
     required this.type,
   });
-  final String name;
+  String name;
   final String stellarSecret;
   final String stellarAddress;
   final String tfchainSecret;

@@ -4,9 +4,13 @@ import 'package:threebotlogin/screens/wallet_details.dart';
 
 class WalletCardWidget extends StatelessWidget {
   const WalletCardWidget(
-      {super.key, required this.wallet, required this.onDeleteWallet});
+      {super.key,
+      required this.wallet,
+      required this.onDeleteWallet,
+      required this.onEditWallet});
   final Wallet wallet;
   final void Function(String name) onDeleteWallet;
+  final void Function(String oldName, String newName) onEditWallet;
 
   @override
   Widget build(BuildContext context) {
@@ -17,6 +21,7 @@ class WalletCardWidget extends StatelessWidget {
             builder: (context) => WalletDetailsScreen(
               wallet: wallet,
               onDeleteWallet: onDeleteWallet,
+              onEditWallet: onEditWallet,
             ),
           ));
         },
