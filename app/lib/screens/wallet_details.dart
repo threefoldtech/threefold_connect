@@ -5,8 +5,10 @@ import 'package:threebotlogin/widgets/wallet_balance.dart';
 import 'package:threebotlogin/widgets/wallet_details.dart';
 
 class WalletDetailsScreen extends StatefulWidget {
-  const WalletDetailsScreen({super.key, required this.wallet});
+  const WalletDetailsScreen(
+      {super.key, required this.wallet, required this.onDeleteWallet});
   final Wallet wallet;
+  final void Function(String name) onDeleteWallet;
 
   @override
   State<WalletDetailsScreen> createState() => _WalletDetailsScreenState();
@@ -27,7 +29,10 @@ class _WalletDetailsScreenState extends State<WalletDetailsScreen> {
     if (currentScreenIndex == 1) {
       content = const WalletTransactionsWidget();
     } else if (currentScreenIndex == 2) {
-      content = WalletDetailsWidget(wallet: widget.wallet);
+      content = WalletDetailsWidget(
+        wallet: widget.wallet,
+        onDeleteWallet: widget.onDeleteWallet,
+      );
     } else {
       content = const WalletBalanceWidget();
     }

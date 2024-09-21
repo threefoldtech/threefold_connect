@@ -3,8 +3,10 @@ import 'package:threebotlogin/models/wallet.dart';
 import 'package:threebotlogin/screens/wallet_details.dart';
 
 class WalletCardWidget extends StatelessWidget {
-  const WalletCardWidget({super.key, required this.wallet});
+  const WalletCardWidget(
+      {super.key, required this.wallet, required this.onDeleteWallet});
   final Wallet wallet;
+  final void Function(String name) onDeleteWallet;
 
   @override
   Widget build(BuildContext context) {
@@ -12,7 +14,10 @@ class WalletCardWidget extends StatelessWidget {
       child: InkWell(
         onTap: () {
           Navigator.of(context).push(MaterialPageRoute(
-            builder: (context) => WalletDetailsScreen(wallet: wallet),
+            builder: (context) => WalletDetailsScreen(
+              wallet: wallet,
+              onDeleteWallet: onDeleteWallet,
+            ),
           ));
         },
         child: Padding(

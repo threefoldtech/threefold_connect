@@ -17,7 +17,12 @@ class WalletScreen extends StatefulWidget {
 
 class _WalletScreenState extends State<WalletScreen> {
   bool loading = true;
-  final List<Wallet> wallets = [];
+  List<Wallet> wallets = [];
+
+  onDeleteWallet(String name) {
+    wallets = wallets.where((w) => w.name != name).toList();
+    setState(() {});
+  }
 
   @override
   void initState() {
@@ -46,7 +51,11 @@ class _WalletScreenState extends State<WalletScreen> {
     } else {
       mainWidget = ListView(
         children: [
-          for (final wallet in wallets) WalletCardWidget(wallet: wallet)
+          for (final wallet in wallets)
+            WalletCardWidget(
+              wallet: wallet,
+              onDeleteWallet: onDeleteWallet,
+            )
         ],
       );
     }

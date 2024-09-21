@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:threebotlogin/models/wallet.dart';
+import 'package:threebotlogin/services/wallet_service.dart';
 
 class WalletDetailsWidget extends StatefulWidget {
-  const WalletDetailsWidget({super.key, required this.wallet});
+  const WalletDetailsWidget(
+      {super.key, required this.wallet, required this.onDeleteWallet});
   final Wallet wallet;
+  final void Function(String name) onDeleteWallet;
 
   @override
   State<WalletDetailsWidget> createState() => _WalletDetailsWidgetState();
@@ -18,6 +21,22 @@ class _WalletDetailsWidgetState extends State<WalletDetailsWidget> {
   final walletNameController = TextEditingController();
   bool showTfchainSecret = false;
   bool showStellarSecret = false;
+  bool deleteLoading = false;
+
+  _deleteWallet() async {
+    setState(() {
+      deleteLoading = true;
+    });
+    await deleteWallet(walletNameController.text);
+    widget.onDeleteWallet(walletNameController.text);
+    if (context.mounted) {
+      Navigator.pop(context);
+    }
+
+    setState(() {
+      deleteLoading = false;
+    });
+  }
 
   @override
   void dispose() {
@@ -178,18 +197,27 @@ class _WalletDetailsWidgetState extends State<WalletDetailsWidget> {
               child: SizedBox(
                 width: MediaQuery.of(context).size.width - 40,
                 child: ElevatedButton(
-                  onPressed: () {
-                    //TODO: delete the wallet with warning dialog
-                  },
+                  onPressed: _deleteWallet,
                   style: ElevatedButton.styleFrom(
                       backgroundColor:
                           Theme.of(context).colorScheme.errorContainer),
-                  child: Text(
-                    'Delete',
-                    style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                          color: Theme.of(context).colorScheme.onErrorContainer,
+                  child: deleteLoading
+                      ? SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: Theme.of(context).colorScheme.error,
+                          ))
+                      : Text(
+                          'Delete',
+                          style:
+                              Theme.of(context).textTheme.bodyMedium!.copyWith(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onErrorContainer,
+                                  ),
                         ),
-                  ),
                 ),
               ),
             )
