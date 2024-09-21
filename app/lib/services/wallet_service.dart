@@ -140,23 +140,24 @@ Future<void> _saveWalletsToPkid(List<PkidWallet> wallets) async {
   await client.setPKidDoc('purse', encodedWallets);
 }
 
-Future<Map<int, String>> getWalletTwinId(String walletName, String walletSeed,
-    WalletType walletType, String chainUrl) async {
+Future<Map<int, Map<String, String>>> getWalletTwinId(String walletName,
+    String walletSeed, WalletType walletType, String chainUrl) async {
   final (_, tfchainClient) =
       await loadWalletClients(walletName, walletSeed, walletType, chainUrl);
   final twinId = await TFChainService.getTwinIdByClient(tfchainClient);
-  final Map<int, String> twinIdWallet = {
-    twinId: tfchainClient.mnemonicOrSecretSeed
+  final Map<int, Map<String, String>> twinIdWallet = {
+    twinId: {'seed': tfchainClient.mnemonicOrSecretSeed, 'name': walletName}
   };
   return twinIdWallet;
 }
 
-Future<Map<int, String>> getWalletsTwinIds() async {
+Future<Map<int, Map<String, String>>> getWalletsTwinIds() async {
   List<PkidWallet> pkidWallets = await _getPkidWallets();
   final String chainUrl = Globals().chainUrl;
-  final Map<int, String> twinWallets = await compute((void _) async {
-    final List<Future<Map<int, String>>> twinIdWalletFutures = [];
-    final Map<int, String> twinWallets = {};
+  final Map<int, Map<String, String>> twinWallets =
+      await compute((void _) async {
+    final List<Future<Map<int, Map<String, String>>>> twinIdWalletFutures = [];
+    final Map<int, Map<String, String>> twinWallets = {};
     for (final w in pkidWallets) {
       final twinIdWalletFuture =
           getWalletTwinId(w.name, w.seed, w.type, chainUrl);

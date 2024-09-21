@@ -1,4 +1,5 @@
 import 'package:gridproxy_client/gridproxy_client.dart';
+import 'package:gridproxy_client/models/nodes.dart';
 import 'package:threebotlogin/helpers/globals.dart';
 import 'package:threebotlogin/main.reflectable.dart';
 import 'package:threebotlogin/services/shared_preference_service.dart';
@@ -36,4 +37,17 @@ Future<List<Farm>> getFarmsByTwinIds(List<int> twinIds) async {
   final listFarms = await Future.wait(farmFutures);
   final farms = listFarms.expand((i) => i).toList(); //flat
   return farms;
+}
+
+Future<List<Node>> getNodesByFarmId(int farmId) async {
+  try {
+    initializeReflectable();
+    final gridproxyUrl = Globals().gridproxyUrl;
+    GridProxyClient client = GridProxyClient(gridproxyUrl);
+    final nodes =
+        await client.nodes.list(ListNodesQueryParamaters(farm_ids: '$farmId'));
+    return nodes;
+  } catch (e) {
+    throw Exception("Error occurred: $e");
+  }
 }

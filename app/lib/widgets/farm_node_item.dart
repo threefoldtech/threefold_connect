@@ -21,7 +21,7 @@ class _FarmNodeItemWidgetState extends State<FarmNodeItemWidget> {
 
   @override
   Widget build(BuildContext context) {
-    nodeIdController.text = widget.node.nodeId;
+    nodeIdController.text = widget.node.nodeId.toString();
 
     final Color statusColor;
     if (widget.node.status == NodeStatus.Up) {
@@ -59,7 +59,10 @@ class _FarmNodeItemWidgetState extends State<FarmNodeItemWidget> {
                 borderRadius: BorderRadius.all(Radius.circular(20)))),
         child: Text(
           widget.node.status.name,
-          style: Theme.of(context).textTheme.bodySmall!.copyWith(color: statusTextColor),
+          style: Theme.of(context)
+              .textTheme
+              .bodySmall!
+              .copyWith(color: statusTextColor),
         ),
       ),
     );

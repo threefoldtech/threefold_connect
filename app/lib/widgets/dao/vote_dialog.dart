@@ -21,7 +21,7 @@ class VoteDialog extends StatefulWidget {
 class _VoteDialogState extends State<VoteDialog> {
   int? farmId;
   final List<Farm> farms = [];
-  Map<int, String> twinIdWallets = {};
+  Map<int, Map<String, String>> twinIdWallets = {};
   bool loading = true;
   bool yesLoading = false;
   bool noLoading = false;
@@ -198,7 +198,7 @@ class _VoteDialogState extends State<VoteDialog> {
     });
     final farm = farms.firstWhere((farm) => farm.farmID == farmId);
     final twinId = farm.twinId;
-    final seed = twinIdWallets[twinId];
+    final seed = twinIdWallets[twinId]!['seed'];
     try {
       await vote(approve, widget.proposalHash, farmId!, seed!);
 
