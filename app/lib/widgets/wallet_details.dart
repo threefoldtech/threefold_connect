@@ -34,6 +34,7 @@ class _WalletDetailsWidgetState extends State<WalletDetailsWidget> {
     setState(() {
       deleteLoading = true;
     });
+    //TODO: Show snack in case of failure
     await deleteWallet(walletNameController.text);
     widget.onDeleteWallet(walletNameController.text);
     if (context.mounted) {
@@ -47,15 +48,17 @@ class _WalletDetailsWidgetState extends State<WalletDetailsWidget> {
 
   _editWallet() async {
     edit = !edit;
-    if (walletName == walletNameController.text) {
+    final String newName = walletNameController.text.trim();
+    if (walletName == newName) {
       FocusScope.of(context).requestFocus(nameFocus);
       setState(() {});
       return;
     }
-    await editWallet(walletName, walletNameController.text);
-    widget.onEditWallet(walletName, walletNameController.text);
-    walletName = walletNameController.text;
-    widget.wallet.name = walletName;
+    //TODO: Show snack in case of failure
+    await editWallet(walletName, newName);
+    widget.onEditWallet(walletName, newName);
+    walletName = newName;
+    widget.wallet.name = newName;
     setState(() {});
   }
 
