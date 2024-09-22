@@ -237,7 +237,13 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
             },
           ),
           TextButton(
-            child: const Text('Yes'),
+            child: Text(
+              'Yes',
+              style: Theme.of(context)
+                  .textTheme
+                  .bodyMedium!
+                  .copyWith(color: Theme.of(context).colorScheme.error),
+            ),
             onPressed: () async {
               // try {
               //   String deviceID = await _listener.getToken();

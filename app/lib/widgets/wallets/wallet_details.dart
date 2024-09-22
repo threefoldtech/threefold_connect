@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:threebotlogin/models/wallet.dart';
 import 'package:threebotlogin/services/wallet_service.dart';
+import 'package:threebotlogin/widgets/custom_dialog.dart';
 
 class WalletDetailsWidget extends StatefulWidget {
   const WalletDetailsWidget(
@@ -37,9 +38,6 @@ class _WalletDetailsWidgetState extends State<WalletDetailsWidget> {
     //TODO: Show snack in case of failure
     await deleteWallet(walletNameController.text);
     widget.onDeleteWallet(walletNameController.text);
-    if (context.mounted) {
-      Navigator.pop(context);
-    }
 
     setState(() {
       deleteLoading = false;
@@ -223,7 +221,7 @@ class _WalletDetailsWidgetState extends State<WalletDetailsWidget> {
                 child: SizedBox(
                   width: MediaQuery.of(context).size.width - 40,
                   child: ElevatedButton(
-                    onPressed: _deleteWallet,
+                    onPressed: _showDeleteConfirmationDialog,
                     style: ElevatedButton.styleFrom(
                         backgroundColor:
                             Theme.of(context).colorScheme.errorContainer),
@@ -251,6 +249,43 @@ class _WalletDetailsWidgetState extends State<WalletDetailsWidget> {
               )
           ],
         ),
+      ),
+    );
+  }
+
+  void _showDeleteConfirmationDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) => CustomDialog(
+        image: Icons.error,
+        title: 'Are you sure?',
+        description:
+            'If you confirm, your wallet will be removed from this device.',
+        actions: <Widget>[
+          TextButton(
+            child: const Text('Cancel'),
+            onPressed: () {
+              Navigator.pop(context);
+            },
+          ),
+          TextButton(
+            onPressed: () async {
+              await _deleteWallet();
+              if (context.mounted) {
+                Navigator.pop(context);
+                Navigator.pop(context);
+              }
+            },
+            //TODO: show loading when press yes
+            child: Text(
+              'Yes',
+              style: Theme.of(context)
+                  .textTheme
+                  .bodyMedium!
+                  .copyWith(color: Theme.of(context).colorScheme.error),
+            ),
+          ),
+        ],
       ),
     );
   }
