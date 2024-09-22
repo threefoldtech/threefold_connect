@@ -4,9 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:threebotlogin/models/wallet.dart';
 import 'package:threebotlogin/services/wallet_service.dart';
-import 'package:threebotlogin/widgets/add_wallet.dart';
 import 'package:threebotlogin/widgets/layout_drawer.dart';
-import 'package:threebotlogin/widgets/wallet_card.dart';
+import 'package:threebotlogin/widgets/wallets/add_wallet.dart';
+import 'package:threebotlogin/widgets/wallets/wallet_card.dart';
 
 class WalletScreen extends StatefulWidget {
   const WalletScreen({super.key});

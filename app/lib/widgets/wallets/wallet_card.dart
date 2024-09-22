@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:threebotlogin/models/wallet.dart';
-import 'package:threebotlogin/screens/wallet_details.dart';
+import 'package:threebotlogin/screens/wallets/wallet_details.dart';
 
 class WalletCardWidget extends StatelessWidget {
   const WalletCardWidget(
