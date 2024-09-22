@@ -198,13 +198,13 @@ class _VoteDialogState extends State<VoteDialog> {
     });
     final farm = farms.firstWhere((farm) => farm.farmID == farmId);
     final twinId = farm.twinId;
-    final seed = twinIdWallets[twinId]!['seed'];
+    final seed = twinIdWallets[twinId]!['tfchainSeed'];
     try {
       await vote(approve, widget.proposalHash, farmId!, seed!);
 
-      _showDialog('Vote', 'You have voted successfully.', Icons.check);
+      _showDialog('Voted!', 'You have voted successfully.', Icons.check);
     } catch (e) {
-      _showDialog('Vote', 'Failed to Vote.', Icons.error);
+      _showDialog('Error', 'Failed to Vote.', Icons.error);
     } finally {
       setState(() {
         yesLoading = false;

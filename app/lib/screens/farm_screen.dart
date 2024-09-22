@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:threebotlogin/models/farm.dart';
 import 'package:threebotlogin/services/gridproxy_service.dart';
 import 'package:threebotlogin/services/wallet_service.dart';
+import 'package:threebotlogin/widgets/add_farm.dart';
 import 'package:threebotlogin/widgets/farm_item.dart';
 import 'package:threebotlogin/widgets/layout_drawer.dart';
 
@@ -31,7 +32,7 @@ class _FarmScreenState extends State<FarmScreen> {
     twinIdWallets = await getWalletsTwinIds();
     final farmsList = await getFarmsByTwinIds(twinIdWallets.keys.toList());
     for (final f in farmsList) {
-      final seed = twinIdWallets[f.twinId]!['seed'];
+      final seed = twinIdWallets[f.twinId]!['tfchainSeed'];
       final walletName = twinIdWallets[f.twinId]!['name'];
       final nodes = await getNodesByFarmId(f.farmID);
       farms.add(Farm(
@@ -56,6 +57,7 @@ class _FarmScreenState extends State<FarmScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // TODO: handle empty farms
     Widget mainWidget;
     if (loading) {
       mainWidget = Center(
@@ -76,6 +78,35 @@ class _FarmScreenState extends State<FarmScreen> {
       mainWidget = ListView(
           children: [for (final farm in farms) FarmItemWidget(farm: farm)]);
     }
-    return LayoutDrawer(titleText: 'Farms', content: mainWidget);
+    return LayoutDrawer(
+      titleText: 'Farms',
+      content: mainWidget,
+      appBarActions: loading
+          ? []
+          : [
+              IconButton(
+                  onPressed: _openAddFarmOverlay,
+                  icon: const Icon(
+                    Icons.add,
+                  ))
+            ],
+    );
+  }
+
+  _openAddFarmOverlay() {
+    showModalBottomSheet(
+        isScrollControlled: true,
+        useSafeArea: true,
+        constraints: const BoxConstraints(maxWidth: double.infinity),
+        context: context,
+        builder: (ctx) => NewFarm(
+              onAddFarm: _addFarm,
+              wallets: twinIdWallets.values.toList(),
+            ));
+  }
+
+  _addFarm(Farm farm) {
+    farms.add(farm);
+    setState(() {});
   }
 }

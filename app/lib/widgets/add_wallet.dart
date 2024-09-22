@@ -99,7 +99,7 @@ class _NewWalletState extends State<NewWallet> {
     try {
       await addWallet(walletName, walletSecret);
       await _showDialog('Wallet Added!',
-          '$walletName has been added successfully', Icons.check);
+          'Wallet $walletName has been added successfully', Icons.check);
     } catch (e) {
       print(e);
       _showDialog(
@@ -163,9 +163,10 @@ class _NewWalletState extends State<NewWallet> {
                     const Spacer(),
                     ElevatedButton(
                         onPressed: () {
+                          if (saveLoading) return;
                           Navigator.pop(context);
                         },
-                        child: const Text('Cancel')),
+                        child: const Text('Close')),
                     const SizedBox(
                       width: 5,
                     ),

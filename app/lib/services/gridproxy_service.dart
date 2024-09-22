@@ -25,7 +25,7 @@ Future<List<Farm>> getFarmsByTwinId(int twinId) async {
         await client.farms.list(ListFarmsQueryParameters(twin_id: twinId));
     return farms;
   } catch (e) {
-    throw Exception("Error occurred: $e");
+    throw Exception('Failed to get farms due to $e');
   }
 }
 
@@ -48,6 +48,6 @@ Future<List<Node>> getNodesByFarmId(int farmId) async {
         await client.nodes.list(ListNodesQueryParamaters(farm_ids: '$farmId'));
     return nodes;
   } catch (e) {
-    throw Exception("Error occurred: $e");
+    throw Exception('Failed to get nodes due to $e');
   }
 }

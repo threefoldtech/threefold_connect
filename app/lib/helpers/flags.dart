@@ -64,6 +64,8 @@ class Flags {
         (await Flags().getFlagValueByFeatureName('chain-url'))!;
     Globals().gridproxyUrl =
         (await Flags().getFlagValueByFeatureName('gridproxy-url'))!;
+    Globals().activationUrl =
+        (await Flags().getFlagValueByFeatureName('activation-url'))!;
     Globals().spendingLimit = int.parse(
         (await Flags().getFlagValueByFeatureName('spending-limit')).toString());
   }

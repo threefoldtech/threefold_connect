@@ -142,11 +142,15 @@ Future<void> _saveWalletsToPkid(List<PkidWallet> wallets) async {
 
 Future<Map<int, Map<String, String>>> getWalletTwinId(String walletName,
     String walletSeed, WalletType walletType, String chainUrl) async {
-  final (_, tfchainClient) =
+  final (stellarClient, tfchainClient) =
       await loadWalletClients(walletName, walletSeed, walletType, chainUrl);
   final twinId = await TFChainService.getTwinIdByClient(tfchainClient);
   final Map<int, Map<String, String>> twinIdWallet = {
-    twinId: {'seed': tfchainClient.mnemonicOrSecretSeed, 'name': walletName}
+    twinId: {
+      'tfchainSeed': tfchainClient.mnemonicOrSecretSeed,
+      'name': walletName,
+      'stellarAddress': stellarClient.accountId
+    }
   };
   return twinIdWallet;
 }
@@ -170,7 +174,7 @@ Future<Map<int, Map<String, String>>> getWalletsTwinIds() async {
     });
     return twinWallets;
   }, null);
-
+  // TODO: return all wallets in case creating new farm
   twinWallets.removeWhere((key, value) => key == 0);
   return twinWallets;
 }
