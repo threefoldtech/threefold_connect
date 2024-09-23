@@ -37,10 +37,10 @@ packages:
     dependency: transitive
     description:
       name: asn1lib
-      sha256: "58082b3f0dca697204dbab0ef9ff208bfaea7767ea771076af9a343488428dda"
+      sha256: "6b151826fcc95ff246cd219a0bf4c753ea14f4081ad71c61939becf3aba27f70"
       url: "https://pub.dev"
     source: hosted
-    version: "1.5.3"
+    version: "1.5.5"
   async:
     dependency: transitive
     description:
@@ -476,18 +476,20 @@ packages:
   gridproxy_client:
     dependency: "direct main"
     description:
-      path: "../../../codescalers/tfgrid-sdk-dart/packages/gridproxy_client"
-      relative: true
-    source: path
+      path: "packages/gridproxy_client"
+      ref: tfchain_graphql_hotfix
+      resolved-ref: "314f46728e43cb86f430cda6ba756d4be3fb6e07"
+      url: "https://github.com/codescalers/tfgrid-sdk-dart"
+    source: git
     version: "1.0.0"
   hashlib:
     dependency: transitive
     description:
       name: hashlib
-      sha256: "7431346983b7c18fa3d6107891b7f00da4fffc378eed8454a0c9e17961164ffd"
+      sha256: f572f2abce09fc7aee53f15927052b9732ea1053e540af8cae211111ee0b99b1
       url: "https://pub.dev"
     source: hosted
-    version: "1.20.2"
+    version: "1.21.0"
   hashlib_codecs:
     dependency: transitive
     description:
@@ -636,10 +638,10 @@ packages:
     dependency: "direct overridden"
     description:
       name: meta
-      sha256: bdb68674043280c3428e9ec998512fb681678676b3c54e773629ffe74419f8c7
+      sha256: e3641ec5d63ebf0d9b41bd43201a66e3fc79a65db5f61fc181f04cd27aab950c
       url: "https://pub.dev"
     source: hosted
-    version: "1.15.0"
+    version: "1.16.0"
   mime:
     dependency: transitive
     description:
@@ -724,10 +726,10 @@ packages:
     dependency: transitive
     description:
       name: path_provider_foundation
-      sha256: "5a7999be66e000916500be4f15a3633ebceb8302719b47b9cc49ce924125350f"
+      sha256: f234384a3fdd67f989b4d54a5d73ca2a6c422fa55ae694381ae0f4375cd1ea16
       url: "https://pub.dev"
     source: hosted
-    version: "2.3.2"
+    version: "2.4.0"
   path_provider_linux:
     dependency: transitive
     description:
@@ -996,10 +998,10 @@ packages:
     dependency: transitive
     description:
       name: shared_preferences_foundation
-      sha256: "7708d83064f38060c7b39db12aefe449cb8cdc031d6062280087bc4cdb988f5c"
+      sha256: "671e7a931f55a08aa45be2a13fe7247f2a41237897df434b30d2012388191833"
       url: "https://pub.dev"
     source: hosted
-    version: "2.3.5"
+    version: "2.5.0"
   shared_preferences_linux:
     dependency: transitive
     description:
@@ -1048,20 +1050,20 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.4"
-  shuftipro_sdk:
+  shuftipro_onsite_sdk:
     dependency: "direct main"
     description:
-      name: shuftipro_sdk
-      sha256: fd47550bbbfe50c99ef490fdb609b5a8d5e3e770d3fb8196c984a7f68d00772e
+      name: shuftipro_onsite_sdk
+      sha256: d1329e5fe5a15cbbe5d2e75af9ab0eab1dd00a41a017eaf74225cb37d39f9e52
       url: "https://pub.dev"
     source: hosted
-    version: "1.3.9"
+    version: "1.0.5"
   signer:
     dependency: transitive
     description:
       path: "packages/signer"
       ref: main
-      resolved-ref: "27c3fda2b6fe8c67785cbe5ff08373878a2a8470"
+      resolved-ref: fb8afb190f8c4fcad43692f37ea0d72cc57bcefc
       url: "https://github.com/codescalers/tfgrid-sdk-dart.git"
     source: git
     version: "0.1.0"
@@ -1153,9 +1155,11 @@ packages:
   stellar_client:
     dependency: "direct main"
     description:
-      path: "../../../codescalers/tfgrid-sdk-dart/packages/stellar_client"
-      relative: true
-    source: path
+      path: "packages/stellar_client"
+      ref: tfchain_graphql_hotfix
+      resolved-ref: "314f46728e43cb86f430cda6ba756d4be3fb6e07"
+      url: "https://github.com/codescalers/tfgrid-sdk-dart"
+    source: git
     version: "0.1.0"
   stellar_flutter_sdk:
     dependency: transitive
@@ -1240,9 +1244,11 @@ packages:
   tfchain_client:
     dependency: "direct main"
     description:
-      path: "../../../codescalers/tfgrid-sdk-dart/packages/tfchain_client"
-      relative: true
-    source: path
+      path: "packages/tfchain_client"
+      ref: tfchain_graphql_hotfix
+      resolved-ref: "314f46728e43cb86f430cda6ba756d4be3fb6e07"
+      url: "https://github.com/codescalers/tfgrid-sdk-dart"
+    source: git
     version: "0.1.0"
   timing:
     dependency: transitive
@@ -1344,10 +1350,10 @@ packages:
     dependency: transitive
     description:
       name: url_launcher_ios
-      sha256: "75bb6fe3f60070407704282a2d295630cab232991eb52542b18347a8a941df03"
+      sha256: e43b677296fadce447e987a2f519dcf5f6d1e527dc35d01ffab4fff5b8a7063e
       url: "https://pub.dev"
     source: hosted
-    version: "6.2.4"
+    version: "6.3.1"
   url_launcher_linux:
     dependency: transitive
     description:
@@ -1510,4 +1516,4 @@ packages:
     version: "1.1.4+10"
 sdks:
   dart: ">=3.2.3 <4.0.0"
-  flutter: ">=3.16.0"
+  flutter: ">=3.16.6"
