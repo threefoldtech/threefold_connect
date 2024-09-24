@@ -60,10 +60,10 @@ android {
 
 		signingConfigs {
         release {
-            // keyAlias localProperties.getProperty('keyAlias')
-            // keyPassword localProperties.getProperty('keyPassword')
-            // storeFile file(localProperties.getProperty('storeFile'))
-            // storePassword localProperties.getProperty('storePassword')
+            keyAlias localProperties.getProperty('keyAlias')
+            keyPassword localProperties.getProperty('keyPassword')
+            storeFile file(localProperties.getProperty('storeFile'))
+            storePassword localProperties.getProperty('storePassword')
         }
         debug {
 
@@ -78,10 +78,14 @@ android {
         }
     }
     buildscript {
-    ext {
-        stripeVersion = "20.19.1" // This is the version BEFORE the kotlin bump
+        ext {
+            stripeVersion = "20.19.1" // This is the version BEFORE the kotlin bump
+        }
     }
-}
+
+    dataBinding {
+        enabled = true
+    }
 }
 
 flutter {

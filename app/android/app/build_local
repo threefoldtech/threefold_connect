@@ -78,10 +78,14 @@ android {
         }
     }
     buildscript {
-    ext {
-        stripeVersion = "20.19.1" // This is the version BEFORE the kotlin bump
+        ext {
+            stripeVersion = "20.19.1" // This is the version BEFORE the kotlin bump
+        }
     }
-}
+
+    dataBinding {
+        enabled = true
+    }
 }
 
 flutter {
