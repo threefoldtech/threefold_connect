@@ -24,3 +24,10 @@ Future<String> getBalanceByClient(Client client) async {
   }
   return '0';
 }
+
+Future<List<OperationResponse>> listTransactions(String secret) async {
+  final client = Client(NetworkType.PUBLIC, secret);
+  final transactions = await client.getTransactions(assetCodeFilter: 'TFT');
+  print(transactions);
+  return transactions;
+}

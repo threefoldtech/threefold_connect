@@ -50,3 +50,28 @@ class PkidWallet {
     };
   }
 }
+
+enum TransactionType { Create, Payment, Receive }
+
+class Transaction {
+  Transaction({
+    required this.hash,
+    required this.from,
+    required this.to,
+    required this.asset,
+    required this.amount,
+    // required this.memo, // check how to get it
+    required this.type,
+    required this.status,
+    required this.date,
+  });
+  final String hash;
+  final String from;
+  final String to;
+  final String asset;
+  final String amount;
+  // final String memo;
+  final TransactionType type;
+  final bool status;
+  final String date;
+}
