@@ -19,17 +19,17 @@ dependencies:
   tfchain_client:
     git:
       url: https://github.com/codescalers/tfgrid-sdk-dart
-      ref: main
+      ref: tfchain_graphql_hotfix
       path: packages/tfchain_client
   stellar_client:
     git:
       url: https://github.com/codescalers/tfgrid-sdk-dart
-      ref: main
+      ref: tfchain_graphql_hotfix
       path: packages/stellar_client
   gridproxy_client:
     git:
       url: https://github.com/codescalers/tfgrid-sdk-dart
-      ref: main
+      ref: tfchain_graphql_hotfix
       path: packages/gridproxy_client
   shuftipro_onsite_sdk: ^1.0.5
   flutter_svg: ^2.0.6

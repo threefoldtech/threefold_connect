@@ -64,6 +64,7 @@ class _IdentityVerificationScreenState
   };
 
   Map<String, Object> authObject = {
+    'auth_type': 'access_token',
     'access_token': '',
   };
 
