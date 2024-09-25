@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:threebotlogin/models/wallet.dart';
 import 'package:threebotlogin/screens/wallets/transactions.dart';
-import 'package:threebotlogin/widgets/wallets/wallet_assets.dart';
+import 'package:threebotlogin/screens/wallets/wallet_assets.dart';
 import 'package:threebotlogin/screens/wallets/wallet_info.dart';
 
 class WalletDetailsScreen extends StatefulWidget {

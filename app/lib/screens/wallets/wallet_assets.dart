@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:stellar_client/models/vesting_account.dart';
 import 'package:threebotlogin/helpers/globals.dart';
 import 'package:threebotlogin/models/wallet.dart';
+import 'package:threebotlogin/screens/wallets/receive.dart';
+import 'package:threebotlogin/screens/wallets/send.dart';
 import 'package:threebotlogin/services/stellar_service.dart' as Stellar;
 import 'package:threebotlogin/services/tfchain_service.dart' as TFChain;
 import 'package:threebotlogin/widgets/wallets/arrow_inward.dart';
@@ -95,13 +97,22 @@ class _WalletAssetsWidgetState extends State<WalletAssetsWidget> {
               children: [
                 Column(
                   children: [
-                    CircleAvatar(
-                      radius: 30,
-                      backgroundColor: Theme.of(context).colorScheme.error,
-                      child: Icon(
-                        Icons.arrow_outward_outlined,
-                        color: Theme.of(context).colorScheme.onError,
-                        size: 30,
+                    InkWell(
+                      onTap: () {
+                        Navigator.of(context).push(MaterialPageRoute(
+                          builder: (context) => WalletSendScreen(
+                            wallet: widget.wallet,
+                          ),
+                        ));
+                      },
+                      child: CircleAvatar(
+                        radius: 30,
+                        backgroundColor: Theme.of(context).colorScheme.error,
+                        child: Icon(
+                          Icons.arrow_outward_outlined,
+                          color: Theme.of(context).colorScheme.onError,
+                          size: 30,
+                        ),
                       ),
                     ),
                     const SizedBox(height: 10),
@@ -116,13 +127,23 @@ class _WalletAssetsWidgetState extends State<WalletAssetsWidget> {
                 ),
                 Column(
                   children: [
-                    CircleAvatar(
-                        radius: 30,
-                        backgroundColor: Theme.of(context).colorScheme.primary,
-                        child: ArrowInward(
-                          color: Theme.of(context).colorScheme.onPrimary,
-                          size: 30,
-                        )),
+                    InkWell(
+                      onTap: () {
+                        Navigator.of(context).push(MaterialPageRoute(
+                          builder: (context) => WalletReceiveScreen(
+                            wallet: widget.wallet,
+                          ),
+                        ));
+                      },
+                      child: CircleAvatar(
+                          radius: 30,
+                          backgroundColor:
+                              Theme.of(context).colorScheme.primary,
+                          child: ArrowInward(
+                            color: Theme.of(context).colorScheme.onPrimary,
+                            size: 30,
+                          )),
+                    ),
                     const SizedBox(height: 10),
                     Text(
                       'Receive',
