@@ -60,7 +60,7 @@ class Transaction {
     required this.to,
     required this.asset,
     required this.amount,
-    // required this.memo, // check how to get it
+    // required this.memo, //TODO: check how to get it (transaction link)
     required this.type,
     required this.status,
     required this.date,

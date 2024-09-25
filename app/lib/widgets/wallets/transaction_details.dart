@@ -23,11 +23,39 @@ class TransactionDetails extends StatelessWidget {
                 children: [
                   Text(label,
                       style: Theme.of(context).textTheme.titleLarge!.copyWith(
-                          color: Theme.of(context).colorScheme.onBackground)),
-                  const SizedBox(height: 4.0),
-                  Text(value,
-                      style: Theme.of(context).textTheme.bodyLarge!.copyWith(
-                          color: Theme.of(context).colorScheme.onBackground)),
+                          color: Theme.of(context).colorScheme.onBackground,
+                          fontWeight: FontWeight.bold)),
+                  const SizedBox(height: 10),
+                  label == 'Type'
+                      ? Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 12, vertical: 6),
+                          decoration: BoxDecoration(
+                            border: Border.all(
+                              color: value == 'Receive'
+                                  ? Theme.of(context).colorScheme.primary
+                                  : Theme.of(context).colorScheme.error,
+                            ),
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: Text(value,
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodyMedium!
+                                  .copyWith(
+                                    color: value == 'Receive'
+                                        ? Theme.of(context).colorScheme.primary
+                                        : Theme.of(context).colorScheme.error,
+                                  )),
+                        )
+                      : Text(value,
+                          style: Theme.of(context)
+                              .textTheme
+                              .bodyLarge!
+                              .copyWith(
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .onBackground)),
                 ],
               ),
             ),
@@ -41,29 +69,12 @@ class TransactionDetails extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            children: [
-              IconButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                  icon: const Icon(Icons.arrow_back)),
-              const Text(
-                'Transaction Details',
-                style: TextStyle(
-                  fontSize: 20,
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ],
-          ),
           const SizedBox(height: 16.0),
           buildDetailRow('From', transaction.from),
           const Divider(),
           buildDetailRow('To', transaction.to),
           const Divider(),
-          buildDetailRow('Type', transaction.type.toString()),
+          buildDetailRow('Type', transaction.type.name),
           const Divider(),
           buildDetailRow('Amount', transaction.amount),
           const Divider(),

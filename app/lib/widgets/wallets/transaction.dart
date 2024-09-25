@@ -65,8 +65,7 @@ class TransactionWidget extends StatelessWidget {
                                       : Theme.of(context).colorScheme.error,
                                 )),
                       ),
-                      Text(
-                          DateTime.parse(transaction.date).toLocal().toString(),
+                      Text(transaction.date,
                           overflow: TextOverflow.ellipsis,
                           style: Theme.of(context)
                               .textTheme
@@ -84,9 +83,6 @@ class TransactionWidget extends StatelessWidget {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
               decoration: BoxDecoration(
-                // color: status == 'Successful'
-                //     ? Theme.of(context).colorScheme.primary
-                //     : Theme.of(context).colorScheme.error,
                 border: Border.all(
                   color: transaction.status
                       ? Theme.of(context).colorScheme.primary

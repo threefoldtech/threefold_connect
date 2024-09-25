@@ -37,6 +37,7 @@ class WalletCardWidget extends StatelessWidget {
                     ),
               ),
               const SizedBox(height: 10),
+              // TODO: hide the balance if there is no account for this wallet
               Row(
                 children: [
                   Text(
