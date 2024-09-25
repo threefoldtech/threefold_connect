@@ -1,3 +1,4 @@
+import 'package:stellar_client/models/vesting_account.dart';
 import 'package:stellar_client/stellar_client.dart';
 import 'package:stellar_flutter_sdk/stellar_flutter_sdk.dart';
 
@@ -28,6 +29,11 @@ Future<String> getBalanceByClient(Client client) async {
 Future<List<OperationResponse>> listTransactions(String secret) async {
   final client = Client(NetworkType.PUBLIC, secret);
   final transactions = await client.getTransactions(assetCodeFilter: 'TFT');
-  print(transactions);
   return transactions;
+}
+
+Future<List<VestingAccount>?> listVestedAccounts(String secret) async {
+  final client = Client(NetworkType.PUBLIC, secret);
+  final accounts = await client.getVestingAccounts();
+  return accounts;
 }

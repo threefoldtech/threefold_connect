@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:threebotlogin/models/wallet.dart';
 import 'package:threebotlogin/screens/wallets/transactions.dart';
-import 'package:threebotlogin/widgets/wallets/wallet_balance.dart';
+import 'package:threebotlogin/widgets/wallets/wallet_assets.dart';
 import 'package:threebotlogin/screens/wallets/wallet_info.dart';
 
 class WalletDetailsScreen extends StatefulWidget {
@@ -47,7 +47,9 @@ class _WalletDetailsScreenState extends State<WalletDetailsScreen> {
         onEditWallet: _onEditWallet,
       );
     } else {
-      content = const WalletBalanceWidget();
+      content = WalletAssetsWidget(
+        wallet: widget.wallet,
+      );
     }
     return Scaffold(
       appBar: AppBar(title: Text(widget.wallet.name)),

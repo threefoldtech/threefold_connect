@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'dart:math' as math;
 
 class ArrowInward extends StatelessWidget {
-  const ArrowInward({
-    Key? key,
-  }) : super(key: key);
+  const ArrowInward({super.key, required this.color, this.size = 24});
+  final Color color;
+  final double size;
 
   @override
   Widget build(BuildContext context) {
@@ -12,7 +12,8 @@ class ArrowInward extends StatelessWidget {
       angle: 180 * math.pi / 180,
       child: Icon(
         Icons.arrow_outward,
-        color: Theme.of(context).colorScheme.onPrimary,
+        color: color,
+        size: size,
       ),
     );
   }

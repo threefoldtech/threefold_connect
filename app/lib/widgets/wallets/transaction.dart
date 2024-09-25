@@ -33,7 +33,9 @@ class TransactionWidget extends StatelessWidget {
                   ? Theme.of(context).colorScheme.primary
                   : Theme.of(context).colorScheme.error,
               child: transaction.type == TransactionType.Receive
-                  ? const ArrowInward()
+                  ? ArrowInward(
+                      color: Theme.of(context).colorScheme.onPrimary,
+                    )
                   : Icon(
                       Icons.arrow_outward,
                       color: Theme.of(context).colorScheme.onError,
