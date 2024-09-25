@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:stellar_client/models/vesting_account.dart';
+import 'package:threebotlogin/helpers/globals.dart';
 import 'package:threebotlogin/models/wallet.dart';
-import 'package:threebotlogin/services/stellar_service.dart';
+import 'package:threebotlogin/services/stellar_service.dart' as Stellar;
+import 'package:threebotlogin/services/tfchain_service.dart' as TFChain;
 import 'package:threebotlogin/widgets/wallets/arrow_inward.dart';
 import 'package:threebotlogin/widgets/wallets/balance_tile.dart';
 
@@ -15,15 +17,44 @@ class WalletAssetsWidget extends StatefulWidget {
 
 class _WalletAssetsWidgetState extends State<WalletAssetsWidget> {
   List<VestingAccount>? vestedWallets = [];
+  bool tfchainBalaceLoading = true;
+  bool stellarBalaceLoading = true;
 
   _listVestedAccounts() async {
-    vestedWallets = await listVestedAccounts(widget.wallet.stellarSecret);
+    vestedWallets =
+        await Stellar.listVestedAccounts(widget.wallet.stellarSecret);
     setState(() {});
+  }
+
+  _loadTFChainBalance() async {
+    setState(() {
+      tfchainBalaceLoading = true;
+    });
+    final chainUrl = Globals().chainUrl;
+    widget.wallet.tfchainBalance =
+        (await TFChain.getBalance(chainUrl, widget.wallet.tfchainAddress))
+            .toString();
+    setState(() {
+      tfchainBalaceLoading = false;
+    });
+  }
+
+  _loadStellarBalance() async {
+    setState(() {
+      stellarBalaceLoading = true;
+    });
+    widget.wallet.stellarBalance =
+        (await Stellar.getBalance(widget.wallet.stellarSecret)).toString();
+    setState(() {
+      stellarBalaceLoading = false;
+    });
   }
 
   @override
   void initState() {
     _listVestedAccounts();
+    _loadTFChainBalance();
+    _loadStellarBalance();
     super.initState();
   }
 
@@ -32,6 +63,8 @@ class _WalletAssetsWidgetState extends State<WalletAssetsWidget> {
     List<Widget> vestWidgets = [];
     if (vestedWallets != null && vestedWallets!.isNotEmpty) {
       vestWidgets = [
+        const Divider(),
+        const SizedBox(height: 10),
         Text(
           'Vest',
           style: Theme.of(context).textTheme.headlineSmall!.copyWith(
@@ -41,9 +74,11 @@ class _WalletAssetsWidgetState extends State<WalletAssetsWidget> {
         const SizedBox(
           height: 20,
         ),
-        // Use the correct balance from the vest account
         WalletBalanceTileWidget(
-            name: 'Stellar', balance: vestedWallets![0].tft.toString()),
+          name: 'Stellar',
+          balance: vestedWallets![0].tft.toString(),
+          loading: false,
+        ),
       ];
     }
 
@@ -99,7 +134,8 @@ class _WalletAssetsWidgetState extends State<WalletAssetsWidget> {
               ],
             ),
           ),
-          // TODO: reload balance on mount
+          const Divider(),
+          const SizedBox(height: 10),
           Text(
             'Assets',
             style: Theme.of(context).textTheme.headlineSmall!.copyWith(
@@ -110,12 +146,18 @@ class _WalletAssetsWidgetState extends State<WalletAssetsWidget> {
             height: 20,
           ),
           WalletBalanceTileWidget(
-              name: 'Stellar', balance: widget.wallet.stellarBalance),
+            name: 'Stellar',
+            balance: widget.wallet.stellarBalance,
+            loading: stellarBalaceLoading,
+          ),
           const SizedBox(height: 10),
           WalletBalanceTileWidget(
-              name: 'TFChain', balance: widget.wallet.tfchainBalance),
+            name: 'TFChain',
+            balance: widget.wallet.tfchainBalance,
+            loading: tfchainBalaceLoading,
+          ),
           const SizedBox(
-            height: 30,
+            height: 20,
           ),
           ...vestWidgets
         ],

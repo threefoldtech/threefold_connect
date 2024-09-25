@@ -5,9 +5,11 @@ class WalletBalanceTileWidget extends StatelessWidget {
     super.key,
     required this.balance,
     required this.name,
+    required this.loading,
   });
   final String balance;
   final String name;
+  final bool loading;
 
   @override
   Widget build(BuildContext context) {
@@ -18,11 +20,14 @@ class WalletBalanceTileWidget extends StatelessWidget {
         ),
         borderRadius: BorderRadius.circular(5),
       ),
-      leading: Image.asset(
-        'assets/tft_icon.png',
-        fit: BoxFit.cover,
-        color: Theme.of(context).colorScheme.onBackground,
-        height: 50,
+      leading: SizedBox(
+        width: 25,
+        child: Image.asset(
+          'assets/tft_icon.png',
+          fit: BoxFit.cover,
+          color: Theme.of(context).colorScheme.onBackground,
+          height: 50,
+        ),
       ),
       title: Text(
         name,
@@ -30,12 +35,19 @@ class WalletBalanceTileWidget extends StatelessWidget {
               color: Theme.of(context).colorScheme.onSecondaryContainer,
             ),
       ),
-      trailing: Text(
-        '$balance TFT',
-        style: Theme.of(context).textTheme.bodyLarge!.copyWith(
-              color: Theme.of(context).colorScheme.onSecondaryContainer,
+      trailing: loading
+          ? const SizedBox(
+              width: 20,
+              height: 20,
+              child: CircularProgressIndicator(
+                strokeWidth: 2,
+              ))
+          : Text(
+              '$balance TFT',
+              style: Theme.of(context).textTheme.bodyLarge!.copyWith(
+                    color: Theme.of(context).colorScheme.onSecondaryContainer,
+                  ),
             ),
-      ),
     );
   }
 }

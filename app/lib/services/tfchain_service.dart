@@ -15,6 +15,7 @@ import 'package:http/http.dart' as http;
 Future<int?> getMyTwinId() async {
   final chainUrl = Globals().chainUrl;
   if (chainUrl == '') return null;
+  // TODO: make sure we are using the correct phrase or needs to use derived seed
   final phrase = await getPhrase();
   if (phrase != null) {
     return await compute((void _) async {
