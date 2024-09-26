@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:threebotlogin/models/wallet.dart';
+import 'package:threebotlogin/screens/qr_code_screen.dart';
 
 enum ChainType {
   Stellar,
@@ -148,7 +149,21 @@ class _WalletReceiveScreenState extends State<WalletReceiveScreen> {
               padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 10),
               child: ElevatedButton(
                 onPressed: () {
-                  //TODO: Show qr code
+                  //TODO: Validate inputs first
+                  final quaryParams = {'amount': amountController.text};
+                  if (chainType == ChainType.Stellar) {
+                    quaryParams['message'] = memoController.text;
+                  }
+                  final uri = Uri(
+                      scheme: 'TFT',
+                      path: toController.text,
+                      queryParameters: quaryParams);
+                  final codeMessage = uri.toString();
+                  showDialog(
+                    context: context,
+                    builder: (context) =>
+                        GenerateQRCodeScreen(message: codeMessage),
+                  );
                 },
                 style: ElevatedButton.styleFrom(),
                 child: SizedBox(
