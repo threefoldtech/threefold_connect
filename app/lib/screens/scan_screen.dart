@@ -52,7 +52,7 @@ class _ScanScreenState extends State<ScanScreen> {
           color: Colors.transparent,
           child: Container(
             decoration: BoxDecoration(
-                color: Theme.of(context).primaryColor,
+                color: Theme.of(context).colorScheme.primaryContainer,
                 borderRadius: const BorderRadius.only(
                     topLeft: Radius.circular(20.0),
                     topRight: Radius.circular(20.0))),
@@ -72,13 +72,13 @@ class _ScanScreenState extends State<ScanScreen> {
                   },
                   child: const Icon(Icons.arrow_back_ios),
                 ),
-                const Text(
+                Text(
                   'Scan QR',
                   textAlign: TextAlign.center,
-                  style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 21.0),
+                  style: Theme.of(context).textTheme.titleLarge!.copyWith(
+                        color: Theme.of(context).colorScheme.onPrimaryContainer,
+                        fontWeight: FontWeight.bold,
+                      ),
                 ),
                 const SizedBox(
                   width: 60.0,
@@ -88,12 +88,12 @@ class _ScanScreenState extends State<ScanScreen> {
           ),
         ),
         Container(
-          color: Theme.of(context).primaryColor,
+          color: Theme.of(context).colorScheme.primaryContainer,
           child: Container(
             color: Colors.transparent,
             child: Container(
               decoration: BoxDecoration(
-                  color: Theme.of(context).scaffoldBackgroundColor,
+                  color: Theme.of(context).colorScheme.secondaryContainer,
                   borderRadius: const BorderRadius.only(
                       topLeft: Radius.circular(20.0),
                       topRight: Radius.circular(20.0))),
@@ -107,7 +107,10 @@ class _ScanScreenState extends State<ScanScreen> {
                     child: Center(
                       child: Text(
                         helperText,
-                        style: const TextStyle(fontSize: 16.0),
+                        style: Theme.of(context).textTheme.bodyLarge!.copyWith(
+                            color: Theme.of(context)
+                                .colorScheme
+                                .onSecondaryContainer),
                       ),
                     ),
                   ),
