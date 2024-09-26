@@ -13,6 +13,11 @@ class _WebViewState extends State<WebView> {
   late WebViewController controller;
 
   @override
+  void dispose() {
+    super.dispose();
+  }
+
+  @override
   void initState() {
     super.initState();
     controller = WebViewController()

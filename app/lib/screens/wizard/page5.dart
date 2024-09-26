@@ -66,7 +66,6 @@ class _Page5State extends State<Page5> {
                         termsAgreement.attemptToContinue();
                       } else {
                         saveInitDone();
-                        Navigator.of(context).pop();
                         await Navigator.push(
                             context,
                             MaterialPageRoute(
