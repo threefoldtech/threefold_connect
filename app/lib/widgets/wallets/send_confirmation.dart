@@ -26,6 +26,7 @@ class _SendConfirmationWidgetState extends State<SendConfirmationWidget> {
   final toController = TextEditingController();
   final amountController = TextEditingController();
   final memoController = TextEditingController();
+  bool loading = false;
 
   @override
   void initState() {
@@ -110,12 +111,16 @@ class _SendConfirmationWidgetState extends State<SendConfirmationWidget> {
           const SizedBox(height: 30),
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 10),
-            child: ElevatedButton(
-              onPressed: () async {},
-              style: ElevatedButton.styleFrom(),
-              child: SizedBox(
-                width: double.infinity,
-                child: Text(
+            child: SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: _send,
+                child: loading? const SizedBox(
+                                width: 20,
+                                height: 20,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 3,
+                                )): Text(
                   'Confirm',
                   style: Theme.of(context).textTheme.titleLarge!.copyWith(
                       color: Theme.of(context).colorScheme.primary,
@@ -128,5 +133,15 @@ class _SendConfirmationWidgetState extends State<SendConfirmationWidget> {
         ]),
       ),
     );
+  }
+  _send() async {
+    setState(() {
+      loading = true;
+    });
+    await Future.delayed(Duration(seconds: 5));
+
+    setState(() {
+      loading = false;
+    });
   }
 }
