@@ -43,3 +43,13 @@ Future<List<VestingAccount>?> listVestedAccounts(String secret) async {
   final accounts = await client.getVestingAccounts();
   return accounts;
 }
+
+Future<void> transfer(String secret, String dest, String amount, String memo) async {
+  final client = Client(NetworkType.PUBLIC, secret);
+   await client.transferThroughThreefoldService(
+    destinationAddress: dest,
+    amount: amount,
+    currency: 'TFT',
+    memoText: memo,
+  );
+}
