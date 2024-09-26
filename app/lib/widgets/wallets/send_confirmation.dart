@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:threebotlogin/models/wallet.dart';
+import 'package:threebotlogin/services/stellar_service.dart' as Stellar;
+import 'package:threebotlogin/services/tfchain_service.dart' as TFChain;
+import 'package:threebotlogin/widgets/custom_dialog.dart';
 
 class SendConfirmationWidget extends StatefulWidget {
   const SendConfirmationWidget({
     super.key,
     required this.chainType,
+    required this.secret,
     required this.from,
     required this.to,
     required this.amount,
@@ -12,6 +16,7 @@ class SendConfirmationWidget extends StatefulWidget {
   });
 
   final ChainType chainType;
+  final String secret;
   final String from;
   final String to;
   final String amount;
@@ -115,18 +120,20 @@ class _SendConfirmationWidgetState extends State<SendConfirmationWidget> {
               width: double.infinity,
               child: ElevatedButton(
                 onPressed: _send,
-                child: loading? const SizedBox(
-                                width: 20,
-                                height: 20,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 3,
-                                )): Text(
-                  'Confirm',
-                  style: Theme.of(context).textTheme.titleLarge!.copyWith(
-                      color: Theme.of(context).colorScheme.primary,
-                      fontWeight: FontWeight.bold),
-                  textAlign: TextAlign.center,
-                ),
+                child: loading
+                    ? const SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 3,
+                        ))
+                    : Text(
+                        'Confirm',
+                        style: Theme.of(context).textTheme.titleLarge!.copyWith(
+                            color: Theme.of(context).colorScheme.primary,
+                            fontWeight: FontWeight.bold),
+                        textAlign: TextAlign.center,
+                      ),
               ),
             ),
           ),
@@ -134,14 +141,51 @@ class _SendConfirmationWidgetState extends State<SendConfirmationWidget> {
       ),
     );
   }
+
   _send() async {
     setState(() {
       loading = true;
     });
-    await Future.delayed(Duration(seconds: 5));
+    try {
+      if (widget.chainType == ChainType.Stellar) {
+        await Stellar.transfer(
+            widget.secret, widget.to, widget.amount, widget.memo);
+      } else {
+        await TFChain.transfer(widget.secret, widget.to, widget.amount);
+      }
+      await _showDialog(
+          'Success!', 'Tokens have been transfered successfully', Icons.check);
+    } catch (e) {
+      _showDialog(
+          'Error', 'Failed to transfer. Please try again.', Icons.error);
+      setState(() {
+      loading = false;
+      });
+      return;
+    }
 
     setState(() {
       loading = false;
     });
+    if (!context.mounted) return;
+    Navigator.pop(context);
+  }
+
+  Future<void> _showDialog(String title, String message, IconData icon) async {
+    showDialog(
+      barrierDismissible: false,
+      context: context,
+      builder: (BuildContext context) => CustomDialog(
+        image: icon,
+        title: title,
+        description: message,
+      ),
+    );
+    await Future.delayed(
+      const Duration(seconds: 3),
+      () {
+        Navigator.pop(context);
+      },
+    );
   }
 }

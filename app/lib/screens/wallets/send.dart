@@ -249,6 +249,9 @@ class _WalletSendScreenState extends State<WalletSendScreen> {
         context: context,
         builder: (ctx) => SendConfirmationWidget(
               chainType: chainType,
+              secret: chainType == ChainType.Stellar
+                  ? widget.wallet.stellarSecret
+                  : widget.wallet.tfchainSecret,
               from: fromController.text,
               to: toController.text,
               amount: amountController.text,

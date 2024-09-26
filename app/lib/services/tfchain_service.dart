@@ -138,7 +138,7 @@ Future<Farm?> createFarm(
   }
 }
 
-transfer(String secret, String dest, String amount) async {
+Future<void> transfer(String secret, String dest, String amount) async {
   final chainUrl = Globals().chainUrl;
   final client = TFChain.Client(chainUrl, secret, 'sr25519');
   client.connect();
