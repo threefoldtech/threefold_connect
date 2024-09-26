@@ -59,6 +59,8 @@ dependencies:
   pinenacl: ^0.5.1
   pinput: 3.0.1
   build_runner: ^2.4.9
+  qr_flutter: ^4.1.0
+  screen_brightness: ^1.0.1
 
 dev_dependencies:
   flutter_test:
