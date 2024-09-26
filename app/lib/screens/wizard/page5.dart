@@ -4,6 +4,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
 import 'package:threebotlogin/screens/unregistered_screen.dart';
 import 'package:threebotlogin/screens/wizard/web_view.dart';
+import 'package:threebotlogin/services/shared_preference_service.dart';
 import 'package:threebotlogin/widgets/wizard/terms_agreement.dart';
 
 class Page5 extends StatefulWidget {
@@ -64,6 +65,7 @@ class _Page5State extends State<Page5> {
                       if (!termsAgreement.isChecked) {
                         termsAgreement.attemptToContinue();
                       } else {
+                        saveInitDone();
                         Navigator.of(context).pop();
                         await Navigator.push(
                             context,
@@ -105,19 +107,17 @@ class _Page5State extends State<Page5> {
                           TextSpan(
                             text: "I agree to Threefold's ",
                             style: TextStyle(
-                              color: termsAgreement.attemptedWithoutAccepting &&
-                                      !termsAgreement.isChecked
-                                  ? Colors.red
-                                  : Theme.of(context).colorScheme.onBackground,
-                            ),
+                                color: termsAgreement.attemptedWithoutAccepting && !termsAgreement.isChecked
+                      ? Colors.red
+                      : Theme.of(context).colorScheme.onBackground,
+                                    ),
                           ),
                           TextSpan(
                             text: 'Terms and conditions.',
-                            style: TextStyle(
-                              color: termsAgreement.attemptedWithoutAccepting &&
-                                      !termsAgreement.isChecked
-                                  ? Colors.red
-                                  : Theme.of(context).colorScheme.onBackground,
+                            style:  TextStyle(
+                              color: termsAgreement.attemptedWithoutAccepting && !termsAgreement.isChecked
+                      ? Colors.red
+                      : Theme.of(context).colorScheme.onBackground,
                               decoration: TextDecoration.underline,
                             ),
                             recognizer: TapGestureRecognizer()
