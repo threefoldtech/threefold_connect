@@ -1,5 +1,6 @@
 enum WalletType { Native, Imported }
-enum ChainType {Stellar, TFChain }
+
+enum ChainType { Stellar, TFChain }
 
 class Wallet {
   Wallet({
@@ -43,12 +44,7 @@ class PkidWallet {
             json['type'] == 'NATIVE' ? WalletType.Native : WalletType.Imported);
   }
   toMap() {
-    return {
-      'name': name,
-      'index': index,
-      'seed': seed,
-      'type': type.toString()
-    };
+    return {'name': name, 'index': index, 'seed': seed, 'type': type.name};
   }
 }
 
