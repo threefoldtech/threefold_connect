@@ -3,11 +3,15 @@ import 'package:flutter/services.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
 import 'package:threebotlogin/models/wallet.dart';
 import 'package:threebotlogin/screens/scan_screen.dart';
+import 'package:threebotlogin/screens/wallets/contatcs.dart';
 import 'package:threebotlogin/widgets/wallets/send_confirmation.dart';
 
 class WalletSendScreen extends StatefulWidget {
-  const WalletSendScreen({super.key, required this.wallet});
+  const WalletSendScreen(
+      {super.key, required this.wallet, required this.allWallets});
   final Wallet wallet;
+  final List<Wallet> allWallets;
+
   @override
   State<WalletSendScreen> createState() => _WalletSendScreenState();
 }
@@ -33,6 +37,11 @@ class _WalletSendScreenState extends State<WalletSendScreen> {
     amountController.dispose();
     memoController.dispose();
     super.dispose();
+  }
+
+  void _selectToAddress(String address) {
+    toController.text = address;
+    setState(() {});
   }
 
   @override
@@ -154,9 +163,17 @@ class _WalletSendScreenState extends State<WalletSendScreen> {
                         color: Theme.of(context).colorScheme.onBackground,
                       ),
                   controller: toController,
-                  decoration: const InputDecoration(
-                    labelText: 'To',
-                  )),
+                  decoration: InputDecoration(
+                      labelText: 'To',
+                      suffixIcon: IconButton(
+                          onPressed: () {
+                            Navigator.of(context).push(MaterialPageRoute(
+                              builder: (context) => ContractsScreen(
+                                  wallets: widget.allWallets,
+                                  onSelectToAddress: _selectToAddress),
+                            ));
+                          },
+                          icon: const Icon(Icons.person)))),
             ),
             const SizedBox(height: 10),
             ListTile(

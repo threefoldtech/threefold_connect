@@ -64,6 +64,7 @@ class _WalletScreenState extends State<WalletScreen> {
           for (final wallet in wallets)
             WalletCardWidget(
               wallet: wallet,
+              allWallets: wallets,
               onDeleteWallet: onDeleteWallet,
               onEditWallet: onEditWallet,
             )

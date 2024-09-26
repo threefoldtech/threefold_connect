@@ -8,9 +8,11 @@ class WalletDetailsScreen extends StatefulWidget {
   const WalletDetailsScreen(
       {super.key,
       required this.wallet,
+      required this.allWallets,
       required this.onDeleteWallet,
       required this.onEditWallet});
   final Wallet wallet;
+  final List<Wallet> allWallets;
   final void Function(String name) onDeleteWallet;
   final void Function(String oldName, String newName) onEditWallet;
 
@@ -48,6 +50,7 @@ class _WalletDetailsScreenState extends State<WalletDetailsScreen> {
       );
     } else {
       content = WalletAssetsWidget(
+        allWallets: widget.allWallets,
         wallet: widget.wallet,
       );
     }

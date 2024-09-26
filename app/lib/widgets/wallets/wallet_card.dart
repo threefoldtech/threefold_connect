@@ -6,9 +6,11 @@ class WalletCardWidget extends StatelessWidget {
   const WalletCardWidget(
       {super.key,
       required this.wallet,
+      required this.allWallets,
       required this.onDeleteWallet,
       required this.onEditWallet});
   final Wallet wallet;
+  final List<Wallet> allWallets;
   final void Function(String name) onDeleteWallet;
   final void Function(String oldName, String newName) onEditWallet;
 
@@ -20,6 +22,7 @@ class WalletCardWidget extends StatelessWidget {
           Navigator.of(context).push(MaterialPageRoute(
             builder: (context) => WalletDetailsScreen(
               wallet: wallet,
+              allWallets: allWallets,
               onDeleteWallet: onDeleteWallet,
               onEditWallet: onEditWallet,
             ),
