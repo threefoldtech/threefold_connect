@@ -170,6 +170,8 @@ class _WalletSendScreenState extends State<WalletSendScreen> {
                       labelText:
                           'Amount (Balance: ${chainType == ChainType.Stellar ? widget.wallet.stellarBalance : widget.wallet.tfchainBalance})',
                       hintText: '100')),
+              subtitle: Text(
+                  'Max Fee: ${chainType == ChainType.Stellar ? 0.1 : 0.01} TFT'),
             ),
             const SizedBox(height: 10),
             if (chainType == ChainType.Stellar)
