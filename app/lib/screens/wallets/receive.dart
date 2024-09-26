@@ -130,7 +130,7 @@ class _WalletReceiveScreenState extends State<WalletReceiveScreen> {
                   keyboardType: TextInputType.number,
                   controller: amountController,
                   decoration: const InputDecoration(
-                      labelText: 'Amount', hintText: '100')),
+                      suffixText: 'TFT', labelText: 'Amount', hintText: '100')),
             ),
             const SizedBox(height: 10),
             if (chainType == ChainType.Stellar)

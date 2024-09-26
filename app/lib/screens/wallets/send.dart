@@ -173,7 +173,8 @@ class _WalletSendScreenState extends State<WalletSendScreen> {
                   decoration: InputDecoration(
                       labelText:
                           'Amount (Balance: ${chainType == ChainType.Stellar ? widget.wallet.stellarBalance : widget.wallet.tfchainBalance})',
-                      hintText: '100')),
+                      hintText: '100',
+                      suffixText: 'TFT')),
               subtitle: Text(
                   'Max Fee: ${chainType == ChainType.Stellar ? 0.1 : 0.01} TFT'),
             ),
