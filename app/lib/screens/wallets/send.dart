@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:qr_code_scanner/qr_code_scanner.dart';
 import 'package:threebotlogin/models/wallet.dart';
+import 'package:threebotlogin/screens/scan_screen.dart';
 
 enum ChainType {
   Stellar,
@@ -19,6 +22,7 @@ class _WalletSendScreenState extends State<WalletSendScreen> {
   final amountController = TextEditingController();
   final memoController = TextEditingController();
   ChainType chainType = ChainType.Stellar;
+  // TODO: Add validation on all fields
 
   @override
   void initState() {
@@ -113,7 +117,7 @@ class _WalletSendScreenState extends State<WalletSendScreen> {
               padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 10),
               child: TextButton(
                 onPressed: () {
-                  //TODO: Scan qr code
+                  scanQrCode();
                 },
                 style: TextButton.styleFrom(
                   shape: RoundedRectangleBorder(
@@ -209,5 +213,33 @@ class _WalletSendScreenState extends State<WalletSendScreen> {
         ),
       ),
     );
+  }
+
+  scanQrCode() async {
+    await SystemChannels.textInput.invokeMethod('TextInput.hide');
+    // QRCode scanner is black if we don't sleep here.
+    bool slept =
+        await Future.delayed(const Duration(milliseconds: 400), () => true);
+    late Barcode result;
+    if (slept) {
+      if (context.mounted) {
+        result = await Navigator.push(context,
+            MaterialPageRoute(builder: (context) => const ScanScreen()));
+      }
+    }
+    if (result.code != null) {
+      final code = Uri.parse(result.code!);
+      toController.text = code.path;
+      if (code.queryParameters.containsKey('amount')) {
+        amountController.text = code.queryParameters['amount']!;
+      }
+      if (chainType == ChainType.Stellar &&
+          code.queryParameters.containsKey('message')) {
+        memoController.text = code.queryParameters['message']!;
+      }
+      setState(() {});
+    }
+
+    return result.code;
   }
 }
