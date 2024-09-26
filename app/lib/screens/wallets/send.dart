@@ -3,11 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
 import 'package:threebotlogin/models/wallet.dart';
 import 'package:threebotlogin/screens/scan_screen.dart';
-
-enum ChainType {
-  Stellar,
-  TFChain,
-}
+import 'package:threebotlogin/widgets/wallets/send_confirmation.dart';
 
 class WalletSendScreen extends StatefulWidget {
   const WalletSendScreen({super.key, required this.wallet});
@@ -194,8 +190,9 @@ class _WalletSendScreenState extends State<WalletSendScreen> {
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 10),
               child: ElevatedButton(
-                onPressed: () {
-                  //TODO: Show confirmation page
+                onPressed: () async {
+                  // TODO: Trigger validation here
+                  await _send_confirmation();
                 },
                 style: ElevatedButton.styleFrom(),
                 child: SizedBox(
@@ -242,5 +239,20 @@ class _WalletSendScreenState extends State<WalletSendScreen> {
     }
 
     return result.code;
+  }
+
+  _send_confirmation() async {
+    showModalBottomSheet(
+        isScrollControlled: true,
+        useSafeArea: true,
+        constraints: const BoxConstraints(maxWidth: double.infinity),
+        context: context,
+        builder: (ctx) => SendConfirmationWidget(
+              chainType: chainType,
+              from: fromController.text,
+              to: toController.text,
+              amount: amountController.text,
+              memo: memoController.text,
+            ));
   }
 }

@@ -1,4 +1,5 @@
 enum WalletType { Native, Imported }
+enum ChainType {Stellar, TFChain }
 
 class Wallet {
   Wallet({

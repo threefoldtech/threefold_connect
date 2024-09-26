@@ -2,10 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:threebotlogin/models/wallet.dart';
 import 'package:threebotlogin/screens/qr_code_screen.dart';
 
-enum ChainType {
-  Stellar,
-  TFChain,
-}
 
 class WalletReceiveScreen extends StatefulWidget {
   const WalletReceiveScreen({super.key, required this.wallet});
