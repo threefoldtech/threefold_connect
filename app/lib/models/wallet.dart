@@ -1,4 +1,4 @@
-enum WalletType { Native, Imported }
+enum WalletType { NATIVE, IMPORTED }
 
 enum ChainType { Stellar, TFChain }
 
@@ -33,7 +33,7 @@ class PkidWallet {
   String name;
   final int index;
   final String seed;
-  final WalletType type;
+   WalletType type;
 
   factory PkidWallet.fromJson(Map<String, dynamic> json) {
     return PkidWallet(
@@ -41,7 +41,7 @@ class PkidWallet {
         name: json['name'],
         seed: json['seed'],
         type:
-            json['type'] == 'NATIVE' ? WalletType.Native : WalletType.Imported);
+            json['type'] == 'NATIVE' ? WalletType.NATIVE : WalletType.IMPORTED);
   }
   toMap() {
     return {'name': name, 'index': index, 'seed': seed, 'type': type.name};

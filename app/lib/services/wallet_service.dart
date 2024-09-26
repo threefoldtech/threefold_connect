@@ -112,7 +112,7 @@ Future<void> addWallet(String walletName, String walletSecret) async {
       name: walletName,
       index: -1,
       seed: walletSecret,
-      type: WalletType.Imported));
+      type: WalletType.IMPORTED));
 
   await _saveWalletsToPkid(wallets);
 }

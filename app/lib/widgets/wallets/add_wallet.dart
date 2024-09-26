@@ -195,7 +195,7 @@ Future<Wallet> loadAddedWallet(String walletName, String walletSecret) async {
   final chainUrl = Globals().chainUrl;
   final Wallet wallet = await compute((void _) async {
     final wallet = await loadWallet(
-        walletName, walletSecret, WalletType.Imported, chainUrl);
+        walletName, walletSecret, WalletType.IMPORTED, chainUrl);
     return wallet;
   }, null);
   return wallet;

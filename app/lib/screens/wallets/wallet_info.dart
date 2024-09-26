@@ -216,7 +216,7 @@ class _WalletDetailsWidgetState extends State<WalletDetailsWidget> {
                   icon: edit ? const Icon(Icons.save) : const Icon(Icons.edit)),
             ),
             const SizedBox(height: 40),
-            if (widget.wallet.type == WalletType.Imported)
+            if (widget.wallet.type == WalletType.IMPORTED)
               Center(
                 child: SizedBox(
                   width: MediaQuery.of(context).size.width - 40,
