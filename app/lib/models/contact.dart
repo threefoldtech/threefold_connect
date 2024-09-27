@@ -7,7 +7,7 @@ class PkidContact {
     required this.type,
   });
   String name;
-  final String address;
+  String address;
   final ChainType type;
 
   factory PkidContact.fromJson(Map<String, dynamic> json) {
