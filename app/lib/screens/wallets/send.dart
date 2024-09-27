@@ -3,7 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
 import 'package:threebotlogin/models/wallet.dart';
 import 'package:threebotlogin/screens/scan_screen.dart';
-import 'package:threebotlogin/screens/wallets/contatcs.dart';
+import 'package:threebotlogin/screens/wallets/contacts.dart';
 import 'package:threebotlogin/widgets/wallets/send_confirmation.dart';
 
 class WalletSendScreen extends StatefulWidget {

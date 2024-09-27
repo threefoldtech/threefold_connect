@@ -18,6 +18,6 @@ class PkidContact {
             json['type'] == 'stellar' ? ChainType.Stellar : ChainType.TFChain);
   }
   toMap() {
-    return {'name': name, 'address': address, 'type': type.name};
+    return {'name': name, 'address': address, 'type': type.name.toLowerCase()};
   }
 }

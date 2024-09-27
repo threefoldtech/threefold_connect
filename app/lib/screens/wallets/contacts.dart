@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:threebotlogin/models/contact.dart';
 import 'package:threebotlogin/models/wallet.dart';
 import 'package:threebotlogin/services/contact_service.dart';
+import 'package:threebotlogin/widgets/wallets/add_contact.dart';
 import 'package:threebotlogin/widgets/wallets/contacts_widget.dart';
 
 class ContractsScreen extends StatefulWidget {
@@ -40,24 +41,51 @@ class _ContractsScreenState extends State<ContractsScreen> {
     }
   }
 
-  _loadOtherContacts() async {
+  _loadFavouriteContacts() async {
     myPkidContacts = await getPkidContacts();
     myPkidContacts =
         myPkidContacts.where((c) => c.type == widget.chainType).toList();
     setState(() {});
   }
 
+  _onAddContact(PkidContact contact) async {
+    myPkidContacts.add(contact);
+    setState(() {});
+  }
+
+  _openAddContactOverlay() {
+    showModalBottomSheet(
+        isScrollControlled: true,
+        useSafeArea: true,
+        constraints: const BoxConstraints(maxWidth: double.infinity),
+        context: context,
+        builder: (ctx) => NewContact(
+              onAddContact: _onAddContact,
+              chainType: widget.chainType,
+              contacts: [...myPkidContacts, ...myWalletContacts],
+            ));
+  }
+
   @override
   void initState() {
     _loadMyWalletContacts();
-    _loadOtherContacts();
+    _loadFavouriteContacts();
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(title: const Text('Contacts')),
+        appBar: AppBar(
+          title: const Text('Contacts'),
+          actions: DefaultTabController.of(context).index == 1
+              ? []
+              : [
+                  IconButton(
+                      onPressed: _openAddContactOverlay,
+                      icon: const Icon(Icons.add))
+                ],
+        ),
         body: DefaultTabController(
           length: 2,
           child: Column(
@@ -74,7 +102,7 @@ class _ContractsScreenState extends State<ContractsScreen> {
                     dividerColor: Theme.of(context).scaffoldBackgroundColor,
                     tabs: const [
                       Tab(text: 'My Wallets'),
-                      Tab(text: 'Others'),
+                      Tab(text: 'Favourite'),
                     ],
                   ),
                 ),
