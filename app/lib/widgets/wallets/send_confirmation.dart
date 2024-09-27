@@ -154,10 +154,10 @@ class _SendConfirmationWidgetState extends State<SendConfirmationWidget> {
         await TFChain.transfer(widget.secret, widget.to, widget.amount);
       }
       await _showDialog(
-          'Success!', 'Tokens have been transfered successfully', Icons.check);
+          'Success!', 'Tokens have been transfered successfully', Icons.check, DialogType.Info);
     } catch (e) {
       _showDialog(
-          'Error', 'Failed to transfer. Please try again.', Icons.error);
+          'Error', 'Failed to transfer. Please try again.', Icons.error, DialogType.Error);
       setState(() {
       loading = false;
       });
@@ -171,11 +171,12 @@ class _SendConfirmationWidgetState extends State<SendConfirmationWidget> {
     Navigator.pop(context);
   }
 
-  Future<void> _showDialog(String title, String message, IconData icon) async {
+  Future<void> _showDialog(String title, String message, IconData icon, DialogType type) async {
     showDialog(
       barrierDismissible: false,
       context: context,
       builder: (BuildContext context) => CustomDialog(
+        type: type,
         image: icon,
         title: title,
         description: message,

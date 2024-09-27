@@ -20,11 +20,12 @@ class _NewFarmState extends State<NewFarm> {
   Map<String, String> _selectedWallet = {};
   bool saveLoading = false;
   String? nameError;
-  Future<void> _showDialog(String title, String message, IconData icon) async {
+  Future<void> _showDialog(String title, String message, IconData icon, DialogType type) async {
     showDialog(
       barrierDismissible: false,
       context: context,
       builder: (BuildContext context) => CustomDialog(
+        type: type,
         image: icon,
         title: title,
         description: message,
@@ -72,11 +73,11 @@ class _NewFarmState extends State<NewFarm> {
           farmId: f.id,
           nodes: []);
       await _showDialog('Farm Created!',
-          'Farm $farmName has been added successfully', Icons.check);
+          'Farm $farmName has been added successfully', Icons.check, DialogType.Info);
     } catch (e) {
       print(e);
       _showDialog(
-          'Error', 'Failed to create farm. Please try again.', Icons.error);
+          'Error', 'Failed to create farm. Please try again.', Icons.error, DialogType.Error);
       saveLoading = false;
       setState(() {});
       return;

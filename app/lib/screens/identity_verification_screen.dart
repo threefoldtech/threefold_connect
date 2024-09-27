@@ -333,7 +333,8 @@ class _IdentityVerificationScreenState
       context: context,
       barrierDismissible: false,
       builder: (BuildContext customContext) => CustomDialog(
-        image: Icons.info,
+        type: DialogType.Warning,
+        image: Icons.warning,
         title: 'Are you sure',
         description: 'Are you sure you want to exit the verification process',
         actions: <Widget>[
@@ -407,6 +408,7 @@ class _IdentityVerificationScreenState
             context: context,
             barrierDismissible: false,
             builder: (BuildContext dialogContext) => CustomDialog(
+              type: DialogType.Error,
               image: Icons.close,
               title: 'Request canceled',
               description: 'Verification process has been canceled.',
@@ -426,6 +428,7 @@ class _IdentityVerificationScreenState
             context: context,
             barrierDismissible: false,
             builder: (BuildContext dialogContext) => CustomDialog(
+              type: DialogType.Error,
               image: Icons.close,
               title: 'Request canceled',
               description:
@@ -986,6 +989,7 @@ class _IdentityVerificationScreenState
         return showDialog(
             context: context,
             builder: (BuildContext context) => CustomDialog(
+                  type: DialogType.Warning,
                   image: Icons.warning,
                   title: 'Maximum requests Reached',
                   description:
@@ -1009,7 +1013,8 @@ class _IdentityVerificationScreenState
         return showDialog(
             context: context,
             builder: (BuildContext context) => CustomDialog(
-                  image: Icons.warning,
+                  type: DialogType.Error,
+                  image: Icons.error,
                   title: "Couldn't setup verification process",
                   description:
                       'Something went wrong. Please contact support if this issue persists.',
@@ -1053,7 +1058,8 @@ class _IdentityVerificationScreenState
       return showDialog(
         context: context,
         builder: (BuildContext context) => CustomDialog(
-          image: Icons.warning,
+          type: DialogType.Error,
+          image: Icons.error,
           title: 'Failed to setup process',
           description:
               'Something went wrong. \n If this issue persist, please contact support',

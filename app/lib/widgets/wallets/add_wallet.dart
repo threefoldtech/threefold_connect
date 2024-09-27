@@ -28,11 +28,12 @@ class _NewWalletState extends State<NewWallet> {
   bool saveLoading = false;
   String? nameError;
   String? secretError;
-  Future<void> _showDialog(String title, String message, IconData icon) async {
+  Future<void> _showDialog(String title, String message, IconData icon, DialogType type) async {
     showDialog(
       barrierDismissible: false,
       context: context,
       builder: (BuildContext context) => CustomDialog(
+        type: type,
         image: icon,
         title: title,
         description: message,
@@ -91,7 +92,7 @@ class _NewWalletState extends State<NewWallet> {
     } catch (e) {
       print(e);
       _showDialog(
-          'Error', 'Failed to load wallet. Please try again.', Icons.error);
+          'Error', 'Failed to load wallet. Please try again.', Icons.error, DialogType.Error);
       saveLoading = false;
       setState(() {});
       return;
@@ -99,11 +100,11 @@ class _NewWalletState extends State<NewWallet> {
     try {
       await addWallet(walletName, walletSecret);
       await _showDialog('Wallet Added!',
-          'Wallet $walletName has been added successfully', Icons.check);
+          'Wallet $walletName has been added successfully', Icons.check, DialogType.Info);
     } catch (e) {
       print(e);
       _showDialog(
-          'Error', 'Failed to save wallet. Please try again.', Icons.error);
+          'Error', 'Failed to save wallet. Please try again.', Icons.error, DialogType.Error);
       saveLoading = false;
       setState(() {});
       return;
