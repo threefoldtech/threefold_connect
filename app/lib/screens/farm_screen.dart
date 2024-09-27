@@ -79,7 +79,7 @@ class _FarmScreenState extends State<FarmScreen> {
           children: [for (final farm in farms) FarmItemWidget(farm: farm)]);
     }
     return LayoutDrawer(
-      titleText: 'Farms',
+      titleText: 'Farming',
       content: mainWidget,
       appBarActions: loading
           ? []

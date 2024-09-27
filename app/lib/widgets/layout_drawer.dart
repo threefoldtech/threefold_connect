@@ -202,7 +202,7 @@ class _LayoutDrawerState extends State<LayoutDrawer> {
             BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
             BottomNavigationBarItem(
                 icon: Icon(Icons.account_balance_wallet), label: 'Wallet'),
-            BottomNavigationBarItem(icon: Icon(Icons.storage), label: 'Farms'),
+            BottomNavigationBarItem(icon: Icon(Icons.storage), label: 'Farming'),
             BottomNavigationBarItem(
                 icon: Icon(Icons.settings), label: 'Settings'),
           ],
