@@ -110,10 +110,10 @@ class _WalletAssetsWidgetState extends State<WalletAssetsWidget> {
                       },
                       child: CircleAvatar(
                         radius: 30,
-                        backgroundColor: Theme.of(context).colorScheme.error,
+                        backgroundColor: Theme.of(context).colorScheme.primaryContainer,
                         child: Icon(
                           Icons.arrow_outward_outlined,
-                          color: Theme.of(context).colorScheme.onError,
+                          color: Theme.of(context).colorScheme.onPrimaryContainer,
                           size: 30,
                         ),
                       ),
@@ -121,10 +121,8 @@ class _WalletAssetsWidgetState extends State<WalletAssetsWidget> {
                     const SizedBox(height: 10),
                     Text(
                       'Send',
-                      style: Theme.of(context)
-                          .textTheme
-                          .titleLarge!
-                          .copyWith(color: Theme.of(context).colorScheme.error),
+                      style: Theme.of(context).textTheme.titleLarge!.copyWith(
+                          color: Theme.of(context).colorScheme.primary),
                     ),
                   ],
                 ),
@@ -141,9 +139,9 @@ class _WalletAssetsWidgetState extends State<WalletAssetsWidget> {
                       child: CircleAvatar(
                           radius: 30,
                           backgroundColor:
-                              Theme.of(context).colorScheme.primary,
+                              Theme.of(context).colorScheme.primaryContainer,
                           child: ArrowInward(
-                            color: Theme.of(context).colorScheme.onPrimary,
+                            color: Theme.of(context).colorScheme.onPrimaryContainer,
                             size: 30,
                           )),
                     ),
