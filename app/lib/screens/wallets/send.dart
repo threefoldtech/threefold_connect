@@ -169,6 +169,8 @@ class _WalletSendScreenState extends State<WalletSendScreen> {
                           onPressed: () {
                             Navigator.of(context).push(MaterialPageRoute(
                               builder: (context) => ContractsScreen(
+                                  chainType: chainType,
+                                  currentWalletAddress: fromController.text,
                                   wallets: widget.allWallets,
                                   onSelectToAddress: _selectToAddress),
                             ));
