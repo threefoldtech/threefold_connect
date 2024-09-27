@@ -43,6 +43,12 @@ class WalletCardWidget extends StatelessWidget {
               // TODO: hide the balance if there is no account for this wallet
               Row(
                 children: [
+                  SizedBox(
+                      width: 35,
+                      child: Image.asset(
+                        'assets/tft_icon.png',
+                        color: Theme.of(context).colorScheme.onBackground,
+                      )),
                   Text(
                     'Stellar',
                     style: Theme.of(context).textTheme.bodyLarge!.copyWith(
@@ -64,6 +70,13 @@ class WalletCardWidget extends StatelessWidget {
               ),
               Row(
                 children: [
+                  SizedBox(
+                      width: 35,
+                      child: Image.asset(
+                        'assets/tft_icon.png',
+                        fit: BoxFit.contain,
+                        color: Theme.of(context).colorScheme.onBackground,
+                      )),
                   Text(
                     'TFChain',
                     style: Theme.of(context).textTheme.bodyLarge!.copyWith(
