@@ -7,9 +7,11 @@ class ContactsWidget extends StatelessWidget {
     super.key,
     required this.contacts,
     required this.onSelectToAddress,
+    this.canEditAndDelete = false,
   });
   final List<PkidContact> contacts;
   final void Function(String address) onSelectToAddress;
+  final bool canEditAndDelete;
 
   @override
   Widget build(BuildContext context) {
@@ -23,6 +25,7 @@ class ContactsWidget extends StatelessWidget {
             child: ContactCardWidget(
               name: contact.name,
               address: contact.address,
+              canEditAndDelete: canEditAndDelete,
             )),
     ]);
   }

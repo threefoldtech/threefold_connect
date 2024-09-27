@@ -111,8 +111,10 @@ class _ContractsScreenState extends State<ContractsScreen> {
                         contacts: myWalletContacts,
                         onSelectToAddress: widget.onSelectToAddress),
                     ContactsWidget(
-                        contacts: myPkidContacts,
-                        onSelectToAddress: widget.onSelectToAddress),
+                      contacts: myPkidContacts,
+                      onSelectToAddress: widget.onSelectToAddress,
+                      canEditAndDelete: true,
+                    ),
                   ],
                 ),
               ),
