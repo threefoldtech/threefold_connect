@@ -31,6 +31,10 @@ Future<List<PkidWallet>> _getPkidWallets() async {
           ? jsonDecode(pKidResult['data'])
           : {};
 
+  if (pKidResult.containsKey('success') && result.isEmpty) {
+    return [];
+  }
+
   Map<int, dynamic> dataMap = result.asMap();
   final pkidWallets =
       dataMap.values.map((e) => PkidWallet.fromJson(e)).toList();

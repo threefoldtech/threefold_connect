@@ -78,13 +78,10 @@ class _ContractsScreenState extends State<ContractsScreen> {
     return Scaffold(
         appBar: AppBar(
           title: const Text('Contacts'),
-          actions: DefaultTabController.of(context).index == 1
-              ? []
-              : [
-                  IconButton(
-                      onPressed: _openAddContactOverlay,
-                      icon: const Icon(Icons.add))
-                ],
+          actions: [
+            IconButton(
+                onPressed: _openAddContactOverlay, icon: const Icon(Icons.add))
+          ],
         ),
         body: DefaultTabController(
           length: 2,

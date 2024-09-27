@@ -24,7 +24,9 @@ Future<List<PkidContact>> getPkidContacts() async {
       pKidResult.containsKey('data') && pKidResult.containsKey('success')
           ? jsonDecode(pKidResult['data'])
           : {};
-
+  if (pKidResult.containsKey('success') && result.isEmpty) {
+    return [];
+  }
   Map<int, dynamic> dataMap = result.asMap();
   final pkidWallets =
       dataMap.values.map((e) => PkidContact.fromJson(e)).toList();
