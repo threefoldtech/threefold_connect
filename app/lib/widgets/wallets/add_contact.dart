@@ -123,6 +123,12 @@ class _NewContactState extends State<NewContact> {
             padding: EdgeInsets.fromLTRB(16, 16, 16, keyboardSpace + 16),
             child: Column(
               children: [
+                Text(
+                  'Add Contact',
+                  style: Theme.of(context).textTheme.headlineSmall!.copyWith(
+                        color: Theme.of(context).colorScheme.onBackground,
+                      ),
+                ),
                 TextField(
                   style: Theme.of(context).textTheme.bodyMedium!.copyWith(
                       color: Theme.of(context).colorScheme.onBackground,

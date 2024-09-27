@@ -20,7 +20,8 @@ class _NewFarmState extends State<NewFarm> {
   Map<String, String> _selectedWallet = {};
   bool saveLoading = false;
   String? nameError;
-  Future<void> _showDialog(String title, String message, IconData icon, DialogType type) async {
+  Future<void> _showDialog(
+      String title, String message, IconData icon, DialogType type) async {
     showDialog(
       barrierDismissible: false,
       context: context,
@@ -72,12 +73,15 @@ class _NewFarmState extends State<NewFarm> {
           twinId: f!.twinId,
           farmId: f.id,
           nodes: []);
-      await _showDialog('Farm Created!',
-          'Farm $farmName has been added successfully', Icons.check, DialogType.Info);
+      await _showDialog(
+          'Farm Created!',
+          'Farm $farmName has been added successfully',
+          Icons.check,
+          DialogType.Info);
     } catch (e) {
       print(e);
-      _showDialog(
-          'Error', 'Failed to create farm. Please try again.', Icons.error, DialogType.Error);
+      _showDialog('Error', 'Failed to create farm. Please try again.',
+          Icons.error, DialogType.Error);
       saveLoading = false;
       setState(() {});
       return;
@@ -118,6 +122,12 @@ class _NewFarmState extends State<NewFarm> {
             padding: EdgeInsets.fromLTRB(16, 16, 16, keyboardSpace + 16),
             child: Column(
               children: [
+                Text(
+                  'Create Farm',
+                  style: Theme.of(context).textTheme.headlineSmall!.copyWith(
+                        color: Theme.of(context).colorScheme.onBackground,
+                      ),
+                ),
                 TextField(
                   style: Theme.of(context).textTheme.bodyMedium!.copyWith(
                       color: Theme.of(context).colorScheme.onBackground,
