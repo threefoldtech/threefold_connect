@@ -16,7 +16,7 @@ Future<FlutterPkid> _getPkidClient() async {
   return client;
 }
 
-Future<List<PkidContact>> _getPkidContacts() async {
+Future<List<PkidContact>> getPkidContacts() async {
   FlutterPkid client = await _getPkidClient();
   final pKidResult = await client.getPKidDoc('contacts');
   final result =

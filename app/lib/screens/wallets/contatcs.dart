@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:threebotlogin/models/contact.dart';
 import 'package:threebotlogin/models/wallet.dart';
-import 'package:threebotlogin/widgets/wallets/contact_card.dart';
+import 'package:threebotlogin/services/contact_service.dart';
+import 'package:threebotlogin/widgets/wallets/contacts_widget.dart';
 
 class ContractsScreen extends StatefulWidget {
   const ContractsScreen(
@@ -20,36 +22,77 @@ class ContractsScreen extends StatefulWidget {
 }
 
 class _ContractsScreenState extends State<ContractsScreen> {
+  List<PkidContact> myWalletContacts = [];
+  List<PkidContact> myPkidContacts = [];
+
+  _loadMyWalletContacts() {
+    for (final w in widget.wallets) {
+      if (widget.chainType == ChainType.Stellar &&
+          w.stellarAddress != widget.currentWalletAddress) {
+        myWalletContacts.add(PkidContact(
+            name: w.name, address: w.stellarAddress, type: ChainType.Stellar));
+      }
+      if (widget.chainType == ChainType.TFChain &&
+          w.tfchainAddress != widget.currentWalletAddress) {
+        myWalletContacts.add(PkidContact(
+            name: w.name, address: w.tfchainAddress, type: ChainType.TFChain));
+      }
+    }
+  }
+
+  _loadOtherContacts() async {
+    myPkidContacts = await getPkidContacts();
+    myPkidContacts =
+        myPkidContacts.where((c) => c.type == widget.chainType).toList();
+    setState(() {});
+  }
+
+  @override
+  void initState() {
+    _loadMyWalletContacts();
+    _loadOtherContacts();
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
-    final List<Wallet> wallets = widget.wallets.where((w) {
-      if (widget.chainType ==ChainType.Stellar && w.stellarAddress != widget.currentWalletAddress){
-        return true;
-      }
-      if (widget.chainType ==ChainType.TFChain && w.tfchainAddress != widget.currentWalletAddress){
-        return true;
-      }
-      return false;
-    }).toList();
     return Scaffold(
-      appBar: AppBar(title: const Text('Contacts')),
-      body: ListView(children: [
-        for (final wallet in wallets)
-          InkWell(
-              onTap: () {
-                widget.chainType == ChainType.Stellar
-                    ? widget.onSelectToAddress(wallet.stellarAddress)
-                    : widget.onSelectToAddress(wallet.tfchainAddress);
-
-                Navigator.of(context).pop();
-              },
-              child: ContactCardWidget(
-                name: wallet.name,
-                address: widget.chainType == ChainType.Stellar
-                    ? wallet.stellarAddress
-                    : wallet.tfchainAddress,
-              )),
-      ]),
-    );
+        appBar: AppBar(title: const Text('Contacts')),
+        body: DefaultTabController(
+          length: 2,
+          child: Column(
+            children: [
+              PreferredSize(
+                preferredSize: const Size.fromHeight(50.0),
+                child: Container(
+                  color: Theme.of(context).scaffoldBackgroundColor,
+                  child: TabBar(
+                    labelColor: Theme.of(context).colorScheme.primary,
+                    indicatorColor: Theme.of(context).colorScheme.primary,
+                    unselectedLabelColor:
+                        Theme.of(context).colorScheme.onBackground,
+                    dividerColor: Theme.of(context).scaffoldBackgroundColor,
+                    tabs: const [
+                      Tab(text: 'My Wallets'),
+                      Tab(text: 'Others'),
+                    ],
+                  ),
+                ),
+              ),
+              Expanded(
+                child: TabBarView(
+                  children: [
+                    ContactsWidget(
+                        contacts: myWalletContacts,
+                        onSelectToAddress: widget.onSelectToAddress),
+                    ContactsWidget(
+                        contacts: myPkidContacts,
+                        onSelectToAddress: widget.onSelectToAddress),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ));
   }
 }
