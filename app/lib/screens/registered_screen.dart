@@ -48,8 +48,8 @@ class _RegisteredScreenState extends State<RegisteredScreen>
           ),
         ),
         Container(
-          margin: const EdgeInsets.symmetric(vertical: 50, horizontal: 10),
-          height: MediaQuery.of(context).size.height * 0.5,
+          padding: const EdgeInsets.symmetric(vertical: 30, horizontal: 10),
+          height: MediaQuery.of(context).size.height * 0.6,
           width: MediaQuery.of(context).size.width,
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
