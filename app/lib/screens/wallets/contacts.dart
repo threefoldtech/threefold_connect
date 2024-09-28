@@ -66,6 +66,11 @@ class _ContractsScreenState extends State<ContractsScreen> {
             ));
   }
 
+  _onDeleteContact(String name) {
+    myPkidContacts = myPkidContacts.where((c) => c.name != name).toList();
+    setState(() {});
+  }
+
   @override
   void initState() {
     _loadMyWalletContacts();
@@ -113,6 +118,7 @@ class _ContractsScreenState extends State<ContractsScreen> {
                     ContactsWidget(
                       contacts: myPkidContacts,
                       onSelectToAddress: widget.onSelectToAddress,
+                      onDeleteContact: _onDeleteContact,
                       canEditAndDelete: true,
                     ),
                   ],

@@ -1,14 +1,75 @@
 import 'package:flutter/material.dart';
+import 'package:threebotlogin/services/contact_service.dart';
+import 'package:threebotlogin/widgets/custom_dialog.dart';
 
-class ContactCardWidget extends StatelessWidget {
+class ContactCardWidget extends StatefulWidget {
   const ContactCardWidget(
       {super.key,
       required this.name,
       required this.address,
-      required this.canEditAndDelete});
+      required this.canEditAndDelete,
+      this.onDeleteContact});
   final String name;
   final String address;
   final bool canEditAndDelete;
+  final void Function(String name)? onDeleteContact;
+
+  @override
+  State<ContactCardWidget> createState() => _ContactCardWidgetState();
+}
+
+class _ContactCardWidgetState extends State<ContactCardWidget> {
+  bool deleteLoading = false;
+  _deleteWallet() async {
+    setState(() {
+      deleteLoading = true;
+    });
+    //TODO: Show snack in case of failure
+    await deleteContact(widget.name);
+    widget.onDeleteContact!(widget.name);
+
+    setState(() {
+      deleteLoading = false;
+    });
+  }
+
+  void _showDeleteConfirmationDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) => CustomDialog(
+        type: DialogType.Warning,
+        image: Icons.warning,
+        title: 'Are you sure?',
+        description:
+            'If you confirm, your wallet will be removed from this device.',
+        actions: <Widget>[
+          TextButton(
+            child: const Text('Cancel'),
+            onPressed: () {
+              Navigator.pop(context);
+            },
+          ),
+          TextButton(
+            onPressed: () async {
+              await _deleteWallet();
+              if (context.mounted) {
+                Navigator.pop(context);
+                Navigator.pop(context);
+              }
+            },
+            //TODO: show loading when press yes
+            child: Text(
+              'Yes',
+              style: Theme.of(context)
+                  .textTheme
+                  .bodyMedium!
+                  .copyWith(color: Theme.of(context).colorScheme.error),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -27,7 +88,7 @@ class ContactCardWidget extends StatelessWidget {
               children: [
                 Expanded(
                   child: Text(
-                    name,
+                    widget.name,
                     overflow: TextOverflow.ellipsis,
                     style: Theme.of(context).textTheme.titleLarge!.copyWith(
                           color: Theme.of(context)
@@ -36,7 +97,7 @@ class ContactCardWidget extends StatelessWidget {
                         ),
                   ),
                 ),
-                if (canEditAndDelete)
+                if (widget.canEditAndDelete)
                   Row(
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.end,
@@ -46,18 +107,26 @@ class ContactCardWidget extends StatelessWidget {
                           icon: const Icon(
                             Icons.edit,
                           )),
-                      IconButton(
-                          onPressed: () {},
-                          icon: Icon(
-                            Icons.delete,
-                            color: Theme.of(context).colorScheme.error,
-                          )),
+                      deleteLoading
+                          ? SizedBox(
+                              width: 20,
+                              height: 20,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: Theme.of(context).colorScheme.error,
+                              ))
+                          : IconButton(
+                              onPressed: _showDeleteConfirmationDialog,
+                              icon: Icon(
+                                Icons.delete,
+                                color: Theme.of(context).colorScheme.error,
+                              )),
                     ],
                   ),
               ],
             ),
             Text(
-              address,
+              widget.address,
               overflow: TextOverflow.ellipsis,
               style: Theme.of(context).textTheme.bodyMedium!.copyWith(
                     color: Theme.of(context).colorScheme.onSecondaryContainer,
