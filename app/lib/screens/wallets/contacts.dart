@@ -28,13 +28,11 @@ class _ContractsScreenState extends State<ContractsScreen> {
 
   _loadMyWalletContacts() {
     for (final w in widget.wallets) {
-      if (widget.chainType == ChainType.Stellar &&
-          w.stellarAddress != widget.currentWalletAddress) {
+      if (widget.chainType == ChainType.Stellar) {
         myWalletContacts.add(PkidContact(
             name: w.name, address: w.stellarAddress, type: ChainType.Stellar));
       }
-      if (widget.chainType == ChainType.TFChain &&
-          w.tfchainAddress != widget.currentWalletAddress) {
+      if (widget.chainType == ChainType.TFChain) {
         myWalletContacts.add(PkidContact(
             name: w.name, address: w.tfchainAddress, type: ChainType.TFChain));
       }
@@ -75,6 +73,7 @@ class _ContractsScreenState extends State<ContractsScreen> {
         builder: (ctx) => AddEditContact(
               chainType: widget.chainType,
               contacts: [...myPkidContacts, ...myWalletContacts],
+              operation: ContactOperation.Edit,
               name: name,
               address: address,
               onEditContact: _onEditContact,
@@ -138,7 +137,10 @@ class _ContractsScreenState extends State<ContractsScreen> {
                 child: TabBarView(
                   children: [
                     ContactsWidget(
-                        contacts: myWalletContacts,
+                        contacts: myWalletContacts
+                            .where(
+                                (c) => c.address != widget.currentWalletAddress)
+                            .toList(),
                         onSelectToAddress: widget.onSelectToAddress),
                     ContactsWidget(
                       contacts: myPkidContacts,

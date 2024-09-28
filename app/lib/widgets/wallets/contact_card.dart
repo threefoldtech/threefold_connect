@@ -44,7 +44,7 @@ class _ContactCardWidgetState extends State<ContactCardWidget> {
         image: Icons.warning,
         title: 'Are you sure?',
         description:
-            'If you confirm, your wallet will be removed from this device.',
+            'If you confirm, your contact will be removed from this device.',
         actions: <Widget>[
           TextButton(
             child: const Text('Cancel'),
@@ -56,7 +56,6 @@ class _ContactCardWidgetState extends State<ContactCardWidget> {
             onPressed: () async {
               await _deleteWallet();
               if (context.mounted) {
-                Navigator.pop(context);
                 Navigator.pop(context);
               }
             },

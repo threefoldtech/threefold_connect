@@ -167,7 +167,7 @@ class _AddEditContactState extends State<AddEditContact> {
       setState(() {});
       return;
     }
-    widget.onEditContact!(widget.name, contactAddress, contactAddress);
+    widget.onEditContact!(widget.name, contactName, contactAddress);
     saveLoading = false;
     setState(() {});
     if (!context.mounted) return;
@@ -201,7 +201,9 @@ class _AddEditContactState extends State<AddEditContact> {
             child: Column(
               children: [
                 Text(
-                  'Add Contact',
+                  widget.operation == ContactOperation.Add
+                      ? 'Add Contact'
+                      : 'Edit Contact',
                   style: Theme.of(context).textTheme.headlineSmall!.copyWith(
                         color: Theme.of(context).colorScheme.onBackground,
                       ),
