@@ -3,16 +3,19 @@ import 'package:threebotlogin/services/contact_service.dart';
 import 'package:threebotlogin/widgets/custom_dialog.dart';
 
 class ContactCardWidget extends StatefulWidget {
-  const ContactCardWidget(
-      {super.key,
-      required this.name,
-      required this.address,
-      required this.canEditAndDelete,
-      this.onDeleteContact});
+  const ContactCardWidget({
+    super.key,
+    required this.name,
+    required this.address,
+    required this.canEditAndDelete,
+    this.onDeleteContact,
+    this.onEditContact,
+  });
   final String name;
   final String address;
   final bool canEditAndDelete;
   final void Function(String name)? onDeleteContact;
+  final void Function(String oldName, String oldAddress)? onEditContact;
 
   @override
   State<ContactCardWidget> createState() => _ContactCardWidgetState();
@@ -103,7 +106,9 @@ class _ContactCardWidgetState extends State<ContactCardWidget> {
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
                       IconButton(
-                          onPressed: () {},
+                          onPressed: () {
+                            widget.onEditContact!(widget.name, widget.address);
+                          },
                           icon: const Icon(
                             Icons.edit,
                           )),

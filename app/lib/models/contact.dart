@@ -1,5 +1,7 @@
 import 'package:threebotlogin/models/wallet.dart';
 
+enum ContactOperation { Add, Edit }
+
 class PkidContact {
   PkidContact({
     required this.name,

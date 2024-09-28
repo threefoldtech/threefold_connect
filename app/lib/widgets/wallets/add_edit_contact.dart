@@ -6,23 +6,34 @@ import 'package:threebotlogin/models/wallet.dart';
 import 'package:threebotlogin/services/contact_service.dart';
 import 'package:threebotlogin/widgets/custom_dialog.dart';
 
-class NewContact extends StatefulWidget {
-  const NewContact(
-      {super.key,
-      required this.onAddContact,
-      required this.contacts,
-      required this.chainType});
-  final void Function(PkidContact addedContact) onAddContact;
+class AddEditContact extends StatefulWidget {
+  const AddEditContact({
+    super.key,
+    required this.contacts,
+    required this.chainType,
+    this.operation = ContactOperation.Add,
+    this.onAddContact,
+    this.name = '',
+    this.address = '',
+    this.onEditContact,
+  });
+
+  final void Function(PkidContact addedContact)? onAddContact;
   final List<PkidContact> contacts;
   final ChainType chainType;
+  final ContactOperation operation;
+  final String name;
+  final String address;
+  final void Function(String oldName, String newName, String newAddress)?
+      onEditContact;
 
   @override
   State<StatefulWidget> createState() {
-    return _NewContactState();
+    return _AddEditContactState();
   }
 }
 
-class _NewContactState extends State<NewContact> {
+class _AddEditContactState extends State<AddEditContact> {
   final _nameController = TextEditingController();
   final _addressController = TextEditingController();
   bool saveLoading = false;
@@ -48,7 +59,7 @@ class _NewContactState extends State<NewContact> {
     );
   }
 
-  Future<void> _validateAddSubmitData() async {
+  Future<void> _validateAndAdd() async {
     final contactName = _nameController.text.trim();
     final contactAddress = _addressController.text.trim();
     nameError = null;
@@ -98,12 +109,78 @@ class _NewContactState extends State<NewContact> {
       setState(() {});
       return;
     }
-    widget.onAddContact(PkidContact(
+    widget.onAddContact!(PkidContact(
         name: contactName, address: contactAddress, type: widget.chainType));
     saveLoading = false;
     setState(() {});
     if (!context.mounted) return;
     Navigator.pop(context);
+  }
+
+  Future<void> _validateAndEdit() async {
+    final contactName = _nameController.text.trim();
+    final contactAddress = _addressController.text.trim();
+    nameError = null;
+    addressError = null;
+    saveLoading = true;
+    setState(() {});
+
+    if (contactName.isEmpty) {
+      nameError = "Name can't be empty";
+      saveLoading = false;
+      setState(() {});
+      return;
+    }
+    final c = widget.contacts.where((element) => element.name == contactName);
+    if (contactName != widget.name && c.isNotEmpty) {
+      nameError = 'Name is used for another contact';
+      saveLoading = false;
+      setState(() {});
+      return;
+    }
+    if (contactAddress.isEmpty) {
+      addressError = "Address can't be empty";
+      saveLoading = false;
+      setState(() {});
+      return;
+    }
+    final contacts = widget.contacts.where((c) => c.address == contactAddress);
+    if (contactAddress != widget.address && contacts.isNotEmpty) {
+      addressError = 'Address is used in another contact';
+      saveLoading = false;
+      setState(() {});
+      return;
+    }
+    // TODO: add address validation based on the chain type
+    try {
+      await editContact(widget.name, contactAddress, contactAddress);
+      await _showDialog(
+          'Contact Modified!',
+          'Contact $contactName has been modified successfully',
+          Icons.check,
+          DialogType.Info);
+    } catch (e) {
+      print(e);
+      _showDialog('Error', 'Failed to modify contact. Please try again.',
+          Icons.error, DialogType.Error);
+      saveLoading = false;
+      setState(() {});
+      return;
+    }
+    widget.onEditContact!(widget.name, contactAddress, contactAddress);
+    saveLoading = false;
+    setState(() {});
+    if (!context.mounted) return;
+    Navigator.pop(context);
+  }
+
+  @override
+  void initState() {
+    if (widget.operation == ContactOperation.Edit) {
+      _nameController.text = widget.name;
+      _addressController.text = widget.address;
+    }
+    super.initState();
   }
 
   @override
@@ -168,7 +245,9 @@ class _NewContactState extends State<NewContact> {
                       width: 5,
                     ),
                     ElevatedButton(
-                        onPressed: _validateAddSubmitData,
+                        onPressed: widget.operation == ContactOperation.Add
+                            ? _validateAndAdd
+                            : _validateAndEdit,
                         child: saveLoading
                             ? const SizedBox(
                                 width: 20,

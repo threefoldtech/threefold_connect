@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:threebotlogin/models/contact.dart';
 import 'package:threebotlogin/models/wallet.dart';
 import 'package:threebotlogin/services/contact_service.dart';
-import 'package:threebotlogin/widgets/wallets/add_contact.dart';
+import 'package:threebotlogin/widgets/wallets/add_edit_contact.dart';
 import 'package:threebotlogin/widgets/wallets/contacts_widget.dart';
 
 class ContractsScreen extends StatefulWidget {
@@ -59,11 +59,36 @@ class _ContractsScreenState extends State<ContractsScreen> {
         useSafeArea: true,
         constraints: const BoxConstraints(maxWidth: double.infinity),
         context: context,
-        builder: (ctx) => NewContact(
+        builder: (ctx) => AddEditContact(
               onAddContact: _onAddContact,
               chainType: widget.chainType,
               contacts: [...myPkidContacts, ...myWalletContacts],
             ));
+  }
+
+  _openEditContactOverlay(String name, String address) {
+    showModalBottomSheet(
+        isScrollControlled: true,
+        useSafeArea: true,
+        constraints: const BoxConstraints(maxWidth: double.infinity),
+        context: context,
+        builder: (ctx) => AddEditContact(
+              chainType: widget.chainType,
+              contacts: [...myPkidContacts, ...myWalletContacts],
+              name: name,
+              address: address,
+              onEditContact: _onEditContact,
+            ));
+  }
+
+  _onEditContact(String oldName, String newName, String newAddress) {
+    for (final c in myPkidContacts) {
+      if (c.name == oldName) {
+        c.name = newName;
+        c.address = newAddress;
+      }
+    }
+    setState(() {});
   }
 
   _onDeleteContact(String name) {
@@ -119,6 +144,7 @@ class _ContractsScreenState extends State<ContractsScreen> {
                       contacts: myPkidContacts,
                       onSelectToAddress: widget.onSelectToAddress,
                       onDeleteContact: _onDeleteContact,
+                      onEditContact: _openEditContactOverlay,
                       canEditAndDelete: true,
                     ),
                   ],

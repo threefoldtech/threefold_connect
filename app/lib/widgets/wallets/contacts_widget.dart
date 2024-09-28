@@ -8,6 +8,7 @@ class ContactsWidget extends StatelessWidget {
     required this.contacts,
     required this.onSelectToAddress,
     this.onDeleteContact,
+    this.onEditContact,
     this.canEditAndDelete = false,
   });
 
@@ -15,6 +16,7 @@ class ContactsWidget extends StatelessWidget {
   final void Function(String address) onSelectToAddress;
   final bool canEditAndDelete;
   final void Function(String name)? onDeleteContact;
+  final void Function(String oldName, String oldAddress)? onEditContact;
 
   @override
   Widget build(BuildContext context) {
@@ -29,7 +31,9 @@ class ContactsWidget extends StatelessWidget {
                 name: contact.name,
                 address: contact.address,
                 canEditAndDelete: canEditAndDelete,
-                onDeleteContact: onDeleteContact)),
+                onDeleteContact: onDeleteContact,
+                onEditContact: onEditContact,
+                )),
     ]);
   }
 }
