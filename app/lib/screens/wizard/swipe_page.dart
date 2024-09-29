@@ -24,51 +24,56 @@ class _SwipePagesState extends State<SwipePage> {
       body: Column(
         children: [
           Padding(
-            padding: EdgeInsets.only(top: MediaQuery.of(context).size.height * 0.01, bottom: 16),
-            child: Column(children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  TextButton(
-                      onPressed: () {
-                        showDialog(
-                          context: context,
-                          builder: (BuildContext context) {
-                            return const TermsAndConditions();
-                          },
-                        );
-                      },
-                      child: Text(
-                        'SKIP',
-                        style: TextStyle(
-                            color: Theme.of(context).colorScheme.onBackground),
-                      ))
-                ],
-              ),
-              Expanded(
-                child: PageView(
-                  controller: _pageController,
-                  onPageChanged: (int index) {
-                    setState(() {
-                      _currentPage = index;
-                    });
-                  },
-                  children: const [Page1(), Page2(), Page3(), Page4(), Page5()],
-                ),
-              ),
-            ]),
-          ),
-          SmoothPageIndicator(
-            controller: _pageController,
-            count: 5,
-            effect: ExpandingDotsEffect(
-              dotWidth: 20,
-              dotHeight: 20,
-              activeDotColor: Theme.of(context).colorScheme.secondary,
-              dotColor: Colors.blue,
+            padding:
+                EdgeInsets.only(top: MediaQuery.of(context).size.height * 0.01),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                TextButton(
+                    onPressed: () {
+                      showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return const TermsAndConditions();
+                        },
+                      );
+                    },
+                    child: Text(
+                      'SKIP',
+                      style: TextStyle(
+                          color: Theme.of(context).colorScheme.onBackground),
+                    ))
+              ],
             ),
           ),
-          const SizedBox(height: 16),
+          Expanded(
+            child: PageView(
+              controller: _pageController,
+              onPageChanged: (int index) {
+                setState(() {
+                  _currentPage = index;
+                });
+              },
+              children: const [Page1(), Page2(), Page3(), Page4(), Page5()],
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(top: 16, bottom: 16),
+            child: Column(
+              children: [
+                SmoothPageIndicator(
+                  controller: _pageController,
+                  count: 5,
+                  effect: ExpandingDotsEffect(
+                    dotWidth: 20,
+                    dotHeight: 20,
+                    activeDotColor: Theme.of(context).colorScheme.secondary,
+                    dotColor: Colors.blue,
+                  ),
+                ),
+              ],
+            ),
+          ),
         ],
       ),
     );
