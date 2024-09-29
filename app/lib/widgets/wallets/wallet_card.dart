@@ -40,62 +40,63 @@ class WalletCardWidget extends StatelessWidget {
                     ),
               ),
               const SizedBox(height: 10),
-              // TODO: hide the balance if there is no account for this wallet
-              Row(
-                children: [
-                  SizedBox(
-                      width: 35,
-                      child: Image.asset(
-                        'assets/tft_icon.png',
-                        color: Theme.of(context).colorScheme.onBackground,
-                      )),
-                  Text(
-                    'Stellar',
-                    style: Theme.of(context).textTheme.bodyLarge!.copyWith(
-                          color: Theme.of(context)
-                              .colorScheme
-                              .onSecondaryContainer,
-                        ),
-                  ),
-                  const Spacer(),
-                  Text(
-                    '${wallet.stellarBalance} TFT',
-                    style: Theme.of(context).textTheme.bodyLarge!.copyWith(
-                          color: Theme.of(context)
-                              .colorScheme
-                              .onSecondaryContainer,
-                        ),
-                  ),
-                ],
-              ),
-              Row(
-                children: [
-                  SizedBox(
-                      width: 35,
-                      child: Image.asset(
-                        'assets/tft_icon.png',
-                        fit: BoxFit.contain,
-                        color: Theme.of(context).colorScheme.onBackground,
-                      )),
-                  Text(
-                    'TFChain',
-                    style: Theme.of(context).textTheme.bodyLarge!.copyWith(
-                          color: Theme.of(context)
-                              .colorScheme
-                              .onSecondaryContainer,
-                        ),
-                  ),
-                  const Spacer(),
-                  Text(
-                    '${wallet.tfchainBalance} TFT',
-                    style: Theme.of(context).textTheme.bodyLarge!.copyWith(
-                          color: Theme.of(context)
-                              .colorScheme
-                              .onSecondaryContainer,
-                        ),
-                  ),
-                ],
-              )
+              if (double.parse(wallet.stellarBalance) >= 0)
+                Row(
+                  children: [
+                    SizedBox(
+                        width: 35,
+                        child: Image.asset(
+                          'assets/tft_icon.png',
+                          color: Theme.of(context).colorScheme.onBackground,
+                        )),
+                    Text(
+                      'Stellar',
+                      style: Theme.of(context).textTheme.bodyLarge!.copyWith(
+                            color: Theme.of(context)
+                                .colorScheme
+                                .onSecondaryContainer,
+                          ),
+                    ),
+                    const Spacer(),
+                    Text(
+                      '${wallet.stellarBalance} TFT',
+                      style: Theme.of(context).textTheme.bodyLarge!.copyWith(
+                            color: Theme.of(context)
+                                .colorScheme
+                                .onSecondaryContainer,
+                          ),
+                    ),
+                  ],
+                ),
+              if (double.parse(wallet.tfchainBalance) >= 0)
+                Row(
+                  children: [
+                    SizedBox(
+                        width: 35,
+                        child: Image.asset(
+                          'assets/tft_icon.png',
+                          fit: BoxFit.contain,
+                          color: Theme.of(context).colorScheme.onBackground,
+                        )),
+                    Text(
+                      'TFChain',
+                      style: Theme.of(context).textTheme.bodyLarge!.copyWith(
+                            color: Theme.of(context)
+                                .colorScheme
+                                .onSecondaryContainer,
+                          ),
+                    ),
+                    const Spacer(),
+                    Text(
+                      '${wallet.tfchainBalance} TFT',
+                      style: Theme.of(context).textTheme.bodyLarge!.copyWith(
+                            color: Theme.of(context)
+                                .colorScheme
+                                .onSecondaryContainer,
+                          ),
+                    ),
+                  ],
+                )
             ],
           ),
         ),

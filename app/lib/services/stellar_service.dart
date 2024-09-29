@@ -17,13 +17,14 @@ Future<String> getBalanceByClient(Client client) async {
     final stellarBalances = await client.getBalance();
     for (final balance in stellarBalances) {
       if (balance.assetCode == 'TFT') {
+        if (double.parse(balance.balance) == 0) return '0';
         return balance.balance;
       }
     }
   } catch (e) {
     print("Couldn't load the account balance.");
   }
-  return '0';
+  return '-1';
 }
 
 Future<String> getBalance(String secret) async {
@@ -44,9 +45,10 @@ Future<List<VestingAccount>?> listVestedAccounts(String secret) async {
   return accounts;
 }
 
-Future<void> transfer(String secret, String dest, String amount, String memo) async {
+Future<void> transfer(
+    String secret, String dest, String amount, String memo) async {
   final client = Client(NetworkType.PUBLIC, secret);
-   await client.transferThroughThreefoldService(
+  await client.transferThroughThreefoldService(
     destinationAddress: dest,
     amount: amount,
     currency: 'TFT',

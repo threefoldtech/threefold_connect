@@ -35,9 +35,10 @@ class _WalletAssetsWidgetState extends State<WalletAssetsWidget> {
       tfchainBalaceLoading = true;
     });
     final chainUrl = Globals().chainUrl;
+    final balance =
+        await TFChain.getBalance(chainUrl, widget.wallet.tfchainAddress);
     widget.wallet.tfchainBalance =
-        (await TFChain.getBalance(chainUrl, widget.wallet.tfchainAddress))
-            .toString();
+        balance.toString() == '0.0' ? '0' : balance.toString();
     setState(() {
       tfchainBalaceLoading = false;
     });
@@ -110,10 +111,12 @@ class _WalletAssetsWidgetState extends State<WalletAssetsWidget> {
                       },
                       child: CircleAvatar(
                         radius: 30,
-                        backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+                        backgroundColor:
+                            Theme.of(context).colorScheme.primaryContainer,
                         child: Icon(
                           Icons.arrow_outward_outlined,
-                          color: Theme.of(context).colorScheme.onPrimaryContainer,
+                          color:
+                              Theme.of(context).colorScheme.onPrimaryContainer,
                           size: 30,
                         ),
                       ),
@@ -141,7 +144,9 @@ class _WalletAssetsWidgetState extends State<WalletAssetsWidget> {
                           backgroundColor:
                               Theme.of(context).colorScheme.primaryContainer,
                           child: ArrowInward(
-                            color: Theme.of(context).colorScheme.onPrimaryContainer,
+                            color: Theme.of(context)
+                                .colorScheme
+                                .onPrimaryContainer,
                             size: 30,
                           )),
                     ),
@@ -167,17 +172,19 @@ class _WalletAssetsWidgetState extends State<WalletAssetsWidget> {
           const SizedBox(
             height: 20,
           ),
-          WalletBalanceTileWidget(
-            name: 'Stellar',
-            balance: widget.wallet.stellarBalance,
-            loading: stellarBalaceLoading,
-          ),
+          if (double.parse(widget.wallet.stellarBalance) >= 0)
+            WalletBalanceTileWidget(
+              name: 'Stellar',
+              balance: widget.wallet.stellarBalance,
+              loading: stellarBalaceLoading,
+            ),
           const SizedBox(height: 10),
-          WalletBalanceTileWidget(
-            name: 'TFChain',
-            balance: widget.wallet.tfchainBalance,
-            loading: tfchainBalaceLoading,
-          ),
+          if (double.parse(widget.wallet.tfchainBalance) >= 0)
+            WalletBalanceTileWidget(
+              name: 'TFChain',
+              balance: widget.wallet.tfchainBalance,
+              loading: tfchainBalaceLoading,
+            ),
           const SizedBox(
             height: 20,
           ),
