@@ -178,7 +178,7 @@ Future<Map<int, Map<String, String>>> getWalletsTwinIds() async {
     });
     return twinWallets;
   }, null);
-  // TODO: return all wallets in case creating new farm
+
   twinWallets.removeWhere((key, value) => key == 0);
   return twinWallets;
 }

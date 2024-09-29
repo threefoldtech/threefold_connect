@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:threebotlogin/models/farm.dart';
+import 'package:threebotlogin/models/wallet.dart';
 import 'package:threebotlogin/services/gridproxy_service.dart';
+import 'package:threebotlogin/services/tfchain_service.dart';
 import 'package:threebotlogin/services/wallet_service.dart';
 import 'package:threebotlogin/widgets/add_farm.dart';
 import 'package:threebotlogin/widgets/farm_item.dart';
@@ -15,7 +17,7 @@ class FarmScreen extends StatefulWidget {
 
 class _FarmScreenState extends State<FarmScreen> {
   List<Farm> farms = [];
-  Map<int, Map<String, String>> twinIdWallets = {};
+  List<Wallet> wallets = [];
 
   bool loading = true;
 
@@ -29,17 +31,24 @@ class _FarmScreenState extends State<FarmScreen> {
     setState(() {
       loading = true;
     });
-    twinIdWallets = await getWalletsTwinIds();
+    wallets = await listWallets();
+    final Map<int, Wallet> twinIdWallets = {};
+    for (final w in wallets) {
+      final twinId = await getTwinId(w.tfchainSecret);
+      if (twinId != 0) {
+        twinIdWallets[twinId] = w;
+      }
+    }
     final farmsList = await getFarmsByTwinIds(twinIdWallets.keys.toList());
     for (final f in farmsList) {
-      final seed = twinIdWallets[f.twinId]!['tfchainSeed'];
-      final walletName = twinIdWallets[f.twinId]!['name'];
+      final seed = twinIdWallets[f.twinId]!.tfchainSecret;
+      final walletName = twinIdWallets[f.twinId]!.name;
       final nodes = await getNodesByFarmId(f.farmID);
       farms.add(Farm(
           name: f.name,
           walletAddress: f.stellarAddress,
-          tfchainWalletSecret: seed!,
-          walletName: walletName!,
+          tfchainWalletSecret: seed,
+          walletName: walletName,
           twinId: f.twinId,
           farmId: f.farmID,
           nodes: nodes.map((n) {
@@ -101,7 +110,7 @@ class _FarmScreenState extends State<FarmScreen> {
         context: context,
         builder: (ctx) => NewFarm(
               onAddFarm: _addFarm,
-              wallets: twinIdWallets.values.toList(),
+              wallets: wallets,
             ));
   }
 
