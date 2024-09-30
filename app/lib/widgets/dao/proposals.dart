@@ -4,7 +4,7 @@ import 'package:tfchain_client/models/dao.dart';
 import 'dao_card.dart';
 
 class ProposalsWidget extends StatefulWidget {
-  final List<Proposal>? proposals;
+  final List<Proposal> proposals;
   final bool active;
   const ProposalsWidget(
       {super.key, required this.proposals, this.active = false});
@@ -14,7 +14,7 @@ class ProposalsWidget extends StatefulWidget {
 }
 
 class _ProposalsWidgetState extends State<ProposalsWidget> {
-  List<Proposal>? proposals = [];
+  List<Proposal> proposals = [];
 
   @override
   void initState() {
@@ -34,15 +34,15 @@ class _ProposalsWidgetState extends State<ProposalsWidget> {
 
   void search(String searchWord) {
     setState(() {
-      final String filterText = searchWord.toLowerCase();
+      final String filterText = searchWord.toLowerCase().trim();
       if (searchWord == '') {
         setState(() {
           proposals = widget.proposals;
         });
-      } else if (widget.proposals != null) {
+      } else {
         setState(() {
           proposals = widget.proposals
-              ?.where((Proposal entry) =>
+              .where((Proposal entry) =>
                   entry.description.toLowerCase().contains(filterText))
               .toList();
         });
@@ -100,7 +100,7 @@ class _ProposalsWidgetState extends State<ProposalsWidget> {
               )
             : Center(
                 child: Text(
-                  widget.proposals!.isEmpty
+                  widget.proposals.isEmpty
                       ? 'No active proposal at the moment'
                       : 'No result was found',
                   style: Theme.of(context).textTheme.bodyLarge!.copyWith(
@@ -110,8 +110,8 @@ class _ProposalsWidgetState extends State<ProposalsWidget> {
   }
 }
 
-List<DaoCard>? _buildDaoCardList(List<Proposal>? list, bool active) {
-  return list?.map((item) {
+List<DaoCard>? _buildDaoCardList(List<Proposal> list, bool active) {
+  return list.map((item) {
     return DaoCard(
       proposal: item,
       active: active,
