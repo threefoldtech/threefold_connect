@@ -34,27 +34,24 @@ class _Page5State extends State<Page5> {
             Column(children: [
               Text(
                 'STARTYOUR',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 30,
-                  color: Theme.of(context).colorScheme.onBackground,
-                ),
+                style: Theme.of(context).textTheme.displayMedium!.copyWith(
+                      color: Theme.of(context).colorScheme.onBackground,
+                      fontWeight: FontWeight.bold,
+                    ),
               ),
               Text(
                 'THREEFOLD',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 30,
-                  color: Theme.of(context).colorScheme.primary,
-                ),
+                style: Theme.of(context).textTheme.displayMedium!.copyWith(
+                      color: Theme.of(context).colorScheme.primary,
+                      fontWeight: FontWeight.bold,
+                    ),
               ),
-              const Text(
+              Text(
                 'JOURNEY',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 30,
-                  color: Colors.blue,
-                ),
+                style: Theme.of(context).textTheme.displayMedium!.copyWith(
+                      color: Theme.of(context).colorScheme.onBackground,
+                      fontWeight: FontWeight.bold,
+                    ),
               ),
               Padding(
                 padding: const EdgeInsets.all(10),
@@ -106,17 +103,19 @@ class _Page5State extends State<Page5> {
                           TextSpan(
                             text: "I agree to Threefold's ",
                             style: TextStyle(
-                                color: termsAgreement.attemptedWithoutAccepting && !termsAgreement.isChecked
-                      ? Colors.red
-                      : Theme.of(context).colorScheme.onBackground,
-                                    ),
+                              color: termsAgreement.attemptedWithoutAccepting &&
+                                      !termsAgreement.isChecked
+                                  ? Colors.red
+                                  : Theme.of(context).colorScheme.onBackground,
+                            ),
                           ),
                           TextSpan(
                             text: 'Terms and conditions.',
-                            style:  TextStyle(
-                              color: termsAgreement.attemptedWithoutAccepting && !termsAgreement.isChecked
-                      ? Colors.red
-                      : Theme.of(context).colorScheme.onBackground,
+                            style: TextStyle(
+                              color: termsAgreement.attemptedWithoutAccepting &&
+                                      !termsAgreement.isChecked
+                                  ? Colors.red
+                                  : Theme.of(context).colorScheme.onBackground,
                               decoration: TextDecoration.underline,
                             ),
                             recognizer: TapGestureRecognizer()
