@@ -68,6 +68,8 @@ class _DaoPageState extends State<DaoPage> {
                   unselectedLabelColor:
                       Theme.of(context).colorScheme.onBackground,
                   dividerColor: Theme.of(context).scaffoldBackgroundColor,
+                  labelStyle: Theme.of(context).textTheme.titleLarge,
+                  unselectedLabelStyle: Theme.of(context).textTheme.titleMedium,
                   tabs: const [
                     Tab(text: 'Active'),
                     Tab(text: 'Executable'),

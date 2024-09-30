@@ -126,9 +126,12 @@ class _ContractsScreenState extends State<ContractsScreen> {
                     unselectedLabelColor:
                         Theme.of(context).colorScheme.onBackground,
                     dividerColor: Theme.of(context).scaffoldBackgroundColor,
+                    labelStyle: Theme.of(context).textTheme.titleLarge,
+                    unselectedLabelStyle:
+                        Theme.of(context).textTheme.titleMedium,
                     tabs: const [
                       Tab(text: 'My Wallets'),
-                      Tab(text: 'Favourite'),
+                      Tab(text: 'Favourites'),
                     ],
                   ),
                 ),
