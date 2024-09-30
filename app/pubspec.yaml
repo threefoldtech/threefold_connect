@@ -61,6 +61,7 @@ dependencies:
   build_runner: ^2.4.9
   qr_flutter: ^4.1.0
   screen_brightness: ^1.0.1
+  validators: ^3.0.0
 
 dev_dependencies:
   flutter_test:

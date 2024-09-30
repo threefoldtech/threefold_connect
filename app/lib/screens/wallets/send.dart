@@ -4,7 +4,9 @@ import 'package:qr_code_scanner/qr_code_scanner.dart';
 import 'package:threebotlogin/models/wallet.dart';
 import 'package:threebotlogin/screens/scan_screen.dart';
 import 'package:threebotlogin/screens/wallets/contacts.dart';
+import 'package:threebotlogin/services/stellar_service.dart';
 import 'package:threebotlogin/widgets/wallets/send_confirmation.dart';
+import 'package:validators/validators.dart';
 
 class WalletSendScreen extends StatefulWidget {
   const WalletSendScreen(
@@ -22,7 +24,8 @@ class _WalletSendScreenState extends State<WalletSendScreen> {
   final amountController = TextEditingController();
   final memoController = TextEditingController();
   ChainType chainType = ChainType.Stellar;
-  // TODO: Add validation on all fields
+  String? toAddressError;
+  String? amountError;
 
   @override
   void initState() {
@@ -37,6 +40,72 @@ class _WalletSendScreenState extends State<WalletSendScreen> {
     amountController.dispose();
     memoController.dispose();
     super.dispose();
+  }
+
+  bool _validate() {
+    final toAddress = toController.text.trim();
+    final amount = amountController.text.trim();
+    amountError = null;
+    toAddressError = null;
+    if (toAddress.isEmpty) {
+      toAddressError = "Address can't be empty";
+      setState(() {});
+      return false;
+    }
+    if (amount.isEmpty) {
+      amountError = "Amount can't be empty";
+      setState(() {});
+      return false;
+    }
+    if (!isFloat(amount)) {
+      amountError = 'Amount should have numeric values only';
+      setState(() {});
+      return false;
+    }
+    if (chainType == ChainType.TFChain) {
+      if (toAddress.length != 48) {
+        toAddressError = 'Address length should be 48 characters';
+        setState(() {});
+        return false;
+      }
+
+      if (double.parse(amount) < 0.01) {
+        amountError = "Amount can't be less than 0.01";
+        setState(() {});
+        return false;
+      }
+      if (double.parse(widget.wallet.tfchainBalance) -
+              double.parse(amount) -
+              0.01 <
+          0) {
+        amountError = "Amount shouldn't be more than the wallet balance";
+        setState(() {});
+        return false;
+      }
+    }
+    if (chainType == ChainType.Stellar) {
+      if (!isValidStellarAddress(toAddress)) {
+        toAddressError = 'Invaild Stellar address';
+        setState(() {});
+        return false;
+      }
+
+      if (double.parse(amount) < 0.1) {
+        amountError = "Amount can't be less than 0.1";
+        setState(() {});
+        return false;
+      }
+      if (double.parse(widget.wallet.stellarBalance) -
+              double.parse(amount) -
+              0.1 <
+          0) {
+        amountError = "Amount shouldn't be more than the wallet balance";
+        setState(() {});
+        return false;
+      }
+    }
+    setState(() {});
+    return true;
   }
 
   void _selectToAddress(String address) {
@@ -165,6 +234,7 @@ class _WalletSendScreenState extends State<WalletSendScreen> {
                   controller: toController,
                   decoration: InputDecoration(
                       labelText: 'To',
+                      errorText: toAddressError,
                       suffixIcon: IconButton(
                           onPressed: () {
                             Navigator.of(context).push(MaterialPageRoute(
@@ -189,7 +259,8 @@ class _WalletSendScreenState extends State<WalletSendScreen> {
                       labelText:
                           'Amount (Balance: ${chainType == ChainType.Stellar ? widget.wallet.stellarBalance : widget.wallet.tfchainBalance})',
                       hintText: '100',
-                      suffixText: 'TFT')),
+                      suffixText: 'TFT',
+                      errorText: amountError)),
               subtitle: Text(
                   'Max Fee: ${chainType == ChainType.Stellar ? 0.1 : 0.01} TFT'),
             ),
@@ -210,8 +281,9 @@ class _WalletSendScreenState extends State<WalletSendScreen> {
               padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 10),
               child: ElevatedButton(
                 onPressed: () async {
-                  // TODO: Trigger validation here
-                  await _send_confirmation();
+                  if (_validate()) {
+                    await _send_confirmation();
+                  }
                 },
                 style: ElevatedButton.styleFrom(),
                 child: SizedBox(

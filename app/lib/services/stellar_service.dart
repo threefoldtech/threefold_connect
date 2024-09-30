@@ -12,6 +12,16 @@ bool isValidStellarSecret(String seed) {
   return false;
 }
 
+bool isValidStellarAddress(String address) {
+  try {
+    StrKey.decodeStellarAccountId(address);
+    return true;
+  } catch (e) {
+    print('Address is invalid. $e');
+  }
+  return false;
+}
+
 Future<String> getBalanceByClient(Client client) async {
   try {
     final stellarBalances = await client.getBalance();
