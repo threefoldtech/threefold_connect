@@ -18,7 +18,9 @@ class CommonPage extends StatefulWidget {
     this.heightPercentage = 100,
     this.widthPercentage = 300,
   }) : super(key: key);
-  _CommonPageState createState() => _CommonPageState();
+  
+  @override
+  State<CommonPage> createState() => _CommonPageState();
 }
 
 class _CommonPageState extends State<CommonPage> {

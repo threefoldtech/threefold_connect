@@ -12,6 +12,6 @@ class _InitState extends State<InitScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(body: SafeArea(child: SwipePage()));
+    return const Scaffold(body: SafeArea(child: SwipePage()));
   }
 }
