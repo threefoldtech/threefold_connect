@@ -202,9 +202,9 @@ class _VoteDialogState extends State<VoteDialog> {
     try {
       await vote(approve, widget.proposalHash, farmId!, seed!);
 
-      _showDialog('Voted!', 'You have voted successfully.', Icons.check);
+      _showDialog('Voted!', 'You have voted successfully.', Icons.check, DialogType.Info);
     } catch (e) {
-      _showDialog('Error', 'Failed to Vote.', Icons.error);
+      _showDialog('Error', 'Failed to Vote.', Icons.error, DialogType.Error);
     } finally {
       setState(() {
         yesLoading = false;
@@ -213,12 +213,13 @@ class _VoteDialogState extends State<VoteDialog> {
     }
   }
 
-  _showDialog(String title, String description, IconData icon) async {
+  _showDialog(String title, String description, IconData icon, DialogType type) async {
     if (context.mounted) {
       showDialog(
         barrierDismissible: false,
         context: context,
         builder: (BuildContext context) => CustomDialog(
+          type: type,
           image: icon,
           title: title,
           description: description,

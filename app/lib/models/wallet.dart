@@ -1,4 +1,6 @@
-enum WalletType { Native, Imported }
+enum WalletType { NATIVE, IMPORTED }
+
+enum ChainType { Stellar, TFChain }
 
 class Wallet {
   Wallet({
@@ -31,7 +33,7 @@ class PkidWallet {
   String name;
   final int index;
   final String seed;
-  final WalletType type;
+   WalletType type;
 
   factory PkidWallet.fromJson(Map<String, dynamic> json) {
     return PkidWallet(
@@ -39,15 +41,10 @@ class PkidWallet {
         name: json['name'],
         seed: json['seed'],
         type:
-            json['type'] == 'NATIVE' ? WalletType.Native : WalletType.Imported);
+            json['type'] == 'NATIVE' ? WalletType.NATIVE : WalletType.IMPORTED);
   }
   toMap() {
-    return {
-      'name': name,
-      'index': index,
-      'seed': seed,
-      'type': type.toString()
-    };
+    return {'name': name, 'index': index, 'seed': seed, 'type': type.name};
   }
 }
 
@@ -60,7 +57,7 @@ class Transaction {
     required this.to,
     required this.asset,
     required this.amount,
-    // required this.memo, // check how to get it
+    // required this.memo, //TODO: check how to get it (transaction link)
     required this.type,
     required this.status,
     required this.date,

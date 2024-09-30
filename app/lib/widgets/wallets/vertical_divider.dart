@@ -10,7 +10,7 @@ class CustomVerticalDivider extends StatelessWidget {
       child: Padding(
         padding: EdgeInsets.only(left: 35),
         child: SizedBox(
-          height: 40,
+          height: 20,
           child: VerticalDivider(
             color: Colors.grey,
             width: 2,

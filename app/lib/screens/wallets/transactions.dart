@@ -4,7 +4,7 @@ import 'package:threebotlogin/services/stellar_service.dart';
 import 'package:threebotlogin/widgets/wallets/transaction.dart';
 import 'package:threebotlogin/widgets/wallets/vertical_divider.dart';
 import 'package:stellar_flutter_sdk/src/responses/operations/payment_operation_response.dart';
-import 'package:stellar_flutter_sdk/src/responses/operations/path_payment_strict_receive_operation_response.dart';
+// import 'package:stellar_flutter_sdk/src/responses/operations/path_payment_strict_receive_operation_response.dart';
 
 class WalletTransactionsWidget extends StatefulWidget {
   const WalletTransactionsWidget({super.key, required this.wallet});
@@ -30,21 +30,23 @@ class _WalletTransactionsWidgetState extends State<WalletTransactionsWidget> {
             hash: tx.transactionHash!,
             from: tx.from!.accountId,
             to: tx.to!.accountId,
-            asset: tx.asset.toString(),
+            asset: tx.assetCode.toString(),
             amount: tx.amount!,
-            type: TransactionType.Payment,
+            type: tx.to!.accountId == widget.wallet.stellarAddress
+                ? TransactionType.Receive
+                : TransactionType.Payment,
             status: tx.transactionSuccessful!,
-            date: tx.createdAt!);
-      } else if (tx is PathPaymentStrictReceiveOperationResponse) {
-        return Transaction(
-            hash: tx.transactionHash!,
-            from: tx.from!,
-            to: tx.to!,
-            asset: tx.asset.toString(),
-            type: TransactionType.Payment,
-            status: tx.transactionSuccessful!,
-            amount: tx.amount!,
-            date: tx.createdAt!);
+            date: DateTime.parse(tx.createdAt!).toLocal().toString());
+        // } else if (tx is PathPaymentStrictReceiveOperationResponse) {
+        //   return Transaction(
+        //       hash: tx.transactionHash!,
+        //       from: tx.from!,
+        //       to: tx.to!,
+        //       asset: tx.assetCode.toString(),
+        //       type: TransactionType.Receive,
+        //       status: tx.transactionSuccessful!,
+        //       amount: tx.amount!,
+        //       date: tx.createdAt!);
       }
       // TODO: handle creation transaction
     }).toList();

@@ -28,11 +28,13 @@ class _NewWalletState extends State<NewWallet> {
   bool saveLoading = false;
   String? nameError;
   String? secretError;
-  Future<void> _showDialog(String title, String message, IconData icon) async {
+  Future<void> _showDialog(
+      String title, String message, IconData icon, DialogType type) async {
     showDialog(
       barrierDismissible: false,
       context: context,
       builder: (BuildContext context) => CustomDialog(
+        type: type,
         image: icon,
         title: title,
         description: message,
@@ -90,20 +92,23 @@ class _NewWalletState extends State<NewWallet> {
       wallet = await loadAddedWallet(walletName, walletSecret);
     } catch (e) {
       print(e);
-      _showDialog(
-          'Error', 'Failed to load wallet. Please try again.', Icons.error);
+      _showDialog('Error', 'Failed to load wallet. Please try again.',
+          Icons.error, DialogType.Error);
       saveLoading = false;
       setState(() {});
       return;
     }
     try {
       await addWallet(walletName, walletSecret);
-      await _showDialog('Wallet Added!',
-          'Wallet $walletName has been added successfully', Icons.check);
+      await _showDialog(
+          'Wallet Added!',
+          'Wallet $walletName has been added successfully',
+          Icons.check,
+          DialogType.Info);
     } catch (e) {
       print(e);
-      _showDialog(
-          'Error', 'Failed to save wallet. Please try again.', Icons.error);
+      _showDialog('Error', 'Failed to save wallet. Please try again.',
+          Icons.error, DialogType.Error);
       saveLoading = false;
       setState(() {});
       return;
@@ -132,6 +137,12 @@ class _NewWalletState extends State<NewWallet> {
             padding: EdgeInsets.fromLTRB(16, 16, 16, keyboardSpace + 16),
             child: Column(
               children: [
+                Text(
+                  'Import Wallet',
+                  style: Theme.of(context).textTheme.headlineSmall!.copyWith(
+                        color: Theme.of(context).colorScheme.onBackground,
+                      ),
+                ),
                 TextField(
                   style: Theme.of(context).textTheme.bodyMedium!.copyWith(
                       color: Theme.of(context).colorScheme.onBackground,
@@ -195,7 +206,7 @@ Future<Wallet> loadAddedWallet(String walletName, String walletSecret) async {
   final chainUrl = Globals().chainUrl;
   final Wallet wallet = await compute((void _) async {
     final wallet = await loadWallet(
-        walletName, walletSecret, WalletType.Imported, chainUrl);
+        walletName, walletSecret, WalletType.IMPORTED, chainUrl);
     return wallet;
   }, null);
   return wallet;

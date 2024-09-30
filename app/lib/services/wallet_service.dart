@@ -31,6 +31,10 @@ Future<List<PkidWallet>> _getPkidWallets() async {
           ? jsonDecode(pKidResult['data'])
           : {};
 
+  if (pKidResult.containsKey('success') && result.isEmpty) {
+    return [];
+  }
+
   Map<int, dynamic> dataMap = result.asMap();
   final pkidWallets =
       dataMap.values.map((e) => PkidWallet.fromJson(e)).toList();
@@ -112,7 +116,7 @@ Future<void> addWallet(String walletName, String walletSecret) async {
       name: walletName,
       index: -1,
       seed: walletSecret,
-      type: WalletType.Imported));
+      type: WalletType.IMPORTED));
 
   await _saveWalletsToPkid(wallets);
 }
@@ -174,7 +178,7 @@ Future<Map<int, Map<String, String>>> getWalletsTwinIds() async {
     });
     return twinWallets;
   }, null);
-  // TODO: return all wallets in case creating new farm
+
   twinWallets.removeWhere((key, value) => key == 0);
   return twinWallets;
 }
