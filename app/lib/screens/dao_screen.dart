@@ -20,13 +20,31 @@ class _DaoPageState extends State<DaoPage> {
     setState(() {
       loading = true;
     });
-    // TODO: show error in case of failure
-    final proposals = await getProposals();
-    activeList.addAll(proposals['activeProposals']!);
-    inactiveList.addAll(proposals['inactiveProposals']!);
-    setState(() {
-      loading = false;
-    });
+    try {
+      final proposals = await getProposals();
+      activeList.addAll(proposals['activeProposals']!);
+      inactiveList.addAll(proposals['inactiveProposals']!);
+    } catch (e) {
+      print('Failed to load proposals due to $e');
+      if (context.mounted) {
+        final loadingProposalFailure = SnackBar(
+          content: Text(
+            'Failed to load proposals',
+            style: Theme.of(context)
+                .textTheme
+                .bodyMedium!
+                .copyWith(color: Theme.of(context).colorScheme.errorContainer),
+          ),
+          duration: const Duration(seconds: 3),
+        );
+        ScaffoldMessenger.of(context).clearSnackBars();
+        ScaffoldMessenger.of(context).showSnackBar(loadingProposalFailure);
+      }
+    } finally {
+      setState(() {
+        loading = false;
+      });
+    }
   }
 
   @override
