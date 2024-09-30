@@ -52,58 +52,61 @@ class _ProposalsWidgetState extends State<ProposalsWidget> {
 
   @override
   Widget build(BuildContext context) {
+    final daoCards = _buildDaoCardList(proposals, widget.active);
     return Scaffold(
-      appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(60.0),
-        child: Padding(
-          padding: const EdgeInsets.all(10),
-          child: SizedBox(
-            height: 40,
-            child: SearchBar(
-              backgroundColor: MaterialStateProperty.all<Color>(
-                  Theme.of(context).colorScheme.background),
-              onChanged: search,
-              trailing: <Widget>[
-                Icon(
-                  Icons.search,
-                  color: Theme.of(context).colorScheme.onBackground,
-                )
-              ],
-              hintText: 'Search by proposal description',
-              hintStyle: MaterialStateProperty.all<TextStyle>(
-                Theme.of(context).textTheme.bodyLarge!.copyWith(
-                      color: Theme.of(context).colorScheme.onSecondaryContainer,
-                    ),
-              ),
-              textStyle: MaterialStateProperty.all<TextStyle>(
-                Theme.of(context).textTheme.bodyLarge!.copyWith(
-                      color: Theme.of(context).colorScheme.onSecondaryContainer,
-                      decorationThickness: 0,
-                    ),
-              ),
-              shape: MaterialStateProperty.all<OutlinedBorder>(
-                RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(15),
+        appBar: PreferredSize(
+          preferredSize: const Size.fromHeight(60.0),
+          child: Padding(
+            padding: const EdgeInsets.all(10),
+            child: SizedBox(
+              height: 40,
+              child: SearchBar(
+                backgroundColor: MaterialStateProperty.all<Color>(
+                    Theme.of(context).colorScheme.background),
+                onChanged: search,
+                trailing: <Widget>[
+                  Icon(
+                    Icons.search,
+                    color: Theme.of(context).colorScheme.onBackground,
+                  )
+                ],
+                hintText: 'Search by proposal description',
+                hintStyle: MaterialStateProperty.all<TextStyle>(
+                  Theme.of(context).textTheme.bodyLarge!.copyWith(
+                        color:
+                            Theme.of(context).colorScheme.onSecondaryContainer,
+                      ),
+                ),
+                textStyle: MaterialStateProperty.all<TextStyle>(
+                  Theme.of(context).textTheme.bodyLarge!.copyWith(
+                        color:
+                            Theme.of(context).colorScheme.onSecondaryContainer,
+                        decorationThickness: 0,
+                      ),
+                ),
+                shape: MaterialStateProperty.all<OutlinedBorder>(
+                  RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(15),
+                  ),
                 ),
               ),
             ),
           ),
         ),
-      ),
-      body: SingleChildScrollView(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: _buildDaoCardList(proposals, widget.active) ??
-              [
-                Text(
-                  'No active proposal at the moment',
+        body: daoCards!.isNotEmpty
+            ? SingleChildScrollView(
+                child:
+                    Column(mainAxisSize: MainAxisSize.min, children: daoCards),
+              )
+            : Center(
+                child: Text(
+                  widget.proposals!.isEmpty
+                      ? 'No active proposal at the moment'
+                      : 'No result was found',
                   style: Theme.of(context).textTheme.bodyLarge!.copyWith(
                       color: Theme.of(context).colorScheme.onBackground),
-                )
-              ],
-        ),
-      ),
-    );
+                ),
+              ));
   }
 }
 
