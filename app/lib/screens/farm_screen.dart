@@ -85,7 +85,6 @@ class _FarmScreenState extends State<FarmScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // TODO: handle empty farms
     Widget mainWidget;
     if (loading) {
       mainWidget = Center(
@@ -102,6 +101,16 @@ class _FarmScreenState extends State<FarmScreen> {
           ),
         ],
       ));
+    } else if (farms.isEmpty) {
+      mainWidget = Center(
+        child: Text(
+          'No farms yet.',
+          style: Theme.of(context)
+              .textTheme
+              .bodyLarge!
+              .copyWith(color: Theme.of(context).colorScheme.onBackground),
+        ),
+      );
     } else {
       mainWidget = ListView(
           children: [for (final farm in farms) FarmItemWidget(farm: farm)]);
