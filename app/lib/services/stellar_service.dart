@@ -43,7 +43,6 @@ Future<String> getBalance(String secret) async {
 }
 
 Future<List<OperationResponse>> listTransactions(String secret) async {
-  //TODO: try catch error in case the wallet doesn't exist and return []
   final client = Client(NetworkType.PUBLIC, secret);
   final transactions = await client.getTransactions(assetCodeFilter: 'TFT');
   return transactions;
