@@ -69,12 +69,30 @@ class _WalletDetailsWidgetState extends State<WalletDetailsWidget> {
       setState(() {});
       return;
     }
-    //TODO: Show snack in case of failure
-    await editWallet(walletName, newName);
-    widget.onEditWallet(walletName, newName);
-    walletName = newName;
-    widget.wallet.name = newName;
-    setState(() {});
+    try {
+      await editWallet(walletName, newName);
+      widget.onEditWallet(walletName, newName);
+      walletName = newName;
+      widget.wallet.name = newName;
+    } catch (e) {
+      print('Failed to modify wallet due to $e');
+      if (context.mounted) {
+        final loadingFarmsFailure = SnackBar(
+          content: Text(
+            'Failed to Modify',
+            style: Theme.of(context)
+                .textTheme
+                .bodyMedium!
+                .copyWith(color: Theme.of(context).colorScheme.errorContainer),
+          ),
+          duration: const Duration(seconds: 3),
+        );
+        ScaffoldMessenger.of(context).clearSnackBars();
+        ScaffoldMessenger.of(context).showSnackBar(loadingFarmsFailure);
+      }
+    } finally {
+      setState(() {});
+    }
   }
 
   @override
