@@ -35,13 +35,30 @@ class _WalletDetailsWidgetState extends State<WalletDetailsWidget> {
     setState(() {
       deleteLoading = true;
     });
-    //TODO: Show snack in case of failure
-    await deleteWallet(walletNameController.text);
-    widget.onDeleteWallet(walletNameController.text);
-
-    setState(() {
-      deleteLoading = false;
-    });
+    try {
+      await deleteWallet(walletNameController.text);
+      widget.onDeleteWallet(walletNameController.text);
+    } catch (e) {
+      print('Failed to delete wallet due to $e');
+      if (context.mounted) {
+        final loadingFarmsFailure = SnackBar(
+          content: Text(
+            'Failed to delete',
+            style: Theme.of(context)
+                .textTheme
+                .bodyMedium!
+                .copyWith(color: Theme.of(context).colorScheme.errorContainer),
+          ),
+          duration: const Duration(seconds: 3),
+        );
+        ScaffoldMessenger.of(context).clearSnackBars();
+        ScaffoldMessenger.of(context).showSnackBar(loadingFarmsFailure);
+      }
+    } finally {
+      setState(() {
+        deleteLoading = false;
+      });
+    }
   }
 
   _editWallet() async {
