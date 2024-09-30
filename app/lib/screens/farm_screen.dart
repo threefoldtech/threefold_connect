@@ -31,37 +31,56 @@ class _FarmScreenState extends State<FarmScreen> {
     setState(() {
       loading = true;
     });
-    wallets = await listWallets();
-    final Map<int, Wallet> twinIdWallets = {};
-    for (final w in wallets) {
-      final twinId = await getTwinId(w.tfchainSecret);
-      if (twinId != 0) {
-        twinIdWallets[twinId] = w;
+    try {
+      wallets = await listWallets();
+      final Map<int, Wallet> twinIdWallets = {};
+      for (final w in wallets) {
+        final twinId = await getTwinId(w.tfchainSecret);
+        if (twinId != 0) {
+          twinIdWallets[twinId] = w;
+        }
       }
+      final farmsList = await getFarmsByTwinIds(twinIdWallets.keys.toList());
+      for (final f in farmsList) {
+        final seed = twinIdWallets[f.twinId]!.tfchainSecret;
+        final walletName = twinIdWallets[f.twinId]!.name;
+        final nodes = await getNodesByFarmId(f.farmID);
+        farms.add(Farm(
+            name: f.name,
+            walletAddress: f.stellarAddress,
+            tfchainWalletSecret: seed,
+            walletName: walletName,
+            twinId: f.twinId,
+            farmId: f.farmID,
+            nodes: nodes.map((n) {
+              return Node(
+                nodeId: n.nodeId,
+                status: NodeStatus.values.firstWhere((e) =>
+                    e.toString().toLowerCase() == 'nodestatus.${n.status}'),
+              );
+            }).toList()));
+      }
+    } catch (e) {
+      print('Failed to get farms due to $e');
+      if (context.mounted) {
+        final loadingFarmsFailure = SnackBar(
+          content: Text(
+            'Failed to load farms',
+            style: Theme.of(context)
+                .textTheme
+                .bodyMedium!
+                .copyWith(color: Theme.of(context).colorScheme.errorContainer),
+          ),
+          duration: const Duration(seconds: 3),
+        );
+        ScaffoldMessenger.of(context).clearSnackBars();
+        ScaffoldMessenger.of(context).showSnackBar(loadingFarmsFailure);
+      }
+    } finally {
+      setState(() {
+        loading = false;
+      });
     }
-    final farmsList = await getFarmsByTwinIds(twinIdWallets.keys.toList());
-    for (final f in farmsList) {
-      final seed = twinIdWallets[f.twinId]!.tfchainSecret;
-      final walletName = twinIdWallets[f.twinId]!.name;
-      final nodes = await getNodesByFarmId(f.farmID);
-      farms.add(Farm(
-          name: f.name,
-          walletAddress: f.stellarAddress,
-          tfchainWalletSecret: seed,
-          walletName: walletName,
-          twinId: f.twinId,
-          farmId: f.farmID,
-          nodes: nodes.map((n) {
-            return Node(
-              nodeId: n.nodeId,
-              status: NodeStatus.values.firstWhere((e) =>
-                  e.toString().toLowerCase() == 'nodestatus.${n.status}'),
-            );
-          }).toList()));
-    }
-    setState(() {
-      loading = false;
-    });
   }
 
   @override
