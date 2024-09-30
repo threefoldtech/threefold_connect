@@ -31,13 +31,14 @@ class _WalletDetailsWidgetState extends State<WalletDetailsWidget> {
   bool deleteLoading = false;
   bool edit = false;
 
-  _deleteWallet() async {
+  Future<bool> _deleteWallet() async {
     setState(() {
       deleteLoading = true;
     });
     try {
       await deleteWallet(walletNameController.text);
       widget.onDeleteWallet(walletNameController.text);
+      return true;
     } catch (e) {
       print('Failed to delete wallet due to $e');
       if (context.mounted) {
@@ -54,6 +55,7 @@ class _WalletDetailsWidgetState extends State<WalletDetailsWidget> {
         ScaffoldMessenger.of(context).clearSnackBars();
         ScaffoldMessenger.of(context).showSnackBar(loadingFarmsFailure);
       }
+      return false;
     } finally {
       setState(() {
         deleteLoading = false;
@@ -306,10 +308,10 @@ class _WalletDetailsWidgetState extends State<WalletDetailsWidget> {
           ),
           TextButton(
             onPressed: () async {
-              await _deleteWallet();
+              final deleted = await _deleteWallet();
               if (context.mounted) {
                 Navigator.pop(context);
-                Navigator.pop(context);
+                if (deleted) Navigator.pop(context);
               }
             },
             //TODO: show loading when press yes
