@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:threebotlogin/models/wallet.dart';
 import 'package:threebotlogin/screens/qr_code_screen.dart';
-
+import 'package:validators/validators.dart';
 
 class WalletReceiveScreen extends StatefulWidget {
   const WalletReceiveScreen({super.key, required this.wallet});
@@ -16,7 +16,7 @@ class _WalletReceiveScreenState extends State<WalletReceiveScreen> {
   final amountController = TextEditingController();
   final memoController = TextEditingController();
   ChainType chainType = ChainType.Stellar;
-  // TODO: Add validation on all fields
+  String? amountError;
 
   @override
   void initState() {
@@ -30,6 +30,41 @@ class _WalletReceiveScreenState extends State<WalletReceiveScreen> {
     amountController.dispose();
     memoController.dispose();
     super.dispose();
+  }
+
+  bool _validate() {
+    final amount = amountController.text.trim();
+    amountError = null;
+
+    if (amount.isEmpty) {
+      amountError = "Amount can't be empty";
+      setState(() {});
+      return false;
+    }
+
+    if (!isFloat(amount)) {
+      amountError = 'Amount should have numeric values only';
+      setState(() {});
+      return false;
+    }
+
+    return true;
+  }
+
+  _showQRCode() {
+    final quaryParams = {'amount': amountController.text.trim()};
+    if (chainType == ChainType.Stellar) {
+      quaryParams['message'] = memoController.text.trim();
+    }
+    final uri = Uri(
+        scheme: 'TFT',
+        path: toController.text.trim(),
+        queryParameters: quaryParams);
+    final codeMessage = uri.toString();
+    showDialog(
+      context: context,
+      builder: (context) => GenerateQRCodeScreen(message: codeMessage),
+    );
   }
 
   @override
@@ -125,8 +160,11 @@ class _WalletReceiveScreenState extends State<WalletReceiveScreen> {
                       ),
                   keyboardType: TextInputType.number,
                   controller: amountController,
-                  decoration: const InputDecoration(
-                      suffixText: 'TFT', labelText: 'Amount', hintText: '100')),
+                  decoration: InputDecoration(
+                      suffixText: 'TFT',
+                      labelText: 'Amount',
+                      hintText: '100',
+                      errorText: amountError)),
             ),
             const SizedBox(height: 10),
             if (chainType == ChainType.Stellar)
@@ -145,21 +183,9 @@ class _WalletReceiveScreenState extends State<WalletReceiveScreen> {
               padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 10),
               child: ElevatedButton(
                 onPressed: () {
-                  //TODO: Validate inputs first
-                  final quaryParams = {'amount': amountController.text};
-                  if (chainType == ChainType.Stellar) {
-                    quaryParams['message'] = memoController.text;
-                  }
-                  final uri = Uri(
-                      scheme: 'TFT',
-                      path: toController.text,
-                      queryParameters: quaryParams);
-                  final codeMessage = uri.toString();
-                  showDialog(
-                    context: context,
-                    builder: (context) =>
-                        GenerateQRCodeScreen(message: codeMessage),
-                  );
+                  final valid = _validate();
+                  print(valid);
+                  if (valid) _showQRCode();
                 },
                 style: ElevatedButton.styleFrom(),
                 child: SizedBox(
