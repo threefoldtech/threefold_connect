@@ -21,6 +21,7 @@ class _NewFarmState extends State<NewFarm> {
   Wallet? _selectedWallet;
   bool saveLoading = false;
   String? nameError;
+  String? walletError;
   Future<void> _showDialog(
       String title, String message, IconData icon, DialogType type) async {
     showDialog(
@@ -42,8 +43,8 @@ class _NewFarmState extends State<NewFarm> {
   }
 
   Future<void> _validateSubmittedData() async {
-    print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
     final farmName = _nameController.text.trim();
+    walletError = null;
     nameError = null;
     saveLoading = true;
     setState(() {});
@@ -56,9 +57,9 @@ class _NewFarmState extends State<NewFarm> {
     }
     //TODO: check if the farm name is used from gridproxy
 
-    //TODO: show error for the drop down menu
     if (_selectedWallet == null) {
       saveLoading = false;
+      walletError = 'Please select a wallet';
       setState(() {});
       return;
     }
@@ -146,6 +147,7 @@ class _NewFarmState extends State<NewFarm> {
                 DropdownMenu(
                   menuHeight: MediaQuery.sizeOf(context).height * 0.3,
                   enableFilter: true,
+                  errorText: walletError,
                   width: MediaQuery.sizeOf(context).width * 0.92,
                   textStyle: Theme.of(context).textTheme.bodyLarge!.copyWith(
                         color: Theme.of(context).colorScheme.onBackground,
