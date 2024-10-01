@@ -20,20 +20,34 @@ class ContactsWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListView(children: [
-      for (final contact in contacts)
-        InkWell(
-            onTap: () {
-              onSelectToAddress(contact.address);
-              Navigator.of(context).pop();
-            },
-            child: ContactCardWidget(
+    Widget content;
+    if (contacts.isEmpty) {
+      content = Center(
+        child: Text(
+          'No contacts yet.',
+          style: Theme.of(context)
+              .textTheme
+              .bodyLarge!
+              .copyWith(color: Theme.of(context).colorScheme.onBackground),
+        ),
+      );
+    } else {
+      content = ListView(children: [
+        for (final contact in contacts)
+          InkWell(
+              onTap: () {
+                onSelectToAddress(contact.address);
+                Navigator.of(context).pop();
+              },
+              child: ContactCardWidget(
                 name: contact.name,
                 address: contact.address,
                 canEditAndDelete: canEditAndDelete,
                 onDeleteContact: onDeleteContact,
                 onEditContact: onEditContact,
-                )),
-    ]);
+              )),
+      ]);
+    }
+    return content;
   }
 }

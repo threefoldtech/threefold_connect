@@ -96,12 +96,14 @@ class _AddEditContactState extends State<AddEditContact> {
     }
     if (widget.chainType == ChainType.TFChain && contactAddress.length != 48) {
       addressError = 'Address length should be 48 characters';
+      saveLoading = false;
       setState(() {});
       return;
     }
     if (widget.chainType == ChainType.Stellar &&
         !isValidStellarAddress(contactAddress)) {
       addressError = 'Invaild Stellar address';
+      saveLoading = false;
       setState(() {});
       return;
     }
@@ -166,12 +168,14 @@ class _AddEditContactState extends State<AddEditContact> {
 
     if (widget.chainType == ChainType.TFChain && contactAddress.length != 48) {
       addressError = 'Address length should be 48 characters';
+      saveLoading = false;
       setState(() {});
       return;
     }
     if (widget.chainType == ChainType.Stellar &&
         !isValidStellarAddress(contactAddress)) {
       addressError = 'Invaild Stellar address';
+      saveLoading = false;
       setState(() {});
       return;
     }

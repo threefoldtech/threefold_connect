@@ -131,7 +131,7 @@ class _ContractsScreenState extends State<ContractsScreen> {
                         Theme.of(context).textTheme.titleMedium,
                     tabs: const [
                       Tab(text: 'My Wallets'),
-                      Tab(text: 'Favourites'),
+                      Tab(text: 'Favorites'),
                     ],
                   ),
                 ),
