@@ -63,8 +63,8 @@ class _NewFarmState extends State<NewFarm> {
       setState(() {});
       return;
     }
+
     Farm farm;
-    print(_selectedWallet);
     try {
       final f = await createFarm(farmName, _selectedWallet!.tfchainSecret,
           _selectedWallet!.stellarAddress);
@@ -144,55 +144,67 @@ class _NewFarmState extends State<NewFarm> {
                 const SizedBox(
                   height: 20,
                 ),
-                DropdownMenu(
-                  menuHeight: MediaQuery.sizeOf(context).height * 0.3,
-                  enableFilter: true,
-                  errorText: walletError,
-                  width: MediaQuery.sizeOf(context).width * 0.92,
-                  textStyle: Theme.of(context).textTheme.bodyLarge!.copyWith(
-                        color: Theme.of(context).colorScheme.onBackground,
-                      ),
-                  trailingIcon: const Icon(
-                    CupertinoIcons.chevron_down,
-                    size: 18,
-                  ),
-                  selectedTrailingIcon: const Icon(
-                    CupertinoIcons.chevron_up,
-                    size: 18,
-                  ),
-                  inputDecorationTheme: InputDecorationTheme(
-                    filled: true,
-                    fillColor: Theme.of(context).colorScheme.secondaryContainer,
-                    enabledBorder: UnderlineInputBorder(
-                      borderRadius: const BorderRadius.all(Radius.circular(4)),
-                      borderSide: BorderSide(
-                        color: Theme.of(context).colorScheme.secondaryContainer,
-                        width: 8.0,
-                      ),
-                    ),
-                  ),
-                  menuStyle: MenuStyle(
-                    shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                      const RoundedRectangleBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(4)),
-                      ),
-                    ),
-                  ),
-                  label: Text(
-                    'Select Wallet',
-                    style: Theme.of(context).textTheme.bodyLarge!.copyWith(
-                          color: Theme.of(context)
-                              .colorScheme
-                              .onSecondaryContainer,
+                if (widget.wallets.isNotEmpty)
+                  DropdownMenu(
+                    menuHeight: MediaQuery.sizeOf(context).height * 0.3,
+                    enableFilter: true,
+                    errorText: walletError,
+                    width: MediaQuery.sizeOf(context).width * 0.92,
+                    textStyle: Theme.of(context).textTheme.bodyLarge!.copyWith(
+                          color: Theme.of(context).colorScheme.onBackground,
                         ),
+                    trailingIcon: const Icon(
+                      CupertinoIcons.chevron_down,
+                      size: 18,
+                    ),
+                    selectedTrailingIcon: const Icon(
+                      CupertinoIcons.chevron_up,
+                      size: 18,
+                    ),
+                    inputDecorationTheme: InputDecorationTheme(
+                      filled: true,
+                      fillColor:
+                          Theme.of(context).colorScheme.secondaryContainer,
+                      enabledBorder: UnderlineInputBorder(
+                        borderRadius:
+                            const BorderRadius.all(Radius.circular(4)),
+                        borderSide: BorderSide(
+                          color:
+                              Theme.of(context).colorScheme.secondaryContainer,
+                          width: 8.0,
+                        ),
+                      ),
+                    ),
+                    menuStyle: MenuStyle(
+                      shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                        const RoundedRectangleBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(4)),
+                        ),
+                      ),
+                    ),
+                    label: Text(
+                      'Select Wallet',
+                      style: Theme.of(context).textTheme.bodyLarge!.copyWith(
+                            color: Theme.of(context)
+                                .colorScheme
+                                .onSecondaryContainer,
+                          ),
+                    ),
+                    dropdownMenuEntries: _buildDropdownMenuEntries(),
+                    onSelected: (Wallet? value) {
+                      if (value != null) {
+                        _selectedWallet = value;
+                      }
+                    },
                   ),
-                  dropdownMenuEntries: _buildDropdownMenuEntries(),
-                  onSelected: (Wallet? value) {
-                    if (value != null) {
-                      _selectedWallet = value;
-                    }
-                  },
-                ),
+                if (widget.wallets.isEmpty)
+                  Text(
+                    'Please initiate the first wallet or import a wallet.',
+                    style: Theme.of(context)
+                        .textTheme
+                        .bodyLarge!
+                        .copyWith(color: Theme.of(context).colorScheme.error),
+                  ),
                 const SizedBox(
                   height: 30,
                 ),
