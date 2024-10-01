@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:threebotlogin/models/contact.dart';
 import 'package:threebotlogin/models/wallet.dart';
 import 'package:threebotlogin/services/contact_service.dart';
+import 'package:threebotlogin/services/stellar_service.dart';
 import 'package:threebotlogin/widgets/custom_dialog.dart';
 
 class AddEditContact extends StatefulWidget {
@@ -93,7 +94,18 @@ class _AddEditContactState extends State<AddEditContact> {
       setState(() {});
       return;
     }
-    // TODO: add address validation based on the chain type
+    if (widget.chainType == ChainType.TFChain && contactAddress.length != 48) {
+      addressError = 'Address length should be 48 characters';
+      setState(() {});
+      return;
+    }
+    if (widget.chainType == ChainType.Stellar &&
+        !isValidStellarAddress(contactAddress)) {
+      addressError = 'Invaild Stellar address';
+      setState(() {});
+      return;
+    }
+
     try {
       await addContact(contactName, contactAddress, widget.chainType);
       await _showDialog(
@@ -151,7 +163,19 @@ class _AddEditContactState extends State<AddEditContact> {
       setState(() {});
       return;
     }
-    // TODO: add address validation based on the chain type
+
+    if (widget.chainType == ChainType.TFChain && contactAddress.length != 48) {
+      addressError = 'Address length should be 48 characters';
+      setState(() {});
+      return;
+    }
+    if (widget.chainType == ChainType.Stellar &&
+        !isValidStellarAddress(contactAddress)) {
+      addressError = 'Invaild Stellar address';
+      setState(() {});
+      return;
+    }
+
     try {
       await editContact(widget.name, contactAddress, contactAddress);
       await _showDialog(
