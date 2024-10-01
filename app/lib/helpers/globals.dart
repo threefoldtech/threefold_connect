@@ -57,6 +57,8 @@ class Globals {
   String chainUrl = '';
   String gridproxyUrl = '';
   String activationUrl = '';
+  String relayUrl = '';
+  String termsAndConditionsUrl = '';
 
   bool isCacheClearedWallet = false;
   bool isCacheClearedFarmer = false;

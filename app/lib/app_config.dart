@@ -218,5 +218,7 @@ void setFallbackConfigs() {
   Globals().chainUrl = '';
   Globals().gridproxyUrl = '';
   Globals().activationUrl = '';
+  Globals().relayUrl = '';
+  Globals().termsAndConditionsUrl = '';
   Globals().spendingLimit = 0;
 }

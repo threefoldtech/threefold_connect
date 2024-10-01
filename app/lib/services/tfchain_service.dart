@@ -111,8 +111,7 @@ _activateAccount(String tfchainSeed) async {
   if (activationResponse.statusCode != 200) {
     throw Exception('Failed to activate account');
   }
-  // TODO: Add T&C and relay urls in flagsmith 
-  const documentUrl = 'https://library.threefold.me/info/legal/';
+  final documentUrl = Globals().termsAndConditionsUrl;
   final documentUri = Uri.parse(documentUrl);
   final response = await http.get(documentUri);
   final bytes = utf8.encode(response.body);
@@ -122,7 +121,8 @@ _activateAccount(String tfchainSeed) async {
 
   await client.termsAndConditions
       .accept(documentLink: documentUrl, documentHash: hashString.codeUnits);
-  await client.twins.create(relay: 'relay.dev.grid.tf', pk: []);
+  final relayUrl = Globals().relayUrl;
+  await client.twins.create(relay: relayUrl, pk: []);
 }
 
 Future<Farm?> createFarm(
