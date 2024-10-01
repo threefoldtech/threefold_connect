@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:threebotlogin/models/farm.dart';
 import 'package:threebotlogin/models/wallet.dart';
+import 'package:threebotlogin/services/gridproxy_service.dart';
 import 'package:threebotlogin/services/tfchain_service.dart';
 import 'package:threebotlogin/widgets/custom_dialog.dart';
 
@@ -55,7 +56,14 @@ class _NewFarmState extends State<NewFarm> {
       setState(() {});
       return;
     }
-    //TODO: check if the farm name is used from gridproxy
+    final available = await isFarmNameAvailable(farmName);
+
+    if (!available) {
+      nameError = 'Farm name is already used';
+      saveLoading = false;
+      setState(() {});
+      return;
+    }
 
     if (_selectedWallet == null) {
       saveLoading = false;

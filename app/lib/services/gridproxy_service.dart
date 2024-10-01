@@ -51,3 +51,15 @@ Future<List<Node>> getNodesByFarmId(int farmId) async {
     throw Exception('Failed to get nodes due to $e');
   }
 }
+
+Future<bool> isFarmNameAvailable(String name) async {
+  try {
+    initializeReflectable();
+    final gridproxyUrl = Globals().gridproxyUrl;
+    GridProxyClient client = GridProxyClient(gridproxyUrl);
+    final farms = await client.farms.list(ListFarmsQueryParameters(name: name));
+    return farms.isEmpty;
+  } catch (e) {
+    throw Exception('Failed to get farms due to $e');
+  }
+}
