@@ -1,13 +1,14 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:threebotlogin/models/farm.dart';
+import 'package:threebotlogin/models/wallet.dart';
 import 'package:threebotlogin/services/tfchain_service.dart';
 import 'package:threebotlogin/widgets/custom_dialog.dart';
 
 class NewFarm extends StatefulWidget {
   const NewFarm({super.key, required this.onAddFarm, required this.wallets});
   final void Function(Farm addedFarm) onAddFarm;
-  final List<Map<String, String>> wallets;
+  final List<Wallet> wallets;
 
   @override
   State<StatefulWidget> createState() {
@@ -17,14 +18,16 @@ class NewFarm extends StatefulWidget {
 
 class _NewFarmState extends State<NewFarm> {
   final _nameController = TextEditingController();
-  Map<String, String> _selectedWallet = {};
+  Wallet? _selectedWallet;
   bool saveLoading = false;
   String? nameError;
-  Future<void> _showDialog(String title, String message, IconData icon) async {
+  Future<void> _showDialog(
+      String title, String message, IconData icon, DialogType type) async {
     showDialog(
       barrierDismissible: false,
       context: context,
       builder: (BuildContext context) => CustomDialog(
+        type: type,
         image: icon,
         title: title,
         description: message,
@@ -39,6 +42,7 @@ class _NewFarmState extends State<NewFarm> {
   }
 
   Future<void> _validateSubmittedData() async {
+    print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
     final farmName = _nameController.text.trim();
     nameError = null;
     saveLoading = true;
@@ -53,7 +57,7 @@ class _NewFarmState extends State<NewFarm> {
     //TODO: check if the farm name is used from gridproxy
 
     //TODO: show error for the drop down menu
-    if (_selectedWallet.isEmpty) {
+    if (_selectedWallet == null) {
       saveLoading = false;
       setState(() {});
       return;
@@ -61,22 +65,25 @@ class _NewFarmState extends State<NewFarm> {
     Farm farm;
     print(_selectedWallet);
     try {
-      final f = await createFarm(farmName, _selectedWallet['tfchainSeed']!,
-          _selectedWallet['stellarAddress']!);
+      final f = await createFarm(farmName, _selectedWallet!.tfchainSecret,
+          _selectedWallet!.stellarAddress);
       farm = Farm(
           name: farmName,
-          walletAddress: _selectedWallet['stellarAddress']!,
-          tfchainWalletSecret: _selectedWallet['tfchainSeed']!,
-          walletName: _selectedWallet['name']!,
+          walletAddress: _selectedWallet!.stellarAddress,
+          tfchainWalletSecret: _selectedWallet!.tfchainSecret,
+          walletName: _selectedWallet!.name,
           twinId: f!.twinId,
           farmId: f.id,
           nodes: []);
-      await _showDialog('Farm Created!',
-          'Farm $farmName has been added successfully', Icons.check);
+      await _showDialog(
+          'Farm Created!',
+          'Farm $farmName has been added successfully',
+          Icons.check,
+          DialogType.Info);
     } catch (e) {
       print(e);
-      _showDialog(
-          'Error', 'Failed to create farm. Please try again.', Icons.error);
+      _showDialog('Error', 'Failed to create farm. Please try again.',
+          Icons.error, DialogType.Error);
       saveLoading = false;
       setState(() {});
       return;
@@ -88,12 +95,12 @@ class _NewFarmState extends State<NewFarm> {
     Navigator.pop(context);
   }
 
-  List<DropdownMenuEntry<Map<String, String>>> _buildDropdownMenuEntries() {
+  List<DropdownMenuEntry<Wallet>> _buildDropdownMenuEntries() {
     return widget.wallets.map((wallet) {
-      return DropdownMenuEntry<Map<String, String>>(
+      return DropdownMenuEntry<Wallet>(
         value: wallet,
-        label: wallet['name']!,
-        labelWidget: Text(wallet['name']!,
+        label: wallet.name,
+        labelWidget: Text(wallet.name,
             style: Theme.of(context).textTheme.bodyLarge!.copyWith(
                   color: Theme.of(context).colorScheme.onBackground,
                 )),
@@ -117,6 +124,12 @@ class _NewFarmState extends State<NewFarm> {
             padding: EdgeInsets.fromLTRB(16, 16, 16, keyboardSpace + 16),
             child: Column(
               children: [
+                Text(
+                  'Create Farm',
+                  style: Theme.of(context).textTheme.headlineSmall!.copyWith(
+                        color: Theme.of(context).colorScheme.onBackground,
+                      ),
+                ),
                 TextField(
                   style: Theme.of(context).textTheme.bodyMedium!.copyWith(
                       color: Theme.of(context).colorScheme.onBackground,
@@ -172,7 +185,7 @@ class _NewFarmState extends State<NewFarm> {
                         ),
                   ),
                   dropdownMenuEntries: _buildDropdownMenuEntries(),
-                  onSelected: (Map<String, String>? value) {
+                  onSelected: (Wallet? value) {
                     if (value != null) {
                       _selectedWallet = value;
                     }

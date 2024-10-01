@@ -183,6 +183,7 @@ class _MobileRegistrationScreenState extends State<MobileRegistrationScreen> {
       showDialog(
         context: context,
         builder: (BuildContext context) => CustomDialog(
+          type: DialogType.Error,
           image: Icons.error,
           title: 'Error',
           description:

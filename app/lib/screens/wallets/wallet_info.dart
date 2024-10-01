@@ -31,17 +31,36 @@ class _WalletDetailsWidgetState extends State<WalletDetailsWidget> {
   bool deleteLoading = false;
   bool edit = false;
 
-  _deleteWallet() async {
+  Future<bool> _deleteWallet() async {
     setState(() {
       deleteLoading = true;
     });
-    //TODO: Show snack in case of failure
-    await deleteWallet(walletNameController.text);
-    widget.onDeleteWallet(walletNameController.text);
-
-    setState(() {
-      deleteLoading = false;
-    });
+    try {
+      await deleteWallet(walletNameController.text);
+      widget.onDeleteWallet(walletNameController.text);
+      return true;
+    } catch (e) {
+      print('Failed to delete wallet due to $e');
+      if (context.mounted) {
+        final loadingFarmsFailure = SnackBar(
+          content: Text(
+            'Failed to delete',
+            style: Theme.of(context)
+                .textTheme
+                .bodyMedium!
+                .copyWith(color: Theme.of(context).colorScheme.errorContainer),
+          ),
+          duration: const Duration(seconds: 3),
+        );
+        ScaffoldMessenger.of(context).clearSnackBars();
+        ScaffoldMessenger.of(context).showSnackBar(loadingFarmsFailure);
+      }
+      return false;
+    } finally {
+      setState(() {
+        deleteLoading = false;
+      });
+    }
   }
 
   _editWallet() async {
@@ -52,12 +71,30 @@ class _WalletDetailsWidgetState extends State<WalletDetailsWidget> {
       setState(() {});
       return;
     }
-    //TODO: Show snack in case of failure
-    await editWallet(walletName, newName);
-    widget.onEditWallet(walletName, newName);
-    walletName = newName;
-    widget.wallet.name = newName;
-    setState(() {});
+    try {
+      await editWallet(walletName, newName);
+      widget.onEditWallet(walletName, newName);
+      walletName = newName;
+      widget.wallet.name = newName;
+    } catch (e) {
+      print('Failed to modify wallet due to $e');
+      if (context.mounted) {
+        final loadingFarmsFailure = SnackBar(
+          content: Text(
+            'Failed to Modify',
+            style: Theme.of(context)
+                .textTheme
+                .bodyMedium!
+                .copyWith(color: Theme.of(context).colorScheme.errorContainer),
+          ),
+          duration: const Duration(seconds: 3),
+        );
+        ScaffoldMessenger.of(context).clearSnackBars();
+        ScaffoldMessenger.of(context).showSnackBar(loadingFarmsFailure);
+      }
+    } finally {
+      setState(() {});
+    }
   }
 
   @override
@@ -216,7 +253,7 @@ class _WalletDetailsWidgetState extends State<WalletDetailsWidget> {
                   icon: edit ? const Icon(Icons.save) : const Icon(Icons.edit)),
             ),
             const SizedBox(height: 40),
-            if (widget.wallet.type == WalletType.Imported)
+            if (widget.wallet.type == WalletType.IMPORTED)
               Center(
                 child: SizedBox(
                   width: MediaQuery.of(context).size.width - 40,
@@ -257,7 +294,8 @@ class _WalletDetailsWidgetState extends State<WalletDetailsWidget> {
     showDialog(
       context: context,
       builder: (BuildContext context) => CustomDialog(
-        image: Icons.error,
+        type: DialogType.Warning,
+        image: Icons.warning,
         title: 'Are you sure?',
         description:
             'If you confirm, your wallet will be removed from this device.',
@@ -270,10 +308,10 @@ class _WalletDetailsWidgetState extends State<WalletDetailsWidget> {
           ),
           TextButton(
             onPressed: () async {
-              await _deleteWallet();
+              final deleted = await _deleteWallet();
               if (context.mounted) {
                 Navigator.pop(context);
-                Navigator.pop(context);
+                if (deleted) Navigator.pop(context);
               }
             },
             //TODO: show loading when press yes

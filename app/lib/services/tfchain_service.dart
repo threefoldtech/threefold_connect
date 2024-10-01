@@ -15,6 +15,7 @@ import 'package:http/http.dart' as http;
 Future<int?> getMyTwinId() async {
   final chainUrl = Globals().chainUrl;
   if (chainUrl == '') return null;
+  // TODO: make sure we are using the correct phrase or needs to use derived seed
   final phrase = await getPhrase();
   if (phrase != null) {
     return await compute((void _) async {
@@ -53,6 +54,12 @@ Future<int> getTwinIdByClient(TFChain.Client client) async {
   await client.connect();
   final twinId = await client.twins.getMyTwinId();
   return twinId ?? 0;
+}
+
+Future<int> getTwinId(String seed) async {
+  final chainUrl = Globals().chainUrl;
+  final client = TFChain.Client(chainUrl, seed, 'sr25519');
+  return getTwinIdByClient(client);
 }
 
 Future<Map<String, List<Proposal>>> getProposals() async {
@@ -96,16 +103,17 @@ _activateAccount(String tfchainSeed) async {
   final activationUrl = Globals().activationUrl;
   final chainUrl = Globals().chainUrl;
   final client = TFChain.Client(chainUrl, tfchainSeed, 'sr25519');
-  client.connect();
+  await client.connect();
 
-  final activationUri = Uri.https(activationUrl);
+  final activationUri = Uri.parse(activationUrl);
   final activationResponse = await http
       .post(activationUri, body: {'substrateAccountID': client.address});
   if (activationResponse.statusCode != 200) {
-    throw Exception('Failed to activate accont');
+    throw Exception('Failed to activate account');
   }
+  // TODO: Add T&C and relay urls in flagsmith 
   const documentUrl = 'https://library.threefold.me/info/legal/';
-  final documentUri = Uri.https(documentUrl);
+  final documentUri = Uri.parse(documentUrl);
   final response = await http.get(documentUri);
   final bytes = utf8.encode(response.body);
   final digest = md5.convert(bytes);
@@ -114,7 +122,7 @@ _activateAccount(String tfchainSeed) async {
 
   await client.termsAndConditions
       .accept(documentLink: documentUrl, documentHash: hashString.codeUnits);
-  await client.twins.create(relay: '', pk: []);
+  await client.twins.create(relay: 'relay.dev.grid.tf', pk: []);
 }
 
 Future<Farm?> createFarm(
@@ -125,7 +133,7 @@ Future<Farm?> createFarm(
     client.connect();
     final twinId = await getTwinIdByClient(client);
     if (twinId == 0) {
-      _activateAccount(tfchainSeed);
+      await _activateAccount(tfchainSeed);
     }
     final farmId = await client.farms.create(name: name, publicIps: []);
     final farm = await client.farms.get(id: farmId!);
@@ -135,4 +143,11 @@ Future<Farm?> createFarm(
   } catch (e) {
     throw Exception('Failed to create farm due to $e');
   }
+}
+
+Future<void> transfer(String secret, String dest, String amount) async {
+  final chainUrl = Globals().chainUrl;
+  final client = TFChain.Client(chainUrl, secret, 'sr25519');
+  client.connect();
+  await client.balances.transfer(address: dest, amount: BigInt.parse(amount));
 }

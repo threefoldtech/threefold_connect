@@ -8,6 +8,7 @@ emailVerificationDialog(context) {
     barrierDismissible: false,
     builder: (BuildContext context) => CustomDialog(
       image: Icons.error,
+      type: DialogType.Error,
       title: 'Please verify email',
       description: 'Please verify email before using this app',
       actions: <Widget>[

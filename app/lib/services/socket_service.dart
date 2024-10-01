@@ -207,6 +207,7 @@ Future showIdentityMessage(BuildContext context, String type) async {
       return showDialog(
         context: context,
         builder: (BuildContext context) => CustomDialog(
+          type: DialogType.Warning,
           image: Icons.warning,
           title: 'Identity verify timed out',
           description:
@@ -226,7 +227,8 @@ Future showIdentityMessage(BuildContext context, String type) async {
       return showDialog(
         context: context,
         builder: (BuildContext context) => CustomDialog(
-          image: Icons.warning,
+          type: DialogType.Error,
+          image: Icons.error,
           title: 'Identity verify failed',
           description:
               'Something went wrong.\nIf this issue persist, please contact support',

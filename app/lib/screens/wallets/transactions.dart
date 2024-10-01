@@ -4,7 +4,7 @@ import 'package:threebotlogin/services/stellar_service.dart';
 import 'package:threebotlogin/widgets/wallets/transaction.dart';
 import 'package:threebotlogin/widgets/wallets/vertical_divider.dart';
 import 'package:stellar_flutter_sdk/src/responses/operations/payment_operation_response.dart';
-import 'package:stellar_flutter_sdk/src/responses/operations/path_payment_strict_receive_operation_response.dart';
+// import 'package:stellar_flutter_sdk/src/responses/operations/path_payment_strict_receive_operation_response.dart';
 
 class WalletTransactionsWidget extends StatefulWidget {
   const WalletTransactionsWidget({super.key, required this.wallet});
@@ -23,35 +23,56 @@ class _WalletTransactionsWidgetState extends State<WalletTransactionsWidget> {
     setState(() {
       loading = true;
     });
-    final txs = await listTransactions(widget.wallet.stellarSecret);
-    final transactionsList = txs.map((tx) {
-      if (tx is PaymentOperationResponse) {
-        return Transaction(
-            hash: tx.transactionHash!,
-            from: tx.from!.accountId,
-            to: tx.to!.accountId,
-            asset: tx.asset.toString(),
-            amount: tx.amount!,
-            type: TransactionType.Payment,
-            status: tx.transactionSuccessful!,
-            date: tx.createdAt!);
-      } else if (tx is PathPaymentStrictReceiveOperationResponse) {
-        return Transaction(
-            hash: tx.transactionHash!,
-            from: tx.from!,
-            to: tx.to!,
-            asset: tx.asset.toString(),
-            type: TransactionType.Payment,
-            status: tx.transactionSuccessful!,
-            amount: tx.amount!,
-            date: tx.createdAt!);
+    try {
+      final txs = await listTransactions(widget.wallet.stellarSecret);
+      final transactionsList = txs.map((tx) {
+        if (tx is PaymentOperationResponse) {
+          return Transaction(
+              hash: tx.transactionHash!,
+              from: tx.from!.accountId,
+              to: tx.to!.accountId,
+              asset: tx.assetCode.toString(),
+              amount: tx.amount!,
+              type: tx.to!.accountId == widget.wallet.stellarAddress
+                  ? TransactionType.Receive
+                  : TransactionType.Payment,
+              status: tx.transactionSuccessful!,
+              date: DateTime.parse(tx.createdAt!).toLocal().toString());
+          // } else if (tx is PathPaymentStrictReceiveOperationResponse) {
+          //   return Transaction(
+          //       hash: tx.transactionHash!,
+          //       from: tx.from!,
+          //       to: tx.to!,
+          //       asset: tx.assetCode.toString(),
+          //       type: TransactionType.Receive,
+          //       status: tx.transactionSuccessful!,
+          //       amount: tx.amount!,
+          //       date: tx.createdAt!);
+        }
+        // TODO: handle creation transaction
+      }).toList();
+      transactions = transactionsList.where((tx) => tx != null).toList();
+    } catch (e) {
+      print('Failed to load transactions due to $e');
+      if (context.mounted) {
+        final loadingFarmsFailure = SnackBar(
+          content: Text(
+            'Failed to load transaction',
+            style: Theme.of(context)
+                .textTheme
+                .bodyMedium!
+                .copyWith(color: Theme.of(context).colorScheme.errorContainer),
+          ),
+          duration: const Duration(seconds: 3),
+        );
+        ScaffoldMessenger.of(context).clearSnackBars();
+        ScaffoldMessenger.of(context).showSnackBar(loadingFarmsFailure);
       }
-      // TODO: handle creation transaction
-    }).toList();
-    transactions = transactionsList.where((tx) => tx != null).toList();
-    setState(() {
-      loading = false;
-    });
+    } finally {
+      setState(() {
+        loading = false;
+      });
+    }
   }
 
   @override
@@ -62,7 +83,6 @@ class _WalletTransactionsWidgetState extends State<WalletTransactionsWidget> {
 
   @override
   Widget build(BuildContext context) {
-    // TODO: handle empty transactions
     Widget mainWidget;
     if (loading) {
       mainWidget = Center(
@@ -79,6 +99,16 @@ class _WalletTransactionsWidgetState extends State<WalletTransactionsWidget> {
           ),
         ],
       ));
+    } else if (transactions.isEmpty) {
+      mainWidget = Center(
+        child: Text(
+          'No transactions yet.',
+          style: Theme.of(context)
+              .textTheme
+              .bodyLarge!
+              .copyWith(color: Theme.of(context).colorScheme.onBackground),
+        ),
+      );
     } else {
       mainWidget = ListView(
         children: [

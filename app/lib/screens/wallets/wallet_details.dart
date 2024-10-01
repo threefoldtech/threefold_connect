@@ -1,16 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:threebotlogin/models/wallet.dart';
 import 'package:threebotlogin/screens/wallets/transactions.dart';
-import 'package:threebotlogin/widgets/wallets/wallet_balance.dart';
+import 'package:threebotlogin/screens/wallets/wallet_assets.dart';
 import 'package:threebotlogin/screens/wallets/wallet_info.dart';
 
 class WalletDetailsScreen extends StatefulWidget {
   const WalletDetailsScreen(
       {super.key,
       required this.wallet,
+      required this.allWallets,
       required this.onDeleteWallet,
       required this.onEditWallet});
   final Wallet wallet;
+  final List<Wallet> allWallets;
   final void Function(String name) onDeleteWallet;
   final void Function(String oldName, String newName) onEditWallet;
 
@@ -47,7 +49,10 @@ class _WalletDetailsScreenState extends State<WalletDetailsScreen> {
         onEditWallet: _onEditWallet,
       );
     } else {
-      content = const WalletBalanceWidget();
+      content = WalletAssetsWidget(
+        allWallets: widget.allWallets,
+        wallet: widget.wallet,
+      );
     }
     return Scaffold(
       appBar: AppBar(title: Text(widget.wallet.name)),

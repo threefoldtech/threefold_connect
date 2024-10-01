@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:threebotlogin/main.dart';
+
+enum DialogType {Info, Warning, Error}
 
 class CustomDialog extends StatefulWidget {
   final String? description;
@@ -7,6 +10,7 @@ class CustomDialog extends StatefulWidget {
   final String title;
   final IconData image;
   final dynamic hiddenAction;
+  final DialogType type; 
 
   const CustomDialog({
     super.key,
@@ -16,6 +20,7 @@ class CustomDialog extends StatefulWidget {
     this.actions,
     this.image = Icons.person,
     this.hiddenAction,
+    this.type = DialogType.Info,
   });
 
   show(context) {
@@ -24,6 +29,7 @@ class CustomDialog extends StatefulWidget {
       barrierDismissible: false,
       builder: (BuildContext context) => CustomDialog(
         image: Icons.error,
+        type: DialogType.Error,
         title: title,
         description: description,
         widgetDescription: widgetDescription,
@@ -50,6 +56,7 @@ class _CustomDialogState extends State<CustomDialog> {
       context: context,
       barrierDismissible: false,
       builder: (BuildContext context) => CustomDialog(
+        type: DialogType.Error,
         image: Icons.error,
         title: widget.title,
         description: widget.description,
@@ -88,6 +95,18 @@ class _CustomDialogState extends State<CustomDialog> {
   circularImage(context) {
     int timesPressed = 0;
     const int timesPressedToReveal = 5;
+    Color backgroundColor;
+    Color color;
+    if (widget.type == DialogType.Error){
+      backgroundColor = Theme.of(context).colorScheme.error;
+      color = Theme.of(context).colorScheme.onError;
+    } else if (widget.type == DialogType.Warning){
+      backgroundColor = Theme.of(context).colorScheme.warning;
+      color = Theme.of(context).colorScheme.onWarning;
+    } else {
+      backgroundColor = Theme.of(context).colorScheme.primary;
+      color = Theme.of(context).colorScheme.onPrimary;
+    }
     return Positioned(
       left: 20.0,
       right: 20.0,
@@ -107,12 +126,12 @@ class _CustomDialogState extends State<CustomDialog> {
           }
         },
         child: CircleAvatar(
-          backgroundColor: Theme.of(context).colorScheme.primary,
+          backgroundColor: backgroundColor,
           radius: 30.0,
           child: Icon(
             widget.image,
             size: 42.0,
-            color: Theme.of(context).colorScheme.onPrimary,
+            color: color,
           ),
         ),
       ),
