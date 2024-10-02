@@ -108,9 +108,12 @@ class _NewWalletState extends State<NewWallet> {
 
     final validName = _validateName(walletName);
     final validSecret = _validateSecret(walletSecret);
-    saveLoading = true;
+    if (validName && validSecret) {
+      return true;
+    }
+    saveLoading = false;
     setState(() {});
-    return validName && validSecret;
+    return false;
   }
 
   Future<void> _addWallet() async {
