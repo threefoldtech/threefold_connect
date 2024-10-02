@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:threebotlogin/screens/main_screen.dart';
 import 'package:threebotlogin/screens/wizard/web_view.dart';
 import 'package:threebotlogin/services/shared_preference_service.dart';
 import 'package:threebotlogin/widgets/custom_dialog.dart';
@@ -75,13 +74,7 @@ class _TermsAndConditionsState extends State<TermsAndConditions> {
             } else {
               saveInitDone();
               Navigator.of(context).pop();
-              await Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => const MainScreen(
-                            initDone: true,
-                            registered: false,
-                          )));
+              Navigator.pop(context, true);
             }
           },
           child: const Text('Continue'),
