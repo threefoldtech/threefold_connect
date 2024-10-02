@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 300 300">
+  <defs>
+    <style>
+      .cls-1 {
+        stroke: #dddddc;
+      }
+
+      .cls-1, .cls-2 {
+        fill: none;
+        stroke-miterlimit: 10;
+      }
+
+      .cls-3 {
+        fill: #1272b9;
+      }
+
+      .cls-3, .cls-4, .cls-5 {
+        stroke-width: 0px;
+      }
+
+      .cls-4 {
+        fill: #1ab689;
+      }
+
+      .cls-2 {
+        stroke: #787878;
+        stroke-width: 3px;
+      }
+
+      .cls-5 {
+        fill: #cbcbca;
+      }
+    </style>
+  </defs>
+  <circle class="cls-2" cx="149.9" cy="150" r="145.1"/>
+  <circle class="cls-2" cx="149.9" cy="150" r="89.9"/>
+  <g>
+    <path class="cls-3" d="M197.2,158.2l-68.8-48,12.3-18.2,62.5,43.5c3.5,2.4,4.4,7.3,2,10.8l-7.9,11.8Z"/>
+    <polygon class="cls-4" points="179.3 184.6 130.7 150.7 142.9 132.5 191.6 166.4 179.3 184.6"/>
+    <path class="cls-5" d="M155.7,206.9l-62.9-43.9,12.3-18.2,68.8,48-8.3,12.2c-2.2,3.3-6.6,4.1-9.9,1.8Z"/>
+  </g>
+  <g>
+    <circle class="cls-1" cx="149.9" cy="150" r="127"/>
+    <circle class="cls-1" cx="149.9" cy="150" r="120.1"/>
+    <circle class="cls-1" cx="149.9" cy="150" r="113.2"/>
+    <circle class="cls-1" cx="149.9" cy="150" r="106.4"/>
+    <circle class="cls-1" cx="149.9" cy="150" r="99.5"/>
+    <circle class="cls-1" cx="149.9" cy="150" r="92.6"/>
+  </g>
+</svg>

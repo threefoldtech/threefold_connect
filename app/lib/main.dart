@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
 import 'package:threebotlogin/helpers/globals.dart';
 import 'package:threebotlogin/screens/splash_screen.dart';
 import 'package:threebotlogin/services/shared_preference_service.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:threebotlogin/widgets/wizard/terms_agreement.dart';
 
 extension ColorSchemeExtension on ColorScheme {
   Color get warning => brightness == Brightness.light
@@ -37,7 +39,9 @@ Future<void> main() async {
   await setGlobalValues();
 
   bool registered = doubleName != null;
-  runApp(MyApp(initDone: initDone, registered: registered));
+  runApp(ChangeNotifierProvider(
+      create: ((context) => TermsAgreement()),
+      child: MyApp(initDone: initDone, registered: registered)));
 }
 
 Future<void> setGlobalValues() async {
