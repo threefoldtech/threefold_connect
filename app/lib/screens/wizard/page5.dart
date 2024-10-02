@@ -2,7 +2,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
-import 'package:threebotlogin/screens/unregistered_screen.dart';
+import 'package:threebotlogin/screens/main_screen.dart';
 import 'package:threebotlogin/screens/wizard/web_view.dart';
 import 'package:threebotlogin/services/shared_preference_service.dart';
 import 'package:threebotlogin/widgets/wizard/terms_agreement.dart';
@@ -10,7 +10,8 @@ import 'package:threebotlogin/widgets/wizard/terms_agreement.dart';
 class Page5 extends StatefulWidget {
   const Page5({super.key});
 
-  _Page5State createState() => _Page5State();
+  @override
+  State<Page5> createState() => _Page5State();
 }
 
 class _Page5State extends State<Page5> {
@@ -63,26 +64,22 @@ class _Page5State extends State<Page5> {
                         termsAgreement.attemptToContinue();
                       } else {
                         saveInitDone();
-                        await Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) =>
-                                    const UnregisteredScreen()));
+                        await Navigator.of(context).push(MaterialPageRoute(
+                            builder: (context) => const MainScreen(
+                                  initDone: true,
+                                  registered: false,
+                                )));
                       }
                     },
-                    style: ButtonStyle(
-                        shape:
-                            MaterialStateProperty.all<RoundedRectangleBorder>(
-                          RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(30),
-                          ),
-                        ),
-                        backgroundColor: MaterialStatePropertyAll(
-                          Theme.of(context).colorScheme.primary,
-                        )),
+                    style: ElevatedButton.styleFrom(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(30),
+                      ),
+                      backgroundColor: Theme.of(context).colorScheme.primary,
+                    ),
                     child: Text(
                       'GET STARTED',
-                      style: TextStyle(
+                      style: Theme.of(context).textTheme.bodyLarge!.copyWith(
                           color: Theme.of(context).colorScheme.onPrimary),
                     )),
               ),
@@ -102,22 +99,37 @@ class _Page5State extends State<Page5> {
                         children: [
                           TextSpan(
                             text: "I agree to Threefold's ",
-                            style: TextStyle(
-                              color: termsAgreement.attemptedWithoutAccepting &&
-                                      !termsAgreement.isChecked
-                                  ? Colors.red
-                                  : Theme.of(context).colorScheme.onBackground,
-                            ),
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodyMedium!
+                                .copyWith(
+                                  color: termsAgreement
+                                              .attemptedWithoutAccepting &&
+                                          !termsAgreement.isChecked
+                                      ? Theme.of(context).colorScheme.error
+                                      : Theme.of(context)
+                                          .colorScheme
+                                          .onBackground,
+                                ),
                           ),
                           TextSpan(
                             text: 'Terms and conditions.',
-                            style: TextStyle(
-                              color: termsAgreement.attemptedWithoutAccepting &&
-                                      !termsAgreement.isChecked
-                                  ? Colors.red
-                                  : Theme.of(context).colorScheme.onBackground,
-                              decoration: TextDecoration.underline,
-                            ),
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodyMedium!
+                                .copyWith(
+                                  color: termsAgreement
+                                              .attemptedWithoutAccepting &&
+                                          !termsAgreement.isChecked
+                                      ? Theme.of(context).colorScheme.error
+                                      : Colors.blue,
+                                  decoration: TextDecoration.underline,
+                                  decorationColor: termsAgreement
+                                              .attemptedWithoutAccepting &&
+                                          !termsAgreement.isChecked
+                                      ? Theme.of(context).colorScheme.error
+                                      : Colors.blue,
+                                ),
                             recognizer: TapGestureRecognizer()
                               ..onTap = () {
                                 Navigator.push(

@@ -9,14 +9,21 @@ import 'package:threebotlogin/screens/wizard/page5.dart';
 import '../../widgets/wizard/terms_and_conditions.dart';
 
 class SwipePage extends StatefulWidget {
+  const SwipePage({super.key});
+
   @override
-  _SwipePagesState createState() => _SwipePagesState();
+  State<SwipePage> createState() => _SwipePagesState();
 }
 
 class _SwipePagesState extends State<SwipePage> {
   final PageController _pageController =
       PageController(); // Controls the PageView
-  int _currentPage = 0;
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -40,7 +47,7 @@ class _SwipePagesState extends State<SwipePage> {
                     },
                     child: Text(
                       'SKIP',
-                      style: TextStyle(
+                      style: Theme.of(context).textTheme.bodyLarge!.copyWith(
                           color: Theme.of(context).colorScheme.onBackground),
                     ))
               ],
@@ -50,9 +57,7 @@ class _SwipePagesState extends State<SwipePage> {
             child: PageView(
               controller: _pageController,
               onPageChanged: (int index) {
-                setState(() {
-                  _currentPage = index;
-                });
+                setState(() {});
               },
               children: const [Page1(), Page2(), Page3(), Page4(), Page5()],
             ),
@@ -67,8 +72,8 @@ class _SwipePagesState extends State<SwipePage> {
                   effect: ExpandingDotsEffect(
                     dotWidth: 20,
                     dotHeight: 20,
-                    activeDotColor: Theme.of(context).colorScheme.secondary,
-                    dotColor: Colors.blue,
+                    activeDotColor: Theme.of(context).colorScheme.primary,
+                    dotColor: Theme.of(context).colorScheme.outline,
                   ),
                 ),
               ],
