@@ -476,9 +476,11 @@ packages:
   gridproxy_client:
     dependency: "direct main"
     description:
-      path: "../../../codescalers/tfgrid-sdk-dart/packages/gridproxy_client"
-      relative: true
-    source: path
+      path: "packages/gridproxy_client"
+      ref: tfchain_graphql_hotfix
+      resolved-ref: "314f46728e43cb86f430cda6ba756d4be3fb6e07"
+      url: "https://github.com/codescalers/tfgrid-sdk-dart"
+    source: git
     version: "1.0.0"
   hashlib:
     dependency: transitive
@@ -1330,9 +1332,11 @@ packages:
   tfchain_client:
     dependency: "direct main"
     description:
-      path: "../../../codescalers/tfgrid-sdk-dart/packages/tfchain_client"
-      relative: true
-    source: path
+      path: "packages/tfchain_client"
+      ref: tfchain_graphql_hotfix
+      resolved-ref: "314f46728e43cb86f430cda6ba756d4be3fb6e07"
+      url: "https://github.com/codescalers/tfgrid-sdk-dart"
+    source: git
     version: "0.1.0"
   timing:
     dependency: transitive
@@ -1640,4 +1644,4 @@ packages:
     version: "1.1.4+10"
 sdks:
   dart: ">=3.2.3 <4.0.0"
-  flutter: ">=3.16.0"
+  flutter: ">=3.16.6"

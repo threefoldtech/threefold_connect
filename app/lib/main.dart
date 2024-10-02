@@ -5,6 +5,7 @@ import 'package:threebotlogin/helpers/globals.dart';
 import 'package:threebotlogin/screens/splash_screen.dart';
 import 'package:threebotlogin/services/shared_preference_service.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:threebotlogin/widgets/theme_provider.dart';
 import 'package:threebotlogin/widgets/wizard/terms_agreement.dart';
 
 extension ColorSchemeExtension on ColorScheme {
@@ -39,9 +40,17 @@ Future<void> main() async {
   await setGlobalValues();
 
   bool registered = doubleName != null;
-  runApp(ChangeNotifierProvider(
-      create: ((context) => TermsAgreement()),
-      child: MyApp(initDone: initDone, registered: registered)));
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(
+            create: (context) => ThemeProvider()), // Theme provider
+        ChangeNotifierProvider(
+            create: (context) => TermsAgreement()), // Terms agreement provider
+      ],
+      child: MyApp(initDone: initDone, registered: registered),
+    ),
+  );
 }
 
 Future<void> setGlobalValues() async {
@@ -55,7 +64,7 @@ Future<void> setGlobalValues() async {
       (identity['signedIdentityNameIdentifier'] != null);
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({
     super.key,
     required this.initDone,
@@ -68,7 +77,19 @@ class MyApp extends StatelessWidget {
   final bool registered;
 
   @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+
     var kColorScheme = ColorScheme.fromSeed(
       brightness: Brightness.light,
       seedColor: const Color.fromARGB(255, 26, 161, 143),
@@ -134,8 +155,9 @@ class MyApp extends StatelessWidget {
           unselectedItemColor: kDarkColorScheme.secondary,
         ),
       ),
-      themeMode: ThemeMode.system,
-      home: SplashScreen(initDone: initDone, registered: registered),
+      themeMode: themeProvider.themeMode,
+      home: SplashScreen(
+          initDone: widget.initDone, registered: widget.registered),
     );
   }
 }
