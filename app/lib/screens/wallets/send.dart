@@ -352,10 +352,10 @@ class _WalletSendScreenState extends State<WalletSendScreen> {
               secret: chainType == ChainType.Stellar
                   ? widget.wallet.stellarSecret
                   : widget.wallet.tfchainSecret,
-              from: fromController.text,
-              to: toController.text,
-              amount: amountController.text,
-              memo: memoController.text,
+              from: fromController.text.trim(),
+              to: toController.text.trim(),
+              amount: amountController.text.trim(),
+              memo: memoController.text.trim(),
             ));
   }
 }
