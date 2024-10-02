@@ -34,8 +34,8 @@ class _FarmItemWidgetState extends State<FarmItemWidget> {
     walletAddressController.text = widget.farm.walletAddress;
     tfchainWalletSecretController.text = widget.farm.tfchainWalletSecret;
     walletNameController.text = widget.farm.walletName;
-    farmIdController.text = widget.farm.farmId;
-    twinIdController.text = widget.farm.twinId;
+    farmIdController.text = widget.farm.farmId.toString();
+    twinIdController.text = widget.farm.twinId.toString();
 
     return ExpansionTile(
       title: Text(

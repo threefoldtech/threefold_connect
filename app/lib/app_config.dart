@@ -217,5 +217,8 @@ void setFallbackConfigs() {
   Globals().phoneVerification = false;
   Globals().chainUrl = '';
   Globals().gridproxyUrl = '';
+  Globals().activationUrl = '';
+  Globals().relayUrl = '';
+  Globals().termsAndConditionsUrl = '';
   Globals().spendingLimit = 0;
 }

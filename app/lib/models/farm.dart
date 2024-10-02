@@ -5,7 +5,7 @@ class Node {
     required this.nodeId,
     required this.status,
   });
-  final String nodeId;
+  final int nodeId;
   final NodeStatus status;
 }
 
@@ -24,7 +24,7 @@ class Farm {
   final String walletAddress;
   final String tfchainWalletSecret;
   final String walletName;
-  final String twinId;
-  final String farmId;
+  final int twinId;
+  final int farmId;
   final List<Node> nodes;
 }

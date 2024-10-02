@@ -26,6 +26,7 @@ Future<void> showWrongEmojiDialog(BuildContext ctx) async {
   await showDialog(
     context: ctx,
     builder: (BuildContext context) => CustomDialog(
+      type: DialogType.Warning,
       image: Icons.warning,
       title: 'Wrong emoji',
       description:

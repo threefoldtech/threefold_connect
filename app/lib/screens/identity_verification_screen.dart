@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_pkid/flutter_pkid.dart';
 import 'package:http/http.dart';
-import 'package:shuftipro_sdk/shuftipro_sdk.dart';
+import 'package:shuftipro_onsite_sdk/shuftipro_onsite_sdk.dart';
 import 'package:threebotlogin/events/events.dart';
 import 'package:threebotlogin/events/identity_callback_event.dart';
 import 'package:threebotlogin/helpers/globals.dart';
@@ -64,6 +64,7 @@ class _IdentityVerificationScreenState
   };
 
   Map<String, Object> authObject = {
+    'auth_type': 'access_token',
     'access_token': '',
   };
 
@@ -332,7 +333,8 @@ class _IdentityVerificationScreenState
       context: context,
       barrierDismissible: false,
       builder: (BuildContext customContext) => CustomDialog(
-        image: Icons.info,
+        type: DialogType.Warning,
+        image: Icons.warning,
         title: 'Are you sure',
         description: 'Are you sure you want to exit the verification process',
         actions: <Widget>[
@@ -406,6 +408,7 @@ class _IdentityVerificationScreenState
             context: context,
             barrierDismissible: false,
             builder: (BuildContext dialogContext) => CustomDialog(
+              type: DialogType.Error,
               image: Icons.close,
               title: 'Request canceled',
               description: 'Verification process has been canceled.',
@@ -425,6 +428,7 @@ class _IdentityVerificationScreenState
             context: context,
             barrierDismissible: false,
             builder: (BuildContext dialogContext) => CustomDialog(
+              type: DialogType.Error,
               image: Icons.close,
               title: 'Request canceled',
               description:
@@ -985,6 +989,7 @@ class _IdentityVerificationScreenState
         return showDialog(
             context: context,
             builder: (BuildContext context) => CustomDialog(
+                  type: DialogType.Warning,
                   image: Icons.warning,
                   title: 'Maximum requests Reached',
                   description:
@@ -1008,7 +1013,8 @@ class _IdentityVerificationScreenState
         return showDialog(
             context: context,
             builder: (BuildContext context) => CustomDialog(
-                  image: Icons.warning,
+                  type: DialogType.Error,
+                  image: Icons.error,
                   title: "Couldn't setup verification process",
                   description:
                       'Something went wrong. Please contact support if this issue persists.',
@@ -1052,7 +1058,8 @@ class _IdentityVerificationScreenState
       return showDialog(
         context: context,
         builder: (BuildContext context) => CustomDialog(
-          image: Icons.warning,
+          type: DialogType.Error,
+          image: Icons.error,
           title: 'Failed to setup process',
           description:
               'Something went wrong. \n If this issue persist, please contact support',

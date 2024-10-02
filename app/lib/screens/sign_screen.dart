@@ -410,6 +410,7 @@ class _SignScreenState extends State<SignScreen> with BlockAndRunMixin {
       context: context,
       barrierDismissible: false,
       builder: (BuildContext customContext) => CustomDialog(
+        type: DialogType.Warning,
         image: Icons.warning,
         title: 'Are you sure',
         description:

@@ -193,7 +193,8 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
     showDialog(
       context: context,
       builder: (BuildContext context) => CustomDialog(
-        image: Icons.error,
+        type: DialogType.Warning,
+        image: Icons.warning,
         title: 'Disable Fingerprint',
         description:
             'Are you sure you want to deactivate fingerprint as authentication method?',
@@ -225,7 +226,8 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
     showDialog(
       context: context,
       builder: (BuildContext context) => CustomDialog(
-        image: Icons.error,
+        type: DialogType.Warning,
+        image: Icons.warning,
         title: 'Are you sure?',
         description:
             'If you confirm, your account will be removed from this device. You can always recover your account with your username and phrase.',
@@ -237,7 +239,13 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
             },
           ),
           TextButton(
-            child: const Text('Yes'),
+            child: Text(
+              'Yes',
+              style: Theme.of(context)
+                  .textTheme
+                  .bodyMedium!
+                  .copyWith(color: Theme.of(context).colorScheme.error),
+            ),
             onPressed: () async {
               // try {
               //   String deviceID = await _listener.getToken();
@@ -257,6 +265,7 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
                 showDialog(
                   context: preferenceContext!,
                   builder: (BuildContext context) => CustomDialog(
+                    type: DialogType.Error,
                     title: 'Error',
                     description:
                         'Something went wrong when trying to remove your account.',
@@ -349,7 +358,7 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
         context: context,
         builder: (BuildContext context) => CustomDialog(
           hiddenAction: copySeedPhrase,
-          image: Icons.create,
+          image: Icons.info,
           title: 'Please write this down on a piece of paper',
           description: phrase.toString(),
           actions: <Widget>[

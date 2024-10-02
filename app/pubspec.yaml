@@ -19,19 +19,19 @@ dependencies:
   tfchain_client:
     git:
       url: https://github.com/codescalers/tfgrid-sdk-dart
-      ref: main
+      ref: tfchain_graphql_hotfix
       path: packages/tfchain_client
   stellar_client:
     git:
       url: https://github.com/codescalers/tfgrid-sdk-dart
-      ref: main
+      ref: tfchain_graphql_hotfix_2
       path: packages/stellar_client
   gridproxy_client:
     git:
       url: https://github.com/codescalers/tfgrid-sdk-dart
-      ref: main
+      ref: tfchain_graphql_hotfix
       path: packages/gridproxy_client
-  shuftipro_sdk: ^1.2.5
+  shuftipro_onsite_sdk: ^1.0.5
   flutter_svg: ^2.0.6
   bip39: ^1.0.6
   socket_io_client: ^1.0.2
@@ -59,6 +59,12 @@ dependencies:
   pinenacl: ^0.5.1
   pinput: 3.0.1
   build_runner: ^2.4.9
+  smooth_page_indicator: ^1.2.0+3
+  webview_flutter: ^4.8.0
+  provider: ^6.1.2
+  qr_flutter: ^4.1.0
+  screen_brightness: ^1.0.1
+  validators: ^3.0.0
 
 dev_dependencies:
   flutter_test:
