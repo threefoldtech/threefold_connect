@@ -345,6 +345,7 @@ class _WalletSendScreenState extends State<WalletSendScreen> {
     showModalBottomSheet(
         isScrollControlled: true,
         useSafeArea: true,
+        isDismissible: false,
         constraints: const BoxConstraints(maxWidth: double.infinity),
         context: context,
         builder: (ctx) => SendConfirmationWidget(

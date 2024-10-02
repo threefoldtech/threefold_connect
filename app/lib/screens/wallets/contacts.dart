@@ -55,6 +55,7 @@ class _ContractsScreenState extends State<ContractsScreen> {
     showModalBottomSheet(
         isScrollControlled: true,
         useSafeArea: true,
+        isDismissible: false,
         constraints: const BoxConstraints(maxWidth: double.infinity),
         context: context,
         builder: (ctx) => AddEditContact(
@@ -68,6 +69,7 @@ class _ContractsScreenState extends State<ContractsScreen> {
     showModalBottomSheet(
         isScrollControlled: true,
         useSafeArea: true,
+        isDismissible: false,
         constraints: const BoxConstraints(maxWidth: double.infinity),
         context: context,
         builder: (ctx) => AddEditContact(
