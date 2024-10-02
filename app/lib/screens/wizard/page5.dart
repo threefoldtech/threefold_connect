@@ -2,7 +2,6 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
-import 'package:threebotlogin/screens/main_screen.dart';
 import 'package:threebotlogin/screens/wizard/web_view.dart';
 import 'package:threebotlogin/services/shared_preference_service.dart';
 import 'package:threebotlogin/widgets/wizard/terms_agreement.dart';
@@ -64,11 +63,7 @@ class _Page5State extends State<Page5> {
                         termsAgreement.attemptToContinue();
                       } else {
                         saveInitDone();
-                        await Navigator.of(context).push(MaterialPageRoute(
-                            builder: (context) => const MainScreen(
-                                  initDone: true,
-                                  registered: false,
-                                )));
+                        Navigator.pop(context, true);
                       }
                     },
                     style: ElevatedButton.styleFrom(
