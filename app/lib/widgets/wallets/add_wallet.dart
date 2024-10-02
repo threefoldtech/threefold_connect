@@ -48,46 +48,75 @@ class _NewWalletState extends State<NewWallet> {
     );
   }
 
-  Future<void> _validateAddSubmitData() async {
-    final walletName = _nameController.text.trim();
-    final walletSecret = _secretController.text.trim();
+  bool _validateName(String walletName) {
     nameError = null;
-    secretError = null;
-    saveLoading = true;
-    setState(() {});
 
     if (walletName.isEmpty) {
       nameError = "Name can't be empty";
-      saveLoading = false;
-      setState(() {});
-      return;
+      return false;
     }
     final w = widget.wallets.where((element) => element.name == walletName);
     if (w.isNotEmpty) {
       nameError = 'Name exists';
-      saveLoading = false;
-      setState(() {});
-      return;
+      return false;
     }
+    return true;
+  }
+
+  bool _validateSecret(String walletSecret) {
+    secretError = null;
+
     if (walletSecret.isEmpty) {
       secretError = "Secret can't be empty";
-      saveLoading = false;
-      setState(() {});
-      return;
+      return false;
     }
-    if (!(validateMnemonic(walletSecret) ||
-        (!validateMnemonic(walletSecret) && walletSecret.contains(' ')) ||
-        (isValidStellarSecret(walletSecret)) ||
-        (isValidSeed(walletSecret) &&
-            ((!walletSecret.startsWith('0x') && walletSecret.length == 64) ||
-                (walletSecret.startsWith('0x') &&
-                    walletSecret.length == 66))))) {
-      secretError = 'Secret is invalid';
-      saveLoading = false;
-      setState(() {});
-      return;
+
+    if (validateMnemonic(walletSecret)) {
+      return true;
     }
+
+    if (walletSecret.contains(' ')) {
+      secretError = 'Invalid Mnemonic';
+      return false;
+    }
+
+    if (isValidStellarSecret(walletSecret)) {
+      return true;
+    }
+
+    if (!isValidSeed(walletSecret)) {
+      secretError = 'Invalid seed';
+      return false;
+    }
+    if (!walletSecret.startsWith('0x') && walletSecret.length != 64) {
+      secretError = 'Invalid seed length';
+      return false;
+    }
+
+    if (walletSecret.startsWith('0x') && walletSecret.length != 66) {
+      secretError = 'Invalid seed length';
+      return false;
+    }
+    return true;
+  }
+
+  bool _validate() {
+    final walletName = _nameController.text.trim();
+    final walletSecret = _secretController.text.trim();
+    saveLoading = true;
+    setState(() {});
+
+    final validName = _validateName(walletName);
+    final validSecret = _validateSecret(walletSecret);
+    saveLoading = true;
+    setState(() {});
+    return validName && validSecret;
+  }
+
+  Future<void> _addWallet() async {
     Wallet wallet;
+    final walletName = _nameController.text.trim();
+    final walletSecret = _secretController.text.trim();
     try {
       wallet = await loadAddedWallet(walletName, walletSecret);
     } catch (e) {
@@ -182,7 +211,9 @@ class _NewWalletState extends State<NewWallet> {
                       width: 5,
                     ),
                     ElevatedButton(
-                        onPressed: _validateAddSubmitData,
+                        onPressed: () {
+                          if (_validate()) _addWallet();
+                        },
                         child: saveLoading
                             ? const SizedBox(
                                 width: 20,
