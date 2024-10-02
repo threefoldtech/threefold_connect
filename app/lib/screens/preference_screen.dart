@@ -151,7 +151,7 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
             },
           ),
           ListTile(
-            leading: const Icon(Icons.lightbulb),
+            leading: const Icon(Icons.brightness_6_outlined),
             title: const Text('Appearance'),
             trailing: GestureDetector(
               onTap: () {
@@ -177,7 +177,7 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
                   children: [
                     AnimatedPositioned(
                       duration: const Duration(milliseconds: 300),
-                      left: isDarkMode ? 15 : 0,
+                      left: isDarkMode ? 20 : 0,
                       child: Container(
                         width: 20,
                         height: 20,

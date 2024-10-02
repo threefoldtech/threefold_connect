@@ -38,13 +38,13 @@ Future<void> main() async {
   String? doubleName = await getDoubleName();
 
   await setGlobalValues();
-
+  String? savedTheme = await getTheme();
   bool registered = doubleName != null;
   runApp(
     MultiProvider(
       providers: [
         ChangeNotifierProvider(
-            create: (context) => ThemeProvider()), // Theme provider
+            create: (context) => ThemeProvider(savedTheme == 'dark' ? ThemeMode.dark : ThemeMode.light)), // Theme provider
         ChangeNotifierProvider(
             create: (context) => TermsAgreement()), // Terms agreement provider
       ],
