@@ -117,14 +117,10 @@ class _AddEditContactState extends State<AddEditContact> {
       print(e);
       _showDialog('Error', 'Failed to save contact. Please try again.',
           Icons.error, DialogType.Error);
-      saveLoading = false;
-      setState(() {});
       return;
     }
     widget.onAddContact!(PkidContact(
         name: contactName, address: contactAddress, type: widget.chainType));
-    saveLoading = false;
-    setState(() {});
     if (!context.mounted) return;
     Navigator.pop(context);
   }
@@ -141,13 +137,9 @@ class _AddEditContactState extends State<AddEditContact> {
       print(e);
       _showDialog('Error', 'Failed to modify contact. Please try again.',
           Icons.error, DialogType.Error);
-      saveLoading = false;
-      setState(() {});
       return;
     }
     widget.onEditContact!(widget.name, contactName, contactAddress);
-    saveLoading = false;
-    setState(() {});
     if (!context.mounted) return;
     Navigator.pop(context);
   }

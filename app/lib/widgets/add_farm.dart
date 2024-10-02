@@ -43,35 +43,32 @@ class _NewFarmState extends State<NewFarm> {
     );
   }
 
-  Future<void> _validateSubmittedData() async {
-    final farmName = _nameController.text.trim();
-    walletError = null;
+  Future<bool> _validateName(String farmName) async {
     nameError = null;
-    saveLoading = true;
-    setState(() {});
+    walletError = null;
 
     if (farmName.isEmpty) {
       nameError = "Name can't be empty";
-      saveLoading = false;
-      setState(() {});
-      return;
+      return false;
     }
     final available = await isFarmNameAvailable(farmName);
 
     if (!available) {
       nameError = 'Farm name is already used';
-      saveLoading = false;
-      setState(() {});
-      return;
+      return false;
     }
+    return true;
+  }
 
+  bool _validateWallet() {
     if (_selectedWallet == null) {
-      saveLoading = false;
       walletError = 'Please select a wallet';
-      setState(() {});
-      return;
+      return false;
     }
+    return true;
+  }
 
+  _add(String farmName) async {
     Farm farm;
     try {
       final f = await createFarm(farmName, _selectedWallet!.tfchainSecret,
@@ -93,15 +90,24 @@ class _NewFarmState extends State<NewFarm> {
       print(e);
       _showDialog('Error', 'Failed to create farm. Please try again.',
           Icons.error, DialogType.Error);
-      saveLoading = false;
-      setState(() {});
       return;
     }
     widget.onAddFarm(farm);
-    saveLoading = false;
-    setState(() {});
     if (!context.mounted) return;
     Navigator.pop(context);
+  }
+
+  Future<void> _validateAndAdd() async {
+    final farmName = _nameController.text.trim();
+    saveLoading = true;
+    setState(() {});
+    final validName = await _validateName(farmName);
+    final validWallet = _validateWallet();
+    if (validName && validWallet) {
+      await _add(farmName);
+    }
+    saveLoading = false;
+    setState(() {});
   }
 
   List<DropdownMenuEntry<Wallet>> _buildDropdownMenuEntries() {
@@ -229,7 +235,7 @@ class _NewFarmState extends State<NewFarm> {
                       width: 5,
                     ),
                     ElevatedButton(
-                        onPressed: _validateSubmittedData,
+                        onPressed: _validateAndAdd,
                         child: saveLoading
                             ? const SizedBox(
                                 width: 20,
