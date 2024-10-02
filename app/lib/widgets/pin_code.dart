@@ -3,13 +3,16 @@ import 'package:pinput/pinput.dart';
 import 'package:threebotlogin/helpers/globals.dart';
 
 class PincodeWidget extends StatefulWidget {
-  const PincodeWidget(
-      {super.key,
-      required this.userMessage,
-      required this.title,
-      required this.handler});
+  const PincodeWidget({
+    super.key,
+    required this.userMessage,
+    required this.title,
+    required this.handler,
+    this.hideBackButton = false,
+  });
   final String title;
   final String userMessage;
+  final bool hideBackButton;
   final Function(String) handler;
 
   @override
@@ -50,9 +53,9 @@ class _PincodeWidgetState extends State<PincodeWidget> {
     /// Optionally you can use form to validate the Pinput
     return Scaffold(
       appBar: AppBar(
-        elevation: 0,
-        title: Text(widget.title),
-      ),
+          elevation: 0,
+          title: Text(widget.title),
+          automaticallyImplyLeading: widget.hideBackButton == false),
       body: Center(
         child: Form(
           key: formKey,

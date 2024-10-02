@@ -3,10 +3,11 @@ import 'package:threebotlogin/services/shared_preference_service.dart';
 import 'package:threebotlogin/widgets/pin_code.dart';
 
 class ChangePinScreen extends StatefulWidget {
-  const ChangePinScreen({super.key, this.currentPin, this.hideBackButton});
+  const ChangePinScreen(
+      {super.key, this.currentPin, this.hideBackButton = false});
 
   final String? currentPin;
-  final bool? hideBackButton;
+  final bool hideBackButton;
 
   @override
   State<ChangePinScreen> createState() => _ChangePinScreenState();
@@ -38,11 +39,16 @@ class _ChangePinScreenState extends State<ChangePinScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return PincodeWidget(
-      title:
-          widget.currentPin == null ? 'Choose your pincode' : 'Change pincode',
-      userMessage: getText(),
-      handler: changePin,
+    return PopScope(
+      canPop: widget.hideBackButton == false,
+      child: PincodeWidget(
+        title: widget.currentPin == null
+            ? 'Choose your pincode'
+            : 'Change pincode',
+        userMessage: getText(),
+        hideBackButton: widget.hideBackButton,
+        handler: changePin,
+      ),
     );
   }
 
