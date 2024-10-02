@@ -60,54 +60,52 @@ class _AddEditContactState extends State<AddEditContact> {
     );
   }
 
-  Future<void> _validateAndAdd() async {
-    final contactName = _nameController.text.trim();
-    final contactAddress = _addressController.text.trim();
+  bool _validateName(String contactName, {bool edit = false}) {
     nameError = null;
-    addressError = null;
-    saveLoading = true;
-    setState(() {});
 
     if (contactName.isEmpty) {
       nameError = "Name can't be empty";
-      saveLoading = false;
-      setState(() {});
-      return;
+      return false;
     }
-    final c = widget.contacts.where((element) => element.name == contactName);
-    if (c.isNotEmpty) {
+    final c = widget.contacts.where((c) => c.name == contactName);
+    if (edit && contactName != widget.name && c.isNotEmpty) {
+      nameError = 'Name is used for another contact';
+      return false;
+    } else if (!edit && c.isNotEmpty) {
       nameError = 'Name exists';
-      saveLoading = false;
-      setState(() {});
-      return;
+      return false;
     }
+    return true;
+  }
+
+  bool _validateAddress(String contactAddress, {bool edit = false}) {
+    addressError = null;
+
     if (contactAddress.isEmpty) {
       addressError = "Address can't be empty";
-      saveLoading = false;
-      setState(() {});
-      return;
+      return false;
     }
     final contacts = widget.contacts.where((c) => c.address == contactAddress);
-    if (contacts.isNotEmpty) {
+    if (edit && contactAddress != widget.address && contacts.isNotEmpty) {
+      addressError = 'Address is used in another contact';
+      return false;
+    } else if (!edit && contacts.isNotEmpty) {
       addressError = 'Address exists';
-      saveLoading = false;
-      setState(() {});
-      return;
+      return false;
     }
     if (widget.chainType == ChainType.TFChain && contactAddress.length != 48) {
       addressError = 'Address length should be 48 characters';
-      saveLoading = false;
-      setState(() {});
-      return;
+      return false;
     }
     if (widget.chainType == ChainType.Stellar &&
         !isValidStellarAddress(contactAddress)) {
       addressError = 'Invaild Stellar address';
-      saveLoading = false;
-      setState(() {});
-      return;
+      return false;
     }
+    return true;
+  }
 
+  _add(String contactName, String contactAddress) async {
     try {
       await addContact(contactName, contactAddress, widget.chainType);
       await _showDialog(
@@ -131,57 +129,9 @@ class _AddEditContactState extends State<AddEditContact> {
     Navigator.pop(context);
   }
 
-  Future<void> _validateAndEdit() async {
-    final contactName = _nameController.text.trim();
-    final contactAddress = _addressController.text.trim();
-    nameError = null;
-    addressError = null;
-    saveLoading = true;
-    setState(() {});
-
-    if (contactName.isEmpty) {
-      nameError = "Name can't be empty";
-      saveLoading = false;
-      setState(() {});
-      return;
-    }
-    final c = widget.contacts.where((element) => element.name == contactName);
-    if (contactName != widget.name && c.isNotEmpty) {
-      nameError = 'Name is used for another contact';
-      saveLoading = false;
-      setState(() {});
-      return;
-    }
-    if (contactAddress.isEmpty) {
-      addressError = "Address can't be empty";
-      saveLoading = false;
-      setState(() {});
-      return;
-    }
-    final contacts = widget.contacts.where((c) => c.address == contactAddress);
-    if (contactAddress != widget.address && contacts.isNotEmpty) {
-      addressError = 'Address is used in another contact';
-      saveLoading = false;
-      setState(() {});
-      return;
-    }
-
-    if (widget.chainType == ChainType.TFChain && contactAddress.length != 48) {
-      addressError = 'Address length should be 48 characters';
-      saveLoading = false;
-      setState(() {});
-      return;
-    }
-    if (widget.chainType == ChainType.Stellar &&
-        !isValidStellarAddress(contactAddress)) {
-      addressError = 'Invaild Stellar address';
-      saveLoading = false;
-      setState(() {});
-      return;
-    }
-
+  _edit(String contactName, String contactAddress) async {
     try {
-      await editContact(widget.name, contactAddress, contactAddress);
+      await editContact(widget.name, contactName, contactAddress);
       await _showDialog(
           'Contact Modified!',
           'Contact $contactName has been modified successfully',
@@ -200,6 +150,38 @@ class _AddEditContactState extends State<AddEditContact> {
     setState(() {});
     if (!context.mounted) return;
     Navigator.pop(context);
+  }
+
+  Future<void> _validateAndAdd() async {
+    final contactName = _nameController.text.trim();
+    final contactAddress = _addressController.text.trim();
+    saveLoading = true;
+    setState(() {});
+    final validName = _validateName(contactName);
+    final validAddress = _validateAddress(contactAddress);
+
+    if (validName && validAddress) {
+      return await _add(contactName, contactAddress);
+    }
+    saveLoading = false;
+    setState(() {});
+  }
+
+  Future<void> _validateAndEdit() async {
+    final contactName = _nameController.text.trim();
+    final contactAddress = _addressController.text.trim();
+    saveLoading = true;
+    setState(() {});
+    final validName = _validateName(contactName, edit: true);
+    final validAddress = _validateAddress(contactAddress, edit: true);
+
+    if (validName &&
+        validAddress &&
+        (contactName != widget.name || contactAddress != widget.address)) {
+      return await _edit(contactName, contactAddress);
+    }
+    saveLoading = false;
+    setState(() {});
   }
 
   @override
