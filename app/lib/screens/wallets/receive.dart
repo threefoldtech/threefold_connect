@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:threebotlogin/models/wallet.dart';
 import 'package:threebotlogin/screens/qr_code_screen.dart';
+import 'package:threebotlogin/widgets/wallets/select_chain_widget.dart';
 import 'package:validators/validators.dart';
 
 class WalletReceiveScreen extends StatefulWidget {
@@ -51,6 +52,14 @@ class _WalletReceiveScreenState extends State<WalletReceiveScreen> {
     return true;
   }
 
+  onChangeChain(ChainType type) {
+    toController.text = type == ChainType.Stellar
+        ? widget.wallet.stellarAddress
+        : widget.wallet.tfchainAddress;
+    chainType = type;
+    setState(() {});
+  }
+
   _showQRCode() {
     final quaryParams = {'amount': amountController.text.trim()};
     if (chainType == ChainType.Stellar) {
@@ -69,77 +78,13 @@ class _WalletReceiveScreenState extends State<WalletReceiveScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final width = MediaQuery.of(context).size.width;
     return Scaffold(
       appBar: AppBar(title: const Text('Receive')),
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(8.0),
           child: Column(children: [
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  ElevatedButton(
-                    onPressed: () => setState(() {
-                      toController.text = widget.wallet.stellarAddress;
-                      chainType = ChainType.Stellar;
-                    }),
-                    style: ElevatedButton.styleFrom(
-                        fixedSize: Size.fromWidth(width / 3),
-                        backgroundColor: chainType == ChainType.Stellar
-                            ? Theme.of(context).colorScheme.primaryContainer
-                            : Theme.of(context).colorScheme.background,
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(3),
-                            side: BorderSide(
-                                color: chainType == ChainType.Stellar
-                                    ? Theme.of(context)
-                                        .colorScheme
-                                        .primaryContainer
-                                    : Theme.of(context)
-                                        .colorScheme
-                                        .secondaryContainer))),
-                    child: Text(
-                      'Stellar',
-                      style: Theme.of(context).textTheme.titleLarge!.copyWith(
-                          color: chainType == ChainType.Stellar
-                              ? Theme.of(context).colorScheme.onPrimaryContainer
-                              : Theme.of(context).colorScheme.onBackground),
-                    ),
-                  ),
-                  ElevatedButton(
-                    onPressed: () => setState(() {
-                      toController.text = widget.wallet.tfchainAddress;
-                      chainType = ChainType.TFChain;
-                    }),
-                    style: ElevatedButton.styleFrom(
-                        fixedSize: Size.fromWidth(width / 3),
-                        backgroundColor: chainType == ChainType.TFChain
-                            ? Theme.of(context).colorScheme.primaryContainer
-                            : Theme.of(context).colorScheme.background,
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(5),
-                            side: BorderSide(
-                                color: chainType == ChainType.TFChain
-                                    ? Theme.of(context)
-                                        .colorScheme
-                                        .primaryContainer
-                                    : Theme.of(context)
-                                        .colorScheme
-                                        .secondaryContainer))),
-                    child: Text(
-                      'TFChain',
-                      style: Theme.of(context).textTheme.titleLarge!.copyWith(
-                          color: chainType == ChainType.TFChain
-                              ? Theme.of(context).colorScheme.onPrimaryContainer
-                              : Theme.of(context).colorScheme.onBackground),
-                    ),
-                  ),
-                ],
-              ),
-            ),
+            SelectChainWidget(onChangeChain: onChangeChain),
             const SizedBox(height: 40),
             ListTile(
               title: TextField(

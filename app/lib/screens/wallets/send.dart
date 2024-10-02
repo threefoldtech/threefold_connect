@@ -5,6 +5,7 @@ import 'package:threebotlogin/models/wallet.dart';
 import 'package:threebotlogin/screens/scan_screen.dart';
 import 'package:threebotlogin/screens/wallets/contacts.dart';
 import 'package:threebotlogin/services/stellar_service.dart';
+import 'package:threebotlogin/widgets/wallets/select_chain_widget.dart';
 import 'package:threebotlogin/widgets/wallets/send_confirmation.dart';
 import 'package:validators/validators.dart';
 
@@ -40,6 +41,14 @@ class _WalletSendScreenState extends State<WalletSendScreen> {
     amountController.dispose();
     memoController.dispose();
     super.dispose();
+  }
+
+  onChangeChain(ChainType type) {
+    fromController.text = type == ChainType.Stellar
+        ? widget.wallet.stellarAddress
+        : widget.wallet.tfchainAddress;
+    chainType = type;
+    setState(() {});
   }
 
   bool _validateToAddress() {
@@ -121,7 +130,6 @@ class _WalletSendScreenState extends State<WalletSendScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final width = MediaQuery.of(context).size.width;
     String balance = chainType == ChainType.Stellar
         ? widget.wallet.stellarBalance
         : widget.wallet.tfchainBalance;
@@ -132,70 +140,7 @@ class _WalletSendScreenState extends State<WalletSendScreen> {
         child: Padding(
           padding: const EdgeInsets.all(8.0),
           child: Column(children: [
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  ElevatedButton(
-                    onPressed: () => setState(() {
-                      fromController.text = widget.wallet.stellarAddress;
-                      chainType = ChainType.Stellar;
-                    }),
-                    style: ElevatedButton.styleFrom(
-                        fixedSize: Size.fromWidth(width / 3),
-                        backgroundColor: chainType == ChainType.Stellar
-                            ? Theme.of(context).colorScheme.primaryContainer
-                            : Theme.of(context).colorScheme.background,
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(3),
-                            side: BorderSide(
-                                color: chainType == ChainType.Stellar
-                                    ? Theme.of(context)
-                                        .colorScheme
-                                        .primaryContainer
-                                    : Theme.of(context)
-                                        .colorScheme
-                                        .secondaryContainer))),
-                    child: Text(
-                      'Stellar',
-                      style: Theme.of(context).textTheme.titleLarge!.copyWith(
-                          color: chainType == ChainType.Stellar
-                              ? Theme.of(context).colorScheme.onPrimaryContainer
-                              : Theme.of(context).colorScheme.onBackground),
-                    ),
-                  ),
-                  ElevatedButton(
-                    onPressed: () => setState(() {
-                      fromController.text = widget.wallet.tfchainAddress;
-                      chainType = ChainType.TFChain;
-                    }),
-                    style: ElevatedButton.styleFrom(
-                        fixedSize: Size.fromWidth(width / 3),
-                        backgroundColor: chainType == ChainType.TFChain
-                            ? Theme.of(context).colorScheme.primaryContainer
-                            : Theme.of(context).colorScheme.background,
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(5),
-                            side: BorderSide(
-                                color: chainType == ChainType.TFChain
-                                    ? Theme.of(context)
-                                        .colorScheme
-                                        .primaryContainer
-                                    : Theme.of(context)
-                                        .colorScheme
-                                        .secondaryContainer))),
-                    child: Text(
-                      'TFChain',
-                      style: Theme.of(context).textTheme.titleLarge!.copyWith(
-                          color: chainType == ChainType.TFChain
-                              ? Theme.of(context).colorScheme.onPrimaryContainer
-                              : Theme.of(context).colorScheme.onBackground),
-                    ),
-                  ),
-                ],
-              ),
-            ),
+            SelectChainWidget(onChangeChain: onChangeChain),
             const SizedBox(height: 40),
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 10),
