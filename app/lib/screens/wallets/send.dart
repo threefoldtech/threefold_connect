@@ -140,7 +140,8 @@ class _WalletSendScreenState extends State<WalletSendScreen> {
         child: Padding(
           padding: const EdgeInsets.all(8.0),
           child: Column(children: [
-            SelectChainWidget(onChangeChain: onChangeChain),
+            SelectChainWidget(
+                chainType: chainType, onChangeChain: onChangeChain),
             const SizedBox(height: 40),
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 10),

@@ -2,16 +2,36 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:threebotlogin/models/wallet.dart';
 
-class SelectChainWidget extends StatefulWidget {
-  const SelectChainWidget({super.key, required this.onChangeChain});
+class SelectChainWidget extends StatelessWidget {
+  const SelectChainWidget(
+      {super.key, required this.chainType, required this.onChangeChain});
   final void Function(ChainType chainType) onChangeChain;
+  final ChainType chainType;
 
-  @override
-  State<SelectChainWidget> createState() => _SelectChainWidgetState();
-}
-
-class _SelectChainWidgetState extends State<SelectChainWidget> {
-  ChainType chainType = ChainType.Stellar;
+  Widget _optionButton(BuildContext context, String label, double width,
+      bool active, void Function() onPressed) {
+    final ColorScheme colorScheme = Theme.of(context).colorScheme;
+    return ElevatedButton(
+      onPressed: onPressed,
+      style: ElevatedButton.styleFrom(
+          fixedSize: Size.fromWidth(width),
+          backgroundColor:
+              active ? colorScheme.primaryContainer : colorScheme.background,
+          shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(5),
+              side: BorderSide(
+                  color: active
+                      ? colorScheme.primaryContainer
+                      : colorScheme.secondaryContainer))),
+      child: Text(
+        label,
+        style: Theme.of(context).textTheme.titleLarge!.copyWith(
+            color: active
+                ? colorScheme.onPrimaryContainer
+                : colorScheme.onBackground),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -21,58 +41,16 @@ class _SelectChainWidgetState extends State<SelectChainWidget> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          ElevatedButton(
-            onPressed: () {
-              chainType = ChainType.Stellar;
-              widget.onChangeChain(chainType);
-            },
-            style: ElevatedButton.styleFrom(
-                fixedSize: Size.fromWidth(width / 3),
-                backgroundColor: chainType == ChainType.Stellar
-                    ? Theme.of(context).colorScheme.primaryContainer
-                    : Theme.of(context).colorScheme.background,
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(3),
-                    side: BorderSide(
-                        color: chainType == ChainType.Stellar
-                            ? Theme.of(context).colorScheme.primaryContainer
-                            : Theme.of(context)
-                                .colorScheme
-                                .secondaryContainer))),
-            child: Text(
-              'Stellar',
-              style: Theme.of(context).textTheme.titleLarge!.copyWith(
-                  color: chainType == ChainType.Stellar
-                      ? Theme.of(context).colorScheme.onPrimaryContainer
-                      : Theme.of(context).colorScheme.onBackground),
-            ),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              chainType = ChainType.TFChain;
-              widget.onChangeChain(chainType);
-            },
-            style: ElevatedButton.styleFrom(
-                fixedSize: Size.fromWidth(width / 3),
-                backgroundColor: chainType == ChainType.TFChain
-                    ? Theme.of(context).colorScheme.primaryContainer
-                    : Theme.of(context).colorScheme.background,
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(5),
-                    side: BorderSide(
-                        color: chainType == ChainType.TFChain
-                            ? Theme.of(context).colorScheme.primaryContainer
-                            : Theme.of(context)
-                                .colorScheme
-                                .secondaryContainer))),
-            child: Text(
-              'TFChain',
-              style: Theme.of(context).textTheme.titleLarge!.copyWith(
-                  color: chainType == ChainType.TFChain
-                      ? Theme.of(context).colorScheme.onPrimaryContainer
-                      : Theme.of(context).colorScheme.onBackground),
-            ),
-          ),
+          _optionButton(
+              context, 'Stellar', width / 3, chainType == ChainType.Stellar,
+              () {
+            onChangeChain(ChainType.Stellar);
+          }),
+          _optionButton(
+              context, 'TFChain', width / 3, chainType == ChainType.TFChain,
+              () {
+            onChangeChain(ChainType.TFChain);
+          }),
         ],
       ),
     );

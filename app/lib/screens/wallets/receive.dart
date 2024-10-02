@@ -84,7 +84,8 @@ class _WalletReceiveScreenState extends State<WalletReceiveScreen> {
         child: Padding(
           padding: const EdgeInsets.all(8.0),
           child: Column(children: [
-            SelectChainWidget(onChangeChain: onChangeChain),
+            SelectChainWidget(
+                chainType: chainType, onChangeChain: onChangeChain),
             const SizedBox(height: 40),
             ListTile(
               title: TextField(
