@@ -190,7 +190,7 @@ class _MobileRegistrationScreenState extends State<MobileRegistrationScreen> {
               'Something went wrong when trying to create your account.',
           actions: <Widget>[
             TextButton(
-              child: const Text('Ok'),
+              child: const Text('Close'),
               onPressed: () {
                 Navigator.pop(context);
               },

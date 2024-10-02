@@ -36,7 +36,7 @@ class CustomDialog extends StatefulWidget {
         actions: <Widget>[
           //@todo make this configurable, ok;okcancel
           TextButton(
-            child: const Text('Ok'),
+            child: const Text('Close'),
             onPressed: () {
               Navigator.pop(context);
             },
@@ -64,7 +64,7 @@ class _CustomDialogState extends State<CustomDialog> {
         actions: <Widget>[
           //@todo make this configurable, ok;okcancel
           TextButton(
-            child: const Text('Ok'),
+            child: const Text('Close'),
             onPressed: () {
               Navigator.pop(context);
             },

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:threebotlogin/main.dart';
 import 'package:threebotlogin/models/wallet.dart';
 import 'package:threebotlogin/services/wallet_service.dart';
 import 'package:threebotlogin/widgets/custom_dialog.dart';
@@ -320,7 +321,7 @@ class _WalletDetailsWidgetState extends State<WalletDetailsWidget> {
               style: Theme.of(context)
                   .textTheme
                   .bodyMedium!
-                  .copyWith(color: Theme.of(context).colorScheme.error),
+                  .copyWith(color: Theme.of(context).colorScheme.warning),
             ),
           ),
         ],

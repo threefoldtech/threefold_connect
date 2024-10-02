@@ -7,6 +7,7 @@ import 'package:threebotlogin/events/close_socket_event.dart';
 import 'package:threebotlogin/events/events.dart';
 import 'package:threebotlogin/helpers/environment.dart';
 import 'package:threebotlogin/helpers/globals.dart';
+import 'package:threebotlogin/main.dart';
 
 import 'package:threebotlogin/screens/authentication_screen.dart';
 import 'package:threebotlogin/screens/change_pin_screen.dart';
@@ -209,7 +210,13 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
             },
           ),
           TextButton(
-            child: const Text('Yes'),
+            child: Text(
+              'Yes',
+              style: Theme.of(context)
+                  .textTheme
+                  .bodyMedium!
+                  .copyWith(color: Theme.of(context).colorScheme.warning),
+            ),
             onPressed: () async {
               Navigator.pop(context);
               finger = false;
@@ -244,7 +251,7 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
               style: Theme.of(context)
                   .textTheme
                   .bodyMedium!
-                  .copyWith(color: Theme.of(context).colorScheme.error),
+                  .copyWith(color: Theme.of(context).colorScheme.warning),
             ),
             onPressed: () async {
               // try {
@@ -271,7 +278,7 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
                         'Something went wrong when trying to remove your account.',
                     actions: <Widget>[
                       TextButton(
-                        child: const Text('Ok'),
+                        child: const Text('Close'),
                         onPressed: () {
                           Navigator.pop(context);
                         },
@@ -434,7 +441,7 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
             description: 'Your pincode was successfully changed.',
             actions: <Widget>[
               TextButton(
-                child: const Text('Ok'),
+                child: const Text('Close'),
                 onPressed: () async {
                   Navigator.pop(context);
                 },
@@ -470,7 +477,7 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
                 'Type: ${appConfig.environment}\nGit hash: ${appConfig.githash}\nTime: ${appConfig.time}',
             actions: <Widget>[
               TextButton(
-                child: const Text('Ok'),
+                child: const Text('Close'),
                 onPressed: () {
                   Navigator.pop(context);
                   setState(() {});

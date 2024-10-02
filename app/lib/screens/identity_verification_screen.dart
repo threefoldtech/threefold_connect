@@ -346,7 +346,13 @@ class _IdentityVerificationScreenState
             },
           ),
           TextButton(
-            child: const Text('Yes'),
+            child: Text(
+              'Yes',
+              style: Theme.of(context)
+                  .textTheme
+                  .bodyMedium!
+                  .copyWith(color: Theme.of(context).colorScheme.warning),
+            ),
             onPressed: () async {
               Navigator.pop(customContext);
               setState(() {
@@ -417,7 +423,7 @@ class _IdentityVerificationScreenState
                     onPressed: () {
                       Navigator.pop(dialogContext);
                     },
-                    child: const Text('OK'))
+                    child: const Text('Close'))
               ],
             ),
           );
@@ -438,7 +444,7 @@ class _IdentityVerificationScreenState
                     onPressed: () {
                       Navigator.pop(dialogContext);
                     },
-                    child: const Text('OK'))
+                    child: const Text('Close'))
               ],
             ),
           );
@@ -996,7 +1002,7 @@ class _IdentityVerificationScreenState
                       'You already had 5 requests in last 24 hours. \nPlease try again in 24 hours.',
                   actions: <Widget>[
                     TextButton(
-                      child: const Text('Ok'),
+                      child: const Text('Close'),
                       onPressed: () {
                         Navigator.pop(context);
                       },
@@ -1020,7 +1026,7 @@ class _IdentityVerificationScreenState
                       'Something went wrong. Please contact support if this issue persists.',
                   actions: <Widget>[
                     TextButton(
-                      child: const Text('Ok'),
+                      child: const Text('Close'),
                       onPressed: () {
                         Navigator.pop(context);
                       },
@@ -1065,7 +1071,7 @@ class _IdentityVerificationScreenState
               'Something went wrong. \n If this issue persist, please contact support',
           actions: <Widget>[
             TextButton(
-              child: const Text('Ok'),
+              child: const Text('Close'),
               onPressed: () {
                 Navigator.pop(context);
               },
@@ -1319,7 +1325,7 @@ class _IdentityVerificationScreenState
         description: 'A verification email has been sent.',
         actions: <Widget>[
           TextButton(
-            child: const Text('Ok'),
+            child: const Text('Close'),
             onPressed: () {
               Navigator.pop(context);
             },

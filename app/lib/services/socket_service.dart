@@ -143,7 +143,7 @@ Future emailVerification(BuildContext context) async {
       description: 'Your email has been verified!',
       actions: <Widget>[
         TextButton(
-          child: const Text('Ok'),
+          child: const Text('Close'),
           onPressed: () {
             Navigator.pop(context);
           },
@@ -191,7 +191,7 @@ Future phoneVerification(BuildContext context) async {
       description: 'Your phone has been verified!',
       actions: <Widget>[
         TextButton(
-          child: const Text('Ok'),
+          child: const Text('Close'),
           onPressed: () {
             Navigator.pop(context);
           },
@@ -214,7 +214,7 @@ Future showIdentityMessage(BuildContext context, String type) async {
               'Your verification attempt has expired, please retry and finish the flow in under 10 minutes.',
           actions: <Widget>[
             TextButton(
-              child: const Text('Ok'),
+              child: const Text('Close'),
               onPressed: () {
                 Navigator.pop(context);
               },
@@ -234,7 +234,7 @@ Future showIdentityMessage(BuildContext context, String type) async {
               'Something went wrong.\nIf this issue persist, please contact support',
           actions: <Widget>[
             TextButton(
-              child: const Text('Ok'),
+              child: const Text('Close'),
               onPressed: () {
                 Navigator.pop(context);
               },
@@ -252,7 +252,7 @@ Future showIdentityMessage(BuildContext context, String type) async {
         description: 'Your identity has been verified successfully',
         actions: <Widget>[
           TextButton(
-            child: const Text('Ok'),
+            child: const Text('Close'),
             onPressed: () {
               Navigator.pop(context);
             },

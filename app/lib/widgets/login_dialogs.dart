@@ -12,7 +12,7 @@ Future<void> showExpiredDialog(BuildContext ctx) async {
           'Your login attempt has expired, please request a new one in your browser.',
       actions: <Widget>[
         TextButton(
-          child: const Text('Ok'),
+          child: const Text('Close'),
           onPressed: () {
             Navigator.pop(context);
           },
@@ -52,7 +52,7 @@ Future<void> showLoggedInDialog(BuildContext ctx) async {
       description: 'You are now logged in. Please return to your browser.',
       actions: <Widget>[
         TextButton(
-          child: const Text('Ok'),
+          child: const Text('Close'),
           onPressed: () {
             Navigator.pop(context);
           },
@@ -72,7 +72,7 @@ Future<void> showSignedInDialog(BuildContext ctx) async {
           'The data has been successfully signed. Please return to your browser.',
       actions: <Widget>[
         TextButton(
-          child: const Text('Ok'),
+          child: const Text('Close'),
           onPressed: () {
             Navigator.pop(context);
           },

@@ -36,7 +36,7 @@ phoneSendDialog(context) {
       description: 'A verification sms has been sent.',
       actions: <Widget>[
         TextButton(
-          child: const Text('Ok'),
+          child: const Text('Close'),
           onPressed: () {
             Navigator.pop(context);
           },

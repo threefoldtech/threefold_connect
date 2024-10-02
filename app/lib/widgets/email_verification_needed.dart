@@ -13,7 +13,7 @@ emailVerificationDialog(context) {
       description: 'Please verify email before using this app',
       actions: <Widget>[
         TextButton(
-          child: const Text('Ok'),
+          child: const Text('Close'),
           onPressed: () {
             Navigator.pop(context);
           },
@@ -41,7 +41,7 @@ emailResentDialog(context) {
       description: 'A new verification email has been sent.',
       actions: <Widget>[
         TextButton(
-          child: const Text('Ok'),
+          child: const Text('Close'),
           onPressed: () {
             Navigator.pop(context);
           },

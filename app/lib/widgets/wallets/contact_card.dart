@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:threebotlogin/main.dart';
 import 'package:threebotlogin/services/contact_service.dart';
 import 'package:threebotlogin/widgets/custom_dialog.dart';
 
@@ -82,7 +83,7 @@ class _ContactCardWidgetState extends State<ContactCardWidget> {
               style: Theme.of(context)
                   .textTheme
                   .bodyMedium!
-                  .copyWith(color: Theme.of(context).colorScheme.error),
+                  .copyWith(color: Theme.of(context).colorScheme.warning),
             ),
           ),
         ],
