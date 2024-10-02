@@ -27,13 +27,30 @@ class _ContactCardWidgetState extends State<ContactCardWidget> {
     setState(() {
       deleteLoading = true;
     });
-    //TODO: Show snack in case of failure
-    await deleteContact(widget.name);
-    widget.onDeleteContact!(widget.name);
-
-    setState(() {
-      deleteLoading = false;
-    });
+    try {
+      await deleteContact(widget.name);
+      widget.onDeleteContact!(widget.name);
+    } catch (e) {
+      print('Failed to delete contact due to $e');
+      if (context.mounted) {
+        final loadingFarmsFailure = SnackBar(
+          content: Text(
+            'Failed to delete',
+            style: Theme.of(context)
+                .textTheme
+                .bodyMedium!
+                .copyWith(color: Theme.of(context).colorScheme.errorContainer),
+          ),
+          duration: const Duration(seconds: 3),
+        );
+        ScaffoldMessenger.of(context).clearSnackBars();
+        ScaffoldMessenger.of(context).showSnackBar(loadingFarmsFailure);
+      }
+    } finally {
+      setState(() {
+        deleteLoading = false;
+      });
+    }
   }
 
   void _showDeleteConfirmationDialog() {
