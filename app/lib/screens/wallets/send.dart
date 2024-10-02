@@ -42,36 +42,45 @@ class _WalletSendScreenState extends State<WalletSendScreen> {
     super.dispose();
   }
 
-  bool _validate() {
+  bool _validateToAddress() {
     final toAddress = toController.text.trim();
-    final amount = amountController.text.trim();
-    amountError = null;
     toAddressError = null;
     if (toAddress.isEmpty) {
       toAddressError = "Address can't be empty";
-      setState(() {});
       return false;
     }
+
+    if (chainType == ChainType.TFChain) {
+      if (toAddress.length != 48) {
+        toAddressError = 'Address length should be 48 characters';
+        return false;
+      }
+    }
+
+    if (chainType == ChainType.Stellar) {
+      if (!isValidStellarAddress(toAddress)) {
+        toAddressError = 'Invaild Stellar address';
+        return false;
+      }
+    }
+    return true;
+  }
+
+  bool _validateAmount() {
+    final amount = amountController.text.trim();
+    amountError = null;
+
     if (amount.isEmpty) {
       amountError = "Amount can't be empty";
-      setState(() {});
       return false;
     }
     if (!isFloat(amount)) {
       amountError = 'Amount should have numeric values only';
-      setState(() {});
       return false;
     }
     if (chainType == ChainType.TFChain) {
-      if (toAddress.length != 48) {
-        toAddressError = 'Address length should be 48 characters';
-        setState(() {});
-        return false;
-      }
-
       if (double.parse(amount) < 0.01) {
         amountError = "Amount can't be less than 0.01";
-        setState(() {});
         return false;
       }
       if (double.parse(widget.wallet.tfchainBalance) -
@@ -79,20 +88,12 @@ class _WalletSendScreenState extends State<WalletSendScreen> {
               0.01 <
           0) {
         amountError = "Amount shouldn't be more than the wallet balance";
-        setState(() {});
         return false;
       }
     }
     if (chainType == ChainType.Stellar) {
-      if (!isValidStellarAddress(toAddress)) {
-        toAddressError = 'Invaild Stellar address';
-        setState(() {});
-        return false;
-      }
-
       if (double.parse(amount) < 0.1) {
         amountError = "Amount can't be less than 0.1";
-        setState(() {});
         return false;
       }
       if (double.parse(widget.wallet.stellarBalance) -
@@ -100,12 +101,17 @@ class _WalletSendScreenState extends State<WalletSendScreen> {
               0.1 <
           0) {
         amountError = "Amount shouldn't be more than the wallet balance";
-        setState(() {});
         return false;
       }
     }
-    setState(() {});
     return true;
+  }
+
+  bool _validate() {
+    final validAddress = _validateToAddress();
+    final validAmount = _validateAmount();
+    setState(() {});
+    return validAddress && validAmount;
   }
 
   void _selectToAddress(String address) {
@@ -116,6 +122,10 @@ class _WalletSendScreenState extends State<WalletSendScreen> {
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
+    String balance = chainType == ChainType.Stellar
+        ? widget.wallet.stellarBalance
+        : widget.wallet.tfchainBalance;
+    balance = balance != '-1' ? balance : '0';
     return Scaffold(
       appBar: AppBar(title: const Text('Send')),
       body: SingleChildScrollView(
@@ -256,8 +266,7 @@ class _WalletSendScreenState extends State<WalletSendScreen> {
                   keyboardType: TextInputType.number,
                   controller: amountController,
                   decoration: InputDecoration(
-                      labelText:
-                          'Amount (Balance: ${chainType == ChainType.Stellar ? widget.wallet.stellarBalance : widget.wallet.tfchainBalance})',
+                      labelText: 'Amount (Balance: $balance)',
                       hintText: '100',
                       suffixText: 'TFT',
                       errorText: amountError)),
