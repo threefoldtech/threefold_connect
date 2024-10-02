@@ -64,8 +64,8 @@ Future<void> setGlobalValues() async {
       (identity['signedIdentityNameIdentifier'] != null);
 }
 
-class MyApp extends StatefulWidget {
-  const MyApp({
+class MyApp extends StatelessWidget {
+    const MyApp({
     super.key,
     required this.initDone,
     this.doubleName,
@@ -75,16 +75,6 @@ class MyApp extends StatefulWidget {
   final bool initDone;
   final String? doubleName;
   final bool registered;
-
-  @override
-  State<MyApp> createState() => _MyAppState();
-}
-
-class _MyAppState extends State<MyApp> {
-  @override
-  void initState() {
-    super.initState();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -157,7 +147,7 @@ class _MyAppState extends State<MyApp> {
       ),
       themeMode: themeProvider.themeMode,
       home: SplashScreen(
-          initDone: widget.initDone, registered: widget.registered),
+          initDone: initDone, registered: registered),
     );
   }
 }
