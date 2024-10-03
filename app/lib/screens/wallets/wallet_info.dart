@@ -52,6 +52,8 @@ class _WalletDetailsWidgetState extends State<WalletDetailsWidget> {
         ScaffoldMessenger.of(context).showSnackBar(loadingFarmsFailure);
       }
       return false;
+    } finally {
+      if (context.mounted) Navigator.of(context).pop();
     }
   }
 

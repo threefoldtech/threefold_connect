@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:threebotlogin/main.dart';
 import 'package:threebotlogin/services/contact_service.dart';
-import 'package:threebotlogin/widgets/custom_dialog.dart';
+import 'package:threebotlogin/widgets/wallets/warning_dialog.dart';
 
 class ContactCardWidget extends StatefulWidget {
   const ContactCardWidget({
@@ -23,14 +22,11 @@ class ContactCardWidget extends StatefulWidget {
 }
 
 class _ContactCardWidgetState extends State<ContactCardWidget> {
-  bool deleteLoading = false;
-  _deleteWallet() async {
-    setState(() {
-      deleteLoading = true;
-    });
+  Future<bool> _deleteContact() async {
     try {
       await deleteContact(widget.name);
       widget.onDeleteContact!(widget.name);
+      return true;
     } catch (e) {
       print('Failed to delete contact due to $e');
       if (context.mounted) {
@@ -47,46 +43,18 @@ class _ContactCardWidgetState extends State<ContactCardWidget> {
         ScaffoldMessenger.of(context).clearSnackBars();
         ScaffoldMessenger.of(context).showSnackBar(loadingFarmsFailure);
       }
-    } finally {
-      setState(() {
-        deleteLoading = false;
-      });
     }
+    return false;
   }
 
   void _showDeleteConfirmationDialog() {
     showDialog(
       context: context,
-      builder: (BuildContext context) => CustomDialog(
-        type: DialogType.Warning,
-        image: Icons.warning,
+      builder: (BuildContext context) => WarningDialogWidget(
         title: 'Are you sure?',
         description:
             'If you confirm, your contact will be removed from this device.',
-        actions: <Widget>[
-          TextButton(
-            child: const Text('Cancel'),
-            onPressed: () {
-              Navigator.pop(context);
-            },
-          ),
-          TextButton(
-            onPressed: () async {
-              await _deleteWallet();
-              if (context.mounted) {
-                Navigator.pop(context);
-              }
-            },
-            //TODO: show loading when press yes
-            child: Text(
-              'Yes',
-              style: Theme.of(context)
-                  .textTheme
-                  .bodyMedium!
-                  .copyWith(color: Theme.of(context).colorScheme.warning),
-            ),
-          ),
-        ],
+        onAgree: _deleteContact,
       ),
     );
   }
@@ -129,20 +97,12 @@ class _ContactCardWidgetState extends State<ContactCardWidget> {
                           icon: const Icon(
                             Icons.edit,
                           )),
-                      deleteLoading
-                          ? SizedBox(
-                              width: 20,
-                              height: 20,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2,
-                                color: Theme.of(context).colorScheme.error,
-                              ))
-                          : IconButton(
-                              onPressed: _showDeleteConfirmationDialog,
-                              icon: Icon(
-                                Icons.delete,
-                                color: Theme.of(context).colorScheme.error,
-                              )),
+                      IconButton(
+                          onPressed: _showDeleteConfirmationDialog,
+                          icon: Icon(
+                            Icons.delete,
+                            color: Theme.of(context).colorScheme.error,
+                          )),
                     ],
                   ),
               ],

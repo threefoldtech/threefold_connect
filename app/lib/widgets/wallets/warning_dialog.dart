@@ -37,12 +37,11 @@ class _WarningDialogWidgetState extends State<WarningDialogWidget> {
           onPressed: () async {
             deleteLoading = true;
             setState(() {});
-            final deleted = await widget.onAgree();
+            await widget.onAgree();
             deleteLoading = false;
             setState(() {});
             if (context.mounted) {
               Navigator.pop(context);
-              if (deleted) Navigator.pop(context);
             }
           },
           child: deleteLoading
