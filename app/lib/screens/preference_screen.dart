@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:provider/provider.dart';
@@ -77,7 +78,14 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
   @override
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
-    final isDarkMode = themeProvider.themeMode == ThemeMode.dark;
+    bool isSystemDarkMode = false;
+    if (themeProvider.themeMode == ThemeMode.system){
+      var brightness =
+          SchedulerBinding.instance.platformDispatcher.platformBrightness;
+      isSystemDarkMode = brightness == Brightness.dark;
+    }
+    bool isDarkMode = themeProvider.themeMode == ThemeMode.dark ||
+        (themeProvider.themeMode == ThemeMode.system && isSystemDarkMode);
     return LayoutDrawer(
       titleText: 'Settings',
       content: ListView(

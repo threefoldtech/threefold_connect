@@ -23,11 +23,7 @@ class ThemeProvider with ChangeNotifier {
     if (savedTheme != null) {
       _themeMode = savedTheme == 'dark' ? ThemeMode.dark : ThemeMode.light;
     } else {
-      var brightness =
-          SchedulerBinding.instance.platformDispatcher.platformBrightness;
-      _themeMode = brightness == Brightness.dark
-          ? ThemeMode.dark
-          : ThemeMode.light;
+      _themeMode = ThemeMode.system;
     }
     notifyListeners();
   }
