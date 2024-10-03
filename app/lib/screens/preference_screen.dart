@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:package_info_plus/package_info_plus.dart';
+import 'package:provider/provider.dart';
 import 'package:threebotlogin/app_config.dart';
 import 'package:threebotlogin/apps/free_flow_pages/ffp_events.dart';
 import 'package:threebotlogin/events/close_socket_event.dart';
@@ -16,6 +18,7 @@ import 'package:threebotlogin/services/fingerprint_service.dart';
 import 'package:threebotlogin/services/shared_preference_service.dart';
 import 'package:threebotlogin/widgets/custom_dialog.dart';
 import 'package:threebotlogin/widgets/layout_drawer.dart';
+import 'package:threebotlogin/widgets/theme_provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class PreferenceScreen extends StatefulWidget {
@@ -75,6 +78,15 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+    bool isDarkMode;
+    if (themeProvider.themeMode == ThemeMode.system){
+      final brightness =
+          SchedulerBinding.instance.platformDispatcher.platformBrightness;
+      isDarkMode = brightness == Brightness.dark;
+    } else {
+      isDarkMode = themeProvider.themeMode == ThemeMode.dark;
+    }
     return LayoutDrawer(
       titleText: 'Settings',
       content: ListView(
@@ -147,6 +159,67 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
               _changePincode();
             },
           ),
+          ListTile(
+            leading: const Icon(Icons.brightness_6_outlined),
+            title: const Text('Appearance'),
+            trailing: GestureDetector(
+              onTap: () {
+                themeProvider.toggleTheme();
+              },
+              child: Container(
+                width: 40,
+                height: 20,
+                decoration: BoxDecoration(
+                  color: isDarkMode
+                      ? Colors.black
+                      : Theme.of(context).colorScheme.primary,
+                  borderRadius: BorderRadius.circular(10),
+                  boxShadow: const [
+                    BoxShadow(
+                      color: Colors.black26,
+                      blurRadius: 4,
+                      offset: Offset(2, 2),
+                    ),
+                  ],
+                ),
+                child: Stack(
+                  children: [
+                    AnimatedPositioned(
+                      duration: const Duration(milliseconds: 300),
+                      left: isDarkMode ? 20 : 0,
+                      child: Container(
+                        width: 20,
+                        height: 20,
+                        decoration: const BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: Colors.white,
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black26,
+                              blurRadius: 4,
+                              offset: Offset(2, 2),
+                            ),
+                          ],
+                        ),
+                        child: Center(
+                          child: Icon(
+                            isDarkMode
+                                ? Icons
+                                    .nightlight_round
+                                : Icons.wb_sunny,
+                            color: isDarkMode
+                                ? Colors.black
+                                : Theme.of(context).colorScheme.primary,
+                                size: 14,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),          
           ListTile(
             leading: const Icon(Icons.perm_device_information),
             title: Text('Version: $version - $buildNumber'),

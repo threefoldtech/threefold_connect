@@ -485,8 +485,8 @@ packages:
     dependency: "direct main"
     description:
       path: "packages/gridproxy_client"
-      ref: tfchain_graphql_hotfix
-      resolved-ref: "314f46728e43cb86f430cda6ba756d4be3fb6e07"
+      ref: tfchain_graphql
+      resolved-ref: "34c29c3d39530dae2843fbe3ad47307db6d28a23"
       url: "https://github.com/codescalers/tfgrid-sdk-dart"
     source: git
     version: "1.0.0"
@@ -1260,8 +1260,8 @@ packages:
     dependency: "direct main"
     description:
       path: "packages/stellar_client"
-      ref: tfchain_graphql_hotfix_2
-      resolved-ref: "563cc0297d79dc333157fe69a7540f0190ff3496"
+      ref: tfchain_graphql
+      resolved-ref: "34c29c3d39530dae2843fbe3ad47307db6d28a23"
       url: "https://github.com/codescalers/tfgrid-sdk-dart"
     source: git
     version: "0.1.0"
@@ -1349,8 +1349,8 @@ packages:
     dependency: "direct main"
     description:
       path: "packages/tfchain_client"
-      ref: tfchain_graphql_hotfix
-      resolved-ref: "314f46728e43cb86f430cda6ba756d4be3fb6e07"
+      ref: tfchain_graphql
+      resolved-ref: "34c29c3d39530dae2843fbe3ad47307db6d28a23"
       url: "https://github.com/codescalers/tfgrid-sdk-dart"
     source: git
     version: "0.1.0"
