@@ -540,3 +540,16 @@ Future<void> setPKidMigrationIssueSolved(bool isFixed) async {
   final SharedPreferences prefs = await SharedPreferences.getInstance();
   await prefs.setBool('isPkidMigrationIssueSolved', isFixed);
 }
+
+Future<void> setTheme(String theme) async {
+  final SharedPreferences prefs = await SharedPreferences.getInstance();
+  prefs.remove('theme');
+
+  prefs.setString('theme', theme);
+}
+
+Future<String?> getTheme() async {
+  final SharedPreferences prefs = await SharedPreferences.getInstance();
+
+  return prefs.getString('theme');
+}
