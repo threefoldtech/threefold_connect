@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:threebotlogin/main.dart';
 import 'package:threebotlogin/models/wallet.dart';
 import 'package:threebotlogin/services/wallet_service.dart';
-import 'package:threebotlogin/widgets/custom_dialog.dart';
+import 'package:threebotlogin/widgets/wallets/warning_dialog.dart';
 
 class WalletDetailsWidget extends StatefulWidget {
   const WalletDetailsWidget(
@@ -29,13 +28,9 @@ class _WalletDetailsWidgetState extends State<WalletDetailsWidget> {
   String walletName = '';
   bool showTfchainSecret = false;
   bool showStellarSecret = false;
-  bool deleteLoading = false;
   bool edit = false;
 
   Future<bool> _deleteWallet() async {
-    setState(() {
-      deleteLoading = true;
-    });
     try {
       await deleteWallet(walletNameController.text);
       widget.onDeleteWallet(walletNameController.text);
@@ -57,10 +52,6 @@ class _WalletDetailsWidgetState extends State<WalletDetailsWidget> {
         ScaffoldMessenger.of(context).showSnackBar(loadingFarmsFailure);
       }
       return false;
-    } finally {
-      setState(() {
-        deleteLoading = false;
-      });
     }
   }
 
@@ -263,25 +254,13 @@ class _WalletDetailsWidgetState extends State<WalletDetailsWidget> {
                     style: ElevatedButton.styleFrom(
                         backgroundColor:
                             Theme.of(context).colorScheme.errorContainer),
-                    child: deleteLoading
-                        ? SizedBox(
-                            width: 20,
-                            height: 20,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              color: Theme.of(context).colorScheme.error,
-                            ))
-                        : Text(
-                            'Delete',
-                            style: Theme.of(context)
-                                .textTheme
-                                .bodyMedium!
-                                .copyWith(
-                                  color: Theme.of(context)
-                                      .colorScheme
-                                      .onErrorContainer,
-                                ),
+                    child: Text(
+                      'Delete',
+                      style: Theme.of(context).textTheme.bodyLarge!.copyWith(
+                            color:
+                                Theme.of(context).colorScheme.onErrorContainer,
                           ),
+                    ),
                   ),
                 ),
               )
@@ -294,37 +273,11 @@ class _WalletDetailsWidgetState extends State<WalletDetailsWidget> {
   void _showDeleteConfirmationDialog() {
     showDialog(
       context: context,
-      builder: (BuildContext context) => CustomDialog(
-        type: DialogType.Warning,
-        image: Icons.warning,
+      builder: (BuildContext context) => WarningDialogWidget(
         title: 'Are you sure?',
         description:
             'If you confirm, your wallet will be removed from this device.',
-        actions: <Widget>[
-          TextButton(
-            child: const Text('Cancel'),
-            onPressed: () {
-              Navigator.pop(context);
-            },
-          ),
-          TextButton(
-            onPressed: () async {
-              final deleted = await _deleteWallet();
-              if (context.mounted) {
-                Navigator.pop(context);
-                if (deleted) Navigator.pop(context);
-              }
-            },
-            //TODO: show loading when press yes
-            child: Text(
-              'Yes',
-              style: Theme.of(context)
-                  .textTheme
-                  .bodyMedium!
-                  .copyWith(color: Theme.of(context).colorScheme.warning),
-            ),
-          ),
-        ],
+        onAgree: _deleteWallet,
       ),
     );
   }

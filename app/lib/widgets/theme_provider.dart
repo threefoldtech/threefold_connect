@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
 import 'package:threebotlogin/services/shared_preference_service.dart';
 
 class ThemeProvider with ChangeNotifier {

@@ -154,7 +154,7 @@ class _SendConfirmationWidgetState extends State<SendConfirmationWidget> {
         await TFChain.transfer(widget.secret, widget.to, widget.amount);
       }
       await _showDialog(
-          'Success!', 'Tokens have been transfered successfully', Icons.check, DialogType.Info);
+          'Success!', 'Tokens have been transferred successfully', Icons.check, DialogType.Info);
     } catch (e) {
       _showDialog(
           'Error', 'Failed to transfer. Please try again.', Icons.error, DialogType.Error);
