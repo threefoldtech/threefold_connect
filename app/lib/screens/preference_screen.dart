@@ -78,14 +78,14 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
   @override
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
-    bool isSystemDarkMode = false;
+    bool isDarkMode;
     if (themeProvider.themeMode == ThemeMode.system){
-      var brightness =
+      final brightness =
           SchedulerBinding.instance.platformDispatcher.platformBrightness;
-      isSystemDarkMode = brightness == Brightness.dark;
+      isDarkMode = brightness == Brightness.dark;
+    } else {
+      isDarkMode = themeProvider.themeMode == ThemeMode.dark;
     }
-    bool isDarkMode = themeProvider.themeMode == ThemeMode.dark ||
-        (themeProvider.themeMode == ThemeMode.system && isSystemDarkMode);
     return LayoutDrawer(
       titleText: 'Settings',
       content: ListView(
