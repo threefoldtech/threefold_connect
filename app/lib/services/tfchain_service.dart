@@ -1,40 +1,26 @@
 import 'dart:convert';
 
-import 'package:flutter/foundation.dart';
 import 'package:tfchain_client/generated/dev/types/tfchain_support/types/farm.dart';
+import 'package:threebotlogin/apps/wallet/wallet_config.dart';
 import 'package:threebotlogin/helpers/globals.dart';
 import 'package:threebotlogin/services/shared_preference_service.dart';
-import 'package:stellar_client/stellar_client.dart' as Stellar;
-import 'package:convert/convert.dart';
 import 'package:tfchain_client/tfchain_client.dart' as TFChain;
 import 'package:tfchain_client/models/dao.dart';
 import 'package:tfchain_client/generated/dev/types/pallet_dao/proposal/dao_votes.dart';
 import 'package:crypto/crypto.dart';
 import 'package:http/http.dart' as http;
+import 'package:hashlib/hashlib.dart' as hashlib;
 
 Future<int?> getMyTwinId() async {
   final chainUrl = Globals().chainUrl;
   if (chainUrl == '') return null;
-  // TODO: make sure we are using the correct phrase or needs to use derived seed
-  final phrase = await getPhrase();
-  if (phrase != null) {
-    return await compute((void _) async {
-      final wallet =
-          await Stellar.Client.fromMnemonic(Stellar.NetworkType.PUBLIC, phrase);
-      final privateKey = wallet.privateKey;
-      if (privateKey != null) {
-        final hexSecret = hex.encode(privateKey.toList().sublist(0, 32));
-        final tfchainClient =
-            TFChain.Client(chainUrl, '0x$hexSecret', "sr25519");
-        await tfchainClient.connect();
-        final twinId = await tfchainClient.twins.getMyTwinId();
-        await tfchainClient.disconnect();
-        return twinId;
-      }
-      return null;
-    }, null);
-  }
-  return null;
+  final derivedSeed = await getDerivedSeed(WalletConfig().appId());
+  final seedList = derivedSeed.toList();
+  seedList.addAll([0, 0, 0, 0, 0, 0, 0, 0]); // instead of sia binary encoder
+  final seed = hashlib.Blake2b(32).hex(seedList);
+  final twinId = getTwinId('0x$seed');
+  if (twinId == 0) return null;
+  return twinId;
 }
 
 Future<double> getBalance(String chainUrl, String address) async {
