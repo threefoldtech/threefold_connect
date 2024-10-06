@@ -15,6 +15,7 @@ import 'package:bip39/bip39.dart' as bip39;
 import 'package:convert/convert.dart';
 import 'package:threebotlogin/services/stellar_service.dart' as StellarService;
 import 'package:threebotlogin/services/tfchain_service.dart' as TFChainService;
+import 'package:hashlib/hashlib.dart';
 
 Future<FlutterPkid> _getPkidClient() async {
   Uint8List seed = await getDerivedSeed(WalletConfig().appId());
@@ -61,22 +62,25 @@ Future<(Stellar.Client, TFChain.Client)> loadWalletClients(String walletName,
   Stellar.Client stellarClient;
   TFChain.Client tfchainClient;
   if (' '.allMatches(walletSeed).length == 11) {
-    tfchainClient = TFChain.Client(chainUrl, walletSeed, "sr25519");
+    tfchainClient = TFChain.Client(chainUrl, walletSeed, 'sr25519');
     final entropy = bip39.mnemonicToEntropy(walletSeed);
-    final seed = entropy.padRight(64, "0");
+    final seed = entropy.padRight(64, '0');
     stellarClient =
         Stellar.Client.fromSecretSeedHex(Stellar.NetworkType.PUBLIC, seed);
   } else if (' '.allMatches(walletSeed).length == 23) {
-    stellarClient = await Stellar.Client.fromMnemonic(
-        Stellar.NetworkType.PUBLIC, walletSeed);
-    final hexSecret =
-        hex.encode(stellarClient.privateKey!.toList().sublist(0, 32));
-    tfchainClient = TFChain.Client(chainUrl, '0x$hexSecret', "sr25519");
+    final entropy = bip39.mnemonicToEntropy(walletSeed);
+    final seedList = hex.decode(entropy).toList();
+    seedList.addAll([0, 0, 0, 0, 0, 0, 0, 0]); // instead of sia binary encoder
+    final seed = Blake2b(32).hex(seedList);
+
+    stellarClient =
+        Stellar.Client.fromSecretSeedHex(Stellar.NetworkType.PUBLIC, seed);
+    tfchainClient = TFChain.Client(chainUrl, '0x$seed', 'sr25519');
   } else if (StellarService.isValidStellarSecret(walletSeed)) {
     stellarClient = Stellar.Client(Stellar.NetworkType.PUBLIC, walletSeed);
     final hexSecret =
         hex.encode(stellarClient.privateKey!.toList().sublist(0, 32));
-    tfchainClient = TFChain.Client(chainUrl, '0x$hexSecret', "sr25519");
+    tfchainClient = TFChain.Client(chainUrl, '0x$hexSecret', 'sr25519');
   } else {
     if (walletSeed.startsWith(RegExp(r'0[xX]'))) {
       walletSeed = walletSeed.substring(2);
@@ -85,7 +89,7 @@ Future<(Stellar.Client, TFChain.Client)> loadWalletClients(String walletName,
         Stellar.NetworkType.PUBLIC, walletSeed);
     final hexSecret =
         hex.encode(stellarClient.privateKey!.toList().sublist(0, 32));
-    tfchainClient = TFChain.Client(chainUrl, '0x$hexSecret', "sr25519");
+    tfchainClient = TFChain.Client(chainUrl, '0x$hexSecret', 'sr25519');
   }
   return (stellarClient, tfchainClient);
 }
