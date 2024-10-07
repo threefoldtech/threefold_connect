@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:threebotlogin/models/wallet.dart';
 import 'package:threebotlogin/screens/wallets/wallet_details.dart';
+import 'package:threebotlogin/services/stellar_service.dart';
 
-class WalletCardWidget extends StatelessWidget {
+class WalletCardWidget extends StatefulWidget {
   const WalletCardWidget(
       {super.key,
       required this.wallet,
@@ -15,24 +16,71 @@ class WalletCardWidget extends StatelessWidget {
   final void Function(String oldName, String newName) onEditWallet;
 
   @override
+  State<WalletCardWidget> createState() => _WalletCardWidgetState();
+}
+
+class _WalletCardWidgetState extends State<WalletCardWidget> {
+  bool initialWalletLoading = false;
+
+  _initializeWallet() async {
+    setState(() {
+      initialWalletLoading = true;
+    });
+    try {
+      await initialize(widget.wallet.stellarSecret);
+      widget.wallet.stellarBalance =
+          await getBalance(widget.wallet.stellarSecret);
+    } catch (e) {
+      print('Failed to initialize wallet due to $e');
+      if (context.mounted) {
+        final loadingFarmsFailure = SnackBar(
+          content: Text(
+            'Failed to initialize wallet',
+            style: Theme.of(context)
+                .textTheme
+                .bodyMedium!
+                .copyWith(color: Theme.of(context).colorScheme.errorContainer),
+          ),
+          duration: const Duration(seconds: 3),
+        );
+        ScaffoldMessenger.of(context).clearSnackBars();
+        ScaffoldMessenger.of(context).showSnackBar(loadingFarmsFailure);
+      }
+    } finally {
+      setState(() {
+        initialWalletLoading = false;
+      });
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     List<Widget> cardContent = [];
-    if (wallet.type == WalletType.NATIVE && wallet.stellarBalance == '-1') {
+    if (widget.wallet.type == WalletType.NATIVE &&
+        widget.wallet.stellarBalance == '-1') {
       cardContent = [
         Container(
             alignment: Alignment.centerRight,
             child: ElevatedButton(
-              onPressed: () {},
-              child: Text(
-                'Initialize Wallet',
-                style: Theme.of(context).textTheme.bodyLarge!.copyWith(
-                    color: Theme.of(context).colorScheme.onPrimaryContainer),
-              ),
+              onPressed: _initializeWallet,
+              child: initialWalletLoading
+                  ? const SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                      ))
+                  : Text(
+                      'Initialize Wallet',
+                      style: Theme.of(context).textTheme.bodyLarge!.copyWith(
+                          color:
+                              Theme.of(context).colorScheme.onPrimaryContainer),
+                    ),
             ))
       ];
     } else {
       cardContent = [
-        if (double.parse(wallet.stellarBalance) >= 0)
+        if (double.parse(widget.wallet.stellarBalance) >= 0)
           Row(
             children: [
               SizedBox(
@@ -49,14 +97,14 @@ class WalletCardWidget extends StatelessWidget {
               ),
               const Spacer(),
               Text(
-                '${wallet.stellarBalance} TFT',
+                '${widget.wallet.stellarBalance} TFT',
                 style: Theme.of(context).textTheme.bodyLarge!.copyWith(
                       color: Theme.of(context).colorScheme.onSecondaryContainer,
                     ),
               ),
             ],
           ),
-        if (double.parse(wallet.tfchainBalance) >= 0)
+        if (double.parse(widget.wallet.tfchainBalance) >= 0)
           Row(
             children: [
               SizedBox(
@@ -74,7 +122,7 @@ class WalletCardWidget extends StatelessWidget {
               ),
               const Spacer(),
               Text(
-                '${wallet.tfchainBalance} TFT',
+                '${widget.wallet.tfchainBalance} TFT',
                 style: Theme.of(context).textTheme.bodyLarge!.copyWith(
                       color: Theme.of(context).colorScheme.onSecondaryContainer,
                     ),
@@ -90,16 +138,16 @@ class WalletCardWidget extends StatelessWidget {
           side: BorderSide(color: Theme.of(context).colorScheme.primary)),
       child: InkWell(
         onTap: () {
-          if (wallet.type == WalletType.NATIVE &&
-              wallet.stellarBalance == '-1') {
+          if (widget.wallet.type == WalletType.NATIVE &&
+              widget.wallet.stellarBalance == '-1') {
             return;
           }
           Navigator.of(context).push(MaterialPageRoute(
             builder: (context) => WalletDetailsScreen(
-              wallet: wallet,
-              allWallets: allWallets,
-              onDeleteWallet: onDeleteWallet,
-              onEditWallet: onEditWallet,
+              wallet: widget.wallet,
+              allWallets: widget.allWallets,
+              onDeleteWallet: widget.onDeleteWallet,
+              onEditWallet: widget.onEditWallet,
             ),
           ));
         },
@@ -109,7 +157,7 @@ class WalletCardWidget extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                wallet.name,
+                widget.wallet.name,
                 style: Theme.of(context).textTheme.titleLarge!.copyWith(
                       color: Theme.of(context).colorScheme.onSecondaryContainer,
                     ),

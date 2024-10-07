@@ -64,3 +64,8 @@ Future<void> transfer(
     memoText: memo,
   );
 }
+
+Future<void> initialize(String secret) async {
+  final client = Client(NetworkType.PUBLIC, secret);
+  await client.activateThroughThreefoldService();
+}
