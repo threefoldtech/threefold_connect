@@ -65,7 +65,7 @@ class _AppState extends State<MainScreen> {
           children: [
             const Hero(
               tag: 'logo',
-              child: HomeLogoWidget(),
+              child: HomeLogoWidget(animate: true,),
             ),
             const SizedBox(height: 50),
             Container(
@@ -84,16 +84,6 @@ class _AppState extends State<MainScreen> {
             const SizedBox(
               height: 40,
             ),
-            Visibility(
-              visible: errorMessage == null,
-              child: Transform.scale(
-                scale: 0.5,
-                child: CircularProgressIndicator(
-                  color: Theme.of(context).colorScheme.primary,
-                ),
-              ),
-            ),
-            const SizedBox(height: 20),
             Visibility(
                 maintainSize: true,
                 maintainAnimation: true,

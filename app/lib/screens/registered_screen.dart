@@ -43,7 +43,7 @@ class _RegisteredScreenState extends State<RegisteredScreen>
                 ),
                 const Hero(
                   tag: 'logo',
-                  child: HomeLogoWidget(),
+                  child: HomeLogoWidget(animate: false,),
                 ),
               ],
             ),

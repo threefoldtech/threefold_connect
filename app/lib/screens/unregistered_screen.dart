@@ -79,7 +79,7 @@ class _UnregisteredScreenState extends State<UnregisteredScreen>
           children: <Widget>[
             const Hero(
               tag: 'logo',
-              child: HomeLogoWidget(),
+              child: HomeLogoWidget(animate: false,),
             ),
             const SizedBox(height: 150),
             SizedBox(
