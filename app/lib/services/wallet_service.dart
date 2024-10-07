@@ -114,13 +114,14 @@ Future<Wallet> loadWallet(String walletName, String walletSeed,
   return wallet;
 }
 
-Future<void> addWallet(String walletName, String walletSecret) async {
+Future<void> addWallet(String walletName, String walletSecret,
+    {WalletType type = WalletType.IMPORTED}) async {
   List<PkidWallet> wallets = await _getPkidWallets();
   wallets.add(PkidWallet(
       name: walletName,
-      index: -1,
+      index: type == WalletType.NATIVE ? 0 : -1,
       seed: walletSecret,
-      type: WalletType.IMPORTED));
+      type: type));
 
   await _saveWalletsToPkid(wallets);
 }

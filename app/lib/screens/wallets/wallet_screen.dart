@@ -2,11 +2,14 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:threebotlogin/apps/wallet/wallet_config.dart';
 import 'package:threebotlogin/models/wallet.dart';
+import 'package:threebotlogin/services/shared_preference_service.dart';
 import 'package:threebotlogin/services/wallet_service.dart';
 import 'package:threebotlogin/widgets/layout_drawer.dart';
 import 'package:threebotlogin/widgets/wallets/add_wallet.dart';
 import 'package:threebotlogin/widgets/wallets/wallet_card.dart';
+import 'package:hashlib/hashlib.dart';
 
 class WalletScreen extends StatefulWidget {
   const WalletScreen({super.key});
@@ -105,6 +108,9 @@ class _WalletScreenState extends State<WalletScreen> {
     try {
       final myWallets = await listWallets();
       wallets.addAll(myWallets);
+      if (wallets.isEmpty) {
+        await _addInitialWallet();
+      }
     } catch (e) {
       failed = true;
       print('Failed to get wallets due to $e');
@@ -140,6 +146,17 @@ class _WalletScreenState extends State<WalletScreen> {
               onAddWallet: _addWallet,
               wallets: wallets,
             ));
+  }
+
+  Future<void> _addInitialWallet() async {
+    const walletName = 'Daily';
+    final derivedSeed = await getDerivedSeed(WalletConfig().appId());
+    final seedList = derivedSeed.toList();
+    seedList.addAll([0, 0, 0, 0, 0, 0, 0, 0]); // instead of sia binary encoder
+    final walletSecret = Blake2b(32).hex(seedList);
+    final wallet = await loadAddedWallet(walletName, walletSecret);
+    await addWallet(walletName, walletSecret, type: WalletType.NATIVE);
+    wallets.add(wallet);
   }
 
   void _addWallet(Wallet wallet) {
