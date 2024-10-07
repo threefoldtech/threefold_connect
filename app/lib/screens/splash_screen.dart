@@ -43,7 +43,7 @@ class _SplashScreenState extends State<SplashScreen>
       body: Center(
         child: Hero(
           tag: 'logo',
-          child: HomeLogoWidget(),
+          child: HomeLogoWidget(animate: true,),
         ),
       ),
     );
