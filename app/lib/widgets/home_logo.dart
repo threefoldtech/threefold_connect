@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:lottie/lottie.dart';
 
 class HomeLogoWidget extends StatelessWidget {
-  const HomeLogoWidget({super.key});
+  final bool animate;
+  const HomeLogoWidget({super.key, required this.animate});
 
   @override
   Widget build(BuildContext context) {
@@ -11,23 +13,36 @@ class HomeLogoWidget extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         Center(
-    
-    child: Container(color: Colors.transparent,child: Lottie.asset(
-      'assets/tfloading.json',
-      repeat: true,
-      animate: true,
-        options: LottieOptions(enableMergePaths: true),    
-),) 
-
+          child: animate
+              ? Column(children: [
+                              SizedBox(
+                  height: 50,
+                  width: 50,
+                  child: Lottie.asset(
+                    'assets/tfloading.json',
+                    repeat: true,
+                    animate: true,
+                  ),
+                ),
+                        const SizedBox(height: 10,),
+        Text(
+          'THREEFOLD',
+          style: Theme.of(context).textTheme.headlineSmall!.copyWith(
+              color: Theme.of(context).colorScheme.onBackground,
+              fontWeight: FontWeight.bold),
         ),
-      
 
-        // SvgPicture.asset(
-        //   'assets/TF_logo.svg',
-        //   alignment: Alignment.center,
-        //   colorFilter: ColorFilter.mode(
-        //       Theme.of(context).colorScheme.onBackground, BlendMode.srcIn),
-        // ),
+              ],) 
+
+              : SvgPicture.asset(
+                  'assets/TF_logo.svg',
+                  alignment: Alignment.center,
+                  colorFilter: ColorFilter.mode(
+                    Theme.of(context).colorScheme.onBackground,
+                    BlendMode.srcIn,
+                  ),
+                ),
+        ),
         SizedBox(
           height: MediaQuery.of(context).size.height * 0.04,
           width: MediaQuery.of(context).size.width * 0.6,
@@ -38,7 +53,7 @@ class HomeLogoWidget extends StatelessWidget {
         ),
         Text(
           'ThreeFold Connect App',
-          style: Theme.of(context).textTheme.titleLarge!.copyWith(
+          style: Theme.of(context).textTheme.headlineSmall!.copyWith(
               color: Theme.of(context).colorScheme.primary,
               fontWeight: FontWeight.bold),
         ),
