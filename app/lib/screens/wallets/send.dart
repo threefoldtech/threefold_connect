@@ -133,7 +133,9 @@ class _WalletSendScreenState extends State<WalletSendScreen> {
     String balance = chainType == ChainType.Stellar
         ? widget.wallet.stellarBalance
         : widget.wallet.tfchainBalance;
-    balance = balance != '-1' ? balance : '0';
+    final bool hideStellar = widget.wallet.stellarBalance == '-1';
+    if (hideStellar) chainType = ChainType.TFChain;
+
     return Scaffold(
       appBar: AppBar(title: const Text('Send')),
       body: SingleChildScrollView(
@@ -141,7 +143,9 @@ class _WalletSendScreenState extends State<WalletSendScreen> {
           padding: const EdgeInsets.all(8.0),
           child: Column(children: [
             SelectChainWidget(
-                chainType: chainType, onChangeChain: onChangeChain),
+                chainType: chainType,
+                onChangeChain: onChangeChain,
+                hideStellar: hideStellar),
             const SizedBox(height: 40),
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 10),

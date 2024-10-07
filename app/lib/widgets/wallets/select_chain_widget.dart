@@ -4,9 +4,13 @@ import 'package:threebotlogin/models/wallet.dart';
 
 class SelectChainWidget extends StatelessWidget {
   const SelectChainWidget(
-      {super.key, required this.chainType, required this.onChangeChain});
+      {super.key,
+      required this.chainType,
+      required this.onChangeChain,
+      required this.hideStellar});
   final void Function(ChainType chainType) onChangeChain;
   final ChainType chainType;
+  final bool hideStellar;
 
   Widget _optionButton(BuildContext context, String label, double width,
       bool active, void Function() onPressed) {
@@ -41,11 +45,12 @@ class SelectChainWidget extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          _optionButton(
-              context, 'Stellar', width / 3, chainType == ChainType.Stellar,
-              () {
-            onChangeChain(ChainType.Stellar);
-          }),
+          if (!hideStellar)
+            _optionButton(
+                context, 'Stellar', width / 3, chainType == ChainType.Stellar,
+                () {
+              onChangeChain(ChainType.Stellar);
+            }),
           _optionButton(
               context, 'TFChain', width / 3, chainType == ChainType.TFChain,
               () {
