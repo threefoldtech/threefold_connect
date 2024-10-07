@@ -9,11 +9,11 @@ class Page4 extends StatelessWidget {
     return const CommonPage(
       title: 'THREEFOLD',
       subtitle: 'NEWS',
-      imagePath: 'assets/news.svg',
+      imagePath: 'assets/news_outline.png',
       description:
           "Stay updated with ThreeFold's latest updates via the News section within the app.",
-      heightPercentage: 0.5,
-      widthPercentage: 0.8,
+      heightPercentage: 0.4,
+      widthPercentage: 0.75,
     );
   }
 }

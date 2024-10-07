@@ -18,7 +18,7 @@ class CommonPage extends StatefulWidget {
     this.heightPercentage = 100,
     this.widthPercentage = 300,
   }) : super(key: key);
-  
+
   @override
   State<CommonPage> createState() => _CommonPageState();
 }
@@ -36,7 +36,9 @@ class _CommonPageState extends State<CommonPage> {
                 Text(
                   widget.title,
                   style: Theme.of(context).textTheme.displayMedium!.copyWith(
-                        color: Theme.of(context).colorScheme.onBackground,
+                        color: widget.title == 'Welcome to'
+                            ? Theme.of(context).colorScheme.primary
+                            : Theme.of(context).colorScheme.onBackground,
                         fontWeight: FontWeight.bold,
                       ),
                 ),
@@ -48,8 +50,19 @@ class _CommonPageState extends State<CommonPage> {
                           fontWeight: FontWeight.bold,
                         ),
                   ),
+                SizedBox(
+                  height: widget.subtitle.isEmpty
+                  ? MediaQuery.of(context).size.height * 0.15
+                  : MediaQuery.of(context).size.height * 0.04,
+                ),
                 widget.imagePath.endsWith('.svg')
-                    ? SizedBox(
+                    ? SvgPicture.asset(
+                        widget.imagePath,
+                        alignment: Alignment.center,
+                        colorFilter: ColorFilter.mode(
+                          Theme.of(context).colorScheme.onBackground,
+                          BlendMode.srcIn,
+                        ),
                         width: widget.widthPercentage != null
                             ? MediaQuery.of(context).size.width *
                                 widget.widthPercentage!
@@ -58,16 +71,10 @@ class _CommonPageState extends State<CommonPage> {
                             ? MediaQuery.of(context).size.width *
                                 widget.heightPercentage!
                             : null,
-                        child: SvgPicture.asset(
-                          widget.imagePath,
-                          alignment: Alignment.center,
-                          colorFilter: ColorFilter.mode(
-                            Theme.of(context).colorScheme.onBackground,
-                            BlendMode.srcIn,
-                          ),
-                        ),
                       )
-                    : SizedBox(
+                    : Image.asset(
+                        widget.imagePath,
+                        fit: BoxFit.contain,
                         width: widget.widthPercentage != null
                             ? MediaQuery.of(context).size.width *
                                 widget.widthPercentage!
@@ -76,10 +83,6 @@ class _CommonPageState extends State<CommonPage> {
                             ? MediaQuery.of(context).size.width *
                                 widget.heightPercentage!
                             : null,
-                        child: Image.asset(
-                          widget.imagePath,
-                          fit: BoxFit.contain,
-                        ),
                       ),
               ]),
             ),

@@ -20,13 +20,11 @@ class _Page5State extends State<Page5> {
       body: Center(
         child: Column(
           children: [
-            SizedBox(
+            Image.asset(
+              'assets/rocket_outline.png',
+              fit: BoxFit.contain,
               width: MediaQuery.of(context).size.width * 0.75,
               height: MediaQuery.of(context).size.height * 0.25,
-              child: SvgPicture.asset(
-                'assets/journey.svg',
-                alignment: Alignment.center,
-              ),
             ),
             SizedBox(
               height: MediaQuery.of(context).size.height * 0.02,

@@ -9,7 +9,7 @@ class Page3 extends StatelessWidget {
     return const CommonPage(
       title: 'THREEFOLD',
       subtitle: 'WALLET',
-      imagePath: 'assets/tft.png',
+      imagePath: 'assets/wallet_outline.png',
       description:
           'Access your ThreeFold Wallet and your ThreeFold Tokens (TFT). More currencies are to be added in the future.',
       heightPercentage: 0.4,

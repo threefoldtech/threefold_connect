@@ -9,9 +9,9 @@ class Page2 extends StatelessWidget {
     return const CommonPage(
       title: 'MAXIMUM',
       subtitle: 'SECURITY',
-      imagePath: 'assets/fingerprint.svg',
-      widthPercentage: 0.75,
-      heightPercentage: 0.5,
+      imagePath: 'assets/finger_outline.png',
+      widthPercentage: 0.6,
+      heightPercentage: 0.4,
       description:
           'The app provides a secure authentication mechanism that provides your identity on the Threefold Grid.',
     );
