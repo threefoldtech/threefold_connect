@@ -62,10 +62,10 @@ class _ContactCardWidgetState extends State<ContactCardWidget> {
   @override
   Widget build(BuildContext context) {
     return Card(
-      // color: Theme.of(context).colorScheme.background,
-      // shape: RoundedRectangleBorder(
-      //     borderRadius: BorderRadius.circular(5),
-      //     side: BorderSide(color: Theme.of(context).colorScheme.primary)),
+      color: Theme.of(context).colorScheme.background,
+      shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(5),
+          side: BorderSide(color: Theme.of(context).colorScheme.primary)),
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
