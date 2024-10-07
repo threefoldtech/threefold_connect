@@ -17,6 +17,7 @@ class WalletScreen extends StatefulWidget {
 
 class _WalletScreenState extends State<WalletScreen> {
   bool loading = true;
+  bool failed = false;
   List<Wallet> wallets = [];
 
   onDeleteWallet(String name) {
@@ -58,6 +59,16 @@ class _WalletScreenState extends State<WalletScreen> {
           ),
         ],
       ));
+    } else if (failed) {
+      mainWidget = Center(
+        child: Text(
+          'Something went wrong.',
+          style: Theme.of(context)
+              .textTheme
+              .bodyLarge!
+              .copyWith(color: Theme.of(context).colorScheme.onBackground),
+        ),
+      );
     } else {
       mainWidget = ListView(
         children: [
@@ -75,7 +86,7 @@ class _WalletScreenState extends State<WalletScreen> {
     return LayoutDrawer(
       titleText: 'Wallet',
       content: mainWidget,
-      appBarActions: loading
+      appBarActions: loading && !failed
           ? []
           : [
               IconButton(
@@ -91,11 +102,11 @@ class _WalletScreenState extends State<WalletScreen> {
     setState(() {
       loading = true;
     });
-    // TODO: handle empty list wallets
     try {
       final myWallets = await listWallets();
       wallets.addAll(myWallets);
     } catch (e) {
+      failed = true;
       print('Failed to get wallets due to $e');
       if (context.mounted) {
         final loadingFarmsFailure = SnackBar(
