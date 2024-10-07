@@ -92,12 +92,30 @@ class _WalletScreenState extends State<WalletScreen> {
       loading = true;
     });
     // TODO: handle empty list wallets
-    // TODO: show error on failure
-    final myWallets = await listWallets();
-    wallets.addAll(myWallets);
-    setState(() {
-      loading = false;
-    });
+    try {
+      final myWallets = await listWallets();
+      wallets.addAll(myWallets);
+    } catch (e) {
+      print('Failed to get wallets due to $e');
+      if (context.mounted) {
+        final loadingFarmsFailure = SnackBar(
+          content: Text(
+            'Failed to load wallets',
+            style: Theme.of(context)
+                .textTheme
+                .bodyMedium!
+                .copyWith(color: Theme.of(context).colorScheme.errorContainer),
+          ),
+          duration: const Duration(seconds: 3),
+        );
+        ScaffoldMessenger.of(context).clearSnackBars();
+        ScaffoldMessenger.of(context).showSnackBar(loadingFarmsFailure);
+      }
+    } finally {
+      setState(() {
+        loading = false;
+      });
+    }
   }
 
   _openAddWalletOverlay() {
