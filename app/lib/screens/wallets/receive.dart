@@ -96,7 +96,7 @@ class _WalletReceiveScreenState extends State<WalletReceiveScreen> {
               title: TextField(
                   readOnly: true,
                   style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                        color: Theme.of(context).colorScheme.onBackground,
+                        color: Theme.of(context).colorScheme.onSurface,
                       ),
                   controller: toController,
                   decoration: InputDecoration(
@@ -107,7 +107,7 @@ class _WalletReceiveScreenState extends State<WalletReceiveScreen> {
             ListTile(
               title: TextField(
                   style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                        color: Theme.of(context).colorScheme.onBackground,
+                        color: Theme.of(context).colorScheme.onSurface,
                       ),
                   keyboardType: TextInputType.number,
                   controller: amountController,
@@ -122,7 +122,7 @@ class _WalletReceiveScreenState extends State<WalletReceiveScreen> {
               ListTile(
                 title: TextField(
                     style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                          color: Theme.of(context).colorScheme.onBackground,
+                          color: Theme.of(context).colorScheme.onSurface,
                         ),
                     controller: memoController,
                     decoration: const InputDecoration(

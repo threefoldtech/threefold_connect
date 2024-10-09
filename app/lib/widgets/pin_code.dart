@@ -64,8 +64,10 @@ class _PincodeWidgetState extends State<PincodeWidget> {
             children: [
               Text(
                 widget.userMessage,
-                style: Theme.of(context).textTheme.bodyLarge!.copyWith(
-                    color: Theme.of(context).colorScheme.onBackground),
+                style: Theme.of(context)
+                    .textTheme
+                    .bodyLarge!
+                    .copyWith(color: Theme.of(context).colorScheme.onSurface),
               ),
               const SizedBox(height: 150),
               Pinput(

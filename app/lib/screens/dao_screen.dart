@@ -66,7 +66,7 @@ class _DaoPageState extends State<DaoPage> {
           Text(
             'Loading Proposals...',
             style: Theme.of(context).textTheme.bodyLarge!.copyWith(
-                color: Theme.of(context).colorScheme.onBackground,
+                color: Theme.of(context).colorScheme.onSurface,
                 fontWeight: FontWeight.bold),
           ),
         ],
@@ -83,8 +83,7 @@ class _DaoPageState extends State<DaoPage> {
                 child: TabBar(
                   labelColor: Theme.of(context).colorScheme.primary,
                   indicatorColor: Theme.of(context).colorScheme.primary,
-                  unselectedLabelColor:
-                      Theme.of(context).colorScheme.onBackground,
+                  unselectedLabelColor: Theme.of(context).colorScheme.onSurface,
                   dividerColor: Theme.of(context).scaffoldBackgroundColor,
                   labelStyle: Theme.of(context).textTheme.titleLarge,
                   unselectedLabelStyle: Theme.of(context).textTheme.titleMedium,

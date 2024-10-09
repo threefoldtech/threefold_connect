@@ -20,7 +20,7 @@ class SelectChainWidget extends StatelessWidget {
       style: ElevatedButton.styleFrom(
           fixedSize: Size.fromWidth(width),
           backgroundColor:
-              active ? colorScheme.primaryContainer : colorScheme.background,
+              active ? colorScheme.primaryContainer : colorScheme.surface,
           shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(5),
               side: BorderSide(
@@ -32,7 +32,7 @@ class SelectChainWidget extends StatelessWidget {
         style: Theme.of(context).textTheme.titleLarge!.copyWith(
             color: active
                 ? colorScheme.onPrimaryContainer
-                : colorScheme.onBackground),
+                : colorScheme.onSurface),
       ),
     );
   }

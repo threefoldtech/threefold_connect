@@ -285,8 +285,8 @@ class _SignScreenState extends State<SignScreen> with BlockAndRunMixin {
         children: [
           ElevatedButton(
             style: ButtonStyle(
-                backgroundColor: MaterialStateProperty.all<Color>(Colors.white),
-                padding: MaterialStateProperty.all<EdgeInsets>(
+                backgroundColor: WidgetStateProperty.all<Color>(Colors.white),
+                padding: WidgetStateProperty.all<EdgeInsets>(
                     const EdgeInsets.all(12))),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,

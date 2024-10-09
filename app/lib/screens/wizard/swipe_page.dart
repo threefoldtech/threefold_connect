@@ -48,7 +48,7 @@ class _SwipePagesState extends State<SwipePage> {
                     child: Text(
                       'SKIP',
                       style: Theme.of(context).textTheme.bodyLarge!.copyWith(
-                          color: Theme.of(context).colorScheme.onBackground),
+                          color: Theme.of(context).colorScheme.onSurface),
                     ))
               ],
             ),
