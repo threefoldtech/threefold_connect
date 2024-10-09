@@ -59,6 +59,7 @@ class Globals {
   String activationUrl = '';
   String relayUrl = '';
   String termsAndConditionsUrl = '';
+  String newsUrl = '';
 
   bool isCacheClearedWallet = false;
   bool isCacheClearedFarmer = false;

@@ -221,4 +221,5 @@ void setFallbackConfigs() {
   Globals().relayUrl = '';
   Globals().termsAndConditionsUrl = '';
   Globals().spendingLimit = 0;
+  Globals().newsUrl = '';
 }
