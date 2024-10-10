@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:stellar_client/models/transaction.dart';
 import 'package:threebotlogin/models/wallet.dart';
 import 'package:threebotlogin/services/stellar_service.dart';
 import 'package:threebotlogin/widgets/wallets/transaction.dart';
 import 'package:threebotlogin/widgets/wallets/vertical_divider.dart';
-import 'package:stellar_flutter_sdk/src/responses/operations/payment_operation_response.dart';
-// import 'package:stellar_flutter_sdk/src/responses/operations/path_payment_strict_receive_operation_response.dart';
 
 class WalletTransactionsWidget extends StatefulWidget {
   const WalletTransactionsWidget({super.key, required this.wallet});
@@ -16,7 +15,7 @@ class WalletTransactionsWidget extends StatefulWidget {
 }
 
 class _WalletTransactionsWidgetState extends State<WalletTransactionsWidget> {
-  List<Transaction?> transactions = [];
+  List<PaymentTransaction?> transactions = [];
   bool loading = true;
 
   _listTransactions() async {
@@ -26,30 +25,9 @@ class _WalletTransactionsWidgetState extends State<WalletTransactionsWidget> {
     try {
       final txs = await listTransactions(widget.wallet.stellarSecret);
       final transactionsList = txs.map((tx) {
-        if (tx is PaymentOperationResponse) {
-          return Transaction(
-              hash: tx.transactionHash!,
-              from: tx.from!.accountId,
-              to: tx.to!.accountId,
-              asset: tx.assetCode.toString(),
-              amount: tx.amount!,
-              type: tx.to!.accountId == widget.wallet.stellarAddress
-                  ? TransactionType.Receive
-                  : TransactionType.Payment,
-              status: tx.transactionSuccessful!,
-              date: DateTime.parse(tx.createdAt!).toLocal().toString());
-          // } else if (tx is PathPaymentStrictReceiveOperationResponse) {
-          //   return Transaction(
-          //       hash: tx.transactionHash!,
-          //       from: tx.from!,
-          //       to: tx.to!,
-          //       asset: tx.assetCode.toString(),
-          //       type: TransactionType.Receive,
-          //       status: tx.transactionSuccessful!,
-          //       amount: tx.amount!,
-          //       date: tx.createdAt!);
+        if (tx is PaymentTransaction) {
+          return tx;
         }
-        // TODO: handle creation transaction
       }).toList();
       transactions = transactionsList.where((tx) => tx != null).toList();
     } catch (e) {
