@@ -43,15 +43,13 @@ Future<void> main() async {
   ThemeMode initialThemeMode = ThemeMode.system;
 
   ThemeProvider themeProvider = ThemeProvider(initialThemeMode);
-  await themeProvider.loadTheme(); 
+  await themeProvider.loadTheme();
 
   runApp(
     MultiProvider(
       providers: [
-        ChangeNotifierProvider(
-            create: (context) => themeProvider),
-        ChangeNotifierProvider(
-            create: (context) => TermsAgreement()),
+        ChangeNotifierProvider(create: (context) => themeProvider),
+        ChangeNotifierProvider(create: (context) => TermsAgreement()),
       ],
       child: MyApp(initDone: initDone, registered: registered),
     ),
@@ -70,7 +68,7 @@ Future<void> setGlobalValues() async {
 }
 
 class MyApp extends StatelessWidget {
-    const MyApp({
+  const MyApp({
     super.key,
     required this.initDone,
     this.doubleName,
@@ -108,7 +106,7 @@ class MyApp extends StatelessWidget {
           foregroundColor: kColorScheme.onPrimary,
         ),
         cardTheme: const CardTheme().copyWith(
-            color: kColorScheme.secondaryContainer,
+            color: kColorScheme.surfaceContainer,
             margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8)),
         elevatedButtonTheme: ElevatedButtonThemeData(
           style: ElevatedButton.styleFrom(
@@ -118,7 +116,7 @@ class MyApp extends StatelessWidget {
         ),
         expansionTileTheme: const ExpansionTileThemeData().copyWith(
             backgroundColor: kColorScheme.backgroundDarker,
-            collapsedBackgroundColor: ThemeData().colorScheme.background),
+            collapsedBackgroundColor: ThemeData().colorScheme.surface),
         bottomNavigationBarTheme: const BottomNavigationBarThemeData().copyWith(
           selectedItemColor: kColorScheme.primary,
           unselectedItemColor: kColorScheme.secondary,
@@ -134,7 +132,7 @@ class MyApp extends StatelessWidget {
           foregroundColor: kDarkColorScheme.onPrimaryContainer,
         ),
         cardTheme: const CardTheme().copyWith(
-            color: kDarkColorScheme.secondaryContainer,
+            color: kDarkColorScheme.surfaceContainer,
             margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8)),
         elevatedButtonTheme: ElevatedButtonThemeData(
           style: ElevatedButton.styleFrom(
@@ -144,15 +142,14 @@ class MyApp extends StatelessWidget {
         ),
         expansionTileTheme: const ExpansionTileThemeData().copyWith(
             backgroundColor: kDarkColorScheme.backgroundDarker,
-            collapsedBackgroundColor: kDarkColorScheme.background),
+            collapsedBackgroundColor: kDarkColorScheme.surface),
         bottomNavigationBarTheme: const BottomNavigationBarThemeData().copyWith(
           selectedItemColor: kDarkColorScheme.primary,
           unselectedItemColor: kDarkColorScheme.secondary,
         ),
       ),
       themeMode: themeProvider.themeMode,
-      home: SplashScreen(
-          initDone: initDone, registered: registered),
+      home: SplashScreen(initDone: initDone, registered: registered),
     );
   }
 }

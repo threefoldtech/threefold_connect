@@ -1,6 +1,5 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
 import 'package:threebotlogin/screens/wizard/web_view.dart';
 import 'package:threebotlogin/services/shared_preference_service.dart';
@@ -33,7 +32,7 @@ class _Page5State extends State<Page5> {
               Text(
                 'STARTYOUR',
                 style: Theme.of(context).textTheme.displayMedium!.copyWith(
-                      color: Theme.of(context).colorScheme.onBackground,
+                      color: Theme.of(context).colorScheme.onSurface,
                       fontWeight: FontWeight.bold,
                     ),
               ),
@@ -47,7 +46,7 @@ class _Page5State extends State<Page5> {
               Text(
                 'JOURNEY',
                 style: Theme.of(context).textTheme.displayMedium!.copyWith(
-                      color: Theme.of(context).colorScheme.onBackground,
+                      color: Theme.of(context).colorScheme.onSurface,
                       fontWeight: FontWeight.bold,
                     ),
               ),
@@ -100,9 +99,7 @@ class _Page5State extends State<Page5> {
                                               .attemptedWithoutAccepting &&
                                           !termsAgreement.isChecked
                                       ? Theme.of(context).colorScheme.error
-                                      : Theme.of(context)
-                                          .colorScheme
-                                          .onBackground,
+                                      : Theme.of(context).colorScheme.onSurface,
                                 ),
                           ),
                           TextSpan(

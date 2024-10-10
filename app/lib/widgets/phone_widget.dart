@@ -93,12 +93,12 @@ class PhoneAlertDialogState extends State<PhoneAlertDialog> {
                       ),
                     ),
                     style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                        color: Theme.of(context).colorScheme.onBackground),
+                        color: Theme.of(context).colorScheme.onSurface),
                     dropdownTextStyle: Theme.of(context)
                         .textTheme
                         .bodyMedium!
                         .copyWith(
-                            color: Theme.of(context).colorScheme.onBackground),
+                            color: Theme.of(context).colorScheme.onSurface),
                     onChanged: (phone) {
                       PhoneNumber p = phone;
                       setState(() {

@@ -126,7 +126,7 @@ class _ContractsScreenState extends State<ContractsScreen> {
                     labelColor: Theme.of(context).colorScheme.primary,
                     indicatorColor: Theme.of(context).colorScheme.primary,
                     unselectedLabelColor:
-                        Theme.of(context).colorScheme.onBackground,
+                        Theme.of(context).colorScheme.onSurface,
                     dividerColor: Theme.of(context).scaffoldBackgroundColor,
                     labelStyle: Theme.of(context).textTheme.titleLarge,
                     unselectedLabelStyle:

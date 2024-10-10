@@ -87,7 +87,7 @@ class _ShowResultDialogState extends State<ShowResultDialog>
             Text(
               'Loading Votes...',
               style: Theme.of(context).textTheme.bodyLarge!.copyWith(
-                  color: Theme.of(context).colorScheme.onBackground,
+                  color: Theme.of(context).colorScheme.onSurface,
                   fontWeight: FontWeight.bold),
             ),
           ],
@@ -112,10 +112,12 @@ class _ShowResultDialogState extends State<ShowResultDialog>
                 },
               ),
               Center(
-                child: Text('Threshold ${totalVotes} / ${threshold}',
-                    style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                          color: Theme.of(context).colorScheme.onBackground,
-                        )),
+                child: Text(
+                  'Threshold $totalVotes / $threshold',
+                  style: Theme.of(context).textTheme.titleMedium!.copyWith(
+                        color: Theme.of(context).colorScheme.onSurface,
+                      ),
+                ),
               ),
             ],
           ),
@@ -125,14 +127,14 @@ class _ShowResultDialogState extends State<ShowResultDialog>
             children: [
               Text('Yes',
                   style: Theme.of(context).textTheme.bodyLarge!.copyWith(
-                        color: Theme.of(context).colorScheme.onBackground,
+                        color: Theme.of(context).colorScheme.onSurface,
                       )),
               Text(
                   totalVotes == 0
                       ? '0%'
                       : '${((yesVotes / totalVotes) * 100).toStringAsFixed(0)}%',
                   style: Theme.of(context).textTheme.bodyLarge!.copyWith(
-                        color: Theme.of(context).colorScheme.onBackground,
+                        color: Theme.of(context).colorScheme.onSurface,
                       )),
             ],
           ),
@@ -152,14 +154,14 @@ class _ShowResultDialogState extends State<ShowResultDialog>
             children: [
               Text('No',
                   style: Theme.of(context).textTheme.bodyLarge!.copyWith(
-                        color: Theme.of(context).colorScheme.onBackground,
+                        color: Theme.of(context).colorScheme.onSurface,
                       )),
               Text(
                   totalVotes == 0
                       ? '0%'
                       : '${(noVotes / totalVotes * 100).toStringAsFixed(0)}%',
                   style: Theme.of(context).textTheme.bodyLarge!.copyWith(
-                        color: Theme.of(context).colorScheme.onBackground,
+                        color: Theme.of(context).colorScheme.onSurface,
                       )),
             ],
           ),
@@ -181,7 +183,7 @@ class _ShowResultDialogState extends State<ShowResultDialog>
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(10),
         ),
-        backgroundColor: Theme.of(context).colorScheme.background,
+        backgroundColor: Theme.of(context).colorScheme.surface,
         child: content);
   }
 }

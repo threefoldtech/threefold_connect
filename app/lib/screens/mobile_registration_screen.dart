@@ -293,7 +293,7 @@ class _MobileRegistrationScreenState extends State<MobileRegistrationScreen> {
               style: Theme.of(context)
                   .textTheme
                   .bodyMedium!
-                  .copyWith(color: Theme.of(context).colorScheme.onBackground),
+                  .copyWith(color: Theme.of(context).colorScheme.onSurface),
             ),
             const SizedBox(
               height: 10,
@@ -351,13 +351,15 @@ class _MobileRegistrationScreenState extends State<MobileRegistrationScreen> {
             style: Theme.of(context)
                 .textTheme
                 .titleMedium!
-                .copyWith(color: Theme.of(context).colorScheme.onBackground),
+                .copyWith(color: Theme.of(context).colorScheme.onSurface),
           ),
           subtitle: state.index > 0
               ? Text(
                   doubleNameController.text,
-                  style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                      color: Theme.of(context).colorScheme.onBackground),
+                  style: Theme.of(context)
+                      .textTheme
+                      .bodyMedium!
+                      .copyWith(color: Theme.of(context).colorScheme.onSurface),
                 )
               : null,
           content: Card(
@@ -437,13 +439,15 @@ class _MobileRegistrationScreenState extends State<MobileRegistrationScreen> {
             style: Theme.of(context)
                 .textTheme
                 .titleMedium!
-                .copyWith(color: Theme.of(context).colorScheme.onBackground),
+                .copyWith(color: Theme.of(context).colorScheme.onSurface),
           ),
           subtitle: state.index > _State.Email.index
               ? Text(
                   emailController.text,
-                  style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                      color: Theme.of(context).colorScheme.onBackground),
+                  style: Theme.of(context)
+                      .textTheme
+                      .bodyMedium!
+                      .copyWith(color: Theme.of(context).colorScheme.onSurface),
                 )
               : null,
           content: Card(

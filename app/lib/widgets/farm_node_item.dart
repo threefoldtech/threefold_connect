@@ -46,7 +46,7 @@ class _FarmNodeItemWidgetState extends State<FarmNodeItemWidget> {
           style: Theme.of(context)
               .textTheme
               .bodyMedium!
-              .copyWith(color: Theme.of(context).colorScheme.onBackground),
+              .copyWith(color: Theme.of(context).colorScheme.onSurface),
           controller: nodeIdController,
           decoration: const InputDecoration(
             labelText: 'Node ID',

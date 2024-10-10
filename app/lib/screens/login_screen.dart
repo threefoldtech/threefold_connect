@@ -111,8 +111,10 @@ class _LoginScreenState extends State<LoginScreen> with BlockAndRunMixin {
                 padding: const EdgeInsets.only(right: 24.0, left: 24.0),
                 child: Text(
                   isMobileCheck ? scopeTextMobile : scopeText,
-                  style: Theme.of(context).textTheme.bodyLarge!.copyWith(
-                      color: Theme.of(context).colorScheme.onBackground),
+                  style: Theme.of(context)
+                      .textTheme
+                      .bodyLarge!
+                      .copyWith(color: Theme.of(context).colorScheme.onSurface),
                   textAlign: TextAlign.center,
                 ),
               ),
@@ -187,7 +189,8 @@ class _LoginScreenState extends State<LoginScreen> with BlockAndRunMixin {
                   padding: const EdgeInsets.only(right: 24.0, left: 24.0),
                   child: Text(
                     'Attempt expires in ${(timeLeft >= 0) ? timeLeft.toString() : '0'} second(s).',
-                    style: Theme.of(context).textTheme.bodyMedium!.copyWith(color: Theme.of(context).colorScheme.onBackground),
+                    style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                        color: Theme.of(context).colorScheme.onSurface),
                     textAlign: TextAlign.center,
                   ),
                 ),

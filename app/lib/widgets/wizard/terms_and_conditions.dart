@@ -25,8 +25,10 @@ class _TermsAndConditionsState extends State<TermsAndConditions> {
           children: [
             Text(
                 'Before you can start using the app, you must accept the Terms and Conditions.',
-                style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                    color: Theme.of(context).colorScheme.onBackground)),
+                style: Theme.of(context)
+                    .textTheme
+                    .bodyMedium!
+                    .copyWith(color: Theme.of(context).colorScheme.onSurface)),
             GestureDetector(
               onTap: () {
                 Navigator.push(
@@ -56,7 +58,7 @@ class _TermsAndConditionsState extends State<TermsAndConditions> {
                             color: termsAgreement.attemptedWithoutAccepting &&
                                     !termsAgreement.isChecked
                                 ? Theme.of(context).colorScheme.error
-                                : Theme.of(context).colorScheme.onBackground)),
+                                : Theme.of(context).colorScheme.onSurface)),
                   ),
                 ],
               );

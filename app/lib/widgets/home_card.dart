@@ -21,6 +21,7 @@ class HomeCardWidget extends StatelessWidget {
     final size = MediaQuery.of(context).size.width;
     const double margin = 3;
     return Card(
+      color: Theme.of(context).colorScheme.secondaryContainer,
       margin: const EdgeInsets.all(margin),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
       clipBehavior: Clip.hardEdge,

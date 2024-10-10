@@ -23,7 +23,7 @@ class TransactionDetails extends StatelessWidget {
                 children: [
                   Text(label,
                       style: Theme.of(context).textTheme.titleLarge!.copyWith(
-                          color: Theme.of(context).colorScheme.onBackground,
+                          color: Theme.of(context).colorScheme.onSurface,
                           fontWeight: FontWeight.bold)),
                   const SizedBox(height: 10),
                   label == 'Type'
@@ -53,9 +53,8 @@ class TransactionDetails extends StatelessWidget {
                               .textTheme
                               .bodyLarge!
                               .copyWith(
-                                  color: Theme.of(context)
-                                      .colorScheme
-                                      .onBackground)),
+                                  color:
+                                      Theme.of(context).colorScheme.onSurface)),
                 ],
               ),
             ),

@@ -61,30 +61,30 @@ class _ProposalsWidgetState extends State<ProposalsWidget> {
             child: SizedBox(
               height: 40,
               child: SearchBar(
-                backgroundColor: MaterialStateProperty.all<Color>(
-                    Theme.of(context).colorScheme.background),
+                backgroundColor: WidgetStateProperty.all<Color>(
+                    Theme.of(context).colorScheme.surfaceContainer),
                 onChanged: search,
                 trailing: <Widget>[
                   Icon(
                     Icons.search,
-                    color: Theme.of(context).colorScheme.onBackground,
+                    color: Theme.of(context).colorScheme.onSurface,
                   )
                 ],
                 hintText: 'Search by proposal description',
-                hintStyle: MaterialStateProperty.all<TextStyle>(
+                hintStyle: WidgetStateProperty.all<TextStyle>(
                   Theme.of(context).textTheme.bodyLarge!.copyWith(
                         color:
                             Theme.of(context).colorScheme.onSecondaryContainer,
                       ),
                 ),
-                textStyle: MaterialStateProperty.all<TextStyle>(
+                textStyle: WidgetStateProperty.all<TextStyle>(
                   Theme.of(context).textTheme.bodyLarge!.copyWith(
                         color:
                             Theme.of(context).colorScheme.onSecondaryContainer,
                         decorationThickness: 0,
                       ),
                 ),
-                shape: MaterialStateProperty.all<OutlinedBorder>(
+                shape: WidgetStateProperty.all<OutlinedBorder>(
                   RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(15),
                   ),
@@ -103,8 +103,10 @@ class _ProposalsWidgetState extends State<ProposalsWidget> {
                   widget.proposals.isEmpty
                       ? 'No active proposal at the moment'
                       : 'No result was found',
-                  style: Theme.of(context).textTheme.bodyLarge!.copyWith(
-                      color: Theme.of(context).colorScheme.onBackground),
+                  style: Theme.of(context)
+                      .textTheme
+                      .bodyLarge!
+                      .copyWith(color: Theme.of(context).colorScheme.onSurface),
                 ),
               ));
   }

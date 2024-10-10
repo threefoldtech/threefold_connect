@@ -178,7 +178,7 @@ class _WalletSendScreenState extends State<WalletSendScreen> {
               title: TextField(
                   readOnly: true,
                   style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                        color: Theme.of(context).colorScheme.onBackground,
+                        color: Theme.of(context).colorScheme.onSurface,
                       ),
                   controller: fromController,
                   decoration: InputDecoration(
@@ -189,7 +189,7 @@ class _WalletSendScreenState extends State<WalletSendScreen> {
             ListTile(
               title: TextField(
                   style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                        color: Theme.of(context).colorScheme.onBackground,
+                        color: Theme.of(context).colorScheme.onSurface,
                       ),
                   controller: toController,
                   decoration: InputDecoration(
@@ -211,7 +211,7 @@ class _WalletSendScreenState extends State<WalletSendScreen> {
             ListTile(
               title: TextField(
                   style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                        color: Theme.of(context).colorScheme.onBackground,
+                        color: Theme.of(context).colorScheme.onSurface,
                       ),
                   keyboardType: TextInputType.number,
                   controller: amountController,
@@ -228,7 +228,7 @@ class _WalletSendScreenState extends State<WalletSendScreen> {
               ListTile(
                 title: TextField(
                     style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                          color: Theme.of(context).colorScheme.onBackground,
+                          color: Theme.of(context).colorScheme.onSurface,
                         ),
                     controller: memoController,
                     decoration: const InputDecoration(

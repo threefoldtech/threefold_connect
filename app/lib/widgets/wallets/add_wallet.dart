@@ -172,14 +172,13 @@ class _NewWalletState extends State<NewWallet> {
                 Text(
                   'Import Wallet',
                   style: Theme.of(context).textTheme.headlineSmall!.copyWith(
-                        color: Theme.of(context).colorScheme.onBackground,
+                        color: Theme.of(context).colorScheme.onSurface,
                       ),
                 ),
                 TextField(
                   style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                      color: Theme.of(context).colorScheme.onBackground,
-                      decorationColor:
-                          Theme.of(context).colorScheme.onBackground),
+                      color: Theme.of(context).colorScheme.onSurface,
+                      decorationColor: Theme.of(context).colorScheme.onSurface),
                   maxLength: 50,
                   decoration: InputDecoration(
                       label: const Text('Name'), errorText: nameError),
@@ -187,9 +186,8 @@ class _NewWalletState extends State<NewWallet> {
                 ),
                 TextField(
                   style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                      color: Theme.of(context).colorScheme.onBackground,
-                      decorationColor:
-                          Theme.of(context).colorScheme.onBackground),
+                      color: Theme.of(context).colorScheme.onSurface,
+                      decorationColor: Theme.of(context).colorScheme.onSurface),
                   keyboardType: TextInputType.multiline,
                   maxLines: null,
                   decoration: InputDecoration(

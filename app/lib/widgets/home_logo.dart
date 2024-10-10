@@ -32,7 +32,7 @@ class HomeLogoWidget extends StatelessWidget {
                           .textTheme
                           .headlineSmall!
                           .copyWith(
-                              color: Theme.of(context).colorScheme.onBackground,
+                              color: Theme.of(context).colorScheme.onSurface,
                               fontWeight: FontWeight.bold),
                     ),
                   ],
@@ -41,7 +41,7 @@ class HomeLogoWidget extends StatelessWidget {
                   'assets/TF_logo.svg',
                   alignment: Alignment.center,
                   colorFilter: ColorFilter.mode(
-                    Theme.of(context).colorScheme.onBackground,
+                    Theme.of(context).colorScheme.onSurface,
                     BlendMode.srcIn,
                   ),
                 ),

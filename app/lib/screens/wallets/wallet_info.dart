@@ -119,14 +119,14 @@ class _WalletDetailsWidgetState extends State<WalletDetailsWidget> {
             Text(
               'Addresses',
               style: Theme.of(context).textTheme.titleLarge!.copyWith(
-                    color: Theme.of(context).colorScheme.onBackground,
+                    color: Theme.of(context).colorScheme.onSurface,
                   ),
             ),
             ListTile(
               title: TextField(
                   readOnly: true,
                   style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                        color: Theme.of(context).colorScheme.onBackground,
+                        color: Theme.of(context).colorScheme.onSurface,
                       ),
                   controller: stellarAddressController,
                   decoration: const InputDecoration(
@@ -146,7 +146,7 @@ class _WalletDetailsWidgetState extends State<WalletDetailsWidget> {
               title: TextField(
                   readOnly: true,
                   style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                        color: Theme.of(context).colorScheme.onBackground,
+                        color: Theme.of(context).colorScheme.onSurface,
                       ),
                   controller: tfchainAddressController,
                   decoration: const InputDecoration(
@@ -166,7 +166,7 @@ class _WalletDetailsWidgetState extends State<WalletDetailsWidget> {
             Text(
               'Secrets',
               style: Theme.of(context).textTheme.titleLarge!.copyWith(
-                    color: Theme.of(context).colorScheme.onBackground,
+                    color: Theme.of(context).colorScheme.onSurface,
                   ),
             ),
             ListTile(
@@ -174,7 +174,7 @@ class _WalletDetailsWidgetState extends State<WalletDetailsWidget> {
                   readOnly: true,
                   obscureText: !showStellarSecret,
                   style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                        color: Theme.of(context).colorScheme.onBackground,
+                        color: Theme.of(context).colorScheme.onSurface,
                       ),
                   controller: stellarSecretController,
                   decoration: InputDecoration(
@@ -204,7 +204,7 @@ class _WalletDetailsWidgetState extends State<WalletDetailsWidget> {
                   readOnly: true,
                   obscureText: !showTfchainSecret,
                   style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                        color: Theme.of(context).colorScheme.onBackground,
+                        color: Theme.of(context).colorScheme.onSurface,
                       ),
                   controller: tfchainSecretController,
                   decoration: InputDecoration(
@@ -236,7 +236,7 @@ class _WalletDetailsWidgetState extends State<WalletDetailsWidget> {
                   autofocus: edit,
                   readOnly: !edit,
                   style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                        color: Theme.of(context).colorScheme.onBackground,
+                        color: Theme.of(context).colorScheme.onSurface,
                       ),
                   controller: walletNameController,
                   decoration: const InputDecoration(

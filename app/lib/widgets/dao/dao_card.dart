@@ -34,7 +34,6 @@ class _DaoCardState extends State<DaoCard> {
   @override
   Widget build(BuildContext context) {
     return Card(
-      color: Theme.of(context).cardColor,
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(

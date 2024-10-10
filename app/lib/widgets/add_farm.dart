@@ -117,7 +117,7 @@ class _NewFarmState extends State<NewFarm> {
         label: wallet.name,
         labelWidget: Text(wallet.name,
             style: Theme.of(context).textTheme.bodyLarge!.copyWith(
-                  color: Theme.of(context).colorScheme.onBackground,
+                  color: Theme.of(context).colorScheme.onSurface,
                 )),
       );
     }).toList();
@@ -142,14 +142,13 @@ class _NewFarmState extends State<NewFarm> {
                 Text(
                   'Create Farm',
                   style: Theme.of(context).textTheme.headlineSmall!.copyWith(
-                        color: Theme.of(context).colorScheme.onBackground,
+                        color: Theme.of(context).colorScheme.onSurface,
                       ),
                 ),
                 TextField(
                   style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                      color: Theme.of(context).colorScheme.onBackground,
-                      decorationColor:
-                          Theme.of(context).colorScheme.onBackground),
+                      color: Theme.of(context).colorScheme.onSurface,
+                      decorationColor: Theme.of(context).colorScheme.onSurface),
                   maxLength: 40,
                   decoration: InputDecoration(
                       label: const Text('Name'), errorText: nameError),
@@ -165,7 +164,7 @@ class _NewFarmState extends State<NewFarm> {
                     errorText: walletError,
                     width: MediaQuery.sizeOf(context).width * 0.92,
                     textStyle: Theme.of(context).textTheme.bodyLarge!.copyWith(
-                          color: Theme.of(context).colorScheme.onBackground,
+                          color: Theme.of(context).colorScheme.onSurface,
                         ),
                     trailingIcon: const Icon(
                       CupertinoIcons.chevron_down,
@@ -190,7 +189,7 @@ class _NewFarmState extends State<NewFarm> {
                       ),
                     ),
                     menuStyle: MenuStyle(
-                      shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                      shape: WidgetStateProperty.all<RoundedRectangleBorder>(
                         const RoundedRectangleBorder(
                           borderRadius: BorderRadius.all(Radius.circular(4)),
                         ),

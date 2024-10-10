@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:threebotlogin/main.dart';
 
-enum DialogType {Info, Warning, Error}
+enum DialogType { Info, Warning, Error }
 
 class CustomDialog extends StatefulWidget {
   final String? description;
@@ -10,7 +10,7 @@ class CustomDialog extends StatefulWidget {
   final String title;
   final IconData image;
   final dynamic hiddenAction;
-  final DialogType type; 
+  final DialogType type;
 
   const CustomDialog({
     super.key,
@@ -97,10 +97,10 @@ class _CustomDialogState extends State<CustomDialog> {
     const int timesPressedToReveal = 5;
     Color backgroundColor;
     Color color;
-    if (widget.type == DialogType.Error){
+    if (widget.type == DialogType.Error) {
       backgroundColor = Theme.of(context).colorScheme.error;
       color = Theme.of(context).colorScheme.onError;
-    } else if (widget.type == DialogType.Warning){
+    } else if (widget.type == DialogType.Warning) {
       backgroundColor = Theme.of(context).colorScheme.warning;
       color = Theme.of(context).colorScheme.onWarning;
     } else {
@@ -112,7 +112,7 @@ class _CustomDialogState extends State<CustomDialog> {
       right: 20.0,
       child: TextButton(
         style: ButtonStyle(
-          overlayColor: MaterialStateProperty.all(Colors.transparent),
+          overlayColor: WidgetStateProperty.all(Colors.transparent),
         ),
         onPressed: () {
           if (widget.hiddenAction != null) {
@@ -146,7 +146,7 @@ class _CustomDialogState extends State<CustomDialog> {
         padding: const EdgeInsets.only(top: 30.0 + 20.0),
         margin: const EdgeInsets.only(top: 30.0),
         decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.background,
+          color: Theme.of(context).colorScheme.surface,
           shape: BoxShape.rectangle,
           borderRadius: BorderRadius.circular(20.0),
           boxShadow: const [
@@ -166,7 +166,7 @@ class _CustomDialogState extends State<CustomDialog> {
                 widget.title,
                 style: Theme.of(context).textTheme.titleLarge!.copyWith(
                     fontWeight: FontWeight.bold,
-                    color: Theme.of(context).colorScheme.onBackground),
+                    color: Theme.of(context).colorScheme.onSurface),
                 textAlign: TextAlign.center,
               ),
             ),
@@ -181,7 +181,7 @@ class _CustomDialogState extends State<CustomDialog> {
                         textAlign: TextAlign.center,
                         style: Theme.of(context).textTheme.bodyMedium!.copyWith(
                             fontWeight: FontWeight.bold,
-                            color: Theme.of(context).colorScheme.onBackground),
+                            color: Theme.of(context).colorScheme.onSurface),
                       )
                     : widget.widgetDescription,
               ),

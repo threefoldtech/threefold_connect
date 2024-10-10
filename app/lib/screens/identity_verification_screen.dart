@@ -514,7 +514,7 @@ class _IdentityVerificationScreenState
             style: Theme.of(context)
                 .textTheme
                 .bodyMedium!
-                .copyWith(color: Theme.of(context).colorScheme.onBackground),
+                .copyWith(color: Theme.of(context).colorScheme.onSurface),
           ),
           const SizedBox(
             height: 10,
@@ -546,8 +546,10 @@ class _IdentityVerificationScreenState
                 ),
                 Text(
                   'One moment please',
-                  style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                      color: Theme.of(context).colorScheme.onBackground),
+                  style: Theme.of(context)
+                      .textTheme
+                      .bodyMedium!
+                      .copyWith(color: Theme.of(context).colorScheme.onSurface),
                 ),
                 const SizedBox(
                   height: 10,
@@ -605,7 +607,7 @@ class _IdentityVerificationScreenState
                           color: Theme.of(context).colorScheme.primary,
                           width: 2),
                       shape: BoxShape.circle,
-                      color: Theme.of(context).colorScheme.background),
+                      color: Theme.of(context).colorScheme.surface),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -640,7 +642,7 @@ class _IdentityVerificationScreenState
                                       fontWeight: FontWeight.bold,
                                       color: Theme.of(context)
                                           .colorScheme
-                                          .onBackground),
+                                          .onSurface),
                             ),
                           )
                         ],
@@ -729,7 +731,7 @@ class _IdentityVerificationScreenState
                     border: Border.all(
                         color: Theme.of(context).colorScheme.primary, width: 2),
                     shape: BoxShape.circle,
-                    color: Theme.of(context).colorScheme.background),
+                    color: Theme.of(context).colorScheme.surface),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -783,7 +785,7 @@ class _IdentityVerificationScreenState
                                                 fontWeight: FontWeight.bold,
                                                 color: Theme.of(context)
                                                     .colorScheme
-                                                    .onBackground),
+                                                    .onSurface),
                                       ),
                                     )
                                   ],
@@ -935,7 +937,7 @@ class _IdentityVerificationScreenState
                                         fontWeight: FontWeight.bold,
                                         color: Theme.of(context)
                                             .colorScheme
-                                            .onBackground)))
+                                            .onSurface)))
                       ],
                     ),
                     const SizedBox(height: 5),
@@ -1354,16 +1356,14 @@ class _IdentityVerificationScreenState
                           .textTheme
                           .headlineMedium!
                           .copyWith(
-                              color:
-                                  Theme.of(context).colorScheme.onBackground),
+                              color: Theme.of(context).colorScheme.onSurface),
                     )
                   : Text('Change email',
                       style: Theme.of(context)
                           .textTheme
                           .headlineMedium!
                           .copyWith(
-                              color:
-                                  Theme.of(context).colorScheme.onBackground)),
+                              color: Theme.of(context).colorScheme.onSurface)),
               contentPadding: const EdgeInsets.all(24),
               content: Column(
                 mainAxisSize: MainAxisSize.min,
@@ -1374,18 +1374,16 @@ class _IdentityVerificationScreenState
                               .textTheme
                               .bodyLarge!
                               .copyWith(
-                                  color: Theme.of(context)
-                                      .colorScheme
-                                      .onBackground))
+                                  color:
+                                      Theme.of(context).colorScheme.onSurface))
                       : Text(
                           'Changing your email will require you to go through the email verification process again.',
                           style: Theme.of(context)
                               .textTheme
                               .bodyLarge!
                               .copyWith(
-                                  color: Theme.of(context)
-                                      .colorScheme
-                                      .onBackground)),
+                                  color:
+                                      Theme.of(context).colorScheme.onSurface)),
                   TextField(
                     controller: controller,
                     decoration: InputDecoration(

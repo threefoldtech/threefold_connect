@@ -65,7 +65,9 @@ class _AppState extends State<MainScreen> {
           children: [
             const Hero(
               tag: 'logo',
-              child: HomeLogoWidget(animate: true,),
+              child: HomeLogoWidget(
+                animate: true,
+              ),
             ),
             const SizedBox(height: 50),
             Container(
@@ -78,7 +80,7 @@ class _AppState extends State<MainScreen> {
                     fontWeight: FontWeight.bold,
                     color: errorMessage != null
                         ? Theme.of(context).colorScheme.error
-                        : Theme.of(context).colorScheme.onBackground),
+                        : Theme.of(context).colorScheme.onSurface),
               ),
             ),
             const SizedBox(

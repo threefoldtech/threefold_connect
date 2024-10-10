@@ -43,7 +43,9 @@ class _RegisteredScreenState extends State<RegisteredScreen>
                 ),
                 const Hero(
                   tag: 'logo',
-                  child: HomeLogoWidget(animate: false,),
+                  child: HomeLogoWidget(
+                    animate: false,
+                  ),
                 ),
               ],
             ),
@@ -64,7 +66,7 @@ class _RegisteredScreenState extends State<RegisteredScreen>
                             .textTheme
                             .titleMedium!
                             .copyWith(
-                              color: Theme.of(context).colorScheme.onBackground,
+                              color: Theme.of(context).colorScheme.onSurface,
                             ),
                         children: const <TextSpan>[
                           TextSpan(

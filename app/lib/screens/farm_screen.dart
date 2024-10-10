@@ -96,7 +96,7 @@ class _FarmScreenState extends State<FarmScreen> {
           Text(
             'Loading Farms...',
             style: Theme.of(context).textTheme.bodyLarge!.copyWith(
-                color: Theme.of(context).colorScheme.onBackground,
+                color: Theme.of(context).colorScheme.onSurface,
                 fontWeight: FontWeight.bold),
           ),
         ],
@@ -108,7 +108,7 @@ class _FarmScreenState extends State<FarmScreen> {
           style: Theme.of(context)
               .textTheme
               .bodyLarge!
-              .copyWith(color: Theme.of(context).colorScheme.onBackground),
+              .copyWith(color: Theme.of(context).colorScheme.onSurface),
         ),
       );
     } else {
