@@ -57,7 +57,7 @@ class _WalletScreenState extends State<WalletScreen> {
           Text(
             'Loading Wallets...',
             style: Theme.of(context).textTheme.bodyLarge!.copyWith(
-                color: Theme.of(context).colorScheme.onBackground,
+                color: Theme.of(context).colorScheme.onSurface,
                 fontWeight: FontWeight.bold),
           ),
         ],
@@ -69,7 +69,7 @@ class _WalletScreenState extends State<WalletScreen> {
           style: Theme.of(context)
               .textTheme
               .bodyLarge!
-              .copyWith(color: Theme.of(context).colorScheme.onBackground),
+              .copyWith(color: Theme.of(context).colorScheme.onSurface),
         ),
       );
     } else {

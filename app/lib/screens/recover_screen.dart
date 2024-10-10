@@ -132,16 +132,15 @@ class _RecoverScreenState extends State<RecoverScreen> {
                 style: Theme.of(context)
                     .textTheme
                     .titleLarge!
-                    .copyWith(color: Theme.of(context).colorScheme.onBackground),
+                    .copyWith(color: Theme.of(context).colorScheme.onSurface),
               ),
             ),
             Padding(
               padding: const EdgeInsets.all(20),
               child: TextFormField(
                   style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                      color: Theme.of(context).colorScheme.onBackground,
-                    decorationColor: Theme.of(context).colorScheme.onBackground
-                      ),
+                      color: Theme.of(context).colorScheme.onSurface,
+                      decorationColor: Theme.of(context).colorScheme.onSurface),
                   keyboardType: TextInputType.text,
                   decoration: const InputDecoration(
                     labelText: 'Name',
@@ -160,9 +159,8 @@ class _RecoverScreenState extends State<RecoverScreen> {
               padding: const EdgeInsets.all(20),
               child: TextFormField(
                 style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                    color: Theme.of(context).colorScheme.onBackground,
-                    decorationColor: Theme.of(context).colorScheme.onBackground
-                    ),
+                    color: Theme.of(context).colorScheme.onSurface,
+                    decorationColor: Theme.of(context).colorScheme.onSurface),
                 keyboardType: TextInputType.multiline,
                 maxLines: null,
                 decoration: const InputDecoration(
@@ -274,7 +272,7 @@ class _RecoverScreenState extends State<RecoverScreen> {
               style: Theme.of(context)
                   .textTheme
                   .bodyMedium!
-                  .copyWith(color: Theme.of(context).colorScheme.onBackground),
+                  .copyWith(color: Theme.of(context).colorScheme.onSurface),
             ),
             const SizedBox(
               height: 10,

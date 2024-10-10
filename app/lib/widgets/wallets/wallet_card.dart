@@ -87,7 +87,7 @@ class _WalletCardWidgetState extends State<WalletCardWidget> {
                   width: 35,
                   child: Image.asset(
                     'assets/tft_icon.png',
-                    color: Theme.of(context).colorScheme.onBackground,
+                    color: Theme.of(context).colorScheme.onSurface,
                   )),
               Text(
                 'Stellar',
@@ -112,7 +112,7 @@ class _WalletCardWidgetState extends State<WalletCardWidget> {
                   child: Image.asset(
                     'assets/tft_icon.png',
                     fit: BoxFit.contain,
-                    color: Theme.of(context).colorScheme.onBackground,
+                    color: Theme.of(context).colorScheme.onSurface,
                   )),
               Text(
                 'TFChain',
@@ -132,7 +132,6 @@ class _WalletCardWidgetState extends State<WalletCardWidget> {
       ];
     }
     return Card(
-      color: Theme.of(context).colorScheme.background,
       shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(5),
           side: BorderSide(color: Theme.of(context).colorScheme.primary)),

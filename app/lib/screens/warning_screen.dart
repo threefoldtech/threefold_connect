@@ -51,8 +51,10 @@ class _WarningScreenState extends State<WarningScreen> {
               children: <Widget>[
                 Text(
                   'Please check the URL bar in your browser and make sure it matches one of the images below.',
-                  style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                      color: Theme.of(context).colorScheme.onBackground),
+                  style: Theme.of(context)
+                      .textTheme
+                      .bodyMedium!
+                      .copyWith(color: Theme.of(context).colorScheme.onSurface),
                 ),
               ],
             ),
@@ -81,8 +83,10 @@ class _WarningScreenState extends State<WarningScreen> {
               children: <Widget>[
                 Text(
                   'Does the URL bar match?',
-                  style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                      color: Theme.of(context).colorScheme.onBackground),
+                  style: Theme.of(context)
+                      .textTheme
+                      .titleMedium!
+                      .copyWith(color: Theme.of(context).colorScheme.onSurface),
                 ),
               ],
             ),
@@ -93,7 +97,7 @@ class _WarningScreenState extends State<WarningScreen> {
                 children: <Widget>[
                   ElevatedButton(
                     style: ButtonStyle(
-                      backgroundColor: MaterialStateProperty.all(
+                      backgroundColor: WidgetStateProperty.all(
                           Theme.of(context).colorScheme.errorContainer),
                     ),
                     onPressed: () {
@@ -102,12 +106,13 @@ class _WarningScreenState extends State<WarningScreen> {
                     child: Text(
                       "No, it doesn't",
                       style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                          color: Theme.of(context).colorScheme.onErrorContainer),
+                          color:
+                              Theme.of(context).colorScheme.onErrorContainer),
                     ),
                   ),
                   ElevatedButton(
                     style: ButtonStyle(
-                      backgroundColor: MaterialStateProperty.all(
+                      backgroundColor: WidgetStateProperty.all(
                           Theme.of(context).colorScheme.primaryContainer),
                     ),
                     onPressed: () {
@@ -116,7 +121,8 @@ class _WarningScreenState extends State<WarningScreen> {
                     child: Text(
                       'Yes, it does',
                       style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                          color: Theme.of(context).colorScheme.onPrimaryContainer),
+                          color:
+                              Theme.of(context).colorScheme.onPrimaryContainer),
                     ),
                   ),
                 ],

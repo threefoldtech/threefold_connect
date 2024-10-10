@@ -38,7 +38,7 @@ class _CommonPageState extends State<CommonPage> {
                   style: Theme.of(context).textTheme.displayMedium!.copyWith(
                         color: widget.title == 'Welcome to'
                             ? Theme.of(context).colorScheme.primary
-                            : Theme.of(context).colorScheme.onBackground,
+                            : Theme.of(context).colorScheme.onSurface,
                         fontWeight: FontWeight.bold,
                       ),
                 ),
@@ -52,15 +52,15 @@ class _CommonPageState extends State<CommonPage> {
                   ),
                 SizedBox(
                   height: widget.subtitle.isEmpty
-                  ? MediaQuery.of(context).size.height * 0.15
-                  : MediaQuery.of(context).size.height * 0.04,
+                      ? MediaQuery.of(context).size.height * 0.15
+                      : MediaQuery.of(context).size.height * 0.04,
                 ),
                 widget.imagePath.endsWith('.svg')
                     ? SvgPicture.asset(
                         widget.imagePath,
                         alignment: Alignment.center,
                         colorFilter: ColorFilter.mode(
-                          Theme.of(context).colorScheme.onBackground,
+                          Theme.of(context).colorScheme.onSurface,
                           BlendMode.srcIn,
                         ),
                         width: widget.widthPercentage != null
@@ -92,7 +92,7 @@ class _CommonPageState extends State<CommonPage> {
               child: Text(
                 widget.description,
                 style: Theme.of(context).textTheme.bodyLarge!.copyWith(
-                      color: Theme.of(context).colorScheme.onBackground,
+                      color: Theme.of(context).colorScheme.onSurface,
                       fontWeight: FontWeight.bold,
                     ),
                 textAlign: TextAlign.center,

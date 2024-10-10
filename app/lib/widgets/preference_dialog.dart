@@ -162,10 +162,11 @@ class _PreferenceDialogState extends State<PreferenceDialog> {
                               (BuildContext context, AsyncSnapshot snapshot) {
                             if (snapshot.hasData) {
                               return Container(
-                                decoration:  BoxDecoration(
+                                decoration: BoxDecoration(
                                   border: Border(
                                       bottom: BorderSide(
-                                    color:Theme.of(context).colorScheme.onBackground,
+                                    color:
+                                        Theme.of(context).colorScheme.onSurface,
                                     width: 0.5,
                                   )),
                                 ),
@@ -188,7 +189,7 @@ class _PreferenceDialogState extends State<PreferenceDialog> {
                                         .copyWith(
                                           color: Theme.of(context)
                                               .colorScheme
-                                              .onBackground,
+                                              .onSurface,
                                           fontWeight: FontWeight.bold,
                                         ),
                                   ),
@@ -207,10 +208,11 @@ class _PreferenceDialogState extends State<PreferenceDialog> {
                               (BuildContext context, AsyncSnapshot snapshot) {
                             if (snapshot.hasData) {
                               return Container(
-                                decoration:  BoxDecoration(
+                                decoration: BoxDecoration(
                                   border: Border(
                                       bottom: BorderSide(
-                                    color: Theme.of(context).colorScheme.onBackground,
+                                    color:
+                                        Theme.of(context).colorScheme.onSurface,
                                     width: 0.5,
                                   )),
                                 ),
@@ -233,7 +235,7 @@ class _PreferenceDialogState extends State<PreferenceDialog> {
                                         .copyWith(
                                           color: Theme.of(context)
                                               .colorScheme
-                                              .onBackground,
+                                              .onSurface,
                                           fontWeight: FontWeight.bold,
                                         ),
                                   ),
@@ -247,10 +249,10 @@ class _PreferenceDialogState extends State<PreferenceDialog> {
 
                       case 'digitalTwin':
                         return Container(
-                          decoration:  BoxDecoration(
+                          decoration: BoxDecoration(
                             border: Border(
                                 bottom: BorderSide(
-                              color: Theme.of(context).colorScheme.onBackground,
+                              color: Theme.of(context).colorScheme.onSurface,
                               width: 0.5,
                             )),
                           ),
@@ -269,9 +271,8 @@ class _PreferenceDialogState extends State<PreferenceDialog> {
                                   .textTheme
                                   .bodyLarge!
                                   .copyWith(
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .onBackground,
+                                    color:
+                                        Theme.of(context).colorScheme.onSurface,
                                     fontWeight: FontWeight.bold,
                                   ),
                             ),
@@ -285,10 +286,11 @@ class _PreferenceDialogState extends State<PreferenceDialog> {
                               (BuildContext context, AsyncSnapshot snapshot) {
                             if (snapshot.hasData) {
                               return Container(
-                                decoration:  BoxDecoration(
+                                decoration: BoxDecoration(
                                   border: Border(
                                       bottom: BorderSide(
-                                    color: Theme.of(context).colorScheme.onBackground,
+                                    color:
+                                        Theme.of(context).colorScheme.onSurface,
                                     width: 0.5,
                                   )),
                                 ),
@@ -310,7 +312,7 @@ class _PreferenceDialogState extends State<PreferenceDialog> {
                                         .copyWith(
                                           color: Theme.of(context)
                                               .colorScheme
-                                              .onBackground,
+                                              .onSurface,
                                           fontWeight: FontWeight.bold,
                                         ),
                                   ),
@@ -329,10 +331,11 @@ class _PreferenceDialogState extends State<PreferenceDialog> {
                               (BuildContext context, AsyncSnapshot snapshot) {
                             if (snapshot.hasData) {
                               return Container(
-                                decoration:  BoxDecoration(
+                                decoration: BoxDecoration(
                                   border: Border(
                                       bottom: BorderSide(
-                                    color: Theme.of(context).colorScheme.onBackground,
+                                    color:
+                                        Theme.of(context).colorScheme.onSurface,
                                     width: 0.5,
                                   )),
                                 ),
@@ -355,7 +358,7 @@ class _PreferenceDialogState extends State<PreferenceDialog> {
                                         .copyWith(
                                           color: Theme.of(context)
                                               .colorScheme
-                                              .onBackground,
+                                              .onSurface,
                                           fontWeight: FontWeight.bold,
                                         ),
                                   ),
@@ -374,10 +377,11 @@ class _PreferenceDialogState extends State<PreferenceDialog> {
                               (BuildContext context, AsyncSnapshot snapshot) {
                             if (snapshot.hasData) {
                               return Container(
-                                decoration:  BoxDecoration(
+                                decoration: BoxDecoration(
                                   border: Border(
                                       bottom: BorderSide(
-                                    color: Theme.of(context).colorScheme.onBackground,
+                                    color:
+                                        Theme.of(context).colorScheme.onSurface,
                                     width: 0.5,
                                   )),
                                 ),
@@ -399,7 +403,7 @@ class _PreferenceDialogState extends State<PreferenceDialog> {
                                         .copyWith(
                                           color: Theme.of(context)
                                               .colorScheme
-                                              .onBackground,
+                                              .onSurface,
                                           fontWeight: FontWeight.bold,
                                         ),
                                   ),
@@ -418,10 +422,11 @@ class _PreferenceDialogState extends State<PreferenceDialog> {
                               (BuildContext context, AsyncSnapshot snapshot) {
                             if (snapshot.hasData) {
                               return Container(
-                                decoration:  BoxDecoration(
+                                decoration: BoxDecoration(
                                   border: Border(
                                       bottom: BorderSide(
-                                    color: Theme.of(context).colorScheme.onBackground,
+                                    color:
+                                        Theme.of(context).colorScheme.onSurface,
                                     width: 0.5,
                                   )),
                                 ),
@@ -443,7 +448,7 @@ class _PreferenceDialogState extends State<PreferenceDialog> {
                                         .copyWith(
                                           color: Theme.of(context)
                                               .colorScheme
-                                              .onBackground,
+                                              .onSurface,
                                           fontWeight: FontWeight.bold,
                                         ),
                                   ),
@@ -462,10 +467,11 @@ class _PreferenceDialogState extends State<PreferenceDialog> {
                               (BuildContext context, AsyncSnapshot snapshot) {
                             if (snapshot.hasData) {
                               return Container(
-                                decoration:  BoxDecoration(
+                                decoration: BoxDecoration(
                                   border: Border(
                                       bottom: BorderSide(
-                                    color: Theme.of(context).colorScheme.onBackground,
+                                    color:
+                                        Theme.of(context).colorScheme.onSurface,
                                     width: 0.5,
                                   )),
                                 ),
@@ -487,7 +493,7 @@ class _PreferenceDialogState extends State<PreferenceDialog> {
                                         .copyWith(
                                           color: Theme.of(context)
                                               .colorScheme
-                                              .onBackground,
+                                              .onSurface,
                                           fontWeight: FontWeight.bold,
                                         ),
                                   ),
@@ -506,10 +512,11 @@ class _PreferenceDialogState extends State<PreferenceDialog> {
                               (BuildContext context, AsyncSnapshot snapshot) {
                             if (snapshot.hasData) {
                               return Container(
-                                decoration:  BoxDecoration(
+                                decoration: BoxDecoration(
                                   border: Border(
                                       bottom: BorderSide(
-                                    color: Theme.of(context).colorScheme.onBackground,
+                                    color:
+                                        Theme.of(context).colorScheme.onSurface,
                                     width: 0.5,
                                   )),
                                 ),
@@ -531,7 +538,7 @@ class _PreferenceDialogState extends State<PreferenceDialog> {
                                         .copyWith(
                                           color: Theme.of(context)
                                               .colorScheme
-                                              .onBackground,
+                                              .onSurface,
                                           fontWeight: FontWeight.bold,
                                         ),
                                   ),
@@ -550,10 +557,11 @@ class _PreferenceDialogState extends State<PreferenceDialog> {
                               (BuildContext context, AsyncSnapshot snapshot) {
                             if (snapshot.hasData) {
                               return Container(
-                                decoration:  BoxDecoration(
+                                decoration: BoxDecoration(
                                   border: Border(
                                       bottom: BorderSide(
-                                    color: Theme.of(context).colorScheme.onBackground,
+                                    color:
+                                        Theme.of(context).colorScheme.onSurface,
                                     width: 0.5,
                                   )),
                                 ),
@@ -575,7 +583,7 @@ class _PreferenceDialogState extends State<PreferenceDialog> {
                                         .copyWith(
                                           color: Theme.of(context)
                                               .colorScheme
-                                              .onBackground,
+                                              .onSurface,
                                           fontWeight: FontWeight.bold,
                                         ),
                                   ),
@@ -595,10 +603,12 @@ class _PreferenceDialogState extends State<PreferenceDialog> {
                               if (!snapshot.hasData ||
                                   snapshot.data.length == 0) {
                                 return Container(
-                                    decoration:  BoxDecoration(
+                                    decoration: BoxDecoration(
                                       border: Border(
                                           bottom: BorderSide(
-                                        color: Theme.of(context).colorScheme.onBackground,
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .onSurface,
                                         width: 0.5,
                                       )),
                                     ),
@@ -619,7 +629,7 @@ class _PreferenceDialogState extends State<PreferenceDialog> {
                                                   .copyWith(
                                                     color: Theme.of(context)
                                                         .colorScheme
-                                                        .onBackground,
+                                                        .onSurface,
                                                     fontWeight: FontWeight.bold,
                                                   ),
                                             ),
@@ -646,10 +656,11 @@ class _PreferenceDialogState extends State<PreferenceDialog> {
                               }
 
                               return Container(
-                                decoration:  BoxDecoration(
+                                decoration: BoxDecoration(
                                   border: Border(
                                       bottom: BorderSide(
-                                    color: Theme.of(context).colorScheme.onBackground,
+                                    color:
+                                        Theme.of(context).colorScheme.onSurface,
                                     width: 0.5,
                                   )),
                                 ),
@@ -685,7 +696,7 @@ class _PreferenceDialogState extends State<PreferenceDialog> {
                                                 .copyWith(
                                                   color: Theme.of(context)
                                                       .colorScheme
-                                                      .onBackground,
+                                                      .onSurface,
                                                   fontWeight: FontWeight.bold,
                                                 ),
                                           ),
@@ -744,7 +755,7 @@ class _PreferenceDialogState extends State<PreferenceDialog> {
             '${widget.appId}  would like to access',
             style: Theme.of(context).textTheme.bodyLarge!.copyWith(
                 fontWeight: FontWeight.bold,
-                color: Theme.of(context).colorScheme.onBackground),
+                color: Theme.of(context).colorScheme.onSurface),
             textAlign: TextAlign.center,
           ),
         ),

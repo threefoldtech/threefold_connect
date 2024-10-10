@@ -49,7 +49,7 @@ class TransactionWidget extends StatelessWidget {
                   Text(transaction.hash,
                       overflow: TextOverflow.ellipsis,
                       style: Theme.of(context).textTheme.bodyLarge!.copyWith(
-                          color: Theme.of(context).colorScheme.onBackground)),
+                          color: Theme.of(context).colorScheme.onSurface)),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -73,9 +73,8 @@ class TransactionWidget extends StatelessWidget {
                               .textTheme
                               .bodyMedium!
                               .copyWith(
-                                  color: Theme.of(context)
-                                      .colorScheme
-                                      .onBackground)),
+                                  color:
+                                      Theme.of(context).colorScheme.onSurface)),
                     ],
                   ),
                 ],

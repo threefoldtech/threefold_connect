@@ -60,14 +60,14 @@ class _SendConfirmationWidgetState extends State<SendConfirmationWidget> {
           Text(
             'Send Confirmation',
             style: Theme.of(context).textTheme.headlineSmall!.copyWith(
-                  color: Theme.of(context).colorScheme.onBackground,
+                  color: Theme.of(context).colorScheme.onSurface,
                 ),
           ),
           ListTile(
             title: TextField(
                 readOnly: true,
                 style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                      color: Theme.of(context).colorScheme.onBackground,
+                      color: Theme.of(context).colorScheme.onSurface,
                     ),
                 controller: fromController,
                 decoration: const InputDecoration(
@@ -79,7 +79,7 @@ class _SendConfirmationWidgetState extends State<SendConfirmationWidget> {
             title: TextField(
                 readOnly: true,
                 style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                      color: Theme.of(context).colorScheme.onBackground,
+                      color: Theme.of(context).colorScheme.onSurface,
                     ),
                 controller: toController,
                 decoration: const InputDecoration(
@@ -91,7 +91,7 @@ class _SendConfirmationWidgetState extends State<SendConfirmationWidget> {
             title: TextField(
                 readOnly: true,
                 style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                      color: Theme.of(context).colorScheme.onBackground,
+                      color: Theme.of(context).colorScheme.onSurface,
                     ),
                 keyboardType: TextInputType.number,
                 controller: amountController,
@@ -106,7 +106,7 @@ class _SendConfirmationWidgetState extends State<SendConfirmationWidget> {
               title: TextField(
                   readOnly: true,
                   style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                        color: Theme.of(context).colorScheme.onBackground,
+                        color: Theme.of(context).colorScheme.onSurface,
                       ),
                   controller: memoController,
                   decoration: const InputDecoration(
@@ -153,13 +153,13 @@ class _SendConfirmationWidgetState extends State<SendConfirmationWidget> {
       } else {
         await TFChain.transfer(widget.secret, widget.to, widget.amount);
       }
-      await _showDialog(
-          'Success!', 'Tokens have been transferred successfully', Icons.check, DialogType.Info);
+      await _showDialog('Success!', 'Tokens have been transferred successfully',
+          Icons.check, DialogType.Info);
     } catch (e) {
-      _showDialog(
-          'Error', 'Failed to transfer. Please try again.', Icons.error, DialogType.Error);
+      _showDialog('Error', 'Failed to transfer. Please try again.', Icons.error,
+          DialogType.Error);
       setState(() {
-      loading = false;
+        loading = false;
       });
       return;
     }
@@ -171,7 +171,8 @@ class _SendConfirmationWidgetState extends State<SendConfirmationWidget> {
     Navigator.pop(context);
   }
 
-  Future<void> _showDialog(String title, String message, IconData icon, DialogType type) async {
+  Future<void> _showDialog(
+      String title, String message, IconData icon, DialogType type) async {
     showDialog(
       barrierDismissible: false,
       context: context,

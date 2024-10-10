@@ -25,7 +25,7 @@ class WalletBalanceTileWidget extends StatelessWidget {
         child: Image.asset(
           'assets/tft_icon.png',
           fit: BoxFit.cover,
-          color: Theme.of(context).colorScheme.onBackground,
+          color: Theme.of(context).colorScheme.onSurface,
           height: 50,
         ),
       ),

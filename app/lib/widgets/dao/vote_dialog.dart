@@ -51,7 +51,7 @@ class _VoteDialogState extends State<VoteDialog> {
         label: farm.name,
         labelWidget: Text(farm.name,
             style: Theme.of(context).textTheme.bodyLarge!.copyWith(
-                  color: Theme.of(context).colorScheme.onBackground,
+                  color: Theme.of(context).colorScheme.onSurface,
                 )),
       );
     }).toList();
@@ -73,7 +73,7 @@ class _VoteDialogState extends State<VoteDialog> {
             Text(
               'Loading Farms...',
               style: Theme.of(context).textTheme.bodyLarge!.copyWith(
-                  color: Theme.of(context).colorScheme.onBackground,
+                  color: Theme.of(context).colorScheme.onSurface,
                   fontWeight: FontWeight.bold),
             ),
           ],
@@ -91,7 +91,7 @@ class _VoteDialogState extends State<VoteDialog> {
               enableFilter: true,
               width: MediaQuery.sizeOf(context).width * 0.55,
               textStyle: Theme.of(context).textTheme.bodyLarge!.copyWith(
-                    color: Theme.of(context).colorScheme.onBackground,
+                    color: Theme.of(context).colorScheme.onSurface,
                   ),
               trailingIcon: const Icon(
                 CupertinoIcons.chevron_down,
@@ -113,7 +113,7 @@ class _VoteDialogState extends State<VoteDialog> {
                 ),
               ),
               menuStyle: MenuStyle(
-                shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                shape: WidgetStateProperty.all<RoundedRectangleBorder>(
                   const RoundedRectangleBorder(
                     borderRadius: BorderRadius.all(Radius.circular(4)),
                   ),
@@ -202,7 +202,8 @@ class _VoteDialogState extends State<VoteDialog> {
     try {
       await vote(approve, widget.proposalHash, farmId!, seed!);
 
-      _showDialog('Voted!', 'You have voted successfully.', Icons.check, DialogType.Info);
+      _showDialog('Voted!', 'You have voted successfully.', Icons.check,
+          DialogType.Info);
     } catch (e) {
       _showDialog('Error', 'Failed to Vote.', Icons.error, DialogType.Error);
     } finally {
@@ -213,7 +214,8 @@ class _VoteDialogState extends State<VoteDialog> {
     }
   }
 
-  _showDialog(String title, String description, IconData icon, DialogType type) async {
+  _showDialog(
+      String title, String description, IconData icon, DialogType type) async {
     if (context.mounted) {
       showDialog(
         barrierDismissible: false,

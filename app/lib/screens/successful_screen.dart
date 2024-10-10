@@ -47,7 +47,7 @@ class _SuccessfulScreenState extends State<SuccessfulScreen> {
                 widget.text,
                 style: Theme.of(context).textTheme.bodyLarge!.copyWith(
                     fontWeight: FontWeight.bold,
-                    color: Theme.of(context).colorScheme.onBackground),
+                    color: Theme.of(context).colorScheme.onSurface),
               ),
               const SizedBox(
                 height: 60.0,

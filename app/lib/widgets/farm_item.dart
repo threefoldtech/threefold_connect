@@ -41,7 +41,7 @@ class _FarmItemWidgetState extends State<FarmItemWidget> {
       title: Text(
         widget.farm.name,
         style: Theme.of(context).textTheme.titleMedium!.copyWith(
-              color: Theme.of(context).colorScheme.onBackground,
+              color: Theme.of(context).colorScheme.onSurface,
             ),
       ),
       childrenPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
@@ -50,7 +50,7 @@ class _FarmItemWidgetState extends State<FarmItemWidget> {
           title: TextField(
               readOnly: true,
               style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                    color: Theme.of(context).colorScheme.onBackground,
+                    color: Theme.of(context).colorScheme.onSurface,
                   ),
               controller: walletAddressController,
               decoration: const InputDecoration(
@@ -72,7 +72,7 @@ class _FarmItemWidgetState extends State<FarmItemWidget> {
               readOnly: true,
               obscureText: !showTfchainSecret,
               style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                    color: Theme.of(context).colorScheme.onBackground,
+                    color: Theme.of(context).colorScheme.onSurface,
                   ),
               controller: tfchainWalletSecretController,
               decoration: InputDecoration(
@@ -103,7 +103,7 @@ class _FarmItemWidgetState extends State<FarmItemWidget> {
           title: TextField(
               readOnly: true,
               style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                    color: Theme.of(context).colorScheme.onBackground,
+                    color: Theme.of(context).colorScheme.onSurface,
                   ),
               controller: walletNameController,
               decoration: const InputDecoration(
@@ -114,7 +114,7 @@ class _FarmItemWidgetState extends State<FarmItemWidget> {
           title: TextField(
               readOnly: true,
               style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                    color: Theme.of(context).colorScheme.onBackground,
+                    color: Theme.of(context).colorScheme.onSurface,
                   ),
               controller: twinIdController,
               decoration: const InputDecoration(
@@ -125,7 +125,7 @@ class _FarmItemWidgetState extends State<FarmItemWidget> {
           title: TextField(
               readOnly: true,
               style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                    color: Theme.of(context).colorScheme.onBackground,
+                    color: Theme.of(context).colorScheme.onSurface,
                   ),
               controller: farmIdController,
               decoration: const InputDecoration(

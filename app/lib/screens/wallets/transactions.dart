@@ -94,7 +94,7 @@ class _WalletTransactionsWidgetState extends State<WalletTransactionsWidget> {
           Text(
             'Loading Transactions...',
             style: Theme.of(context).textTheme.bodyLarge!.copyWith(
-                color: Theme.of(context).colorScheme.onBackground,
+                color: Theme.of(context).colorScheme.onSurface,
                 fontWeight: FontWeight.bold),
           ),
         ],
@@ -106,7 +106,7 @@ class _WalletTransactionsWidgetState extends State<WalletTransactionsWidget> {
           style: Theme.of(context)
               .textTheme
               .bodyLarge!
-              .copyWith(color: Theme.of(context).colorScheme.onBackground),
+              .copyWith(color: Theme.of(context).colorScheme.onSurface),
         ),
       );
     } else {
