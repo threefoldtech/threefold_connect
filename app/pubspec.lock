@@ -214,6 +214,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.0.26"
+  crisp_chat:
+    dependency: "direct main"
+    description:
+      name: crisp_chat
+      sha256: be64cceaa81cb2eb8871faf32319eb36379b2796ea924830284bce97ba9c0dcf
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.0.6"
   crypto:
     dependency: transitive
     description:
@@ -489,9 +497,11 @@ packages:
   gridproxy_client:
     dependency: "direct main"
     description:
-      path: "../../../codescalers/tfgrid-sdk-dart/packages/gridproxy_client"
-      relative: true
-    source: path
+      path: "packages/gridproxy_client"
+      ref: tfchain_graphql
+      resolved-ref: bd83a0bb1778b78c1b0b3b6c34d93f2ca2b54d16
+      url: "https://github.com/codescalers/tfgrid-sdk-dart"
+    source: git
     version: "1.0.0"
   hashlib:
     dependency: transitive
@@ -1294,9 +1304,11 @@ packages:
   stellar_client:
     dependency: "direct main"
     description:
-      path: "../../../codescalers/tfgrid-sdk-dart/packages/stellar_client"
-      relative: true
-    source: path
+      path: "packages/stellar_client"
+      ref: tfchain_graphql
+      resolved-ref: bd83a0bb1778b78c1b0b3b6c34d93f2ca2b54d16
+      url: "https://github.com/codescalers/tfgrid-sdk-dart"
+    source: git
     version: "0.1.0"
   stellar_flutter_sdk:
     dependency: transitive
@@ -1381,9 +1393,11 @@ packages:
   tfchain_client:
     dependency: "direct main"
     description:
-      path: "../../../codescalers/tfgrid-sdk-dart/packages/tfchain_client"
-      relative: true
-    source: path
+      path: "packages/tfchain_client"
+      ref: tfchain_graphql
+      resolved-ref: bd83a0bb1778b78c1b0b3b6c34d93f2ca2b54d16
+      url: "https://github.com/codescalers/tfgrid-sdk-dart"
+    source: git
     version: "0.1.0"
   timing:
     dependency: transitive

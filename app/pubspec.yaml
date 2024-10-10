@@ -66,6 +66,7 @@ dependencies:
   screen_brightness: ^1.0.1
   validators: ^3.0.0
   lottie: ^3.1.2
+  crisp_chat: ^2.0.6
 
 dev_dependencies:
   flutter_test:
