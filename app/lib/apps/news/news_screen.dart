@@ -9,7 +9,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
 class NewsScreen extends StatefulWidget {
-  const NewsScreen({Key? key}) : super(key: key);
+  const NewsScreen({super.key});
 
   @override
   State<NewsScreen> createState() => _NewsScreenState();
@@ -17,14 +17,14 @@ class NewsScreen extends StatefulWidget {
 
 class _NewsScreenState extends State<NewsScreen> {
   final Xml2Json xml2json = Xml2Json();
-  List topStories = [];
+  List allArticles = [];
+  List visibleArticles = [];
   bool isLoading = false;
   bool isInitialLoading = true;
   int articlesPerPage = 5;
   int currentPage = 0;
   final ScrollController _scrollController = ScrollController();
   final newsUrl = Globals().newsUrl;
-
 
   Future<void> getArticles() async {
     setState(() {
@@ -45,16 +45,30 @@ class _NewsScreenState extends State<NewsScreen> {
     var allEntries = data['feed']['entry'] ?? [];
 
     setState(() {
-      topStories.addAll(allEntries
-          .skip(currentPage * articlesPerPage)
-          .take(articlesPerPage)
-          .toList());
-      currentPage++;
+      allArticles = allEntries;
+      loadMoreArticles();
+
       isLoading = false;
       if (currentPage > 0) {
         isInitialLoading = false;
       }
     });
+  }
+
+  void loadMoreArticles() {
+    final startIndex = currentPage * articlesPerPage;
+    final endIndex = startIndex + articlesPerPage;
+
+    if (startIndex < allArticles.length) {
+      setState(() {
+        isLoading = true;
+        visibleArticles.addAll(
+          allArticles.sublist(
+              startIndex, endIndex.clamp(0, allArticles.length)),
+        );
+        currentPage++;
+      });
+    }
   }
 
   @override
@@ -64,7 +78,11 @@ class _NewsScreenState extends State<NewsScreen> {
     _scrollController.addListener(() {
       if (_scrollController.position.pixels ==
           _scrollController.position.maxScrollExtent) {
-        getArticles();
+        loadMoreArticles();
+      } else {
+        setState(() {
+          isLoading = false;
+        });
       }
     });
   }
@@ -84,15 +102,32 @@ class _NewsScreenState extends State<NewsScreen> {
           Expanded(
             child: ListView.builder(
               controller: _scrollController,
-              itemCount: topStories.length + (isLoading ? 1 : 0),
+              itemCount: visibleArticles.length + (isLoading ? 1 : 0),
               itemBuilder: (context, index) {
-                if (index == topStories.length) {
-                  return const Padding(
-                    padding: EdgeInsets.all(8),
-                    child: Center(child: CircularProgressIndicator()),
+                if (index == visibleArticles.length && isInitialLoading) {
+                  return Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Padding(
+                        padding: EdgeInsets.only(
+                            bottom: 4,
+                            top: MediaQuery.of(context).size.height * 0.4),
+                        child: const CircularProgressIndicator(),
+                      ),
+                      Text(
+                        'Loading Articles ...',
+                        style: Theme.of(context)
+                            .textTheme
+                            .titleMedium!
+                            .copyWith(
+                              color: Theme.of(context).colorScheme.onSurface,
+                            ),
+                      ),
+                    ],
                   );
                 }
-                var entry = topStories[index];
+                var entry = visibleArticles[index];
 
                 var title = entry['title']?['\$t'] ?? 'No Title';
                 var content = entry['content']?['\$t'] ?? 'No Content';
@@ -103,7 +138,7 @@ class _NewsScreenState extends State<NewsScreen> {
                 var publishedDateStr = entry['published']?['\$t'] ?? '';
                 DateTime publishedDate;
                 try {
-                  publishedDate = DateTime.parse(publishedDateStr);
+                  publishedDate = DateTime.parse(publishedDateStr).toLocal();
                 } catch (e) {
                   publishedDate = DateTime.now();
                 }
@@ -116,12 +151,9 @@ class _NewsScreenState extends State<NewsScreen> {
                   padding:
                       const EdgeInsets.symmetric(horizontal: 8, vertical: 4.0),
                   child: Card(
-                    color: Theme.of(context).colorScheme.background,
                     elevation: 4.0,
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12)),
                     child: Padding(
-                      padding: const EdgeInsets.all(8.0),
+                      padding: const EdgeInsets.all(16),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -129,6 +161,7 @@ class _NewsScreenState extends State<NewsScreen> {
                             children: [
                               Image.asset(
                                 'assets/tft_icon.png',
+                                color: Theme.of(context).colorScheme.onSurface,
                                 height: 20,
                                 width: 20,
                               ),
@@ -144,7 +177,7 @@ class _NewsScreenState extends State<NewsScreen> {
                                             .copyWith(
                                               color: Theme.of(context)
                                                   .colorScheme
-                                                  .onBackground,
+                                                  .onSurface,
                                             )),
                                     TextSpan(
                                         text: formattedDate,
@@ -154,7 +187,7 @@ class _NewsScreenState extends State<NewsScreen> {
                                             .copyWith(
                                               color: Theme.of(context)
                                                   .colorScheme
-                                                  .onBackground,
+                                                  .onSurface,
                                             )),
                                   ],
                                 ),
@@ -171,9 +204,8 @@ class _NewsScreenState extends State<NewsScreen> {
                                 .titleLarge!
                                 .copyWith(
                                   fontWeight: FontWeight.bold,
-                                  color: Theme.of(context)
-                                      .colorScheme
-                                      .onBackground,
+                                  color:
+                                      Theme.of(context).colorScheme.onSurface,
                                 ),
                           ),
                           const SizedBox(height: 5),
@@ -182,7 +214,7 @@ class _NewsScreenState extends State<NewsScreen> {
                                 ? '${content.substring(0, 200)}...'
                                 : content,
                             textStyle: TextStyle(
-                              color: Theme.of(context).colorScheme.onBackground,
+                              color: Theme.of(context).colorScheme.onSurface,
                             ),
                             onTapUrl: (url) {
                               if (url.isNotEmpty) {
@@ -200,9 +232,6 @@ class _NewsScreenState extends State<NewsScreen> {
                                 onPressed: () async {
                                   _launchURL(link);
                                 },
-                                style: TextButton.styleFrom(
-                                  backgroundColor: Colors.transparent,
-                                ),
                                 child: Text(
                                   'Read more',
                                   style: Theme.of(context)
@@ -238,8 +267,8 @@ class _NewsScreenState extends State<NewsScreen> {
   }
 
   void _launchURL(String url) async {
-    if (await canLaunch(url)) {
-      await launch(url);
+    if (await canLaunchUrl(Uri.parse(url))) {
+      await launchUrl(Uri.parse(url));
     } else {
       throw 'Could not launch $url';
     }

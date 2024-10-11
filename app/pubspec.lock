@@ -294,6 +294,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.3.7"
+  dbus:
+    dependency: transitive
+    description:
+      name: dbus
+      sha256: "365c771ac3b0e58845f39ec6deebc76e3276aa9922b0cc60840712094d9047ac"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.7.10"
   decimal:
     dependency: transitive
     description:
@@ -601,9 +609,11 @@ packages:
   gridproxy_client:
     dependency: "direct main"
     description:
-      path: "../../../codescalers/tfgrid-sdk-dart/packages/gridproxy_client"
-      relative: true
-    source: path
+      path: "packages/gridproxy_client"
+      ref: tfchain_graphql
+      resolved-ref: bd83a0bb1778b78c1b0b3b6c34d93f2ca2b54d16
+      url: "https://github.com/codescalers/tfgrid-sdk-dart"
+    source: git
     version: "1.0.0"
   hashlib:
     dependency: transitive
@@ -709,6 +719,30 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.0.4+9"
+  just_audio:
+    dependency: transitive
+    description:
+      name: just_audio
+      sha256: b41646a8241688f1d99c2e69c4da2bb26aa4b3a99795f6ff205c2a165e033fda
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.9.41"
+  just_audio_platform_interface:
+    dependency: transitive
+    description:
+      name: just_audio_platform_interface
+      sha256: "0243828cce503c8366cc2090cefb2b3c871aa8ed2f520670d76fd47aa1ab2790"
+      url: "https://pub.dev"
+    source: hosted
+    version: "4.3.0"
+  just_audio_web:
+    dependency: transitive
+    description:
+      name: just_audio_web
+      sha256: "0edb481ad4aa1ff38f8c40f1a3576013c3420bf6669b686fe661627d49bc606c"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.4.11"
   leak_tracker:
     dependency: transitive
     description:
@@ -1430,9 +1464,11 @@ packages:
   stellar_client:
     dependency: "direct main"
     description:
-      path: "../../../codescalers/tfgrid-sdk-dart/packages/stellar_client"
-      relative: true
-    source: path
+      path: "packages/stellar_client"
+      ref: tfchain_graphql
+      resolved-ref: bd83a0bb1778b78c1b0b3b6c34d93f2ca2b54d16
+      url: "https://github.com/codescalers/tfgrid-sdk-dart"
+    source: git
     version: "0.1.0"
   stellar_flutter_sdk:
     dependency: transitive
@@ -1517,9 +1553,11 @@ packages:
   tfchain_client:
     dependency: "direct main"
     description:
-      path: "../../../codescalers/tfgrid-sdk-dart/packages/tfchain_client"
-      relative: true
-    source: path
+      path: "packages/tfchain_client"
+      ref: tfchain_graphql
+      resolved-ref: bd83a0bb1778b78c1b0b3b6c34d93f2ca2b54d16
+      url: "https://github.com/codescalers/tfgrid-sdk-dart"
+    source: git
     version: "0.1.0"
   timeago:
     dependency: "direct main"
@@ -1729,6 +1767,46 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.1.4"
+  video_player:
+    dependency: transitive
+    description:
+      name: video_player
+      sha256: "4a8c3492d734f7c39c2588a3206707a05ee80cef52e8c7f3b2078d430c84bc17"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.9.2"
+  video_player_android:
+    dependency: transitive
+    description:
+      name: video_player_android
+      sha256: e343701aa890b74a863fa460f5c0e628127ed06a975d7d9af6b697133fb25bdf
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.7.1"
+  video_player_avfoundation:
+    dependency: transitive
+    description:
+      name: video_player_avfoundation
+      sha256: cd5ab8a8bc0eab65ab0cea40304097edc46da574c8c1ecdee96f28cd8ef3792f
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.6.2"
+  video_player_platform_interface:
+    dependency: transitive
+    description:
+      name: video_player_platform_interface
+      sha256: "229d7642ccd9f3dc4aba169609dd6b5f3f443bb4cc15b82f7785fcada5af9bbb"
+      url: "https://pub.dev"
+    source: hosted
+    version: "6.2.3"
+  video_player_web:
+    dependency: transitive
+    description:
+      name: video_player_web
+      sha256: "8e9cb7fe94e49490e67bbc15149691792b58a0ade31b32e3f3688d104a0e057b"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.2.0"
   vm_service:
     dependency: transitive
     description:
@@ -1737,6 +1815,22 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "14.2.1"
+  wakelock_plus:
+    dependency: transitive
+    description:
+      name: wakelock_plus
+      sha256: f268ca2116db22e57577fb99d52515a24bdc1d570f12ac18bb762361d43b043d
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.1.4"
+  wakelock_plus_platform_interface:
+    dependency: transitive
+    description:
+      name: wakelock_plus_platform_interface
+      sha256: "422d1cdbb448079a8a62a5a770b69baa489f8f7ca21aef47800c726d404f9d16"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.2.1"
   watcher:
     dependency: transitive
     description:
