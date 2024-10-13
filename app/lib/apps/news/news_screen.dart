@@ -116,7 +116,7 @@ class _NewsScreenState extends State<NewsScreen> {
                         child: const CircularProgressIndicator(),
                       ),
                       Text(
-                        'Loading Articles ...',
+                        'Loading Articles...',
                         style: Theme.of(context)
                             .textTheme
                             .titleMedium!
