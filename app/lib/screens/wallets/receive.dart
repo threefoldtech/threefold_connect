@@ -142,7 +142,7 @@ class _WalletReceiveScreenState extends State<WalletReceiveScreen> {
                 child: SizedBox(
                   width: double.infinity,
                   child: Text(
-                    'Generate QR code',
+                    'Generate QR Code',
                     style: Theme.of(context).textTheme.titleLarge!.copyWith(
                         color: Theme.of(context).colorScheme.primary,
                         fontWeight: FontWeight.bold),
