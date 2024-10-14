@@ -51,12 +51,13 @@ class _CrispChatbotState extends State<CrispChatbot> with AutomaticKeepAliveClie
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    return const LayoutDrawer(
-      titleText: 'Support',
-      content: Center(
-        child: CircularProgressIndicator()
-      ),
-    );
+    return const SizedBox.shrink();
+    // return const LayoutDrawer(
+    //   titleText: 'Support',
+    //   content: Center(
+    //     child: CircularProgressIndicator()
+    //   ),
+    // );
   }
 
   @override
