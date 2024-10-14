@@ -617,11 +617,9 @@ packages:
   gridproxy_client:
     dependency: "direct main"
     description:
-      path: "packages/gridproxy_client"
-      ref: tfchain_graphql
-      resolved-ref: bd83a0bb1778b78c1b0b3b6c34d93f2ca2b54d16
-      url: "https://github.com/codescalers/tfgrid-sdk-dart"
-    source: git
+      path: "../../../codescalers/tfgrid-sdk-dart/packages/gridproxy_client"
+      relative: true
+    source: path
     version: "1.0.0"
   hashlib:
     dependency: transitive
@@ -679,6 +677,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "4.0.2"
+  idenfy_sdk_flutter:
+    dependency: "direct main"
+    description:
+      name: idenfy_sdk_flutter
+      sha256: "26d72aa9a0d5dc3c315a9e77abc7c8bea6f2ca53d72bcb2a34303cf169ca2187"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.5.3"
   intl:
     dependency: "direct overridden"
     description:
@@ -1343,14 +1349,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.0.0"
-  shuftipro_onsite_sdk:
-    dependency: "direct main"
-    description:
-      name: shuftipro_onsite_sdk
-      sha256: "3de6bf3c1c6a6a88356adcc15232e7ea3deda694090df64ae2e8295a100f6f37"
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.0.3"
   signer:
     dependency: transitive
     description:
@@ -1472,11 +1470,9 @@ packages:
   stellar_client:
     dependency: "direct main"
     description:
-      path: "packages/stellar_client"
-      ref: tfchain_graphql
-      resolved-ref: bd83a0bb1778b78c1b0b3b6c34d93f2ca2b54d16
-      url: "https://github.com/codescalers/tfgrid-sdk-dart"
-    source: git
+      path: "../../../codescalers/tfgrid-sdk-dart/packages/stellar_client"
+      relative: true
+    source: path
     version: "0.1.0"
   stellar_flutter_sdk:
     dependency: transitive
@@ -1561,11 +1557,9 @@ packages:
   tfchain_client:
     dependency: "direct main"
     description:
-      path: "packages/tfchain_client"
-      ref: tfchain_graphql
-      resolved-ref: bd83a0bb1778b78c1b0b3b6c34d93f2ca2b54d16
-      url: "https://github.com/codescalers/tfgrid-sdk-dart"
-    source: git
+      path: "../../../codescalers/tfgrid-sdk-dart/packages/tfchain_client"
+      relative: true
+    source: path
     version: "0.1.0"
   timeago:
     dependency: "direct main"
