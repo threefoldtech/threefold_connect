@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:threebotlogin/models/wallet.dart';
+import 'package:stellar_client/models/transaction.dart';
 import 'package:threebotlogin/widgets/wallets/transaction_details.dart';
 
 class TransactionDetailsScreen extends StatelessWidget {
-  final Transaction transaction;
+  final PaymentTransaction transaction;
 
   const TransactionDetailsScreen({
     super.key,

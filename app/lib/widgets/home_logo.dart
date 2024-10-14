@@ -55,7 +55,7 @@ class HomeLogoWidget extends StatelessWidget {
           ),
         ),
         Text(
-          'ThreeFold Connect App',
+          'ThreeFold Connect',
           style: Theme.of(context).textTheme.titleLarge!.copyWith(
               color: Theme.of(context).colorScheme.primary,
               fontWeight: FontWeight.bold),

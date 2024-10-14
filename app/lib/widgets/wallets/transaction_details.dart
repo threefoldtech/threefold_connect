@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:threebotlogin/models/wallet.dart';
+import 'package:stellar_client/models/transaction.dart';
 
 class TransactionDetails extends StatelessWidget {
-  final Transaction transaction;
+  final PaymentTransaction transaction;
 
   const TransactionDetails({
     super.key,
@@ -80,6 +80,8 @@ class TransactionDetails extends StatelessWidget {
           buildDetailRow('Asset', transaction.asset),
           const Divider(),
           buildDetailRow('Date', transaction.date),
+          const Divider(),
+          buildDetailRow('Memo', transaction.memo),
           const Divider(),
           buildDetailRow('Transaction Hash', transaction.hash),
           const Divider(),

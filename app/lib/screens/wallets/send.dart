@@ -164,7 +164,7 @@ class _WalletSendScreenState extends State<WalletSendScreen> {
                 child: SizedBox(
                   width: double.infinity,
                   child: Text(
-                    'Scan QR code',
+                    'Scan QR Code',
                     style: Theme.of(context).textTheme.titleLarge!.copyWith(
                         color: Theme.of(context).colorScheme.primary,
                         fontWeight: FontWeight.bold),

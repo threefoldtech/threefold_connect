@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:threebotlogin/models/wallet.dart';
+import 'package:stellar_client/models/transaction.dart';
 import 'package:threebotlogin/screens/wallets/transaction_details.dart';
 import 'package:threebotlogin/widgets/wallets/arrow_inward.dart';
 
 class TransactionWidget extends StatelessWidget {
-  final Transaction transaction;
+  final PaymentTransaction transaction;
 
   const TransactionWidget({
     super.key,

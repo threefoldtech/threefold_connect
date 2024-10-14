@@ -33,11 +33,11 @@ class PkidWallet {
   String name;
   final int index;
   final String seed;
-   WalletType type;
+  WalletType type;
 
   factory PkidWallet.fromJson(Map<String, dynamic> json) {
     return PkidWallet(
-        index: json["index"],
+        index: json['index'],
         name: json['name'],
         seed: json['seed'],
         type:
@@ -46,29 +46,4 @@ class PkidWallet {
   toMap() {
     return {'name': name, 'index': index, 'seed': seed, 'type': type.name};
   }
-}
-
-enum TransactionType { Create, Payment, Receive }
-
-class Transaction {
-  Transaction({
-    required this.hash,
-    required this.from,
-    required this.to,
-    required this.asset,
-    required this.amount,
-    // required this.memo, //TODO: check how to get it (transaction link)
-    required this.type,
-    required this.status,
-    required this.date,
-  });
-  final String hash;
-  final String from;
-  final String to;
-  final String asset;
-  final String amount;
-  // final String memo;
-  final TransactionType type;
-  final bool status;
-  final String date;
 }

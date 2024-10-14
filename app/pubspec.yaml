@@ -67,6 +67,9 @@ dependencies:
   validators: ^3.0.0
   lottie: ^3.1.2
   crisp_chat: ^2.0.6
+  xml2json: ^6.2.3
+  timeago: ^3.7.0
+  flutter_widget_from_html: ^0.15.2
 
 dev_dependencies:
   flutter_test:
