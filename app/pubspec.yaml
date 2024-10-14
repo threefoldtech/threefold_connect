@@ -31,7 +31,6 @@ dependencies:
       url: https://github.com/codescalers/tfgrid-sdk-dart
       ref: tfchain_graphql
       path: packages/gridproxy_client
-  shuftipro_onsite_sdk: 1.0.3
   flutter_svg: ^2.0.6
   bip39: ^1.0.6
   socket_io_client: ^1.0.2
@@ -69,6 +68,7 @@ dependencies:
   xml2json: ^6.2.3
   timeago: ^3.7.0
   flutter_widget_from_html: ^0.15.2
+  idenfy_sdk_flutter: 2.5.3
 
 dev_dependencies:
   flutter_test:
