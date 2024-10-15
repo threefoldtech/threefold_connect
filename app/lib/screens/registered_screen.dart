@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:threebotlogin/widgets/chat_widget.dart';
 import 'package:threebotlogin/widgets/home_card.dart';
 import 'package:threebotlogin/widgets/home_logo.dart';
 
@@ -51,7 +52,7 @@ class _RegisteredScreenState extends State<RegisteredScreen>
             ),
           ),
           Container(
-            padding: const EdgeInsets.symmetric(vertical: 30, horizontal: 10),
+            padding: const EdgeInsets.only(left: 10, right: 10, top: 30),
             height: MediaQuery.of(context).size.height * 0.6,
             width: MediaQuery.of(context).size.width,
             child: Column(
@@ -122,6 +123,14 @@ class _RegisteredScreenState extends State<RegisteredScreen>
                         name: 'Settings', icon: Icons.settings, pageNumber: 7),
                   ],
                 ),
+                    Spacer(),
+                const Row(
+                  children: [
+                    Spacer(),
+                    CrispChatbot(),
+                    SizedBox(width: 20,)
+                  ],
+                )
               ],
             ),
           )
