@@ -13,6 +13,7 @@ import 'package:threebotlogin/screens/init_screen.dart';
 import 'package:threebotlogin/screens/unregistered_screen.dart';
 import 'package:threebotlogin/services/3bot_service.dart';
 import 'package:threebotlogin/services/migration_service.dart';
+import 'package:threebotlogin/services/open_kyc_service.dart';
 import 'package:threebotlogin/services/socket_service.dart';
 import 'package:threebotlogin/services/shared_preference_service.dart';
 import 'package:threebotlogin/widgets/error_widget.dart';
@@ -314,6 +315,7 @@ class _AppState extends State<MainScreen> {
       twinId = await TFChain.getMyTwinId();
       if (twinId != null) {
         await saveTwinId(twinId);
+        await updateUserData('twin_id', twinId.toString());
       }
     }
   }
