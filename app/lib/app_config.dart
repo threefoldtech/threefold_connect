@@ -222,4 +222,5 @@ void setFallbackConfigs() {
   Globals().termsAndConditionsUrl = '';
   Globals().spendingLimit = 0;
   Globals().newsUrl = '';
+  Globals().idenfyServiceUrl = '';
 }
