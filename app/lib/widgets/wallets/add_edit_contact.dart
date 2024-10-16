@@ -153,7 +153,7 @@ class _AddEditContactState extends State<AddEditContact> {
     final validAddress = _validateAddress(contactAddress);
 
     if (validName && validAddress) {
-      return await _add(contactName, contactAddress);
+      await _add(contactName, contactAddress);
     }
     saveLoading = false;
     setState(() {});
@@ -170,7 +170,7 @@ class _AddEditContactState extends State<AddEditContact> {
     if (validName &&
         validAddress &&
         (contactName != widget.name || contactAddress != widget.address)) {
-      return await _edit(contactName, contactAddress);
+      await _edit(contactName, contactAddress);
     }
     saveLoading = false;
     setState(() {});
