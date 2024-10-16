@@ -321,7 +321,7 @@ Future<void> saveIdentity(
         'signedIdentityGenderIdentifier': signedIdentityGenderIdentifier,
         'referenceId': referenceId
       }));
-  updateUserData("identity_reference", referenceId);
+  updateUserData('identity_reference', referenceId);
 
   Globals().identityVerified.value = true;
 }

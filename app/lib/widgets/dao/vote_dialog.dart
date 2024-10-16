@@ -31,7 +31,8 @@ class _VoteDialogState extends State<VoteDialog> {
       loading = true;
     });
     twinIdWallets = await getWalletsTwinIds();
-    List<Farm> farmsList = await getFarmsByTwinIds(twinIdWallets.keys.toList());
+    List<Farm> farmsList =
+        await getFarmsByTwinIds(twinIdWallets.keys.toList(), hasUpNode: true);
     farms.addAll(farmsList);
     setState(() {
       loading = false;
