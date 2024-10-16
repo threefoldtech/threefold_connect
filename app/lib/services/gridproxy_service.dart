@@ -16,23 +16,25 @@ Future<double> getMySpending() async {
   return spending.overall_consumption;
 }
 
-Future<List<Farm>> getFarmsByTwinId(int twinId) async {
+Future<List<Farm>> getFarmsByTwinId(int twinId,
+    {bool hasUpNode = false}) async {
   try {
     initializeReflectable();
     final gridproxyUrl = Globals().gridproxyUrl;
     GridProxyClient client = GridProxyClient(gridproxyUrl);
-    final farms =
-        await client.farms.list(ListFarmsQueryParameters(twin_id: twinId));
+    final farms = await client.farms.list(ListFarmsQueryParameters(
+        twin_id: twinId, node_status: hasUpNode ? 'up' : null));
     return farms;
   } catch (e) {
     throw Exception('Failed to get farms due to $e');
   }
 }
 
-Future<List<Farm>> getFarmsByTwinIds(List<int> twinIds) async {
+Future<List<Farm>> getFarmsByTwinIds(List<int> twinIds,
+    {bool hasUpNode = false}) async {
   final List<Future<List<Farm>>> farmFutures = [];
   for (final twinId in twinIds) {
-    farmFutures.add(getFarmsByTwinId(twinId));
+    farmFutures.add(getFarmsByTwinId(twinId, hasUpNode: hasUpNode));
   }
   final listFarms = await Future.wait(farmFutures);
   final farms = listFarms.expand((i) => i).toList(); //flat
