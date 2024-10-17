@@ -44,20 +44,10 @@ class _CrispChatbotState extends State<CrispChatbot> {
         onTap: _openChat,
         child: CircleAvatar(
           radius: 30,
-          // backgroundColor: Theme.of(context).colorScheme.primaryContainer,
           backgroundColor: Colors.blue,
           child: SvgPicture.asset(
             'assets/crisp.svg',
-            // colorFilter: ColorFilter.mode(
-            //     Theme.of(context).colorScheme.onPrimaryContainer,
-            //     BlendMode.srcIn),
           ),
         ));
   }
-
-  @override
-  void dispose() {
-    super.dispose();
-  }
-
 }

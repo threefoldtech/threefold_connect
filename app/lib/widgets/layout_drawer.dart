@@ -31,7 +31,7 @@ class _LayoutDrawerState extends State<LayoutDrawer> {
       } else if (index == 2) {
         globals.tabController.animateTo(3);
       } else if (index == 3) {
-        globals.tabController.animateTo(7);
+        globals.tabController.animateTo(6);
       } else {
         return;
       }
