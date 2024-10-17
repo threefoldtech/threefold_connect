@@ -60,6 +60,7 @@ class Globals {
   String relayUrl = '';
   String termsAndConditionsUrl = '';
   String newsUrl = '';
+  String idenfyServiceUrl = '';
 
   bool isCacheClearedWallet = false;
   bool isCacheClearedFarmer = false;

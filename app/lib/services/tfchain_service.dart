@@ -10,17 +10,33 @@ import 'package:tfchain_client/generated/dev/types/pallet_dao/proposal/dao_votes
 import 'package:crypto/crypto.dart';
 import 'package:http/http.dart' as http;
 import 'package:hashlib/hashlib.dart' as hashlib;
+import 'package:signer/signer.dart';
 
-Future<int?> getMyTwinId() async {
-  final chainUrl = Globals().chainUrl;
-  if (chainUrl == '') return null;
+Future<String> getMySeed() async {
   final derivedSeed = await getDerivedSeed(WalletConfig().appId());
   final seedList = derivedSeed.toList();
   seedList.addAll([0, 0, 0, 0, 0, 0, 0, 0]); // instead of sia binary encoder
   final seed = hashlib.Blake2b(32).hex(seedList);
-  final twinId = getTwinId('0x$seed');
+  return '0x$seed';
+}
+
+Future<int?> getMyTwinId() async {
+  final seed = await getMySeed();
+  final twinId = getTwinId(seed);
   if (twinId == 0) return null;
   return twinId;
+}
+
+Future<Signer> getMySigner() async {
+  final seed = await getMySeed();
+  final signer = Signer();
+  signer.fromHexSeed(seed, KPType.sr25519);
+  return signer;
+}
+
+Future<String> getMyAddress() async {
+  final signer = await getMySigner();
+  return signer.keypair!.address;
 }
 
 Future<double> getBalance(String chainUrl, String address) async {
