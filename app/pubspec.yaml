@@ -65,10 +65,11 @@ dependencies:
   screen_brightness: ^1.0.1
   validators: ^3.0.0
   lottie: ^3.1.2
+  crisp_chat: 2.0.3
   xml2json: ^6.2.3
   timeago: ^3.7.0
   flutter_widget_from_html: ^0.15.2
-  idenfy_sdk_flutter: 2.5.3
+  # idenfy_sdk_flutter: 2.5.3
 
 dev_dependencies:
   flutter_test:

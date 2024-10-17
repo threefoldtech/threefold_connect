@@ -154,7 +154,8 @@ class _WalletScreenState extends State<WalletScreen> {
     final seedList = derivedSeed.toList();
     seedList.addAll([0, 0, 0, 0, 0, 0, 0, 0]); // instead of sia binary encoder
     final walletSecret = Blake2b(32).hex(seedList);
-    final wallet = await loadAddedWallet(walletName, walletSecret);
+    final wallet = await loadAddedWallet(walletName, walletSecret,
+        type: WalletType.NATIVE);
     await addWallet(walletName, walletSecret, type: WalletType.NATIVE);
     wallets.add(wallet);
   }

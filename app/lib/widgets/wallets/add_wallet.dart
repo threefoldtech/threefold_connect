@@ -234,11 +234,11 @@ class _NewWalletState extends State<NewWallet> {
   }
 }
 
-Future<Wallet> loadAddedWallet(String walletName, String walletSecret) async {
+Future<Wallet> loadAddedWallet(String walletName, String walletSecret,
+    {WalletType type = WalletType.IMPORTED}) async {
   final chainUrl = Globals().chainUrl;
   final Wallet wallet = await compute((void _) async {
-    final wallet = await loadWallet(
-        walletName, walletSecret, WalletType.IMPORTED, chainUrl);
+    final wallet = await loadWallet(walletName, walletSecret, type, chainUrl);
     return wallet;
   }, null);
   return wallet;

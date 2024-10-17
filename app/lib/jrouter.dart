@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:threebotlogin/app.dart';
-import 'package:threebotlogin/apps/chatbot/chatbot.dart';
 import 'package:threebotlogin/apps/dao/dao.dart';
 import 'package:threebotlogin/apps/wallet/wallet.dart';
 import 'package:threebotlogin/screens/identity_verification_screen.dart';
@@ -62,14 +61,6 @@ class JRouter {
             view: await Dao().widget(),
           ),
           app: Dao()),
-      AppInfo(
-          route: Route(
-            path: '/chatbot',
-            name: 'Support',
-            icon: Icons.chat,
-            view: await Chatbot().widget(),
-          ),
-          app: Chatbot()),
       AppInfo(
           route: Route(
             path: '/identityverification',

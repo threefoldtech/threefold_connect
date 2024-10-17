@@ -32,7 +32,7 @@ Future<List<PkidWallet>> _getPkidWallets() async {
           ? jsonDecode(pKidResult['data'])
           : {};
 
-  if (pKidResult.containsKey('success') && result.isEmpty) {
+  if (result.isEmpty) {
     return [];
   }
 
