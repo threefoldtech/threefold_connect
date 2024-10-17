@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_pkid/flutter_pkid.dart';
 import 'package:http/http.dart';
-import 'package:shuftipro_onsite_sdk/shuftipro_onsite_sdk.dart';
+// import 'package:shuftipro_onsite_sdk/shuftipro_onsite_sdk.dart';
 import 'package:threebotlogin/events/events.dart';
 import 'package:threebotlogin/events/identity_callback_event.dart';
 import 'package:threebotlogin/helpers/globals.dart';
@@ -391,15 +391,15 @@ class _IdentityVerificationScreenState
         var brightness =
             SchedulerBinding.instance.platformDispatcher.platformBrightness;
         configObj['dark_mode'] = brightness == Brightness.dark;
-        String r = await ShuftiproSdk.sendRequest(
-            authObject: authObject,
-            createdPayload: createdPayload,
-            configObject: configObj);
+        // String r = await ShuftiproSdk.sendRequest(
+        // authObject: authObject,
+        // createdPayload: createdPayload,
+        // configObject: configObj);
 
         print('Receiving response');
-        debugPrint(r);
+        // debugPrint(r);
 
-        await handleShuftiCallBack(r);
+        // await handleShuftiCallBack(r);
       },
     );
   }

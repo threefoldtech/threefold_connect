@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:threebotlogin/widgets/chat_widget.dart';
 import 'package:threebotlogin/widgets/home_card.dart';
 import 'package:threebotlogin/widgets/home_logo.dart';
 
@@ -51,7 +52,7 @@ class _RegisteredScreenState extends State<RegisteredScreen>
             ),
           ),
           Container(
-            padding: const EdgeInsets.symmetric(vertical: 30, horizontal: 10),
+            padding: const EdgeInsets.only(left: 10, right: 10, top: 30),
             height: MediaQuery.of(context).size.height * 0.6,
             width: MediaQuery.of(context).size.width,
             child: Column(
@@ -86,30 +87,21 @@ class _RegisteredScreenState extends State<RegisteredScreen>
                     HomeCardWidget(
                         name: 'Wallet',
                         icon: Icons.account_balance_wallet,
-                        pageNumber: 2,
-                        fullWidth: true),
+                        pageNumber: 2),
+                    HomeCardWidget(
+                        name: 'Farming', icon: Icons.storage, pageNumber: 3),
                   ],
                 ),
                 const Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    HomeCardWidget(
-                        name: 'Farming', icon: Icons.storage, pageNumber: 3),
                     HomeCardWidget(
                         name: 'Dao',
                         icon: Icons.how_to_vote_outlined,
                         pageNumber: 4),
-                  ],
-                ),
-                const Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
                     HomeCardWidget(
                         name: 'News', icon: Icons.article, pageNumber: 1),
-                    HomeCardWidget(
-                        name: 'Support', icon: Icons.build, pageNumber: 5),
                   ],
                 ),
                 const Row(
@@ -117,11 +109,19 @@ class _RegisteredScreenState extends State<RegisteredScreen>
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     HomeCardWidget(
-                        name: 'Identity', icon: Icons.person, pageNumber: 6),
+                        name: 'Identity', icon: Icons.person, pageNumber: 5),
                     HomeCardWidget(
-                        name: 'Settings', icon: Icons.settings, pageNumber: 7),
+                        name: 'Settings', icon: Icons.settings, pageNumber: 6),
                   ],
                 ),
+                    Spacer(),
+                const Row(
+                  children: [
+                    Spacer(),
+                    CrispChatbot(),
+                    SizedBox(width: 20,)
+                  ],
+                )
               ],
             ),
           )
