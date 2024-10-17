@@ -5,6 +5,8 @@ import 'package:flutter_pkid/flutter_pkid.dart';
 import 'package:http/http.dart';
 import 'package:idenfy_sdk_flutter/idenfy_sdk_flutter.dart';
 import 'package:idenfy_sdk_flutter/models/idenfy_identification_status.dart';
+import 'package:threebotlogin/events/events.dart';
+import 'package:threebotlogin/events/identity_callback_event.dart';
 import 'package:threebotlogin/helpers/globals.dart';
 import 'package:threebotlogin/helpers/kyc_helpers.dart';
 import 'package:threebotlogin/main.dart';
@@ -135,8 +137,14 @@ class _IdentityVerificationScreenState
     });
     getVerificationStatus().then((verificationStatus) {
       setState(() {
-        identityVerified = verificationStatus.status == 'APPROVED' ||
-            verificationStatus.status == 'SUSPECTED';
+        if (verificationStatus.status == 'APPROVED' ||
+            verificationStatus.status == 'SUSPECTED') {
+          identityVerified = true;
+          setIsIdentityVerified(true);
+        } else {
+          identityVerified = false;
+          setIsIdentityVerified(false);
+        }
       });
     });
     getSpending();
@@ -287,13 +295,55 @@ class _IdentityVerificationScreenState
 
   Future<void> initIdenfySdk(String token) async {
     IdenfyIdentificationResult? idenfySDKresult;
-    idenfySDKresult = await IdenfySdkFlutter.start(token);
+    try {
+      idenfySDKresult = await IdenfySdkFlutter.start(token);
+    } catch (e) {
+      print(e);
+      if (context.mounted) {
+        showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (BuildContext dialogContext) => CustomDialog(
+            type: DialogType.Error,
+            image: Icons.close,
+            title: 'Error',
+            description:
+                'Something went wrong. Please contact support if this issue persists.',
+            actions: [
+              TextButton(
+                  onPressed: () {
+                    Navigator.pop(dialogContext);
+                  },
+                  child: const Text('Close'))
+            ],
+          ),
+        );
+      }
+    }
     await handleIdenfyResponse(idenfySDKresult);
   }
 
   Future<void> handleIdenfyResponse(IdenfyIdentificationResult? result) async {
     print(result);
-    // TODO: wait for the status to be changed on the service.
+    // TODO: we might can you use the result directly to know the status
+    final verificationStatus = await getVerificationStatus();
+    setState(() {
+      if (verificationStatus.status == 'APPROVED' ||
+          verificationStatus.status == 'SUSPECTED') {
+        identityVerified = true;
+        setIsIdentityVerified(true);
+        Globals().identityVerified.value = true;
+        Events().emit(IdentityCallbackEvent(type: 'success'));
+      } else {
+        identityVerified = false;
+        setIsIdentityVerified(false);
+        Globals().identityVerified.value = false;
+        Events().emit(IdentityCallbackEvent(type: 'failed'));
+      }
+    });
+    final data = await getVerificationData();
+    await saveIdentity(data.fullName, data.docIssuingCountry, data.docDob,
+        data.docSex, data.scanRef);
   }
 
   Widget _pleaseWait() {
@@ -789,6 +839,7 @@ class _IdentityVerificationScreenState
     });
 
     try {
+      // TODO: handle token failure cases (e.g.: max retries exceed, unauthorized, ...)
       final token = await getToken();
       await initIdenfySdk(token.authToken);
 
