@@ -57,11 +57,7 @@ class _CrispChatbotState extends State<CrispChatbot> {
 
   @override
   void dispose() {
-    _onClose();
     super.dispose();
   }
 
-  Future<void> _onClose() async {
-    await FlutterCrispChat.resetCrispChatSession();
-  }
 }

@@ -674,14 +674,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "4.0.2"
-  idenfy_sdk_flutter:
-    dependency: "direct main"
-    description:
-      name: idenfy_sdk_flutter
-      sha256: "26d72aa9a0d5dc3c315a9e77abc7c8bea6f2ca53d72bcb2a34303cf169ca2187"
-      url: "https://pub.dev"
-    source: hosted
-    version: "2.5.3"
   intl:
     dependency: "direct overridden"
     description:

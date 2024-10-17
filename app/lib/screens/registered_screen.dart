@@ -87,30 +87,21 @@ class _RegisteredScreenState extends State<RegisteredScreen>
                     HomeCardWidget(
                         name: 'Wallet',
                         icon: Icons.account_balance_wallet,
-                        pageNumber: 2,
-                        fullWidth: true),
+                        pageNumber: 2),
+                    HomeCardWidget(
+                        name: 'Farming', icon: Icons.storage, pageNumber: 3),
                   ],
                 ),
                 const Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    HomeCardWidget(
-                        name: 'Farming', icon: Icons.storage, pageNumber: 3),
                     HomeCardWidget(
                         name: 'Dao',
                         icon: Icons.how_to_vote_outlined,
                         pageNumber: 4),
-                  ],
-                ),
-                const Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
                     HomeCardWidget(
                         name: 'News', icon: Icons.article, pageNumber: 1),
-                    HomeCardWidget(
-                        name: 'Support', icon: Icons.build, pageNumber: 5),
                   ],
                 ),
                 const Row(
@@ -118,9 +109,9 @@ class _RegisteredScreenState extends State<RegisteredScreen>
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     HomeCardWidget(
-                        name: 'Identity', icon: Icons.person, pageNumber: 6),
+                        name: 'Identity', icon: Icons.person, pageNumber: 5),
                     HomeCardWidget(
-                        name: 'Settings', icon: Icons.settings, pageNumber: 7),
+                        name: 'Settings', icon: Icons.settings, pageNumber: 6),
                   ],
                 ),
                     Spacer(),

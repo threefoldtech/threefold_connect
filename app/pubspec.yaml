@@ -69,7 +69,7 @@ dependencies:
   xml2json: ^6.2.3
   timeago: ^3.7.0
   flutter_widget_from_html: ^0.15.2
-  idenfy_sdk_flutter: 2.5.3
+  # idenfy_sdk_flutter: 2.5.3
 
 dev_dependencies:
   flutter_test:

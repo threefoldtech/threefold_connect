@@ -156,24 +156,12 @@ class _LayoutDrawerState extends State<LayoutDrawer> {
               ListTile(
                 minLeadingWidth: 10,
                 leading: const Padding(
-                  padding: EdgeInsets.only(left: 10),
-                  child: Icon(Icons.build, size: 18),
-                ),
-                title: const Text('Support'),
-                onTap: () {
-                  Navigator.pop(context);
-                  globals.tabController.animateTo(5);
-                },
-              ),
-              ListTile(
-                minLeadingWidth: 10,
-                leading: const Padding(
                     padding: EdgeInsets.only(left: 10),
                     child: Icon(Icons.person, size: 18)),
                 title: const Text('Identity'),
                 onTap: () {
                   Navigator.pop(context);
-                  globals.tabController.animateTo(6);
+                  globals.tabController.animateTo(5);
                 },
               ),
               ListTile(
@@ -184,7 +172,7 @@ class _LayoutDrawerState extends State<LayoutDrawer> {
                 title: const Text('Settings'),
                 onTap: () {
                   Navigator.pop(context);
-                  globals.tabController.animateTo(7);
+                  globals.tabController.animateTo(6);
                 },
               ),
             ],
