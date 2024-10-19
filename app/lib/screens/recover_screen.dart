@@ -186,11 +186,6 @@ class _RecoverScreenState extends State<RecoverScreen> {
             ),
             ElevatedButton(
               style: ElevatedButton.styleFrom(
-                shape: const RoundedRectangleBorder(
-                  borderRadius: BorderRadius.all(Radius.circular(10)),
-                ),
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 11.0, vertical: 6.0),
               ),
               child: Text(
                 'Recover Account',
