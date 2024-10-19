@@ -22,7 +22,7 @@ Future<String> getMySeed() async {
 
 Future<int?> getMyTwinId() async {
   final seed = await getMySeed();
-  final twinId = getTwinId(seed);
+  final twinId = await getTwinId(seed);
   if (twinId == 0) return null;
   return twinId;
 }
