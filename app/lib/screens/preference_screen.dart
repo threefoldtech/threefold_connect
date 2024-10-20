@@ -80,7 +80,7 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
     bool isDarkMode;
-    if (themeProvider.themeMode == ThemeMode.system){
+    if (themeProvider.themeMode == ThemeMode.system) {
       final brightness =
           SchedulerBinding.instance.platformDispatcher.platformBrightness;
       isDarkMode = brightness == Brightness.dark;
@@ -204,13 +204,12 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
                         child: Center(
                           child: Icon(
                             isDarkMode
-                                ? Icons
-                                    .nightlight_round
+                                ? Icons.nightlight_round
                                 : Icons.wb_sunny,
                             color: isDarkMode
                                 ? Colors.black
                                 : Theme.of(context).colorScheme.primary,
-                                size: 14,
+                            size: 14,
                           ),
                         ),
                       ),
@@ -219,7 +218,7 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
                 ),
               ),
             ),
-          ),          
+          ),
           ListTile(
             leading: const Icon(Icons.perm_device_information),
             title: Text('Version: $version - $buildNumber'),

@@ -78,7 +78,7 @@ class AppConfigProduction extends AppConfigImpl {
 
   @override
   String openKycApiUrl() {
-    return "https://openkyc.threefold.me";
+    return 'https://openkyc.threefold.me';
   }
 
   @override
@@ -118,7 +118,7 @@ class AppConfigProduction extends AppConfigImpl {
 class AppConfigStaging extends AppConfigImpl {
   @override
   String baseUrl() {
-    return "login.staging.threefold.me";
+    return 'login.staging.threefold.me';
   }
 
   @override
@@ -128,17 +128,17 @@ class AppConfigStaging extends AppConfigImpl {
 
   @override
   String threeBotApiUrl() {
-    return "https://login.staging.threefold.me/api";
+    return 'https://login.staging.threefold.me/api';
   }
 
   @override
   String threeBotFrontEndUrl() {
-    return "https://login.staging.threefold.me/";
+    return 'https://login.staging.threefold.me/';
   }
 
   @override
   String threeBotSocketUrl() {
-    return "wss://login.staging.threefold.me";
+    return 'wss://login.staging.threefold.me';
   }
 
   @override
@@ -163,27 +163,27 @@ class AppConfigStaging extends AppConfigImpl {
 class AppConfigTesting extends AppConfigImpl {
   @override
   String baseUrl() {
-    return "login.testing.threefold.me";
+    return 'login.testing.threefold.me';
   }
 
   @override
   String openKycApiUrl() {
-    return "https://openkyc.testing.threefold.me";
+    return 'https://openkyc.testing.threefold.me';
   }
 
   @override
   String threeBotApiUrl() {
-    return "https://login.testing.threefold.me/api";
+    return 'https://login.testing.threefold.me/api';
   }
 
   @override
   String threeBotFrontEndUrl() {
-    return "https://login.testing.threefold.me/";
+    return 'https://login.testing.threefold.me/';
   }
 
   @override
   String threeBotSocketUrl() {
-    return "wss://login.testing.threefold.me";
+    return 'wss://login.testing.threefold.me';
   }
 
   @override

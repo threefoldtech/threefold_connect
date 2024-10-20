@@ -114,12 +114,14 @@ class _RegisteredScreenState extends State<RegisteredScreen>
                         name: 'Settings', icon: Icons.settings, pageNumber: 6),
                   ],
                 ),
-                    Spacer(),
+                const Spacer(),
                 const Row(
                   children: [
                     Spacer(),
                     CrispChatbot(),
-                    SizedBox(width: 20,)
+                    SizedBox(
+                      width: 20,
+                    )
                   ],
                 )
               ],

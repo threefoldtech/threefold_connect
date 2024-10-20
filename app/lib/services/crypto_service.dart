@@ -91,8 +91,7 @@ Future<Map<String, String>> encrypt(
   Uint8List nonce = sodium.randombytes.buf(24);
 
   final secretKey = Uint8List(32);
-  TweetNaClExt.crypto_sign_ed25519_sk_to_x25519_sk(
-      secretKey, sk);
+  TweetNaClExt.crypto_sign_ed25519_sk_to_x25519_sk(secretKey, sk);
 
   Uint8List message = Uint8List.fromList(data.codeUnits);
   Uint8List encryptedData = sodium.crypto.box.easy(
@@ -114,15 +113,15 @@ Future<String> decrypt(
   Sodium sodium = await SodiumInit.init();
 
   final publicKey = Uint8List(32);
-  TweetNaClExt.crypto_sign_ed25519_pk_to_x25519_pk(
-      publicKey, pk);
+  TweetNaClExt.crypto_sign_ed25519_pk_to_x25519_pk(publicKey, pk);
 
   final secretKey = Uint8List(32);
-  TweetNaClExt.crypto_sign_ed25519_sk_to_x25519_sk(
-      secretKey, sk);
+  TweetNaClExt.crypto_sign_ed25519_sk_to_x25519_sk(secretKey, sk);
 
   Uint8List decryptedData = sodium.crypto.box.sealOpen(
-      cipherText: cipherText, publicKey: publicKey, secretKey: sodium.secureCopy(secretKey));
+      cipherText: cipherText,
+      publicKey: publicKey,
+      secretKey: sodium.secureCopy(secretKey));
   return String.fromCharCodes(decryptedData);
 }
 
