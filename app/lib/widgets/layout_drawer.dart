@@ -186,6 +186,7 @@ class _LayoutDrawerState extends State<LayoutDrawer> {
           selectedFontSize: selectedFontSize,
           unselectedFontSize: 12,
           currentIndex: currentScreenIndex,
+          type: BottomNavigationBarType.fixed,
           items: const [
             BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
             BottomNavigationBarItem(
