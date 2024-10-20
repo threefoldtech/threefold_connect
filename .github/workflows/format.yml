@@ -1,0 +1,30 @@
+name: Format and Analyze
+
+on:
+  pull_request:
+    branches:
+      - development
+  push:
+    branches:
+      - development
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up Repository
+        uses: actions/checkout@v2
+      # Setup the flutter environment.
+      - uses: subosito/flutter-action@v1
+        with:
+          channel: 'stable' # 'dev', 'alpha', default to: 'stable'
+          flutter-version: '2.10.1' # you can also specify exact version of flutter
+      
+      # Get flutter dependencies.
+      - run: cd app && flutter pub get
+      
+      # Check for any formatting issues in the code.
+      - run: flutter format .
+      
+      # Statically analyze the Dart code for any errors.
+      - run: flutter analyze .
