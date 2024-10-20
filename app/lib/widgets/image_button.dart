@@ -5,17 +5,18 @@ class ImageButton extends StatefulWidget {
   final selectedImageId;
   final callback;
 
-  ImageButton(this.imageId, this.selectedImageId, this.callback, {Key? key})
-      : super(key: key);
+  const ImageButton(this.imageId, this.selectedImageId, this.callback,
+      {super.key});
 
-  _ImageButtonState createState() => _ImageButtonState();
+  @override
+  State<ImageButton> createState() => _ImageButtonState();
 }
 
 class _ImageButtonState extends State<ImageButton> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: new BoxDecoration(
+      decoration: BoxDecoration(
         border: (widget.selectedImageId == widget.imageId)
             ? Border.all(width: 2, color: Theme.of(context).primaryColor)
             : Border.all(width: 2, color: Colors.transparent),
@@ -25,14 +26,14 @@ class _ImageButtonState extends State<ImageButton> {
       height: 50,
       child: OutlinedButton(
         style: OutlinedButton.styleFrom(
-          padding: EdgeInsets.all(10),
-          shape: CircleBorder(),
+          padding: const EdgeInsets.all(10),
+          shape: const CircleBorder(),
         ),
         onPressed: () {
           widget.callback(widget.imageId);
         },
         child: Image.asset(
-          'assets/icons/' + widget.imageId.toString() + '.png',
+          'assets/icons/${widget.imageId.toString()}.png',
         ),
       ),
     );

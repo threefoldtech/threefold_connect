@@ -7,10 +7,10 @@ import 'package:threebotlogin/widgets/layout_drawer.dart';
 class ChatbotWidget extends StatefulWidget {
   final String email;
 
-  ChatbotWidget({required this.email});
+  const ChatbotWidget({super.key, required this.email});
 
   @override
-  _ChatbotState createState() => new _ChatbotState(email: this.email);
+  _ChatbotState createState() => _ChatbotState(email: email);
 }
 
 class _ChatbotState extends State<ChatbotWidget> with AutomaticKeepAliveClientMixin {
@@ -23,8 +23,7 @@ class _ChatbotState extends State<ChatbotWidget> with AutomaticKeepAliveClientMi
   _ChatbotState({required this.email}) {
     iaWebview = InAppWebView(
       initialUrlRequest: URLRequest(
-          url: Uri.parse('${config.url()}$email&cache_buster=' +
-              new DateTime.now().millisecondsSinceEpoch.toString())),
+          url: Uri.parse('${config.url()}$email&cache_buster=${DateTime.now().millisecondsSinceEpoch}')),
       initialOptions: InAppWebViewGroupOptions(
           crossPlatform: InAppWebViewOptions(useShouldOverrideUrlLoading: true),
           android: AndroidInAppWebViewOptions(supportMultipleWindows: true, useHybridComposition: true)),
@@ -36,7 +35,7 @@ class _ChatbotState extends State<ChatbotWidget> with AutomaticKeepAliveClientMi
         return Future.value(true);
       },
       onConsoleMessage: (InAppWebViewController controller, ConsoleMessage consoleMessage) {
-        print("CB console: " + consoleMessage.message);
+        print('CB console: ${consoleMessage.message}');
       },
       onLoadStart: (InAppWebViewController controller, _) {
         webView = controller;
@@ -70,10 +69,6 @@ class _ChatbotState extends State<ChatbotWidget> with AutomaticKeepAliveClientMi
     );
   }
 
-  @override
-  void initState() {
-    super.initState();
-  }
 
   @override
   void dispose() {

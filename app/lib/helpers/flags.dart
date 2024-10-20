@@ -6,7 +6,7 @@ import 'package:threebotlogin/services/tools_service.dart';
 import 'globals.dart';
 
 class Flags {
-  static final Flags _singleton = new Flags._internal();
+  static final Flags _singleton = Flags._internal();
 
   late FlagsmithClient client;
 
@@ -60,6 +60,20 @@ class Flags {
         await Flags().hasFlagValueByFeatureName('redo-identity-verification');
     Globals().phoneVerification =
         await Flags().hasFlagValueByFeatureName('phone-verification');
+    Globals().chainUrl =
+        (await Flags().getFlagValueByFeatureName('chain-url'))!;
+    Globals().gridproxyUrl =
+        (await Flags().getFlagValueByFeatureName('gridproxy-url'))!;
+    Globals().activationUrl =
+        (await Flags().getFlagValueByFeatureName('activation-url'))!;
+    Globals().relayUrl =
+        (await Flags().getFlagValueByFeatureName('relay-url'))!;
+    Globals().termsAndConditionsUrl =
+        (await Flags().getFlagValueByFeatureName('terms-conditions-url'))!;
+    Globals().spendingLimit = int.parse(
+        (await Flags().getFlagValueByFeatureName('spending-limit')).toString());
+    Globals().newsUrl =
+        (await Flags().getFlagValueByFeatureName('news-url'))!;    
   }
 
   Future<bool> hasFlagValueByFeatureName(String name) async {
@@ -85,7 +99,7 @@ class Flags {
   Future<dynamic> setDeviceTrait(Identity user) async {
     String info = await getDeviceInfo();
     TraitWithIdentity trait =
-        new TraitWithIdentity(identity: user, key: 'device', value: info);
+        TraitWithIdentity(identity: user, key: 'device', value: info);
     return (await client.createTrait(value: trait));
   }
 

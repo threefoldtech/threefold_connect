@@ -11,6 +11,8 @@ import 'package:url_launcher/url_launcher.dart';
 bool created = false;
 
 class NewsWidget extends StatefulWidget {
+  const NewsWidget({super.key});
+
   @override
   _NewsState createState() => _NewsState();
 }
@@ -19,19 +21,19 @@ class _NewsState extends State<NewsWidget> with AutomaticKeepAliveClientMixin {
   late InAppWebViewController webView;
   late InAppWebView iaWebView;
 
-  String url = "";
-  String initialEndsWith = "";
+  String url = '';
+  String initialEndsWith = '';
   double progress = 0;
   var config = NewsConfig();
 
   _back(NewsBackEvent event) async {
     Uri? url = await webView.getUrl();
-    print("URL: " + url.toString());
+    print('URL: $url');
     if (url.toString().endsWith(initialEndsWith)) {
       Events().emit(GoHomeEvent());
       return;
     }
-    this.webView.goBack();
+    webView.goBack();
   }
 
   _NewsState() {
@@ -66,7 +68,7 @@ class _NewsState extends State<NewsWidget> with AutomaticKeepAliveClientMixin {
       },
       onConsoleMessage:
           (InAppWebViewController controller, ConsoleMessage consoleMessage) {
-        print("News console: " + consoleMessage.message);
+        print('News console: ${consoleMessage.message}');
       },
     );
     Events().onEvent(NewsBackEvent().runtimeType, _back);

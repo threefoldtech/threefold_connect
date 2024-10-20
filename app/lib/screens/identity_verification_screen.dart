@@ -1,15 +1,16 @@
 import 'dart:convert';
 import 'dart:core';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter_pkid/flutter_pkid.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:http/http.dart';
-import 'package:shuftipro_sdk/shuftipro_sdk.dart';
+// import 'package:shuftipro_onsite_sdk/shuftipro_onsite_sdk.dart';
 import 'package:threebotlogin/events/events.dart';
 import 'package:threebotlogin/events/identity_callback_event.dart';
 import 'package:threebotlogin/helpers/globals.dart';
-import 'package:threebotlogin/helpers/hex_color.dart';
 import 'package:threebotlogin/helpers/kyc_helpers.dart';
+import 'package:threebotlogin/main.dart';
+import 'package:threebotlogin/services/gridproxy_service.dart';
 import 'package:threebotlogin/services/identity_service.dart';
 import 'package:threebotlogin/services/open_kyc_service.dart';
 import 'package:threebotlogin/services/pkid_service.dart';
@@ -22,7 +23,10 @@ import 'package:country_picker/country_picker.dart';
 import 'package:threebotlogin/widgets/phone_widget.dart';
 
 class IdentityVerificationScreen extends StatefulWidget {
-  _IdentityVerificationScreenState createState() =>
+  const IdentityVerificationScreen({super.key});
+
+  @override
+  State<IdentityVerificationScreen> createState() =>
       _IdentityVerificationScreenState();
 }
 
@@ -56,9 +60,11 @@ class _IdentityVerificationScreenState
     'open_webview': false,
     'asyncRequest': false,
     'captureEnabled': false,
+    'dark_mode': false,
   };
 
   Map<String, Object> authObject = {
+    'auth_type': 'access_token',
     'access_token': '',
   };
 
@@ -124,6 +130,7 @@ class _IdentityVerificationScreenState
       'text': 'My name is John Doe and I authorize this transaction of \$100/-',
     },
   };
+  double spending = 0.0;
 
   setEmailVerified() {
     if (mounted) {
@@ -211,123 +218,112 @@ class _IdentityVerificationScreenState
         }
       });
     });
+    getSpending();
   }
 
   @override
   Widget build(BuildContext context) {
     return LayoutDrawer(
       titleText: 'Identity',
-      content: Stack(
-        children: [
-          SvgPicture.asset(
-            'assets/bg.svg',
-            alignment: Alignment.center,
-            width: MediaQuery.of(context).size.width,
-            height: MediaQuery.of(context).size.height,
-          ),
-          FutureBuilder(
-            future: getEmail(),
-            builder: (ctx, snapshot) {
-              if (snapshot.connectionState == ConnectionState.done) {
-                if (isLoading) {
-                  return _pleaseWait();
-                }
-
-                return Column(
-                  mainAxisSize: MainAxisSize.max,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.all(15),
-                      child: Column(
-                        children: [
-                          AnimatedBuilder(
-                              animation: Listenable.merge([
-                                Globals().emailVerified,
-                                Globals().phoneVerified,
-                                Globals().identityVerified
-                              ]),
-                              builder: (BuildContext context, _) {
-                                return Column(
-                                  children: [
-                                    // Step one: verify email
-                                    _fillCard(
-                                        getCorrectState(1, emailVerified,
-                                            phoneVerified, identityVerified),
-                                        1,
-                                        email,
-                                        Icons.email),
-
-                                    // Step two: verify phone
-                                    Globals().phoneVerification == true
-                                        ? _fillCard(
-                                            getCorrectState(
-                                                2,
-                                                emailVerified,
-                                                phoneVerified,
-                                                identityVerified),
-                                            2,
-                                            phone,
-                                            Icons.phone)
-                                        : Container(),
-
-                                    // Step three: verify identity
-                                    Globals().isOpenKYCEnabled
-                                        ? _fillCard(
-                                            getCorrectState(
-                                                3,
-                                                emailVerified,
-                                                phoneVerified,
-                                                identityVerified),
-                                            3,
-                                            extract3Bot(doubleName),
-                                            Icons.perm_identity)
-                                        : Container(),
-
-                                    Globals().redoIdentityVerification &&
-                                            identityVerified == true
-                                        ? ElevatedButton(
-                                            onPressed: () async {
-                                              await verifyIdentityProcess();
-                                            },
-                                            child: const Text(
-                                                'Redo identity verification'))
-                                        : Container(),
-                                    Globals().debugMode == true
-                                        ? ElevatedButton(
-                                            onPressed: () async {
-                                              bool? isEmailVerified =
-                                                  await getIsEmailVerified();
-                                              bool? isPhoneVerified =
-                                                  await getIsPhoneVerified();
-                                              bool? isIdentityVerified =
-                                                  await getIsIdentityVerified();
-
-                                              kycLogs = '';
-                                              kycLogs +=
-                                                  'Email verified: $isEmailVerified\n';
-                                              kycLogs +=
-                                                  'Phone verified: $isPhoneVerified\n';
-                                              kycLogs +=
-                                                  'Identity verified: $isIdentityVerified\n';
-
-                                              setState(() {});
-                                            },
-                                            child: const Text('KYC Status'))
-                                        : Container(),
-                                    Text(kycLogs),
-                                  ],
-                                );
-                              })
-                        ],
-                      ),
-                    )
-                  ],
-                );
-              }
+      content: FutureBuilder(
+        future: getEmail(),
+        builder: (ctx, snapshot) {
+          if (snapshot.connectionState == ConnectionState.done) {
+            if (isLoading) {
               return _pleaseWait();
-            },
-          ),
-        ],
+            }
+
+            return Column(
+              mainAxisSize: MainAxisSize.max,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(15),
+                  child: Column(
+                    children: [
+                      AnimatedBuilder(
+                          animation: Listenable.merge([
+                            Globals().emailVerified,
+                            Globals().phoneVerified,
+                            Globals().identityVerified
+                          ]),
+                          builder: (BuildContext context, _) {
+                            return Column(
+                              children: [
+                                // Step one: verify email
+                                _fillCard(
+                                    getCorrectState(1, emailVerified,
+                                        phoneVerified, identityVerified),
+                                    1,
+                                    email,
+                                    Icons.email),
+
+                                // Step two: verify phone
+                                (Globals().phoneVerification == true ||
+                                        (Globals().spendingLimit > 0 &&
+                                            spending > Globals().spendingLimit))
+                                    ? _fillCard(
+                                        getCorrectState(2, emailVerified,
+                                            phoneVerified, identityVerified),
+                                        2,
+                                        phone,
+                                        Icons.phone)
+                                    : Container(),
+
+                                // Step three: verify identity
+                                (Globals().isOpenKYCEnabled ||
+                                        (Globals().spendingLimit > 0 &&
+                                            spending > Globals().spendingLimit))
+                                    ? _fillCard(
+                                        getCorrectState(3, emailVerified,
+                                            phoneVerified, identityVerified),
+                                        3,
+                                        extract3Bot(doubleName),
+                                        Icons.perm_identity)
+                                    : Container(),
+
+                                Globals().redoIdentityVerification &&
+                                        identityVerified == true
+                                    ? ElevatedButton(
+                                        onPressed: () async {
+                                          await verifyIdentityProcess();
+                                        },
+                                        child: const Text(
+                                            'Redo identity verification'))
+                                    : Container(),
+                                Globals().debugMode == true
+                                    ? ElevatedButton(
+                                        onPressed: () async {
+                                          bool? isEmailVerified =
+                                              await getIsEmailVerified();
+                                          bool? isPhoneVerified =
+                                              await getIsPhoneVerified();
+                                          bool? isIdentityVerified =
+                                              await getIsIdentityVerified();
+
+                                          kycLogs = '';
+                                          kycLogs +=
+                                              'Email verified: $isEmailVerified\n';
+                                          kycLogs +=
+                                              'Phone verified: $isPhoneVerified\n';
+                                          kycLogs +=
+                                              'Identity verified: $isIdentityVerified\n';
+
+                                          setState(() {});
+                                        },
+                                        child: const Text('KYC Status'))
+                                    : Container(),
+                                Text(kycLogs),
+                              ],
+                            );
+                          })
+                    ],
+                  ),
+                )
+              ],
+            );
+          }
+          return _pleaseWait();
+        },
       ),
     );
   }
@@ -337,7 +333,8 @@ class _IdentityVerificationScreenState
       context: context,
       barrierDismissible: false,
       builder: (BuildContext customContext) => CustomDialog(
-        image: Icons.info,
+        type: DialogType.Warning,
+        image: Icons.warning,
         title: 'Are you sure',
         description: 'Are you sure you want to exit the verification process',
         actions: <Widget>[
@@ -349,7 +346,13 @@ class _IdentityVerificationScreenState
             },
           ),
           TextButton(
-            child: const Text('Yes'),
+            child: Text(
+              'Yes',
+              style: Theme.of(context)
+                  .textTheme
+                  .bodyMedium!
+                  .copyWith(color: Theme.of(context).colorScheme.warning),
+            ),
             onPressed: () async {
               Navigator.pop(customContext);
               setState(() {
@@ -370,6 +373,13 @@ class _IdentityVerificationScreenState
         }
       },
       context: context,
+      countryListTheme: CountryListThemeData(
+        backgroundColor: Theme.of(context).colorScheme.secondaryContainer,
+        textStyle: Theme.of(context).textTheme.bodySmall!.copyWith(
+            color: Theme.of(context).colorScheme.onSecondaryContainer),
+        searchTextStyle: Theme.of(context).textTheme.bodySmall!.copyWith(
+            color: Theme.of(context).colorScheme.onSecondaryContainer),
+      ),
       showPhoneCode:
           false, // optional. Shows phone code before the country name.
       onSelect: (Country country) async {
@@ -378,16 +388,18 @@ class _IdentityVerificationScreenState
         });
 
         print('Select country: ${country.displayName}');
-
-        String r = await ShuftiproSdk.sendRequest(
-            authObject: authObject,
-            createdPayload: createdPayload,
-            configObject: configObj);
+        var brightness =
+            SchedulerBinding.instance.platformDispatcher.platformBrightness;
+        configObj['dark_mode'] = brightness == Brightness.dark;
+        // String r = await ShuftiproSdk.sendRequest(
+        // authObject: authObject,
+        // createdPayload: createdPayload,
+        // configObject: configObj);
 
         print('Receiving response');
-        debugPrint(r);
+        // debugPrint(r);
 
-        await handleShuftiCallBack(r);
+        // await handleShuftiCallBack(r);
       },
     );
   }
@@ -402,6 +414,7 @@ class _IdentityVerificationScreenState
             context: context,
             barrierDismissible: false,
             builder: (BuildContext dialogContext) => CustomDialog(
+              type: DialogType.Error,
               image: Icons.close,
               title: 'Request canceled',
               description: 'Verification process has been canceled.',
@@ -410,7 +423,7 @@ class _IdentityVerificationScreenState
                     onPressed: () {
                       Navigator.pop(dialogContext);
                     },
-                    child: const Text('OK'))
+                    child: const Text('Close'))
               ],
             ),
           );
@@ -421,6 +434,7 @@ class _IdentityVerificationScreenState
             context: context,
             barrierDismissible: false,
             builder: (BuildContext dialogContext) => CustomDialog(
+              type: DialogType.Error,
               image: Icons.close,
               title: 'Request canceled',
               description:
@@ -430,7 +444,7 @@ class _IdentityVerificationScreenState
                     onPressed: () {
                       Navigator.pop(dialogContext);
                     },
-                    child: const Text('OK'))
+                    child: const Text('Close'))
               ],
             ),
           );
@@ -438,9 +452,7 @@ class _IdentityVerificationScreenState
       }
 
       // Close your eyes for one second
-      String bodyText = res.split('body=')[1].split(', verification_url')[0];
-      Map<String, dynamic> data = jsonDecode(bodyText);
-
+      Map<String, dynamic> data = jsonDecode(res);
       switch (data['event']) {
         // AUTHORIZATION IS WRONG
         case 'request.unauthorized':
@@ -484,19 +496,27 @@ class _IdentityVerificationScreenState
   }
 
   Widget _pleaseWait() {
-    return const Dialog(
+    return Dialog(
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          SizedBox(
+          const SizedBox(
             height: 10,
           ),
-          CircularProgressIndicator(),
-          SizedBox(
+          CircularProgressIndicator(
+            color: Theme.of(context).colorScheme.primary,
+          ),
+          const SizedBox(
             height: 10,
           ),
-          Text('One moment please'),
-          SizedBox(
+          Text(
+            'One moment please',
+            style: Theme.of(context)
+                .textTheme
+                .bodyMedium!
+                .copyWith(color: Theme.of(context).colorScheme.onSurface),
+          ),
+          const SizedBox(
             height: 10,
           ),
         ],
@@ -511,19 +531,27 @@ class _IdentityVerificationScreenState
       builder: (BuildContext context) {
         return WillPopScope(
           onWillPop: () => Future.value(false),
-          child: const Dialog(
+          child: Dialog(
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                SizedBox(
+                const SizedBox(
                   height: 10,
                 ),
-                CircularProgressIndicator(),
-                SizedBox(
+                CircularProgressIndicator(
+                  color: Theme.of(context).colorScheme.primary,
+                ),
+                const SizedBox(
                   height: 10,
                 ),
-                Text('One moment please'),
-                SizedBox(
+                Text(
+                  'One moment please',
+                  style: Theme.of(context)
+                      .textTheme
+                      .bodyMedium!
+                      .copyWith(color: Theme.of(context).colorScheme.onSurface),
+                ),
+                const SizedBox(
                   height: 10,
                 ),
               ],
@@ -575,15 +603,17 @@ class _IdentityVerificationScreenState
                   width: 30.0,
                   height: 30.0,
                   decoration: BoxDecoration(
-                      border: Border.all(color: Colors.blue, width: 2),
+                      border: Border.all(
+                          color: Theme.of(context).colorScheme.primary,
+                          width: 2),
                       shape: BoxShape.circle,
-                      color: Colors.white),
+                      color: Theme.of(context).colorScheme.surface),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text('0$step',
-                          style: const TextStyle(
-                              color: Colors.blue,
+                          style: TextStyle(
+                              color: Theme.of(context).colorScheme.primary,
                               fontWeight: FontWeight.bold,
                               fontSize: 12))
                     ],
@@ -593,7 +623,6 @@ class _IdentityVerificationScreenState
                 Icon(
                   icon,
                   size: 20,
-                  color: Colors.black,
                 ),
                 const Padding(padding: EdgeInsets.only(left: 15)),
                 Flexible(
@@ -606,8 +635,14 @@ class _IdentityVerificationScreenState
                             child: Text(
                               text == '' ? 'Unknown' : text,
                               overflow: TextOverflow.clip,
-                              style: const TextStyle(
-                                  fontSize: 12.0, fontWeight: FontWeight.bold),
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodySmall!
+                                  .copyWith(
+                                      fontWeight: FontWeight.bold,
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onSurface),
                             ),
                           )
                         ],
@@ -615,18 +650,18 @@ class _IdentityVerificationScreenState
                       const SizedBox(
                         height: 5,
                       ),
-                      const Row(
+                      Row(
                         children: <Widget>[
                           Icon(
                             Icons.close,
-                            color: Colors.red,
+                            color: Theme.of(context).colorScheme.error,
                             size: 18.0,
                           ),
-                          Padding(padding: EdgeInsets.only(left: 5)),
+                          const Padding(padding: EdgeInsets.only(left: 5)),
                           Text(
                             'Not verified',
                             style: TextStyle(
-                                color: Colors.red,
+                                color: Theme.of(context).colorScheme.error,
                                 fontWeight: FontWeight.bold,
                                 fontSize: 12),
                           )
@@ -677,12 +712,13 @@ class _IdentityVerificationScreenState
           }
         },
         child: Container(
-          decoration: const BoxDecoration(
+          decoration: BoxDecoration(
               border: Border(
-                  left: BorderSide(color: Colors.blue, width: 5),
-                  right: BorderSide(color: Colors.grey, width: 0.5),
-                  bottom: BorderSide(color: Colors.grey, width: 0.5),
-                  top: BorderSide(color: Colors.grey, width: 0.5))),
+                  left: BorderSide(
+                      color: Theme.of(context).colorScheme.primary, width: 5),
+                  right: const BorderSide(color: Colors.grey, width: 0.5),
+                  bottom: const BorderSide(color: Colors.grey, width: 0.5),
+                  top: const BorderSide(color: Colors.grey, width: 0.5))),
           height: 75,
           width: MediaQuery.of(context).size.width * 100,
           child: Row(
@@ -692,15 +728,16 @@ class _IdentityVerificationScreenState
                 width: 30.0,
                 height: 30.0,
                 decoration: BoxDecoration(
-                    border: Border.all(color: Colors.blue, width: 2),
+                    border: Border.all(
+                        color: Theme.of(context).colorScheme.primary, width: 2),
                     shape: BoxShape.circle,
-                    color: Colors.white),
+                    color: Theme.of(context).colorScheme.surface),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text('0$step',
-                        style: const TextStyle(
-                            color: Colors.blue,
+                        style: TextStyle(
+                            color: Theme.of(context).colorScheme.primary,
                             fontWeight: FontWeight.bold,
                             fontSize: 12))
                   ],
@@ -710,7 +747,6 @@ class _IdentityVerificationScreenState
               Icon(
                 icon,
                 size: 20,
-                color: Colors.black,
               ),
               const Padding(padding: EdgeInsets.only(left: 10)),
               Row(
@@ -742,9 +778,14 @@ class _IdentityVerificationScreenState
                                       child: Text(
                                         text == '' ? 'Unknown' : text,
                                         overflow: TextOverflow.clip,
-                                        style: const TextStyle(
-                                            fontSize: 12.0,
-                                            fontWeight: FontWeight.bold),
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .bodySmall!
+                                            .copyWith(
+                                                fontWeight: FontWeight.bold,
+                                                color: Theme.of(context)
+                                                    .colorScheme
+                                                    .onSurface),
                                       ),
                                     )
                                   ],
@@ -762,10 +803,14 @@ class _IdentityVerificationScreenState
                                           Text(
                                             'SMS sent, retry in ${calculateMinutes()} minute${calculateMinutes() == '1' ? '' : 's'}',
                                             overflow: TextOverflow.clip,
-                                            style: const TextStyle(
-                                                color: Colors.orange,
-                                                fontWeight: FontWeight.bold,
-                                                fontSize: 12),
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .bodySmall!
+                                                .copyWith(
+                                                    fontWeight: FontWeight.bold,
+                                                    color: Theme.of(context)
+                                                        .colorScheme
+                                                        .warning),
                                           )
                                         ],
                                       )
@@ -848,15 +893,16 @@ class _IdentityVerificationScreenState
             Container(
               width: 30.0,
               height: 30.0,
-              decoration: const BoxDecoration(
-                  shape: BoxShape.circle, color: Colors.green),
-              child: const Column(
+              decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Theme.of(context).colorScheme.primary),
+              child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Icon(
                     Icons.check,
-                    color: Colors.white,
                     size: 15.0,
+                    color: Theme.of(context).colorScheme.onPrimary,
                   ),
                 ],
               ),
@@ -865,7 +911,6 @@ class _IdentityVerificationScreenState
             Icon(
               icon,
               size: 20,
-              color: Colors.black,
             ),
             const Padding(padding: EdgeInsets.only(left: 15)),
             Row(
@@ -885,19 +930,27 @@ class _IdentityVerificationScreenState
                                     MediaQuery.of(context).size.width * 0.55),
                             child: Text(text == '' ? 'Unknown' : text,
                                 overflow: TextOverflow.clip,
-                                style: const TextStyle(
-                                    fontSize: 12, fontWeight: FontWeight.bold)))
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodySmall!
+                                    .copyWith(
+                                        fontWeight: FontWeight.bold,
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .onSurface)))
                       ],
                     ),
                     const SizedBox(height: 5),
-                    const Row(
+                    Row(
                       children: [
                         Text(
                           'Verified',
-                          style: TextStyle(
-                              color: Colors.green,
-                              fontSize: 12,
-                              fontWeight: FontWeight.bold),
+                          style: Theme.of(context)
+                              .textTheme
+                              .bodySmall!
+                              .copyWith(
+                                  color: Theme.of(context).colorScheme.primary,
+                                  fontWeight: FontWeight.bold),
                         )
                       ],
                     )
@@ -906,17 +959,17 @@ class _IdentityVerificationScreenState
                 step == 1
                     ? const Column(
                         mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(Icons.edit, size: 20, color: Colors.black)
-                        ],
+                        children: [Icon(Icons.edit, size: 20)],
                       )
                     : const Column(),
                 step == 3
                     ? const Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Icon(Icons.chevron_right,
-                              size: 20, color: Colors.black)
+                          Icon(
+                            Icons.chevron_right,
+                            size: 20,
+                          )
                         ],
                       )
                     : const Column()
@@ -936,8 +989,7 @@ class _IdentityVerificationScreenState
 
     try {
       Response accessTokenResponse = await getShuftiAccessToken();
-      if (accessTokenResponse.statusCode == 403 ||
-          accessTokenResponse == null) {
+      if (accessTokenResponse.statusCode == 403) {
         setState(() {
           isLoading = false;
         });
@@ -945,13 +997,14 @@ class _IdentityVerificationScreenState
         return showDialog(
             context: context,
             builder: (BuildContext context) => CustomDialog(
+                  type: DialogType.Warning,
                   image: Icons.warning,
                   title: 'Maximum requests Reached',
                   description:
                       'You already had 5 requests in last 24 hours. \nPlease try again in 24 hours.',
                   actions: <Widget>[
                     TextButton(
-                      child: const Text('Ok'),
+                      child: const Text('Close'),
                       onPressed: () {
                         Navigator.pop(context);
                       },
@@ -959,8 +1012,6 @@ class _IdentityVerificationScreenState
                   ],
                 ));
       }
-
-      showCountryPopup();
 
       if (accessTokenResponse.statusCode != 200) {
         setState(() {
@@ -970,13 +1021,14 @@ class _IdentityVerificationScreenState
         return showDialog(
             context: context,
             builder: (BuildContext context) => CustomDialog(
-                  image: Icons.warning,
+                  type: DialogType.Error,
+                  image: Icons.error,
                   title: "Couldn't setup verification process",
                   description:
                       'Something went wrong. Please contact support if this issue persists.',
                   actions: <Widget>[
                     TextButton(
-                      child: const Text('Ok'),
+                      child: const Text('Close'),
                       onPressed: () {
                         Navigator.pop(context);
                       },
@@ -999,6 +1051,8 @@ class _IdentityVerificationScreenState
       createdPayload['face'] = verificationObj['face']!;
       createdPayload['verification_mode'] = 'image_only';
 
+      showCountryPopup();
+
       setState(() {
         isLoading = false;
         isInIdentityProcess = true;
@@ -1012,13 +1066,14 @@ class _IdentityVerificationScreenState
       return showDialog(
         context: context,
         builder: (BuildContext context) => CustomDialog(
-          image: Icons.warning,
+          type: DialogType.Error,
+          image: Icons.error,
           title: 'Failed to setup process',
           description:
               'Something went wrong. \n If this issue persist, please contact support',
           actions: <Widget>[
             TextButton(
-              child: const Text('Ok'),
+              child: const Text('Close'),
               onPressed: () {
                 Navigator.pop(context);
               },
@@ -1051,123 +1106,192 @@ class _IdentityVerificationScreenState
                         height: 10,
                       ),
                       Container(
-                          padding: const EdgeInsets.fromLTRB(15, 10, 15, 10),
-                          child: const Column(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 15, vertical: 10),
+                          child: Column(
                             children: [
-                              Row(
-                                children: [
-                                  Text(
-                                    'OpenKYC ID CARD',
-                                    style: TextStyle(
-                                        fontSize: 18.0,
-                                        fontWeight: FontWeight.bold),
-                                    textAlign: TextAlign.left,
-                                  ),
-                                ],
+                              Text(
+                                'OpenKYC ID CARD',
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .titleLarge!
+                                    .copyWith(
+                                        fontWeight: FontWeight.bold,
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .onSecondaryContainer),
+                                textAlign: TextAlign.center,
                               ),
-                              SizedBox(height: 5),
+                              const SizedBox(height: 5),
                               Row(children: [
                                 Text(
                                   'Your own personal KYC ID CARD',
-                                  style: TextStyle(
-                                      fontSize: 13, color: Colors.grey),
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .titleMedium!
+                                      .copyWith(
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .onSecondaryContainer),
                                 ),
                               ]),
                             ],
                           )),
                       Container(
-                        padding: const EdgeInsets.fromLTRB(15, 20, 15, 20),
-                        color: HexColor('#f2f5f3'),
+                        color: Theme.of(context).colorScheme.secondaryContainer,
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 15, vertical: 20),
                         child: Column(
                           children: [
                             Row(
                               children: [
                                 Text(
                                   'Full name',
-                                  style: TextStyle(
-                                    fontSize: 13,
-                                    color: HexColor('#787878'),
-                                  ),
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .bodyMedium!
+                                      .copyWith(
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .primary,
+                                      ),
                                 )
                               ],
                             ),
                             Row(
-                              children: [Text(name)],
+                              children: [
+                                Text(
+                                  name,
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .bodyMedium!
+                                      .copyWith(
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .onSecondaryContainer,
+                                      ),
+                                )
+                              ],
                             )
                           ],
                         ),
                       ),
                       Container(
-                        padding: const EdgeInsets.fromLTRB(15, 20, 15, 20),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 15, vertical: 20),
                         child: Column(
                           children: [
                             Row(
                               children: [
                                 Text(
                                   'Birthday',
-                                  style: TextStyle(
-                                    fontSize: 13,
-                                    color: HexColor('#787878'),
-                                  ),
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .bodyMedium!
+                                      .copyWith(
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .primary,
+                                      ),
                                 ),
                               ],
                             ),
                             Row(
                               children: [
-                                Text(snapshot.data['identityDOB'] != 'None'
-                                    ? snapshot.data['identityDOB']
-                                    : 'Unknown')
+                                Text(
+                                  snapshot.data['identityDOB'] != 'None'
+                                      ? snapshot.data['identityDOB']
+                                      : 'Unknown',
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .bodyMedium!
+                                      .copyWith(
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .onSecondaryContainer,
+                                      ),
+                                )
                               ],
                             )
                           ],
                         ),
                       ),
                       Container(
-                        padding: const EdgeInsets.fromLTRB(15, 20, 15, 20),
-                        color: HexColor('#f2f5f3'),
+                        color: Theme.of(context).colorScheme.secondaryContainer,
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 15, vertical: 20),
                         child: Column(
                           children: [
                             Row(
                               children: [
                                 Text(
                                   'Country',
-                                  style: TextStyle(
-                                    fontSize: 13,
-                                    color: HexColor('#787878'),
-                                  ),
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .bodyMedium!
+                                      .copyWith(
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .primary,
+                                      ),
                                 )
                               ],
                             ),
                             Row(
                               children: [
-                                Text(snapshot.data['identityCountry'] != 'None'
-                                    ? snapshot.data['identityCountry']
-                                    : 'Unknown')
+                                Text(
+                                  snapshot.data['identityCountry'] != 'None'
+                                      ? snapshot.data['identityCountry']
+                                      : 'Unknown',
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .bodyMedium!
+                                      .copyWith(
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .onSecondaryContainer,
+                                      ),
+                                )
                               ],
                             )
                           ],
                         ),
                       ),
                       Container(
-                        padding: const EdgeInsets.fromLTRB(15, 20, 15, 20),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 15, vertical: 20),
                         child: Column(
                           children: [
                             Row(
                               children: [
                                 Text(
                                   'Gender',
-                                  style: TextStyle(
-                                    fontSize: 13,
-                                    color: HexColor('#787878'),
-                                  ),
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .bodyMedium!
+                                      .copyWith(
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .primary,
+                                      ),
                                 )
                               ],
                             ),
                             Row(
                               children: [
-                                Text(snapshot.data['identityGender'] != 'None'
-                                    ? snapshot.data['identityGender']
-                                    : 'Unknown')
+                                Text(
+                                  snapshot.data['identityGender'] != 'None'
+                                      ? snapshot.data['identityGender']
+                                      : 'Unknown',
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .bodyMedium!
+                                      .copyWith(
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .onSecondaryContainer,
+                                      ),
+                                )
                               ],
                             )
                           ],
@@ -1203,7 +1327,7 @@ class _IdentityVerificationScreenState
         description: 'A verification email has been sent.',
         actions: <Widget>[
           TextButton(
-            child: const Text('Ok'),
+            child: const Text('Close'),
             onPressed: () {
               Navigator.pop(context);
             },
@@ -1226,33 +1350,55 @@ class _IdentityVerificationScreenState
           return StatefulBuilder(builder: (statefulContext, setCustomState) {
             return AlertDialog(
               title: emailWasEmpty == true
-                  ? const Text('Add email')
-                  : const Text('Change email'),
+                  ? Text(
+                      'Add email',
+                      style: Theme.of(context)
+                          .textTheme
+                          .headlineMedium!
+                          .copyWith(
+                              color: Theme.of(context).colorScheme.onSurface),
+                    )
+                  : Text('Change email',
+                      style: Theme.of(context)
+                          .textTheme
+                          .headlineMedium!
+                          .copyWith(
+                              color: Theme.of(context).colorScheme.onSurface)),
               contentPadding: const EdgeInsets.all(24),
-              content: Container(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    emailWasEmpty == true
-                        ? const Text('Please pass us your email address')
-                        : const Text(
-                            'Changing your email will require you to go through the email verification process again.'),
-                    TextField(
-                      controller: controller,
-                      decoration: InputDecoration(
-                          focusedBorder: UnderlineInputBorder(
-                            borderSide: BorderSide(
-                                color: Theme.of(context).primaryColor),
-                          ),
-                          labelText: 'Email',
-                          errorText: validEmail == true ? null : errorEmail),
-                    ),
-                    const SizedBox(
-                      height: 20,
-                    ),
-                    statusMessage
-                  ],
-                ),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  emailWasEmpty == true
+                      ? Text('Please pass us your email address',
+                          style: Theme.of(context)
+                              .textTheme
+                              .bodyLarge!
+                              .copyWith(
+                                  color:
+                                      Theme.of(context).colorScheme.onSurface))
+                      : Text(
+                          'Changing your email will require you to go through the email verification process again.',
+                          style: Theme.of(context)
+                              .textTheme
+                              .bodyLarge!
+                              .copyWith(
+                                  color:
+                                      Theme.of(context).colorScheme.onSurface)),
+                  TextField(
+                    controller: controller,
+                    decoration: InputDecoration(
+                        focusedBorder: UnderlineInputBorder(
+                          borderSide:
+                              BorderSide(color: Theme.of(context).primaryColor),
+                        ),
+                        labelText: 'Email',
+                        errorText: validEmail == true ? null : errorEmail),
+                  ),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  statusMessage
+                ],
               ),
               actions: [
                 TextButton(
@@ -1486,5 +1632,34 @@ class _IdentityVerificationScreenState
     Globals().smsSentOn = DateTime.now().millisecondsSinceEpoch;
 
     phoneSendDialog(context);
+  }
+
+  Future<void> getSpending() async {
+    if (Globals().spendingLimit <= 0) return;
+    try {
+      setState(() {
+        isLoading = true;
+      });
+      spending = await getMySpending();
+    } catch (e) {
+      final loadingSpendingFailure = SnackBar(
+        content: Text(
+          'Failed to load user spending',
+          style: Theme.of(context)
+              .textTheme
+              .bodyMedium!
+              .copyWith(color: Theme.of(context).colorScheme.errorContainer),
+        ),
+        duration: const Duration(seconds: 3),
+      );
+      ScaffoldMessenger.of(context).clearSnackBars();
+      ScaffoldMessenger.of(context).showSnackBar(loadingSpendingFailure);
+      print('Failed to load user spending due to $e');
+      spending = 0.0;
+    } finally {
+      setState(() {
+        isLoading = false;
+      });
+    }
   }
 }

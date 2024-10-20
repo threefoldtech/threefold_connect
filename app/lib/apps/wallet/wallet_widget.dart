@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -21,6 +20,8 @@ import 'package:threebotlogin/widgets/layout_drawer.dart';
 bool created = false;
 
 class WalletWidget extends StatefulWidget {
+  const WalletWidget({super.key});
+
   @override
   _WalletState createState() => _WalletState();
 }
@@ -40,7 +41,7 @@ class _WalletState extends State<WalletWidget> with AutomaticKeepAliveClientMixi
       Events().emit(GoHomeEvent());
       return;
     }
-    this.webView.goBack();
+    webView.goBack();
   }
 
   _WalletState() {
@@ -50,7 +51,7 @@ class _WalletState extends State<WalletWidget> with AutomaticKeepAliveClientMixi
     iaWebView = InAppWebView(
       initialUrlRequest: URLRequest(
           url: Uri.parse(
-              walletUri + '?cache_buster=' + new DateTime.now().millisecondsSinceEpoch.toString())),
+              '$walletUri?cache_buster=${DateTime.now().millisecondsSinceEpoch}')),
       initialOptions: InAppWebViewGroupOptions(
           crossPlatform: InAppWebViewOptions(
             cacheEnabled: Globals().isCacheClearedWallet,
@@ -60,7 +61,7 @@ class _WalletState extends State<WalletWidget> with AutomaticKeepAliveClientMixi
           ios: IOSInAppWebViewOptions()),
       onWebViewCreated: (InAppWebViewController controller) {
         webView = controller;
-        this.addHandler();
+        addHandler();
       },
       onCreateWindow: (InAppWebViewController controller, CreateWindowAction req) {
         return Future.value(true);
@@ -77,7 +78,7 @@ class _WalletState extends State<WalletWidget> with AutomaticKeepAliveClientMixi
         });
       },
       onConsoleMessage: (InAppWebViewController controller, ConsoleMessage consoleMessage) {
-        print("Wallet console: " + consoleMessage.message);
+        print('Wallet console: ${consoleMessage.message}');
       },
     );
 
@@ -126,18 +127,18 @@ class _WalletState extends State<WalletWidget> with AutomaticKeepAliveClientMixi
     bool slept = await Future.delayed(const Duration(milliseconds: 400), () => true);
     late Barcode result;
     if (slept) {
-      result = await Navigator.push(context, MaterialPageRoute(builder: (context) => ScanScreen()));
+      result = await Navigator.push(context, MaterialPageRoute(builder: (context) => const ScanScreen()));
     }
     return result.code;
   }
 
   addHandler() {
-    webView.addJavaScriptHandler(handlerName: "ADD_IMPORT_WALLET", callback: saveImportedWallet);
-    webView.addJavaScriptHandler(handlerName: "ADD_APP_WALLET", callback: saveAppWallet);
-    webView.addJavaScriptHandler(handlerName: "SCAN_QR", callback: scanQrCode);
-    webView.addJavaScriptHandler(handlerName: "VUE_INITIALIZED", callback: vueInitialized);
-    webView.addJavaScriptHandler(handlerName: "SAVE_WALLETS", callback: saveWalletCallback);
-    webView.addJavaScriptHandler(handlerName: "SIGNING", callback: signCallback);
+    webView.addJavaScriptHandler(handlerName: 'ADD_IMPORT_WALLET', callback: saveImportedWallet);
+    webView.addJavaScriptHandler(handlerName: 'ADD_APP_WALLET', callback: saveAppWallet);
+    webView.addJavaScriptHandler(handlerName: 'SCAN_QR', callback: scanQrCode);
+    webView.addJavaScriptHandler(handlerName: 'VUE_INITIALIZED', callback: vueInitialized);
+    webView.addJavaScriptHandler(handlerName: 'SAVE_WALLETS', callback: saveWalletCallback);
+    webView.addJavaScriptHandler(handlerName: 'SIGNING', callback: signCallback);
   }
 
   signCallback(List<dynamic> params) async {

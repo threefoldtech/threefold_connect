@@ -69,7 +69,8 @@ Future<void> handleKYCData(Map<dynamic, dynamic> emailData,
         jsonDecode(identityData['identityDocumentMeta']),
         identityData['signedIdentityDocumentMetaIdentifier'],
         identityData['identityGender'],
-        identityData['signedIdentityGenderIdentifier']);
+        identityData['signedIdentityGenderIdentifier'],
+        identityData['referenceId']);
   }
 }
 

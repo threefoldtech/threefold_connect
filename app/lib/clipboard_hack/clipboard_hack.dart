@@ -5,7 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 
 void copy(List<dynamic> params) {
-  Clipboard.setData(new ClipboardData(text: params[0]));
+  Clipboard.setData(ClipboardData(text: params[0]));
 }
 
 Future<String?> paste(List<dynamic> params) async {
@@ -15,9 +15,9 @@ Future<String?> paste(List<dynamic> params) async {
 
 Future<void> addClipboardHack(InAppWebViewController webview) async {
   if (Platform.isAndroid) {
-    const oneSec = const Duration(seconds: 1);
+    const oneSec = Duration(seconds: 1);
 
-    new Timer.periodic(oneSec, (Timer t) async {
+    Timer.periodic(oneSec, (Timer t) async {
       await webview.injectJavascriptFileFromAsset(
           assetFilePath: 'assets/clipboardhack.js');
     });
@@ -27,6 +27,6 @@ Future<void> addClipboardHack(InAppWebViewController webview) async {
 }
 
 void addClipboardHandlersOnly(InAppWebViewController webview) {
-  webview.addJavaScriptHandler(handlerName: "COPY", callback: copy);
-  webview.addJavaScriptHandler(handlerName: "PASTE", callback: paste);
+  webview.addJavaScriptHandler(handlerName: 'COPY', callback: copy);
+  webview.addJavaScriptHandler(handlerName: 'PASTE', callback: paste);
 }

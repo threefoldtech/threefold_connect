@@ -3,13 +3,13 @@ import 'package:package_info_plus/package_info_plus.dart';
 import 'package:threebotlogin/helpers/globals.dart';
 
 class ErrorScreen extends StatefulWidget {
+  const ErrorScreen({super.key, this.errorScreen, this.errorMessage = ''});
+
   final Widget? errorScreen;
   final String errorMessage;
 
-  ErrorScreen({Key? key, this.errorScreen, this.errorMessage = ''})
-      : super(key: key);
-
-  _ErrorScreenState createState() => _ErrorScreenState();
+  @override
+  State<ErrorScreen> createState() => _ErrorScreenState();
 }
 
 class _ErrorScreenState extends State<ErrorScreen> {
@@ -29,7 +29,7 @@ class _ErrorScreenState extends State<ErrorScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Error'),
+        title: const Text('Error'),
         elevation: 0.0,
       ),
       body: Column(
@@ -41,21 +41,21 @@ class _ErrorScreenState extends State<ErrorScreen> {
           Icon(
             Icons.warning,
             size: 42.0,
-            color: Theme.of(context).errorColor,
+            color: Theme.of(context).colorScheme.error,
           ),
-          SizedBox(
+          const SizedBox(
             height: 20.0,
           ),
           Text(widget.errorMessage.isEmpty
               ? 'Please update the app before continuing'
               : widget.errorMessage),
-          SizedBox(
+          const SizedBox(
             height: 60.0,
           ),
           Expanded(
             child: Container(),
           ),
-          Text('v ' + version + (Globals.isInDebugMode ? '-DEBUG' : '')),
+          Text('v $version${Globals.isInDebugMode ? '-DEBUG' : ''}'),
         ],
       ),
     );

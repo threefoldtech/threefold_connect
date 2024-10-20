@@ -8,17 +8,18 @@ emailVerificationDialog(context) {
     barrierDismissible: false,
     builder: (BuildContext context) => CustomDialog(
       image: Icons.error,
-      title: "Please verify email",
-      description: "Please verify email before using this app",
+      type: DialogType.Error,
+      title: 'Please verify email',
+      description: 'Please verify email before using this app',
       actions: <Widget>[
         TextButton(
-          child: new Text("Ok"),
+          child: const Text('Close'),
           onPressed: () {
             Navigator.pop(context);
           },
         ),
         TextButton(
-          child: new Text("Resend email"),
+          child: const Text('Resend email'),
           onPressed: () async {
             sendVerificationEmail();
             Navigator.pop(context);
@@ -36,11 +37,11 @@ emailResentDialog(context) {
     barrierDismissible: false,
     builder: (BuildContext context) => CustomDialog(
       image: Icons.check,
-      title: "Email has been resent.",
-      description: "A new verification email has been sent.",
+      title: 'Email has been resent.',
+      description: 'A new verification email has been sent.',
       actions: <Widget>[
         TextButton(
-          child: new Text("Ok"),
+          child: const Text('Close'),
           onPressed: () {
             Navigator.pop(context);
           },

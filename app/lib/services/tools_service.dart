@@ -5,11 +5,11 @@ import 'dart:math';
 
 import 'package:device_info_plus/device_info_plus.dart';
 
-const chars = "abcdefghijklmnopqrstuvwxyz0123456789";
+const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
 
 String randomString(int len) {
-  Random rnd = new Random(new DateTime.now().millisecondsSinceEpoch);
-  String result = "";
+  Random rnd = Random(DateTime.now().millisecondsSinceEpoch);
+  String result = '';
 
   for (int i = 0; i < len; i++) {
     result += chars[rnd.nextInt(chars.length)];
@@ -19,16 +19,16 @@ String randomString(int len) {
 }
 
 bool validateEmail(String? value) {
-  RegExp regex = new RegExp(
+  RegExp regex = RegExp(
       r"^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,253}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,253}[a-zA-Z0-9])?)*$");
   return regex.hasMatch(value.toString());
 }
 
 bool validateSeedWords(String seed, String confirmationWords) {
-  List<String> words = confirmationWords.split(" ");
-  List<String> seedWords = seed.split(" ");
+  List<String> words = confirmationWords.split(' ');
+  List<String> seedWords = seed.split(' ');
 
-  // if lenght is not correct return already here
+  // if length is not correct return already here
   if (words.length != 3) return false;
 
   for (final String word in words) {
@@ -42,7 +42,7 @@ bool validateSeedWords(String seed, String confirmationWords) {
 
 bool validateDoubleName(String value) {
   Pattern pattern = r'^[a-zA-Z0-9]+$';
-  RegExp regex = new RegExp(pattern.toString());
+  RegExp regex = RegExp(pattern.toString());
 
   if (!regex.hasMatch(value)) {
     return false;
@@ -70,15 +70,11 @@ Future<String> getDeviceInfo() async {
   String info = '';
   if (Platform.isIOS) {
     IosDeviceInfo i = await deviceInfoPlugin.iosInfo;
-    info = 'IOS_' + i.systemVersion.toString();
+    info = 'IOS_${i.systemVersion.toString()}';
   } else if (Platform.isAndroid) {
     AndroidDeviceInfo i = await deviceInfoPlugin.androidInfo;
-    info = 'ANDROID_' +
-        i.brand.toString().replaceAll(' ', '').toUpperCase() +
-        '_' +
-        i.model.toString().replaceAll(' ', '').toUpperCase() +
-        '_SDK' +
-        i.version.sdkInt.toString();
+    info =
+        'ANDROID_${i.brand.toString().replaceAll(" ", "").toUpperCase()}_${i.model.toString().replaceAll(" ", "").toUpperCase()}_SDK${i.version.sdkInt}';
   }
 
   return info;
@@ -86,6 +82,6 @@ Future<String> getDeviceInfo() async {
 
 extension BoolParsing on String {
   bool parseBool() {
-    return this.toLowerCase() == 'true';
+    return toLowerCase() == 'true';
   }
 }

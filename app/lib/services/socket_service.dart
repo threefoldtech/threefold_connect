@@ -43,7 +43,7 @@ class BackendConnection {
       print('[connect]');
 
       socket.emit('join', {'room': doubleName.toLowerCase(), 'app': true});
-      print('Joined room: ' + doubleName.toLowerCase());
+      print('Joined room: ${doubleName.toLowerCase()}');
     });
 
     socket.on('email_verification', (_) {
@@ -55,7 +55,7 @@ class BackendConnection {
 
     socket.on('login', (dynamic data) async {
       print('[login]');
-      int currentTimestamp = new DateTime.now().millisecondsSinceEpoch;
+      int currentTimestamp = DateTime.now().millisecondsSinceEpoch;
 
       if (data['created'] != null &&
           ((currentTimestamp - data['created']) / 1000) >
@@ -83,7 +83,7 @@ class BackendConnection {
   void closeSocketConnection(CloseSocketEvent event) {
     print('Closing socket connection');
 
-    print('Leaving room: ' + doubleName);
+    print('Leaving room: $doubleName');
     socket.emit('leave', {'room': doubleName});
 
     socket.clearListeners();
@@ -118,10 +118,10 @@ Future emailVerification(BuildContext context) async {
   }
 
   Map<String, dynamic> body = jsonDecode(response.body);
-  String? signedEmailIdentifier = body["signed_email_identifier"];
+  String? signedEmailIdentifier = body['signed_email_identifier'];
 
   if (signedEmailIdentifier == null || signedEmailIdentifier.isEmpty) {
-    await saveEmail(email["email"]!, null);
+    await saveEmail(email['email']!, null);
   }
 
   var vSei = jsonDecode(
@@ -133,17 +133,17 @@ Future emailVerification(BuildContext context) async {
   }
 
   await setIsEmailVerified(true);
-  await saveEmail(vSei["email"], signedEmailIdentifier);
+  await saveEmail(vSei['email'], signedEmailIdentifier);
 
   showDialog(
     context: context,
     builder: (BuildContext context) => CustomDialog(
       image: Icons.email,
-      title: "Email verified",
-      description: "Your email has been verified!",
+      title: 'Email verified',
+      description: 'Your email has been verified!',
       actions: <Widget>[
         TextButton(
-          child: new Text("Ok"),
+          child: const Text('Close'),
           onPressed: () {
             Navigator.pop(context);
           },
@@ -167,9 +167,9 @@ Future phoneVerification(BuildContext context) async {
   }
 
   Map<String, dynamic> body = jsonDecode(response.body);
-  String? signedPhoneIdentifier = body["signed_phone_identifier"];
+  String? signedPhoneIdentifier = body['signed_phone_identifier'];
   if (signedPhoneIdentifier == null || signedPhoneIdentifier.isEmpty) {
-    await savePhone(phone["phone"]!, null);
+    await savePhone(phone['phone']!, null);
   }
 
   var vSpi = jsonDecode(
@@ -181,17 +181,17 @@ Future phoneVerification(BuildContext context) async {
   }
 
   await setIsPhoneVerified(true);
-  await savePhone(vSpi["phone"], signedPhoneIdentifier);
+  await savePhone(vSpi['phone'], signedPhoneIdentifier);
 
   showDialog(
     context: context,
     builder: (BuildContext context) => CustomDialog(
       image: Icons.phone_android,
-      title: "Phone verified",
-      description: "Your phone has been verified!",
+      title: 'Phone verified',
+      description: 'Your phone has been verified!',
       actions: <Widget>[
         TextButton(
-          child: new Text("Ok"),
+          child: const Text('Close'),
           onPressed: () {
             Navigator.pop(context);
           },
@@ -207,13 +207,14 @@ Future showIdentityMessage(BuildContext context, String type) async {
       return showDialog(
         context: context,
         builder: (BuildContext context) => CustomDialog(
+          type: DialogType.Warning,
           image: Icons.warning,
-          title: "Identity verify timed out",
+          title: 'Identity verify timed out',
           description:
-              "Your verification attempt has expired, please retry and finish the flow in under 10 minutes.",
+              'Your verification attempt has expired, please retry and finish the flow in under 10 minutes.',
           actions: <Widget>[
             TextButton(
-              child: new Text("Ok"),
+              child: const Text('Close'),
               onPressed: () {
                 Navigator.pop(context);
               },
@@ -226,13 +227,14 @@ Future showIdentityMessage(BuildContext context, String type) async {
       return showDialog(
         context: context,
         builder: (BuildContext context) => CustomDialog(
-          image: Icons.warning,
-          title: "Identity verify failed",
+          type: DialogType.Error,
+          image: Icons.error,
+          title: 'Identity verify failed',
           description:
-              "Something went wrong.\nIf this issue persist, please contact support",
+              'Something went wrong.\nIf this issue persist, please contact support',
           actions: <Widget>[
             TextButton(
-              child: new Text("Ok"),
+              child: const Text('Close'),
               onPressed: () {
                 Navigator.pop(context);
               },
@@ -246,11 +248,11 @@ Future showIdentityMessage(BuildContext context, String type) async {
       context: context,
       builder: (BuildContext context) => CustomDialog(
         image: Icons.check,
-        title: "Identity verified",
-        description: "Your identity has been verified successfully",
+        title: 'Identity verified',
+        description: 'Your identity has been verified successfully',
         actions: <Widget>[
           TextButton(
-            child: new Text("Ok"),
+            child: const Text('Close'),
             onPressed: () {
               Navigator.pop(context);
             },
@@ -272,15 +274,15 @@ Future identityVerification(String reference) async {
   Map<String, dynamic> identifiersData = json.decode(response.body);
 
   String signedIdentityNameIdentifier =
-      identifiersData["signed_identity_name_identifier"];
+      identifiersData['signed_identity_name_identifier'];
   String signedIdentityCountryIdentifier =
-      identifiersData["signed_identity_country_identifier"];
+      identifiersData['signed_identity_country_identifier'];
   String signedIdentityDOBIdentifier =
-      identifiersData["signed_identity_dob_identifier"];
+      identifiersData['signed_identity_dob_identifier'];
   String signedIdentityDocumentMetaIdentifier =
-      identifiersData["signed_identity_document_meta_identifier"];
+      identifiersData['signed_identity_document_meta_identifier'];
   String signedIdentityGenderIdentifier =
-      identifiersData["signed_identity_gender_identifier"];
+      identifiersData['signed_identity_gender_identifier'];
 
   if (signedIdentityNameIdentifier.isEmpty ||
       signedIdentityCountryIdentifier.isEmpty ||
@@ -301,15 +303,15 @@ Future identityVerification(String reference) async {
           .body);
 
   var verifiedSignedIdentityNameIdentifier =
-      jsonDecode(identifiers["signedIdentityNameIdentifierVerified"]);
+      jsonDecode(identifiers['signedIdentityNameIdentifierVerified']);
   var verifiedSignedIdentityCountryIdentifier =
-      jsonDecode(identifiers["signedIdentityCountryIdentifierVerified"]);
+      jsonDecode(identifiers['signedIdentityCountryIdentifierVerified']);
   var verifiedSignedIdentityDOBIdentifier =
-      jsonDecode(identifiers["signedIdentityDOBIdentifierVerified"]);
+      jsonDecode(identifiers['signedIdentityDOBIdentifierVerified']);
   var verifiedSignedIdentityDocumentMetaIdentifier =
-      jsonDecode(identifiers["signedIdentityDocumentMetaIdentifierVerified"]);
+      jsonDecode(identifiers['signedIdentityDocumentMetaIdentifierVerified']);
   var verifiedSignedIdentityGenderIdentifier =
-      jsonDecode(identifiers["signedIdentityGenderIdentifierVerified"]);
+      jsonDecode(identifiers['signedIdentityGenderIdentifierVerified']);
 
   if (verifiedSignedIdentityNameIdentifier == null ||
       verifiedSignedIdentityNameIdentifier['identifier'].toString() !=
@@ -353,7 +355,8 @@ Future identityVerification(String reference) async {
       verifiedSignedIdentityDocumentMetaIdentifier['document_meta_data'],
       signedIdentityDocumentMetaIdentifier,
       verifiedSignedIdentityGenderIdentifier['gender_data'],
-      signedIdentityGenderIdentifier);
+      signedIdentityGenderIdentifier,
+      reference);
 
   return 'Verified';
 }
@@ -373,7 +376,7 @@ Future openSign(BuildContext ctx, Sign signData,
     ctx,
     MaterialPageRoute(
       builder: (context) => AuthenticationScreen(
-          correctPin: pin!, userMessage: "Please enter your PIN code"),
+          correctPin: pin!, userMessage: 'Please enter your PIN code'),
     ),
   );
 
@@ -418,7 +421,7 @@ Future openLogin(BuildContext ctx, Login loginData,
     MaterialPageRoute(
       builder: (context) => AuthenticationScreen(
           correctPin: pin!,
-          userMessage: "Please enter your PIN code.",
+          userMessage: 'Please enter your PIN code.',
           loginData: loginData),
     ),
   );
@@ -431,7 +434,7 @@ Future openLogin(BuildContext ctx, Login loginData,
     bool? warningScreenCompleted = await Navigator.push(
       ctx,
       MaterialPageRoute(
-        builder: (context) => WarningScreen(),
+        builder: (context) => const WarningScreen(),
       ),
     );
 

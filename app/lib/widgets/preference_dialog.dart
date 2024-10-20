@@ -13,9 +13,11 @@ class PreferenceDialog extends StatefulWidget {
   final Function? callback;
   final String? type;
 
-  PreferenceDialog({this.scope, this.appId, this.callback, this.type});
+  const PreferenceDialog(
+      {super.key, this.scope, this.appId, this.callback, this.type});
 
-  _PreferenceDialogState createState() => _PreferenceDialogState();
+  @override
+  State<PreferenceDialog> createState() => _PreferenceDialogState();
 }
 
 class _PreferenceDialogState extends State<PreferenceDialog> {
@@ -113,16 +115,16 @@ class _PreferenceDialogState extends State<PreferenceDialog> {
   void initializeDropDown() {
     getWallets().then((value) {
       setState(() {
-        if (value.length != 0) {
+        if (value.isNotEmpty) {
           wallets = value;
-          if (wallets.length != 0) {
+          if (wallets.isNotEmpty) {
             _selectedItem = wallets[0].address;
             toggleScope('walletAddressData', _selectedItem);
             _menuItems = List.generate(
               wallets.length,
               (i) => DropdownMenuItem(
                 value: wallets[i].address,
-                child: Text("${wallets[i].name}"),
+                child: Text(wallets[i].name),
               ),
             );
           } else {
@@ -153,7 +155,7 @@ class _PreferenceDialogState extends State<PreferenceDialog> {
                   if (scopeAsMap[scopeItem] != null) {
                     bool mandatory = scopeAsMap[scopeItem];
                     switch (scopeItem) {
-                      case "doubleName":
+                      case 'doubleName':
                         return FutureBuilder(
                           future: getDoubleName(),
                           builder:
@@ -163,7 +165,8 @@ class _PreferenceDialogState extends State<PreferenceDialog> {
                                 decoration: BoxDecoration(
                                   border: Border(
                                       bottom: BorderSide(
-                                    color: Colors.grey,
+                                    color:
+                                        Theme.of(context).colorScheme.onSurface,
                                     width: 0.5,
                                   )),
                                 ),
@@ -178,21 +181,27 @@ class _PreferenceDialogState extends State<PreferenceDialog> {
                                           toggleScope(scopeItem, value);
                                         }),
                                   title: Text(
-                                    "${scopeItem.toUpperCase()}" +
-                                        (mandatory ? " *" : ""),
-                                    style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.black),
+                                    scopeItem.toUpperCase() +
+                                        (mandatory ? ' *' : ''),
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .bodyLarge!
+                                        .copyWith(
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .onSurface,
+                                          fontWeight: FontWeight.bold,
+                                        ),
                                   ),
                                 ),
                               );
                             } else {
-                              return SizedBox(width: 0, height: 0);
+                              return const SizedBox(width: 0, height: 0);
                             }
                           },
                         );
 
-                      case "email":
+                      case 'email':
                         return FutureBuilder(
                           future: getEmail(),
                           builder:
@@ -202,7 +211,8 @@ class _PreferenceDialogState extends State<PreferenceDialog> {
                                 decoration: BoxDecoration(
                                   border: Border(
                                       bottom: BorderSide(
-                                    color: Colors.grey,
+                                    color:
+                                        Theme.of(context).colorScheme.onSurface,
                                     width: 0.5,
                                   )),
                                 ),
@@ -217,26 +227,32 @@ class _PreferenceDialogState extends State<PreferenceDialog> {
                                           toggleScope(scopeItem, value);
                                         }),
                                   title: Text(
-                                    "${scopeItem.toUpperCase()}" +
-                                        (mandatory ? " *" : ""),
-                                    style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.black),
+                                    scopeItem.toUpperCase() +
+                                        (mandatory ? ' *' : ''),
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .bodyLarge!
+                                        .copyWith(
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .onSurface,
+                                          fontWeight: FontWeight.bold,
+                                        ),
                                   ),
                                 ),
                               );
                             } else {
-                              return SizedBox(width: 0, height: 0);
+                              return const SizedBox(width: 0, height: 0);
                             }
                           },
                         );
 
-                      case "digitalTwin":
+                      case 'digitalTwin':
                         return Container(
                           decoration: BoxDecoration(
                             border: Border(
                                 bottom: BorderSide(
-                              color: Colors.grey,
+                              color: Theme.of(context).colorScheme.onSurface,
                               width: 0.5,
                             )),
                           ),
@@ -250,22 +266,34 @@ class _PreferenceDialogState extends State<PreferenceDialog> {
                                     toggleScope(scopeItem, value);
                                   }),
                             title: Text(
-                              "${scopeItem.toUpperCase()}" +
-                                  (mandatory ? " *" : ""),
-                              style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.black),
+                              scopeItem.toUpperCase() + (mandatory ? ' *' : ''),
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodyLarge!
+                                  .copyWith(
+                                    color:
+                                        Theme.of(context).colorScheme.onSurface,
+                                    fontWeight: FontWeight.bold,
+                                  ),
                             ),
                           ),
                         );
 
-                      case "phone":
+                      case 'phone':
                         return FutureBuilder(
                           future: getPhone(),
                           builder:
                               (BuildContext context, AsyncSnapshot snapshot) {
                             if (snapshot.hasData) {
                               return Container(
+                                decoration: BoxDecoration(
+                                  border: Border(
+                                      bottom: BorderSide(
+                                    color:
+                                        Theme.of(context).colorScheme.onSurface,
+                                    width: 0.5,
+                                  )),
+                                ),
                                 child: CheckboxListTile(
                                   value:
                                       (previousSelectedScope[scopeItem] == null)
@@ -277,27 +305,26 @@ class _PreferenceDialogState extends State<PreferenceDialog> {
                                           toggleScope(scopeItem, value);
                                         }),
                                   title: Text(
-                                    "PHONE NUMBER" + (mandatory ? " *" : ""),
-                                    style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.black),
+                                    'PHONE NUMBER${(mandatory ? " *" : "")}',
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .bodyLarge!
+                                        .copyWith(
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .onSurface,
+                                          fontWeight: FontWeight.bold,
+                                        ),
                                   ),
-                                ),
-                                decoration: BoxDecoration(
-                                  border: Border(
-                                      bottom: BorderSide(
-                                    color: Colors.grey,
-                                    width: 0.5,
-                                  )),
                                 ),
                               );
                             } else {
-                              return SizedBox(width: 0, height: 0);
+                              return const SizedBox(width: 0, height: 0);
                             }
                           },
                         );
 
-                      case "derivedSeed":
+                      case 'derivedSeed':
                         return FutureBuilder(
                           future: getDerivedSeed(widget.appId!),
                           builder:
@@ -307,7 +334,8 @@ class _PreferenceDialogState extends State<PreferenceDialog> {
                                 decoration: BoxDecoration(
                                   border: Border(
                                       bottom: BorderSide(
-                                    color: Colors.grey,
+                                    color:
+                                        Theme.of(context).colorScheme.onSurface,
                                     width: 0.5,
                                   )),
                                 ),
@@ -322,21 +350,27 @@ class _PreferenceDialogState extends State<PreferenceDialog> {
                                           toggleScope(scopeItem, value);
                                         }),
                                   title: Text(
-                                    "${scopeItem.toUpperCase()}" +
-                                        (mandatory ? " *" : ""),
-                                    style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.black),
+                                    scopeItem.toUpperCase() +
+                                        (mandatory ? ' *' : ''),
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .bodyLarge!
+                                        .copyWith(
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .onSurface,
+                                          fontWeight: FontWeight.bold,
+                                        ),
                                   ),
                                 ),
                               );
                             } else {
-                              return SizedBox(width: 0, height: 0);
+                              return const SizedBox(width: 0, height: 0);
                             }
                           },
                         );
 
-                      case "identityName":
+                      case 'identityName':
                         return FutureBuilder(
                           future: getIdentity(),
                           builder:
@@ -346,7 +380,8 @@ class _PreferenceDialogState extends State<PreferenceDialog> {
                                 decoration: BoxDecoration(
                                   border: Border(
                                       bottom: BorderSide(
-                                    color: Colors.grey,
+                                    color:
+                                        Theme.of(context).colorScheme.onSurface,
                                     width: 0.5,
                                   )),
                                 ),
@@ -361,20 +396,26 @@ class _PreferenceDialogState extends State<PreferenceDialog> {
                                           toggleScope(scopeItem, value);
                                         }),
                                   title: Text(
-                                    "NAME (IDENTITY)" + (mandatory ? " *" : ""),
-                                    style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.black),
+                                    'NAME (IDENTITY)${(mandatory ? " *" : "")}',
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .bodyLarge!
+                                        .copyWith(
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .onSurface,
+                                          fontWeight: FontWeight.bold,
+                                        ),
                                   ),
                                 ),
                               );
                             } else {
-                              return SizedBox(width: 0, height: 0);
+                              return const SizedBox(width: 0, height: 0);
                             }
                           },
                         );
 
-                      case "identityDOB":
+                      case 'identityDOB':
                         return FutureBuilder(
                           future: getIdentity(),
                           builder:
@@ -384,7 +425,8 @@ class _PreferenceDialogState extends State<PreferenceDialog> {
                                 decoration: BoxDecoration(
                                   border: Border(
                                       bottom: BorderSide(
-                                    color: Colors.grey,
+                                    color:
+                                        Theme.of(context).colorScheme.onSurface,
                                     width: 0.5,
                                   )),
                                 ),
@@ -399,21 +441,26 @@ class _PreferenceDialogState extends State<PreferenceDialog> {
                                           toggleScope(scopeItem, value);
                                         }),
                                   title: Text(
-                                    "DATE OF BIRTH (IDENTITY)" +
-                                        (mandatory ? " *" : ""),
-                                    style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.black),
+                                    'DATE OF BIRTH (IDENTITY)${(mandatory ? " *" : "")}',
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .bodyLarge!
+                                        .copyWith(
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .onSurface,
+                                          fontWeight: FontWeight.bold,
+                                        ),
                                   ),
                                 ),
                               );
                             } else {
-                              return SizedBox(width: 0, height: 0);
+                              return const SizedBox(width: 0, height: 0);
                             }
                           },
                         );
 
-                      case "identityGender":
+                      case 'identityGender':
                         return FutureBuilder(
                           future: getIdentity(),
                           builder:
@@ -423,7 +470,8 @@ class _PreferenceDialogState extends State<PreferenceDialog> {
                                 decoration: BoxDecoration(
                                   border: Border(
                                       bottom: BorderSide(
-                                    color: Colors.grey,
+                                    color:
+                                        Theme.of(context).colorScheme.onSurface,
                                     width: 0.5,
                                   )),
                                 ),
@@ -438,21 +486,26 @@ class _PreferenceDialogState extends State<PreferenceDialog> {
                                           toggleScope(scopeItem, value);
                                         }),
                                   title: Text(
-                                    "GENDER (IDENTITY)" +
-                                        (mandatory ? " *" : ""),
-                                    style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.black),
+                                    'GENDER (IDENTITY)${(mandatory ? " *" : "")}',
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .bodyLarge!
+                                        .copyWith(
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .onSurface,
+                                          fontWeight: FontWeight.bold,
+                                        ),
                                   ),
                                 ),
                               );
                             } else {
-                              return SizedBox(width: 0, height: 0);
+                              return const SizedBox(width: 0, height: 0);
                             }
                           },
                         );
 
-                      case "identityDocumentMeta":
+                      case 'identityDocumentMeta':
                         return FutureBuilder(
                           future: getIdentity(),
                           builder:
@@ -462,7 +515,8 @@ class _PreferenceDialogState extends State<PreferenceDialog> {
                                 decoration: BoxDecoration(
                                   border: Border(
                                       bottom: BorderSide(
-                                    color: Colors.grey,
+                                    color:
+                                        Theme.of(context).colorScheme.onSurface,
                                     width: 0.5,
                                   )),
                                 ),
@@ -477,21 +531,26 @@ class _PreferenceDialogState extends State<PreferenceDialog> {
                                           toggleScope(scopeItem, value);
                                         }),
                                   title: Text(
-                                    "DOCUMENT META DATA (IDENTITY)" +
-                                        (mandatory ? " *" : ""),
-                                    style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.black),
+                                    'DOCUMENT META DATA (IDENTITY)${(mandatory ? " *" : "")}',
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .bodyLarge!
+                                        .copyWith(
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .onSurface,
+                                          fontWeight: FontWeight.bold,
+                                        ),
                                   ),
                                 ),
                               );
                             } else {
-                              return SizedBox(width: 0, height: 0);
+                              return const SizedBox(width: 0, height: 0);
                             }
                           },
                         );
 
-                      case "identityCountry":
+                      case 'identityCountry':
                         return FutureBuilder(
                           future: getIdentity(),
                           builder:
@@ -501,7 +560,8 @@ class _PreferenceDialogState extends State<PreferenceDialog> {
                                 decoration: BoxDecoration(
                                   border: Border(
                                       bottom: BorderSide(
-                                    color: Colors.grey,
+                                    color:
+                                        Theme.of(context).colorScheme.onSurface,
                                     width: 0.5,
                                   )),
                                 ),
@@ -516,21 +576,26 @@ class _PreferenceDialogState extends State<PreferenceDialog> {
                                           toggleScope(scopeItem, value);
                                         }),
                                   title: Text(
-                                    "COUNTRY (IDENTITY)" +
-                                        (mandatory ? " *" : ""),
-                                    style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.black),
+                                    'COUNTRY (IDENTITY)${(mandatory ? " *" : "")}',
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .bodyLarge!
+                                        .copyWith(
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .onSurface,
+                                          fontWeight: FontWeight.bold,
+                                        ),
                                   ),
                                 ),
                               );
                             } else {
-                              return SizedBox(width: 0, height: 0);
+                              return const SizedBox(width: 0, height: 0);
                             }
                           },
                         );
 
-                      case "walletAddress":
+                      case 'walletAddress':
                         return FutureBuilder(
                             future: getWallets(),
                             builder:
@@ -541,11 +606,13 @@ class _PreferenceDialogState extends State<PreferenceDialog> {
                                     decoration: BoxDecoration(
                                       border: Border(
                                           bottom: BorderSide(
-                                        color: Colors.grey,
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .onSurface,
                                         width: 0.5,
                                       )),
                                     ),
-                                    padding: EdgeInsets.only(
+                                    padding: const EdgeInsets.only(
                                         left: 16, right: 25, top: 8),
                                     child: Column(
                                       children: [
@@ -554,24 +621,29 @@ class _PreferenceDialogState extends State<PreferenceDialog> {
                                               MainAxisAlignment.spaceBetween,
                                           children: [
                                             Text(
-                                              "${scopeItem.toUpperCase()}" +
-                                                  (mandatory ? " *" : ""),
-                                              style: TextStyle(
-                                                  fontWeight: FontWeight.bold,
-                                                  color: Colors.black,
-                                                  fontSize: 16),
+                                              scopeItem.toUpperCase() +
+                                                  (mandatory ? ' *' : ''),
+                                              style: Theme.of(context)
+                                                  .textTheme
+                                                  .bodyLarge!
+                                                  .copyWith(
+                                                    color: Theme.of(context)
+                                                        .colorScheme
+                                                        .onSurface,
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
                                             ),
-                                            Icon(
+                                            const Icon(
                                               Icons.warning,
                                               size: 24,
                                               color: Colors.red,
                                             ),
                                           ],
                                         ),
-                                        Padding(
+                                        const Padding(
                                             padding:
                                                 EdgeInsets.only(bottom: 6)),
-                                        Row(children: [
+                                        const Row(children: [
                                           Flexible(
                                               child: Text(
                                             'The wallet inside ThreeFold Connect should have been opened at least once.',
@@ -587,7 +659,8 @@ class _PreferenceDialogState extends State<PreferenceDialog> {
                                 decoration: BoxDecoration(
                                   border: Border(
                                       bottom: BorderSide(
-                                    color: Colors.grey,
+                                    color:
+                                        Theme.of(context).colorScheme.onSurface,
                                     width: 0.5,
                                   )),
                                 ),
@@ -615,21 +688,27 @@ class _PreferenceDialogState extends State<PreferenceDialog> {
                                                   toggleScope(scopeItem, value);
                                                 }),
                                           title: Text(
-                                            "${scopeItem.toUpperCase()}" +
-                                                (mandatory ? " *" : ""),
-                                            style: TextStyle(
-                                                fontWeight: FontWeight.bold,
-                                                color: Colors.black),
+                                            scopeItem.toUpperCase() +
+                                                (mandatory ? ' *' : ''),
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .bodyLarge!
+                                                .copyWith(
+                                                  color: Theme.of(context)
+                                                      .colorScheme
+                                                      .onSurface,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
                                           ),
                                         ))
                                       ],
                                     ),
                                     Row(
                                       children: [
-                                        Padding(
+                                        const Padding(
                                           padding: EdgeInsets.only(left: 16),
                                         ),
-                                        Container(
+                                        SizedBox(
                                             width: MediaQuery.of(context)
                                                     .size
                                                     .width *
@@ -655,7 +734,7 @@ class _PreferenceDialogState extends State<PreferenceDialog> {
                             });
                     }
                   }
-                  return SizedBox(width: 0, height: 0);
+                  return const SizedBox(width: 0, height: 0);
                 },
               ))
           : const Text('No extra permissions needed.'),
@@ -668,20 +747,20 @@ class _PreferenceDialogState extends State<PreferenceDialog> {
       return Container();
     }
 
-    return Container(
-      child: Column(
-        children: [
-          Container(
-            padding: EdgeInsets.all(8),
-            child: Text(
-              '${widget.appId}  would like to access',
-              style: TextStyle(fontWeight: FontWeight.bold),
-              textAlign: TextAlign.center,
-            ),
+    return Column(
+      children: [
+        Container(
+          padding: const EdgeInsets.all(8),
+          child: Text(
+            '${widget.appId}  would like to access',
+            style: Theme.of(context).textTheme.bodyLarge!.copyWith(
+                fontWeight: FontWeight.bold,
+                color: Theme.of(context).colorScheme.onSurface),
+            textAlign: TextAlign.center,
           ),
-          Container(child: scopeList(context))
-        ],
-      ),
+        ),
+        Container(child: scopeList(context))
+      ],
     );
   }
 }

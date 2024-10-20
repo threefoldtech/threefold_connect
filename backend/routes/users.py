@@ -197,19 +197,20 @@ def set_phone_verified_handler(doublename):
     return Response("Ok")
 
 
-@ api_users.route("/change-email", methods=["POST"])
-def change_email_for_user():
+@ api_users.route("/update", methods=["POST"])
+def update_user():
     body = request.get_json()
 
     if body is None:
-        return Response('Body cannot be empty', status=404)
+        return Response('Body cannot be empty', status=400)
 
     username = body.get('username')
-    email = body.get('email')
-    if username is None or email is None:
-        return Response("Username is empty or Email is empty", status=404)
+    field = body.get('field')
+    value = body.get('value')
+    if username is None or field is None or value is None:
+        return Response("Username, Field, or Value is empty", status=400)
 
-    logger.debug("Change email for user %s", username)
+    logger.debug(f"Change {field} for user {username}")
     user = db.get_user_by_double_name(username)
 
     if user is None:
@@ -222,8 +223,8 @@ def change_email_for_user():
             logger.debug("Response of verification is of instance Response, Failed to Verify.")
             return signed_data_verification_response
 
-        db.update_user_email(username, email)
-        return Response("Successfully updated email address", status=200)
+        db.update_user(username, field, value)
+        return Response(f"Successfully updated {field}", status=200)
 
     except Exception as e:
         print(e)

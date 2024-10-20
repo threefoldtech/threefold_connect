@@ -1,32 +1,32 @@
 class Events {
-  static final Events _singleton = new Events._internal();
+  static final Events _singleton = Events._internal();
 
   factory Events() {
     return _singleton;
   }
 
-  Map<Type, dynamic> eventList = Map<Type, dynamic>();
+  Map<Type, dynamic> eventList = <Type, dynamic>{};
 
   Events._internal(); // init here
 
   onEvent(Type eventType, Function function) {
-    if (this.eventList[eventType] == null) {
-      this.eventList[eventType] = [];
+    if (eventList[eventType] == null) {
+      eventList[eventType] = [];
     }
-    this.eventList[eventType].add(function);
+    eventList[eventType].add(function);
   }
 
   emit(var event) {
     var eventType = event.runtimeType;
-    if (this.eventList[eventType] == null) {
+    if (eventList[eventType] == null) {
       return;
     }
-    for (var function in this.eventList[eventType]) {
+    for (var function in eventList[eventType]) {
       function(event);
     }
   }
 
   reset() {
-    eventList = Map<Type, dynamic>();
+    eventList = <Type, dynamic>{};
   }
 }

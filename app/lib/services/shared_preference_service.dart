@@ -8,6 +8,7 @@ import 'package:threebotlogin/helpers/globals.dart';
 import 'package:threebotlogin/models/wallet_data.dart';
 import 'package:threebotlogin/services/3bot_service.dart';
 import 'package:threebotlogin/services/crypto_service.dart';
+import 'package:threebotlogin/services/open_kyc_service.dart';
 import 'package:threebotlogin/services/pkid_service.dart';
 import 'package:pinenacl/api.dart';
 import 'package:pinenacl/tweetnacl.dart' show TweetNaClExt;
@@ -30,11 +31,11 @@ Future<Uint8List> getPublicKey() async {
 
   var userInfoResponse = await getUserInfo(await getDoubleName());
   if (userInfoResponse.statusCode != 200) {
-    throw new Exception('User not found');
+    throw Exception('User not found');
   }
 
   var userInfo = json.decode(userInfoResponse.body);
-  var done = await prefs.setString("publickey", userInfo['publicKey']);
+  var done = await prefs.setString('publickey', userInfo['publicKey']);
 
   if (done && prefs.getString('publickey') == userInfo['publicKey']) {
     setPublicKeyFixed();
@@ -120,6 +121,19 @@ Future<String?> getPhrase() async {
   return prefs.getString('phrase');
 }
 
+Future<void> saveTwinId(int twinId) async {
+  final SharedPreferences prefs = await SharedPreferences.getInstance();
+  prefs.remove('twinId');
+
+  prefs.setInt('twinId', twinId);
+  updateUserData("twinId", twinId.toString());
+}
+
+Future<int?> getTwinId() async {
+  final SharedPreferences prefs = await SharedPreferences.getInstance();
+  return prefs.getInt('twinId');
+}
+
 ///
 ///
 /// Email methods in Shared Preferences
@@ -160,6 +174,7 @@ Future<void> saveEmail(String email, String? signedEmailIdentifier) async {
     prefs.setString('signedEmailIdentifier', signedEmailIdentifier);
     client.setPKidDoc(
         'email', json.encode({'email': email, 'sei': signedEmailIdentifier}));
+    updateUserData("email", email);
     return;
   }
 
@@ -207,6 +222,7 @@ Future<void> savePhone(String phone, String? signedPhoneIdentifier) async {
     prefs.setString('signedPhoneIdentifier', signedPhoneIdentifier);
     client.setPKidDoc(
         'phone', json.encode({'phone': phone, 'spi': signedPhoneIdentifier}));
+    updateUserData("phone", phone);
     return;
   }
 
@@ -261,7 +277,8 @@ Future<void> saveIdentity(
     Map<String, dynamic> identityDocumentMeta,
     String signedIdentityDocumentMetaIdentifier,
     String identityGender,
-    String signedIdentityGenderIdentifier) async {
+    String signedIdentityGenderIdentifier,
+    String referenceId) async {
   final SharedPreferences prefs = await SharedPreferences.getInstance();
   prefs.remove('identityName');
   prefs.remove('identityCountry');
@@ -301,8 +318,10 @@ Future<void> saveIdentity(
         'signedIdentityDocumentMetaIdentifier':
             signedIdentityDocumentMetaIdentifier,
         'identityGender': identityGender,
-        'signedIdentityGenderIdentifier': signedIdentityGenderIdentifier
+        'signedIdentityGenderIdentifier': signedIdentityGenderIdentifier,
+        'referenceId': referenceId
       }));
+  updateUserData('identity_reference', referenceId);
 
   Globals().identityVerified.value = true;
 }
@@ -413,12 +432,12 @@ Future<bool> getInitDone() async {
 
 Future<bool> savePreviousState(String state) async {
   final SharedPreferences prefs = await SharedPreferences.getInstance();
-  return await prefs.setString("previousState", state);
+  return await prefs.setString('previousState', state);
 }
 
 Future<String?> getPreviousState() async {
   final SharedPreferences prefs = await SharedPreferences.getInstance();
-  return prefs.getString("previousState");
+  return prefs.getString('previousState');
 }
 
 ///
@@ -520,4 +539,17 @@ Future<bool?> isPKidMigrationIssueSolved() async {
 Future<void> setPKidMigrationIssueSolved(bool isFixed) async {
   final SharedPreferences prefs = await SharedPreferences.getInstance();
   await prefs.setBool('isPkidMigrationIssueSolved', isFixed);
+}
+
+Future<void> setTheme(String theme) async {
+  final SharedPreferences prefs = await SharedPreferences.getInstance();
+  prefs.remove('theme');
+
+  prefs.setString('theme', theme);
+}
+
+Future<String?> getTheme() async {
+  final SharedPreferences prefs = await SharedPreferences.getInstance();
+
+  return prefs.getString('theme');
 }

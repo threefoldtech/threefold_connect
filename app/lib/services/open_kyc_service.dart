@@ -14,10 +14,13 @@ String threeBotFrontEndUrl = AppConfig().threeBotFrontEndUrl();
 Map<String, String> requestHeaders = {'Content-type': 'application/json'};
 
 Future<Response> getSignedEmailIdentifierFromOpenKYC(String doubleName) async {
-  String timestamp = new DateTime.now().millisecondsSinceEpoch.toString();
+  String timestamp = DateTime.now().millisecondsSinceEpoch.toString();
   Uint8List sk = await getPrivateKey();
 
-  Map<String, String> payload = {"timestamp": timestamp, "intention": "get-signedemailidentifier"};
+  Map<String, String> payload = {
+    'timestamp': timestamp,
+    'intention': 'get-signedemailidentifier'
+  };
   String signedPayload = await signData(jsonEncode(payload), sk);
 
   Map<String, String> loginRequestHeaders = {
@@ -32,10 +35,13 @@ Future<Response> getSignedEmailIdentifierFromOpenKYC(String doubleName) async {
 }
 
 Future<Response> getSignedPhoneIdentifierFromOpenKYC(String doubleName) async {
-  String timestamp = new DateTime.now().millisecondsSinceEpoch.toString();
+  String timestamp = DateTime.now().millisecondsSinceEpoch.toString();
   Uint8List sk = await getPrivateKey();
 
-  Map<String, String> payload = {"timestamp": timestamp, "intention": "get-signedphoneidentifier"};
+  Map<String, String> payload = {
+    'timestamp': timestamp,
+    'intention': 'get-signedphoneidentifier'
+  };
   String signedPayload = await signData(jsonEncode(payload), sk);
 
   Map<String, String> loginRequestHeaders = {
@@ -49,13 +55,14 @@ Future<Response> getSignedPhoneIdentifierFromOpenKYC(String doubleName) async {
   return http.get(url, headers: loginRequestHeaders);
 }
 
-Future<Response> getSignedIdentityIdentifierFromOpenKYC(String doubleName) async {
-  String timestamp = new DateTime.now().millisecondsSinceEpoch.toString();
+Future<Response> getSignedIdentityIdentifierFromOpenKYC(
+    String doubleName) async {
+  String timestamp = DateTime.now().millisecondsSinceEpoch.toString();
   Uint8List sk = await getPrivateKey();
 
   Map<String, String> payload = {
-    "timestamp": timestamp,
-    "intention": "get-identity-kyc-data-identifiers"
+    'timestamp': timestamp,
+    'intention': 'get-identity-kyc-data-identifiers'
   };
 
   String signedPayload = await signData(jsonEncode(payload), sk);
@@ -71,20 +78,24 @@ Future<Response> getSignedIdentityIdentifierFromOpenKYC(String doubleName) async
   return http.get(url, headers: loginRequestHeaders);
 }
 
-Future<Response> verifySignedEmailIdentifier(String signedEmailIdentifier) async {
+Future<Response> verifySignedEmailIdentifier(
+    String signedEmailIdentifier) async {
   Uri url = Uri.parse('$openKycApiUrl/verification/verify-sei');
   print('Sending call: ${url.toString()}');
 
   return http.post(url,
-      body: json.encode({"signedEmailIdentifier": signedEmailIdentifier}), headers: requestHeaders);
+      body: json.encode({'signedEmailIdentifier': signedEmailIdentifier}),
+      headers: requestHeaders);
 }
 
-Future<Response> verifySignedPhoneIdentifier(String signedPhoneIdentifier) async {
+Future<Response> verifySignedPhoneIdentifier(
+    String signedPhoneIdentifier) async {
   Uri url = Uri.parse('$openKycApiUrl/verification/verify-spi');
   print('Sending call: ${url.toString()}');
 
   return http.post(url,
-      body: json.encode({"signedPhoneIdentifier": signedPhoneIdentifier}), headers: requestHeaders);
+      body: json.encode({'signedPhoneIdentifier': signedPhoneIdentifier}),
+      headers: requestHeaders);
 }
 
 Future<Response> verifySignedIdentityIdentifier(
@@ -99,12 +110,13 @@ Future<Response> verifySignedIdentityIdentifier(
 
   return http.post(url,
       body: json.encode({
-        "signedIdentityNameIdentifier": signedIdentityNameIdentifier,
-        "signedIdentityCountryIdentifier": signedIdentityCountryIdentifier,
-        "signedIdentityDOBIdentifier": signedIdentityDOBIdentifier,
-        "signedIdentityDocumentMetaIdentifier": signedIdentityDocumentMetaIdentifier,
-        "signedIdentityGenderIdentifier": signedIdentityGenderIdentifier,
-        "reference": reference
+        'signedIdentityNameIdentifier': signedIdentityNameIdentifier,
+        'signedIdentityCountryIdentifier': signedIdentityCountryIdentifier,
+        'signedIdentityDOBIdentifier': signedIdentityDOBIdentifier,
+        'signedIdentityDocumentMetaIdentifier':
+            signedIdentityDocumentMetaIdentifier,
+        'signedIdentityGenderIdentifier': signedIdentityGenderIdentifier,
+        'reference': reference
       }),
       headers: requestHeaders);
 }
@@ -141,7 +153,7 @@ Future<dynamic> getShuftiAccessToken() async {
     return;
   }
 
-  String encodedBody = json.encode({"signedPhoneIdentifier": phoneMap['spi']});
+  String encodedBody = json.encode({'signedPhoneIdentifier': phoneMap['spi']});
 
   Uri url = Uri.parse('$openKycApiUrl/verification/shufti-access-token');
   print('Sending call: ${url.toString()}');
@@ -188,11 +200,15 @@ Future<Response> verifyIdentity(String reference) async {
   return http.post(url, body: encodedBody, headers: requestHeaders);
 }
 
+// TODO: Remove this method and user update user data
 Future<Response> updateEmailAddressOfUser() async {
-  String timestamp = new DateTime.now().millisecondsSinceEpoch.toString();
+  String timestamp = DateTime.now().millisecondsSinceEpoch.toString();
   Uint8List sk = await getPrivateKey();
 
-  Map<String, String> payload = {"timestamp": timestamp, "intention": "change-email"};
+  Map<String, String> payload = {
+    'timestamp': timestamp,
+    'intention': 'change-email'
+  };
   String signedPayload = await signData(jsonEncode(payload), sk);
 
   Map<String, String?> email = await getEmail();
@@ -202,9 +218,37 @@ Future<Response> updateEmailAddressOfUser() async {
     'Jimber-Authorization': signedPayload
   };
 
-  String encodedBody = jsonEncode({'username': await getDoubleName(), "email": email['email']});
+  String encodedBody = jsonEncode({
+    'username': await getDoubleName(),
+    'field': 'email',
+    'value': email['email']
+  });
 
-  Uri url = Uri.parse('$threeBotApiUrl/users/change-email');
+  Uri url = Uri.parse('$threeBotApiUrl/users/update');
+  print('Sending call: ${url.toString()}');
+
+  return http.post(url, headers: loginRequestHeaders, body: encodedBody);
+}
+
+Future<Response> updateUserData(String field, String value) async {
+  String timestamp = DateTime.now().millisecondsSinceEpoch.toString();
+  Uint8List sk = await getPrivateKey();
+
+  Map<String, String> payload = {
+    'timestamp': timestamp,
+    'intention': 'change-$field'
+  };
+  String signedPayload = await signData(jsonEncode(payload), sk);
+
+  Map<String, String> loginRequestHeaders = {
+    'Content-type': 'application/json',
+    'Jimber-Authorization': signedPayload
+  };
+
+  String encodedBody = jsonEncode(
+      {'username': await getDoubleName(), 'field': field, 'value': value});
+
+  Uri url = Uri.parse('$threeBotApiUrl/users/update');
   print('Sending call: ${url.toString()}');
 
   return http.post(url, headers: loginRequestHeaders, body: encodedBody);

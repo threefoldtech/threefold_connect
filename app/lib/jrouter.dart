@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:threebotlogin/app.dart';
-import 'package:threebotlogin/apps/chatbot/chatbot.dart';
+import 'package:threebotlogin/apps/dao/dao.dart';
 import 'package:threebotlogin/apps/wallet/wallet.dart';
 import 'package:threebotlogin/screens/identity_verification_screen.dart';
 import 'package:threebotlogin/screens/preference_screen.dart';
@@ -55,18 +55,18 @@ class JRouter {
           app: Farmers()),
       AppInfo(
           route: Route(
-            path: '/chatbot',
-            name: 'Support',
-            icon: Icons.chat,
-            view: await Chatbot().widget(),
+            path: '/dao',
+            name: 'Dao',
+            icon: Icons.how_to_vote_outlined,
+            view: await Dao().widget(),
           ),
-          app: Chatbot()),
+          app: Dao()),
       AppInfo(
           route: Route(
             path: '/identityverification',
             name: 'IdentityVerification',
             icon: Icons.lock,
-            view: IdentityVerificationScreen(),
+            view: const IdentityVerificationScreen(),
           ),
           app: null),
       AppInfo(
@@ -74,14 +74,10 @@ class JRouter {
             path: '/settings',
             name: 'Settings',
             icon: Icons.settings,
-            view: PreferenceScreen(),
+            view: const PreferenceScreen(),
           ),
           app: null),
     ];
-  }
-
-  Map<String, Widget Function(BuildContext)> getRoutes() {
-    return Map.fromIterable(routes, key: (v) => v.path, value: (v) => v.view);
   }
 
   bool emailMustBeVerified(int index) {
@@ -100,24 +96,23 @@ class JRouter {
 
   List<Widget> getContent() {
     List<Widget> containers = [];
-    routes.forEach((r) {
+    for (var r in routes) {
       containers.add(r.route.view);
-    });
+    }
     return containers;
   }
 
-  List<Container> getAppButtons() {
-    List<Container> iconButtons = [];
-    routes.forEach((r) {
-      iconButtons.add(Container(
-          child: Tab(
+  List<Tab> getAppButtons() {
+    List<Tab> iconButtons = [];
+    for (var r in routes) {
+      iconButtons.add(Tab(
         icon: Icon(
           r.route.icon,
           size: 40,
         ),
         text: r.route.name,
-      )));
-    });
+      ));
+    }
     return iconButtons;
   }
 }

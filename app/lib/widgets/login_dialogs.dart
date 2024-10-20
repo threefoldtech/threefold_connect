@@ -12,7 +12,7 @@ Future<void> showExpiredDialog(BuildContext ctx) async {
           'Your login attempt has expired, please request a new one in your browser.',
       actions: <Widget>[
         TextButton(
-          child: Text('Ok'),
+          child: const Text('Close'),
           onPressed: () {
             Navigator.pop(context);
           },
@@ -26,13 +26,14 @@ Future<void> showWrongEmojiDialog(BuildContext ctx) async {
   await showDialog(
     context: ctx,
     builder: (BuildContext context) => CustomDialog(
+      type: DialogType.Warning,
       image: Icons.warning,
       title: 'Wrong emoji',
       description:
           'You selected the wrong emoji, please check your browser for the new one.',
       actions: <Widget>[
         TextButton(
-          child: Text('Retry'),
+          child: const Text('Retry'),
           onPressed: () {
             Navigator.pop(context);
           },
@@ -51,7 +52,7 @@ Future<void> showLoggedInDialog(BuildContext ctx) async {
       description: 'You are now logged in. Please return to your browser.',
       actions: <Widget>[
         TextButton(
-          child: Text('Ok'),
+          child: const Text('Close'),
           onPressed: () {
             Navigator.pop(context);
           },
@@ -71,7 +72,7 @@ Future<void> showSignedInDialog(BuildContext ctx) async {
           'The data has been successfully signed. Please return to your browser.',
       actions: <Widget>[
         TextButton(
-          child: Text('Ok'),
+          child: const Text('Close'),
           onPressed: () {
             Navigator.pop(context);
           },

@@ -8,13 +8,15 @@ import 'package:threebotlogin/services/shared_preference_service.dart';
 class Chatbot implements App {
   late ChatbotWidget _widget;
 
+  @override
   Future<Widget> widget() async {
     Map<String, String?> email = await getEmail();
     String emailAddress = email['email'].toString();
-    this._widget = ChatbotWidget(email: emailAddress);
-    return this._widget;
+    _widget = ChatbotWidget(email: emailAddress);
+    return _widget;
   }
 
+  @override
   void clearData() {}
 
   @override

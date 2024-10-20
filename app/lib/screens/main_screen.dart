@@ -13,19 +13,22 @@ import 'package:threebotlogin/screens/init_screen.dart';
 import 'package:threebotlogin/screens/unregistered_screen.dart';
 import 'package:threebotlogin/services/3bot_service.dart';
 import 'package:threebotlogin/services/migration_service.dart';
+import 'package:threebotlogin/services/open_kyc_service.dart';
 import 'package:threebotlogin/services/socket_service.dart';
 import 'package:threebotlogin/services/shared_preference_service.dart';
 import 'package:threebotlogin/widgets/error_widget.dart';
+import 'package:threebotlogin/widgets/home_logo.dart';
 import 'package:uni_links/uni_links.dart';
+import 'package:threebotlogin/services/tfchain_service.dart' as TFChain;
 
 class MainScreen extends StatefulWidget {
+  const MainScreen({super.key, this.initDone, this.registered});
+
   final bool? initDone;
   final bool? registered;
 
-  const MainScreen({this.initDone, this.registered});
-
   @override
-  _AppState createState() => _AppState();
+  State<MainScreen> createState() => _AppState();
 }
 
 class _AppState extends State<MainScreen> {
@@ -56,67 +59,51 @@ class _AppState extends State<MainScreen> {
     };
 
     return Scaffold(
-        body: Center(
-            child: Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: <Widget>[
-        Image.asset(
-          'assets/logo.png',
-          height: 100,
-        ),
-        const SizedBox(
-          height: 40,
-        ),
-        Container(
-          padding: const EdgeInsets.only(left: 12, right: 12),
-          child: Text(
-            updateMessage != null
-                ? updateMessage.toString()
-                : errorMessage.toString(),
-            style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: errorMessage != null ? Colors.red : Colors.black),
-          ),
-        ),
-        const SizedBox(
-          height: 40,
-        ),
-        Transform.scale(
-          scale: 0.5,
-          child: const CircularProgressIndicator(
-            color: Color.fromRGBO(0, 174, 239, 1),
-          ),
-        ),
-        const SizedBox(height: 20),
-        Visibility(
-            maintainSize: true,
-            maintainAnimation: true,
-            maintainState: true,
-            visible: errorMessage != null,
-            child: ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Theme.of(context).colorScheme.secondary,
-                shape: const RoundedRectangleBorder(
-                  borderRadius: BorderRadius.all(Radius.circular(30)),
-                ),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            const Hero(
+              tag: 'logo',
+              child: HomeLogoWidget(
+                animate: true,
               ),
-              child: const Row(
-                mainAxisSize: MainAxisSize.min,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
+            ),
+            const SizedBox(height: 50),
+            Container(
+              padding: const EdgeInsets.only(left: 12, right: 12),
+              child: Text(
+                updateMessage != null
+                    ? updateMessage.toString()
+                    : errorMessage.toString(),
+                style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: errorMessage != null
+                        ? Theme.of(context).colorScheme.error
+                        : Theme.of(context).colorScheme.onSurface),
+              ),
+            ),
+            const SizedBox(
+              height: 40,
+            ),
+            Visibility(
+                maintainSize: true,
+                maintainAnimation: true,
+                maintainState: true,
+                visible: errorMessage != null,
+                child: ElevatedButton(
+                  child: const Text(
                     'RETRY',
-                    style: TextStyle(color: Colors.white, fontSize: 16),
                   ),
-                ],
-              ),
-              onPressed: () async {
-                await pushScreens();
-              },
-            ))
-      ],
-    )));
+                  onPressed: () async {
+                    await pushScreens();
+                  },
+                ))
+          ],
+        ),
+      ),
+    );
   }
 
   pushScreens() async {
@@ -164,7 +151,7 @@ class _AppState extends State<MainScreen> {
     }
 
     if (widget.initDone != null && !widget.initDone!) {
-      InitScreen init = InitScreen();
+      InitScreen init = const InitScreen();
       bool accepted = false;
       while (!accepted) {
         accepted = !(await Navigator.push(
@@ -175,7 +162,7 @@ class _AppState extends State<MainScreen> {
 
     if (!widget.registered!) {
       await Navigator.push(context,
-          MaterialPageRoute(builder: (context) => UnregisteredScreen()));
+          MaterialPageRoute(builder: (context) => const UnregisteredScreen()));
     }
 
     await Globals().router.init();
@@ -190,14 +177,33 @@ class _AppState extends State<MainScreen> {
     }
 
     print(mounted);
+    Navigator.of(context).popUntil((route) => route.isFirst);
+
+    updateMessage = 'Fetching user data';
+    setState(() {});
+    try {
+      await loadTwinId();
+    } catch (e) {
+      final loadingTwinFailure = SnackBar(
+        content: Text(
+          'Failed to load twin information',
+          style: Theme.of(context)
+              .textTheme
+              .bodyMedium!
+              .copyWith(color: Theme.of(context).colorScheme.errorContainer),
+        ),
+        duration: const Duration(seconds: 3),
+      );
+      ScaffoldMessenger.of(context).clearSnackBars();
+      ScaffoldMessenger.of(context).showSnackBar(loadingTwinFailure);
+      print('Failed to load twin information due to $e');
+    }
 
     // await Navigator.push(context, MaterialPageRoute(builder: (context) => UnregisteredScreen()));
-    await Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-            builder: (context) => HomeScreen(
-                initialLink: initialLink,
-                backendConnection: _backendConnection)));
+    await Navigator.of(context).pushReplacement(PageRouteBuilder(
+        transitionDuration: Duration(seconds: 1),
+        pageBuilder: (_, __, ___) => HomeScreen(
+            initialLink: initialLink, backendConnection: _backendConnection)));
   }
 
   fetchPkidData() async {
@@ -239,7 +245,7 @@ class _AppState extends State<MainScreen> {
       try {
         String baseUrl = AppConfig().baseUrl();
         final List<InternetAddress> result =
-            await InternetAddress.lookup('$baseUrl')
+            await InternetAddress.lookup(baseUrl)
                 .timeout(Duration(seconds: Globals().timeOutSeconds));
 
         if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
@@ -301,5 +307,16 @@ class _AppState extends State<MainScreen> {
       }
       initialLink = incomingLink;
     });
+  }
+
+  Future<void> loadTwinId() async {
+    int? twinId = await getTwinId();
+    if (twinId == null || twinId == 0) {
+      twinId = await TFChain.getMyTwinId();
+      if (twinId != null) {
+        await saveTwinId(twinId);
+        await updateUserData('twin_id', twinId.toString());
+      }
+    }
   }
 }
