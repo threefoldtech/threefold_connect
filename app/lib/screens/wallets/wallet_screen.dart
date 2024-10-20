@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:threebotlogin/apps/wallet/wallet_config.dart';
 import 'package:threebotlogin/models/wallet.dart';

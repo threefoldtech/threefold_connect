@@ -234,7 +234,7 @@ packages:
     source: hosted
     version: "1.18.0"
   convert:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: convert
       sha256: "0f08b14755d163f6e2134cb58222dd25ea2a2ee8a195e53983d57c075324d592"
@@ -258,7 +258,7 @@ packages:
     source: hosted
     version: "2.0.3"
   crypto:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: crypto
       sha256: ec30d999af904f33454ba22ed9a86162b35e52b44ac4807d1d93c288041d7d27
@@ -619,7 +619,7 @@ packages:
     source: git
     version: "1.0.0"
   hashlib:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: hashlib
       sha256: f572f2abce09fc7aee53f15927052b9732ea1053e540af8cae211111ee0b99b1
@@ -1458,7 +1458,7 @@ packages:
     source: git
     version: "0.1.0"
   stellar_flutter_sdk:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: stellar_flutter_sdk
       sha256: "7d505963fe11d0f90b3f798964c485ed9fa64731c38f14c9b2fb76d5d5bd6cd8"
