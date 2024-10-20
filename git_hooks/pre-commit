@@ -1,0 +1,38 @@
+#!/bin/sh
+
+result=$(dart format .)
+exitCode=$? # If the exitCode is zero, then command executed successfully.
+
+if [ $exitCode  -ne 0 ]; then
+  echo "$result"
+  echo "Dart format found issues, please fix them."
+  exit 1
+fi
+echo "Finished running dart format command."
+
+################################################################
+
+result=$(dart analyze .)
+exitCode=$? # If the exitCode is zero, then command executed successfully.
+
+if [ $exitCode  -ne 0 ]; then
+  echo "$result"
+fi
+echo "Finished running dart analyze command."
+
+################################################################
+
+#  Run `dart dry --apply` to auto-fix basic issues.
+result=$(dart fix --apply)
+exitCode=$?
+
+# Adding the files updated by `dart fix` command to git.
+git add .
+
+echo "$result"
+
+if [ $exitCode -ne 0 ]; then
+  echo "dart fix command failed to execute."
+  exit 1
+fi
+echo "Finished running dart fix command."
