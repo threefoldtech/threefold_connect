@@ -24,7 +24,7 @@ jobs:
       - run: cd app && dart pub get
       
       # Check for any formatting issues in the code.
-      - run: cd lib && dart format .
+      - run: dart format lib
       
       # Statically analyze the Dart code for any errors.
-      - run: dart analyze .
+      - run: dart analyze lib
