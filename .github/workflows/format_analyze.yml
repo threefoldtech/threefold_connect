@@ -8,23 +8,22 @@ on:
     branches:
       - development
 
+
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
       - name: Set up Repository
         uses: actions/checkout@v4
-      # Setup the flutter environment.
       - uses: subosito/flutter-action@v2
         with:
-          channel: 'stable' # 'dev', 'alpha', default to: 'stable'
-          flutter-version: '3.19.0' # you can also specify exact version of flutter
+          channel: 'stable'
+          flutter-version: '3.19.0'
       
-      # Get flutter dependencies.
       - run: cd app && dart pub get
       
-      # Check for any formatting issues in the code.
-      - run: dart format lib
+      - run: ls
+
+      - run: dart format ./lib
       
-      # Statically analyze the Dart code for any errors.
-      - run: dart analyze lib
+      - run: dart analyze ./lib
