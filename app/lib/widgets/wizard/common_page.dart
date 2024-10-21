@@ -151,7 +151,7 @@ class _CommonPageState extends State<CommonPage> {
                             text: TextSpan(
                               children: [
                                 TextSpan(
-                                  text: "I agree to ThreeFold's ",
+                                  text: "I agree to ThreeFolds' ",
                                   style: Theme.of(context)
                                       .textTheme
                                       .bodyMedium!

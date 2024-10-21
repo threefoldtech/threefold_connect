@@ -13,7 +13,7 @@ class Page1 extends StatelessWidget {
       widthPercentage: 0.65,
       heightPercentage: 0.25,
       description:
-          'Threefold Connect is your main access point to the Threefold Grid, Threefold Token, and more. Please allow us to quickly show you around!',
+          'ThreeFold Connect is your main access point to the ThreeFold Grid, ThreeFold Token, and more. Please allow us to quickly show you around!',
     );
   }
 }
