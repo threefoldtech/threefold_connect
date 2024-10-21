@@ -21,7 +21,7 @@ class HomeCardWidget extends StatelessWidget {
     final size = MediaQuery.of(context).size.width;
     const double margin = 3;
     return Card(
-      color: Theme.of(context).colorScheme.secondaryContainer,
+      color: Theme.of(context).colorScheme.primaryContainer,
       margin: const EdgeInsets.all(margin),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
       clipBehavior: Clip.hardEdge,
@@ -42,14 +42,13 @@ class HomeCardWidget extends StatelessWidget {
                 children: [
                   Icon(
                     icon,
-                    color: Theme.of(context).colorScheme.onSecondaryContainer,
+                    color: Theme.of(context).colorScheme.onPrimaryContainer,
                   ),
                   const SizedBox(width: 7),
                   Text(
                     name,
                     style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                        color:
-                            Theme.of(context).colorScheme.onSecondaryContainer,
+                        color: Theme.of(context).colorScheme.onPrimaryContainer,
                         fontWeight: FontWeight.bold),
                   )
                 ],

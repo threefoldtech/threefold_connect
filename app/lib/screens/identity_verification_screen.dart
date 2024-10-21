@@ -1386,11 +1386,10 @@ class _IdentityVerificationScreenState
                                       Theme.of(context).colorScheme.onSurface)),
                   TextField(
                     controller: controller,
-                    decoration: InputDecoration(
-                        focusedBorder: UnderlineInputBorder(
-                          borderSide:
-                              BorderSide(color: Theme.of(context).primaryColor),
+                    style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                          color: Theme.of(context).colorScheme.onSurface,
                         ),
+                    decoration: InputDecoration(
                         labelText: 'Email',
                         errorText: validEmail == true ? null : errorEmail),
                   ),

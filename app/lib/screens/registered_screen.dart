@@ -52,7 +52,7 @@ class _RegisteredScreenState extends State<RegisteredScreen>
             ),
           ),
           Container(
-            padding: const EdgeInsets.only(left: 10, right: 10, top: 30),
+            padding: const EdgeInsets.only(left: 10, right: 10, top: 50),
             height: MediaQuery.of(context).size.height * 0.6,
             width: MediaQuery.of(context).size.width,
             child: Column(
@@ -114,15 +114,9 @@ class _RegisteredScreenState extends State<RegisteredScreen>
                         name: 'Settings', icon: Icons.settings, pageNumber: 6),
                   ],
                 ),
-                const Spacer(),
+                const SizedBox(height: 20),
                 const Row(
-                  children: [
-                    Spacer(),
-                    CrispChatbot(),
-                    SizedBox(
-                      width: 20,
-                    )
-                  ],
+                  children: [Spacer(), CrispChatbot(), SizedBox(width: 20)],
                 )
               ],
             ),
