@@ -1,25 +1,24 @@
 import 'dart:convert';
 import 'dart:core';
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
 import 'package:flutter_pkid/flutter_pkid.dart';
 import 'package:http/http.dart';
-// import 'package:shuftipro_onsite_sdk/shuftipro_onsite_sdk.dart';
+import 'package:idenfy_sdk_flutter/idenfy_sdk_flutter.dart';
+import 'package:idenfy_sdk_flutter/models/idenfy_identification_status.dart';
 import 'package:threebotlogin/events/events.dart';
 import 'package:threebotlogin/events/identity_callback_event.dart';
 import 'package:threebotlogin/helpers/globals.dart';
 import 'package:threebotlogin/helpers/kyc_helpers.dart';
 import 'package:threebotlogin/main.dart';
 import 'package:threebotlogin/services/gridproxy_service.dart';
+import 'package:threebotlogin/services/idenfy_service.dart';
 import 'package:threebotlogin/services/identity_service.dart';
 import 'package:threebotlogin/services/open_kyc_service.dart';
 import 'package:threebotlogin/services/pkid_service.dart';
-import 'package:threebotlogin/services/socket_service.dart';
 import 'package:threebotlogin/services/tools_service.dart';
 import 'package:threebotlogin/services/shared_preference_service.dart';
 import 'package:threebotlogin/widgets/custom_dialog.dart';
 import 'package:threebotlogin/widgets/layout_drawer.dart';
-import 'package:country_picker/country_picker.dart';
 import 'package:threebotlogin/widgets/phone_widget.dart';
 
 class IdentityVerificationScreen extends StatefulWidget {
@@ -56,80 +55,6 @@ class _IdentityVerificationScreenState
 
   bool emailInputValidated = false;
 
-  Map<String, Object> configObj = {
-    'open_webview': false,
-    'asyncRequest': false,
-    'captureEnabled': false,
-    'dark_mode': false,
-  };
-
-  Map<String, Object> authObject = {
-    'auth_type': 'access_token',
-    'access_token': '',
-  };
-
-  // Default values for accessing the Shufti API
-  Map<String, Object> createdPayload = {
-    'country': '',
-    'language': 'EN',
-    'email': '',
-    'callback_url': 'http://www.example.com',
-    'redirect_url': 'https://www.dummyurl.com/',
-    'show_consent': 1,
-    'show_results': 1,
-    'show_privacy_policy': 1,
-  };
-
-  // Template for Shufti API verification object
-  Map<String, Object?> verificationObj = {
-    'face': {},
-    'background_checks': {},
-    'phone': {},
-    'document': {
-      'supported_types': [
-        'passport',
-        'id_card',
-        'driving_license',
-      ],
-      'name': {
-        'first_name': '',
-        'last_name': '',
-        'middle_name': '',
-      },
-      'dob': '',
-      'document_number': '',
-      'expiry_date': '',
-      'issue_date': '',
-      'fetch_enhanced_data': '',
-      'gender': '',
-      'backside_proof_required': '1',
-    },
-    'document_two': {
-      'supported_types': ['passport', 'id_card', 'driving_license'],
-      'name': {'first_name': '', 'last_name': '', 'middle_name': ''},
-      'dob': '',
-      'document_number': '',
-      'expiry_date': '',
-      'issue_date': '',
-      'fetch_enhanced_data': '',
-      'gender': '',
-      'backside_proof_required': '0',
-    },
-    'address': {
-      'full_address': '',
-      'name': {
-        'first_name': '',
-        'last_name': '',
-        'middle_name': '',
-        'fuzzy_match': '',
-      },
-      'supported_types': ['id_card', 'utility_bill', 'bank_statement'],
-    },
-    'consent': {
-      'supported_types': ['printed', 'handwritten'],
-      'text': 'My name is John Doe and I authorize this transaction of \$100/-',
-    },
-  };
   double spending = 0.0;
 
   setEmailVerified() {
@@ -210,11 +135,15 @@ class _IdentityVerificationScreenState
         }
       });
     });
-    getIdentity().then((identityMap) {
+    getVerificationStatus().then((verificationStatus) {
       setState(() {
-        if (identityMap['signedIdentityNameIdentifier'] != null) {
-          identityVerified =
-              (identityMap['signedIdentityNameIdentifier'] != null);
+        if (verificationStatus.status == 'APPROVED' ||
+            verificationStatus.status == 'SUSPECTED') {
+          identityVerified = true;
+          setIsIdentityVerified(true);
+        } else {
+          identityVerified = false;
+          setIsIdentityVerified(false);
         }
       });
     });
@@ -342,7 +271,6 @@ class _IdentityVerificationScreenState
             child: const Text('No'),
             onPressed: () async {
               Navigator.pop(customContext);
-              showCountryPopup();
             },
           ),
           TextButton(
@@ -365,134 +293,57 @@ class _IdentityVerificationScreenState
     );
   }
 
-  void showCountryPopup() {
-    return showCountryPicker(
-      onClosed: () {
-        if (createdPayload['country'] == '') {
-          showAreYouSureToExitDialog();
-        }
-      },
-      context: context,
-      countryListTheme: CountryListThemeData(
-        backgroundColor: Theme.of(context).colorScheme.secondaryContainer,
-        textStyle: Theme.of(context).textTheme.bodySmall!.copyWith(
-            color: Theme.of(context).colorScheme.onSecondaryContainer),
-        searchTextStyle: Theme.of(context).textTheme.bodySmall!.copyWith(
-            color: Theme.of(context).colorScheme.onSecondaryContainer),
-      ),
-      showPhoneCode:
-          false, // optional. Shows phone code before the country name.
-      onSelect: (Country country) async {
-        setState(() {
-          createdPayload['country'] = country.countryCode;
-        });
-
-        print('Select country: ${country.displayName}');
-        var brightness =
-            SchedulerBinding.instance.platformDispatcher.platformBrightness;
-        configObj['dark_mode'] = brightness == Brightness.dark;
-        // String r = await ShuftiproSdk.sendRequest(
-        // authObject: authObject,
-        // createdPayload: createdPayload,
-        // configObject: configObj);
-
-        print('Receiving response');
-        // debugPrint(r);
-
-        // await handleShuftiCallBack(r);
-      },
-    );
-  }
-
-  Future<void> handleShuftiCallBack(String res) async {
+  Future<void> initIdenfySdk(String token) async {
+    IdenfyIdentificationResult? idenfySDKresult;
     try {
-      if (!isJson(res)) {
-        String resData = res.toString();
-
-        if (resData.contains('verification_process_closed')) {
-          return showDialog(
-            context: context,
-            barrierDismissible: false,
-            builder: (BuildContext dialogContext) => CustomDialog(
-              type: DialogType.Error,
-              image: Icons.close,
-              title: 'Request canceled',
-              description: 'Verification process has been canceled.',
-              actions: [
-                TextButton(
-                    onPressed: () {
-                      Navigator.pop(dialogContext);
-                    },
-                    child: const Text('Close'))
-              ],
-            ),
-          );
-        }
-
-        if (resData.contains('internet.connection.problem')) {
-          return showDialog(
-            context: context,
-            barrierDismissible: false,
-            builder: (BuildContext dialogContext) => CustomDialog(
-              type: DialogType.Error,
-              image: Icons.close,
-              title: 'Request canceled',
-              description:
-                  'Please make sure your internet connection is stable.',
-              actions: [
-                TextButton(
-                    onPressed: () {
-                      Navigator.pop(dialogContext);
-                    },
-                    child: const Text('Close'))
-              ],
-            ),
-          );
-        }
-      }
-
-      // Close your eyes for one second
-      Map<String, dynamic> data = jsonDecode(res);
-      switch (data['event']) {
-        // AUTHORIZATION IS WRONG
-        case 'request.unauthorized':
-          {
-            Events().emit(IdentityCallbackEvent(type: 'unauthorized'));
-            break;
-          }
-        // NO BALANCE
-        case 'request.invalid':
-        // DECLINED
-        case 'verification.declined':
-        // TIME OUT
-        case 'request.timeout':
-          {
-            Events().emit(IdentityCallbackEvent(type: 'failed'));
-            break;
-          }
-
-        // ACCEPTED
-        case 'verification.accepted':
-          {
-            await verifyIdentity(reference);
-            await identityVerification(reference).then((value) {
-              if (value == null) {
-                return Events().emit(IdentityCallbackEvent(type: 'failed'));
-              }
-              Events().emit(IdentityCallbackEvent(type: 'success'));
-            });
-            break;
-          }
-        default:
-          {
-            return;
-          }
-      }
+      idenfySDKresult = await IdenfySdkFlutter.start(token);
     } catch (e) {
       print(e);
-    } finally {
-      dispose();
+      if (context.mounted) {
+        showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (BuildContext dialogContext) => CustomDialog(
+            type: DialogType.Error,
+            image: Icons.close,
+            title: 'Error',
+            description:
+                'Something went wrong. Please contact support if this issue persists.',
+            actions: [
+              TextButton(
+                  onPressed: () {
+                    Navigator.pop(dialogContext);
+                  },
+                  child: const Text('Close'))
+            ],
+          ),
+        );
+      }
     }
+    await handleIdenfyResponse(idenfySDKresult);
+  }
+
+  Future<void> handleIdenfyResponse(IdenfyIdentificationResult? result) async {
+    print(result);
+    // TODO: we might can you use the result directly to know the status
+    final verificationStatus = await getVerificationStatus();
+    setState(() {
+      if (verificationStatus.status == 'APPROVED' ||
+          verificationStatus.status == 'SUSPECTED') {
+        identityVerified = true;
+        setIsIdentityVerified(true);
+        Globals().identityVerified.value = true;
+        Events().emit(IdentityCallbackEvent(type: 'success'));
+      } else {
+        identityVerified = false;
+        setIsIdentityVerified(false);
+        Globals().identityVerified.value = false;
+        Events().emit(IdentityCallbackEvent(type: 'failed'));
+      }
+    });
+    final data = await getVerificationData();
+    await saveIdentity(data.fullName, data.docIssuingCountry, data.docDob,
+        data.docSex, data.scanRef);
   }
 
   Widget _pleaseWait() {
@@ -988,70 +839,9 @@ class _IdentityVerificationScreenState
     });
 
     try {
-      Response accessTokenResponse = await getShuftiAccessToken();
-      if (accessTokenResponse.statusCode == 403) {
-        setState(() {
-          isLoading = false;
-        });
-
-        return showDialog(
-            context: context,
-            builder: (BuildContext context) => CustomDialog(
-                  type: DialogType.Warning,
-                  image: Icons.warning,
-                  title: 'Maximum requests Reached',
-                  description:
-                      'You already had 5 requests in last 24 hours. \nPlease try again in 24 hours.',
-                  actions: <Widget>[
-                    TextButton(
-                      child: const Text('Close'),
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
-                    ),
-                  ],
-                ));
-      }
-
-      if (accessTokenResponse.statusCode != 200) {
-        setState(() {
-          isLoading = false;
-        });
-
-        return showDialog(
-            context: context,
-            builder: (BuildContext context) => CustomDialog(
-                  type: DialogType.Error,
-                  image: Icons.error,
-                  title: "Couldn't setup verification process",
-                  description:
-                      'Something went wrong. Please contact support if this issue persists.',
-                  actions: <Widget>[
-                    TextButton(
-                      child: const Text('Close'),
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
-                    ),
-                  ],
-                ));
-      }
-
-      Map<String, dynamic> details = jsonDecode(accessTokenResponse.body);
-      authObject['access_token'] = details['access_token'];
-
-      Response identityResponse = await sendVerificationIdentity();
-      Map<String, dynamic> identityDetails = jsonDecode(identityResponse.body);
-      String verificationCode = identityDetails['verification_code'];
-
-      reference = verificationCode;
-
-      createdPayload['reference'] = reference;
-      createdPayload['document'] = verificationObj['document']!;
-      createdPayload['face'] = verificationObj['face']!;
-      createdPayload['verification_mode'] = 'image_only';
-
-      showCountryPopup();
+      // TODO: handle token failure cases (e.g.: max retries exceed, unauthorized, ...)
+      final token = await getToken();
+      await initIdenfySdk(token.authToken);
 
       setState(() {
         isLoading = false;
