@@ -22,8 +22,6 @@ jobs:
       
       - run: cd app && dart pub get
       
-      - run: ls
-
-      - run: dart format ./lib
+      - run: dart format app/lib
       
-      - run: dart analyze ./lib
+      - run: dart analyze app/lib
