@@ -16,7 +16,7 @@ class _TermsAndConditionsState extends State<TermsAndConditions> {
   @override
   Widget build(BuildContext context) {
     return CustomDialog(
-      title: 'Accept the terms and conditions?',
+      title: 'Accept the Terms and Conditions?',
       widgetDescription: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Column(
@@ -36,7 +36,7 @@ class _TermsAndConditionsState extends State<TermsAndConditions> {
                   MaterialPageRoute(builder: (context) => const WebView()),
                 );
               },
-              child: Text('Terms and Conditions',
+              child: Text('Terms & Conditions',
                   style: Theme.of(context).textTheme.bodyLarge!.copyWith(
                       color: Colors.blue,
                       decoration: TextDecoration.underline,
@@ -53,7 +53,7 @@ class _TermsAndConditionsState extends State<TermsAndConditions> {
                     },
                   ),
                   Expanded(
-                    child: Text('I Accept the terms and conditions.',
+                    child: Text('I Accept the Terms & Conditions.',
                         style: Theme.of(context).textTheme.bodyMedium!.copyWith(
                             color: termsAgreement.attemptedWithoutAccepting &&
                                     !termsAgreement.isChecked

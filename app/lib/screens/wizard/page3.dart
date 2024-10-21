@@ -11,7 +11,7 @@ class Page3 extends StatelessWidget {
       subtitle: 'WALLET',
       imagePath: 'assets/wallet_outline.png',
       description:
-          'Access your ThreeFold Wallet and your ThreeFold Tokens (TFT). More currencies are to be added in the future.',
+          'Access your ThreeFold Wallet and send/receive ThreeFold Tokens (TFT). More currencies can be added in the future.',
       heightPercentage: 0.4,
       widthPercentage: 0.75,
     );
