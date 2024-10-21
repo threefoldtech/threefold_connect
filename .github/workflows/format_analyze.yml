@@ -1,0 +1,27 @@
+name: Format and Analyze
+
+on:
+  pull_request:
+    branches:
+      - development
+  push:
+    branches:
+      - development
+
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up Repository
+        uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          flutter-version: '3.19.0'
+      
+      - run: cd app && dart pub get
+      
+      - run: dart format app/lib
+      
+      - run: dart analyze app/lib
