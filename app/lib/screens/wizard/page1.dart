@@ -7,13 +7,13 @@ class Page1 extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const CommonPage(
-      title: 'Welcome to',
+      title: 'WELCOME TO',
       subtitle: '',
       imagePath: 'assets/TF_logo.svg',
-      widthPercentage: 0.75,
-      heightPercentage: 0.3,
+      widthPercentage: 0.65,
+      heightPercentage: 0.25,
       description:
-          'Threefold Connect is your main access point to the Threefold Grid and more. Please allow us to quickly show you around!',
+          'Threefold Connect is your main access point to the Threefold Grid, Threefold Token, and more. Please allow us to quickly show you around!',
     );
   }
 }
