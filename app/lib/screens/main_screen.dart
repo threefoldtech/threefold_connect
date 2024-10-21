@@ -201,7 +201,7 @@ class _AppState extends State<MainScreen> {
 
     // await Navigator.push(context, MaterialPageRoute(builder: (context) => UnregisteredScreen()));
     await Navigator.of(context).pushReplacement(PageRouteBuilder(
-        transitionDuration: Duration(seconds: 1),
+        transitionDuration: const Duration(seconds: 1),
         pageBuilder: (_, __, ___) => HomeScreen(
             initialLink: initialLink, backendConnection: _backendConnection)));
   }

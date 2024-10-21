@@ -1,0 +1,27 @@
+#!/bin/sh
+
+# Function to run Dart command and check exit code
+run_command() {
+  directory="$1"
+  command="$2"
+
+  cd "$directory" || exit 1
+
+  result=$(eval "$command")
+  echo "$result"
+}
+
+# Change directory to app/lib and run dart format
+run_command "app/lib" "dart format ." "dart format"
+
+echo "Finished running dart format command."
+
+# Run dart analyze in the current directory
+run_command "." "dart analyze ." "dart analyze"
+
+echo "Finished running dart analyze command."
+
+# Run dart fix --apply and add updated files to git
+run_command "." "dart fix --apply && git add ." "dart fix"
+
+echo "Finished running dart fix command."

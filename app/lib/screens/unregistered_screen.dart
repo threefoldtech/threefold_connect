@@ -49,7 +49,7 @@ class _UnregisteredScreenState extends State<UnregisteredScreen>
       showDialog(
         barrierDismissible: false,
         context: context,
-        builder: (BuildContext context) => CustomDialog(
+        builder: (BuildContext context) => const CustomDialog(
           image: Icons.check,
           title: 'Recovered',
           description: 'Your account has been recovered.',
@@ -79,7 +79,9 @@ class _UnregisteredScreenState extends State<UnregisteredScreen>
           children: <Widget>[
             const Hero(
               tag: 'logo',
-              child: HomeLogoWidget(animate: false,),
+              child: HomeLogoWidget(
+                animate: false,
+              ),
             ),
             const SizedBox(height: 150),
             SizedBox(

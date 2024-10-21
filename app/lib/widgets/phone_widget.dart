@@ -61,7 +61,7 @@ class PhoneAlertDialog extends StatefulWidget {
 class PhoneAlertDialogState extends State<PhoneAlertDialog> {
   bool valid = false;
   String verificationPhoneNumber = '';
-  Country _country = countries.firstWhere((element) => element.code == "US");
+  Country _country = countries.firstWhere((element) => element.code == 'US');
 
   @override
   void initState() {

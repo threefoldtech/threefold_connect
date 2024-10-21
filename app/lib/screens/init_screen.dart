@@ -9,7 +9,6 @@ class InitScreen extends StatefulWidget {
 }
 
 class _InitState extends State<InitScreen> {
-
   @override
   Widget build(BuildContext context) {
     return const Scaffold(body: SafeArea(child: SwipePage()));

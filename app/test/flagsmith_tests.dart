@@ -6,12 +6,11 @@ void main() {
   test('Check if FlagSmith is correctly configured', () async {
     Map<String, String> flagSmithConfig = AppConfig().flagSmithConfig();
 
-      final flagSmithClient = await FlagsmithClient.init(
-          config: FlagsmithConfig(
-            baseURI: flagSmithConfig['url'].toString(),
-          ),
-          apiKey: flagSmithConfig['apiKey'].toString());
-
+    final flagSmithClient = await FlagsmithClient.init(
+        config: FlagsmithConfig(
+          baseURI: flagSmithConfig['url'].toString(),
+        ),
+        apiKey: flagSmithConfig['apiKey'].toString());
 
     String? doubleName = 'HALLODITISEENIDENTIFIER';
     Identity user = Identity(identifier: doubleName);

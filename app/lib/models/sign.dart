@@ -16,22 +16,20 @@ class Sign {
   String? redirectUrl;
   String? state;
 
-  Sign({
-    this.doubleName,
-    this.hashedDataUrl,
-    this.dataUrl,
-    this.friendlyName,
-    this.isJson,
-    this.appId,
-    this.type,
-    this.randomRoom,
-    this.redirectUrl,
-    this.state
-  });
+  Sign(
+      {this.doubleName,
+      this.hashedDataUrl,
+      this.dataUrl,
+      this.friendlyName,
+      this.isJson,
+      this.appId,
+      this.type,
+      this.randomRoom,
+      this.redirectUrl,
+      this.state});
 
   Sign.fromJson(Map<String, dynamic> json)
-      :
-        doubleName = json['doubleName'],
+      : doubleName = json['doubleName'],
         hashedDataUrl = json['dataUrlHash'],
         dataUrl = json['dataUrl'],
         friendlyName = json['friendlyName'],
@@ -43,16 +41,16 @@ class Sign {
         state = json['state'];
 
   Map<String, dynamic> toJson() => {
-        'doubleName' : doubleName,
+        'doubleName': doubleName,
         'hashedDataUrl': hashedDataUrl,
         'dataUrl': dataUrl,
         'friendlyName': friendlyName,
         'isJson': isJson,
         'appId': appId,
-        'type' : type,
-        'randomRoom' : randomRoom,
-        'redirectUrl' : redirectUrl,
-        'state' : state
+        'type': type,
+        'randomRoom': randomRoom,
+        'redirectUrl': redirectUrl,
+        'state': state
       };
 
   static Future<Sign> createAndDecryptSignObject(dynamic data) async {
@@ -62,7 +60,8 @@ class Sign {
       Uint8List pk = await getPublicKey();
       Uint8List sk = await getPrivateKey();
 
-      String encryptedSignAttempt = await decrypt(data['encryptedSignAttempt'], pk, sk);
+      String encryptedSignAttempt =
+          await decrypt(data['encryptedSignAttempt'], pk, sk);
       dynamic decryptedSignAttemptMap = jsonDecode(encryptedSignAttempt);
 
       print('Decrypted login attempt');

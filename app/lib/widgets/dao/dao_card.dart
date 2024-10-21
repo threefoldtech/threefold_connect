@@ -20,7 +20,7 @@ class DaoCard extends StatefulWidget {
 
 class _DaoCardState extends State<DaoCard> {
   Future<void> _launchUrl() async {
-    if (widget.proposal.link != "") {
+    if (widget.proposal.link != '') {
       final Uri url = Uri.parse(widget.proposal.link);
       if (!await launchUrl(url)) {
         const SnackBar(

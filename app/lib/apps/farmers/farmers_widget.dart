@@ -24,14 +24,14 @@ class FarmersWidget extends StatefulWidget {
   _FarmersState createState() => _FarmersState();
 }
 
-class _FarmersState extends State<FarmersWidget> with AutomaticKeepAliveClientMixin {
+class _FarmersState extends State<FarmersWidget>
+    with AutomaticKeepAliveClientMixin {
   late InAppWebViewController webView;
 
   double progress = 0;
 
   // Still use wallet configs to have the same derived key
   var walletConfig = WalletConfig();
-
 
   late InAppWebView iaWebView;
 
@@ -54,15 +54,19 @@ class _FarmersState extends State<FarmersWidget> with AutomaticKeepAliveClientMi
               '$farmersUri?cache_buster=${DateTime.now().millisecondsSinceEpoch}')),
       initialOptions: InAppWebViewGroupOptions(
           crossPlatform: InAppWebViewOptions(
-              cacheEnabled: Globals().isCacheClearedFarmer, clearCache: !Globals().isCacheClearedFarmer),
+              cacheEnabled: Globals().isCacheClearedFarmer,
+              clearCache: !Globals().isCacheClearedFarmer),
           android: AndroidInAppWebViewOptions(
-              supportMultipleWindows: true, thirdPartyCookiesEnabled: true, useHybridComposition: true),
+              supportMultipleWindows: true,
+              thirdPartyCookiesEnabled: true,
+              useHybridComposition: true),
           ios: IOSInAppWebViewOptions()),
       onWebViewCreated: (InAppWebViewController controller) {
         webView = controller;
         addHandler();
       },
-      onCreateWindow: (InAppWebViewController controller, CreateWindowAction req) {
+      onCreateWindow:
+          (InAppWebViewController controller, CreateWindowAction req) {
         return Future.value(true);
       },
       onLoadStop: (InAppWebViewController controller, Uri? url) async {
@@ -76,7 +80,8 @@ class _FarmersState extends State<FarmersWidget> with AutomaticKeepAliveClientMi
           this.progress = progress / 100;
         });
       },
-      onConsoleMessage: (InAppWebViewController controller, ConsoleMessage consoleMessage) {
+      onConsoleMessage:
+          (InAppWebViewController controller, ConsoleMessage consoleMessage) {
         print('Wallet console: ${consoleMessage.message}');
       },
     );
@@ -106,29 +111,36 @@ class _FarmersState extends State<FarmersWidget> with AutomaticKeepAliveClientMi
     await SystemChannels.textInput.invokeMethod('TextInput.hide');
 
     // QRCode scanner is black if we don't sleep here.
-    bool slept = await Future.delayed(const Duration(milliseconds: 400), () => true);
+    bool slept =
+        await Future.delayed(const Duration(milliseconds: 400), () => true);
 
     String? result;
     if (slept) {
-      result = await Navigator.push(context, MaterialPageRoute(builder: (context) => const ScanScreen()));
+      result = await Navigator.push(
+          context, MaterialPageRoute(builder: (context) => const ScanScreen()));
     }
 
     return result;
   }
 
   addHandler() {
-    webView.addJavaScriptHandler(handlerName: 'ADD_IMPORT_WALLET', callback: saveImportedWallet);
-    webView.addJavaScriptHandler(handlerName: 'ADD_APP_WALLET', callback: saveAppWallet);
+    webView.addJavaScriptHandler(
+        handlerName: 'ADD_IMPORT_WALLET', callback: saveImportedWallet);
+    webView.addJavaScriptHandler(
+        handlerName: 'ADD_APP_WALLET', callback: saveAppWallet);
     webView.addJavaScriptHandler(handlerName: 'SCAN_QR', callback: scanQrCode);
-    webView.addJavaScriptHandler(handlerName: 'VUE_INITIALIZED', callback: vueInitialized);
-    webView.addJavaScriptHandler(handlerName: 'SAVE_WALLETS', callback: saveWalletCallback);
+    webView.addJavaScriptHandler(
+        handlerName: 'VUE_INITIALIZED', callback: vueInitialized);
+    webView.addJavaScriptHandler(
+        handlerName: 'SAVE_WALLETS', callback: saveWalletCallback);
   }
 
   saveWalletCallback(List<dynamic> params) async {
     try {
       List<WalletData> walletData = [];
       for (var data in params[0]) {
-        walletData.add(WalletData(data['name'], data['chain'], data['address']));
+        walletData
+            .add(WalletData(data['name'], data['chain'], data['address']));
       }
 
       await saveWallets(walletData);

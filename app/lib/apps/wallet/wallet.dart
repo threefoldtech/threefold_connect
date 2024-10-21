@@ -37,6 +37,6 @@ class Wallet implements App {
 
   @override
   void back() {
-        Events().emit(GoHomeEvent());
+    Events().emit(GoHomeEvent());
   }
 }

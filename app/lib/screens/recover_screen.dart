@@ -185,8 +185,7 @@ class _RecoverScreenState extends State<RecoverScreen> {
                   fontWeight: FontWeight.bold),
             ),
             ElevatedButton(
-              style: ElevatedButton.styleFrom(
-              ),
+              style: ElevatedButton.styleFrom(),
               child: Text(
                 'Recover Account',
                 style: Theme.of(context).textTheme.bodyLarge!.copyWith(

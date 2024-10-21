@@ -113,7 +113,7 @@ class AuthenticationScreenState extends State<AuthenticationScreen> {
     );
   }
 
-   validate(String pin) {
+  validate(String pin) {
     int currentTime = DateTime.now().millisecondsSinceEpoch;
 
     if (globals.incorrectPincodeAttempts >= 3 &&
