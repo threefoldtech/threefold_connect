@@ -34,35 +34,21 @@ class Token {
 
 class VerificationStatus {
   const VerificationStatus({
-    required this.fraudTags,
-    required this.mismatchTags,
-    required this.autoDocument,
-    required this.autoFace,
-    required this.manualDocument,
-    required this.manualFace,
-    required this.scanRef,
+    required this.idenfyRef,
+    required this.final_,
     required this.clientId,
     required this.status,
   });
-  final List<String> fraudTags;
-  final List<String> mismatchTags;
-  final String autoDocument;
-  final String autoFace;
-  final String manualDocument;
-  final String manualFace;
-  final String scanRef;
+  final bool final_;
+  final String idenfyRef;
   final String clientId;
   final String status;
 
   factory VerificationStatus.fromJson(Map<String, dynamic> json) {
+    print(json);
     return VerificationStatus(
-        fraudTags: json['fraudTags'],
-        mismatchTags: json['mismatchTags'],
-        autoDocument: json['autoDocument'],
-        autoFace: json['autoFace'],
-        manualDocument: json['manualDocument'],
-        manualFace: json['manualFace'],
-        scanRef: json['scanRef'],
+        final_: json['final'],
+        idenfyRef: json['idenfyRef'],
         clientId: json['clientId'],
         status: json['status']);
   }
@@ -110,46 +96,47 @@ class VerificationData {
     required this.clientId,
   });
 
-  final String docFirstName;
-  final String docLastName;
-  final String docNumber;
-  final String docPersonalCode;
-  final String docExpiry;
-  final String docDob;
-  final String docDateOfIssue;
-  final String docType;
-  final String docSex;
-  final String docNationality;
-  final String docIssuingCountry;
-  final String docTemporaryAddress;
-  final String docBirthName;
-  final String birthPlace;
-  final String authority;
-  final String address;
-  final String mothersMaidenName;
-  final String driverLicenseCategory;
-  final bool manuallyDataChanged;
-  final String fullName;
-  final String orgFirstName;
-  final String orgLastName;
-  final String orgNationality;
-  final String orgBirthPlace;
-  final String orgAuthority;
-  final String orgAddress;
-  final String orgTemporaryAddress;
-  final String orgMothersMaidenName;
-  final String orgBirthName;
-  final String selectedCountry;
-  final String ageEstimate;
-  final String clientIpProxyRiskLevel;
-  final List<String> duplicateFaces;
-  final List<String> duplicateDocFaces;
+  final String? docFirstName;
+  final String? docLastName;
+  final String? docNumber;
+  final String? docPersonalCode;
+  final String? docExpiry;
+  final String? docDob;
+  final String? docDateOfIssue;
+  final String? docType;
+  final String? docSex;
+  final String? docNationality;
+  final String? docIssuingCountry;
+  final String? docTemporaryAddress;
+  final String? docBirthName;
+  final String? birthPlace;
+  final String? authority;
+  final String? address;
+  final String? mothersMaidenName;
+  final String? driverLicenseCategory;
+  final bool? manuallyDataChanged;
+  final String? fullName;
+  final String? orgFirstName;
+  final String? orgLastName;
+  final String? orgNationality;
+  final String? orgBirthPlace;
+  final String? orgAuthority;
+  final String? orgAddress;
+  final String? orgTemporaryAddress;
+  final String? orgMothersMaidenName;
+  final String? orgBirthName;
+  final String? selectedCountry;
+  final String? ageEstimate;
+  final String? clientIpProxyRiskLevel;
+  final List<String>? duplicateFaces;
+  final List<String>? duplicateDocFaces;
   final dynamic addressVerification;
   final dynamic additionalData;
-  final String scanRef;
-  final String clientId;
+  final String? scanRef;
+  final String? clientId;
 
   factory VerificationData.fromJson(Map<String, dynamic> json) {
+    print(json);
     return VerificationData(
         docFirstName: json['docFirstName'],
         docLastName: json['docLastName'],
@@ -190,4 +177,12 @@ class VerificationData {
         scanRef: json['scanRef'],
         clientId: json['clientId']);
   }
+}
+
+class NotFound implements Exception {
+  final String msg;
+  const NotFound(this.msg);
+
+  @override
+  String toString() => 'NotFound: $msg';
 }

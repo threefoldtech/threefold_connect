@@ -256,8 +256,8 @@ Future<Map<String, dynamic>> getIdentity() async {
   };
 }
 
-Future<void> saveIdentity(String identityName, String identityCountry,
-    String identityDOB, String identityGender, String referenceId) async {
+Future<void> saveIdentity(String? identityName, String? identityCountry,
+    String? identityDOB, String? identityGender, String? referenceId) async {
   final SharedPreferences prefs = await SharedPreferences.getInstance();
   prefs.remove('identityName');
   prefs.remove('identityCountry');
@@ -265,11 +265,11 @@ Future<void> saveIdentity(String identityName, String identityCountry,
   prefs.remove('identityGender');
 
   prefs.setString('identityName', jsonEncode(identityName));
-  prefs.setString('identityCountry', identityCountry);
-  prefs.setString('identityDOB', identityDOB);
-  prefs.setString('identityGender', identityGender);
+  prefs.setString('identityCountry', identityCountry!);
+  prefs.setString('identityDOB', identityDOB!);
+  prefs.setString('identityGender', identityGender!);
 
-  updateUserData('identity_reference', referenceId);
+  updateUserData('identity_reference', referenceId!);
   Globals().identityVerified.value = true;
 }
 

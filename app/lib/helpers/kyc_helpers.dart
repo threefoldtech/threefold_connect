@@ -74,7 +74,7 @@ Future<void> saveCorrectVerificationStates(
     Map<dynamic, dynamic> emailData,
     Map<dynamic, dynamic> phoneData,
     VerificationStatus identityVerificationStatus) async {
-  if (identityVerificationStatus.status == 'APPROVED' ||
+  if (identityVerificationStatus.status == 'VERIFIED' ||
       identityVerificationStatus.status == 'SUSPECTED') {
     await setIsIdentityVerified(true);
   } else {

@@ -137,7 +137,7 @@ class _IdentityVerificationScreenState
     });
     getVerificationStatus().then((verificationStatus) {
       setState(() {
-        if (verificationStatus.status == 'APPROVED' ||
+        if (verificationStatus.status == 'VERIFIED' ||
             verificationStatus.status == 'SUSPECTED') {
           identityVerified = true;
           setIsIdentityVerified(true);
@@ -327,23 +327,22 @@ class _IdentityVerificationScreenState
     print(result);
     // TODO: we might can you use the result directly to know the status
     final verificationStatus = await getVerificationStatus();
-    setState(() {
-      if (verificationStatus.status == 'APPROVED' ||
-          verificationStatus.status == 'SUSPECTED') {
-        identityVerified = true;
-        setIsIdentityVerified(true);
-        Globals().identityVerified.value = true;
-        Events().emit(IdentityCallbackEvent(type: 'success'));
-      } else {
-        identityVerified = false;
-        setIsIdentityVerified(false);
-        Globals().identityVerified.value = false;
-        Events().emit(IdentityCallbackEvent(type: 'failed'));
-      }
-    });
-    final data = await getVerificationData();
-    await saveIdentity(data.fullName, data.docIssuingCountry, data.docDob,
-        data.docSex, data.scanRef);
+    if (verificationStatus.status == 'VERIFIED' ||
+        verificationStatus.status == 'SUSPECTED') {
+      identityVerified = true;
+      setIsIdentityVerified(true);
+      Globals().identityVerified.value = true;
+      final data = await getVerificationData();
+      await saveIdentity(data.fullName, data.docIssuingCountry, data.docDob,
+          data.docSex, data.scanRef);
+      Events().emit(IdentityCallbackEvent(type: 'success'));
+    } else {
+      identityVerified = false;
+      setIsIdentityVerified(false);
+      Globals().identityVerified.value = false;
+      Events().emit(IdentityCallbackEvent(type: 'failed'));
+    }
+    setState(() {});
   }
 
   Widget _pleaseWait() {
@@ -885,9 +884,7 @@ class _IdentityVerificationScreenState
                   if (!snapshot.hasData) {
                     return _pleaseWait();
                   }
-
-                  String name = getFullNameOfObject(
-                      jsonDecode(snapshot.data['identityName']));
+                  String name = snapshot.data['identityName'];
                   return Column(
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.start,
