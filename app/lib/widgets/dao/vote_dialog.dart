@@ -87,7 +87,7 @@ class _VoteDialogState extends State<VoteDialog> {
           child: Text(
             'No farms available with online node to vote.',
             style: Theme.of(context).textTheme.bodyLarge!.copyWith(
-                  color: Theme.of(context).colorScheme.onBackground,
+                  color: Theme.of(context).colorScheme.onSurface,
                 ),
             textAlign: TextAlign.center,
           ),
