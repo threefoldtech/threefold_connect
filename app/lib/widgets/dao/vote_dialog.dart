@@ -81,109 +81,123 @@ class _VoteDialogState extends State<VoteDialog> {
         ),
       );
     } else {
-      content = Padding(
-        padding: const EdgeInsets.all(30),
-        child: Flex(
-          direction: Axis.vertical,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            DropdownMenu(
-              menuHeight: MediaQuery.sizeOf(context).height * 0.3,
-              enableFilter: true,
-              width: MediaQuery.sizeOf(context).width * 0.55,
-              textStyle: Theme.of(context).textTheme.bodyLarge!.copyWith(
-                    color: Theme.of(context).colorScheme.onSurface,
-                  ),
-              trailingIcon: const Icon(
-                CupertinoIcons.chevron_down,
-                size: 18,
-              ),
-              selectedTrailingIcon: const Icon(
-                CupertinoIcons.chevron_up,
-                size: 18,
-              ),
-              inputDecorationTheme: InputDecorationTheme(
-                filled: true,
-                fillColor: Theme.of(context).colorScheme.secondaryContainer,
-                enabledBorder: UnderlineInputBorder(
-                  borderRadius: const BorderRadius.all(Radius.circular(4)),
-                  borderSide: BorderSide(
-                    color: Theme.of(context).colorScheme.secondaryContainer,
-                    width: 8.0,
-                  ),
+      if (farms.isEmpty) {
+        content = Padding(
+          padding: const EdgeInsets.all(30),
+          child: Text(
+            'No farms available with online node to vote.',
+            style: Theme.of(context).textTheme.bodyLarge!.copyWith(
+                  color: Theme.of(context).colorScheme.onBackground,
                 ),
-              ),
-              menuStyle: MenuStyle(
-                shape: WidgetStateProperty.all<RoundedRectangleBorder>(
-                  const RoundedRectangleBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(4)),
-                  ),
-                ),
-              ),
-              label: Text(
-                'Select Farm',
-                style: Theme.of(context).textTheme.bodyLarge!.copyWith(
-                      color: Theme.of(context).colorScheme.onSecondaryContainer,
+            textAlign: TextAlign.center,
+          ),
+        );
+      } else {
+        content = Padding(
+          padding: const EdgeInsets.all(30),
+          child: Flex(
+            direction: Axis.vertical,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              DropdownMenu(
+                menuHeight: MediaQuery.sizeOf(context).height * 0.3,
+                enableFilter: true,
+                width: MediaQuery.sizeOf(context).width * 0.55,
+                textStyle: Theme.of(context).textTheme.bodyLarge!.copyWith(
+                      color: Theme.of(context).colorScheme.onSurface,
                     ),
+                trailingIcon: const Icon(
+                  CupertinoIcons.chevron_down,
+                  size: 18,
+                ),
+                selectedTrailingIcon: const Icon(
+                  CupertinoIcons.chevron_up,
+                  size: 18,
+                ),
+                inputDecorationTheme: InputDecorationTheme(
+                  filled: true,
+                  fillColor: Theme.of(context).colorScheme.secondaryContainer,
+                  enabledBorder: UnderlineInputBorder(
+                    borderRadius: const BorderRadius.all(Radius.circular(4)),
+                    borderSide: BorderSide(
+                      color: Theme.of(context).colorScheme.secondaryContainer,
+                      width: 8.0,
+                    ),
+                  ),
+                ),
+                menuStyle: MenuStyle(
+                  shape: WidgetStateProperty.all<RoundedRectangleBorder>(
+                    const RoundedRectangleBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(4)),
+                    ),
+                  ),
+                ),
+                label: Text(
+                  'Select Farm',
+                  style: Theme.of(context).textTheme.bodyLarge!.copyWith(
+                        color:
+                            Theme.of(context).colorScheme.onSecondaryContainer,
+                      ),
+                ),
+                dropdownMenuEntries: _buildDropdownMenuEntries(farms),
+                onSelected: (int? value) {
+                  if (value != null) {
+                    farmId = value;
+                  }
+                },
               ),
-              dropdownMenuEntries: _buildDropdownMenuEntries(farms),
-              onSelected: (int? value) {
-                if (value != null) {
-                  farmId = value;
-                }
-              },
-            ),
-            const SizedBox(height: 20),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                ElevatedButton(
-                  onPressed: () {
-                    _vote(true);
-                  },
-                  child: yesLoading
-                      ? const SizedBox(
-                          width: 20,
-                          height: 20,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                          ))
-                      : Text(
-                          'Yes',
-                          style:
-                              Theme.of(context).textTheme.bodyLarge!.copyWith(
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .onPrimaryContainer,
-                                  ),
-                        ),
-                ),
-                ElevatedButton(
-                  onPressed: () {
-                    _vote(false);
-                  },
-                  child: noLoading
-                      ? const SizedBox(
-                          width: 20,
-                          height: 20,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                          ))
-                      : Text(
-                          'No',
-                          style:
-                              Theme.of(context).textTheme.bodyLarge!.copyWith(
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .onPrimaryContainer,
-                                  ),
-                        ),
-                ),
-              ],
-            ),
-          ],
-        ),
-      );
+              const SizedBox(height: 20),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  ElevatedButton(
+                    onPressed: () {
+                      _vote(true);
+                    },
+                    child: yesLoading
+                        ? const SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                            ))
+                        : Text(
+                            'Yes',
+                            style:
+                                Theme.of(context).textTheme.bodyLarge!.copyWith(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onPrimaryContainer,
+                                    ),
+                          ),
+                  ),
+                  ElevatedButton(
+                    onPressed: () {
+                      _vote(false);
+                    },
+                    child: noLoading
+                        ? const SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                            ))
+                        : Text(
+                            'No',
+                            style:
+                                Theme.of(context).textTheme.bodyLarge!.copyWith(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onPrimaryContainer,
+                                    ),
+                          ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        );
+      }
     }
     return Dialog(
         shape: RoundedRectangleBorder(
