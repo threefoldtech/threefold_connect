@@ -10,6 +10,7 @@ import 'package:threebotlogin/events/identity_callback_event.dart';
 import 'package:threebotlogin/helpers/globals.dart';
 import 'package:threebotlogin/helpers/kyc_helpers.dart';
 import 'package:threebotlogin/main.dart';
+import 'package:threebotlogin/models/idenfy.dart';
 import 'package:threebotlogin/services/gridproxy_service.dart';
 import 'package:threebotlogin/services/idenfy_service.dart';
 import 'package:threebotlogin/services/identity_service.dart';
@@ -137,8 +138,7 @@ class _IdentityVerificationScreenState
     });
     getVerificationStatus().then((verificationStatus) {
       setState(() {
-        if (verificationStatus.status == 'VERIFIED' ||
-            verificationStatus.status == 'SUSPECTED') {
+        if (verificationStatus.status == VerificationState.VERIFIED) {
           identityVerified = true;
           setIsIdentityVerified(true);
         } else {
@@ -320,13 +320,13 @@ class _IdentityVerificationScreenState
         );
       }
     }
+    await Future.delayed(Duration(seconds: 5));
     await handleIdenfyResponse(idenfySDKresult);
   }
 
   Future<void> handleIdenfyResponse(IdenfyIdentificationResult? result) async {
     final verificationStatus = await getVerificationStatus();
-    if (verificationStatus.status == 'VERIFIED' ||
-        verificationStatus.status == 'SUSPECTED') {
+    if (verificationStatus.status == VerificationState.VERIFIED) {
       identityVerified = true;
       setIsIdentityVerified(true);
       Globals().identityVerified.value = true;
@@ -837,10 +837,10 @@ class _IdentityVerificationScreenState
       isLoading = true;
     });
 
+    Token token;
     try {
       // TODO: handle token failure cases (e.g.: max retries exceed, unauthorized, ...)
-      final token = await getToken();
-      await initIdenfySdk(token.authToken);
+      token = await getToken();
 
       setState(() {
         isLoading = false;
@@ -871,6 +871,7 @@ class _IdentityVerificationScreenState
         ),
       );
     }
+    await initIdenfySdk(token.authToken);
   }
 
   Future<dynamic> showIdentityDetails() {

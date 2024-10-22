@@ -1,3 +1,9 @@
+enum VerificationState {
+  VERIFIED,
+  REJECTED,
+  NOTVERIFIED,
+}
+
 class Token {
   const Token({
     required this.message,
@@ -42,15 +48,18 @@ class VerificationStatus {
   final bool final_;
   final String idenfyRef;
   final String clientId;
-  final String status;
+  final VerificationState status;
 
   factory VerificationStatus.fromJson(Map<String, dynamic> json) {
-    print(json);
     return VerificationStatus(
         final_: json['final'],
         idenfyRef: json['idenfyRef'],
         clientId: json['clientId'],
-        status: json['status']);
+        status: json['status'] == VerificationState.VERIFIED.name
+            ? VerificationState.VERIFIED
+            : json['status'] == VerificationState.REJECTED.name
+                ? VerificationState.REJECTED
+                : VerificationState.NOTVERIFIED);
   }
 }
 
@@ -136,7 +145,6 @@ class VerificationData {
   final String? clientId;
 
   factory VerificationData.fromJson(Map<String, dynamic> json) {
-    print(json);
     return VerificationData(
         docFirstName: json['docFirstName'],
         docLastName: json['docLastName'],

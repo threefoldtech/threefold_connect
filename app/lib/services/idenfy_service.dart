@@ -53,7 +53,7 @@ Future<VerificationStatus> getVerificationStatus() async {
         idenfyRef: '',
         final_: false,
         clientId: headers['X-Client-ID']!,
-        status: 'NotVerified');
+        status: VerificationState.NOTVERIFIED);
   } else {
     throw Exception(
         'Failed to fetch verification status due to ${response.body}');

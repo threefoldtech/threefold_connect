@@ -65,8 +65,10 @@ Future<void> handleKYCData(
   if (isIdentityVerified == true) {
     Globals().identityVerified.value = true;
     final data = await getVerificationData();
-    await saveIdentity(data.fullName, data.docIssuingCountry, data.docDob,
-        data.docSex, data.scanRef);
+    final firstName = utf8.decode(latin1.encode(data.orgFirstName!));
+    final lastName = utf8.decode(latin1.encode(data.orgLastName!));
+    await saveIdentity('$lastName $firstName', data.docIssuingCountry,
+        data.docDob, data.docSex, data.scanRef);
   }
 }
 
@@ -74,8 +76,7 @@ Future<void> saveCorrectVerificationStates(
     Map<dynamic, dynamic> emailData,
     Map<dynamic, dynamic> phoneData,
     VerificationStatus identityVerificationStatus) async {
-  if (identityVerificationStatus.status == 'VERIFIED' ||
-      identityVerificationStatus.status == 'SUSPECTED') {
+  if (identityVerificationStatus.status == VerificationState.VERIFIED) {
     await setIsIdentityVerified(true);
   } else {
     await setIsIdentityVerified(false);
