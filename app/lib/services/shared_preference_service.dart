@@ -264,7 +264,7 @@ Future<void> saveIdentity(String? identityName, String? identityCountry,
   prefs.remove('identityDOB');
   prefs.remove('identityGender');
 
-  prefs.setString('identityName', jsonEncode(identityName));
+  prefs.setString('identityName', identityName!);
   prefs.setString('identityCountry', identityCountry!);
   prefs.setString('identityDOB', identityDOB!);
   prefs.setString('identityGender', identityGender!);

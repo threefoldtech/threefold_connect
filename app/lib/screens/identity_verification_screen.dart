@@ -324,8 +324,6 @@ class _IdentityVerificationScreenState
   }
 
   Future<void> handleIdenfyResponse(IdenfyIdentificationResult? result) async {
-    print(result);
-    // TODO: we might can you use the result directly to know the status
     final verificationStatus = await getVerificationStatus();
     if (verificationStatus.status == 'VERIFIED' ||
         verificationStatus.status == 'SUSPECTED') {
@@ -333,8 +331,10 @@ class _IdentityVerificationScreenState
       setIsIdentityVerified(true);
       Globals().identityVerified.value = true;
       final data = await getVerificationData();
-      await saveIdentity(data.fullName, data.docIssuingCountry, data.docDob,
-          data.docSex, data.scanRef);
+      final firstName = utf8.decode(latin1.encode(data.orgFirstName!));
+      final lastName = utf8.decode(latin1.encode(data.orgLastName!));
+      await saveIdentity('$lastName $firstName', data.docIssuingCountry,
+          data.docDob, data.docSex, data.scanRef);
       Events().emit(IdentityCallbackEvent(type: 'success'));
     } else {
       identityVerified = false;
