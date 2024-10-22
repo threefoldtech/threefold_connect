@@ -898,7 +898,7 @@ class _IdentityVerificationScreenState
                           child: Column(
                             children: [
                               Text(
-                                'OpenKYC ID CARD',
+                                'ID CARD',
                                 style: Theme.of(context)
                                     .textTheme
                                     .titleLarge!
