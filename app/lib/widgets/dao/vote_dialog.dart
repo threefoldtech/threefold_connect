@@ -82,15 +82,12 @@ class _VoteDialogState extends State<VoteDialog> {
       );
     } else {
       if (farms.isEmpty) {
-        content = Padding(
-          padding: const EdgeInsets.all(30),
-          child: Text(
-            'No farms available with online node to vote.',
-            style: Theme.of(context).textTheme.bodyLarge!.copyWith(
-                  color: Theme.of(context).colorScheme.onSurface,
-                ),
-            textAlign: TextAlign.center,
-          ),
+        content = Text(
+          'No farms available with online node to vote.',
+          style: Theme.of(context).textTheme.bodyLarge!.copyWith(
+                color: Theme.of(context).colorScheme.onSurface,
+              ),
+          textAlign: TextAlign.center,
         );
       } else {
         content = Padding(
@@ -199,11 +196,19 @@ class _VoteDialogState extends State<VoteDialog> {
         );
       }
     }
-    return Dialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10),
-        ),
-        child: content);
+    return CustomDialog(
+      title: 'Vote',
+      widgetDescription: content,
+      image: Icons.how_to_vote_outlined,
+      actions: <Widget>[
+        TextButton(
+          child: const Text('Close'),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        )
+      ],
+    );
   }
 
   void _vote(bool approve) async {
