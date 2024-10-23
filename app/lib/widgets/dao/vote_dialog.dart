@@ -187,15 +187,8 @@ class _VoteDialogState extends State<VoteDialog> {
                               strokeWidth: 2,
                             ),
                           )
-                        : Text(
+                        : const Text(
                             'Yes',
-                            style: Theme.of(context)
-                                .textTheme
-                                .bodyMedium!
-                                .copyWith(
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .onSurface),
                           ),
                     onPressed: () async {
                       _vote(true);
