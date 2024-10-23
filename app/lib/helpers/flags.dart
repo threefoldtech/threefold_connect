@@ -75,6 +75,12 @@ class Flags {
     Globals().newsUrl = (await Flags().getFlagValueByFeatureName('news-url'))!;
     Globals().idenfyServiceUrl =
         (await Flags().getFlagValueByFeatureName('idenfy-service-url'))!;
+    Globals().maximumKYCRetries = int.parse(
+        (await Flags().getFlagValueByFeatureName('max-kyc-retries'))
+            .toString());
+    Globals().minimumTFChainBalanceForKYC = int.parse(
+        (await Flags().getFlagValueByFeatureName('min-tfchain-balance-for-kyc'))
+            .toString());
   }
 
   Future<bool> hasFlagValueByFeatureName(String name) async {

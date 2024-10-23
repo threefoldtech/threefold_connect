@@ -296,6 +296,8 @@ class _IdentityVerificationScreenState
   Future<void> initIdenfySdk(String token) async {
     IdenfyIdentificationResult? idenfySDKresult;
     try {
+      // TODO: handle cancel request
+      // TODO: check the reject flow
       idenfySDKresult = await IdenfySdkFlutter.start(token);
     } catch (e) {
       print(e);
@@ -849,6 +851,7 @@ class _IdentityVerificationScreenState
       setState(() {
         isLoading = false;
       });
+      final maxRetries = Globals().maximumKYCRetries;
       return showDialog(
           context: context,
           builder: (BuildContext context) => CustomDialog(
@@ -856,7 +859,7 @@ class _IdentityVerificationScreenState
                 image: Icons.warning,
                 title: 'Maximum requests reached',
                 description:
-                    'You already had exceeded the maximum requests in last 24 hours.\nPlease try again in 24 hours.',
+                    'You already had $maxRetries requests in last 24 hours.\nPlease try again in 24 hours.',
                 actions: <Widget>[
                   TextButton(
                     child: const Text('Close'),
@@ -870,15 +873,15 @@ class _IdentityVerificationScreenState
       setState(() {
         isLoading = false;
       });
+      final minimumBalance = Globals().minimumTFChainBalanceForKYC;
       return showDialog(
           context: context,
           builder: (BuildContext context) => CustomDialog(
                 type: DialogType.Warning,
                 image: Icons.warning,
                 title: 'Not Enough Balance',
-                // TODO: the number of token should be configured
                 description:
-                    "You don't have enough balance.\nPlease fund your account with some tokens.",
+                    "You don't have enough balance.\nPlease fund your account at least $minimumBalance TFTs.",
                 actions: <Widget>[
                   TextButton(
                     child: const Text('Close'),
@@ -899,6 +902,7 @@ class _IdentityVerificationScreenState
                 image: Icons.warning,
                 title: "Account doesn't exist",
                 description:
+                    // TODO: initialize tfchain wallet with stellar wallet
                     'Your account is not activated.\nPlease go to wallet section and initialize your wallet.',
                 actions: <Widget>[
                   TextButton(

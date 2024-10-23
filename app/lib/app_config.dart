@@ -209,6 +209,8 @@ void setFallbackConfigs() {
   print("Can't connect to FlagSmith, setting default configs... ");
 
   Globals().isOpenKYCEnabled = false;
+  Globals().maximumKYCRetries = 5;
+  Globals().minimumTFChainBalanceForKYC = 0;
   Globals().debugMode = false;
   Globals().useNewWallet = false;
   Globals().newWalletUrl = '';
