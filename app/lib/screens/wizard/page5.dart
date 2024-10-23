@@ -1,9 +1,7 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:threebotlogin/screens/wizard/web_view.dart';
 import 'package:threebotlogin/services/shared_preference_service.dart';
-import 'package:threebotlogin/widgets/wizard/terms_agreement.dart';
 
 class Page5 extends StatefulWidget {
   const Page5({super.key});
@@ -13,6 +11,8 @@ class Page5 extends StatefulWidget {
 }
 
 class _Page5State extends State<Page5> {
+  bool agreed = false;
+  bool attemptToContinue = false;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -54,14 +54,12 @@ class _Page5State extends State<Page5> {
                 padding: const EdgeInsets.all(10),
                 child: ElevatedButton(
                     onPressed: () async {
-                      final termsAgreement =
-                          Provider.of<TermsAgreement>(context, listen: false);
-                      if (!termsAgreement.isChecked) {
-                        termsAgreement.attemptToContinue();
-                      } else {
+                      if (agreed) {
                         saveInitDone();
                         Navigator.pop(context, true);
                       }
+                      attemptToContinue = true;
+                      setState(() {});
                     },
                     style: ElevatedButton.styleFrom(
                       shape: RoundedRectangleBorder(
@@ -75,66 +73,58 @@ class _Page5State extends State<Page5> {
                           color: Theme.of(context).colorScheme.onPrimary),
                     )),
               ),
-              Consumer<TermsAgreement>(
-                  builder: (context, termsAgreement, child) {
-                return Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Checkbox(
-                      value: termsAgreement.isChecked,
-                      onChanged: (bool? value) {
-                        termsAgreement.toggleChecked(value ?? false);
-                      },
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Checkbox(
+                    value: agreed,
+                    onChanged: (bool? value) {
+                      agreed = value ?? false;
+                      setState(() {});
+                    },
+                  ),
+                  RichText(
+                    text: TextSpan(
+                      children: [
+                        TextSpan(
+                          text: "I agree to Threefold's ",
+                          style: Theme.of(context)
+                              .textTheme
+                              .bodyMedium!
+                              .copyWith(
+                                color: !agreed && attemptToContinue
+                                    ? Theme.of(context).colorScheme.error
+                                    : Theme.of(context).colorScheme.onSurface,
+                              ),
+                        ),
+                        TextSpan(
+                          text: 'Terms and conditions.',
+                          style: Theme.of(context)
+                              .textTheme
+                              .bodyMedium!
+                              .copyWith(
+                                color: !agreed && attemptToContinue
+                                    ? Theme.of(context).colorScheme.error
+                                    : Colors.blue,
+                                decoration: TextDecoration.underline,
+                                decorationColor: !agreed && attemptToContinue
+                                    ? Theme.of(context).colorScheme.error
+                                    : Colors.blue,
+                              ),
+                          recognizer: TapGestureRecognizer()
+                            ..onTap = () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => const WebView()),
+                              );
+                            },
+                        ),
+                      ],
                     ),
-                    RichText(
-                      text: TextSpan(
-                        children: [
-                          TextSpan(
-                            text: "I agree to Threefold's ",
-                            style: Theme.of(context)
-                                .textTheme
-                                .bodyMedium!
-                                .copyWith(
-                                  color: termsAgreement
-                                              .attemptedWithoutAccepting &&
-                                          !termsAgreement.isChecked
-                                      ? Theme.of(context).colorScheme.error
-                                      : Theme.of(context).colorScheme.onSurface,
-                                ),
-                          ),
-                          TextSpan(
-                            text: 'Terms and conditions.',
-                            style: Theme.of(context)
-                                .textTheme
-                                .bodyMedium!
-                                .copyWith(
-                                  color: termsAgreement
-                                              .attemptedWithoutAccepting &&
-                                          !termsAgreement.isChecked
-                                      ? Theme.of(context).colorScheme.error
-                                      : Colors.blue,
-                                  decoration: TextDecoration.underline,
-                                  decorationColor: termsAgreement
-                                              .attemptedWithoutAccepting &&
-                                          !termsAgreement.isChecked
-                                      ? Theme.of(context).colorScheme.error
-                                      : Colors.blue,
-                                ),
-                            recognizer: TapGestureRecognizer()
-                              ..onTap = () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => const WebView()),
-                                );
-                              },
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                );
-              })
+                  ),
+                ],
+              )
             ])
           ],
         ),
