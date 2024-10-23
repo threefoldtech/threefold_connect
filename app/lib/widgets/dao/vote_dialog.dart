@@ -143,54 +143,6 @@ class _VoteDialogState extends State<VoteDialog> {
                   }
                 },
               ),
-              const SizedBox(height: 20),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  ElevatedButton(
-                    onPressed: () {
-                      _vote(true);
-                    },
-                    child: yesLoading
-                        ? const SizedBox(
-                            width: 20,
-                            height: 20,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                            ))
-                        : Text(
-                            'Yes',
-                            style:
-                                Theme.of(context).textTheme.bodyLarge!.copyWith(
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .onPrimaryContainer,
-                                    ),
-                          ),
-                  ),
-                  ElevatedButton(
-                    onPressed: () {
-                      _vote(false);
-                    },
-                    child: noLoading
-                        ? const SizedBox(
-                            width: 20,
-                            height: 20,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                            ))
-                        : Text(
-                            'No',
-                            style:
-                                Theme.of(context).textTheme.bodyLarge!.copyWith(
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .onPrimaryContainer,
-                                    ),
-                          ),
-                  ),
-                ],
-              ),
             ],
           ),
         );
@@ -200,14 +152,56 @@ class _VoteDialogState extends State<VoteDialog> {
       title: 'Vote',
       widgetDescription: content,
       image: Icons.how_to_vote_outlined,
-      actions: <Widget>[
-        TextButton(
-          child: const Text('Close'),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        )
-      ],
+      actions: farms.isEmpty && !loading
+          ? <Widget>[
+              TextButton(
+                child: const Text('Close'),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              ),
+            ]
+          : loading
+              ? null
+              : <Widget>[
+                  TextButton(
+                    child: noLoading
+                        ? const SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                            ),
+                          )
+                        : const Text('No'),
+                    onPressed: () {
+                      _vote(false);
+                    },
+                  ),
+                  TextButton(
+                    child: yesLoading
+                        ? const SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                            ),
+                          )
+                        : Text(
+                            'Yes',
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodyMedium!
+                                .copyWith(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onSurface),
+                          ),
+                    onPressed: () async {
+                      _vote(true);
+                    },
+                  )
+                ],
     );
   }
 
@@ -219,6 +213,20 @@ class _VoteDialogState extends State<VoteDialog> {
     final farm = farms.firstWhere((farm) => farm.farmID == farmId);
     final twinId = farm.twinId;
     final seed = twinIdWallets[twinId]!['tfchainSeed'];
+    final votes = await getProposalVotes(widget.proposalHash);
+
+    final hasVotedYes = votes.ayes.any((vote) => vote.farmId == farmId);
+    final hasVotedNo = votes.nays.any((vote) => vote.farmId == farmId);
+
+    if ((approve && hasVotedYes) || (!approve && hasVotedNo)) {
+      _showDialog('Voted!', 'You have voted successfully.', Icons.check,
+          DialogType.Info);
+      setState(() {
+        yesLoading = false;
+        noLoading = false;
+      });
+      return;
+    }
     try {
       await vote(approve, widget.proposalHash, farmId!, seed!);
 

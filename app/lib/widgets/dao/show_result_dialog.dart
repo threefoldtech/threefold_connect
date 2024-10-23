@@ -181,17 +181,9 @@ class _ShowResultDialogState extends State<ShowResultDialog>
     }
 
     return CustomDialog(
-      title: 'Vote',
+      title: 'Voting Result',
       widgetDescription: content,
       image: Icons.how_to_vote_outlined,
-      actions: <Widget>[
-        TextButton(
-          child: const Text('Close'),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        )
-      ],
     );
   }
 }
