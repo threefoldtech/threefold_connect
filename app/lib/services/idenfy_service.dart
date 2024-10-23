@@ -34,6 +34,8 @@ Future<Token> getToken() async {
   if (response.statusCode == 201 || response.statusCode == 200) {
     return Token.fromJson(jsonDecode(response.body)['result']);
   } else if (response.statusCode == 500) {
+    // TODO: already verified error
+    // TODO: invalid signature
     if (response.body.contains('Too Many Requests')) {
       throw const TooManyRequests('Too many retries');
     } else if (response.body.contains('Not enough balance')) {

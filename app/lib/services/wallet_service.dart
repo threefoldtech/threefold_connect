@@ -187,3 +187,8 @@ Future<Map<int, Map<String, String>>> getWalletsTwinIds() async {
   twinWallets.removeWhere((key, value) => key == 0);
   return twinWallets;
 }
+
+Future<void> initializeWallet(String stellarSecret, String tfchainSeed) async {
+  await StellarService.initialize(stellarSecret);
+  await TFChainService.activateAccount(tfchainSeed);
+}

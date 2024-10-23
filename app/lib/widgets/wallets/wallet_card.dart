@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:threebotlogin/helpers/globals.dart';
 import 'package:threebotlogin/models/wallet.dart';
 import 'package:threebotlogin/screens/wallets/wallet_details.dart';
-import 'package:threebotlogin/services/stellar_service.dart';
+import 'package:threebotlogin/services/stellar_service.dart' as StellarService;
+import 'package:threebotlogin/services/tfchain_service.dart' as TFChainService;
+import 'package:threebotlogin/services/wallet_service.dart';
 
 class WalletCardWidget extends StatefulWidget {
   const WalletCardWidget(
@@ -27,9 +30,15 @@ class _WalletCardWidgetState extends State<WalletCardWidget> {
       initialWalletLoading = true;
     });
     try {
-      await initialize(widget.wallet.stellarSecret);
+      final chainUrl = Globals().chainUrl;
+      await initializeWallet(
+          widget.wallet.stellarSecret, widget.wallet.tfchainSecret);
       widget.wallet.stellarBalance =
-          await getBalance(widget.wallet.stellarSecret);
+          await StellarService.getBalance(widget.wallet.stellarSecret);
+      final tfchainBalance = await TFChainService.getBalance(
+          chainUrl, widget.wallet.tfchainSecret);
+      widget.wallet.tfchainBalance =
+          tfchainBalance.toString() == '0.0' ? '0' : tfchainBalance.toString();
     } catch (e) {
       print('Failed to initialize wallet due to $e');
       if (context.mounted) {

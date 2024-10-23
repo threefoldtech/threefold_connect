@@ -110,7 +110,7 @@ Future<DaoVotes> vote(bool vote, String hash, int farmId, String seed) async {
   }
 }
 
-_activateAccount(String tfchainSeed) async {
+activateAccount(String tfchainSeed) async {
   final activationUrl = Globals().activationUrl;
   final chainUrl = Globals().chainUrl;
   final client = TFChain.Client(chainUrl, tfchainSeed, 'sr25519');
@@ -152,7 +152,7 @@ Future<Farm?> createFarm(
     client.connect();
     final twinId = await getTwinIdByClient(client);
     if (twinId == 0) {
-      await _activateAccount(tfchainSeed);
+      await activateAccount(tfchainSeed);
     }
     final farmId = await client.farms.create(name: name, publicIps: []);
     final farm = await client.farms.get(id: farmId!);

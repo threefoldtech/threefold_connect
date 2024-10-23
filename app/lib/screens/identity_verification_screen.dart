@@ -902,7 +902,6 @@ class _IdentityVerificationScreenState
                 image: Icons.warning,
                 title: "Account doesn't exist",
                 description:
-                    // TODO: initialize tfchain wallet with stellar wallet
                     'Your account is not activated.\nPlease go to wallet section and initialize your wallet.',
                 actions: <Widget>[
                   TextButton(
