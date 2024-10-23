@@ -187,10 +187,26 @@ class VerificationData {
   }
 }
 
-class NotFound implements Exception {
+class TooManyRequests implements Exception {
   final String msg;
-  const NotFound(this.msg);
+  const TooManyRequests(this.msg);
 
   @override
-  String toString() => 'NotFound: $msg';
+  String toString() => msg;
+}
+
+class NotEnoughBalance implements Exception {
+  final String msg;
+  const NotEnoughBalance(this.msg);
+
+  @override
+  String toString() => msg;
+}
+
+class NoTwinId implements Exception {
+  final String msg;
+  const NoTwinId(this.msg);
+
+  @override
+  String toString() => msg;
 }

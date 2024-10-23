@@ -839,18 +839,80 @@ class _IdentityVerificationScreenState
 
     Token token;
     try {
-      // TODO: handle token failure cases (e.g.: max retries exceed, unauthorized, ...)
       token = await getToken();
 
       setState(() {
         isLoading = false;
         isInIdentityProcess = true;
       });
+    } on TooManyRequests catch (_) {
+      setState(() {
+        isLoading = false;
+      });
+      return showDialog(
+          context: context,
+          builder: (BuildContext context) => CustomDialog(
+                type: DialogType.Warning,
+                image: Icons.warning,
+                title: 'Maximum requests reached',
+                description:
+                    'You already had exceeded the maximum requests in last 24 hours.\nPlease try again in 24 hours.',
+                actions: <Widget>[
+                  TextButton(
+                    child: const Text('Close'),
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                  ),
+                ],
+              ));
+    } on NotEnoughBalance catch (_) {
+      setState(() {
+        isLoading = false;
+      });
+      return showDialog(
+          context: context,
+          builder: (BuildContext context) => CustomDialog(
+                type: DialogType.Warning,
+                image: Icons.warning,
+                title: 'Not Enough Balance',
+                // TODO: the number of token should be configured
+                description:
+                    "You don't have enough balance.\nPlease fund your account with some tokens.",
+                actions: <Widget>[
+                  TextButton(
+                    child: const Text('Close'),
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                  ),
+                ],
+              ));
+    } on NoTwinId catch (_) {
+      setState(() {
+        isLoading = false;
+      });
+      return showDialog(
+          context: context,
+          builder: (BuildContext context) => CustomDialog(
+                type: DialogType.Warning,
+                image: Icons.warning,
+                title: "Account doesn't exist",
+                description:
+                    'Your account is not activated.\nPlease go to wallet section and initialize your wallet.',
+                actions: <Widget>[
+                  TextButton(
+                    child: const Text('Close'),
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                  ),
+                ],
+              ));
     } catch (e) {
       setState(() {
         isLoading = false;
       });
-
       print(e);
       return showDialog(
         context: context,

@@ -33,9 +33,16 @@ Future<Token> getToken() async {
   );
   if (response.statusCode == 201 || response.statusCode == 200) {
     return Token.fromJson(jsonDecode(response.body)['result']);
-  } else {
-    throw Exception('Failed to get token due to ${response.body}');
+  } else if (response.statusCode == 500) {
+    if (response.body.contains('Too Many Requests')) {
+      throw const TooManyRequests('Too many retries');
+    } else if (response.body.contains('Not enough balance')) {
+      throw const NotEnoughBalance('Not enough Balance');
+    } else if (response.body.contains('No twin id')) {
+      throw const NoTwinId('No twin id');
+    }
   }
+  throw Exception('Failed to get token due to ${response.body}');
 }
 
 Future<VerificationStatus> getVerificationStatus() async {
