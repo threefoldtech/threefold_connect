@@ -17,10 +17,8 @@ class ReuseableTextStep extends StatelessWidget {
       children: <Widget>[
         Text(
           titleText,
-          style: Theme.of(context)
-              .textTheme
-              .bodyMedium!
-              .copyWith(color: Theme.of(context).colorScheme.onSecondaryContainer),
+          style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+              color: Theme.of(context).colorScheme.onSecondaryContainer),
         ),
         const Divider(
           height: 30,
@@ -34,7 +32,8 @@ class ReuseableTextStep extends StatelessWidget {
                 child: Text(
                   extraText,
                   style: Theme.of(context).textTheme.titleLarge!.copyWith(
-                        color: Theme.of(context).colorScheme.onSecondaryContainer,
+                        color:
+                            Theme.of(context).colorScheme.onSecondaryContainer,
                         fontWeight: FontWeight.bold,
                       ),
                 ),

@@ -71,6 +71,10 @@ dependencies:
   flutter_riverpod: 2.5.1
   # idenfy_sdk_flutter: 2.5.3
 
+  convert: any
+  crypto: any
+  hashlib: any
+  stellar_flutter_sdk: any
 dev_dependencies:
   flutter_test:
     sdk: flutter

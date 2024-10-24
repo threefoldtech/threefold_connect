@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:threebotlogin/services/tfchain_service.dart';
+import 'package:threebotlogin/widgets/custom_dialog.dart';
 
 class ShowResultDialog extends StatefulWidget {
   final String proposalHash;
@@ -179,11 +180,10 @@ class _ShowResultDialogState extends State<ShowResultDialog>
       );
     }
 
-    return Dialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10),
-        ),
-        backgroundColor: Theme.of(context).colorScheme.surface,
-        child: content);
+    return CustomDialog(
+      title: 'Voting Result',
+      widgetDescription: content,
+      image: Icons.how_to_vote_outlined,
+    );
   }
 }

@@ -439,7 +439,11 @@ class _MobileRegistrationScreenState extends State<MobileRegistrationScreen> {
             style: Theme.of(context)
                 .textTheme
                 .titleMedium!
-                .copyWith(color: Theme.of(context).colorScheme.onSurface),
+                .copyWith(color: state.index >= _State.Email.index
+                      ? Theme.of(context)
+                          .colorScheme
+                          .onSurface
+                      : Colors.grey,),
           ),
           subtitle: state.index > _State.Email.index
               ? Text(
@@ -471,7 +475,16 @@ class _MobileRegistrationScreenState extends State<MobileRegistrationScreen> {
               : state == _State.SeedPhrase
                   ? StepState.editing
                   : StepState.disabled,
-          title: const Text('Seed phrase'),
+          title: Text(
+            'Seed phrase',
+            style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                  color: state.index >= _State.SeedPhrase.index
+                      ? Theme.of(context)
+                          .colorScheme
+                          .onSurface
+                      : Colors.grey,
+                ),
+          ),
           content: Card(
             child: Padding(
                 padding: const EdgeInsets.all(16.0),
@@ -507,7 +520,14 @@ class _MobileRegistrationScreenState extends State<MobileRegistrationScreen> {
               : state == _State.ConfirmSeedPhrase
                   ? StepState.editing
                   : StepState.disabled,
-          title: const Text('Confirm seed phrase'),
+          title: Text('Confirm seed phrase',
+              style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                    color: state.index >= _State.ConfirmSeedPhrase.index
+                        ? Theme.of(context)
+                            .colorScheme
+                            .onSurface
+                        : Colors.grey,
+                  )),
           content: Card(
             child: Padding(
               padding: const EdgeInsets.all(16.0),
@@ -530,7 +550,14 @@ class _MobileRegistrationScreenState extends State<MobileRegistrationScreen> {
               : state == _State.Finish
                   ? StepState.editing
                   : StepState.disabled,
-          title: const Text('Finishing'),
+          title: Text('Finishing',
+              style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                    color: state.index >= _State.Finish.index
+                        ? Theme.of(context)
+                            .colorScheme
+                            .onSurface
+                        : Colors.grey,
+                  )),
           content: Card(
             child: Padding(
               padding: const EdgeInsets.all(16.0),

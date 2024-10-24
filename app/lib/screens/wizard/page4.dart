@@ -10,10 +10,9 @@ class Page4 extends StatelessWidget {
       title: 'THREEFOLD',
       subtitle: 'NEWS',
       imagePath: 'assets/news_outline.png',
-      description:
-          "Stay updated with ThreeFold's latest updates via the News section within the app.",
-      heightPercentage: 0.4,
-      widthPercentage: 0.75,
+      description: "Stay up to date with ThreeFolds' latest news",
+      heightPercentage: 0.35,
+      widthPercentage: 0.70,
     );
   }
 }

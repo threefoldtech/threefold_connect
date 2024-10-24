@@ -1,8 +1,6 @@
 import 'dart:convert';
-import 'dart:typed_data';
 
 import 'package:flutter/foundation.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_pkid/flutter_pkid.dart';
 import 'package:threebotlogin/apps/wallet/wallet_config.dart';
 import 'package:threebotlogin/helpers/globals.dart';
@@ -178,9 +176,9 @@ Future<Map<int, Map<String, String>>> getWalletsTwinIds() async {
     }
 
     final twinWalletMaps = await Future.wait(twinIdWalletFutures);
-    twinWalletMaps.forEach((element) {
+    for (var element in twinWalletMaps) {
       twinWallets.addAll(element);
-    });
+    }
     return twinWallets;
   }, null);
 
