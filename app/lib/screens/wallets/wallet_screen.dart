@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:threebotlogin/apps/wallet/wallet_config.dart';
 import 'package:threebotlogin/models/wallet.dart';
+import 'package:threebotlogin/providers/wallets_provider.dart';
 import 'package:threebotlogin/services/shared_preference_service.dart';
 import 'package:threebotlogin/services/wallet_service.dart';
 import 'package:threebotlogin/widgets/layout_drawer.dart';
@@ -8,14 +10,14 @@ import 'package:threebotlogin/widgets/wallets/add_wallet.dart';
 import 'package:threebotlogin/widgets/wallets/wallet_card.dart';
 import 'package:hashlib/hashlib.dart';
 
-class WalletScreen extends StatefulWidget {
+class WalletScreen extends ConsumerStatefulWidget {
   const WalletScreen({super.key});
 
   @override
-  State<WalletScreen> createState() => _WalletScreenState();
+  ConsumerState<WalletScreen> createState() => _WalletScreenState();
 }
 
-class _WalletScreenState extends State<WalletScreen> {
+class _WalletScreenState extends ConsumerState<WalletScreen> {
   bool loading = true;
   bool failed = false;
   List<Wallet> wallets = [];
@@ -103,7 +105,9 @@ class _WalletScreenState extends State<WalletScreen> {
       loading = true;
     });
     try {
-      final myWallets = await listWallets();
+      final walletRef = ref.read(walletsNotifier.notifier);
+      await walletRef.list();
+      final myWallets = ref.watch(walletsNotifier);
       wallets.addAll(myWallets);
       if (wallets.isEmpty) {
         await _addInitialWallet();
