@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 Widget getErrorWidget(BuildContext context, FlutterErrorDetails error) {
+  // print(Theme.of(context).textTheme);
   return const SafeArea(
     child: Scaffold(
       body: Column(
@@ -9,9 +10,8 @@ Widget getErrorWidget(BuildContext context, FlutterErrorDetails error) {
           Center(
             child: Padding(
               padding: EdgeInsets.all(16.0),
-              child: Text(
-                'Oops something went wrong.',
-              ),
+              child: Text('Oops something went wrong.',
+                  style: TextStyle(color: Colors.red)),
             ),
           ),
           SizedBox(
@@ -23,6 +23,9 @@ Widget getErrorWidget(BuildContext context, FlutterErrorDetails error) {
               child: Text(
                 'Please restart the application. If this error persists, please contact support.',
                 textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: Colors.red,
+                ),
               ),
             ),
           ),

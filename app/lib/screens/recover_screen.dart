@@ -56,7 +56,7 @@ class _RecoverScreenState extends State<RecoverScreen> {
       await savePublicKey(keyPair.publicKey);
 
       FlutterPkid client = await getPkidClient(seedPhrase: seedPhrase);
-      List<String> keyWords = ['email', 'phone', 'identity'];
+      List<String> keyWords = ['email', 'phone'];
 
       var futures = keyWords.map((keyword) async {
         var pKidResult = await client.getPKidDoc(keyword);
@@ -73,7 +73,7 @@ class _RecoverScreenState extends State<RecoverScreen> {
       await saveFingerprint(false);
       await saveDoubleName(doubleName);
 
-      await handleKYCData(dataMap[0], dataMap[1], dataMap[2]);
+      await handleKYCData(dataMap[0], dataMap[1]);
 
       await fixPkidMigration();
     } catch (e) {

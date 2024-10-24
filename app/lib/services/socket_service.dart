@@ -229,7 +229,7 @@ Future showIdentityMessage(BuildContext context, String type) async {
         builder: (BuildContext context) => CustomDialog(
           type: DialogType.Error,
           image: Icons.error,
-          title: 'Identity verify failed',
+          title: 'Identity verification failed',
           description:
               'Something went wrong.\nIf this issue persist, please contact support',
           actions: <Widget>[
@@ -261,104 +261,6 @@ Future showIdentityMessage(BuildContext context, String type) async {
       ),
     );
   }
-}
-
-Future identityVerification(String reference) async {
-  String doubleName = (await getDoubleName())!.toLowerCase();
-  Response response = await getSignedIdentityIdentifierFromOpenKYC(doubleName);
-
-  if (response.statusCode != 200) {
-    return;
-  }
-
-  Map<String, dynamic> identifiersData = json.decode(response.body);
-
-  String signedIdentityNameIdentifier =
-      identifiersData['signed_identity_name_identifier'];
-  String signedIdentityCountryIdentifier =
-      identifiersData['signed_identity_country_identifier'];
-  String signedIdentityDOBIdentifier =
-      identifiersData['signed_identity_dob_identifier'];
-  String signedIdentityDocumentMetaIdentifier =
-      identifiersData['signed_identity_document_meta_identifier'];
-  String signedIdentityGenderIdentifier =
-      identifiersData['signed_identity_gender_identifier'];
-
-  if (signedIdentityNameIdentifier.isEmpty ||
-      signedIdentityCountryIdentifier.isEmpty ||
-      signedIdentityDOBIdentifier.isEmpty ||
-      signedIdentityDocumentMetaIdentifier.isEmpty ||
-      signedIdentityGenderIdentifier.isEmpty) {
-    return;
-  }
-
-  Map<String, dynamic> identifiers = jsonDecode(
-      (await verifySignedIdentityIdentifier(
-              signedIdentityNameIdentifier,
-              signedIdentityCountryIdentifier,
-              signedIdentityDOBIdentifier,
-              signedIdentityDocumentMetaIdentifier,
-              signedIdentityGenderIdentifier,
-              reference))
-          .body);
-
-  var verifiedSignedIdentityNameIdentifier =
-      jsonDecode(identifiers['signedIdentityNameIdentifierVerified']);
-  var verifiedSignedIdentityCountryIdentifier =
-      jsonDecode(identifiers['signedIdentityCountryIdentifierVerified']);
-  var verifiedSignedIdentityDOBIdentifier =
-      jsonDecode(identifiers['signedIdentityDOBIdentifierVerified']);
-  var verifiedSignedIdentityDocumentMetaIdentifier =
-      jsonDecode(identifiers['signedIdentityDocumentMetaIdentifierVerified']);
-  var verifiedSignedIdentityGenderIdentifier =
-      jsonDecode(identifiers['signedIdentityGenderIdentifierVerified']);
-
-  if (verifiedSignedIdentityNameIdentifier == null ||
-      verifiedSignedIdentityNameIdentifier['identifier'].toString() !=
-          doubleName) {
-    return;
-  }
-
-  if (verifiedSignedIdentityCountryIdentifier == null ||
-      verifiedSignedIdentityCountryIdentifier['identifier'].toString() !=
-          doubleName) {
-    return;
-  }
-
-  if (verifiedSignedIdentityDOBIdentifier == null ||
-      verifiedSignedIdentityDOBIdentifier['identifier'].toString() !=
-          doubleName) {
-    return;
-  }
-
-  if (verifiedSignedIdentityDocumentMetaIdentifier == null ||
-      verifiedSignedIdentityDocumentMetaIdentifier['identifier'].toString() !=
-          doubleName) {
-    return;
-  }
-
-  if (verifiedSignedIdentityGenderIdentifier == null ||
-      verifiedSignedIdentityGenderIdentifier['identifier'].toString() !=
-          doubleName) {
-    return;
-  }
-
-  await setIsIdentityVerified(true);
-
-  await saveIdentity(
-      verifiedSignedIdentityNameIdentifier['name_data'],
-      signedIdentityNameIdentifier,
-      verifiedSignedIdentityCountryIdentifier['country_data'],
-      signedIdentityCountryIdentifier,
-      verifiedSignedIdentityDOBIdentifier['dob_data'],
-      signedIdentityDOBIdentifier,
-      verifiedSignedIdentityDocumentMetaIdentifier['document_meta_data'],
-      signedIdentityDocumentMetaIdentifier,
-      verifiedSignedIdentityGenderIdentifier['gender_data'],
-      signedIdentityGenderIdentifier,
-      reference);
-
-  return 'Verified';
 }
 
 Future openSign(BuildContext ctx, Sign signData,
