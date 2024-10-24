@@ -90,7 +90,15 @@ Future<VerificationData> getVerificationData() async {
   );
   if (response.statusCode == 200) {
     return VerificationData.fromJson(jsonDecode(response.body)['result']);
-  } else {
-    throw Exception('Failed to fetch verification data');
+  } else if (response.statusCode == 400) {
+    if (response.body.contains('bad challenge') ||
+        response.body.contains('malformed challenge')) {
+      throw const InvalidChallenge('Invalid challenge');
+    }
+  } else if (response.statusCode == 401) {
+    if (response.body.contains('bad signature')) {
+      throw const InvalidSignature('Invalid signature');
+    }
   }
+  throw Exception('Failed to fetch verification data');
 }

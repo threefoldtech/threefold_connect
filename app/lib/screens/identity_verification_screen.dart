@@ -332,12 +332,79 @@ class _IdentityVerificationScreenState
       identityVerified = true;
       setIsIdentityVerified(true);
       Globals().identityVerified.value = true;
-      final data = await getVerificationData();
-      final firstName = utf8.decode(latin1.encode(data.orgFirstName!));
-      final lastName = utf8.decode(latin1.encode(data.orgLastName!));
-      await saveIdentity('$lastName $firstName', data.docIssuingCountry,
-          data.docDob, data.docSex, data.scanRef);
-      Events().emit(IdentityCallbackEvent(type: 'success'));
+      try {
+        final data = await getVerificationData();
+        final firstName = utf8.decode(latin1.encode(data.orgFirstName!));
+        final lastName = utf8.decode(latin1.encode(data.orgLastName!));
+        await saveIdentity('$lastName $firstName', data.docIssuingCountry,
+            data.docDob, data.docSex, data.scanRef);
+        Events().emit(IdentityCallbackEvent(type: 'success'));
+      } on InvalidChallenge catch (_) {
+        setState(() {
+          isLoading = false;
+        });
+        return showDialog(
+            context: context,
+            builder: (BuildContext context) => CustomDialog(
+                  type: DialogType.Warning,
+                  image: Icons.warning,
+                  title: 'Invalid Challenge',
+                  description:
+                      'The request challenge looks wrong. \nIf this issue persist, please contact support.',
+                  actions: <Widget>[
+                    TextButton(
+                      child: const Text('Close'),
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                    ),
+                  ],
+                ));
+      } on InvalidSignature catch (_) {
+        setState(() {
+          isLoading = false;
+        });
+        return showDialog(
+            context: context,
+            builder: (BuildContext context) => CustomDialog(
+                  type: DialogType.Warning,
+                  image: Icons.warning,
+                  title: 'Invalid Signature',
+                  description:
+                      'The request signature looks wrong. \nIf this issue persist, please contact support.',
+                  actions: <Widget>[
+                    TextButton(
+                      child: const Text('Close'),
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                    ),
+                  ],
+                ));
+      } catch (e) {
+        setState(() {
+          isLoading = false;
+        });
+        print(e);
+        return showDialog(
+          context: context,
+          builder: (BuildContext context) => CustomDialog(
+            type: DialogType.Error,
+            image: Icons.error,
+            title: 'Error',
+            description:
+                'Failed to process the verification details. \nIf this issue persist, please contact support.',
+            actions: <Widget>[
+              TextButton(
+                child: const Text('Close'),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              ),
+            ],
+          ),
+        );
+      }
     } else {
       identityVerified = false;
       setIsIdentityVerified(false);
