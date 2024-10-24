@@ -43,7 +43,7 @@ Future<Token> getToken() async {
       throw const InvalidSignature('Invalid signature');
     }
   } else if (response.statusCode == 409) {
-    if (response.body.contains('Already verified')) {
+    if (response.body.contains('already verified')) {
       throw const AlreadyVerified('Already verified');
     }
   } else if (response.statusCode == 500) {
