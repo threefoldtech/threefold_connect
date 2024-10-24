@@ -79,7 +79,9 @@ class _WalletReceiveScreenState extends State<WalletReceiveScreen> {
   @override
   Widget build(BuildContext context) {
     final bool hideStellar = widget.wallet.stellarBalance == '-1';
-    if (hideStellar) chainType = ChainType.TFChain;
+    if (hideStellar) {
+      onChangeChain(ChainType.TFChain);
+    }
     return Scaffold(
       appBar: AppBar(title: const Text('Receive')),
       body: SingleChildScrollView(

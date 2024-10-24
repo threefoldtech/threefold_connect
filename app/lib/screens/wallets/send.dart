@@ -134,7 +134,9 @@ class _WalletSendScreenState extends State<WalletSendScreen> {
         ? widget.wallet.stellarBalance
         : widget.wallet.tfchainBalance;
     final bool hideStellar = widget.wallet.stellarBalance == '-1';
-    if (hideStellar) chainType = ChainType.TFChain;
+    if (hideStellar) {
+      onChangeChain(ChainType.TFChain);
+    }
 
     return Scaffold(
       appBar: AppBar(title: const Text('Send')),
