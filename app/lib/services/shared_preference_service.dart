@@ -126,7 +126,7 @@ Future<void> saveTwinId(int twinId) async {
   prefs.remove('twinId');
 
   prefs.setInt('twinId', twinId);
-  updateUserData("twinId", twinId.toString());
+  updateUserData('twinId', twinId.toString());
 }
 
 Future<int?> getTwinId() async {
@@ -174,7 +174,7 @@ Future<void> saveEmail(String email, String? signedEmailIdentifier) async {
     prefs.setString('signedEmailIdentifier', signedEmailIdentifier);
     client.setPKidDoc(
         'email', json.encode({'email': email, 'sei': signedEmailIdentifier}));
-    updateUserData("email", email);
+    updateUserData('email', email);
     return;
   }
 
@@ -222,7 +222,7 @@ Future<void> savePhone(String phone, String? signedPhoneIdentifier) async {
     prefs.setString('signedPhoneIdentifier', signedPhoneIdentifier);
     client.setPKidDoc(
         'phone', json.encode({'phone': phone, 'spi': signedPhoneIdentifier}));
-    updateUserData("phone", phone);
+    updateUserData('phone', phone);
     return;
   }
 

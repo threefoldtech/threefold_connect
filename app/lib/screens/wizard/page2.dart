@@ -13,7 +13,7 @@ class Page2 extends StatelessWidget {
       widthPercentage: 0.6,
       heightPercentage: 0.4,
       description:
-          'The app provides a secure authentication mechanism that provides your identity on the Threefold Grid.',
+          'The app provides a secure authentication mechanism that creates your virtual identity on the ThreeFold Grid.',
     );
   }
 }
