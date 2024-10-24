@@ -116,7 +116,6 @@ class _CommonPageState extends State<CommonPage> {
                       onPressed: () async {
                         if (agreed) {
                           saveInitDone();
-                          Navigator.of(context).pop();
                           Navigator.pop(context, true);
                         }
                         attemptToContinue = true;
