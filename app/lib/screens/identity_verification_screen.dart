@@ -322,12 +322,38 @@ class _IdentityVerificationScreenState
         );
       }
     }
-    await Future.delayed(Duration(seconds: 5));
+    await Future.delayed(const Duration(seconds: 5));
     await handleIdenfyResponse();
   }
 
   Future<void> handleIdenfyResponse() async {
-    final verificationStatus = await getVerificationStatus();
+    VerificationStatus verificationStatus;
+    try {
+      verificationStatus = await getVerificationStatus();
+    } catch (e) {
+      setState(() {
+        isLoading = false;
+      });
+      print(e);
+      return showDialog(
+        context: context,
+        builder: (BuildContext context) => CustomDialog(
+          type: DialogType.Error,
+          image: Icons.error,
+          title: 'Error',
+          description:
+              'Failed to get the verification status. \nIf this issue persist, please contact support.',
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Close'),
+              onPressed: () {
+                Navigator.pop(context);
+              },
+            ),
+          ],
+        ),
+      );
+    }
     if (verificationStatus.status == VerificationState.VERIFIED) {
       identityVerified = true;
       setIsIdentityVerified(true);
