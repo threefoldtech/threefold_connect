@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-
 import 'package:threebotlogin/widgets/wizard/common_page.dart';
 
 class Page5 extends StatelessWidget {
