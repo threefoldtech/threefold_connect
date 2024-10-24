@@ -45,7 +45,6 @@ class _WalletScreenState extends State<WalletScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // TODO: handle empty wallets
     Widget mainWidget;
     if (loading) {
       mainWidget = Center(

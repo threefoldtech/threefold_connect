@@ -847,6 +847,48 @@ class _IdentityVerificationScreenState
         isLoading = false;
         isInIdentityProcess = true;
       });
+    } on InvalidChallenge catch (_) {
+      setState(() {
+        isLoading = false;
+      });
+      return showDialog(
+          context: context,
+          builder: (BuildContext context) => CustomDialog(
+                type: DialogType.Warning,
+                image: Icons.warning,
+                title: 'Invalid Challenge',
+                description:
+                    'The request challenge looks wrong. \nIf this issue persist, please contact support.',
+                actions: <Widget>[
+                  TextButton(
+                    child: const Text('Close'),
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                  ),
+                ],
+              ));
+    } on InvalidSignature catch (_) {
+      setState(() {
+        isLoading = false;
+      });
+      return showDialog(
+          context: context,
+          builder: (BuildContext context) => CustomDialog(
+                type: DialogType.Warning,
+                image: Icons.warning,
+                title: 'Invalid Signature',
+                description:
+                    'The request signature looks wrong. \nIf this issue persist, please contact support.',
+                actions: <Widget>[
+                  TextButton(
+                    child: const Text('Close'),
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                  ),
+                ],
+              ));
     } on TooManyRequests catch (_) {
       setState(() {
         isLoading = false;
@@ -924,7 +966,7 @@ class _IdentityVerificationScreenState
           image: Icons.error,
           title: 'Failed to setup process',
           description:
-              'Something went wrong. \n If this issue persist, please contact support',
+              'Something went wrong. \nIf this issue persist, please contact support.',
           actions: <Widget>[
             TextButton(
               child: const Text('Close'),

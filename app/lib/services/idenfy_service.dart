@@ -33,9 +33,17 @@ Future<Token> getToken() async {
   );
   if (response.statusCode == 201 || response.statusCode == 200) {
     return Token.fromJson(jsonDecode(response.body)['result']);
+  } else if (response.statusCode == 400) {
+    if (response.body.contains('bad challenge') ||
+        response.body.contains('malformed challenge')) {
+      throw const InvalidChallenge('Invalid challenge');
+    }
+  } else if (response.statusCode == 401) {
+    if (response.body.contains('bad signature')) {
+      throw const InvalidSignature('Invalid signature');
+    }
   } else if (response.statusCode == 500) {
     // TODO: already verified error
-    // TODO: invalid signature
     if (response.body.contains('Too Many Requests')) {
       throw const TooManyRequests('Too many retries');
     } else if (response.body.contains('Not enough balance')) {

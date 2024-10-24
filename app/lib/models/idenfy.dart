@@ -210,3 +210,19 @@ class NoTwinId implements Exception {
   @override
   String toString() => msg;
 }
+
+class InvalidChallenge implements Exception {
+  final String msg;
+  const InvalidChallenge(this.msg);
+
+  @override
+  String toString() => msg;
+}
+
+class InvalidSignature implements Exception {
+  final String msg;
+  const InvalidSignature(this.msg);
+
+  @override
+  String toString() => msg;
+}
