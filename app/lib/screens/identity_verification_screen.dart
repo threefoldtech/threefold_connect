@@ -136,9 +136,9 @@ class _IdentityVerificationScreenState
         }
       });
     });
-    getVerificationStatus().then((verificationStatus) {
+    getIdentity().then((verificationDate) {
       setState(() {
-        if (verificationStatus.status == VerificationState.VERIFIED) {
+        if (verificationDate['identityName'] != null) {
           identityVerified = true;
           setIsIdentityVerified(true);
         } else {
