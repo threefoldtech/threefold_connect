@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:threebotlogin/apps/wallet/wallet_config.dart';
+import 'package:threebotlogin/helpers/globals.dart';
 import 'package:threebotlogin/models/wallet.dart';
 import 'package:threebotlogin/providers/wallets_provider.dart';
 import 'package:threebotlogin/services/shared_preference_service.dart';
@@ -9,6 +10,9 @@ import 'package:threebotlogin/widgets/layout_drawer.dart';
 import 'package:threebotlogin/widgets/wallets/add_wallet.dart';
 import 'package:threebotlogin/widgets/wallets/wallet_card.dart';
 import 'package:hashlib/hashlib.dart';
+
+import 'package:threebotlogin/services/stellar_service.dart' as StellarService;
+import 'package:threebotlogin/services/tfchain_service.dart' as TFChainService;
 
 class WalletScreen extends ConsumerStatefulWidget {
   const WalletScreen({super.key});
@@ -20,6 +24,7 @@ class WalletScreen extends ConsumerStatefulWidget {
 class _WalletScreenState extends ConsumerState<WalletScreen> {
   bool loading = true;
   bool failed = false;
+  bool reloadBalance = true;
   List<Wallet> wallets = [];
 
   onDeleteWallet(String name) {
@@ -36,15 +41,42 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
     setState(() {});
   }
 
+  _reloadBalances() async {
+    await Future.delayed(const Duration(seconds: 10));
+    final chainUrl = Globals().chainUrl;
+    for (final wallet in wallets) {
+      final balance =
+          await TFChainService.getBalance(chainUrl, wallet.tfchainAddress);
+      final tfchainBalance =
+          balance.toString() == '0.0' ? '0' : balance.toString();
+      final stellarBalance =
+          await StellarService.getBalance(wallet.stellarSecret);
+
+      if (tfchainBalance != wallet.tfchainBalance ||
+          stellarBalance != wallet.stellarBalance) {
+        wallet.stellarBalance = stellarBalance;
+        wallet.tfchainBalance = tfchainBalance;
+        setState(() {});
+      }
+    }
+    if (reloadBalance) _reloadBalances();
+  }
+
   @override
   void initState() {
     super.initState();
     listMyWallets();
+    _reloadBalances();
+  }
+
+  @override
+  void dispose() {
+    reloadBalance = false;
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    // TODO: handle empty wallets
     Widget mainWidget;
     if (loading) {
       mainWidget = Center(
@@ -107,8 +139,7 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
     try {
       final walletRef = ref.read(walletsNotifier.notifier);
       await walletRef.list();
-      final myWallets = ref.watch(walletsNotifier);
-      wallets.addAll(myWallets);
+      wallets = ref.watch(walletsNotifier);
       if (wallets.isEmpty) {
         await _addInitialWallet();
       }
