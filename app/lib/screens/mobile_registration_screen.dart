@@ -436,14 +436,11 @@ class _MobileRegistrationScreenState extends State<MobileRegistrationScreen> {
                   : StepState.disabled,
           title: Text(
             'Email',
-            style: Theme.of(context)
-                .textTheme
-                .titleMedium!
-                .copyWith(color: state.index >= _State.Email.index
-                      ? Theme.of(context)
-                          .colorScheme
-                          .onSurface
-                      : Colors.grey,),
+            style: Theme.of(context).textTheme.titleMedium!.copyWith(
+                  color: state.index >= _State.Email.index
+                      ? Theme.of(context).colorScheme.onSurface
+                      : Colors.grey,
+                ),
           ),
           subtitle: state.index > _State.Email.index
               ? Text(
@@ -479,9 +476,7 @@ class _MobileRegistrationScreenState extends State<MobileRegistrationScreen> {
             'Seed phrase',
             style: Theme.of(context).textTheme.bodyMedium!.copyWith(
                   color: state.index >= _State.SeedPhrase.index
-                      ? Theme.of(context)
-                          .colorScheme
-                          .onSurface
+                      ? Theme.of(context).colorScheme.onSurface
                       : Colors.grey,
                 ),
           ),
@@ -523,9 +518,7 @@ class _MobileRegistrationScreenState extends State<MobileRegistrationScreen> {
           title: Text('Confirm seed phrase',
               style: Theme.of(context).textTheme.bodyMedium!.copyWith(
                     color: state.index >= _State.ConfirmSeedPhrase.index
-                        ? Theme.of(context)
-                            .colorScheme
-                            .onSurface
+                        ? Theme.of(context).colorScheme.onSurface
                         : Colors.grey,
                   )),
           content: Card(
@@ -553,9 +546,7 @@ class _MobileRegistrationScreenState extends State<MobileRegistrationScreen> {
           title: Text('Finishing',
               style: Theme.of(context).textTheme.bodyMedium!.copyWith(
                     color: state.index >= _State.Finish.index
-                        ? Theme.of(context)
-                            .colorScheme
-                            .onSurface
+                        ? Theme.of(context).colorScheme.onSurface
                         : Colors.grey,
                   )),
           content: Card(
