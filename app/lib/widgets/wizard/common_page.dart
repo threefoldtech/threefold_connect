@@ -20,7 +20,7 @@ class CommonPage extends StatefulWidget {
     required this.title,
     required this.subtitle,
     required this.imagePath,
-    this.description = "",
+    this.description = '',
     this.heightPercentage = 100,
     this.widthPercentage = 300,
     this.showTermsAndConditions = false,

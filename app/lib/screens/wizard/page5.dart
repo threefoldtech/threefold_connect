@@ -9,7 +9,7 @@ class Page5 extends StatelessWidget {
     return const CommonPage(
       title: 'START YOUR',
       subtitle: 'JOURNEY',
-      imagePath: 'assets/rocket_outline.png',          
+      imagePath: 'assets/rocket_outline.png',
       heightPercentage: 0.4,
       widthPercentage: 0.75,
       showTermsAndConditions: true,

@@ -37,11 +37,11 @@ class _NewsState extends State<NewsWidget> with AutomaticKeepAliveClientMixin {
   }
 
   _NewsState() {
-    this.initialEndsWith = new DateTime.now().millisecondsSinceEpoch.toString();
+    initialEndsWith = DateTime.now().millisecondsSinceEpoch.toString();
     iaWebView = InAppWebView(
       initialUrlRequest: URLRequest(
           url: Uri.parse(
-              'https://news.threefold.me?cache_buster=' + initialEndsWith)),
+              'https://news.threefold.me?cache_buster=$initialEndsWith')),
       initialOptions: InAppWebViewGroupOptions(
           crossPlatform: InAppWebViewOptions(),
           android: AndroidInAppWebViewOptions(

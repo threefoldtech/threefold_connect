@@ -1,6 +1,4 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:threebotlogin/models/contact.dart';
 import 'package:threebotlogin/models/wallet.dart';
 import 'package:threebotlogin/services/contact_service.dart';
