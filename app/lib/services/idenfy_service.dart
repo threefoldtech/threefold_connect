@@ -42,8 +42,11 @@ Future<Token> getToken() async {
     if (response.body.contains('bad signature')) {
       throw const InvalidSignature('Invalid signature');
     }
+  } else if (response.statusCode == 409) {
+    if (response.body.contains('Already verified')) {
+      throw const AlreadyVerified('Already verified');
+    }
   } else if (response.statusCode == 500) {
-    // TODO: already verified error
     if (response.body.contains('Too Many Requests')) {
       throw const TooManyRequests('Too many retries');
     } else if (response.body.contains('Not enough balance')) {

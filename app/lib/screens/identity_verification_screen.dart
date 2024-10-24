@@ -323,10 +323,10 @@ class _IdentityVerificationScreenState
       }
     }
     await Future.delayed(Duration(seconds: 5));
-    await handleIdenfyResponse(idenfySDKresult);
+    await handleIdenfyResponse();
   }
 
-  Future<void> handleIdenfyResponse(IdenfyIdentificationResult? result) async {
+  Future<void> handleIdenfyResponse() async {
     final verificationStatus = await getVerificationStatus();
     if (verificationStatus.status == VerificationState.VERIFIED) {
       identityVerified = true;
@@ -954,6 +954,11 @@ class _IdentityVerificationScreenState
                   ),
                 ],
               ));
+    } on AlreadyVerified catch (_) {
+      setState(() {
+        isLoading = false;
+      });
+      return await handleIdenfyResponse();
     } catch (e) {
       setState(() {
         isLoading = false;

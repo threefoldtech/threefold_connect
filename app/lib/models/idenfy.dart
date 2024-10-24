@@ -226,3 +226,11 @@ class InvalidSignature implements Exception {
   @override
   String toString() => msg;
 }
+
+class AlreadyVerified implements Exception {
+  final String msg;
+  const AlreadyVerified(this.msg);
+
+  @override
+  String toString() => msg;
+}
