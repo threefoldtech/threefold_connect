@@ -229,7 +229,7 @@ Future showIdentityMessage(BuildContext context, String type) async {
         builder: (BuildContext context) => CustomDialog(
           type: DialogType.Error,
           image: Icons.error,
-          title: 'Identity verify failed',
+          title: 'Identity verification failed',
           description:
               'Something went wrong.\nIf this issue persist, please contact support',
           actions: <Widget>[

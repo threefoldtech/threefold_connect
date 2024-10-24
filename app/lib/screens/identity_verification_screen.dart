@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_pkid/flutter_pkid.dart';
 import 'package:http/http.dart';
 import 'package:idenfy_sdk_flutter/idenfy_sdk_flutter.dart';
+import 'package:idenfy_sdk_flutter/models/auto_identification_status.dart';
 import 'package:idenfy_sdk_flutter/models/idenfy_identification_status.dart';
 import 'package:threebotlogin/events/events.dart';
 import 'package:threebotlogin/events/identity_callback_event.dart';
@@ -296,8 +297,6 @@ class _IdentityVerificationScreenState
   Future<void> initIdenfySdk(String token) async {
     IdenfyIdentificationResult? idenfySDKresult;
     try {
-      // TODO: handle cancel request
-      // TODO: check the reject flow
       idenfySDKresult = await IdenfySdkFlutter.start(token);
     } catch (e) {
       print(e);
@@ -323,7 +322,11 @@ class _IdentityVerificationScreenState
       }
     }
     await Future.delayed(const Duration(seconds: 5));
-    await handleIdenfyResponse();
+    if (idenfySDKresult != null &&
+        idenfySDKresult.autoIdentificationStatus !=
+            AutoIdentificationStatus.UNVERIFIED) {
+      await handleIdenfyResponse();
+    }
   }
 
   Future<void> handleIdenfyResponse() async {
@@ -374,7 +377,7 @@ class _IdentityVerificationScreenState
             builder: (BuildContext context) => CustomDialog(
                   type: DialogType.Warning,
                   image: Icons.warning,
-                  title: 'Invalid Challenge',
+                  title: 'Invalid challenge',
                   description:
                       'The request challenge looks wrong. \nIf this issue persist, please contact support.',
                   actions: <Widget>[
@@ -395,7 +398,7 @@ class _IdentityVerificationScreenState
             builder: (BuildContext context) => CustomDialog(
                   type: DialogType.Warning,
                   image: Icons.warning,
-                  title: 'Invalid Signature',
+                  title: 'Invalid signature',
                   description:
                       'The request signature looks wrong. \nIf this issue persist, please contact support.',
                   actions: <Widget>[
@@ -949,7 +952,7 @@ class _IdentityVerificationScreenState
           builder: (BuildContext context) => CustomDialog(
                 type: DialogType.Warning,
                 image: Icons.warning,
-                title: 'Invalid Challenge',
+                title: 'Invalid challenge',
                 description:
                     'The request challenge looks wrong. \nIf this issue persist, please contact support.',
                 actions: <Widget>[
@@ -970,7 +973,7 @@ class _IdentityVerificationScreenState
           builder: (BuildContext context) => CustomDialog(
                 type: DialogType.Warning,
                 image: Icons.warning,
-                title: 'Invalid Signature',
+                title: 'Invalid signature',
                 description:
                     'The request signature looks wrong. \nIf this issue persist, please contact support.',
                 actions: <Widget>[
@@ -1014,7 +1017,7 @@ class _IdentityVerificationScreenState
           builder: (BuildContext context) => CustomDialog(
                 type: DialogType.Warning,
                 image: Icons.warning,
-                title: 'Not Enough Balance',
+                title: 'Not enough balance',
                 description:
                     "You don't have enough balance.\nPlease fund your account at least $minimumBalance TFTs.",
                 actions: <Widget>[
