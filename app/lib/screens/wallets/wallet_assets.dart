@@ -23,6 +23,7 @@ class _WalletAssetsWidgetState extends State<WalletAssetsWidget> {
   List<VestingAccount>? vestedWallets = [];
   bool tfchainBalaceLoading = true;
   bool stellarBalaceLoading = true;
+  bool reloadBalance = true;
 
   _listVestedAccounts() async {
     vestedWallets =
@@ -55,12 +56,26 @@ class _WalletAssetsWidgetState extends State<WalletAssetsWidget> {
     });
   }
 
+  _reloadBalances() async {
+    await _loadStellarBalance();
+    await _loadTFChainBalance();
+    await Future.delayed(const Duration(seconds: 10));
+    if (reloadBalance) {
+      await _reloadBalances();
+    }
+  }
+
   @override
   void initState() {
     _listVestedAccounts();
-    _loadTFChainBalance();
-    _loadStellarBalance();
+    _reloadBalances();
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    reloadBalance = false;
+    super.dispose();
   }
 
   @override
