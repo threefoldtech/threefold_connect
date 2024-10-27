@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:stellar_client/models/vesting_account.dart';
+import 'package:threebotlogin/helpers/globals.dart';
 import 'package:threebotlogin/models/wallet.dart';
 import 'package:threebotlogin/providers/wallets_provider.dart';
 import 'package:threebotlogin/screens/wallets/receive.dart';
@@ -32,7 +33,8 @@ class _WalletAssetsWidgetState extends State<WalletAssetsWidget> {
   }
 
   _reloadBalances() async {
-    await Future.delayed(const Duration(seconds: 10));
+    final refreshBalance = Globals().refreshBalance;
+    await Future.delayed(Duration(seconds: refreshBalance));
     final WalletsNotifier walletRef =
         ProviderScope.containerOf(context, listen: false)
             .read(walletsNotifier.notifier);

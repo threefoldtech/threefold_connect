@@ -67,7 +67,8 @@ class _WalletSendScreenState extends State<WalletSendScreen> {
   }
 
   _reloadBalances() async {
-    await Future.delayed(const Duration(seconds: 10));
+    final refreshBalance = Globals().refreshBalance;
+    await Future.delayed(Duration(seconds: refreshBalance));
     final WalletsNotifier walletRef =
         ProviderScope.containerOf(context, listen: false)
             .read(walletsNotifier.notifier);

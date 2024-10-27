@@ -15,8 +15,9 @@ class WalletsNotifier extends StateNotifier<List<Wallet>> {
   }
 
   void reloadBalances() async {
-    await Future.delayed(const Duration(seconds: 10));
     final chainUrl = Globals().chainUrl;
+    final refreshBalance = Globals().refreshBalance;
+    await Future.delayed(Duration(seconds: refreshBalance));
     final List<Wallet> currentState = state.where((w) => true).toList();
     for (final wallet in currentState) {
       final balance =

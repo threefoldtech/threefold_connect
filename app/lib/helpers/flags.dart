@@ -73,6 +73,9 @@ class Flags {
     Globals().spendingLimit = int.parse(
         (await Flags().getFlagValueByFeatureName('spending-limit')).toString());
     Globals().newsUrl = (await Flags().getFlagValueByFeatureName('news-url'))!;
+    Globals().refreshBalance = int.parse(
+        (await Flags().getFlagValueByFeatureName('refresh-balance'))
+            .toString());
   }
 
   Future<bool> hasFlagValueByFeatureName(String name) async {
