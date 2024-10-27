@@ -43,6 +43,7 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
     super.initState();
     walletRef = ref.read(walletsNotifier.notifier);
     listMyWallets();
+    walletRef.startReloadingBalance();
     walletRef.reloadBalances();
   }
 

@@ -165,5 +165,6 @@ Future<void> transfer(String secret, String dest, String amount) async {
 Future<void> disconnect() async {
   final chainUrl = Globals().chainUrl;
   final client = TFChain.QueryClient(chainUrl);
+  await client.connect();
   await client.disconnect();
 }

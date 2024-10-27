@@ -10,39 +10,45 @@ class WalletsNotifier extends StateNotifier<List<Wallet>> {
   WalletsNotifier() : super([]);
 
   bool _reload = true;
+  bool _loading = true;
   Future<void> list() async {
+    _loading = true;
     state = await listWallets();
+    _loading = false;
   }
 
   void reloadBalances() async {
-    final chainUrl = Globals().chainUrl;
+    if (!_reload) return await TFChainService.disconnect();
+    if (!_loading) {
+      final chainUrl = Globals().chainUrl;
+      final List<Wallet> currentState = state.where((w) => true).toList();
+      for (final wallet in currentState) {
+        final balance =
+            await TFChainService.getBalance(chainUrl, wallet.tfchainAddress);
+        final tfchainBalance =
+            balance.toString() == '0.0' ? '0' : balance.toString();
+        final stellarBalance =
+            await StellarService.getBalance(wallet.stellarSecret);
+
+        if (tfchainBalance != wallet.tfchainBalance ||
+            stellarBalance != wallet.stellarBalance) {
+          wallet.stellarBalance = stellarBalance;
+          wallet.tfchainBalance = tfchainBalance;
+        }
+      }
+      state = currentState;
+    }
     final refreshBalance = Globals().refreshBalance;
     await Future.delayed(Duration(seconds: refreshBalance));
-    final List<Wallet> currentState = state.where((w) => true).toList();
-    for (final wallet in currentState) {
-      final balance =
-          await TFChainService.getBalance(chainUrl, wallet.tfchainAddress);
-      final tfchainBalance =
-          balance.toString() == '0.0' ? '0' : balance.toString();
-      final stellarBalance =
-          await StellarService.getBalance(wallet.stellarSecret);
-
-      if (tfchainBalance != wallet.tfchainBalance ||
-          stellarBalance != wallet.stellarBalance) {
-        wallet.stellarBalance = stellarBalance;
-        wallet.tfchainBalance = tfchainBalance;
-      }
-    }
-
-    state = currentState;
-    if (_reload) {
-      await TFChainService.disconnect();
-      reloadBalances();
-    }
+    reloadBalances();
   }
 
   void stopReloadingBalance() {
     _reload = false;
+  }
+
+  void startReloadingBalance() {
+    _reload = true;
   }
 
   Wallet? getUpdatedWallet(String name) {

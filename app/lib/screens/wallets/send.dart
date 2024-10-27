@@ -67,8 +67,8 @@ class _WalletSendScreenState extends State<WalletSendScreen> {
   }
 
   _reloadBalances() async {
+    if (!reloadBalance) return;
     final refreshBalance = Globals().refreshBalance;
-    await Future.delayed(Duration(seconds: refreshBalance));
     final WalletsNotifier walletRef =
         ProviderScope.containerOf(context, listen: false)
             .read(walletsNotifier.notifier);
@@ -76,9 +76,8 @@ class _WalletSendScreenState extends State<WalletSendScreen> {
     widget.wallet.tfchainBalance = wallet.tfchainBalance;
     widget.wallet.stellarBalance = wallet.stellarBalance;
     setState(() {});
-    if (reloadBalance) {
-      await _reloadBalances();
-    }
+    await Future.delayed(Duration(seconds: refreshBalance));
+    await _reloadBalances();
   }
 
   onChangeChain(ChainType type) {
