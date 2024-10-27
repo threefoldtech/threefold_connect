@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
 import 'package:threebotlogin/helpers/globals.dart';
 import 'package:threebotlogin/models/wallet.dart';
+import 'package:threebotlogin/providers/wallets_provider.dart';
 import 'package:threebotlogin/screens/scan_screen.dart';
 import 'package:threebotlogin/screens/wallets/contacts.dart';
 import 'package:threebotlogin/services/stellar_service.dart';
@@ -65,9 +67,14 @@ class _WalletSendScreenState extends State<WalletSendScreen> {
   }
 
   _reloadBalances() async {
-    await _loadStellarBalance();
-    await _loadTFChainBalance();
     await Future.delayed(const Duration(seconds: 10));
+    final WalletsNotifier walletRef =
+        ProviderScope.containerOf(context, listen: false)
+            .read(walletsNotifier.notifier);
+    final wallet = walletRef.getUpdatedWallet(widget.wallet.name)!;
+    widget.wallet.tfchainBalance = wallet.tfchainBalance;
+    widget.wallet.stellarBalance = wallet.stellarBalance;
+    setState(() {});
     if (reloadBalance) {
       await _reloadBalances();
     }
