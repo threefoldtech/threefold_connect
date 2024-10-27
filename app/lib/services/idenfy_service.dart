@@ -60,11 +60,10 @@ Future<Token> getToken() async {
 
 Future<VerificationStatus> getVerificationStatus() async {
   final idenfyServiceUrl = Globals().idenfyServiceUrl;
-  final headers = await _prepareRequestHeaders();
+  final address = await getMyAddress();
 
   final response = await http.get(
-    Uri.https(idenfyServiceUrl, '/api/v1/status'),
-    headers: headers,
+    Uri.https(idenfyServiceUrl, '/api/v1/status', {'client_id': address}),
   );
   if (response.statusCode == 200) {
     return VerificationStatus.fromJson(jsonDecode(response.body)['result']);
@@ -72,8 +71,8 @@ Future<VerificationStatus> getVerificationStatus() async {
     return VerificationStatus(
         idenfyRef: '',
         final_: false,
-        clientId: headers['X-Client-ID']!,
-        status: VerificationState.NOTVERIFIED);
+        clientId: address,
+        status: VerificationState.UNVERIFIED);
   } else {
     throw Exception(
         'Failed to fetch verification status due to ${response.body}');

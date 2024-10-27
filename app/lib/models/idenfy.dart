@@ -1,7 +1,7 @@
 enum VerificationState {
   VERIFIED,
   REJECTED,
-  NOTVERIFIED,
+  UNVERIFIED,
 }
 
 class Token {
@@ -59,7 +59,7 @@ class VerificationStatus {
             ? VerificationState.VERIFIED
             : json['status'] == VerificationState.REJECTED.name
                 ? VerificationState.REJECTED
-                : VerificationState.NOTVERIFIED);
+                : VerificationState.UNVERIFIED);
   }
 }
 
