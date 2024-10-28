@@ -55,8 +55,15 @@ class _WalletTransactionsWidgetState extends State<WalletTransactionsWidget> {
 
   @override
   void initState() {
-    _listTransactions();
     super.initState();
+    if (widget.wallet.stellarBalance != '-1') {
+      _listTransactions();
+    } else {
+      setState(() {
+        loading = false;
+        transactions = [];
+      });
+    }
   }
 
   @override

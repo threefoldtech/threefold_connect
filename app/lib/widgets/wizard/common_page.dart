@@ -1,10 +1,8 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:provider/provider.dart';
 import 'package:threebotlogin/screens/wizard/web_view.dart';
 import 'package:threebotlogin/services/shared_preference_service.dart';
-import 'package:threebotlogin/widgets/wizard/terms_agreement.dart';
 
 class CommonPage extends StatefulWidget {
   final String title;
@@ -31,6 +29,9 @@ class CommonPage extends StatefulWidget {
 }
 
 class _CommonPageState extends State<CommonPage> {
+  bool agreed = false;
+  bool attemptToContinue = false;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -113,14 +114,12 @@ class _CommonPageState extends State<CommonPage> {
                     padding: const EdgeInsets.all(10),
                     child: ElevatedButton(
                       onPressed: () async {
-                        final termsAgreement =
-                            Provider.of<TermsAgreement>(context, listen: false);
-                        if (!termsAgreement.isChecked) {
-                          termsAgreement.attemptToContinue();
-                        } else {
+                        if (agreed) {
                           saveInitDone();
                           Navigator.pop(context, true);
                         }
+                        attemptToContinue = true;
+                        setState(() {});
                       },
                       style: ElevatedButton.styleFrom(
                         shape: RoundedRectangleBorder(
@@ -136,76 +135,61 @@ class _CommonPageState extends State<CommonPage> {
                       ),
                     ),
                   ),
-                  Consumer<TermsAgreement>(
-                    builder: (context, termsAgreement, child) {
-                      return Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Checkbox(
-                            value: termsAgreement.isChecked,
-                            onChanged: (bool? value) {
-                              termsAgreement.toggleChecked(value ?? false);
-                            },
-                          ),
-                          RichText(
-                            text: TextSpan(
-                              children: [
-                                TextSpan(
-                                  text: "I agree to ThreeFolds' ",
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .bodyMedium!
-                                      .copyWith(
-                                        color: termsAgreement
-                                                    .attemptedWithoutAccepting &&
-                                                !termsAgreement.isChecked
-                                            ? Theme.of(context)
-                                                .colorScheme
-                                                .error
-                                            : Theme.of(context)
-                                                .colorScheme
-                                                .onSurface,
-                                      ),
-                                ),
-                                TextSpan(
-                                  text: 'Terms & Conditions.',
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .bodyMedium!
-                                      .copyWith(
-                                        color: termsAgreement
-                                                    .attemptedWithoutAccepting &&
-                                                !termsAgreement.isChecked
-                                            ? Theme.of(context)
-                                                .colorScheme
-                                                .error
-                                            : Colors.blue,
-                                        decoration: TextDecoration.underline,
-                                        decorationColor: termsAgreement
-                                                    .attemptedWithoutAccepting &&
-                                                !termsAgreement.isChecked
-                                            ? Theme.of(context)
-                                                .colorScheme
-                                                .error
-                                            : Colors.blue,
-                                      ),
-                                  recognizer: TapGestureRecognizer()
-                                    ..onTap = () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) =>
-                                                const WebView()),
-                                      );
-                                    },
-                                ),
-                              ],
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Checkbox(
+                        value: agreed,
+                        onChanged: (bool? value) {
+                          agreed = value ?? false;
+                          setState(() {});
+                        },
+                      ),
+                      RichText(
+                        text: TextSpan(
+                          children: [
+                            TextSpan(
+                              text: "I agree to ThreeFolds' ",
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodyMedium!
+                                  .copyWith(
+                                    color: !agreed && attemptToContinue
+                                        ? Theme.of(context).colorScheme.error
+                                        : Theme.of(context)
+                                            .colorScheme
+                                            .onSurface,
+                                  ),
                             ),
-                          ),
-                        ],
-                      );
-                    },
-                  ),
+                            TextSpan(
+                              text: 'Terms & Conditions.',
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodyMedium!
+                                  .copyWith(
+                                    color: !agreed && attemptToContinue
+                                        ? Theme.of(context).colorScheme.error
+                                        : Colors.blue,
+                                    decoration: TextDecoration.underline,
+                                    decorationColor: !agreed &&
+                                            attemptToContinue
+                                        ? Theme.of(context).colorScheme.error
+                                        : Colors.blue,
+                                  ),
+                              recognizer: TapGestureRecognizer()
+                                ..onTap = () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => const WebView()),
+                                  );
+                                },
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  )
                 ],
               ),
           ],

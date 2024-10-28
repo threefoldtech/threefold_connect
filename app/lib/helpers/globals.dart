@@ -51,6 +51,7 @@ class Globals {
   bool redoIdentityVerification = false;
   bool debugMode = false;
   int timeOutSeconds = 10;
+  int refreshBalance = 10;
   String farmersUrl = '';
   bool canSeeFarmers = false;
   String tosUrl = '';

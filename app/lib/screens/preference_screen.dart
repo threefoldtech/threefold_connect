@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:package_info_plus/package_info_plus.dart';
-import 'package:provider/provider.dart';
 import 'package:threebotlogin/app_config.dart';
 import 'package:threebotlogin/apps/free_flow_pages/ffp_events.dart';
 import 'package:threebotlogin/events/close_socket_event.dart';
@@ -18,17 +18,17 @@ import 'package:threebotlogin/services/fingerprint_service.dart';
 import 'package:threebotlogin/services/shared_preference_service.dart';
 import 'package:threebotlogin/widgets/custom_dialog.dart';
 import 'package:threebotlogin/widgets/layout_drawer.dart';
-import 'package:threebotlogin/widgets/theme_provider.dart';
+import 'package:threebotlogin/providers/theme_provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-class PreferenceScreen extends StatefulWidget {
+class PreferenceScreen extends ConsumerStatefulWidget {
   const PreferenceScreen({super.key});
 
   @override
-  State<PreferenceScreen> createState() => _PreferenceScreenState();
+  ConsumerState<PreferenceScreen> createState() => _PreferenceScreenState();
 }
 
-class _PreferenceScreenState extends State<PreferenceScreen> {
+class _PreferenceScreenState extends ConsumerState<PreferenceScreen> {
   // FirebaseNotificationListener _listener;
   Map email = {};
   String doubleName = '';
@@ -78,14 +78,14 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final themeProvider = Provider.of<ThemeProvider>(context);
+    final themeMode = ref.watch(themeModeNotifier);
     bool isDarkMode;
-    if (themeProvider.themeMode == ThemeMode.system) {
+    if (themeMode == ThemeMode.system) {
       final brightness =
           SchedulerBinding.instance.platformDispatcher.platformBrightness;
       isDarkMode = brightness == Brightness.dark;
     } else {
-      isDarkMode = themeProvider.themeMode == ThemeMode.dark;
+      isDarkMode = themeMode == ThemeMode.dark;
     }
     return LayoutDrawer(
       titleText: 'Settings',
@@ -173,7 +173,7 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
             title: const Text('Appearance'),
             trailing: GestureDetector(
               onTap: () {
-                themeProvider.toggleTheme();
+                ref.read(themeModeNotifier.notifier).toggleTheme();
               },
               child: Container(
                 width: 40,

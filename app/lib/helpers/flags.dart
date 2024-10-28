@@ -81,6 +81,9 @@ class Flags {
     Globals().minimumTFChainBalanceForKYC = int.parse(
         (await Flags().getFlagValueByFeatureName('min-tfchain-balance-for-kyc'))
             .toString());
+    Globals().refreshBalance = int.parse(
+        (await Flags().getFlagValueByFeatureName('refresh-balance'))
+            .toString());
   }
 
   Future<bool> hasFlagValueByFeatureName(String name) async {
