@@ -366,9 +366,9 @@ class _IdentityVerificationScreenState
         final firstName = utf8.decode(latin1.encode(data.orgFirstName!));
         final lastName = utf8.decode(latin1.encode(data.orgLastName!));
         await saveIdentity('$lastName $firstName', data.docIssuingCountry,
-            data.docDob, data.docSex, data.scanRef);
+            data.docDob, data.docSex, data.idenfyRef);
         Events().emit(IdentityCallbackEvent(type: 'success'));
-      } on InvalidChallenge catch (_) {
+      } on BadRequest catch (e) {
         setState(() {
           isLoading = false;
         });
@@ -377,9 +377,9 @@ class _IdentityVerificationScreenState
             builder: (BuildContext context) => CustomDialog(
                   type: DialogType.Warning,
                   image: Icons.warning,
-                  title: 'Invalid challenge',
+                  title: 'Bad Request',
                   description:
-                      'The request challenge looks wrong. \nIf this issue persist, please contact support.',
+                      '$e \nIf this issue persist, please contact support.',
                   actions: <Widget>[
                     TextButton(
                       child: const Text('Close'),
@@ -389,7 +389,7 @@ class _IdentityVerificationScreenState
                     ),
                   ],
                 ));
-      } on InvalidSignature catch (_) {
+      } on Unauthorized catch (e) {
         setState(() {
           isLoading = false;
         });
@@ -398,9 +398,9 @@ class _IdentityVerificationScreenState
             builder: (BuildContext context) => CustomDialog(
                   type: DialogType.Warning,
                   image: Icons.warning,
-                  title: 'Invalid signature',
+                  title: 'Unauthorized',
                   description:
-                      'The request signature looks wrong. \nIf this issue persist, please contact support.',
+                      '$e \nIf this issue persist, please contact support.',
                   actions: <Widget>[
                     TextButton(
                       child: const Text('Close'),
@@ -943,7 +943,7 @@ class _IdentityVerificationScreenState
         isLoading = false;
         isInIdentityProcess = true;
       });
-    } on InvalidChallenge catch (_) {
+    } on BadRequest catch (e) {
       setState(() {
         isLoading = false;
       });
@@ -952,9 +952,9 @@ class _IdentityVerificationScreenState
           builder: (BuildContext context) => CustomDialog(
                 type: DialogType.Warning,
                 image: Icons.warning,
-                title: 'Invalid challenge',
+                title: 'Bad Request',
                 description:
-                    'The request challenge looks wrong. \nIf this issue persist, please contact support.',
+                    '$e \nIf this issue persist, please contact support.',
                 actions: <Widget>[
                   TextButton(
                     child: const Text('Close'),
@@ -964,7 +964,7 @@ class _IdentityVerificationScreenState
                   ),
                 ],
               ));
-    } on InvalidSignature catch (_) {
+    } on Unauthorized catch (e) {
       setState(() {
         isLoading = false;
       });
@@ -973,9 +973,9 @@ class _IdentityVerificationScreenState
           builder: (BuildContext context) => CustomDialog(
                 type: DialogType.Warning,
                 image: Icons.warning,
-                title: 'Invalid signature',
+                title: 'Unauthorized',
                 description:
-                    'The request signature looks wrong. \nIf this issue persist, please contact support.',
+                    '$e \nIf this issue persist, please contact support.',
                 actions: <Widget>[
                   TextButton(
                     child: const Text('Close'),
@@ -995,7 +995,7 @@ class _IdentityVerificationScreenState
           builder: (BuildContext context) => CustomDialog(
                 type: DialogType.Warning,
                 image: Icons.warning,
-                title: 'Maximum requests reached',
+                title: 'Maximum Requests Reached',
                 description:
                     'You already had $maxRetries requests in last 24 hours.\nPlease try again in 24 hours.',
                 actions: <Widget>[

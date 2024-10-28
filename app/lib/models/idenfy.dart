@@ -101,7 +101,7 @@ class VerificationData {
     required this.duplicateDocFaces,
     required this.addressVerification,
     required this.additionalData,
-    required this.scanRef,
+    required this.idenfyRef,
     required this.clientId,
   });
 
@@ -141,7 +141,7 @@ class VerificationData {
   final List<String>? duplicateDocFaces;
   final dynamic addressVerification;
   final dynamic additionalData;
-  final String? scanRef;
+  final String? idenfyRef;
   final String? clientId;
 
   factory VerificationData.fromJson(Map<String, dynamic> json) {
@@ -182,7 +182,7 @@ class VerificationData {
         duplicateDocFaces: json['duplicateDocFaces'],
         addressVerification: json['addressVerification'],
         additionalData: json['additionalData'],
-        scanRef: json['scanRef'],
+        idenfyRef: json['idenfyRef'],
         clientId: json['clientId']);
   }
 }
@@ -211,17 +211,17 @@ class NoTwinId implements Exception {
   String toString() => msg;
 }
 
-class InvalidChallenge implements Exception {
+class BadRequest implements Exception {
   final String msg;
-  const InvalidChallenge(this.msg);
+  const BadRequest(this.msg);
 
   @override
   String toString() => msg;
 }
 
-class InvalidSignature implements Exception {
+class Unauthorized implements Exception {
   final String msg;
-  const InvalidSignature(this.msg);
+  const Unauthorized(this.msg);
 
   @override
   String toString() => msg;

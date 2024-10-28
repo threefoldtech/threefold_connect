@@ -68,7 +68,7 @@ Future<void> handleKYCData(
     final firstName = utf8.decode(latin1.encode(data.orgFirstName!));
     final lastName = utf8.decode(latin1.encode(data.orgLastName!));
     await saveIdentity('$lastName $firstName', data.docIssuingCountry,
-        data.docDob, data.docSex, data.scanRef);
+        data.docDob, data.docSex, data.idenfyRef);
   }
 }
 

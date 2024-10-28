@@ -34,26 +34,15 @@ Future<Token> getToken() async {
   if (response.statusCode == 201 || response.statusCode == 200) {
     return Token.fromJson(jsonDecode(response.body)['result']);
   } else if (response.statusCode == 400) {
-    if (response.body.contains('bad challenge') ||
-        response.body.contains('malformed challenge')) {
-      throw const InvalidChallenge('Invalid challenge');
-    }
+    throw BadRequest(response.body);
   } else if (response.statusCode == 401) {
-    if (response.body.contains('bad signature')) {
-      throw const InvalidSignature('Invalid signature');
-    }
+    throw Unauthorized(response.body);
+  } else if (response.statusCode == 402) {
+    throw NotEnoughBalance(response.body);
   } else if (response.statusCode == 409) {
-    if (response.body.contains('already verified')) {
-      throw const AlreadyVerified('Already verified');
-    }
-  } else if (response.statusCode == 500) {
-    if (response.body.contains('Too Many Requests')) {
-      throw const TooManyRequests('Too many retries');
-    } else if (response.body.contains('Not enough balance')) {
-      throw const NotEnoughBalance('Not enough Balance');
-    } else if (response.body.contains('No twin id')) {
-      throw const NoTwinId('No twin id');
-    }
+    throw AlreadyVerified(response.body);
+  } else if (response.statusCode == 429) {
+    throw TooManyRequests(response.body);
   }
   throw Exception('Failed to get token due to ${response.body}');
 }
@@ -90,14 +79,9 @@ Future<VerificationData> getVerificationData() async {
   if (response.statusCode == 200) {
     return VerificationData.fromJson(jsonDecode(response.body)['result']);
   } else if (response.statusCode == 400) {
-    if (response.body.contains('bad challenge') ||
-        response.body.contains('malformed challenge')) {
-      throw const InvalidChallenge('Invalid challenge');
-    }
+    throw BadRequest(response.body);
   } else if (response.statusCode == 401) {
-    if (response.body.contains('bad signature')) {
-      throw const InvalidSignature('Invalid signature');
-    }
+    throw Unauthorized(response.body);
   }
-  throw Exception('Failed to fetch verification data');
+  throw Exception('Failed to fetch verification data due to ${response.body}');
 }
