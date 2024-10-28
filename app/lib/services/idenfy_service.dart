@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:threebotlogin/helpers/globals.dart';
 import 'package:threebotlogin/services/tfchain_service.dart';
@@ -31,17 +32,18 @@ Future<Token> getToken() async {
     Uri.https(idenfyServiceUrl, '/api/v1/token'),
     headers: headers,
   );
-  if (response.statusCode == 201 || response.statusCode == 200) {
+  if (response.statusCode == HttpStatus.ok ||
+      response.statusCode == HttpStatus.created) {
     return Token.fromJson(jsonDecode(response.body)['result']);
-  } else if (response.statusCode == 400) {
+  } else if (response.statusCode == HttpStatus.badRequest) {
     throw BadRequest(response.body);
-  } else if (response.statusCode == 401) {
+  } else if (response.statusCode == HttpStatus.unauthorized) {
     throw Unauthorized(response.body);
-  } else if (response.statusCode == 402) {
+  } else if (response.statusCode == HttpStatus.paymentRequired) {
     throw NotEnoughBalance(response.body);
-  } else if (response.statusCode == 409) {
+  } else if (response.statusCode == HttpStatus.conflict) {
     throw AlreadyVerified(response.body);
-  } else if (response.statusCode == 429) {
+  } else if (response.statusCode == HttpStatus.tooManyRequests) {
     throw TooManyRequests(response.body);
   }
   throw Exception('Failed to get token due to ${response.body}');
@@ -54,9 +56,9 @@ Future<VerificationStatus> getVerificationStatus() async {
   final response = await http.get(
     Uri.https(idenfyServiceUrl, '/api/v1/status', {'client_id': address}),
   );
-  if (response.statusCode == 200) {
+  if (response.statusCode == HttpStatus.ok) {
     return VerificationStatus.fromJson(jsonDecode(response.body)['result']);
-  } else if (response.statusCode == 404) {
+  } else if (response.statusCode == HttpStatus.notFound) {
     return VerificationStatus(
         idenfyRef: '',
         final_: false,
@@ -76,11 +78,11 @@ Future<VerificationData> getVerificationData() async {
     Uri.https(idenfyServiceUrl, '/api/v1/data'),
     headers: headers,
   );
-  if (response.statusCode == 200) {
+  if (response.statusCode == HttpStatus.ok) {
     return VerificationData.fromJson(jsonDecode(response.body)['result']);
-  } else if (response.statusCode == 400) {
+  } else if (response.statusCode == HttpStatus.badRequest) {
     throw BadRequest(response.body);
-  } else if (response.statusCode == 401) {
+  } else if (response.statusCode == HttpStatus.unauthorized) {
     throw Unauthorized(response.body);
   }
   throw Exception('Failed to fetch verification data due to ${response.body}');
