@@ -45,7 +45,7 @@ class _RecoverScreenState extends State<RecoverScreen> {
 
     Map<String, dynamic> body = json.decode(userInfoResult.body);
     if (body['publicKey'] != base64.encode(keyPair.publicKey)) {
-      throw Exception('Seed phrase does not match with $doubleName');
+      throw Exception('Seed phrase does not match with ${doubleName.replaceAll('.3bot', '')}');
     }
   }
 
