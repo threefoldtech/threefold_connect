@@ -60,7 +60,6 @@ dependencies:
   build_runner: ^2.4.9
   smooth_page_indicator: ^1.2.0+3
   webview_flutter: ^4.8.0
-  provider: ^6.1.2
   qr_flutter: ^4.1.0
   screen_brightness: ^1.0.1
   validators: ^3.0.0
@@ -69,6 +68,7 @@ dependencies:
   xml2json: ^6.2.3
   timeago: ^3.7.0
   flutter_widget_from_html: ^0.15.2
+  flutter_riverpod: 2.5.1
   # idenfy_sdk_flutter: 2.5.3
 
   convert: any

@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:threebotlogin/helpers/globals.dart';
 import 'package:threebotlogin/screens/splash_screen.dart';
 import 'package:threebotlogin/services/shared_preference_service.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:threebotlogin/widgets/theme_provider.dart';
-import 'package:threebotlogin/widgets/wizard/terms_agreement.dart';
+import 'package:threebotlogin/providers/theme_provider.dart';
 
 extension ColorSchemeExtension on ColorScheme {
   Color get warning => brightness == Brightness.light
@@ -40,17 +39,8 @@ Future<void> main() async {
   await setGlobalValues();
   bool registered = doubleName != null;
 
-  ThemeMode initialThemeMode = ThemeMode.system;
-
-  ThemeProvider themeProvider = ThemeProvider(initialThemeMode);
-  await themeProvider.loadTheme();
-
   runApp(
-    MultiProvider(
-      providers: [
-        ChangeNotifierProvider(create: (context) => themeProvider),
-        ChangeNotifierProvider(create: (context) => TermsAgreement()),
-      ],
+    ProviderScope(
       child: MyApp(initDone: initDone, registered: registered),
     ),
   );
@@ -67,7 +57,7 @@ Future<void> setGlobalValues() async {
       (identity['signedIdentityNameIdentifier'] != null);
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends ConsumerWidget {
   const MyApp({
     super.key,
     required this.initDone,
@@ -80,9 +70,9 @@ class MyApp extends StatelessWidget {
   final bool registered;
 
   @override
-  Widget build(BuildContext context) {
-    final themeProvider = Provider.of<ThemeProvider>(context);
-
+  Widget build(BuildContext context, WidgetRef ref) {
+    ref.read(themeModeNotifier.notifier).loadTheme();
+    final themeMode = ref.watch(themeModeNotifier);
     var kColorScheme = ColorScheme.fromSeed(
       brightness: Brightness.light,
       seedColor: const Color.fromARGB(255, 26, 161, 143),
@@ -148,7 +138,7 @@ class MyApp extends StatelessWidget {
           unselectedItemColor: kDarkColorScheme.secondary,
         ),
       ),
-      themeMode: themeProvider.themeMode,
+      themeMode: themeMode,
       home: SplashScreen(initDone: initDone, registered: registered),
     );
   }

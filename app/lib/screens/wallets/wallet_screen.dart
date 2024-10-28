@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:threebotlogin/apps/wallet/wallet_config.dart';
 import 'package:threebotlogin/models/wallet.dart';
+import 'package:threebotlogin/providers/wallets_provider.dart';
 import 'package:threebotlogin/services/shared_preference_service.dart';
 import 'package:threebotlogin/services/wallet_service.dart';
 import 'package:threebotlogin/widgets/layout_drawer.dart';
@@ -8,17 +10,19 @@ import 'package:threebotlogin/widgets/wallets/add_wallet.dart';
 import 'package:threebotlogin/widgets/wallets/wallet_card.dart';
 import 'package:hashlib/hashlib.dart';
 
-class WalletScreen extends StatefulWidget {
+class WalletScreen extends ConsumerStatefulWidget {
   const WalletScreen({super.key});
 
   @override
-  State<WalletScreen> createState() => _WalletScreenState();
+  ConsumerState<WalletScreen> createState() => _WalletScreenState();
 }
 
-class _WalletScreenState extends State<WalletScreen> {
+class _WalletScreenState extends ConsumerState<WalletScreen> {
   bool loading = true;
   bool failed = false;
+  bool reloadBalance = true;
   List<Wallet> wallets = [];
+  late WalletsNotifier walletRef;
 
   onDeleteWallet(String name) {
     wallets = wallets.where((w) => w.name != name).toList();
@@ -37,12 +41,21 @@ class _WalletScreenState extends State<WalletScreen> {
   @override
   void initState() {
     super.initState();
+    walletRef = ref.read(walletsNotifier.notifier);
     listMyWallets();
+    walletRef.startReloadingBalance();
+    walletRef.reloadBalances();
+  }
+
+  @override
+  void dispose() {
+    walletRef.stopReloadingBalance();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    // TODO: handle empty wallets
+    wallets = ref.watch(walletsNotifier);
     Widget mainWidget;
     if (loading) {
       mainWidget = Center(
@@ -72,6 +85,7 @@ class _WalletScreenState extends State<WalletScreen> {
     } else {
       mainWidget = ListView(
         children: [
+          const SizedBox(height: 10),
           for (final wallet in wallets)
             WalletCardWidget(
               wallet: wallet,
@@ -103,8 +117,8 @@ class _WalletScreenState extends State<WalletScreen> {
       loading = true;
     });
     try {
-      final myWallets = await listWallets();
-      wallets.addAll(myWallets);
+      await walletRef.list();
+      await Future.delayed(const Duration(milliseconds: 100));
       if (wallets.isEmpty) {
         await _addInitialWallet();
       }

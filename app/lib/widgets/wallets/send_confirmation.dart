@@ -13,6 +13,7 @@ class SendConfirmationWidget extends StatefulWidget {
     required this.to,
     required this.amount,
     required this.memo,
+    required this.reloadBalance,
   });
 
   final ChainType chainType;
@@ -21,6 +22,7 @@ class SendConfirmationWidget extends StatefulWidget {
   final String to;
   final String amount;
   final String memo;
+  final void Function() reloadBalance;
 
   @override
   State<SendConfirmationWidget> createState() => _SendConfirmationWidgetState();
@@ -167,6 +169,7 @@ class _SendConfirmationWidgetState extends State<SendConfirmationWidget> {
     setState(() {
       loading = false;
     });
+    widget.reloadBalance();
     if (!context.mounted) return;
     Navigator.pop(context);
   }

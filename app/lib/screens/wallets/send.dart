@@ -1,13 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
+import 'package:threebotlogin/helpers/globals.dart';
 import 'package:threebotlogin/models/wallet.dart';
+import 'package:threebotlogin/providers/wallets_provider.dart';
 import 'package:threebotlogin/screens/scan_screen.dart';
 import 'package:threebotlogin/screens/wallets/contacts.dart';
 import 'package:threebotlogin/services/stellar_service.dart';
 import 'package:threebotlogin/widgets/wallets/select_chain_widget.dart';
 import 'package:threebotlogin/widgets/wallets/send_confirmation.dart';
 import 'package:validators/validators.dart';
+import 'package:threebotlogin/services/stellar_service.dart' as Stellar;
+import 'package:threebotlogin/services/tfchain_service.dart' as TFChain;
 
 class WalletSendScreen extends StatefulWidget {
   const WalletSendScreen(
@@ -27,10 +32,12 @@ class _WalletSendScreenState extends State<WalletSendScreen> {
   ChainType chainType = ChainType.Stellar;
   String? toAddressError;
   String? amountError;
+  bool reloadBalance = true;
 
   @override
   void initState() {
     fromController.text = widget.wallet.stellarAddress;
+    _reloadBalances();
     super.initState();
   }
 
@@ -40,7 +47,37 @@ class _WalletSendScreenState extends State<WalletSendScreen> {
     toController.dispose();
     amountController.dispose();
     memoController.dispose();
+    reloadBalance = false;
     super.dispose();
+  }
+
+  _loadTFChainBalance() async {
+    final chainUrl = Globals().chainUrl;
+    final balance =
+        await TFChain.getBalance(chainUrl, widget.wallet.tfchainAddress);
+    widget.wallet.tfchainBalance =
+        balance.toString() == '0.0' ? '0' : balance.toString();
+    setState(() {});
+  }
+
+  _loadStellarBalance() async {
+    widget.wallet.stellarBalance =
+        (await Stellar.getBalance(widget.wallet.stellarSecret)).toString();
+    setState(() {});
+  }
+
+  _reloadBalances() async {
+    if (!reloadBalance) return;
+    final refreshBalance = Globals().refreshBalance;
+    final WalletsNotifier walletRef =
+        ProviderScope.containerOf(context, listen: false)
+            .read(walletsNotifier.notifier);
+    final wallet = walletRef.getUpdatedWallet(widget.wallet.name)!;
+    widget.wallet.tfchainBalance = wallet.tfchainBalance;
+    widget.wallet.stellarBalance = wallet.stellarBalance;
+    setState(() {});
+    await Future.delayed(Duration(seconds: refreshBalance));
+    await _reloadBalances();
   }
 
   onChangeChain(ChainType type) {
@@ -134,7 +171,9 @@ class _WalletSendScreenState extends State<WalletSendScreen> {
         ? widget.wallet.stellarBalance
         : widget.wallet.tfchainBalance;
     final bool hideStellar = widget.wallet.stellarBalance == '-1';
-    if (hideStellar) chainType = ChainType.TFChain;
+    if (hideStellar) {
+      onChangeChain(ChainType.TFChain);
+    }
 
     return Scaffold(
       appBar: AppBar(title: const Text('Send')),
@@ -307,6 +346,9 @@ class _WalletSendScreenState extends State<WalletSendScreen> {
               to: toController.text.trim(),
               amount: amountController.text.trim(),
               memo: memoController.text.trim(),
+              reloadBalance: chainType == ChainType.Stellar
+                  ? _loadStellarBalance
+                  : _loadTFChainBalance,
             ));
   }
 }

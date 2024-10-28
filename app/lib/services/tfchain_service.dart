@@ -27,7 +27,6 @@ Future<double> getBalance(String chainUrl, String address) async {
   final tfchainQueryClient = TFChain.QueryClient(chainUrl);
   await tfchainQueryClient.connect();
   final balances = await tfchainQueryClient.balances.get(address: address);
-  await tfchainQueryClient.disconnect();
   return balances!.data.free / BigInt.from(10).pow(7);
 }
 
@@ -161,4 +160,11 @@ Future<void> transfer(String secret, String dest, String amount) async {
   } finally {
     await client.disconnect();
   }
+}
+
+Future<void> disconnect() async {
+  final chainUrl = Globals().chainUrl;
+  final client = TFChain.QueryClient(chainUrl);
+  await client.connect();
+  await client.disconnect();
 }

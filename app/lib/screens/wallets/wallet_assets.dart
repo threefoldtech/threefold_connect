@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:stellar_client/models/vesting_account.dart';
 import 'package:threebotlogin/helpers/globals.dart';
 import 'package:threebotlogin/models/wallet.dart';
+import 'package:threebotlogin/providers/wallets_provider.dart';
 import 'package:threebotlogin/screens/wallets/receive.dart';
 import 'package:threebotlogin/screens/wallets/send.dart';
 import 'package:threebotlogin/services/stellar_service.dart' as Stellar;
-import 'package:threebotlogin/services/tfchain_service.dart' as TFChain;
 import 'package:threebotlogin/widgets/wallets/arrow_inward.dart';
 import 'package:threebotlogin/widgets/wallets/balance_tile.dart';
 
@@ -21,8 +22,9 @@ class WalletAssetsWidget extends StatefulWidget {
 
 class _WalletAssetsWidgetState extends State<WalletAssetsWidget> {
   List<VestingAccount>? vestedWallets = [];
-  bool tfchainBalaceLoading = true;
-  bool stellarBalaceLoading = true;
+  bool tfchainBalaceLoading = false;
+  bool stellarBalaceLoading = false;
+  bool reloadBalance = true;
 
   _listVestedAccounts() async {
     vestedWallets =
@@ -30,37 +32,31 @@ class _WalletAssetsWidgetState extends State<WalletAssetsWidget> {
     setState(() {});
   }
 
-  _loadTFChainBalance() async {
-    setState(() {
-      tfchainBalaceLoading = true;
-    });
-    final chainUrl = Globals().chainUrl;
-    final balance =
-        await TFChain.getBalance(chainUrl, widget.wallet.tfchainAddress);
-    widget.wallet.tfchainBalance =
-        balance.toString() == '0.0' ? '0' : balance.toString();
-    setState(() {
-      tfchainBalaceLoading = false;
-    });
-  }
-
-  _loadStellarBalance() async {
-    setState(() {
-      stellarBalaceLoading = true;
-    });
-    widget.wallet.stellarBalance =
-        (await Stellar.getBalance(widget.wallet.stellarSecret)).toString();
-    setState(() {
-      stellarBalaceLoading = false;
-    });
+  _reloadBalances() async {
+    if (!reloadBalance) return;
+    final refreshBalance = Globals().refreshBalance;
+    final WalletsNotifier walletRef =
+        ProviderScope.containerOf(context, listen: false)
+            .read(walletsNotifier.notifier);
+    final wallet = walletRef.getUpdatedWallet(widget.wallet.name)!;
+    widget.wallet.tfchainBalance = wallet.tfchainBalance;
+    widget.wallet.stellarBalance = wallet.stellarBalance;
+    setState(() {});
+    await Future.delayed(Duration(seconds: refreshBalance));
+    await _reloadBalances();
   }
 
   @override
   void initState() {
     _listVestedAccounts();
-    _loadTFChainBalance();
-    _loadStellarBalance();
+    _reloadBalances();
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    reloadBalance = false;
+    super.dispose();
   }
 
   @override
