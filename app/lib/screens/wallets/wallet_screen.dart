@@ -25,8 +25,7 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
   late WalletsNotifier walletRef;
 
   onDeleteWallet(String name) {
-    wallets = wallets.where((w) => w.name != name).toList();
-    setState(() {});
+    walletRef.removeWallet(name);
   }
 
   onEditWallet(String oldName, String newName) {
