@@ -309,10 +309,10 @@ packages:
     dependency: transitive
     description:
       name: decimal
-      sha256: "24a261d5d5c87e86c7651c417a5dbdf8bcd7080dd592533910e8d0505a279f21"
+      sha256: "4140a688f9e443e2f4de3a1162387bf25e1ac6d51e24c9da263f245210f41440"
       url: "https://pub.dev"
     source: hosted
-    version: "2.3.3"
+    version: "3.0.2"
   device_info_plus:
     dependency: "direct main"
     description:
@@ -475,7 +475,7 @@ packages:
     description:
       path: "."
       ref: master
-      resolved-ref: "48123e66597f6fb448edb14183935b0b243163a6"
+      resolved-ref: "56cc03e8386a9f0530c3489d8bbbeedecb6f47f9"
       url: "https://github.com/threefoldtech/threefold_connect_flutter_pkid_client"
     source: git
     version: "0.0.1"
@@ -621,9 +621,9 @@ packages:
     dependency: "direct main"
     description:
       path: "packages/gridproxy_client"
-      ref: tfchain_graphql
-      resolved-ref: ce84e9175aefa6a370dc441f29fe8dc661647e34
-      url: "https://github.com/codescalers/tfgrid-sdk-dart"
+      ref: main
+      resolved-ref: "68d4fda0ded7fbc3d6e9a594ebbf0ea7ff3b48b6"
+      url: "https://github.com/threefoldtech/tfgrid-sdk-dart"
     source: git
     version: "1.0.0"
   hashlib:
@@ -662,10 +662,10 @@ packages:
     dependency: "direct main"
     description:
       name: http
-      sha256: a2bbf9d017fcced29139daa8ed2bba4ece450ab222871df93ca9eec6f80c34ba
+      sha256: "761a297c042deedc1ffbb156d6e2af13886bb305c2a343a4d972504cd67dd938"
       url: "https://pub.dev"
     source: hosted
-    version: "1.2.0"
+    version: "1.2.1"
   http_multi_server:
     dependency: transitive
     description:
@@ -758,18 +758,18 @@ packages:
     dependency: transitive
     description:
       name: leak_tracker
-      sha256: "3f87a60e8c63aecc975dda1ceedbc8f24de75f09e4856ea27daf8958f2f0ce05"
+      sha256: "7f0df31977cb2c0b88585095d168e689669a2cc9b97c309665e3386f3e9d341a"
       url: "https://pub.dev"
     source: hosted
-    version: "10.0.5"
+    version: "10.0.4"
   leak_tracker_flutter_testing:
     dependency: transitive
     description:
       name: leak_tracker_flutter_testing
-      sha256: "932549fb305594d82d7183ecd9fa93463e9914e1b67cacc34bc40906594a1806"
+      sha256: "06e98f569d004c1315b991ded39924b21af84cf14cc94791b8aea337d25b57f8"
       url: "https://pub.dev"
     source: hosted
-    version: "3.0.5"
+    version: "3.0.3"
   leak_tracker_testing:
     dependency: transitive
     description:
@@ -790,10 +790,10 @@ packages:
     dependency: "direct main"
     description:
       name: local_auth
-      sha256: d3fece0749101725b03206f84a7dab7aaafb702dbbd09131ff8d8173259a9b19
+      sha256: b8d3b04019dad31b024ffdb4c4d74c466269a780c687141a881639bb0b8f76cd
       url: "https://pub.dev"
     source: hosted
-    version: "1.1.11"
+    version: "1.1.7"
   logging:
     dependency: transitive
     description:
@@ -822,10 +822,10 @@ packages:
     dependency: transitive
     description:
       name: material_color_utilities
-      sha256: f7142bb1154231d7ea5f96bc7bde4bda2a0945d2806bb11670e30b850d56bdec
+      sha256: "0e0a020085b65b6083975e499759762399b4475f766c21668c4ecca34ea74e5a"
       url: "https://pub.dev"
     source: hosted
-    version: "0.11.1"
+    version: "0.8.0"
   merlin:
     dependency: transitive
     description:
@@ -838,10 +838,10 @@ packages:
     dependency: transitive
     description:
       name: meta
-      sha256: bdb68674043280c3428e9ec998512fb681678676b3c54e773629ffe74419f8c7
+      sha256: "7687075e408b093f36e6bbf6c91878cc0d4cd10f409506f7bc996f68220b9136"
       url: "https://pub.dev"
     source: hosted
-    version: "1.15.0"
+    version: "1.12.0"
   mime:
     dependency: transitive
     description:
@@ -1022,18 +1022,18 @@ packages:
     dependency: transitive
     description:
       name: petitparser
-      sha256: cb3798bef7fc021ac45b308f4b51208a152792445cce0448c9a4ba5879dd8750
+      sha256: c15605cd28af66339f8eb6fbe0e541bfe2d1b72d5825efc6598f3e0a31b9ad27
       url: "https://pub.dev"
     source: hosted
-    version: "5.4.0"
+    version: "6.0.2"
   pinenacl:
     dependency: "direct main"
     description:
       name: pinenacl
-      sha256: "3a5503637587d635647c93ea9a8fecf48a420cc7deebe6f1fc85c2a5637ab327"
+      sha256: "57e907beaacbc3c024a098910b6240758e899674de07d6949a67b52fd984cbdf"
       url: "https://pub.dev"
     source: hosted
-    version: "0.5.1"
+    version: "0.6.0"
   pinput:
     dependency: "direct main"
     description:
@@ -1318,10 +1318,10 @@ packages:
     dependency: transitive
     description:
       name: shared_preferences_web
-      sha256: "7b15ffb9387ea3e237bb7a66b8a23d2147663d391cafc5c8f37b2e7b4bde5d21"
+      sha256: d2ca4132d3946fec2184261726b355836a82c33d7d5b67af32692aff18a4684e
       url: "https://pub.dev"
     source: hosted
-    version: "2.2.2"
+    version: "2.4.2"
   shared_preferences_windows:
     dependency: transitive
     description:
@@ -1351,8 +1351,8 @@ packages:
     description:
       path: "packages/signer"
       ref: main
-      resolved-ref: "249ef275b6b9e27e58a4969ec25c138f8e3e922a"
-      url: "https://github.com/codescalers/tfgrid-sdk-dart.git"
+      resolved-ref: "68d4fda0ded7fbc3d6e9a594ebbf0ea7ff3b48b6"
+      url: "https://github.com/threefoldtech/tfgrid-sdk-dart.git"
     source: git
     version: "0.1.0"
   sky_engine:
@@ -1476,19 +1476,19 @@ packages:
     dependency: "direct main"
     description:
       path: "packages/stellar_client"
-      ref: tfchain_graphql
-      resolved-ref: ce84e9175aefa6a370dc441f29fe8dc661647e34
-      url: "https://github.com/codescalers/tfgrid-sdk-dart"
+      ref: main
+      resolved-ref: "68d4fda0ded7fbc3d6e9a594ebbf0ea7ff3b48b6"
+      url: "https://github.com/threefoldtech/tfgrid-sdk-dart"
     source: git
     version: "0.1.0"
   stellar_flutter_sdk:
     dependency: "direct main"
     description:
       name: stellar_flutter_sdk
-      sha256: "7d505963fe11d0f90b3f798964c485ed9fa64731c38f14c9b2fb76d5d5bd6cd8"
+      sha256: a25506529d40a040227cd565de6e1b4cc0a9ffc756472cf3c43420512e8a269b
       url: "https://pub.dev"
     source: hosted
-    version: "1.8.1"
+    version: "1.8.9"
   stream_channel:
     dependency: transitive
     description:
@@ -1557,17 +1557,17 @@ packages:
     dependency: transitive
     description:
       name: test_api
-      sha256: "5b8a98dafc4d5c4c9c72d8b31ab2b23fc13422348d2997120294d3bac86b4ddb"
+      sha256: "9955ae474176f7ac8ee4e989dadfb411a58c30415bcfb648fa04b2b8a03afa7f"
       url: "https://pub.dev"
     source: hosted
-    version: "0.7.2"
+    version: "0.7.0"
   tfchain_client:
     dependency: "direct main"
     description:
       path: "packages/tfchain_client"
-      ref: tfchain_graphql
-      resolved-ref: ce84e9175aefa6a370dc441f29fe8dc661647e34
-      url: "https://github.com/codescalers/tfgrid-sdk-dart"
+      ref: main
+      resolved-ref: "68d4fda0ded7fbc3d6e9a594ebbf0ea7ff3b48b6"
+      url: "https://github.com/threefoldtech/tfgrid-sdk-dart"
     source: git
     version: "0.1.0"
   timeago:
@@ -1590,10 +1590,10 @@ packages:
     dependency: transitive
     description:
       name: toml
-      sha256: "69756bc12eccf279b72217a87310d217efc4b3752f722e890f672801f19ac485"
+      sha256: d968d149c8bd06dc14e09ea3a140f90a3f2ba71949e7a91df4a46f3107400e71
       url: "https://pub.dev"
     source: hosted
-    version: "0.13.1"
+    version: "0.16.0"
   typed_data:
     dependency: transitive
     description:
@@ -1643,13 +1643,13 @@ packages:
     source: hosted
     version: "1.1.0"
   unorm_dart:
-    dependency: transitive
+    dependency: "direct overridden"
     description:
       name: unorm_dart
-      sha256: "5b35bff83fce4d76467641438f9e867dc9bcfdb8c1694854f230579d68cd8f4b"
+      sha256: "23d8bf65605401a6a32cff99435fed66ef3dab3ddcad3454059165df46496a3b"
       url: "https://pub.dev"
     source: hosted
-    version: "0.2.0"
+    version: "0.3.0"
   uri:
     dependency: transitive
     description:
@@ -1710,10 +1710,10 @@ packages:
     dependency: transitive
     description:
       name: url_launcher_web
-      sha256: fff0932192afeedf63cdd50ecbb1bc825d31aed259f02bb8dba0f3b729a5e88b
+      sha256: "772638d3b34c779ede05ba3d38af34657a05ac55b06279ea6edd409e323dca8e"
       url: "https://pub.dev"
     source: hosted
-    version: "2.2.3"
+    version: "2.3.3"
   url_launcher_windows:
     dependency: transitive
     description:
@@ -1822,10 +1822,10 @@ packages:
     dependency: transitive
     description:
       name: vm_service
-      sha256: "5c5f338a667b4c644744b661f309fb8080bb94b18a7e91ef1dbd343bed00ed6d"
+      sha256: "3923c89304b715fb1eb6423f017651664a03bf5f4b29983627c4da791f74a4ec"
       url: "https://pub.dev"
     source: hosted
-    version: "14.2.5"
+    version: "14.2.1"
   wakelock_plus:
     dependency: transitive
     description:
@@ -1854,18 +1854,18 @@ packages:
     dependency: transitive
     description:
       name: web
-      sha256: "4188706108906f002b3a293509234588823c8c979dc83304e229ff400c996b05"
+      sha256: "97da13628db363c635202ad97068d47c5b8aa555808e7a9411963c533b449b27"
       url: "https://pub.dev"
     source: hosted
-    version: "0.4.2"
+    version: "0.5.1"
   web_socket_channel:
     dependency: transitive
     description:
       name: web_socket_channel
-      sha256: "939ab60734a4f8fa95feacb55804fa278de28bdeef38e616dc08e44a84adea23"
+      sha256: "58c6666b342a38816b2e7e50ed0f1e261959630becd4c879c4f26bfa14aa5a42"
       url: "https://pub.dev"
     source: hosted
-    version: "2.4.3"
+    version: "2.4.5"
   webview_flutter:
     dependency: "direct main"
     description:
@@ -1926,10 +1926,10 @@ packages:
     dependency: transitive
     description:
       name: xml
-      sha256: "5bc72e1e45e941d825fd7468b9b4cc3b9327942649aeb6fc5cdbf135f0a86e84"
+      sha256: b015a8ad1c488f66851d762d3090a21c600e479dc75e68328c52774040cf9226
       url: "https://pub.dev"
     source: hosted
-    version: "6.3.0"
+    version: "6.5.0"
   xml2json:
     dependency: "direct main"
     description:
