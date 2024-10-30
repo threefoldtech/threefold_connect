@@ -34,7 +34,7 @@ class HomeCardWidget extends StatelessWidget {
           children: [
             Container(
               padding: const EdgeInsets.all(10),
-              height: size / 8,
+              height: size / 7,
               width: fullWidth ? size * 2 / 2.5 + 2 * margin : size / 2.5,
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
