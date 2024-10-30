@@ -113,8 +113,6 @@ class _NewWalletState extends State<NewWallet> {
 
     List<String> hexSeeds = await getWalletHexSeeds();
     String? walletSeed = await generateHexSeed(walletSecret);
-    print(hexSeeds);
-    print(walletSeed);
     if (hexSeeds.contains(walletSeed)) {
       secretError = 'Secret already exists';
       return false;
