@@ -250,79 +250,26 @@ Future<Map<String, dynamic>> getIdentity() async {
   final SharedPreferences prefs = await SharedPreferences.getInstance();
   return {
     'identityName': prefs.getString('identityName'),
-    'signedIdentityNameIdentifier':
-        prefs.getString('signedIdentityNameIdentifier'),
     'identityCountry': prefs.getString('identityCountry'),
-    'signedIdentityCountryIdentifier':
-        prefs.getString('signedIdentityCountryIdentifier'),
     'identityDOB': prefs.getString('identityDOB'),
-    'signedIdentityDOBIdentifier':
-        prefs.getString('signedIdentityDOBIdentifier'),
-    'identityDocumentMeta': prefs.getString('identityDocumentMeta'),
-    'signedIdentityDocumentMetaIdentifier':
-        prefs.getString('signedIdentityDocumentMetaIdentifier'),
     'identityGender': prefs.getString('identityGender'),
-    'signedIdentityGenderIdentifier':
-        prefs.getString('signedIdentityGenderIdentifier'),
   };
 }
 
-Future<void> saveIdentity(
-    Map<String, dynamic> identityName,
-    String signedIdentityNameIdentifier,
-    String identityCountry,
-    String signedIdentityCountryIdentifier,
-    String identityDOB,
-    String signedIdentityDOBIdentifier,
-    Map<String, dynamic> identityDocumentMeta,
-    String signedIdentityDocumentMetaIdentifier,
-    String identityGender,
-    String signedIdentityGenderIdentifier,
-    String referenceId) async {
+Future<void> saveIdentity(String? identityName, String? identityCountry,
+    String? identityDOB, String? identityGender, String? referenceId) async {
   final SharedPreferences prefs = await SharedPreferences.getInstance();
   prefs.remove('identityName');
   prefs.remove('identityCountry');
   prefs.remove('identityDOB');
-  prefs.remove('identityDocumentMeta');
   prefs.remove('identityGender');
 
-  prefs.setString('identityName', jsonEncode(identityName));
-  prefs.setString('identityCountry', identityCountry);
-  prefs.setString('identityDOB', identityDOB);
-  prefs.setString('identityDocumentMeta', jsonEncode(identityDocumentMeta));
-  prefs.setString('identityGender', identityGender);
+  prefs.setString('identityName', identityName!);
+  prefs.setString('identityCountry', identityCountry!);
+  prefs.setString('identityDOB', identityDOB!);
+  prefs.setString('identityGender', identityGender!);
 
-  prefs.setString('signedIdentityNameIdentifier', signedIdentityNameIdentifier);
-  prefs.setString(
-      'signedIdentityCountryIdentifier', signedIdentityCountryIdentifier);
-  prefs.setString('signedIdentityDOBIdentifier', signedIdentityDOBIdentifier);
-  prefs.setString('signedIdentityDocumentMetaIdentifier',
-      signedIdentityDocumentMetaIdentifier);
-  prefs.setString(
-      'signedIdentityGenderIdentifier', signedIdentityGenderIdentifier);
-
-  prefs.remove('identityVerified');
-
-  FlutterPkid client = await getPkidClient();
-
-  client.setPKidDoc(
-      'identity',
-      json.encode({
-        'identityName': jsonEncode(identityName),
-        'signedIdentityNameIdentifier': signedIdentityNameIdentifier,
-        'identityCountry': identityCountry,
-        'signedIdentityCountryIdentifier': signedIdentityCountryIdentifier,
-        'identityDOB': identityDOB,
-        'signedIdentityDOBIdentifier': signedIdentityDOBIdentifier,
-        'identityDocumentMeta': jsonEncode(identityDocumentMeta),
-        'signedIdentityDocumentMetaIdentifier':
-            signedIdentityDocumentMetaIdentifier,
-        'identityGender': identityGender,
-        'signedIdentityGenderIdentifier': signedIdentityGenderIdentifier,
-        'referenceId': referenceId
-      }));
-  updateUserData('identity_reference', referenceId);
-
+  updateUserData('identity_reference', referenceId!);
   Globals().identityVerified.value = true;
 }
 

@@ -73,6 +73,14 @@ class Flags {
     Globals().spendingLimit = int.parse(
         (await Flags().getFlagValueByFeatureName('spending-limit')).toString());
     Globals().newsUrl = (await Flags().getFlagValueByFeatureName('news-url'))!;
+    Globals().idenfyServiceUrl =
+        (await Flags().getFlagValueByFeatureName('idenfy-service-url'))!;
+    Globals().maximumKYCRetries = int.parse(
+        (await Flags().getFlagValueByFeatureName('max-kyc-retries'))
+            .toString());
+    Globals().minimumTFChainBalanceForKYC = int.parse(
+        (await Flags().getFlagValueByFeatureName('min-tfchain-balance-for-kyc'))
+            .toString());
     Globals().refreshBalance = int.parse(
         (await Flags().getFlagValueByFeatureName('refresh-balance'))
             .toString());

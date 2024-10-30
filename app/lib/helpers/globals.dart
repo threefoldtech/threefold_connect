@@ -44,6 +44,8 @@ class Globals {
 
   // FlagSmith configurations
   bool isOpenKYCEnabled = false;
+  int maximumKYCRetries = 5;
+  int minimumTFChainBalanceForKYC = 0;
   bool useNewWallet = false;
   String newWalletUrl = '';
   bool redoIdentityVerification = false;
@@ -61,6 +63,7 @@ class Globals {
   String relayUrl = '';
   String termsAndConditionsUrl = '';
   String newsUrl = '';
+  String idenfyServiceUrl = '';
 
   bool isCacheClearedWallet = false;
   bool isCacheClearedFarmer = false;
