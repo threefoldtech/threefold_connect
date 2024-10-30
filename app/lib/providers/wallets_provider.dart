@@ -17,6 +17,10 @@ class WalletsNotifier extends StateNotifier<List<Wallet>> {
     _loading = false;
   }
 
+  void removeWallet(String name) {
+    state = state.where((wallet) => wallet.name != name).toList();
+  }
+
   void reloadBalances() async {
     if (!_reload) return await TFChainService.disconnect();
     if (!_loading) {
