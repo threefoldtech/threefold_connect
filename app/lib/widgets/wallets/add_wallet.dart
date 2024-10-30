@@ -101,8 +101,6 @@ class _NewWalletState extends State<NewWallet> {
   }
 
   bool _validateSecret(String walletSecret) {
-    List<String> hexSeeds = getWalletHexSeeds();
-    String? walletSeed = generateHexSeed(walletSecret);
     secretError = null;
 
     if (walletSecret.isEmpty) {
@@ -110,6 +108,8 @@ class _NewWalletState extends State<NewWallet> {
       return false;
     }
 
+    List<String> hexSeeds = getWalletHexSeeds();
+    String? walletSeed = generateHexSeed(walletSecret);
     if (hexSeeds.contains(walletSeed)) {
       secretError = 'Secret already exists';
       return false;
