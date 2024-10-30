@@ -12,6 +12,8 @@ import 'package:threebotlogin/widgets/custom_dialog.dart';
 import 'package:bip39/bip39.dart' as bip39;
 import 'package:threebotlogin/services/stellar_service.dart' as StellarService;
 import 'package:stellar_client/stellar_client.dart' as Stellar;
+import 'package:bip39/bip39.dart';
+import 'package:substrate_bip39/substrate_bip39.dart';
 
 class NewWallet extends StatefulWidget {
   const NewWallet(
@@ -32,7 +34,7 @@ class _NewWalletState extends State<NewWallet> {
   String? nameError;
   String? secretError;
 
-  String? generateHexSeed(String secret) {
+  Future<String?> generateHexSeed(String secret) async {
     String? hexSeed = '';
 
     if (' '.allMatches(secret).length == 23) {
@@ -41,8 +43,9 @@ class _NewWalletState extends State<NewWallet> {
       seedList.addAll([0, 0, 0, 0, 0, 0, 0, 0]);
       hexSeed = '0x${Blake2b(32).hex(seedList)}';
     } else if (' '.allMatches(secret).length == 11) {
-      final entropy = bip39.mnemonicToEntropy(secret);
-      hexSeed = '0x${entropy.padRight(64, '0')}';
+      final entropy = mnemonicToEntropy(secret);
+      final seed = await CryptoScheme.seedFromEntropy(hex.decode(entropy));
+      hexSeed = '0x${hex.encode(seed).substring(0, 64)}';
     } else if (StellarService.isValidStellarSecret(secret)) {
       final stellarClient = Stellar.Client(Stellar.NetworkType.PUBLIC, secret);
       hexSeed =
@@ -53,11 +56,11 @@ class _NewWalletState extends State<NewWallet> {
     return hexSeed;
   }
 
-  List<String> getWalletHexSeeds() {
+  Future<List<String>> getWalletHexSeeds() async {
     List<String> hexSeeds = [];
     for (var wallet in widget.wallets) {
-      final hexSeed = generateHexSeed(wallet.stellarSecret) ??
-          generateHexSeed(wallet.tfchainSecret);
+      final hexSeed = await generateHexSeed(wallet.tfchainSecret) ??
+          await generateHexSeed(wallet.stellarSecret);
       if (hexSeed!.isNotEmpty) {
         hexSeeds.add(hexSeed);
       }
@@ -100,7 +103,7 @@ class _NewWalletState extends State<NewWallet> {
     return true;
   }
 
-  bool _validateSecret(String walletSecret) {
+  Future<bool> _validateSecret(String walletSecret) async {
     secretError = null;
 
     if (walletSecret.isEmpty) {
@@ -108,8 +111,10 @@ class _NewWalletState extends State<NewWallet> {
       return false;
     }
 
-    List<String> hexSeeds = getWalletHexSeeds();
-    String? walletSeed = generateHexSeed(walletSecret);
+    List<String> hexSeeds = await getWalletHexSeeds();
+    String? walletSeed = await generateHexSeed(walletSecret);
+    print(hexSeeds);
+    print(walletSeed);
     if (hexSeeds.contains(walletSeed)) {
       secretError = 'Secret already exists';
       return false;
@@ -144,7 +149,7 @@ class _NewWalletState extends State<NewWallet> {
     return true;
   }
 
-  bool _validate() {
+  Future<bool> _validate() async {
     final walletName = _nameController.text.trim();
     final walletSecret = _secretController.text.trim();
     saveLoading = true;
@@ -152,7 +157,7 @@ class _NewWalletState extends State<NewWallet> {
 
     final validName = _validateName(walletName);
     final validSecret = _validateSecret(walletSecret);
-    if (validName && validSecret) {
+    if (validName && await validSecret) {
       return true;
     }
     saveLoading = false;
@@ -256,8 +261,8 @@ class _NewWalletState extends State<NewWallet> {
                       width: 5,
                     ),
                     ElevatedButton(
-                        onPressed: () {
-                          if (_validate()) _addWallet();
+                        onPressed: () async {
+                          if (await _validate()) _addWallet();
                         },
                         child: saveLoading
                             ? const SizedBox(
