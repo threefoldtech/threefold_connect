@@ -132,6 +132,12 @@ activateAccount(String tfchainSeed) async {
         .map((byte) => byte.toRadixString(16).padLeft(2, '0'))
         .join();
 
+    for (int i = 1; i <= 6; i++) {
+      final balance = await getBalanceByClient(client);
+      if (balance > 0) break;
+      await Future.delayed(const Duration(seconds: 1));
+    }
+    await client.connect();
     await client.termsAndConditions
         .accept(documentLink: documentUrl, documentHash: hashString.codeUnits);
     final relayUrl = Globals().relayUrl;
