@@ -132,7 +132,7 @@ class _PreferenceScreenState extends ConsumerState<PreferenceScreen> {
                             }
                             biometricDeviceName = snapshot.data;
                             return CheckboxListTile(
-                              secondary: biometricDeviceName == 'Face ID'
+                              secondary: biometricDeviceName == 'Face ID'|| biometricDeviceName == 'Face unlock'
                                   ? Image.asset(
                                       'assets/face-id.png',
                                       color: Theme.of(context)
