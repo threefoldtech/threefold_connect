@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:typed_data';
 
+import 'package:threebotlogin/helpers/logger.dart';
 import 'package:threebotlogin/models/scope.dart';
 import 'package:threebotlogin/services/crypto_service.dart';
 import 'package:threebotlogin/services/shared_preference_service.dart';
@@ -78,8 +79,8 @@ class Login {
           await decrypt(data['encryptedLoginAttempt'], pk, sk);
       dynamic decryptedLoginAttemptMap = jsonDecode(decryptedLoginAttempt);
 
-      print('Decrypted login attempt');
-      print(decryptedLoginAttempt);
+      logger.i('Decrypted login attempt');
+      logger.i(decryptedLoginAttempt);
 
       decryptedLoginAttemptMap['type'] = data['type'];
       decryptedLoginAttemptMap['created'] = data['created'];

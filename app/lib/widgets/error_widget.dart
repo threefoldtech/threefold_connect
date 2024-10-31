@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 Widget getErrorWidget(BuildContext context, FlutterErrorDetails error) {
-  // print(Theme.of(context).textTheme);
+  // logger.i(Theme.of(context).textTheme);
   return const SafeArea(
     child: Scaffold(
       body: Column(

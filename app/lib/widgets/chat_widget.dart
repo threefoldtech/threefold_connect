@@ -1,6 +1,7 @@
 import 'package:crisp_chat/crisp_chat.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:threebotlogin/helpers/logger.dart';
 import 'package:threebotlogin/services/shared_preference_service.dart';
 
 class CrispChatbot extends StatefulWidget {
@@ -34,7 +35,7 @@ class _CrispChatbotState extends State<CrispChatbot> {
     try {
       await FlutterCrispChat.openCrispChat(config: config);
     } catch (e) {
-      print('Error opening chat: $e');
+      logger.e('Error opening chat: $e');
     }
   }
 

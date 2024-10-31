@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:typed_data';
 
+import 'package:threebotlogin/helpers/logger.dart';
 import 'package:threebotlogin/services/crypto_service.dart';
 import 'package:threebotlogin/services/shared_preference_service.dart';
 
@@ -64,14 +65,14 @@ class Sign {
           await decrypt(data['encryptedSignAttempt'], pk, sk);
       dynamic decryptedSignAttemptMap = jsonDecode(encryptedSignAttempt);
 
-      print('Decrypted login attempt');
-      print(decryptedSignAttemptMap);
+      logger.i('Decrypted login attempt');
+      logger.i(decryptedSignAttemptMap);
 
       decryptedSignAttemptMap['type'] = data['type'];
       signData = Sign.fromJson(decryptedSignAttemptMap);
 
-      print('This is the signData');
-      print(signData);
+      logger.i('This is the signData');
+      logger.i(signData);
     } else {
       signData = Sign.fromJson(data);
     }

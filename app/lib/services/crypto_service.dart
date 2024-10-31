@@ -5,6 +5,7 @@ import 'dart:typed_data';
 import 'package:crypto/crypto.dart' show sha256;
 import 'package:bip39/bip39.dart' as bip39;
 import 'package:sodium_libs/sodium_libs.dart';
+import 'package:threebotlogin/helpers/logger.dart';
 import 'package:threebotlogin/services/shared_preference_service.dart';
 import 'package:pbkdf2ns/pbkdf2ns.dart';
 import 'package:pinenacl/api.dart';
@@ -76,10 +77,10 @@ Future<bool> verifySignature(Uint8List signedMessage, Uint8List pk) async {
     Uint8List data =
         sodium.crypto.sign.open(signedMessage: signedMessage, publicKey: pk);
 
-    print(utf8.decode(data));
+    logger.i(utf8.decode(data));
     return true;
   } catch (e) {
-    print(e);
+    logger.e(e);
     return false;
   }
 }

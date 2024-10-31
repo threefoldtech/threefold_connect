@@ -1,9 +1,10 @@
+import 'package:threebotlogin/helpers/logger.dart';
 import 'package:threebotlogin/services/pkid_service.dart';
 import 'package:threebotlogin/services/shared_preference_service.dart';
 
 Future<void> fixPkidMigration() async {
   try {
-    print('Doing the migration... ');
+    logger.i('Doing the migration... ');
     await saveEmailToPKidForMigration();
     await savePhoneToPKidForMigration();
 

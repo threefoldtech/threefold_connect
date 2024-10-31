@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:tfchain_client/models/dao.dart';
+import 'package:threebotlogin/helpers/logger.dart';
 import 'package:threebotlogin/widgets/layout_drawer.dart';
 import 'package:threebotlogin/widgets/dao/proposals.dart';
 import 'package:threebotlogin/services/tfchain_service.dart';
@@ -25,7 +26,7 @@ class _DaoPageState extends State<DaoPage> {
       activeList.addAll(proposals['activeProposals']!);
       inactiveList.addAll(proposals['inactiveProposals']!);
     } catch (e) {
-      print('Failed to load proposals due to $e');
+      logger.e('Failed to load proposals due to $e');
       if (context.mounted) {
         final loadingProposalFailure = SnackBar(
           content: Text(

@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:hashlib/hashlib.dart';
 import 'package:threebotlogin/helpers/globals.dart';
+import 'package:threebotlogin/helpers/logger.dart';
 import 'package:threebotlogin/models/wallet.dart';
 import 'package:threebotlogin/services/stellar_service.dart';
 import 'package:threebotlogin/services/wallet_service.dart';
@@ -170,7 +171,7 @@ class _NewWalletState extends State<NewWallet> {
     try {
       wallet = await loadAddedWallet(walletName, walletSecret);
     } catch (e) {
-      print(e);
+      logger.e(e);
       _showDialog('Error', 'Failed to load wallet. Please try again.',
           Icons.error, DialogType.Error);
       saveLoading = false;
@@ -185,7 +186,7 @@ class _NewWalletState extends State<NewWallet> {
           Icons.check,
           DialogType.Info);
     } catch (e) {
-      print(e);
+      logger.e(e);
       _showDialog('Error', 'Failed to save wallet. Please try again.',
           Icons.error, DialogType.Error);
       saveLoading = false;

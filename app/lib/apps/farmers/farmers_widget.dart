@@ -10,6 +10,7 @@ import 'package:threebotlogin/clipboard_hack/clipboard_hack.dart';
 import 'package:threebotlogin/events/events.dart';
 import 'package:threebotlogin/events/go_home_event.dart';
 import 'package:threebotlogin/helpers/globals.dart';
+import 'package:threebotlogin/helpers/logger.dart';
 import 'package:threebotlogin/models/wallet_data.dart';
 import 'package:threebotlogin/screens/scan_screen.dart';
 import 'package:threebotlogin/services/shared_preference_service.dart';
@@ -82,7 +83,7 @@ class _FarmersState extends State<FarmersWidget>
       },
       onConsoleMessage:
           (InAppWebViewController controller, ConsoleMessage consoleMessage) {
-        print('Wallet console: ${consoleMessage.message}');
+        logger.i('Wallet console: ${consoleMessage.message}');
       },
     );
 
@@ -145,7 +146,7 @@ class _FarmersState extends State<FarmersWidget>
 
       await saveWallets(walletData);
     } catch (e) {
-      print(e);
+      logger.e(e);
     }
   }
 

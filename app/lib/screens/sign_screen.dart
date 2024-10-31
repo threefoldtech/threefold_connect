@@ -12,6 +12,7 @@ import 'package:threebotlogin/events/pop_all_sign_event.dart';
 import 'package:threebotlogin/helpers/block_and_run_mixin.dart';
 import 'package:threebotlogin/helpers/download_helper.dart';
 import 'package:threebotlogin/helpers/hex_color.dart';
+import 'package:threebotlogin/helpers/logger.dart';
 import 'package:threebotlogin/models/sign.dart';
 import 'package:threebotlogin/services/3bot_service.dart';
 import 'package:threebotlogin/services/crypto_service.dart';
@@ -52,7 +53,7 @@ class _SignScreenState extends State<SignScreen> with BlockAndRunMixin {
 
   void fetchNecessaryData() async {
     if (widget.signData.isJson == false) {
-      print('Coming here');
+      logger.i('Coming here');
       isDataLoading = false;
       setState(() {});
       return;
@@ -349,7 +350,7 @@ class _SignScreenState extends State<SignScreen> with BlockAndRunMixin {
                 isBusy = false;
                 setState(() {});
               } catch (e) {
-                print(e);
+                logger.e(e);
                 updateMessage = 'Failed to download the file';
                 isBusy = false;
                 setState(() {});

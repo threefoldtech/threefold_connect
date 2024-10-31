@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:threebotlogin/helpers/globals.dart';
+import 'package:threebotlogin/helpers/logger.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 class WebView extends StatefulWidget {
@@ -32,7 +33,7 @@ class _WebViewState extends State<WebView> {
             });
           },
           onWebResourceError: (error) {
-            print('Error loading: ${error.description}');
+            logger.e('Error loading: ${error.description}');
           },
         ),
       )
