@@ -72,10 +72,7 @@ class _RegisteredScreenState extends State<RegisteredScreen>
                         children: const <TextSpan>[
                           TextSpan(
                               text:
-                                  'ThreeFold Connect App is 2FA authenticator. '),
-                          TextSpan(
-                              text:
-                                  'By using ThreeFold Connect you can ensure that a user is who the say they are.'),
+                                  'Your portal to ThreeFold: access your wallets, your digital identity, your farms, and ThreeFold updates with ease.'),
                         ]),
                   ),
                 ),
