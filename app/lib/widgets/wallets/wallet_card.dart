@@ -36,7 +36,7 @@ class _WalletCardWidgetState extends State<WalletCardWidget> {
       widget.wallet.stellarBalance =
           await StellarService.getBalance(widget.wallet.stellarSecret);
       final tfchainBalance = await TFChainService.getBalance(
-          chainUrl, widget.wallet.tfchainSecret);
+          chainUrl, widget.wallet.tfchainAddress);
       widget.wallet.tfchainBalance =
           tfchainBalance.toString() == '0.0' ? '0' : tfchainBalance.toString();
     } catch (e) {
