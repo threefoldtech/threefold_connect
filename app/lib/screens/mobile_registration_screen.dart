@@ -147,8 +147,16 @@ class _MobileRegistrationScreenState extends State<MobileRegistrationScreen> {
       seedConfirmationController.text = seedCheckValue;
     });
 
+    List<String> enteredWords = seedCheckValue.split(' ');
+    if(enteredWords.length != 3 || enteredWords.toSet().length != 3){
+      setState((){
+        errorStepperText = 'Please enter three different words.';
+      });
+      return;
+    }
+
     bool seedWordConfirmationValidation = validateSeedWords(
-        _registrationData.phrase, seedConfirmationController.text);
+        _registrationData.phrase, seedCheckValue);
 
     if (seedWordConfirmationValidation) {
       setState(() {
