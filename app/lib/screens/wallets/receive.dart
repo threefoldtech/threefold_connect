@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:threebotlogin/helpers/logger.dart';
 import 'package:threebotlogin/models/wallet.dart';
 import 'package:threebotlogin/screens/qr_code_screen.dart';
 import 'package:threebotlogin/widgets/wallets/select_chain_widget.dart';
@@ -137,7 +138,7 @@ class _WalletReceiveScreenState extends State<WalletReceiveScreen> {
               child: ElevatedButton(
                 onPressed: () {
                   final valid = _validate();
-                  print(valid);
+                  logger.i(valid);
                   if (valid) _showQRCode();
                 },
                 style: ElevatedButton.styleFrom(),

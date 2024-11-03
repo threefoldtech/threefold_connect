@@ -11,6 +11,7 @@ import 'package:threebotlogin/clipboard_hack/clipboard_hack.dart';
 import 'package:threebotlogin/events/events.dart';
 import 'package:threebotlogin/events/go_home_event.dart';
 import 'package:threebotlogin/helpers/globals.dart';
+import 'package:threebotlogin/helpers/logger.dart';
 import 'package:threebotlogin/models/wallet_data.dart';
 import 'package:threebotlogin/screens/scan_screen.dart';
 import 'package:threebotlogin/services/crypto_service.dart';
@@ -84,7 +85,7 @@ class _WalletState extends State<WalletWidget>
       },
       onConsoleMessage:
           (InAppWebViewController controller, ConsoleMessage consoleMessage) {
-        print('Wallet console: ${consoleMessage.message}');
+        logger.i('Wallet console: ${consoleMessage.message}');
       },
     );
 
@@ -115,8 +116,8 @@ class _WalletState extends State<WalletWidget>
     if (Globals().paymentRequest != null && !Globals().useNewWallet) {
       String paymentRequestString = Globals().paymentRequest.toString();
 
-      print('PAYMENTREQUEST');
-      print(paymentRequestString);
+      logger.i('PAYMENTREQUEST');
+      logger.i(paymentRequestString);
 
       Globals().paymentRequestIsUsed = true;
       jsStartApp =
@@ -161,7 +162,7 @@ class _WalletState extends State<WalletWidget>
       String signedData = await signData(data, sk);
       return signedData;
     } catch (e) {
-      print(e);
+      logger.e(e);
       return '';
     }
   }
@@ -176,7 +177,7 @@ class _WalletState extends State<WalletWidget>
 
       await saveWallets(walletData);
     } catch (e) {
-      print(e);
+      logger.e(e);
     }
   }
 

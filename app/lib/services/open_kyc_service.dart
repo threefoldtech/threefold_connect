@@ -4,6 +4,7 @@ import 'dart:typed_data';
 import 'package:http/http.dart' as http;
 import 'package:http/http.dart';
 import 'package:threebotlogin/app_config.dart';
+import 'package:threebotlogin/helpers/logger.dart';
 import 'package:threebotlogin/services/crypto_service.dart';
 import 'package:threebotlogin/services/shared_preference_service.dart';
 
@@ -29,7 +30,7 @@ Future<Response> getSignedEmailIdentifierFromOpenKYC(String doubleName) async {
   };
 
   Uri url = Uri.parse('$openKycApiUrl/verification/retrieve-sei/$doubleName');
-  print('Sending call: ${url.toString()}');
+  logger.i('Sending call: ${url.toString()}');
 
   return http.get(url, headers: loginRequestHeaders);
 }
@@ -50,7 +51,7 @@ Future<Response> getSignedPhoneIdentifierFromOpenKYC(String doubleName) async {
   };
 
   Uri url = Uri.parse('$openKycApiUrl/verification/retrieve-spi/$doubleName');
-  print('Sending call: ${url.toString()}');
+  logger.i('Sending call: ${url.toString()}');
 
   return http.get(url, headers: loginRequestHeaders);
 }
@@ -58,7 +59,7 @@ Future<Response> getSignedPhoneIdentifierFromOpenKYC(String doubleName) async {
 Future<Response> verifySignedEmailIdentifier(
     String signedEmailIdentifier) async {
   Uri url = Uri.parse('$openKycApiUrl/verification/verify-sei');
-  print('Sending call: ${url.toString()}');
+  logger.i('Sending call: ${url.toString()}');
 
   return http.post(url,
       body: json.encode({'signedEmailIdentifier': signedEmailIdentifier}),
@@ -68,7 +69,7 @@ Future<Response> verifySignedEmailIdentifier(
 Future<Response> verifySignedPhoneIdentifier(
     String signedPhoneIdentifier) async {
   Uri url = Uri.parse('$openKycApiUrl/verification/verify-spi');
-  print('Sending call: ${url.toString()}');
+  logger.i('Sending call: ${url.toString()}');
 
   return http.post(url,
       body: json.encode({'signedPhoneIdentifier': signedPhoneIdentifier}),
@@ -83,7 +84,7 @@ Future<Response> sendVerificationEmail() async {
   });
 
   Uri url = Uri.parse('$openKycApiUrl/verification/send-email');
-  print('Sending call: ${url.toString()}');
+  logger.i('Sending call: ${url.toString()}');
 
   return http.post(url, body: encodedBody, headers: requestHeaders);
 }
@@ -96,7 +97,7 @@ Future<Response> sendVerificationSms() async {
   });
 
   Uri url = Uri.parse('$openKycApiUrl/verification/send-sms');
-  print('Sending call: ${url.toString()}');
+  logger.i('Sending call: ${url.toString()}');
 
   return http.post(url, body: encodedBody, headers: requestHeaders);
 }
@@ -126,7 +127,7 @@ Future<Response> updateEmailAddressOfUser() async {
   });
 
   Uri url = Uri.parse('$threeBotApiUrl/users/update');
-  print('Sending call: ${url.toString()}');
+  logger.i('Sending call: ${url.toString()}');
 
   return http.post(url, headers: loginRequestHeaders, body: encodedBody);
 }
@@ -150,7 +151,7 @@ Future<Response> updateUserData(String field, String value) async {
       {'username': await getDoubleName(), 'field': field, 'value': value});
 
   Uri url = Uri.parse('$threeBotApiUrl/users/update');
-  print('Sending call: ${url.toString()}');
+  logger.i('Sending call: ${url.toString()}');
 
   return http.post(url, headers: loginRequestHeaders, body: encodedBody);
 }

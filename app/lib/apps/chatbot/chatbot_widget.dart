@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:threebotlogin/apps/chatbot/chatbot_config.dart';
 import 'package:threebotlogin/browser.dart';
+import 'package:threebotlogin/helpers/logger.dart';
 import 'package:threebotlogin/widgets/layout_drawer.dart';
 
 class ChatbotWidget extends StatefulWidget {
@@ -10,6 +11,7 @@ class ChatbotWidget extends StatefulWidget {
   const ChatbotWidget({super.key, required this.email});
 
   @override
+  // ignore: library_private_types_in_public_api, no_logic_in_create_state
   _ChatbotState createState() => _ChatbotState(email: email);
 }
 
@@ -41,7 +43,7 @@ class _ChatbotState extends State<ChatbotWidget>
       },
       onConsoleMessage:
           (InAppWebViewController controller, ConsoleMessage consoleMessage) {
-        print('CB console: ${consoleMessage.message}');
+        logger.i('CB console: ${consoleMessage.message}');
       },
       onLoadStart: (InAppWebViewController controller, _) {
         webView = controller;

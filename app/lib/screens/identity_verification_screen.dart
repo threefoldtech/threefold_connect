@@ -10,6 +10,7 @@ import 'package:threebotlogin/events/events.dart';
 import 'package:threebotlogin/events/identity_callback_event.dart';
 import 'package:threebotlogin/helpers/globals.dart';
 import 'package:threebotlogin/helpers/kyc_helpers.dart';
+import 'package:threebotlogin/helpers/logger.dart';
 import 'package:threebotlogin/main.dart';
 import 'package:threebotlogin/models/idenfy.dart';
 import 'package:threebotlogin/services/gridproxy_service.dart';
@@ -299,7 +300,7 @@ class _IdentityVerificationScreenState
     try {
       idenfySDKresult = await IdenfySdkFlutter.start(token);
     } catch (e) {
-      print(e);
+      logger.e(e);
       if (context.mounted) {
         showDialog(
           context: context,
@@ -337,7 +338,7 @@ class _IdentityVerificationScreenState
       setState(() {
         isLoading = false;
       });
-      print(e);
+      logger.e(e);
       return showDialog(
         context: context,
         builder: (BuildContext context) => CustomDialog(
@@ -414,7 +415,7 @@ class _IdentityVerificationScreenState
         setState(() {
           isLoading = false;
         });
-        print(e);
+        logger.e(e);
         return showDialog(
           context: context,
           builder: (BuildContext context) => CustomDialog(
@@ -1059,7 +1060,7 @@ class _IdentityVerificationScreenState
       setState(() {
         isLoading = false;
       });
-      print(e);
+      logger.e(e);
       return showDialog(
         context: context,
         builder: (BuildContext context) => CustomDialog(
@@ -1452,7 +1453,7 @@ class _IdentityVerificationScreenState
 
                         setState(() {});
                       } catch (e) {
-                        print(e);
+                        logger.e(e);
                         Navigator.pop(context);
 
                         await saveEmail(oldEmail['email']!, oldEmail['sei']);
@@ -1478,28 +1479,26 @@ class _IdentityVerificationScreenState
     FlutterPkid client = await getPkidClient();
 
     var emailPKidResult = await client.getPKidDoc('email');
-    print(emailPKidResult);
+    logger.i(emailPKidResult);
     return showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text('Change your email'),
-          content: Container(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Text('Please pass us your email address'),
-                const SizedBox(height: 16),
-                TextField(
-                  controller: changeEmailController,
-                  decoration: InputDecoration(
-                      labelText: 'Email',
-                      errorText: emailInputValidated
-                          ? null
-                          : 'Please enter a valid email'),
-                ),
-              ],
-            ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text('Please pass us your email address'),
+              const SizedBox(height: 16),
+              TextField(
+                controller: changeEmailController,
+                decoration: InputDecoration(
+                    labelText: 'Email',
+                    errorText: emailInputValidated
+                        ? null
+                        : 'Please enter a valid email'),
+              ),
+            ],
           ),
           actions: <Widget>[
             TextButton(
@@ -1649,7 +1648,7 @@ class _IdentityVerificationScreenState
       );
       ScaffoldMessenger.of(context).clearSnackBars();
       ScaffoldMessenger.of(context).showSnackBar(loadingSpendingFailure);
-      print('Failed to load user spending due to $e');
+      logger.e('Failed to load user spending due to $e');
       spending = 0.0;
     } finally {
       setState(() {

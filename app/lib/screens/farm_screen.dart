@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:threebotlogin/helpers/logger.dart';
 import 'package:threebotlogin/models/farm.dart';
 import 'package:threebotlogin/models/wallet.dart';
 import 'package:threebotlogin/services/gridproxy_service.dart';
@@ -61,7 +62,7 @@ class _FarmScreenState extends State<FarmScreen> {
             }).toList()));
       }
     } catch (e) {
-      print('Failed to get farms due to $e');
+      logger.e('Failed to get farms due to $e');
       if (context.mounted) {
         final loadingFarmsFailure = SnackBar(
           content: Text(

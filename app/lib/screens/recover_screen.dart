@@ -6,6 +6,7 @@ import 'package:flutter_pkid/flutter_pkid.dart';
 import 'package:sodium_libs/sodium_libs.dart';
 import 'package:http/http.dart';
 import 'package:threebotlogin/helpers/kyc_helpers.dart';
+import 'package:threebotlogin/helpers/logger.dart';
 import 'package:threebotlogin/services/3bot_service.dart';
 import 'package:threebotlogin/services/crypto_service.dart';
 import 'package:threebotlogin/services/migration_service.dart';
@@ -86,8 +87,8 @@ class _RecoverScreenState extends State<RecoverScreen> {
 
       await fixPkidMigration();
     } catch (e) {
-      print(e);
-      throw ('Something went wrong');
+      logger.e(e);
+      throw Exception('Something went wrong');
     }
   }
 
@@ -243,7 +244,7 @@ class _RecoverScreenState extends State<RecoverScreen> {
                   // to dismiss the recovery screen.
                   Navigator.pop(context, true);
                 } catch (e) {
-                  print(e);
+                  logger.e(e);
                   Navigator.pop(context);
                   error = e.toString();
                   setState(() {});

@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:threebotlogin/helpers/logger.dart';
 import 'package:threebotlogin/services/redirection.dart';
 import 'package:threebotlogin/events/uni_link_event.dart';
 import 'package:threebotlogin/models/login.dart';
@@ -27,7 +28,7 @@ class UniLinkService {
       return await handleSignUniLink(link, context);
     }
 
-    print('Not valid');
+    logger.e('Not valid');
   }
 }
 
@@ -71,7 +72,7 @@ void handleLoginUniLink(Uri link, BuildContext context) async {
     return;
   }
 
-  print(loggedIn);
+  logger.i(loggedIn);
   bool stateSaved = await savePreviousState(login.state.toString());
 
   await showLoggedInDialog(context);
@@ -86,8 +87,8 @@ void handleLoginUniLink(Uri link, BuildContext context) async {
 }
 
 Future<void> handleSignUniLink(Uri link, BuildContext context) async {
-  print('This is the sign link');
-  print(link);
+  logger.i('This is the sign link');
+  logger.i(link);
 
   Map<String, String> queryParams = link.queryParameters;
 
@@ -109,7 +110,7 @@ Future<void> handleSignUniLink(Uri link, BuildContext context) async {
   }
 
   if (!isValidSignAttempt) {
-    print('One or more parameters are missing');
+    logger.i('One or more parameters are missing');
     return;
   }
 
