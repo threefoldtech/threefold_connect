@@ -34,20 +34,27 @@ class _RecoverScreenState extends State<RecoverScreen> {
   String errorStepperText = '';
 
   validateNameSeed(doubleName, seedPhrase) async {
-    checkSeedLength(seedPhrase);
-    KeyPair keyPair = await generateKeyPairFromSeedPhrase(seedPhrase);
-    Response userInfoResult = await getUserInfo(doubleName);
-    Map<String, dynamic> body = json.decode(userInfoResult.body);
+    try {
+      if (doubleName == '.3bot') {
+        throw ('Name is required.');
+      }
 
-    if (doubleName == '.3bot') {
-      throw ('Name is required.');
-    }
+      Response userInfoResult = await getUserInfo(doubleName);
+      if (userInfoResult.statusCode != 200) {
+        throw ('Name was not found.');
+      }
 
-    if (userInfoResult.statusCode != 200) {
-      throw ('Name was not found.');
-    }
-    if (body['publicKey'] != base64.encode(keyPair.publicKey)) {
-      throw ('Seed phrase does not match with ${doubleName.replaceAll('.3bot', '')}');
+      checkSeedLength(seedPhrase);
+      KeyPair keyPair = await generateKeyPairFromSeedPhrase(seedPhrase);
+      Map<String, dynamic> body = json.decode(userInfoResult.body);
+      if (body['publicKey'] != base64.encode(keyPair.publicKey)) {
+        throw ('Seed phrase does not match with ${doubleName.replaceAll('.3bot', '')}');
+      }
+    } catch (e) {
+      if (e.toString().contains('Invalid mnemonic')) {
+        throw ('Invalid mnemonic');
+      }
+      rethrow;
     }
   }
 
