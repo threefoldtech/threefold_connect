@@ -33,19 +33,21 @@ class _RecoverScreenState extends State<RecoverScreen> {
 
   String errorStepperText = '';
 
-  checkSeedPhrase(doubleName, seedPhrase) async {
+  validateNameSeed(doubleName, seedPhrase) async {
     checkSeedLength(seedPhrase);
     KeyPair keyPair = await generateKeyPairFromSeedPhrase(seedPhrase);
-
     Response userInfoResult = await getUserInfo(doubleName);
+    Map<String, dynamic> body = json.decode(userInfoResult.body);
 
-    if (userInfoResult.statusCode != 200) {
-      throw Exception('Name was not found.');
+    if (doubleName == '.3bot') {
+      throw ('Name is required.');
     }
 
-    Map<String, dynamic> body = json.decode(userInfoResult.body);
+    if (userInfoResult.statusCode != 200) {
+      throw ('Name was not found.');
+    }
     if (body['publicKey'] != base64.encode(keyPair.publicKey)) {
-      throw Exception('Seed phrase does not match with ${doubleName.replaceAll('.3bot', '')}');
+      throw ('Seed phrase does not match with ${doubleName.replaceAll('.3bot', '')}');
     }
   }
 
@@ -78,16 +80,16 @@ class _RecoverScreenState extends State<RecoverScreen> {
       await fixPkidMigration();
     } catch (e) {
       print(e);
-      throw Exception('Something went wrong');
+      throw ('Something went wrong');
     }
   }
 
   checkSeedLength(seedPhrase) {
     int seedLength = seedPhrase.split(' ').length;
     if (seedLength <= 23) {
-      throw Exception('Seed phrase is too short');
+      throw ('Seed phrase is too short');
     } else if (seedLength > 24) {
-      throw Exception('Seed phrase is too long');
+      throw ('Seed phrase is too long');
     }
   }
 
@@ -223,7 +225,7 @@ class _RecoverScreenState extends State<RecoverScreen> {
                 try {
                   showSpinner();
 
-                  await checkSeedPhrase(doubleName, seedPhrase);
+                  await validateNameSeed(doubleName, seedPhrase);
                   await continueRecoverAccount();
 
                   // To dismiss the spinner
