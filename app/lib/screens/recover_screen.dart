@@ -86,6 +86,9 @@ class _RecoverScreenState extends State<RecoverScreen> {
 
   checkSeedLength(seedPhrase) {
     int seedLength = seedPhrase.split(' ').length;
+    if (seedLength == 1) {
+      throw ('Seed phrase is required.');
+    }
     if (seedLength <= 23) {
       throw ('Seed phrase is too short');
     } else if (seedLength > 24) {
