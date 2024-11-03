@@ -8,6 +8,7 @@ import 'package:threebotlogin/helpers/environment.dart';
 import 'package:threebotlogin/helpers/flags.dart';
 import 'package:threebotlogin/helpers/globals.dart';
 import 'package:threebotlogin/helpers/kyc_helpers.dart';
+import 'package:threebotlogin/helpers/logger.dart';
 import 'package:threebotlogin/screens/home_screen.dart';
 import 'package:threebotlogin/screens/init_screen.dart';
 import 'package:threebotlogin/screens/unregistered_screen.dart';
@@ -139,7 +140,7 @@ class _AppState extends State<MainScreen> {
       setState(() {});
       await fetchPkidData();
     } catch (e) {
-      print('Error in main screen: $e');
+      logger.e('Error in main screen: $e');
 
       updateMessage = null;
       errorMessage = e.toString();
@@ -176,7 +177,7 @@ class _AppState extends State<MainScreen> {
       _sub?.cancel();
     }
 
-    print(mounted);
+    logger.i(mounted);
     Navigator.of(context).popUntil((route) => route.isFirst);
 
     updateMessage = 'Fetching user data';
@@ -196,7 +197,7 @@ class _AppState extends State<MainScreen> {
       );
       ScaffoldMessenger.of(context).clearSnackBars();
       ScaffoldMessenger.of(context).showSnackBar(loadingTwinFailure);
-      print('Failed to load twin information due to $e');
+      logger.e('Failed to load twin information due to $e');
     }
 
     // await Navigator.push(context, MaterialPageRoute(builder: (context) => UnregisteredScreen()));
@@ -220,7 +221,7 @@ class _AppState extends State<MainScreen> {
         await fetchPKidData();
       }
     } catch (e) {
-      print(e);
+      logger.e(e);
       throw Exception('Unable to fetch pkid data');
     }
   }
@@ -232,7 +233,7 @@ class _AppState extends State<MainScreen> {
               .timeout(Duration(seconds: Globals().timeOutSeconds));
 
       if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
-        print('Connected to the internet');
+        logger.i('Connected to the internet');
       }
     } catch (e) {
       throw Exception(
@@ -249,7 +250,7 @@ class _AppState extends State<MainScreen> {
                 .timeout(Duration(seconds: Globals().timeOutSeconds));
 
         if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
-          print('Connected to the servers');
+          logger.i('Connected to the servers');
         }
       } catch (e) {
         throw Exception(

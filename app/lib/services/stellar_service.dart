@@ -2,13 +2,14 @@ import 'package:stellar_client/models/transaction.dart';
 import 'package:stellar_client/models/vesting_account.dart';
 import 'package:stellar_client/stellar_client.dart';
 import 'package:stellar_flutter_sdk/stellar_flutter_sdk.dart';
+import 'package:threebotlogin/helpers/logger.dart';
 
 bool isValidStellarSecret(String seed) {
   try {
     StrKey.decodeStellarSecretSeed(seed);
     return true;
   } catch (e) {
-    print('Secret is invalid. $e');
+    logger.e('Secret is invalid. $e');
   }
   return false;
 }
@@ -18,7 +19,7 @@ bool isValidStellarAddress(String address) {
     StrKey.decodeStellarAccountId(address);
     return true;
   } catch (e) {
-    print('Address is invalid. $e');
+    logger.e('Address is invalid. $e');
   }
   return false;
 }
@@ -33,7 +34,7 @@ Future<String> getBalanceByClient(Client client) async {
       }
     }
   } catch (e) {
-    print("Couldn't load the account balance due to $e");
+    logger.i("Couldn't load the account balance due to $e");
   }
   return '-1';
 }
