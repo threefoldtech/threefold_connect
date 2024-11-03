@@ -6,7 +6,7 @@ publish_to: "none"
 version: 3.9.1+178
 
 environment:
-  sdk: ">=3.0.0"
+  sdk: ">=3.4.0"
 
 dependencies:
   flutter:
@@ -55,7 +55,7 @@ dependencies:
   dio: ^5.0.0
   open_filex: ^4.3.2
   country_picker: ^2.0.20
-  pinenacl: ^0.6.0
+  pinenacl: 0.6.0
   pinput: 3.0.1
   build_runner: ^2.4.9
   smooth_page_indicator: ^1.2.0+3
