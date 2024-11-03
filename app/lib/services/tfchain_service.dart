@@ -1,3 +1,5 @@
+// ignore_for_file: depend_on_referenced_packages
+
 import 'dart:convert';
 
 import 'package:tfchain_client/generated/dev/types/tfchain_support/types/farm.dart';

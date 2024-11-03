@@ -1,3 +1,5 @@
+// ignore_for_file: implementation_imports, depend_on_referenced_packages
+
 import 'package:bip39/bip39.dart';
 import 'package:convert/convert.dart';
 import 'package:flutter/foundation.dart';

@@ -11,6 +11,7 @@ class ChatbotWidget extends StatefulWidget {
   const ChatbotWidget({super.key, required this.email});
 
   @override
+  // ignore: library_private_types_in_public_api, no_logic_in_create_state
   _ChatbotState createState() => _ChatbotState(email: email);
 }
 

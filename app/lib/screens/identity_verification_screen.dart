@@ -1485,22 +1485,20 @@ class _IdentityVerificationScreenState
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text('Change your email'),
-          content: Container(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Text('Please pass us your email address'),
-                const SizedBox(height: 16),
-                TextField(
-                  controller: changeEmailController,
-                  decoration: InputDecoration(
-                      labelText: 'Email',
-                      errorText: emailInputValidated
-                          ? null
-                          : 'Please enter a valid email'),
-                ),
-              ],
-            ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text('Please pass us your email address'),
+              const SizedBox(height: 16),
+              TextField(
+                controller: changeEmailController,
+                decoration: InputDecoration(
+                    labelText: 'Email',
+                    errorText: emailInputValidated
+                        ? null
+                        : 'Please enter a valid email'),
+              ),
+            ],
           ),
           actions: <Widget>[
             TextButton(
