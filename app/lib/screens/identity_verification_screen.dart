@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:core';
 import 'package:flutter/material.dart';
@@ -59,6 +60,25 @@ class _IdentityVerificationScreenState
 
   double spending = 0.0;
 
+  int emailCountdown = 60;
+  Timer? emailTimer;
+  ValueNotifier<int> countdownNotifier = ValueNotifier(-1);
+
+  void startEmailCountdown() {
+    emailCountdown = 60;
+    countdownNotifier.value = emailCountdown;
+
+    emailTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (emailCountdown > 0) {
+        emailCountdown--;
+        countdownNotifier.value = emailCountdown;
+      } else {
+        countdownNotifier.value = -1;
+        timer.cancel();
+      }
+    });
+  }
+
   setEmailVerified() {
     if (mounted) {
       setState(() {
@@ -100,9 +120,15 @@ class _IdentityVerificationScreenState
     Globals().phoneVerified.addListener(setPhoneVerified);
     Globals().identityVerified.addListener(setIdentityVerified);
     Globals().hidePhoneButton.addListener(setHidePhoneVerify);
-
     checkPhoneStatus();
     getUserValues();
+  }
+
+  @override
+  void dispose() {
+    emailTimer?.cancel();
+    countdownNotifier.dispose();
+    super.dispose();
   }
 
   checkPhoneStatus() {
@@ -667,7 +693,7 @@ class _IdentityVerificationScreenState
                   right: const BorderSide(color: Colors.grey, width: 0.5),
                   bottom: const BorderSide(color: Colors.grey, width: 0.5),
                   top: const BorderSide(color: Colors.grey, width: 0.5))),
-          height: 75,
+          height: 90,
           width: MediaQuery.of(context).size.width * 100,
           child: Row(
             children: [
@@ -738,6 +764,35 @@ class _IdentityVerificationScreenState
                                     )
                                   ],
                                 ),
+                                if (step == 1)
+                                  ValueListenableBuilder<int>(
+                                    valueListenable: countdownNotifier,
+                                    builder: (context, countdownValue, child) {
+                                      if (countdownValue > 0) {
+                                        return Row(
+                                          children: <Widget>[
+                                            Expanded(
+                                              child: Text(
+                                                'Verification email sent, retry in $countdownValue second${countdownValue == 1 ? '' : 's'}',
+                                                overflow: TextOverflow.clip,
+                                                style: Theme.of(context)
+                                                    .textTheme
+                                                    .bodySmall!
+                                                    .copyWith(
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        color: Theme.of(context)
+                                                            .colorScheme
+                                                            .warning),
+                                              ),
+                                            ),
+                                          ],
+                                        );
+                                      } else {
+                                        return Container();
+                                      }
+                                    },
+                                  ),
                                 step == 2 &&
                                         Globals().hidePhoneButton.value == true
                                     ? const SizedBox(
@@ -766,35 +821,42 @@ class _IdentityVerificationScreenState
                               ]))),
                   Globals().hidePhoneButton.value == true && step == 2
                       ? Container()
-                      : ElevatedButton(
-                          onPressed: () async {
-                            switch (step) {
-                              // Verify email
-                              case 1:
-                                {
-                                  verifyEmail();
-                                }
-                                break;
+                      : ValueListenableBuilder<int>(
+                          valueListenable: countdownNotifier,
+                          builder: (context, countdownValue, child) {
+                            return ElevatedButton(
+                                onPressed: countdownValue > 0
+                                    ? null
+                                    : () async {
+                                        switch (step) {
+                                          // Verify email
+                                          case 1:
+                                            {
+                                              startEmailCountdown();
+                                              verifyEmail();
+                                            }
+                                            break;
 
-                              // Verify phone
-                              case 2:
-                                {
-                                  await verifyPhone();
-                                }
-                                break;
+                                          // Verify phone
+                                          case 2:
+                                            {
+                                              await verifyPhone();
+                                            }
+                                            break;
 
-                              // Verify identity
-                              case 3:
-                                {
-                                  await verifyIdentityProcess();
-                                }
-                                break;
-                              default:
-                                {}
-                                break;
-                            }
-                          },
-                          child: const Text('Verify'))
+                                          // Verify identity
+                                          case 3:
+                                            {
+                                              await verifyIdentityProcess();
+                                            }
+                                            break;
+                                          default:
+                                            {}
+                                            break;
+                                        }
+                                      },
+                                child: const Text('Verify'));
+                          })
                 ],
               ),
               const Padding(padding: EdgeInsets.only(right: 10)),
