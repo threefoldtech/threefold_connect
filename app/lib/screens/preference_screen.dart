@@ -31,7 +31,7 @@ class PreferenceScreen extends ConsumerStatefulWidget {
 class _PreferenceScreenState extends ConsumerState<PreferenceScreen> {
   // FirebaseNotificationListener _listener;
   Map email = {};
-  String doubleName = '';
+  // String doubleName = '';
   String phrase = '';
   bool showAdvancedOptions = false;
   Icon showAdvancedOptionsIcon = const Icon(Icons.keyboard_arrow_down);
@@ -93,10 +93,6 @@ class _PreferenceScreenState extends ConsumerState<PreferenceScreen> {
         children: <Widget>[
           const ListTile(
             title: Text('Global settings'),
-          ),
-          ListTile(
-            leading: const Icon(Icons.person),
-            title: Text(doubleName),
           ),
           FutureBuilder(
             future: getPhrase(),
@@ -408,11 +404,11 @@ class _PreferenceScreenState extends ConsumerState<PreferenceScreen> {
   }
 
   void getUserValues() {
-    getDoubleName().then((dn) {
-      setState(() {
-        doubleName = dn!.substring(0, dn.length - 5);
-      });
-    });
+    // getDoubleName().then((dn) {
+    //   setState(() {
+    //     doubleName = dn!.substring(0, dn.length - 5);
+    //   });
+    // });
     getPhrase().then((seedPhrase) {
       setState(() {
         phrase = seedPhrase!;

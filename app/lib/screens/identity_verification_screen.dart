@@ -180,6 +180,10 @@ class _IdentityVerificationScreenState
                           builder: (BuildContext context, _) {
                             return Column(
                               children: [
+                                ListTile(
+                                  leading: const Icon(Icons.person),
+                                  title: Text(doubleName),
+                                ),
                                 // Step one: verify email
                                 _fillCard(
                                     getCorrectState(1, emailVerified,
