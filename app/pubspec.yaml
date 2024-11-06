@@ -76,6 +76,7 @@ dependencies:
   hashlib: any
   stellar_flutter_sdk: ^1.8.9
   flutter_launcher_icons: ^0.14.1
+  email_validator: ^3.0.0
 dev_dependencies:
   flutter_test:
     sdk: flutter

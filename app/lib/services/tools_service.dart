@@ -4,6 +4,7 @@ import 'dart:io';
 import 'dart:math';
 
 import 'package:device_info_plus/device_info_plus.dart';
+import 'package:email_validator/email_validator.dart';
 
 const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
 
@@ -23,10 +24,7 @@ bool validateEmail(String? value) {
     return false;
   }
 
-  final regex = RegExp(
-    r"^[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+)*@[a-zA-Z0-9]+(?:-[a-zA-Z0-9]+)*(\.[a-zA-Z0-9]+(?:-[a-zA-Z0-9]+)*)*\.[a-zA-Z]{2,}$"
-  );
-  return regex.hasMatch(value);
+  return EmailValidator.validate(value);
 }
 
 
