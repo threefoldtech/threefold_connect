@@ -114,6 +114,10 @@ class _NewWalletState extends State<NewWallet> {
       return false;
     }
 
+    if (!walletSecret.startsWith('0x') && walletSecret.length != 56) {
+      secretError = 'Invalid seed length';
+      return false;
+    }
     List<String> hexSeeds = await getWalletHexSeeds();
     String? walletSeed = await generateHexSeed(walletSecret);
     if (hexSeeds.contains(walletSeed)) {
@@ -138,10 +142,6 @@ class _NewWalletState extends State<NewWallet> {
       secretError = 'Invalid seed';
       return false;
     }
-    if (!walletSecret.startsWith('0x') && walletSecret.length != 64) {
-      secretError = 'Invalid seed length';
-      return false;
-    }
 
     if (walletSecret.startsWith('0x') && walletSecret.length != 66) {
       secretError = 'Invalid seed length';
@@ -157,8 +157,8 @@ class _NewWalletState extends State<NewWallet> {
     setState(() {});
 
     final validName = _validateName(walletName);
-    final validSecret = _validateSecret(walletSecret);
-    if (validName && await validSecret) {
+    final validSecret = await _validateSecret(walletSecret);
+    if (validName && validSecret) {
       return true;
     }
     saveLoading = false;
