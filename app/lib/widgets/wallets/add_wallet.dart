@@ -114,7 +114,8 @@ class _NewWalletState extends State<NewWallet> {
       return false;
     }
 
-    if (!walletSecret.startsWith('0x') && walletSecret.length != 56) {
+    // Check stellar secret length before validating
+    if (walletSecret.startsWith('S') && walletSecret.length != 56) {
       secretError = 'Invalid seed length';
       return false;
     }
@@ -140,6 +141,10 @@ class _NewWalletState extends State<NewWallet> {
 
     if (!isValidSeed(walletSecret)) {
       secretError = 'Invalid seed';
+      return false;
+    }
+    if (!walletSecret.startsWith('0x') && walletSecret.length != 64) {
+      secretError = 'Invalid seed length';
       return false;
     }
 
