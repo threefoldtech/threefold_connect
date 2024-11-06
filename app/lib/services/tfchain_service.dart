@@ -178,7 +178,12 @@ Future<void> transfer(String secret, String dest, String amount) async {
   final client = TFChain.Client(chainUrl, secret, 'sr25519');
   try {
     client.connect();
-    await client.balances.transfer(address: dest, amount: BigInt.parse(amount));
+    final amountDouble = double.tryParse(amount);
+    if (amountDouble == null || amountDouble <= 0) {
+      throw Exception('Amount must be a positive numeric value');
+    }
+
+    await client.balances.transfer(address: dest, amount: BigInt.from(amountDouble));
   } catch (e) {
     throw Exception('Failed to transfer due to $e');
   } finally {
