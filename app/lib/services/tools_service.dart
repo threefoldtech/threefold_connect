@@ -4,7 +4,7 @@ import 'dart:io';
 import 'dart:math';
 
 import 'package:device_info_plus/device_info_plus.dart';
-import 'package:email_validator/email_validator.dart';
+import 'package:validators/validators.dart';
 
 const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
 
@@ -24,7 +24,7 @@ bool validateEmail(String? value) {
     return false;
   }
 
-  return EmailValidator.validate(value);
+  return isEmail(value);
 }
 
 
