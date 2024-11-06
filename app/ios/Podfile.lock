@@ -1,6 +1,12 @@
 PODS:
   - audio_session (0.0.1):
     - Flutter
+  - Crisp (2.6.0):
+    - Crisp/Crisp (= 2.6.0)
+  - Crisp/Crisp (2.6.0)
+  - crisp_chat (2.0.3):
+    - Crisp
+    - Flutter
   - device_info_plus (0.0.1):
     - Flutter
   - Flutter (1.0.0)
@@ -63,6 +69,7 @@ PODS:
 
 DEPENDENCIES:
   - audio_session (from `.symlinks/plugins/audio_session/ios`)
+  - crisp_chat (from `.symlinks/plugins/crisp_chat/ios`)
   - device_info_plus (from `.symlinks/plugins/device_info_plus/ios`)
   - Flutter (from `Flutter`)
   - flutter_inappwebview (from `.symlinks/plugins/flutter_inappwebview/ios`)
@@ -88,6 +95,7 @@ DEPENDENCIES:
 
 SPEC REPOS:
   trunk:
+    - Crisp
     - iDenfySDK
     - lottie-ios
     - MTBBarcodeScanner
@@ -96,6 +104,8 @@ SPEC REPOS:
 EXTERNAL SOURCES:
   audio_session:
     :path: ".symlinks/plugins/audio_session/ios"
+  crisp_chat:
+    :path: ".symlinks/plugins/crisp_chat/ios"
   device_info_plus:
     :path: ".symlinks/plugins/device_info_plus/ios"
   Flutter:
@@ -143,6 +153,8 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   audio_session: 088d2483ebd1dc43f51d253d4a1c517d9a2e7207
+  Crisp: 047b4e8b77f28cae5089f037cb327a9a03c9bb4d
+  crisp_chat: 2a726a86ce1c796388db27c80f0f49c423b7c260
   device_info_plus: c6fb39579d0f423935b0c9ce7ee2f44b71b9fce6
   Flutter: e0871f40cf51350855a761d2e70bf5af5b9b5de7
   flutter_inappwebview: 3d32228f1304635e7c028b0d4252937730bbc6cf
@@ -150,7 +162,7 @@ SPEC CHECKSUMS:
   idenfy_sdk_flutter: 3f53cc19cd757e9bb9f01d83386a6db84192dae9
   iDenfySDK: 4bba551e7e824daf7db2b3bac166a9fe339c4269
   just_audio: baa7252489dbcf47a4c7cc9ca663e9661c99aafa
-  local_auth: 1740f55d7af0a2e2a8684ce225fe79d8931e808c
+  local_auth: 25938960984c3a7f6e3253e3f8d962fdd16852bd
   lottie-ios: fcb5e73e17ba4c983140b7d21095c834b3087418
   MTBBarcodeScanner: f453b33c4b7dfe545d8c6484ed744d55671788cb
   open_filex: 6e26e659846ec990262224a12ef1c528bb4edbe4
@@ -170,6 +182,6 @@ SPEC CHECKSUMS:
   wakelock_plus: 8b09852c8876491e4b6d179e17dfe2a0b5f60d47
   webview_flutter_wkwebview: 2a23822e9039b7b1bc52e5add778e5d89ad488d1
 
-PODFILE CHECKSUM: f8ab9e5577c96127975d4ff88c95faaa16cd71bb
+PODFILE CHECKSUM: 050ff199c8e97450c391a88d64db90da96da9995
 
 COCOAPODS: 1.14.3
