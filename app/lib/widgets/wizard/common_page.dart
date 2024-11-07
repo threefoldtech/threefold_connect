@@ -1,6 +1,7 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:threebotlogin/helpers/globals.dart';
 import 'package:threebotlogin/screens/wizard/web_view.dart';
 import 'package:threebotlogin/services/shared_preference_service.dart';
 
@@ -31,6 +32,8 @@ class CommonPage extends StatefulWidget {
 class _CommonPageState extends State<CommonPage> {
   bool agreed = false;
   bool attemptToContinue = false;
+  final termsAndConditionsUrl = Globals().termsAndConditionsUrl;
+
 
   @override
   Widget build(BuildContext context) {
@@ -181,7 +184,7 @@ class _CommonPageState extends State<CommonPage> {
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                        builder: (context) => const WebView()),
+                                        builder: (context) => WebView(title: 'Terms and Conditions', url: termsAndConditionsUrl,)),
                                   );
                                 },
                             ),

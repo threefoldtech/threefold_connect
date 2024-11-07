@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:threebotlogin/helpers/globals.dart';
 import 'package:threebotlogin/helpers/logger.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 class WebView extends StatefulWidget {
-  const WebView({super.key});
+  final String title;
+  final String url;
+
+  const WebView({super.key, required this.title, required this.url});
 
   @override
   State<WebView> createState() => _WebViewState();
@@ -13,7 +15,6 @@ class WebView extends StatefulWidget {
 class _WebViewState extends State<WebView> {
   bool isLoading = true;
   late WebViewController controller;
-  final termsAndConditionsUrl = Globals().termsAndConditionsUrl;
 
   @override
   void dispose() {
@@ -37,14 +38,14 @@ class _WebViewState extends State<WebView> {
           },
         ),
       )
-      ..loadRequest(Uri.parse(termsAndConditionsUrl));
+      ..loadRequest(Uri.parse(widget.url));
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Terms & Conditions'),
+        title: Text(widget.title),
       ),
       body: Stack(
         children: [
