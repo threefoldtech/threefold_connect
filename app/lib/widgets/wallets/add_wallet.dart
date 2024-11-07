@@ -55,6 +55,8 @@ class _NewWalletState extends State<NewWallet> {
           '0x${hex.encode(stellarClient.privateKey!.toList().sublist(0, 32))}';
     } else if (secret.startsWith(RegExp(r'0[xX]'))) {
       hexSeed = secret;
+    } else {
+      hexSeed = '0x$secret';
     }
     return hexSeed;
   }
@@ -114,11 +116,6 @@ class _NewWalletState extends State<NewWallet> {
       return false;
     }
 
-    // Check stellar secret length before validating
-    if (walletSecret.startsWith('S') && walletSecret.length != 56) {
-      secretError = 'Invalid seed length';
-      return false;
-    }
     List<String> hexSeeds = await getWalletHexSeeds();
     String? walletSeed = await generateHexSeed(walletSecret);
     if (hexSeeds.contains(walletSeed)) {
@@ -132,6 +129,12 @@ class _NewWalletState extends State<NewWallet> {
 
     if (walletSecret.contains(' ')) {
       secretError = 'Invalid Mnemonic';
+      return false;
+    }
+
+    // Check stellar secret length before validating
+    if (walletSecret.startsWith('S') && walletSecret.length != 56) {
+      secretError = 'Invalid Stellar secret length';
       return false;
     }
 
