@@ -284,7 +284,7 @@ class _IdentityVerificationScreenState
                     RichText(
                       text: TextSpan(
                         text:
-                            "As part of the verification process, we utilize Idenfy to verify your identity. Please ensure you review Idenfy's ",
+                            "As part of the verification process, we utilize iDenfy to verify your identity. Please ensure you review iDenfy's ",
                         style: Theme.of(context).textTheme.bodyMedium!.copyWith(
                               color: Theme.of(context).colorScheme.onSurface,
                             ),
@@ -358,7 +358,7 @@ class _IdentityVerificationScreenState
                                   ),
                               children: [
                                 TextSpan(
-                                  text: 'IDenfy Terms and conditions.',
+                                  text: 'iDenfy Terms and Conditions.',
                                   style: Theme.of(context)
                                       .textTheme
                                       .bodyMedium!
@@ -377,7 +377,7 @@ class _IdentityVerificationScreenState
                                             url:
                                                 'https://www.idenfy.com/security/',
                                             title:
-                                                'IDenfy Terms and Conditions',
+                                                'iDenfy Terms and Conditions',
                                           ),
                                         ),
                                       );
