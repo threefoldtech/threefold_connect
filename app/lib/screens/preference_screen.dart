@@ -95,26 +95,6 @@ class _PreferenceScreenState extends ConsumerState<PreferenceScreen> {
             title: Text('Global settings'),
           ),
           FutureBuilder(
-            future: getPhrase(),
-            builder: (context, snapshot) {
-              if (snapshot.hasData) {
-                return ListTile(
-                  trailing: const Padding(
-                    padding: EdgeInsets.only(right: 7.5),
-                    child: Icon(Icons.visibility),
-                  ),
-                  leading: const Icon(Icons.vpn_key),
-                  title: const Text('Show phrase'),
-                  onTap: () async {
-                    _showPhrase();
-                  },
-                );
-              } else {
-                return Container();
-              }
-            },
-          ),
-          FutureBuilder(
               future: checkBiometrics(),
               builder: (context, snapshot) {
                 if (snapshot.hasData) {
