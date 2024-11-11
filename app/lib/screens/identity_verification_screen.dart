@@ -39,6 +39,7 @@ class IdentityVerificationScreen extends StatefulWidget {
 class _IdentityVerificationScreenState
     extends State<IdentityVerificationScreen> {
   String doubleName = '';
+  String phrase = '';
   String email = '';
   String phone = '';
 
@@ -123,6 +124,11 @@ class _IdentityVerificationScreenState
     getDoubleName().then((dn) {
       setState(() {
         doubleName = dn!;
+      });
+    });
+    getPhrase().then((seedPhrase) {
+      setState(() {
+        phrase = seedPhrase!;
       });
     });
     getEmail().then((emailMap) {
@@ -532,7 +538,6 @@ class _IdentityVerificationScreenState
               child: const Text('Close'),
               onPressed: () {
                 Navigator.pop(context);
-                setState(() {});
               },
             ),
           ],
