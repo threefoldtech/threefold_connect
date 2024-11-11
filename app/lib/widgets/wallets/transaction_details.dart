@@ -9,6 +9,14 @@ class TransactionDetails extends StatelessWidget {
     required this.transaction,
   });
 
+  String getTransactionAmount() {
+    double amount = double.parse(transaction.amount);
+
+    return amount == amount.roundToDouble()
+        ? transaction.amount.split('.').first
+        : amount.toStringAsFixed(3);
+  }
+
   @override
   Widget build(BuildContext context) {
     Widget buildDetailRow(String label, String value) {
@@ -75,8 +83,7 @@ class TransactionDetails extends StatelessWidget {
           const Divider(),
           buildDetailRow('Type', transaction.type.name),
           const Divider(),
-          buildDetailRow(
-              'Amount', double.parse(transaction.amount).toStringAsFixed(3)),
+          buildDetailRow('Amount', getTransactionAmount()),
           const Divider(),
           buildDetailRow('Asset', transaction.asset),
           const Divider(),
