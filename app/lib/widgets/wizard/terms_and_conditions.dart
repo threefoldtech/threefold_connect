@@ -36,7 +36,11 @@ class _TermsAndConditionsState extends State<TermsAndConditions> {
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => WebView(url: termsAndConditionsUrl, title: 'Terms and Conditions', )),
+                  MaterialPageRoute(
+                      builder: (context) => WebView(
+                            url: termsAndConditionsUrl,
+                            title: 'Terms and Conditions',
+                          )),
                 );
               },
               child: Text('Terms & Conditions',
