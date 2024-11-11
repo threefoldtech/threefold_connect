@@ -30,8 +30,8 @@ class WalletsNotifier extends StateNotifier<List<Wallet>> {
     if (!_reload) return await TFChainService.disconnect();
     if (!_loading) {
       final chainUrl = Globals().chainUrl;
-      final List<Wallet> currentState = state.where((w) => true).toList();
       await _mutex.protect(() async {
+      final List<Wallet> currentState = state.where((w) => true).toList();
         for (final wallet in currentState) {
           final balance =
               await TFChainService.getBalance(chainUrl, wallet.tfchainAddress);
