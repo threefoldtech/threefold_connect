@@ -75,7 +75,8 @@ class TransactionDetails extends StatelessWidget {
           const Divider(),
           buildDetailRow('Type', transaction.type.name),
           const Divider(),
-          buildDetailRow('Amount', transaction.amount),
+          buildDetailRow(
+              'Amount', double.parse(transaction.amount).toStringAsFixed(3)),
           const Divider(),
           buildDetailRow('Asset', transaction.asset),
           const Divider(),
