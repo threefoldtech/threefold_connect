@@ -27,6 +27,7 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
 
   onDeleteWallet(String name) {
     walletRef.removeWallet(name);
+    setState((){});
   }
 
   onEditWallet(String oldName, String newName) {
