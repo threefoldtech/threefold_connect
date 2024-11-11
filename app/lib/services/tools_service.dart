@@ -4,6 +4,7 @@ import 'dart:io';
 import 'dart:math';
 
 import 'package:device_info_plus/device_info_plus.dart';
+import 'package:validators/validators.dart';
 
 const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
 
@@ -41,14 +42,7 @@ bool validateSeedWords(String seed, String confirmationWords) {
 }
 
 bool validateDoubleName(String value) {
-  Pattern pattern = r'^[a-zA-Z0-9]+$';
-  RegExp regex = RegExp(pattern.toString());
-
-  if (!regex.hasMatch(value)) {
-    return false;
-  }
-
-  return true;
+  return isAlphanumeric(value) && isLength(value, 4, 30);
 }
 
 String extract3Bot(String name) {

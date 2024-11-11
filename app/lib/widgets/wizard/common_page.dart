@@ -34,7 +34,6 @@ class _CommonPageState extends State<CommonPage> {
   bool attemptToContinue = false;
   final termsAndConditionsUrl = Globals().termsAndConditionsUrl;
 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -184,7 +183,10 @@ class _CommonPageState extends State<CommonPage> {
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                        builder: (context) => WebView(title: 'Terms and Conditions', url: termsAndConditionsUrl,)),
+                                        builder: (context) => WebView(
+                                              title: 'Terms and Conditions',
+                                              url: termsAndConditionsUrl,
+                                            )),
                                   );
                                 },
                             ),
