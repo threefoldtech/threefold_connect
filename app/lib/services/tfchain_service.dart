@@ -178,7 +178,7 @@ Future<void> transfer(String secret, String dest, String amount) async {
   final client = TFChain.Client(chainUrl, secret, 'sr25519');
   try {
     client.connect();
-    await client.balances.transfer(address: dest, amount: BigInt.parse(amount));
+    await client.balances.transfer(address: dest, amount: double.parse(amount));
   } catch (e) {
     throw Exception('Failed to transfer due to $e');
   } finally {
