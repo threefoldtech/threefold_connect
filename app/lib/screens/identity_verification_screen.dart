@@ -1189,7 +1189,7 @@ class _IdentityVerificationScreenState
                 image: Icons.warning,
                 title: 'Not enough balance',
                 description:
-                    'Please fund your account at least $minimumBalance TFTs.',
+                    'Please fund your account with at least $minimumBalance TFTs.',
                 actions: <Widget>[
                   TextButton(
                     child: const Text('Close'),
