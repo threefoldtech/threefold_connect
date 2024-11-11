@@ -62,14 +62,17 @@ class _PincodeWidgetState extends State<PincodeWidget> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text(
-                widget.userMessage,
-                style: Theme.of(context)
-                    .textTheme
-                    .bodyLarge!
-                    .copyWith(color: Theme.of(context).colorScheme.onSurface),
+              Padding(
+                padding: const EdgeInsets.only(left: 5.0, right: 5.0),
+                child: Text(
+                  widget.userMessage,
+                  style: Theme.of(context)
+                      .textTheme
+                      .bodyLarge!
+                      .copyWith(color: Theme.of(context).colorScheme.onSurface),
+                ),
               ),
-              const SizedBox(height: 150),
+              const Spacer(),
               Pinput(
                 autofocus: true,
                 obscureText: true,

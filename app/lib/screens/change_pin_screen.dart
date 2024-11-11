@@ -42,9 +42,7 @@ class _ChangePinScreenState extends State<ChangePinScreen> {
     return PopScope(
       canPop: widget.hideBackButton == false,
       child: PincodeWidget(
-        title: widget.currentPin == null
-            ? 'Choose your pincode'
-            : 'Change pincode',
+        title: widget.currentPin == null ? 'Choose your PIN' : 'Change PIN',
         userMessage: getText(),
         hideBackButton: widget.hideBackButton,
         handler: changePin,
