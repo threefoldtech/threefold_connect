@@ -1,3 +1,4 @@
+import 'package:mutex/mutex.dart';
 import 'package:threebotlogin/helpers/globals.dart';
 import 'package:threebotlogin/models/wallet.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -11,36 +12,42 @@ class WalletsNotifier extends StateNotifier<List<Wallet>> {
 
   bool _reload = true;
   bool _loading = true;
+  final Mutex _mutex = Mutex();
+
   Future<void> list() async {
     _loading = true;
     state = await listWallets();
     _loading = false;
   }
 
-  void removeWallet(String name) {
-    state = state.where((wallet) => wallet.name != name).toList();
+  Future<void> removeWallet(String name) async {
+    await _mutex.protect(() async {
+      state = state.where((wallet) => wallet.name != name).toList();
+    });
   }
 
   void reloadBalances() async {
     if (!_reload) return await TFChainService.disconnect();
     if (!_loading) {
       final chainUrl = Globals().chainUrl;
-      final List<Wallet> currentState = state.where((w) => true).toList();
-      for (final wallet in currentState) {
-        final balance =
-            await TFChainService.getBalance(chainUrl, wallet.tfchainAddress);
-        final tfchainBalance =
-            balance.toString() == '0.0' ? '0' : balance.toString();
-        final stellarBalance =
-            await StellarService.getBalance(wallet.stellarSecret);
+      await _mutex.protect(() async {
+        final List<Wallet> currentState = state.where((w) => true).toList();
+        for (final wallet in currentState) {
+          final balance =
+              await TFChainService.getBalance(chainUrl, wallet.tfchainAddress);
+          final tfchainBalance =
+              balance.toString() == '0.0' ? '0' : balance.toString();
+          final stellarBalance =
+              await StellarService.getBalance(wallet.stellarSecret);
 
-        if (tfchainBalance != wallet.tfchainBalance ||
-            stellarBalance != wallet.stellarBalance) {
-          wallet.stellarBalance = stellarBalance;
-          wallet.tfchainBalance = tfchainBalance;
+          if (tfchainBalance != wallet.tfchainBalance ||
+              stellarBalance != wallet.stellarBalance) {
+            wallet.stellarBalance = stellarBalance;
+            wallet.tfchainBalance = tfchainBalance;
+          }
         }
-      }
-      state = currentState;
+        state = currentState;
+      });
     }
     final refreshBalance = Globals().refreshBalance;
     await Future.delayed(Duration(seconds: refreshBalance));

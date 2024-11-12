@@ -50,6 +50,12 @@ class _WalletReceiveScreenState extends State<WalletReceiveScreen> {
       return false;
     }
 
+    if (double.parse(amount) <= 0) {
+      amountError = 'Amount should be positive';
+      setState(() {});
+      return false;
+    }
+    setState(() {});
     return true;
   }
 
