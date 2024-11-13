@@ -10,7 +10,7 @@ api_misc = Blueprint('misc_users', __name__, url_prefix="/api")
 @api_misc.route("/minimumversion", methods=["get"])
 def minimum_version_handler():
     response = Response(
-            response=json.dumps({"android": 178, "ios": 178}), mimetype="application/json"
+            response=json.dumps({"android": 182, "ios": 182}), mimetype="application/json"
     )
     return response
 
