@@ -118,7 +118,8 @@ class _WalletReceiveScreenState extends State<WalletReceiveScreen> {
                   style: Theme.of(context).textTheme.bodyMedium!.copyWith(
                         color: Theme.of(context).colorScheme.onSurface,
                       ),
-                  keyboardType: TextInputType.number,
+                  keyboardType:
+                      const TextInputType.numberWithOptions(decimal: true),
                   controller: amountController,
                   decoration: InputDecoration(
                       suffixText: 'TFT',
