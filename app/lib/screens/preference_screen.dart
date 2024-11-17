@@ -376,7 +376,7 @@ class _PreferenceScreenState extends ConsumerState<PreferenceScreen> {
                       ),
                     ));
 
-                if (authenticated == null || authenticated) {
+                if (authenticated == null || !authenticated) {
                   return;
                 }
               }
@@ -396,22 +396,21 @@ class _PreferenceScreenState extends ConsumerState<PreferenceScreen> {
                 final seedPhrase = await getPhrase();
                 FlutterPkid client =
                     await getPkidClient(seedPhrase: seedPhrase!);
-                List<String> keyWords = ['email', 'phone'];
-
-                keyWords.map((keyword) async {
-                  await client.setPKidDoc(keyword, '');
-                });
+                await client.setPKidDoc('email', '');
+                await client.setPKidDoc('phone', '');
                 await saveWalletsToPkid([]);
               }
-              bool result = await clearData();
-              if (result) {
-                Navigator.pop(context);
-                await Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => const MainScreen(
-                            initDone: true, registered: false)));
-                return;
+              bool result = false;
+              if (deleted) {
+                result = await clearData();
+                if (result) {
+                  Navigator.pop(context);
+                  await Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const MainScreen(
+                              initDone: true, registered: false)));
+                }
               }
               if (!result || !deleted) {
                 showDialog(
