@@ -229,3 +229,25 @@ def update_user():
     except Exception as e:
         print(e)
         return Response("Something went wrong", status=402)
+
+@ api_users.route("/<username>", methods=["DELETE"])
+def delete_user(username):
+    logger.debug(f"delete {username}")
+    user = db.get_user_by_double_name(username)
+
+    if user is None:
+        return Response(f"Username '{username}' does not exists", status=404)
+
+    try:
+        signed_data_verification_response = verify_signed_data(username, request.headers.get('Jimber-Authorization'))
+
+        if isinstance(signed_data_verification_response, Response):
+            logger.debug("Response of verification is of instance Response, Failed to Verify.")
+            return signed_data_verification_response
+
+        db.delete_user(username)
+        return Response(f"user '{username}' has been deleted successfully", status=204)
+
+    except Exception as e:
+        print(e)
+        return Response(f"Something went wrong while deleting user '{username}'", status=402)
