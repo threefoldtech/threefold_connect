@@ -636,7 +636,7 @@ def delete_user(double_name):
     delete_sql = f'DELETE FROM users WHERE double_name =?'
     try:
         cursor = conn.cursor()
-        cursor.execute(delete_sql, (double_name))
+        cursor.execute(delete_sql, (double_name,))
         conn.commit()
     except Error as e:
         print(e)
