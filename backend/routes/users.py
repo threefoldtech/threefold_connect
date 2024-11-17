@@ -251,3 +251,36 @@ def delete_user(username):
     except Exception as e:
         print(e)
         return Response(f"Something went wrong while deleting user '{username}'", status=402)
+
+# TODO: remove this endpoint after releasing 4.0.0 of the app
+@ api_users.route("/change-email", methods=["POST"])
+def change_email_for_user():
+    body = request.get_json()
+
+    if body is None:
+        return Response('Body cannot be empty', status=404)
+
+    username = body.get('username')
+    email = body.get('email')
+    if username is None or email is None:
+        return Response("Username is empty or Email is empty", status=404)
+
+    logger.debug("Change email for user %s", username)
+    user = db.get_user_by_double_name(username)
+
+    if user is None:
+        return Response("Username does not exists", status=404)
+
+    try:
+        signed_data_verification_response = verify_signed_data(username, request.headers.get('Jimber-Authorization'))
+
+        if isinstance(signed_data_verification_response, Response):
+            logger.debug("Response of verification is of instance Response, Failed to Verify.")
+            return signed_data_verification_response
+
+        db.update_user_email(username, email)
+        return Response("Successfully updated email address", status=200)
+
+    except Exception as e:
+        print(e)
+        return Response("Something went wrong", status=402)
