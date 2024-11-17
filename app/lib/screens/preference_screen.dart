@@ -26,6 +26,7 @@ import 'package:threebotlogin/services/wallet_service.dart';
 import 'package:threebotlogin/widgets/custom_dialog.dart';
 import 'package:threebotlogin/widgets/layout_drawer.dart';
 import 'package:threebotlogin/providers/theme_provider.dart';
+import 'package:threebotlogin/widgets/wallets/warning_dialog.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class PreferenceScreen extends ConsumerStatefulWidget {
@@ -54,6 +55,7 @@ class _PreferenceScreenState extends ConsumerState<PreferenceScreen> {
   Globals globals = Globals();
 
   MaterialColor thiscolor = Colors.green;
+  bool deleteLoading = false;
 
   @override
   void initState() {
@@ -344,96 +346,86 @@ class _PreferenceScreenState extends ConsumerState<PreferenceScreen> {
     }
     showDialog(
       context: context,
-      builder: (BuildContext context) => CustomDialog(
-        type: DialogType.Warning,
-        image: Icons.warning,
+      builder: (BuildContext context) => WarningDialogWidget(
         title: 'Are you sure?',
         description: message,
-        actions: <Widget>[
-          TextButton(
-            child: const Text('Cancel'),
-            onPressed: () {
-              Navigator.pop(context);
-            },
-          ),
-          TextButton(
-            child: Text(
-              'Yes',
-              style: Theme.of(context)
-                  .textTheme
-                  .bodyMedium!
-                  .copyWith(color: Theme.of(context).colorScheme.warning),
-            ),
-            onPressed: () async {
-              if (delete) {
-                String? pin = await getPin();
-                bool? authenticated = await Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => AuthenticationScreen(
-                        correctPin: pin!,
-                        userMessage: 'Please enter your PIN code',
-                      ),
-                    ));
-
-                if (authenticated == null || !authenticated) {
-                  return;
-                }
-              }
-              Events().emit(CloseSocketEvent());
-              Events().emit(FfpClearCacheEvent());
-              bool deleted = true;
-              if (delete) {
-                try {
-                  Response response = await deleteUser();
-                  if (response.statusCode == HttpStatus.noContent) {
-                    deleted = true;
-                  }
-                } catch (e) {
-                  print('Failed to delete user due to $e');
-                  deleted = false;
-                }
-                final seedPhrase = await getPhrase();
-                FlutterPkid client =
-                    await getPkidClient(seedPhrase: seedPhrase!);
-                await client.setPKidDoc('email', '');
-                await client.setPKidDoc('phone', '');
-                await saveWalletsToPkid([]);
-              }
-              bool result = false;
-              if (deleted) {
-                result = await clearData();
-                if (result) {
-                  Navigator.pop(context);
-                  await Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => const MainScreen(
-                              initDone: true, registered: false)));
-                }
-              }
-              if (!result || !deleted) {
-                showDialog(
-                  context: preferenceContext!,
-                  builder: (BuildContext context) => CustomDialog(
-                    type: DialogType.Error,
-                    title: 'Error',
-                    description:
-                        'Something went wrong when trying to remove your account.',
-                    actions: <Widget>[
-                      TextButton(
-                        child: const Text('Close'),
-                        onPressed: () {
-                          Navigator.pop(context);
-                        },
-                      )
-                    ],
+        onAgree: () async {
+          deleteLoading = true;
+          setState(() {});
+          if (delete) {
+            String? pin = await getPin();
+            bool? authenticated = await Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => AuthenticationScreen(
+                    correctPin: pin!,
+                    userMessage: 'Please enter your PIN code',
                   ),
-                );
+                ));
+
+            if (authenticated == null || !authenticated) {
+              deleteLoading = false;
+              setState(() {});
+              return false;
+            }
+          }
+          Events().emit(CloseSocketEvent());
+          Events().emit(FfpClearCacheEvent());
+          bool deleted = true;
+          if (delete) {
+            try {
+              Response response = await deleteUser();
+              if (response.statusCode == HttpStatus.noContent) {
+                deleted = true;
               }
-            },
-          ),
-        ],
+            } catch (e) {
+              print('Failed to delete user due to $e');
+              deleted = false;
+            }
+            final seedPhrase = await getPhrase();
+            FlutterPkid client = await getPkidClient(seedPhrase: seedPhrase!);
+            await client.setPKidDoc('email', '');
+            await client.setPKidDoc('phone', '');
+            await saveWalletsToPkid([]);
+          }
+          bool result = false;
+          if (deleted) {
+            result = await clearData();
+            if (result) {
+              Navigator.pop(context);
+              await Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) =>
+                          const MainScreen(initDone: true, registered: false)));
+            }
+          }
+          if (!result || !deleted) {
+            showDialog(
+              context: preferenceContext!,
+              builder: (BuildContext context) => CustomDialog(
+                type: DialogType.Error,
+                title: 'Error',
+                description:
+                    'Something went wrong when trying to remove your account.',
+                actions: <Widget>[
+                  TextButton(
+                    child: const Text('Close'),
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                  )
+                ],
+              ),
+            );
+            deleteLoading = false;
+            setState(() {});
+            return false;
+          }
+          deleteLoading = false;
+          setState(() {});
+          return true;
+        },
       ),
     );
   }
