@@ -340,6 +340,7 @@ class _PreferenceScreenState extends ConsumerState<PreferenceScreen> {
       message =
           "If you confirm, your account will be deleted. You won't be able to recover your account.";
     }
+    preferenceContext = context;
     showDialog(
       context: context,
       builder: (BuildContext context) => WarningDialogWidget(
@@ -378,11 +379,13 @@ class _PreferenceScreenState extends ConsumerState<PreferenceScreen> {
               print('Failed to delete user due to $e');
               deleted = false;
             }
-            final seedPhrase = await getPhrase();
-            FlutterPkid client = await getPkidClient(seedPhrase: seedPhrase!);
-            await client.setPKidDoc('email', '');
-            await client.setPKidDoc('phone', '');
-            await saveWalletsToPkid([]);
+            if (deleted) {
+              final seedPhrase = await getPhrase();
+              FlutterPkid client = await getPkidClient(seedPhrase: seedPhrase!);
+              await client.setPKidDoc('email', '');
+              await client.setPKidDoc('phone', '');
+              await saveWalletsToPkid([]);
+            }
           }
           bool result = false;
           if (deleted) {
@@ -397,7 +400,7 @@ class _PreferenceScreenState extends ConsumerState<PreferenceScreen> {
             }
           }
           if (!result || !deleted) {
-            showDialog(
+            await showDialog(
               context: preferenceContext!,
               builder: (BuildContext context) => CustomDialog(
                 type: DialogType.Error,
