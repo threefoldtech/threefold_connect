@@ -51,8 +51,8 @@ class _UnregisteredScreenState extends State<UnregisteredScreen>
         context: context,
         builder: (BuildContext context) => const CustomDialog(
           image: Icons.check,
-          title: 'Recovered',
-          description: 'Your account has been recovered.',
+          title: 'Logged In',
+          description: 'You have logged In successfully.',
         ),
       );
       await Future.delayed(
@@ -101,7 +101,7 @@ class _UnregisteredScreenState extends State<UnregisteredScreen>
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: <Widget>[
                         Text(
-                          'Sign Up',
+                          'Create Account',
                           style: Theme.of(context)
                               .textTheme
                               .titleMedium!
@@ -129,7 +129,7 @@ class _UnregisteredScreenState extends State<UnregisteredScreen>
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: <Widget>[
                         Text(
-                          'Recover Account',
+                          'Log In',
                           style: Theme.of(context)
                               .textTheme
                               .titleMedium!
