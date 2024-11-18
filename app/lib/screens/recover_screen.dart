@@ -109,7 +109,7 @@ class _RecoverScreenState extends State<RecoverScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Recover Account'),
+        title: const Text('Log In'),
       ),
       body: Container(
         padding: const EdgeInsets.all(20.0),
@@ -189,7 +189,7 @@ class _RecoverScreenState extends State<RecoverScreen> {
             ElevatedButton(
               style: ElevatedButton.styleFrom(),
               child: Text(
-                'Recover Account',
+                'Log In',
                 style: Theme.of(context).textTheme.bodyLarge!.copyWith(
                     color: Theme.of(context).colorScheme.onPrimaryContainer),
               ),

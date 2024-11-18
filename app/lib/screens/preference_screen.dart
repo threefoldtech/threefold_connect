@@ -173,7 +173,7 @@ class _PreferenceScreenState extends ConsumerState<PreferenceScreen> {
               }),
           ListTile(
             leading: const Icon(Icons.lock),
-            title: const Text('Change pincode'),
+            title: const Text('Change PIN'),
             onTap: () async {
               _changePincode();
             },
@@ -250,38 +250,33 @@ class _PreferenceScreenState extends ConsumerState<PreferenceScreen> {
             title: const Text('Terms and conditions'),
             onTap: () async => {await _showTermsAndConds()},
           ),
+          ListTile(
+            leading: const Icon(Icons.logout_outlined),
+            title: Text(
+              'Log Out',
+              style: Theme.of(context)
+                  .textTheme
+                  .bodyLarge!
+                  .copyWith(color: Theme.of(context).colorScheme.onSurface),
+            ),
+            onTap: _showDialog,
+          ),
           ExpansionTile(
             title: const Text(
               'Advanced settings',
             ),
             children: <Widget>[
               ListTile(
-                leading: const Icon(Icons.person),
-                title: Text(
-                  'Deactivate Account',
-                  style: Theme.of(context)
-                      .textTheme
-                      .bodyLarge!
-                      .copyWith(color: Theme.of(context).colorScheme.error),
-                ),
-                trailing: Icon(
+                leading: Icon(
                   Icons.remove_circle,
                   color: Theme.of(context).colorScheme.error,
                 ),
-                onTap: _showDialog,
-              ),
-              ListTile(
-                leading: const Icon(Icons.person),
                 title: Text(
                   'Delete Account',
                   style: Theme.of(context)
                       .textTheme
                       .bodyLarge!
                       .copyWith(color: Theme.of(context).colorScheme.error),
-                ),
-                trailing: Icon(
-                  Icons.remove_circle,
-                  color: Theme.of(context).colorScheme.error,
                 ),
                 onTap: () {
                   _showDialog(delete: true);
@@ -338,16 +333,17 @@ class _PreferenceScreenState extends ConsumerState<PreferenceScreen> {
   }
 
   void _showDialog({delete = false}) {
-    String message =
-        'If you confirm, your account will be deactivated. You can always recover your account with your username and phrase.';
+    String title = 'Log Out';
+    String message = 'Are you sure you want to log out?';
     if (delete) {
+      title = 'Are you sure?';
       message =
           "If you confirm, your account will be deleted. You won't be able to recover your account.";
     }
     showDialog(
       context: context,
       builder: (BuildContext context) => WarningDialogWidget(
-        title: 'Are you sure?',
+        title: title,
         description: message,
         onAgree: () async {
           deleteLoading = true;
