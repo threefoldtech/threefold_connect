@@ -375,8 +375,8 @@ class _PreferenceScreenState extends ConsumerState<PreferenceScreen> {
           if (delete) {
             try {
               Response response = await deleteUser();
-              if (response.statusCode == HttpStatus.noContent) {
-                deleted = true;
+              if (response.statusCode != HttpStatus.noContent) {
+                deleted = false;
               }
             } catch (e) {
               print('Failed to delete user due to $e');
