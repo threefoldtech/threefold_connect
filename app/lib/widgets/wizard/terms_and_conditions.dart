@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:threebotlogin/screens/wizard/web_view.dart';
 import 'package:threebotlogin/services/shared_preference_service.dart';
 import 'package:threebotlogin/widgets/custom_dialog.dart';
+import 'package:threebotlogin/helpers/globals.dart';
 
 class TermsAndConditions extends StatefulWidget {
   const TermsAndConditions({Key? key}) : super(key: key);
@@ -13,6 +14,8 @@ class TermsAndConditions extends StatefulWidget {
 class _TermsAndConditionsState extends State<TermsAndConditions> {
   bool agreed = false;
   bool attemptToContinue = false;
+  final termsAndConditionsUrl = Globals().termsAndConditionsUrl;
+
   @override
   Widget build(BuildContext context) {
     return CustomDialog(
@@ -33,7 +36,11 @@ class _TermsAndConditionsState extends State<TermsAndConditions> {
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => const WebView()),
+                  MaterialPageRoute(
+                      builder: (context) => WebView(
+                            url: termsAndConditionsUrl,
+                            title: 'Terms and Conditions',
+                          )),
                 );
               },
               child: Text('Terms & Conditions',

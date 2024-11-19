@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:threebotlogin/apps/wallet/wallet_config.dart';
+import 'package:threebotlogin/helpers/logger.dart';
 import 'package:threebotlogin/models/wallet.dart';
 import 'package:threebotlogin/providers/wallets_provider.dart';
 import 'package:threebotlogin/services/shared_preference_service.dart';
@@ -123,7 +124,7 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
       }
     } catch (e) {
       failed = true;
-      print('Failed to get wallets due to $e');
+      logger.e('Failed to get wallets due to $e');
       if (context.mounted) {
         final loadingFarmsFailure = SnackBar(
           content: Text(

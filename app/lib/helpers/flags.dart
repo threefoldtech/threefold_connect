@@ -1,5 +1,6 @@
 import 'package:flagsmith/flagsmith.dart';
 import 'package:threebotlogin/app_config.dart';
+import 'package:threebotlogin/helpers/logger.dart';
 import 'package:threebotlogin/services/shared_preference_service.dart';
 import 'package:threebotlogin/services/tools_service.dart';
 
@@ -30,7 +31,7 @@ class Flags {
       }
       await client.getFeatureFlags(reload: true);
     } catch (e) {
-      print(e);
+      logger.e(e);
       setFallbackConfigs();
       throw Exception(
           'Error in initialization in Flagsmith, please try again. If this issue persist, please contact support');

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:threebotlogin/helpers/logger.dart';
 import 'package:threebotlogin/models/contact.dart';
 import 'package:threebotlogin/models/wallet.dart';
 import 'package:threebotlogin/services/contact_service.dart';
@@ -112,7 +113,7 @@ class _AddEditContactState extends State<AddEditContact> {
           Icons.check,
           DialogType.Info);
     } catch (e) {
-      print(e);
+      logger.e(e);
       _showDialog('Error', 'Failed to save contact. Please try again.',
           Icons.error, DialogType.Error);
       return;
@@ -132,7 +133,7 @@ class _AddEditContactState extends State<AddEditContact> {
           Icons.check,
           DialogType.Info);
     } catch (e) {
-      print(e);
+      logger.e(e);
       _showDialog('Error', 'Failed to modify contact. Please try again.',
           Icons.error, DialogType.Error);
       return;

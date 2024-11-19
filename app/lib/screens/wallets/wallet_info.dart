@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:threebotlogin/helpers/logger.dart';
 import 'package:threebotlogin/models/wallet.dart';
 import 'package:threebotlogin/services/wallet_service.dart';
 import 'package:threebotlogin/widgets/wallets/warning_dialog.dart';
@@ -36,7 +37,7 @@ class _WalletDetailsWidgetState extends State<WalletDetailsWidget> {
       widget.onDeleteWallet(walletNameController.text);
       return true;
     } catch (e) {
-      print('Failed to delete wallet due to $e');
+      logger.e('Failed to delete wallet due to $e');
       if (context.mounted) {
         final loadingFarmsFailure = SnackBar(
           content: Text(
@@ -71,7 +72,7 @@ class _WalletDetailsWidgetState extends State<WalletDetailsWidget> {
       walletName = newName;
       widget.wallet.name = newName;
     } catch (e) {
-      print('Failed to modify wallet due to $e');
+      logger.e('Failed to modify wallet due to $e');
       if (context.mounted) {
         final loadingFarmsFailure = SnackBar(
           content: Text(

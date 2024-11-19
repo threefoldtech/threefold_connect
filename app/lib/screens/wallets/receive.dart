@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:threebotlogin/helpers/logger.dart';
 import 'package:threebotlogin/models/wallet.dart';
 import 'package:threebotlogin/screens/qr_code_screen.dart';
 import 'package:threebotlogin/widgets/wallets/select_chain_widget.dart';
@@ -49,6 +50,12 @@ class _WalletReceiveScreenState extends State<WalletReceiveScreen> {
       return false;
     }
 
+    if (double.parse(amount) <= 0) {
+      amountError = 'Amount should be positive';
+      setState(() {});
+      return false;
+    }
+    setState(() {});
     return true;
   }
 
@@ -111,7 +118,8 @@ class _WalletReceiveScreenState extends State<WalletReceiveScreen> {
                   style: Theme.of(context).textTheme.bodyMedium!.copyWith(
                         color: Theme.of(context).colorScheme.onSurface,
                       ),
-                  keyboardType: TextInputType.number,
+                  keyboardType:
+                      const TextInputType.numberWithOptions(decimal: true),
                   controller: amountController,
                   decoration: InputDecoration(
                       suffixText: 'TFT',
@@ -137,7 +145,7 @@ class _WalletReceiveScreenState extends State<WalletReceiveScreen> {
               child: ElevatedButton(
                 onPressed: () {
                   final valid = _validate();
-                  print(valid);
+                  logger.i(valid);
                   if (valid) _showQRCode();
                 },
                 style: ElevatedButton.styleFrom(),

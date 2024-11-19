@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:core';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_pkid/flutter_pkid.dart';
 import 'package:http/http.dart';
@@ -10,8 +11,10 @@ import 'package:threebotlogin/events/events.dart';
 import 'package:threebotlogin/events/identity_callback_event.dart';
 import 'package:threebotlogin/helpers/globals.dart';
 import 'package:threebotlogin/helpers/kyc_helpers.dart';
+import 'package:threebotlogin/helpers/logger.dart';
 import 'package:threebotlogin/main.dart';
 import 'package:threebotlogin/models/idenfy.dart';
+import 'package:threebotlogin/screens/wizard/web_view.dart';
 import 'package:threebotlogin/services/gridproxy_service.dart';
 import 'package:threebotlogin/services/idenfy_service.dart';
 import 'package:threebotlogin/services/identity_service.dart';
@@ -258,6 +261,172 @@ class _IdentityVerificationScreenState
     );
   }
 
+  termsAndConditionsDialog() {
+    bool isAccepted = false;
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext customContext) {
+        return StatefulBuilder(
+          builder: (BuildContext context, StateSetter setState) {
+            return CustomDialog(
+              title: 'Terms and Conditions',
+              type: DialogType.Info,
+              image: Icons.info,
+              widgetDescription: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    SizedBox(height: MediaQuery.of(context).size.height * 0.01),
+                    RichText(
+                      text: TextSpan(
+                        text:
+                            "As part of the verification process, we utilize iDenfy to verify your identity. Please ensure you review iDenfy's ",
+                        style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                              color: Theme.of(context).colorScheme.onSurface,
+                            ),
+                        children: [
+                          TextSpan(
+                            text: 'Security and Compliance',
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodyMedium!
+                                .copyWith(
+                                  fontWeight: FontWeight.bold,
+                                  color:
+                                      Theme.of(context).colorScheme.onSurface,
+                                ),
+                          ),
+                          TextSpan(
+                            text: ', which include their ',
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodyMedium!
+                                .copyWith(
+                                  color:
+                                      Theme.of(context).colorScheme.onSurface,
+                                ),
+                          ),
+                          TextSpan(
+                            text: 'Terms & Conditions, Privacy Policy,',
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodyMedium!
+                                .copyWith(
+                                  fontWeight: FontWeight.bold,
+                                  color:
+                                      Theme.of(context).colorScheme.onSurface,
+                                ),
+                          ),
+                          TextSpan(
+                            text: ' and other relevant documents.',
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodyMedium!
+                                .copyWith(
+                                  color:
+                                      Theme.of(context).colorScheme.onSurface,
+                                ),
+                          )
+                          //
+                        ],
+                      ),
+                    ),
+                    Row(
+                      children: [
+                        Checkbox(
+                          value: isAccepted,
+                          onChanged: (bool? value) {
+                            setState(() {
+                              isAccepted = value ?? false;
+                            });
+                          },
+                        ),
+                        Expanded(
+                          child: RichText(
+                            text: TextSpan(
+                              text: 'I have read and agreed to ',
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodyMedium!
+                                  .copyWith(
+                                    color:
+                                        Theme.of(context).colorScheme.onSurface,
+                                  ),
+                              children: [
+                                TextSpan(
+                                  text: 'iDenfy Terms and Conditions.',
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .bodyMedium!
+                                      .copyWith(
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .primary,
+                                        decoration: TextDecoration.underline,
+                                      ),
+                                  recognizer: TapGestureRecognizer()
+                                    ..onTap = () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => const WebView(
+                                            url:
+                                                'https://www.idenfy.com/security/',
+                                            title:
+                                                'iDenfy Terms and Conditions',
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                ),
+                                TextSpan(
+                                  text: '.',
+                                  style: Theme.of(context).textTheme.bodyMedium,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    )
+                  ],
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.pop(customContext);
+                  },
+                  child: const Text('Cancel'),
+                ),
+                TextButton(
+                  onPressed: isAccepted
+                      ? () async {
+                          Navigator.pop(customContext);
+                          await verifyIdentityProcess();
+                        }
+                      : null,
+                  child: Text(
+                    'Continue',
+                    style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                          color: isAccepted
+                              ? Theme.of(context).colorScheme.primary
+                              : Theme.of(context).disabledColor,
+                        ),
+                  ),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+
   showAreYouSureToExitDialog() {
     return showDialog(
       context: context,
@@ -299,7 +468,7 @@ class _IdentityVerificationScreenState
     try {
       idenfySDKresult = await IdenfySdkFlutter.start(token);
     } catch (e) {
-      print(e);
+      logger.e(e);
       if (context.mounted) {
         showDialog(
           context: context,
@@ -337,7 +506,7 @@ class _IdentityVerificationScreenState
       setState(() {
         isLoading = false;
       });
-      print(e);
+      logger.e(e);
       return showDialog(
         context: context,
         builder: (BuildContext context) => CustomDialog(
@@ -414,7 +583,7 @@ class _IdentityVerificationScreenState
         setState(() {
           isLoading = false;
         });
-        print(e);
+        logger.e(e);
         return showDialog(
           context: context,
           builder: (BuildContext context) => CustomDialog(
@@ -786,7 +955,8 @@ class _IdentityVerificationScreenState
                               // Verify identity
                               case 3:
                                 {
-                                  await verifyIdentityProcess();
+                                  termsAndConditionsDialog();
+                                  // await verifyIdentityProcess();
                                 }
                                 break;
                               default:
@@ -1019,7 +1189,7 @@ class _IdentityVerificationScreenState
                 image: Icons.warning,
                 title: 'Not enough balance',
                 description:
-                    "You don't have enough balance.\nPlease fund your account at least $minimumBalance TFTs.",
+                    'Please fund your account with at least $minimumBalance TFTs.',
                 actions: <Widget>[
                   TextButton(
                     child: const Text('Close'),
@@ -1059,7 +1229,7 @@ class _IdentityVerificationScreenState
       setState(() {
         isLoading = false;
       });
-      print(e);
+      logger.e(e);
       return showDialog(
         context: context,
         builder: (BuildContext context) => CustomDialog(
@@ -1452,7 +1622,7 @@ class _IdentityVerificationScreenState
 
                         setState(() {});
                       } catch (e) {
-                        print(e);
+                        logger.e(e);
                         Navigator.pop(context);
 
                         await saveEmail(oldEmail['email']!, oldEmail['sei']);
@@ -1478,28 +1648,26 @@ class _IdentityVerificationScreenState
     FlutterPkid client = await getPkidClient();
 
     var emailPKidResult = await client.getPKidDoc('email');
-    print(emailPKidResult);
+    logger.i(emailPKidResult);
     return showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text('Change your email'),
-          content: Container(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Text('Please pass us your email address'),
-                const SizedBox(height: 16),
-                TextField(
-                  controller: changeEmailController,
-                  decoration: InputDecoration(
-                      labelText: 'Email',
-                      errorText: emailInputValidated
-                          ? null
-                          : 'Please enter a valid email'),
-                ),
-              ],
-            ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text('Please pass us your email address'),
+              const SizedBox(height: 16),
+              TextField(
+                controller: changeEmailController,
+                decoration: InputDecoration(
+                    labelText: 'Email',
+                    errorText: emailInputValidated
+                        ? null
+                        : 'Please enter a valid email'),
+              ),
+            ],
           ),
           actions: <Widget>[
             TextButton(
@@ -1649,7 +1817,7 @@ class _IdentityVerificationScreenState
       );
       ScaffoldMessenger.of(context).clearSnackBars();
       ScaffoldMessenger.of(context).showSnackBar(loadingSpendingFailure);
-      print('Failed to load user spending due to $e');
+      logger.e('Failed to load user spending due to $e');
       spending = 0.0;
     } finally {
       setState(() {

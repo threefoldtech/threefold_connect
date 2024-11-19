@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/services.dart';
 import 'package:local_auth/local_auth.dart';
+import 'package:threebotlogin/helpers/logger.dart';
 
 final LocalAuthentication auth = LocalAuthentication();
 
@@ -33,7 +34,7 @@ Future<bool> authenticate() async {
       biometricOnly: true,
     );
   } on PlatformException catch (e) {
-    print(e);
+    logger.e(e);
     return false;
   }
 

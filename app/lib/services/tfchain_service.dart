@@ -1,3 +1,5 @@
+// ignore_for_file: depend_on_referenced_packages
+
 import 'dart:convert';
 
 import 'package:tfchain_client/generated/dev/types/tfchain_support/types/farm.dart';
@@ -98,7 +100,7 @@ Future<DaoVotes> vote(bool vote, String hash, int farmId, String seed) async {
   final chainUrl = Globals().chainUrl;
   final client = TFChain.Client(chainUrl, seed, 'sr25519');
   try {
-    client.connect();
+    await client.connect();
     final daoVotes =
         await client.dao.vote(farmId: farmId, hash: hash, approve: vote);
     return daoVotes;
@@ -116,7 +118,6 @@ activateAccount(String tfchainSeed) async {
 
   try {
     await client.connect();
-
     final activationUri = Uri.parse(activationUrl);
     final activationResponse = await http
         .post(activationUri, body: {'substrateAccountID': client.address});
@@ -132,6 +133,12 @@ activateAccount(String tfchainSeed) async {
         .map((byte) => byte.toRadixString(16).padLeft(2, '0'))
         .join();
 
+    for (int i = 1; i <= 6; i++) {
+      final balance = await getBalanceByClient(client);
+      if (balance > 0) break;
+      await Future.delayed(const Duration(seconds: 1));
+    }
+    await client.connect();
     await client.termsAndConditions
         .accept(documentLink: documentUrl, documentHash: hashString.codeUnits);
     final relayUrl = Globals().relayUrl;
@@ -148,11 +155,11 @@ Future<Farm?> createFarm(
   final chainUrl = Globals().chainUrl;
   final client = TFChain.Client(chainUrl, tfchainSeed, 'sr25519');
   try {
-    client.connect();
     final twinId = await getTwinIdByClient(client);
     if (twinId == 0) {
       await activateAccount(tfchainSeed);
     }
+    await client.connect();
     final farmId = await client.farms.create(name: name, publicIps: []);
     final farm = await client.farms.get(id: farmId!);
     await client.farms
@@ -169,8 +176,8 @@ Future<void> transfer(String secret, String dest, String amount) async {
   final chainUrl = Globals().chainUrl;
   final client = TFChain.Client(chainUrl, secret, 'sr25519');
   try {
-    client.connect();
-    await client.balances.transfer(address: dest, amount: BigInt.parse(amount));
+    await client.connect();
+    await client.balances.transfer(address: dest, amount: double.parse(amount));
   } catch (e) {
     throw Exception('Failed to transfer due to $e');
   } finally {

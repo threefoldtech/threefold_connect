@@ -1,9 +1,12 @@
+// ignore_for_file: implementation_imports, depend_on_referenced_packages
+
 import 'package:bip39/bip39.dart';
 import 'package:convert/convert.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:hashlib/hashlib.dart';
 import 'package:threebotlogin/helpers/globals.dart';
+import 'package:threebotlogin/helpers/logger.dart';
 import 'package:threebotlogin/models/wallet.dart';
 import 'package:threebotlogin/services/stellar_service.dart';
 import 'package:threebotlogin/services/wallet_service.dart';
@@ -52,6 +55,8 @@ class _NewWalletState extends State<NewWallet> {
           '0x${hex.encode(stellarClient.privateKey!.toList().sublist(0, 32))}';
     } else if (secret.startsWith(RegExp(r'0[xX]'))) {
       hexSeed = secret;
+    } else {
+      hexSeed = '0x$secret';
     }
     return hexSeed;
   }
@@ -127,6 +132,12 @@ class _NewWalletState extends State<NewWallet> {
       return false;
     }
 
+    // Check stellar secret length before validating
+    if (walletSecret.startsWith('S') && walletSecret.length != 56) {
+      secretError = 'Invalid Stellar secret length';
+      return false;
+    }
+
     if (isValidStellarSecret(walletSecret)) {
       return true;
     }
@@ -154,8 +165,8 @@ class _NewWalletState extends State<NewWallet> {
     setState(() {});
 
     final validName = _validateName(walletName);
-    final validSecret = _validateSecret(walletSecret);
-    if (validName && await validSecret) {
+    final validSecret = await _validateSecret(walletSecret);
+    if (validName && validSecret) {
       return true;
     }
     saveLoading = false;
@@ -170,7 +181,7 @@ class _NewWalletState extends State<NewWallet> {
     try {
       wallet = await loadAddedWallet(walletName, walletSecret);
     } catch (e) {
-      print(e);
+      logger.e(e);
       _showDialog('Error', 'Failed to load wallet. Please try again.',
           Icons.error, DialogType.Error);
       saveLoading = false;
@@ -185,7 +196,7 @@ class _NewWalletState extends State<NewWallet> {
           Icons.check,
           DialogType.Info);
     } catch (e) {
-      print(e);
+      logger.e(e);
       _showDialog('Error', 'Failed to save wallet. Please try again.',
           Icons.error, DialogType.Error);
       saveLoading = false;

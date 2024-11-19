@@ -12,6 +12,7 @@ import 'package:threebotlogin/events/go_sign_event.dart';
 import 'package:threebotlogin/events/new_login_event.dart';
 import 'package:threebotlogin/events/phone_event.dart';
 import 'package:threebotlogin/helpers/globals.dart';
+import 'package:threebotlogin/helpers/logger.dart';
 import 'package:threebotlogin/models/login.dart';
 import 'package:threebotlogin/models/sign.dart';
 import 'package:threebotlogin/screens/authentication_screen.dart';
@@ -32,7 +33,8 @@ class BackendConnection {
   BackendConnection(this.doubleName);
 
   init() async {
-    print('Creating socket connection with $threeBotSocketUrl for $doubleName');
+    logger.i(
+        'Creating socket connection with $threeBotSocketUrl for $doubleName');
 
     socket = IO.io(threeBotSocketUrl, <String, dynamic>{
       'transports': ['websocket'],
@@ -40,10 +42,10 @@ class BackendConnection {
     });
 
     socket.on('connect', (res) {
-      print('[connect]');
+      logger.i('[connect]');
 
       socket.emit('join', {'room': doubleName.toLowerCase(), 'app': true});
-      print('Joined room: ${doubleName.toLowerCase()}');
+      logger.i('Joined room: ${doubleName.toLowerCase()}');
     });
 
     socket.on('email_verification', (_) {
@@ -54,13 +56,13 @@ class BackendConnection {
     });
 
     socket.on('login', (dynamic data) async {
-      print('[login]');
+      logger.i('[login]');
       int currentTimestamp = DateTime.now().millisecondsSinceEpoch;
 
       if (data['created'] != null &&
           ((currentTimestamp - data['created']) / 1000) >
               Globals().loginTimeout) {
-        print('We received an expired login attempt, ignoring it.');
+        logger.i('We received an expired login attempt, ignoring it.');
         return;
       }
       Login loginData = await Login.createAndDecryptLoginObject(data);
@@ -74,16 +76,16 @@ class BackendConnection {
     });
 
     socket.on('disconnect', (_) {
-      print('disconnect');
+      logger.i('disconnect');
     });
 
     Events().onEvent(CloseSocketEvent().runtimeType, closeSocketConnection);
   }
 
   void closeSocketConnection(CloseSocketEvent event) {
-    print('Closing socket connection');
+    logger.i('Closing socket connection');
 
-    print('Leaving room: $doubleName');
+    logger.i('Leaving room: $doubleName');
     socket.emit('leave', {'room': doubleName});
 
     socket.clearListeners();
@@ -93,12 +95,12 @@ class BackendConnection {
   }
 
   void joinRoom(roomName) {
-    print('Joining room: ' + roomName);
+    logger.i('Joining room: ' + roomName);
     socket.emit('join', {'room': roomName, 'app': true});
   }
 
   void leaveRoom(roomName) {
-    print('Leaving room: ' + roomName);
+    logger.i('Leaving room: ' + roomName);
     socket.emit('leave', {'room': roomName});
   }
 }

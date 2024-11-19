@@ -121,7 +121,7 @@ Future<void> addWallet(String walletName, String walletSecret,
       seed: walletSecret,
       type: type));
 
-  await _saveWalletsToPkid(wallets);
+  await saveWalletsToPkid(wallets);
 }
 
 Future<void> editWallet(String oldName, String newName) async {
@@ -132,16 +132,16 @@ Future<void> editWallet(String oldName, String newName) async {
       break;
     }
   }
-  await _saveWalletsToPkid(wallets);
+  await saveWalletsToPkid(wallets);
 }
 
 Future<void> deleteWallet(String walletName) async {
   List<PkidWallet> wallets = await _getPkidWallets();
   wallets = wallets.where((w) => w.name != walletName).toList();
-  await _saveWalletsToPkid(wallets);
+  await saveWalletsToPkid(wallets);
 }
 
-Future<void> _saveWalletsToPkid(List<PkidWallet> wallets) async {
+Future<void> saveWalletsToPkid(List<PkidWallet> wallets) async {
   FlutterPkid client = await _getPkidClient();
   final encodedWallets = json.encode(wallets.map((w) => w.toMap()).toList());
   await client.setPKidDoc('purse', encodedWallets);

@@ -6,6 +6,7 @@ import 'package:flutter_pkid/flutter_pkid.dart';
 import 'package:sodium_libs/sodium_libs.dart';
 import 'package:http/http.dart';
 import 'package:threebotlogin/helpers/kyc_helpers.dart';
+import 'package:threebotlogin/helpers/logger.dart';
 import 'package:threebotlogin/services/3bot_service.dart';
 import 'package:threebotlogin/services/crypto_service.dart';
 import 'package:threebotlogin/services/migration_service.dart';
@@ -45,7 +46,8 @@ class _RecoverScreenState extends State<RecoverScreen> {
 
     Map<String, dynamic> body = json.decode(userInfoResult.body);
     if (body['publicKey'] != base64.encode(keyPair.publicKey)) {
-      throw Exception('Seed phrase does not match with ${doubleName.replaceAll('.3bot', '')}');
+      throw Exception(
+          'Seed phrase does not match with ${doubleName.replaceAll('.3bot', '')}');
     }
   }
 
@@ -77,7 +79,7 @@ class _RecoverScreenState extends State<RecoverScreen> {
 
       await fixPkidMigration();
     } catch (e) {
-      print(e);
+      logger.e(e);
       throw Exception('Something went wrong');
     }
   }
@@ -107,7 +109,7 @@ class _RecoverScreenState extends State<RecoverScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Recover Account'),
+        title: const Text('Log In'),
       ),
       body: Container(
         padding: const EdgeInsets.all(20.0),
@@ -187,7 +189,7 @@ class _RecoverScreenState extends State<RecoverScreen> {
             ElevatedButton(
               style: ElevatedButton.styleFrom(),
               child: Text(
-                'Recover Account',
+                'Log In',
                 style: Theme.of(context).textTheme.bodyLarge!.copyWith(
                     color: Theme.of(context).colorScheme.onPrimaryContainer),
               ),
@@ -231,7 +233,7 @@ class _RecoverScreenState extends State<RecoverScreen> {
                   // to dismiss the recovery screen.
                   Navigator.pop(context, true);
                 } catch (e) {
-                  print(e);
+                  logger.e(e);
                   Navigator.pop(context);
                   error = e.toString();
                   setState(() {});
