@@ -55,6 +55,8 @@ class _NewWalletState extends State<NewWallet> {
           '0x${hex.encode(stellarClient.privateKey!.toList().sublist(0, 32))}';
     } else if (secret.startsWith(RegExp(r'0[xX]'))) {
       hexSeed = secret;
+    } else {
+      hexSeed = '0x$secret';
     }
     return hexSeed;
   }
@@ -130,6 +132,12 @@ class _NewWalletState extends State<NewWallet> {
       return false;
     }
 
+    // Check stellar secret length before validating
+    if (walletSecret.startsWith('S') && walletSecret.length != 56) {
+      secretError = 'Invalid Stellar secret length';
+      return false;
+    }
+
     if (isValidStellarSecret(walletSecret)) {
       return true;
     }
@@ -157,8 +165,8 @@ class _NewWalletState extends State<NewWallet> {
     setState(() {});
 
     final validName = _validateName(walletName);
-    final validSecret = _validateSecret(walletSecret);
-    if (validName && await validSecret) {
+    final validSecret = await _validateSecret(walletSecret);
+    if (validName && validSecret) {
       return true;
     }
     saveLoading = false;

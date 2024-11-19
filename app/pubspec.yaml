@@ -3,7 +3,7 @@ description: A decentralized login application
 
 publish_to: "none"
 
-version: 3.9.1+178
+version: 4.0.0+183
 
 environment:
   sdk: ">=3.0.0"
@@ -78,6 +78,7 @@ dependencies:
   flutter_launcher_icons: ^0.14.1
   logger: ^2.4.0
   flutter_keyboard_visibility: ^6.0.0
+  mutex: ^3.1.0
 dev_dependencies:
   flutter_test:
     sdk: flutter

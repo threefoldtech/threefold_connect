@@ -946,6 +946,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.2.1+beta.0"
+  mutex:
+    dependency: "direct main"
+    description:
+      name: mutex
+      sha256: "8827da25de792088eb33e572115a5eb0d61d61a3c01acbc8bcbe76ed78f1a1f2"
+      url: "https://pub.dev"
+    source: hosted
+    version: "3.1.0"
   nested:
     dependency: transitive
     description:
@@ -1654,7 +1662,7 @@ packages:
     description:
       path: "packages/tfchain_client"
       ref: main
-      resolved-ref: "68d4fda0ded7fbc3d6e9a594ebbf0ea7ff3b48b6"
+      resolved-ref: "07cca7b13403815a8556a28a9437ae451bd0eef2"
       url: "https://github.com/threefoldtech/tfgrid-sdk-dart"
     source: git
     version: "0.1.0"
