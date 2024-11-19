@@ -17,7 +17,7 @@ class SelectChainWidget extends StatelessWidget {
     return ElevatedButton(
       onPressed: onPressed,
       style: ElevatedButton.styleFrom(
-          fixedSize: Size.fromWidth(width),
+          maximumSize: Size.fromWidth(width),
           backgroundColor:
               active ? colorScheme.primaryContainer : colorScheme.surface,
           shape: RoundedRectangleBorder(
@@ -51,7 +51,7 @@ class SelectChainWidget extends StatelessWidget {
               onChangeChain(ChainType.Stellar);
             }),
           _optionButton(
-              context, 'TFChain', width / 3, chainType == ChainType.TFChain,
+              context, 'TFChain', width / 2, chainType == ChainType.TFChain,
               () {
             onChangeChain(ChainType.TFChain);
           }),

@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:threebotlogin/helpers/logger.dart';
 import 'package:threebotlogin/models/farm.dart';
 import 'package:threebotlogin/models/wallet.dart';
 import 'package:threebotlogin/services/gridproxy_service.dart';
@@ -87,7 +88,7 @@ class _NewFarmState extends State<NewFarm> {
           Icons.check,
           DialogType.Info);
     } catch (e) {
-      print(e);
+      logger.e(e);
       _showDialog('Error', 'Failed to create farm. Please try again.',
           Icons.error, DialogType.Error);
       return;

@@ -1,6 +1,7 @@
 import 'package:threebotlogin/app_config_local.dart';
 import 'package:threebotlogin/helpers/env_config.dart';
 import 'package:threebotlogin/helpers/environment.dart';
+import 'package:threebotlogin/helpers/logger.dart';
 
 import 'helpers/globals.dart';
 
@@ -206,7 +207,7 @@ class AppConfigTesting extends AppConfigImpl {
 }
 
 void setFallbackConfigs() {
-  print("Can't connect to FlagSmith, setting default configs... ");
+  logger.i("Can't connect to FlagSmith, setting default configs... ");
 
   Globals().isOpenKYCEnabled = false;
   Globals().maximumKYCRetries = 5;

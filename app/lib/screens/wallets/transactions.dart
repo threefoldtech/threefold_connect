@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:stellar_client/models/transaction.dart';
+import 'package:threebotlogin/helpers/logger.dart';
 import 'package:threebotlogin/models/wallet.dart';
 import 'package:threebotlogin/services/stellar_service.dart';
 import 'package:threebotlogin/widgets/wallets/transaction.dart';
@@ -31,7 +32,7 @@ class _WalletTransactionsWidgetState extends State<WalletTransactionsWidget> {
       }).toList();
       transactions = transactionsList.where((tx) => tx != null).toList();
     } catch (e) {
-      print('Failed to load transactions due to $e');
+      logger.e('Failed to load transactions due to $e');
       if (context.mounted) {
         final loadingFarmsFailure = SnackBar(
           content: Text(

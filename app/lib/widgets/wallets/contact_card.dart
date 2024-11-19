@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:threebotlogin/helpers/logger.dart';
 import 'package:threebotlogin/services/contact_service.dart';
 import 'package:threebotlogin/widgets/wallets/warning_dialog.dart';
 
@@ -28,7 +29,7 @@ class _ContactCardWidgetState extends State<ContactCardWidget> {
       widget.onDeleteContact!(widget.name);
       return true;
     } catch (e) {
-      print('Failed to delete contact due to $e');
+      logger.e('Failed to delete contact due to $e');
       if (context.mounted) {
         final loadingFarmsFailure = SnackBar(
           content: Text(
