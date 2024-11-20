@@ -2,6 +2,8 @@ enum WalletType { NATIVE, IMPORTED }
 
 enum ChainType { Stellar, TFChain }
 
+enum TransactionType { Withdraw, Deposit }
+
 class Wallet {
   Wallet({
     required this.name,

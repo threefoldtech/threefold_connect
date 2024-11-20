@@ -4,6 +4,7 @@ import 'package:stellar_client/models/vesting_account.dart';
 import 'package:threebotlogin/helpers/globals.dart';
 import 'package:threebotlogin/models/wallet.dart';
 import 'package:threebotlogin/providers/wallets_provider.dart';
+import 'package:threebotlogin/screens/wallets/bridge.dart';
 import 'package:threebotlogin/screens/wallets/receive.dart';
 import 'package:threebotlogin/screens/wallets/send.dart';
 import 'package:threebotlogin/services/stellar_service.dart' as Stellar;
@@ -149,6 +150,37 @@ class _WalletAssetsWidgetState extends State<WalletAssetsWidget> {
                     const SizedBox(height: 10),
                     Text(
                       'Receive',
+                      style: Theme.of(context).textTheme.titleLarge!.copyWith(
+                          color: Theme.of(context).colorScheme.primary),
+                    ),
+                  ],
+                ),
+                Column(
+                  children: [
+                    InkWell(
+                      onTap: () {
+                        Navigator.of(context).push(MaterialPageRoute(
+                          builder: (context) => WalletBridgeScreen(
+                            wallet: widget.wallet,
+                            allWallets: widget.allWallets,
+                          ),
+                        ));
+                      },
+                      child: CircleAvatar(
+                        radius: 30,
+                        backgroundColor:
+                            Theme.of(context).colorScheme.primaryContainer,
+                        child: Icon(
+                          Icons.swap_horiz,
+                          color:
+                              Theme.of(context).colorScheme.onPrimaryContainer,
+                          size: 35,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    Text(
+                      'Bridge',
                       style: Theme.of(context).textTheme.titleLarge!.copyWith(
                           color: Theme.of(context).colorScheme.primary),
                     ),

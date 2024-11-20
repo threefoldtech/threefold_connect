@@ -5,6 +5,7 @@ import 'dart:convert';
 import 'package:tfchain_client/generated/dev/types/tfchain_support/types/farm.dart';
 import 'package:threebotlogin/apps/wallet/wallet_config.dart';
 import 'package:threebotlogin/helpers/globals.dart';
+import 'package:threebotlogin/helpers/logger.dart';
 import 'package:threebotlogin/services/shared_preference_service.dart';
 import 'package:tfchain_client/tfchain_client.dart' as TFChain;
 import 'package:tfchain_client/models/dao.dart';
@@ -13,6 +14,8 @@ import 'package:crypto/crypto.dart';
 import 'package:http/http.dart' as http;
 import 'package:hashlib/hashlib.dart' as hashlib;
 import 'package:signer/signer.dart';
+
+final chainUrl = Globals().chainUrl;
 
 Future<String> getMySeed() async {
   final derivedSeed = await getDerivedSeed(WalletConfig().appId());
@@ -63,13 +66,11 @@ Future<int> getTwinIdByClient(TFChain.Client client) async {
 }
 
 Future<int> getTwinId(String seed) async {
-  final chainUrl = Globals().chainUrl;
   final client = TFChain.Client(chainUrl, seed, 'sr25519');
   return getTwinIdByClient(client);
 }
 
 Future<Map<String, List<Proposal>>> getProposals() async {
-  final chainUrl = Globals().chainUrl;
   final client = TFChain.QueryClient(chainUrl);
   try {
     await client.connect();
@@ -83,7 +84,6 @@ Future<Map<String, List<Proposal>>> getProposals() async {
 }
 
 Future<DaoVotes> getProposalVotes(String hash) async {
-  final chainUrl = Globals().chainUrl;
   final client = TFChain.QueryClient(chainUrl);
   try {
     await client.connect();
@@ -97,7 +97,6 @@ Future<DaoVotes> getProposalVotes(String hash) async {
 }
 
 Future<DaoVotes> vote(bool vote, String hash, int farmId, String seed) async {
-  final chainUrl = Globals().chainUrl;
   final client = TFChain.Client(chainUrl, seed, 'sr25519');
   try {
     await client.connect();
@@ -113,7 +112,6 @@ Future<DaoVotes> vote(bool vote, String hash, int farmId, String seed) async {
 
 activateAccount(String tfchainSeed) async {
   final activationUrl = Globals().activationUrl;
-  final chainUrl = Globals().chainUrl;
   final client = TFChain.Client(chainUrl, tfchainSeed, 'sr25519');
 
   try {
@@ -152,7 +150,6 @@ activateAccount(String tfchainSeed) async {
 
 Future<Farm?> createFarm(
     String name, String tfchainSeed, String stellarAddress) async {
-  final chainUrl = Globals().chainUrl;
   final client = TFChain.Client(chainUrl, tfchainSeed, 'sr25519');
   try {
     final twinId = await getTwinIdByClient(client);
@@ -173,7 +170,6 @@ Future<Farm?> createFarm(
 }
 
 Future<void> transfer(String secret, String dest, String amount) async {
-  final chainUrl = Globals().chainUrl;
   final client = TFChain.Client(chainUrl, secret, 'sr25519');
   try {
     await client.connect();
@@ -186,8 +182,18 @@ Future<void> transfer(String secret, String dest, String amount) async {
 }
 
 Future<void> disconnect() async {
-  final chainUrl = Globals().chainUrl;
   final client = TFChain.QueryClient(chainUrl);
   await client.connect();
   await client.disconnect();
+}
+
+Future<void> swapToStellar(String secret, String target, BigInt amount) async {
+  try {
+    final client = TFChain.Client(chainUrl, secret, 'sr25519');
+    await client.connect();
+    await client.bridge.swapToStellar(target: target, amount: amount);
+    await client.disconnect();
+  } on FormatException catch (e) {
+    logger.e(e.message);
+  }
 }
