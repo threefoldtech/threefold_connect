@@ -63,7 +63,8 @@ class _PincodeWidgetState extends State<PincodeWidget> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Padding(
-                padding: const EdgeInsets.only(left: 24.0, right: 24.0),
+                padding: const EdgeInsets.symmetric(horizontal: 24),
+
                 child: Text(
                   widget.userMessage,
                   style: Theme.of(context)
