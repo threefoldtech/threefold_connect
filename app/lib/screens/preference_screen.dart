@@ -1,7 +1,11 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_pkid/flutter_pkid.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:http/http.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:threebotlogin/app_config.dart';
 import 'package:threebotlogin/apps/free_flow_pages/ffp_events.dart';
@@ -15,10 +19,14 @@ import 'package:threebotlogin/screens/authentication_screen.dart';
 import 'package:threebotlogin/screens/change_pin_screen.dart';
 import 'package:threebotlogin/screens/main_screen.dart';
 import 'package:threebotlogin/services/fingerprint_service.dart';
+import 'package:threebotlogin/services/open_kyc_service.dart';
+import 'package:threebotlogin/services/pkid_service.dart';
 import 'package:threebotlogin/services/shared_preference_service.dart';
+import 'package:threebotlogin/services/wallet_service.dart';
 import 'package:threebotlogin/widgets/custom_dialog.dart';
 import 'package:threebotlogin/widgets/layout_drawer.dart';
 import 'package:threebotlogin/providers/theme_provider.dart';
+import 'package:threebotlogin/widgets/wallets/warning_dialog.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class PreferenceScreen extends ConsumerStatefulWidget {
@@ -47,6 +55,7 @@ class _PreferenceScreenState extends ConsumerState<PreferenceScreen> {
   Globals globals = Globals();
 
   MaterialColor thiscolor = Colors.green;
+  bool deleteLoading = false;
 
   @override
   void initState() {
@@ -164,7 +173,7 @@ class _PreferenceScreenState extends ConsumerState<PreferenceScreen> {
               }),
           ListTile(
             leading: const Icon(Icons.lock),
-            title: const Text('Change pincode'),
+            title: const Text('Change PIN'),
             onTap: () async {
               _changePincode();
             },
@@ -241,25 +250,37 @@ class _PreferenceScreenState extends ConsumerState<PreferenceScreen> {
             title: const Text('Terms and conditions'),
             onTap: () async => {await _showTermsAndConds()},
           ),
+          ListTile(
+            leading: const Icon(Icons.logout_outlined),
+            title: Text(
+              'Log Out',
+              style: Theme.of(context)
+                  .textTheme
+                  .bodyLarge!
+                  .copyWith(color: Theme.of(context).colorScheme.onSurface),
+            ),
+            onTap: _showDialog,
+          ),
           ExpansionTile(
             title: const Text(
               'Advanced settings',
             ),
             children: <Widget>[
               ListTile(
-                leading: const Icon(Icons.person),
+                leading: Icon(
+                  Icons.remove_circle,
+                  color: Theme.of(context).colorScheme.error,
+                ),
                 title: Text(
-                  'Remove Account From Device',
+                  'Delete Account',
                   style: Theme.of(context)
                       .textTheme
                       .bodyLarge!
                       .copyWith(color: Theme.of(context).colorScheme.error),
                 ),
-                trailing: Icon(
-                  Icons.remove_circle,
-                  color: Theme.of(context).colorScheme.error,
-                ),
-                onTap: _showDialog,
+                onTap: () {
+                  _showDialog(delete: true);
+                },
               ),
             ],
           ),
@@ -311,67 +332,99 @@ class _PreferenceScreenState extends ConsumerState<PreferenceScreen> {
     );
   }
 
-  void _showDialog() {
+  void _showDialog({delete = false}) {
+    String title = 'Log Out';
+    String message = 'Are you sure you want to log out?';
+    if (delete) {
+      title = 'Are you sure?';
+      message =
+          "If you confirm, your account will be deleted. You won't be able to recover your account.";
+    }
+    preferenceContext = context;
     showDialog(
       context: context,
-      builder: (BuildContext context) => CustomDialog(
-        type: DialogType.Warning,
-        image: Icons.warning,
-        title: 'Are you sure?',
-        description:
-            'If you confirm, your account will be removed from this device. You can always recover your account with your username and phrase.',
-        actions: <Widget>[
-          TextButton(
-            child: const Text('Cancel'),
-            onPressed: () {
-              Navigator.pop(context);
-            },
-          ),
-          TextButton(
-            child: Text(
-              'Yes',
-              style: Theme.of(context)
-                  .textTheme
-                  .bodyMedium!
-                  .copyWith(color: Theme.of(context).colorScheme.warning),
-            ),
-            onPressed: () async {
-              // try {
-              //   String deviceID = await _listener.getToken();
-              //   removeDeviceId(deviceID);
-              // } catch (e) {}
-              Events().emit(CloseSocketEvent());
-              Events().emit(FfpClearCacheEvent());
-              bool result = await clearData();
-              if (result) {
-                Navigator.pop(context);
-                await Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => const MainScreen(
-                            initDone: true, registered: false)));
-              } else {
-                showDialog(
-                  context: preferenceContext!,
-                  builder: (BuildContext context) => CustomDialog(
-                    type: DialogType.Error,
-                    title: 'Error',
-                    description:
-                        'Something went wrong when trying to remove your account.',
-                    actions: <Widget>[
-                      TextButton(
-                        child: const Text('Close'),
-                        onPressed: () {
-                          Navigator.pop(context);
-                        },
-                      )
-                    ],
+      builder: (BuildContext context) => WarningDialogWidget(
+        title: title,
+        description: message,
+        onAgree: () async {
+          deleteLoading = true;
+          setState(() {});
+          if (delete) {
+            String? pin = await getPin();
+            bool? authenticated = await Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => AuthenticationScreen(
+                    correctPin: pin!,
+                    userMessage: 'Please enter your PIN code',
                   ),
-                );
+                ));
+
+            if (authenticated == null || !authenticated) {
+              deleteLoading = false;
+              setState(() {});
+              return false;
+            }
+          }
+          Events().emit(CloseSocketEvent());
+          Events().emit(FfpClearCacheEvent());
+          bool deleted = true;
+          if (delete) {
+            try {
+              Response response = await deleteUser();
+              if (response.statusCode != HttpStatus.noContent) {
+                deleted = false;
               }
-            },
-          ),
-        ],
+            } catch (e) {
+              print('Failed to delete user due to $e');
+              deleted = false;
+            }
+            if (deleted) {
+              final seedPhrase = await getPhrase();
+              FlutterPkid client = await getPkidClient(seedPhrase: seedPhrase!);
+              await client.setPKidDoc('email', '');
+              await client.setPKidDoc('phone', '');
+              await saveWalletsToPkid([]);
+            }
+          }
+          bool result = false;
+          if (deleted) {
+            result = await clearData();
+            if (result) {
+              Navigator.pop(context);
+              await Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) =>
+                          const MainScreen(initDone: true, registered: false)));
+            }
+          }
+          if (!result || !deleted) {
+            await showDialog(
+              context: preferenceContext!,
+              builder: (BuildContext context) => CustomDialog(
+                type: DialogType.Error,
+                title: 'Error',
+                description:
+                    'Something went wrong when trying to remove your account.',
+                actions: <Widget>[
+                  TextButton(
+                    child: const Text('Close'),
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                  )
+                ],
+              ),
+            );
+            deleteLoading = false;
+            setState(() {});
+            return false;
+          }
+          deleteLoading = false;
+          setState(() {});
+          return true;
+        },
       ),
     );
   }

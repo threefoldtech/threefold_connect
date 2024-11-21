@@ -50,6 +50,12 @@ class _WalletReceiveScreenState extends State<WalletReceiveScreen> {
       return false;
     }
 
+    if (double.parse(amount) <= 0) {
+      amountError = 'Amount should be positive';
+      setState(() {});
+      return false;
+    }
+    setState(() {});
     return true;
   }
 
@@ -112,7 +118,8 @@ class _WalletReceiveScreenState extends State<WalletReceiveScreen> {
                   style: Theme.of(context).textTheme.bodyMedium!.copyWith(
                         color: Theme.of(context).colorScheme.onSurface,
                       ),
-                  keyboardType: TextInputType.number,
+                  keyboardType:
+                      const TextInputType.numberWithOptions(decimal: true),
                   controller: amountController,
                   decoration: InputDecoration(
                       suffixText: 'TFT',
