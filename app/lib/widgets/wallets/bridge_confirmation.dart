@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:threebotlogin/helpers/globals.dart';
-import 'package:threebotlogin/helpers/logger.dart';
 import 'package:threebotlogin/models/wallet.dart';
 import 'package:threebotlogin/services/stellar_service.dart' as Stellar;
 import 'package:threebotlogin/services/tfchain_service.dart' as TFChain;
@@ -158,9 +157,8 @@ class _BridgeConfirmationWidgetState extends State<BridgeConfirmationWidget> {
         await Stellar.transfer(widget.secret, Globals().bridgeTFTAddress,
             widget.amount, widget.memo);
       } else {
-        logger.f('else enterredddddddddd');
         await TFChain.swapToStellar(
-            widget.secret, widget.to, BigInt.from(widget.amount as num));
+            widget.secret, widget.to, BigInt.from(double.parse(widget.amount)));
       }
       await _showDialog('Success!', 'Tokens have been transferred successfully',
           Icons.check, DialogType.Info);

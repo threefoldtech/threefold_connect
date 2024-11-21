@@ -60,8 +60,7 @@ class Globals {
   String chainUrl = '';
   String gridproxyUrl = '';
   String activationUrl = '';
-  String bridgeTFTAddress =
-      'GAQH7XXFBRWXT2SBK6AHPOLXDCLXVFAKFSOJIRMRNCDINWKHGI6UYVKM';
+  String bridgeTFTAddress = '';
   String relayUrl = '';
   String termsAndConditionsUrl = '';
   String newsUrl = '';

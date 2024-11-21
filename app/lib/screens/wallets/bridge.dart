@@ -124,31 +124,20 @@ class _WalletBridgeScreenSate extends State<WalletBridgeScreen> {
       amountError = 'Amount should have numeric values only';
       return false;
     }
-    if (transactionType == TransactionType.Withdraw) {
-      if (double.parse(amount) < 0.01) {
-        amountError = "Amount can't be less than 0.01";
-        return false;
-      }
-      if (double.parse(widget.wallet.tfchainBalance) -
-              double.parse(amount) -
-              0.01 <
-          0) {
-        amountError = "Amount shouldn't be more than the wallet balance";
-        return false;
-      }
+    if (double.parse(amount) < 2) {
+      amountError = "Amount can't be less than 2";
+      return false;
     }
-    if (transactionType == TransactionType.Deposit) {
-      if (double.parse(amount) < 0.1) {
-        amountError = "Amount can't be less than 0.1";
-        return false;
-      }
-      if (double.parse(widget.wallet.stellarBalance) -
-              double.parse(amount) -
-              0.1 <
-          0) {
-        amountError = "Amount shouldn't be more than the wallet balance";
-        return false;
-      }
+    if (double.parse(widget.wallet.tfchainBalance) - double.parse(amount) - 2 <
+        0) {
+      amountError = "Amount shouldn't be more than the wallet balance";
+      return false;
+    }
+
+    if (double.parse(widget.wallet.stellarBalance) - double.parse(amount) - 2 <
+        0) {
+      amountError = "Amount shouldn't be more than the wallet balance";
+      return false;
     }
     return true;
   }

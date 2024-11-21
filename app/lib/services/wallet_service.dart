@@ -4,7 +4,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_pkid/flutter_pkid.dart';
 import 'package:threebotlogin/apps/wallet/wallet_config.dart';
 import 'package:threebotlogin/helpers/globals.dart';
-import 'package:threebotlogin/helpers/logger.dart';
 import 'package:threebotlogin/models/wallet.dart';
 import 'package:threebotlogin/services/pkid_service.dart';
 import 'package:threebotlogin/services/shared_preference_service.dart';
@@ -98,7 +97,6 @@ Future<Wallet> loadWallet(String walletName, String walletSeed,
   final (stellarClient, tfchainClient) =
       await loadWalletClients(walletName, walletSeed, walletType, chainUrl);
   final stellarBalance = await StellarService.getBalanceByClient(stellarClient);
-  logger.f('Balance, $stellarBalance, tfchainBalance');
   final tfchainBalance = await TFChainService.getBalanceByClient(tfchainClient);
   final wallet = Wallet(
     name: walletName,

@@ -5,7 +5,6 @@ import 'dart:convert';
 import 'package:tfchain_client/generated/dev/types/tfchain_support/types/farm.dart';
 import 'package:threebotlogin/apps/wallet/wallet_config.dart';
 import 'package:threebotlogin/helpers/globals.dart';
-import 'package:threebotlogin/helpers/logger.dart';
 import 'package:threebotlogin/services/shared_preference_service.dart';
 import 'package:tfchain_client/tfchain_client.dart' as TFChain;
 import 'package:tfchain_client/models/dao.dart';
@@ -194,16 +193,9 @@ Future<void> disconnect() async {
 }
 
 Future<void> swapToStellar(String secret, String target, BigInt amount) async {
-  try {
-    print('SWAP ENTERREDDD');
-    final chainUrl = Globals().chainUrl;
-    final client = TFChain.Client(chainUrl, secret, 'sr25519');
-    await client.connect();
-    logger.i('swapToStellar: $secret, $target, amount');
-    await client.bridge.swapToStellar(target: target, amount: amount);
-    await client.disconnect();
-  } on FormatException catch (e) {
-    logger.f('CATCHHHHHHHHHHH');
-    logger.e(e.message);
-  }
+  final chainUrl = Globals().chainUrl;
+  final client = TFChain.Client(chainUrl, secret, 'sr25519');
+  await client.connect();
+  await client.bridge.swapToStellar(target: target, amount: amount);
+  await client.disconnect();
 }
