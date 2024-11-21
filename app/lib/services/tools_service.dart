@@ -44,7 +44,7 @@ bool validateSeedWords(String seed, String confirmationWords) {
 }
 
 bool validateDoubleName(String value) {
-  return isAlphanumeric(value) && isLength(value, 4);
+  return isAlphanumeric(value) && isLength(value, 2);
 }
 
 String extract3Bot(String name) {
