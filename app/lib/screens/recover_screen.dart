@@ -36,15 +36,26 @@ class _RecoverScreenState extends State<RecoverScreen> {
 
   validateNameSeed(doubleName, seedPhrase) async {
     try {
-      if (doubleName == '.3bot') {
-        throw ('Name is required.');
-      }
-
       Response userInfoResult = await getUserInfo(doubleName);
-      if (userInfoResult.statusCode != 200) {
-        throw ('Name was not found.');
-      }
+      await validateName(doubleName, userInfoResult);
+      await validateSeed(seedPhrase, userInfoResult);
+    } catch (e) {
+      rethrow;
+    }
+  }
 
+  validateName(String doubleName, userInfoResult) async {
+    if (doubleName == '.3bot') {
+      throw ('Name is required.');
+    }
+
+    if (userInfoResult.statusCode != 200) {
+      throw ('Name was not found.');
+    }
+  }
+
+  validateSeed(String seedPhrase, userInfoResult) async {
+    try {
       checkSeedLength(seedPhrase);
       KeyPair keyPair = await generateKeyPairFromSeedPhrase(seedPhrase);
       Map<String, dynamic> body = json.decode(userInfoResult.body);
@@ -55,7 +66,6 @@ class _RecoverScreenState extends State<RecoverScreen> {
       if (e.toString().contains('Invalid mnemonic')) {
         throw ('Invalid mnemonic');
       }
-      rethrow;
     }
   }
 
