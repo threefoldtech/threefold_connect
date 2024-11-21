@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 
 class ReuseableTextStep extends StatelessWidget {
-  ReuseableTextStep(
-      {required this.titleText,
+  const ReuseableTextStep(
+      {super.key,
+      required this.titleText,
       required this.extraText,
       required this.errorStepperText});
 
@@ -16,21 +17,25 @@ class ReuseableTextStep extends StatelessWidget {
       children: <Widget>[
         Text(
           titleText,
+          style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+              color: Theme.of(context).colorScheme.onSecondaryContainer),
         ),
-        Divider(
-          height: 50,
+        const Divider(
+          height: 30,
         ),
         Padding(
           padding: const EdgeInsets.only(top: 8.5),
-          child: Container(
-            child: Center(
-              child: Card(
-                child: Padding(
-                  padding: const EdgeInsets.all(5),
-                  child: Text(
-                    extraText,
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24),
-                  ),
+          child: Center(
+            child: Card(
+              child: Padding(
+                padding: const EdgeInsets.all(5),
+                child: Text(
+                  extraText,
+                  style: Theme.of(context).textTheme.titleLarge!.copyWith(
+                        color:
+                            Theme.of(context).colorScheme.onSecondaryContainer,
+                        fontWeight: FontWeight.bold,
+                      ),
                 ),
               ),
             ),
@@ -39,22 +44,24 @@ class ReuseableTextStep extends StatelessWidget {
         Row(
           children: <Widget>[
             Padding(
-              padding: EdgeInsets.only(top: 10),
+              padding: const EdgeInsets.only(top: 10),
               child: Text(
                 errorStepperText,
-                style: TextStyle(color: Colors.red),
+                style: Theme.of(context)
+                    .textTheme
+                    .bodyMedium!
+                    .copyWith(color: Theme.of(context).colorScheme.error),
                 textAlign: TextAlign.left,
               ),
             ),
           ],
         ),
-        Divider(
+        const Divider(
           height: 5,
         ),
-        Row(
+        const Row(
           mainAxisAlignment: MainAxisAlignment.start,
-          children: const <Widget>[
-          ],
+          children: <Widget>[],
         )
       ],
     );

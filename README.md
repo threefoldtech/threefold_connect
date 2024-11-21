@@ -45,7 +45,7 @@ Wallet v3: <https://github.com/threefoldtech/wallet-next>
 
 Farmer: <https://github.com/threefoldtech/wallet-next>
 
-Support: <https://github.com/threefoldtech/tfsupport>
+Support: <https://github.com/threefoldtech/test_feedback>
 
 ## Frontend
 

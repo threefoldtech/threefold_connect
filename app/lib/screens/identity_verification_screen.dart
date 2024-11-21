@@ -1,28 +1,36 @@
 import 'dart:convert';
 import 'dart:core';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_pkid/flutter_pkid.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:http/http.dart';
-import 'package:shuftipro_sdk/shuftipro_sdk.dart';
+import 'package:idenfy_sdk_flutter/idenfy_sdk_flutter.dart';
+import 'package:idenfy_sdk_flutter/models/auto_identification_status.dart';
+import 'package:idenfy_sdk_flutter/models/idenfy_identification_status.dart';
 import 'package:threebotlogin/events/events.dart';
 import 'package:threebotlogin/events/identity_callback_event.dart';
 import 'package:threebotlogin/helpers/globals.dart';
-import 'package:threebotlogin/helpers/hex_color.dart';
 import 'package:threebotlogin/helpers/kyc_helpers.dart';
+import 'package:threebotlogin/helpers/logger.dart';
+import 'package:threebotlogin/main.dart';
+import 'package:threebotlogin/models/idenfy.dart';
+import 'package:threebotlogin/screens/wizard/web_view.dart';
+import 'package:threebotlogin/services/gridproxy_service.dart';
+import 'package:threebotlogin/services/idenfy_service.dart';
 import 'package:threebotlogin/services/identity_service.dart';
 import 'package:threebotlogin/services/open_kyc_service.dart';
 import 'package:threebotlogin/services/pkid_service.dart';
-import 'package:threebotlogin/services/socket_service.dart';
 import 'package:threebotlogin/services/tools_service.dart';
 import 'package:threebotlogin/services/shared_preference_service.dart';
 import 'package:threebotlogin/widgets/custom_dialog.dart';
 import 'package:threebotlogin/widgets/layout_drawer.dart';
-import 'package:country_picker/country_picker.dart';
 import 'package:threebotlogin/widgets/phone_widget.dart';
 
 class IdentityVerificationScreen extends StatefulWidget {
-  _IdentityVerificationScreenState createState() =>
+  const IdentityVerificationScreen({super.key});
+
+  @override
+  State<IdentityVerificationScreen> createState() =>
       _IdentityVerificationScreenState();
 }
 
@@ -52,78 +60,7 @@ class _IdentityVerificationScreenState
 
   bool emailInputValidated = false;
 
-  Map<String, Object> configObj = {
-    'open_webview': false,
-    'asyncRequest': false,
-    'captureEnabled': false,
-  };
-
-  Map<String, Object> authObject = {
-    'access_token': '',
-  };
-
-  // Default values for accessing the Shufti API
-  Map<String, Object> createdPayload = {
-    'country': '',
-    'language': 'EN',
-    'email': '',
-    'callback_url': 'http://www.example.com',
-    'redirect_url': 'https://www.dummyurl.com/',
-    'show_consent': 1,
-    'show_results': 1,
-    'show_privacy_policy': 1,
-  };
-
-  // Template for Shufti API verification object
-  Map<String, Object?> verificationObj = {
-    'face': {},
-    'background_checks': {},
-    'phone': {},
-    'document': {
-      'supported_types': [
-        'passport',
-        'id_card',
-        'driving_license',
-      ],
-      'name': {
-        'first_name': '',
-        'last_name': '',
-        'middle_name': '',
-      },
-      'dob': '',
-      'document_number': '',
-      'expiry_date': '',
-      'issue_date': '',
-      'fetch_enhanced_data': '',
-      'gender': '',
-      'backside_proof_required': '1',
-    },
-    'document_two': {
-      'supported_types': ['passport', 'id_card', 'driving_license'],
-      'name': {'first_name': '', 'last_name': '', 'middle_name': ''},
-      'dob': '',
-      'document_number': '',
-      'expiry_date': '',
-      'issue_date': '',
-      'fetch_enhanced_data': '',
-      'gender': '',
-      'backside_proof_required': '0',
-    },
-    'address': {
-      'full_address': '',
-      'name': {
-        'first_name': '',
-        'last_name': '',
-        'middle_name': '',
-        'fuzzy_match': '',
-      },
-      'supported_types': ['id_card', 'utility_bill', 'bank_statement'],
-    },
-    'consent': {
-      'supported_types': ['printed', 'handwritten'],
-      'text': 'My name is John Doe and I authorize this transaction of \$100/-',
-    },
-  };
+  double spending = 0.0;
 
   setEmailVerified() {
     if (mounted) {
@@ -203,132 +140,290 @@ class _IdentityVerificationScreenState
         }
       });
     });
-    getIdentity().then((identityMap) {
+    getIdentity().then((verificationDate) {
       setState(() {
-        if (identityMap['signedIdentityNameIdentifier'] != null) {
-          identityVerified =
-              (identityMap['signedIdentityNameIdentifier'] != null);
+        if (verificationDate['identityName'] != null) {
+          identityVerified = true;
+          setIsIdentityVerified(true);
+        } else {
+          identityVerified = false;
+          setIsIdentityVerified(false);
         }
       });
     });
+    getSpending();
   }
 
   @override
   Widget build(BuildContext context) {
     return LayoutDrawer(
       titleText: 'Identity',
-      content: Stack(
-        children: [
-          SvgPicture.asset(
-            'assets/bg.svg',
-            alignment: Alignment.center,
-            width: MediaQuery.of(context).size.width,
-            height: MediaQuery.of(context).size.height,
-          ),
-          FutureBuilder(
-            future: getEmail(),
-            builder: (ctx, snapshot) {
-              if (snapshot.connectionState == ConnectionState.done) {
-                if (isLoading) {
-                  return _pleaseWait();
-                }
+      content: FutureBuilder(
+        future: getEmail(),
+        builder: (ctx, snapshot) {
+          if (snapshot.connectionState == ConnectionState.done) {
+            if (isLoading) {
+              return _pleaseWait();
+            }
 
-                return Column(
-                  mainAxisSize: MainAxisSize.max,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.all(15),
-                      child: Column(
-                        children: [
-                          AnimatedBuilder(
-                              animation: Listenable.merge([
-                                Globals().emailVerified,
-                                Globals().phoneVerified,
-                                Globals().identityVerified
-                              ]),
-                              builder: (BuildContext context, _) {
-                                return Column(
-                                  children: [
-                                    // Step one: verify email
-                                    _fillCard(
-                                        getCorrectState(1, emailVerified,
+            return Column(
+              mainAxisSize: MainAxisSize.max,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(15),
+                  child: Column(
+                    children: [
+                      AnimatedBuilder(
+                          animation: Listenable.merge([
+                            Globals().emailVerified,
+                            Globals().phoneVerified,
+                            Globals().identityVerified
+                          ]),
+                          builder: (BuildContext context, _) {
+                            return Column(
+                              children: [
+                                // Step one: verify email
+                                _fillCard(
+                                    getCorrectState(1, emailVerified,
+                                        phoneVerified, identityVerified),
+                                    1,
+                                    email,
+                                    Icons.email),
+
+                                // Step two: verify phone
+                                (Globals().phoneVerification == true ||
+                                        (Globals().spendingLimit > 0 &&
+                                            spending > Globals().spendingLimit))
+                                    ? _fillCard(
+                                        getCorrectState(2, emailVerified,
                                             phoneVerified, identityVerified),
-                                        1,
-                                        email,
-                                        Icons.email),
+                                        2,
+                                        phone,
+                                        Icons.phone)
+                                    : Container(),
 
-                                    // Step two: verify phone
-                                    Globals().phoneVerification == true
-                                        ? _fillCard(
-                                            getCorrectState(
-                                                2,
-                                                emailVerified,
-                                                phoneVerified,
-                                                identityVerified),
-                                            2,
-                                            phone,
-                                            Icons.phone)
-                                        : Container(),
+                                // Step three: verify identity
+                                (Globals().isOpenKYCEnabled ||
+                                        (Globals().spendingLimit > 0 &&
+                                            spending > Globals().spendingLimit))
+                                    ? _fillCard(
+                                        getCorrectState(3, emailVerified,
+                                            phoneVerified, identityVerified),
+                                        3,
+                                        extract3Bot(doubleName),
+                                        Icons.perm_identity)
+                                    : Container(),
 
-                                    // Step three: verify identity
-                                    Globals().isOpenKYCEnabled
-                                        ? _fillCard(
-                                            getCorrectState(
-                                                3,
-                                                emailVerified,
-                                                phoneVerified,
-                                                identityVerified),
-                                            3,
-                                            extract3Bot(doubleName),
-                                            Icons.perm_identity)
-                                        : Container(),
+                                Globals().redoIdentityVerification &&
+                                        identityVerified == true
+                                    ? ElevatedButton(
+                                        onPressed: () async {
+                                          await verifyIdentityProcess();
+                                        },
+                                        child: const Text(
+                                            'Redo identity verification'))
+                                    : Container(),
+                                Globals().debugMode == true
+                                    ? ElevatedButton(
+                                        onPressed: () async {
+                                          bool? isEmailVerified =
+                                              await getIsEmailVerified();
+                                          bool? isPhoneVerified =
+                                              await getIsPhoneVerified();
+                                          bool? isIdentityVerified =
+                                              await getIsIdentityVerified();
 
-                                    Globals().redoIdentityVerification &&
-                                            identityVerified == true
-                                        ? ElevatedButton(
-                                            onPressed: () async {
-                                              await verifyIdentityProcess();
-                                            },
-                                            child: const Text(
-                                                'Redo identity verification'))
-                                        : Container(),
-                                    Globals().debugMode == true
-                                        ? ElevatedButton(
-                                            onPressed: () async {
-                                              bool? isEmailVerified =
-                                                  await getIsEmailVerified();
-                                              bool? isPhoneVerified =
-                                                  await getIsPhoneVerified();
-                                              bool? isIdentityVerified =
-                                                  await getIsIdentityVerified();
+                                          kycLogs = '';
+                                          kycLogs +=
+                                              'Email verified: $isEmailVerified\n';
+                                          kycLogs +=
+                                              'Phone verified: $isPhoneVerified\n';
+                                          kycLogs +=
+                                              'Identity verified: $isIdentityVerified\n';
 
-                                              kycLogs = '';
-                                              kycLogs +=
-                                                  'Email verified: $isEmailVerified\n';
-                                              kycLogs +=
-                                                  'Phone verified: $isPhoneVerified\n';
-                                              kycLogs +=
-                                                  'Identity verified: $isIdentityVerified\n';
+                                          setState(() {});
+                                        },
+                                        child: const Text('KYC Status'))
+                                    : Container(),
+                                Text(kycLogs),
+                              ],
+                            );
+                          })
+                    ],
+                  ),
+                )
+              ],
+            );
+          }
+          return _pleaseWait();
+        },
+      ),
+    );
+  }
 
-                                              setState(() {});
-                                            },
-                                            child: const Text('KYC Status'))
-                                        : Container(),
-                                    Text(kycLogs),
-                                  ],
-                                );
-                              })
+  termsAndConditionsDialog() {
+    bool isAccepted = false;
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext customContext) {
+        return StatefulBuilder(
+          builder: (BuildContext context, StateSetter setState) {
+            return CustomDialog(
+              title: 'Terms and Conditions',
+              type: DialogType.Info,
+              image: Icons.info,
+              widgetDescription: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    SizedBox(height: MediaQuery.of(context).size.height * 0.01),
+                    RichText(
+                      text: TextSpan(
+                        text:
+                            "As part of the verification process, we utilize iDenfy to verify your identity. Please ensure you review iDenfy's ",
+                        style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                              color: Theme.of(context).colorScheme.onSurface,
+                            ),
+                        children: [
+                          TextSpan(
+                            text: 'Security and Compliance',
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodyMedium!
+                                .copyWith(
+                                  fontWeight: FontWeight.bold,
+                                  color:
+                                      Theme.of(context).colorScheme.onSurface,
+                                ),
+                          ),
+                          TextSpan(
+                            text: ', which include their ',
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodyMedium!
+                                .copyWith(
+                                  color:
+                                      Theme.of(context).colorScheme.onSurface,
+                                ),
+                          ),
+                          TextSpan(
+                            text: 'Terms & Conditions, Privacy Policy,',
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodyMedium!
+                                .copyWith(
+                                  fontWeight: FontWeight.bold,
+                                  color:
+                                      Theme.of(context).colorScheme.onSurface,
+                                ),
+                          ),
+                          TextSpan(
+                            text: ' and other relevant documents.',
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodyMedium!
+                                .copyWith(
+                                  color:
+                                      Theme.of(context).colorScheme.onSurface,
+                                ),
+                          )
+                          //
                         ],
                       ),
+                    ),
+                    Row(
+                      children: [
+                        Checkbox(
+                          value: isAccepted,
+                          onChanged: (bool? value) {
+                            setState(() {
+                              isAccepted = value ?? false;
+                            });
+                          },
+                        ),
+                        Expanded(
+                          child: RichText(
+                            text: TextSpan(
+                              text: 'I have read and agreed to ',
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodyMedium!
+                                  .copyWith(
+                                    color:
+                                        Theme.of(context).colorScheme.onSurface,
+                                  ),
+                              children: [
+                                TextSpan(
+                                  text: 'iDenfy Terms and Conditions.',
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .bodyMedium!
+                                      .copyWith(
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .primary,
+                                        decoration: TextDecoration.underline,
+                                      ),
+                                  recognizer: TapGestureRecognizer()
+                                    ..onTap = () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => const WebView(
+                                            url:
+                                                'https://www.idenfy.com/security/',
+                                            title:
+                                                'iDenfy Terms and Conditions',
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                ),
+                                TextSpan(
+                                  text: '.',
+                                  style: Theme.of(context).textTheme.bodyMedium,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
                     )
                   ],
-                );
-              }
-              return _pleaseWait();
-            },
-          ),
-        ],
-      ),
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.pop(customContext);
+                  },
+                  child: const Text('Cancel'),
+                ),
+                TextButton(
+                  onPressed: isAccepted
+                      ? () async {
+                          Navigator.pop(customContext);
+                          await verifyIdentityProcess();
+                        }
+                      : null,
+                  child: Text(
+                    'Continue',
+                    style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                          color: isAccepted
+                              ? Theme.of(context).colorScheme.primary
+                              : Theme.of(context).disabledColor,
+                        ),
+                  ),
+                ),
+              ],
+            );
+          },
+        );
+      },
     );
   }
 
@@ -337,7 +432,8 @@ class _IdentityVerificationScreenState
       context: context,
       barrierDismissible: false,
       builder: (BuildContext customContext) => CustomDialog(
-        image: Icons.info,
+        type: DialogType.Warning,
+        image: Icons.warning,
         title: 'Are you sure',
         description: 'Are you sure you want to exit the verification process',
         actions: <Widget>[
@@ -345,11 +441,16 @@ class _IdentityVerificationScreenState
             child: const Text('No'),
             onPressed: () async {
               Navigator.pop(customContext);
-              showCountryPopup();
             },
           ),
           TextButton(
-            child: const Text('Yes'),
+            child: Text(
+              'Yes',
+              style: Theme.of(context)
+                  .textTheme
+                  .bodyMedium!
+                  .copyWith(color: Theme.of(context).colorScheme.warning),
+            ),
             onPressed: () async {
               Navigator.pop(customContext);
               setState(() {
@@ -362,141 +463,177 @@ class _IdentityVerificationScreenState
     );
   }
 
-  void showCountryPopup() {
-    return showCountryPicker(
-      onClosed: () {
-        if (createdPayload['country'] == '') {
-          showAreYouSureToExitDialog();
-        }
-      },
-      context: context,
-      showPhoneCode:
-          false, // optional. Shows phone code before the country name.
-      onSelect: (Country country) async {
-        setState(() {
-          createdPayload['country'] = country.countryCode;
-        });
-
-        print('Select country: ${country.displayName}');
-
-        String r = await ShuftiproSdk.sendRequest(
-            authObject: authObject,
-            createdPayload: createdPayload,
-            configObject: configObj);
-
-        print('Receiving response');
-        debugPrint(r);
-
-        await handleShuftiCallBack(r);
-      },
-    );
-  }
-
-  Future<void> handleShuftiCallBack(String res) async {
+  Future<void> initIdenfySdk(String token) async {
+    IdenfyIdentificationResult? idenfySDKresult;
     try {
-      if (!isJson(res)) {
-        String resData = res.toString();
-
-        if (resData.contains('verification_process_closed')) {
-          return showDialog(
-            context: context,
-            barrierDismissible: false,
-            builder: (BuildContext dialogContext) => CustomDialog(
-              image: Icons.close,
-              title: 'Request canceled',
-              description: 'Verification process has been canceled.',
-              actions: [
-                TextButton(
-                    onPressed: () {
-                      Navigator.pop(dialogContext);
-                    },
-                    child: const Text('OK'))
-              ],
-            ),
-          );
-        }
-
-        if (resData.contains('internet.connection.problem')) {
-          return showDialog(
-            context: context,
-            barrierDismissible: false,
-            builder: (BuildContext dialogContext) => CustomDialog(
-              image: Icons.close,
-              title: 'Request canceled',
-              description:
-                  'Please make sure your internet connection is stable.',
-              actions: [
-                TextButton(
-                    onPressed: () {
-                      Navigator.pop(dialogContext);
-                    },
-                    child: const Text('OK'))
-              ],
-            ),
-          );
-        }
-      }
-
-      // Close your eyes for one second
-      String bodyText = res.split('body=')[1].split(', verification_url')[0];
-      Map<String, dynamic> data = jsonDecode(bodyText);
-
-      switch (data['event']) {
-        // AUTHORIZATION IS WRONG
-        case 'request.unauthorized':
-          {
-            Events().emit(IdentityCallbackEvent(type: 'unauthorized'));
-            break;
-          }
-        // NO BALANCE
-        case 'request.invalid':
-        // DECLINED
-        case 'verification.declined':
-        // TIME OUT
-        case 'request.timeout':
-          {
-            Events().emit(IdentityCallbackEvent(type: 'failed'));
-            break;
-          }
-
-        // ACCEPTED
-        case 'verification.accepted':
-          {
-            await verifyIdentity(reference);
-            await identityVerification(reference).then((value) {
-              if (value == null) {
-                return Events().emit(IdentityCallbackEvent(type: 'failed'));
-              }
-              Events().emit(IdentityCallbackEvent(type: 'success'));
-            });
-            break;
-          }
-        default:
-          {
-            return;
-          }
-      }
+      idenfySDKresult = await IdenfySdkFlutter.start(token);
     } catch (e) {
-      print(e);
-    } finally {
-      dispose();
+      logger.e(e);
+      if (context.mounted) {
+        showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (BuildContext dialogContext) => CustomDialog(
+            type: DialogType.Error,
+            image: Icons.close,
+            title: 'Error',
+            description:
+                'Something went wrong. Please contact support if this issue persists.',
+            actions: [
+              TextButton(
+                  onPressed: () {
+                    Navigator.pop(dialogContext);
+                  },
+                  child: const Text('Close'))
+            ],
+          ),
+        );
+      }
+    }
+    await Future.delayed(const Duration(seconds: 5));
+    if (idenfySDKresult != null &&
+        idenfySDKresult.autoIdentificationStatus !=
+            AutoIdentificationStatus.UNVERIFIED) {
+      await handleIdenfyResponse();
     }
   }
 
+  Future<void> handleIdenfyResponse() async {
+    VerificationStatus verificationStatus;
+    try {
+      verificationStatus = await getVerificationStatus();
+    } catch (e) {
+      setState(() {
+        isLoading = false;
+      });
+      logger.e(e);
+      return showDialog(
+        context: context,
+        builder: (BuildContext context) => CustomDialog(
+          type: DialogType.Error,
+          image: Icons.error,
+          title: 'Error',
+          description:
+              'Failed to get the verification status. \nIf this issue persist, please contact support.',
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Close'),
+              onPressed: () {
+                Navigator.pop(context);
+              },
+            ),
+          ],
+        ),
+      );
+    }
+    if (verificationStatus.status == VerificationState.VERIFIED) {
+      identityVerified = true;
+      setIsIdentityVerified(true);
+      Globals().identityVerified.value = true;
+      try {
+        final data = await getVerificationData();
+        final firstName = utf8.decode(latin1.encode(data.orgFirstName!));
+        final lastName = utf8.decode(latin1.encode(data.orgLastName!));
+        await saveIdentity('$lastName $firstName', data.docIssuingCountry,
+            data.docDob, data.docSex, data.idenfyRef);
+        Events().emit(IdentityCallbackEvent(type: 'success'));
+      } on BadRequest catch (e) {
+        setState(() {
+          isLoading = false;
+        });
+        return showDialog(
+            context: context,
+            builder: (BuildContext context) => CustomDialog(
+                  type: DialogType.Warning,
+                  image: Icons.warning,
+                  title: 'Bad Request',
+                  description:
+                      '$e \nIf this issue persist, please contact support.',
+                  actions: <Widget>[
+                    TextButton(
+                      child: const Text('Close'),
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                    ),
+                  ],
+                ));
+      } on Unauthorized catch (e) {
+        setState(() {
+          isLoading = false;
+        });
+        return showDialog(
+            context: context,
+            builder: (BuildContext context) => CustomDialog(
+                  type: DialogType.Warning,
+                  image: Icons.warning,
+                  title: 'Unauthorized',
+                  description:
+                      '$e \nIf this issue persist, please contact support.',
+                  actions: <Widget>[
+                    TextButton(
+                      child: const Text('Close'),
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                    ),
+                  ],
+                ));
+      } catch (e) {
+        setState(() {
+          isLoading = false;
+        });
+        logger.e(e);
+        return showDialog(
+          context: context,
+          builder: (BuildContext context) => CustomDialog(
+            type: DialogType.Error,
+            image: Icons.error,
+            title: 'Error',
+            description:
+                'Failed to process the verification details. \nIf this issue persist, please contact support.',
+            actions: <Widget>[
+              TextButton(
+                child: const Text('Close'),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              ),
+            ],
+          ),
+        );
+      }
+    } else {
+      identityVerified = false;
+      setIsIdentityVerified(false);
+      Globals().identityVerified.value = false;
+      Events().emit(IdentityCallbackEvent(type: 'failed'));
+    }
+    setState(() {});
+  }
+
   Widget _pleaseWait() {
-    return const Dialog(
+    return Dialog(
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          SizedBox(
+          const SizedBox(
             height: 10,
           ),
-          CircularProgressIndicator(),
-          SizedBox(
+          CircularProgressIndicator(
+            color: Theme.of(context).colorScheme.primary,
+          ),
+          const SizedBox(
             height: 10,
           ),
-          Text('One moment please'),
-          SizedBox(
+          Text(
+            'One moment please',
+            style: Theme.of(context)
+                .textTheme
+                .bodyMedium!
+                .copyWith(color: Theme.of(context).colorScheme.onSurface),
+          ),
+          const SizedBox(
             height: 10,
           ),
         ],
@@ -511,19 +648,27 @@ class _IdentityVerificationScreenState
       builder: (BuildContext context) {
         return WillPopScope(
           onWillPop: () => Future.value(false),
-          child: const Dialog(
+          child: Dialog(
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                SizedBox(
+                const SizedBox(
                   height: 10,
                 ),
-                CircularProgressIndicator(),
-                SizedBox(
+                CircularProgressIndicator(
+                  color: Theme.of(context).colorScheme.primary,
+                ),
+                const SizedBox(
                   height: 10,
                 ),
-                Text('One moment please'),
-                SizedBox(
+                Text(
+                  'One moment please',
+                  style: Theme.of(context)
+                      .textTheme
+                      .bodyMedium!
+                      .copyWith(color: Theme.of(context).colorScheme.onSurface),
+                ),
+                const SizedBox(
                   height: 10,
                 ),
               ],
@@ -575,15 +720,17 @@ class _IdentityVerificationScreenState
                   width: 30.0,
                   height: 30.0,
                   decoration: BoxDecoration(
-                      border: Border.all(color: Colors.blue, width: 2),
+                      border: Border.all(
+                          color: Theme.of(context).colorScheme.primary,
+                          width: 2),
                       shape: BoxShape.circle,
-                      color: Colors.white),
+                      color: Theme.of(context).colorScheme.surface),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text('0$step',
-                          style: const TextStyle(
-                              color: Colors.blue,
+                          style: TextStyle(
+                              color: Theme.of(context).colorScheme.primary,
                               fontWeight: FontWeight.bold,
                               fontSize: 12))
                     ],
@@ -593,7 +740,6 @@ class _IdentityVerificationScreenState
                 Icon(
                   icon,
                   size: 20,
-                  color: Colors.black,
                 ),
                 const Padding(padding: EdgeInsets.only(left: 15)),
                 Flexible(
@@ -606,8 +752,14 @@ class _IdentityVerificationScreenState
                             child: Text(
                               text == '' ? 'Unknown' : text,
                               overflow: TextOverflow.clip,
-                              style: const TextStyle(
-                                  fontSize: 12.0, fontWeight: FontWeight.bold),
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodySmall!
+                                  .copyWith(
+                                      fontWeight: FontWeight.bold,
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onSurface),
                             ),
                           )
                         ],
@@ -615,18 +767,18 @@ class _IdentityVerificationScreenState
                       const SizedBox(
                         height: 5,
                       ),
-                      const Row(
+                      Row(
                         children: <Widget>[
                           Icon(
                             Icons.close,
-                            color: Colors.red,
+                            color: Theme.of(context).colorScheme.error,
                             size: 18.0,
                           ),
-                          Padding(padding: EdgeInsets.only(left: 5)),
+                          const Padding(padding: EdgeInsets.only(left: 5)),
                           Text(
                             'Not verified',
                             style: TextStyle(
-                                color: Colors.red,
+                                color: Theme.of(context).colorScheme.error,
                                 fontWeight: FontWeight.bold,
                                 fontSize: 12),
                           )
@@ -677,12 +829,13 @@ class _IdentityVerificationScreenState
           }
         },
         child: Container(
-          decoration: const BoxDecoration(
+          decoration: BoxDecoration(
               border: Border(
-                  left: BorderSide(color: Colors.blue, width: 5),
-                  right: BorderSide(color: Colors.grey, width: 0.5),
-                  bottom: BorderSide(color: Colors.grey, width: 0.5),
-                  top: BorderSide(color: Colors.grey, width: 0.5))),
+                  left: BorderSide(
+                      color: Theme.of(context).colorScheme.primary, width: 5),
+                  right: const BorderSide(color: Colors.grey, width: 0.5),
+                  bottom: const BorderSide(color: Colors.grey, width: 0.5),
+                  top: const BorderSide(color: Colors.grey, width: 0.5))),
           height: 75,
           width: MediaQuery.of(context).size.width * 100,
           child: Row(
@@ -692,15 +845,16 @@ class _IdentityVerificationScreenState
                 width: 30.0,
                 height: 30.0,
                 decoration: BoxDecoration(
-                    border: Border.all(color: Colors.blue, width: 2),
+                    border: Border.all(
+                        color: Theme.of(context).colorScheme.primary, width: 2),
                     shape: BoxShape.circle,
-                    color: Colors.white),
+                    color: Theme.of(context).colorScheme.surface),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text('0$step',
-                        style: const TextStyle(
-                            color: Colors.blue,
+                        style: TextStyle(
+                            color: Theme.of(context).colorScheme.primary,
                             fontWeight: FontWeight.bold,
                             fontSize: 12))
                   ],
@@ -710,7 +864,6 @@ class _IdentityVerificationScreenState
               Icon(
                 icon,
                 size: 20,
-                color: Colors.black,
               ),
               const Padding(padding: EdgeInsets.only(left: 10)),
               Row(
@@ -742,9 +895,14 @@ class _IdentityVerificationScreenState
                                       child: Text(
                                         text == '' ? 'Unknown' : text,
                                         overflow: TextOverflow.clip,
-                                        style: const TextStyle(
-                                            fontSize: 12.0,
-                                            fontWeight: FontWeight.bold),
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .bodySmall!
+                                            .copyWith(
+                                                fontWeight: FontWeight.bold,
+                                                color: Theme.of(context)
+                                                    .colorScheme
+                                                    .onSurface),
                                       ),
                                     )
                                   ],
@@ -762,10 +920,14 @@ class _IdentityVerificationScreenState
                                           Text(
                                             'SMS sent, retry in ${calculateMinutes()} minute${calculateMinutes() == '1' ? '' : 's'}',
                                             overflow: TextOverflow.clip,
-                                            style: const TextStyle(
-                                                color: Colors.orange,
-                                                fontWeight: FontWeight.bold,
-                                                fontSize: 12),
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .bodySmall!
+                                                .copyWith(
+                                                    fontWeight: FontWeight.bold,
+                                                    color: Theme.of(context)
+                                                        .colorScheme
+                                                        .warning),
                                           )
                                         ],
                                       )
@@ -793,7 +955,8 @@ class _IdentityVerificationScreenState
                               // Verify identity
                               case 3:
                                 {
-                                  await verifyIdentityProcess();
+                                  termsAndConditionsDialog();
+                                  // await verifyIdentityProcess();
                                 }
                                 break;
                               default:
@@ -848,15 +1011,16 @@ class _IdentityVerificationScreenState
             Container(
               width: 30.0,
               height: 30.0,
-              decoration: const BoxDecoration(
-                  shape: BoxShape.circle, color: Colors.green),
-              child: const Column(
+              decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Theme.of(context).colorScheme.primary),
+              child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Icon(
                     Icons.check,
-                    color: Colors.white,
                     size: 15.0,
+                    color: Theme.of(context).colorScheme.onPrimary,
                   ),
                 ],
               ),
@@ -865,7 +1029,6 @@ class _IdentityVerificationScreenState
             Icon(
               icon,
               size: 20,
-              color: Colors.black,
             ),
             const Padding(padding: EdgeInsets.only(left: 15)),
             Row(
@@ -885,19 +1048,27 @@ class _IdentityVerificationScreenState
                                     MediaQuery.of(context).size.width * 0.55),
                             child: Text(text == '' ? 'Unknown' : text,
                                 overflow: TextOverflow.clip,
-                                style: const TextStyle(
-                                    fontSize: 12, fontWeight: FontWeight.bold)))
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodySmall!
+                                    .copyWith(
+                                        fontWeight: FontWeight.bold,
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .onSurface)))
                       ],
                     ),
                     const SizedBox(height: 5),
-                    const Row(
+                    Row(
                       children: [
                         Text(
                           'Verified',
-                          style: TextStyle(
-                              color: Colors.green,
-                              fontSize: 12,
-                              fontWeight: FontWeight.bold),
+                          style: Theme.of(context)
+                              .textTheme
+                              .bodySmall!
+                              .copyWith(
+                                  color: Theme.of(context).colorScheme.primary,
+                                  fontWeight: FontWeight.bold),
                         )
                       ],
                     )
@@ -906,17 +1077,17 @@ class _IdentityVerificationScreenState
                 step == 1
                     ? const Column(
                         mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(Icons.edit, size: 20, color: Colors.black)
-                        ],
+                        children: [Icon(Icons.edit, size: 20)],
                       )
                     : const Column(),
                 step == 3
                     ? const Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Icon(Icons.chevron_right,
-                              size: 20, color: Colors.black)
+                          Icon(
+                            Icons.chevron_right,
+                            size: 20,
+                          )
                         ],
                       )
                     : const Column()
@@ -934,91 +1105,142 @@ class _IdentityVerificationScreenState
       isLoading = true;
     });
 
+    Token token;
     try {
-      Response accessTokenResponse = await getShuftiAccessToken();
-      if (accessTokenResponse.statusCode == 403 ||
-          accessTokenResponse == null) {
-        setState(() {
-          isLoading = false;
-        });
-
-        return showDialog(
-            context: context,
-            builder: (BuildContext context) => CustomDialog(
-                  image: Icons.warning,
-                  title: 'Maximum requests Reached',
-                  description:
-                      'You already had 5 requests in last 24 hours. \nPlease try again in 24 hours.',
-                  actions: <Widget>[
-                    TextButton(
-                      child: const Text('Ok'),
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
-                    ),
-                  ],
-                ));
-      }
-
-      showCountryPopup();
-
-      if (accessTokenResponse.statusCode != 200) {
-        setState(() {
-          isLoading = false;
-        });
-
-        return showDialog(
-            context: context,
-            builder: (BuildContext context) => CustomDialog(
-                  image: Icons.warning,
-                  title: "Couldn't setup verification process",
-                  description:
-                      'Something went wrong. Please contact support if this issue persists.',
-                  actions: <Widget>[
-                    TextButton(
-                      child: const Text('Ok'),
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
-                    ),
-                  ],
-                ));
-      }
-
-      Map<String, dynamic> details = jsonDecode(accessTokenResponse.body);
-      authObject['access_token'] = details['access_token'];
-
-      Response identityResponse = await sendVerificationIdentity();
-      Map<String, dynamic> identityDetails = jsonDecode(identityResponse.body);
-      String verificationCode = identityDetails['verification_code'];
-
-      reference = verificationCode;
-
-      createdPayload['reference'] = reference;
-      createdPayload['document'] = verificationObj['document']!;
-      createdPayload['face'] = verificationObj['face']!;
-      createdPayload['verification_mode'] = 'image_only';
+      token = await getToken();
 
       setState(() {
         isLoading = false;
         isInIdentityProcess = true;
       });
+    } on BadRequest catch (e) {
+      setState(() {
+        isLoading = false;
+      });
+      return showDialog(
+          context: context,
+          builder: (BuildContext context) => CustomDialog(
+                type: DialogType.Warning,
+                image: Icons.warning,
+                title: 'Bad Request',
+                description:
+                    '$e \nIf this issue persist, please contact support.',
+                actions: <Widget>[
+                  TextButton(
+                    child: const Text('Close'),
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                  ),
+                ],
+              ));
+    } on Unauthorized catch (e) {
+      setState(() {
+        isLoading = false;
+      });
+      return showDialog(
+          context: context,
+          builder: (BuildContext context) => CustomDialog(
+                type: DialogType.Warning,
+                image: Icons.warning,
+                title: 'Unauthorized',
+                description:
+                    '$e \nIf this issue persist, please contact support.',
+                actions: <Widget>[
+                  TextButton(
+                    child: const Text('Close'),
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                  ),
+                ],
+              ));
+    } on TooManyRequests catch (_) {
+      setState(() {
+        isLoading = false;
+      });
+      final maxRetries = Globals().maximumKYCRetries;
+      return showDialog(
+          context: context,
+          builder: (BuildContext context) => CustomDialog(
+                type: DialogType.Warning,
+                image: Icons.warning,
+                title: 'Maximum Requests Reached',
+                description:
+                    'You already had $maxRetries requests in last 24 hours.\nPlease try again in 24 hours.',
+                actions: <Widget>[
+                  TextButton(
+                    child: const Text('Close'),
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                  ),
+                ],
+              ));
+    } on NotEnoughBalance catch (_) {
+      setState(() {
+        isLoading = false;
+      });
+      final minimumBalance = Globals().minimumTFChainBalanceForKYC;
+      return showDialog(
+          context: context,
+          builder: (BuildContext context) => CustomDialog(
+                type: DialogType.Warning,
+                image: Icons.warning,
+                title: 'Not enough balance',
+                description:
+                    'Please fund your account with at least $minimumBalance TFTs.',
+                actions: <Widget>[
+                  TextButton(
+                    child: const Text('Close'),
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                  ),
+                ],
+              ));
+    } on NoTwinId catch (_) {
+      setState(() {
+        isLoading = false;
+      });
+      return showDialog(
+          context: context,
+          builder: (BuildContext context) => CustomDialog(
+                type: DialogType.Warning,
+                image: Icons.warning,
+                title: "Account doesn't exist",
+                description:
+                    'Your account is not activated.\nPlease go to wallet section and initialize your wallet.',
+                actions: <Widget>[
+                  TextButton(
+                    child: const Text('Close'),
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                  ),
+                ],
+              ));
+    } on AlreadyVerified catch (_) {
+      setState(() {
+        isLoading = false;
+      });
+      return await handleIdenfyResponse();
     } catch (e) {
       setState(() {
         isLoading = false;
       });
-
-      print(e);
+      logger.e(e);
       return showDialog(
         context: context,
         builder: (BuildContext context) => CustomDialog(
-          image: Icons.warning,
+          type: DialogType.Error,
+          image: Icons.error,
           title: 'Failed to setup process',
           description:
-              'Something went wrong. \n If this issue persist, please contact support',
+              'Something went wrong. \nIf this issue persist, please contact support.',
           actions: <Widget>[
             TextButton(
-              child: const Text('Ok'),
+              child: const Text('Close'),
               onPressed: () {
                 Navigator.pop(context);
               },
@@ -1027,6 +1249,7 @@ class _IdentityVerificationScreenState
         ),
       );
     }
+    await initIdenfySdk(token.authToken);
   }
 
   Future<dynamic> showIdentityDetails() {
@@ -1040,9 +1263,7 @@ class _IdentityVerificationScreenState
                   if (!snapshot.hasData) {
                     return _pleaseWait();
                   }
-
-                  String name = getFullNameOfObject(
-                      jsonDecode(snapshot.data['identityName']));
+                  String name = snapshot.data['identityName'];
                   return Column(
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -1051,123 +1272,192 @@ class _IdentityVerificationScreenState
                         height: 10,
                       ),
                       Container(
-                          padding: const EdgeInsets.fromLTRB(15, 10, 15, 10),
-                          child: const Column(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 15, vertical: 10),
+                          child: Column(
                             children: [
-                              Row(
-                                children: [
-                                  Text(
-                                    'OpenKYC ID CARD',
-                                    style: TextStyle(
-                                        fontSize: 18.0,
-                                        fontWeight: FontWeight.bold),
-                                    textAlign: TextAlign.left,
-                                  ),
-                                ],
+                              Text(
+                                'ID CARD',
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .titleLarge!
+                                    .copyWith(
+                                        fontWeight: FontWeight.bold,
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .onSecondaryContainer),
+                                textAlign: TextAlign.center,
                               ),
-                              SizedBox(height: 5),
+                              const SizedBox(height: 5),
                               Row(children: [
                                 Text(
                                   'Your own personal KYC ID CARD',
-                                  style: TextStyle(
-                                      fontSize: 13, color: Colors.grey),
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .titleMedium!
+                                      .copyWith(
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .onSecondaryContainer),
                                 ),
                               ]),
                             ],
                           )),
                       Container(
-                        padding: const EdgeInsets.fromLTRB(15, 20, 15, 20),
-                        color: HexColor('#f2f5f3'),
+                        color: Theme.of(context).colorScheme.secondaryContainer,
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 15, vertical: 20),
                         child: Column(
                           children: [
                             Row(
                               children: [
                                 Text(
                                   'Full name',
-                                  style: TextStyle(
-                                    fontSize: 13,
-                                    color: HexColor('#787878'),
-                                  ),
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .bodyMedium!
+                                      .copyWith(
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .primary,
+                                      ),
                                 )
                               ],
                             ),
                             Row(
-                              children: [Text(name)],
+                              children: [
+                                Text(
+                                  name,
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .bodyMedium!
+                                      .copyWith(
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .onSecondaryContainer,
+                                      ),
+                                )
+                              ],
                             )
                           ],
                         ),
                       ),
                       Container(
-                        padding: const EdgeInsets.fromLTRB(15, 20, 15, 20),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 15, vertical: 20),
                         child: Column(
                           children: [
                             Row(
                               children: [
                                 Text(
                                   'Birthday',
-                                  style: TextStyle(
-                                    fontSize: 13,
-                                    color: HexColor('#787878'),
-                                  ),
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .bodyMedium!
+                                      .copyWith(
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .primary,
+                                      ),
                                 ),
                               ],
                             ),
                             Row(
                               children: [
-                                Text(snapshot.data['identityDOB'] != 'None'
-                                    ? snapshot.data['identityDOB']
-                                    : 'Unknown')
+                                Text(
+                                  snapshot.data['identityDOB'] != 'None'
+                                      ? snapshot.data['identityDOB']
+                                      : 'Unknown',
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .bodyMedium!
+                                      .copyWith(
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .onSecondaryContainer,
+                                      ),
+                                )
                               ],
                             )
                           ],
                         ),
                       ),
                       Container(
-                        padding: const EdgeInsets.fromLTRB(15, 20, 15, 20),
-                        color: HexColor('#f2f5f3'),
+                        color: Theme.of(context).colorScheme.secondaryContainer,
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 15, vertical: 20),
                         child: Column(
                           children: [
                             Row(
                               children: [
                                 Text(
                                   'Country',
-                                  style: TextStyle(
-                                    fontSize: 13,
-                                    color: HexColor('#787878'),
-                                  ),
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .bodyMedium!
+                                      .copyWith(
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .primary,
+                                      ),
                                 )
                               ],
                             ),
                             Row(
                               children: [
-                                Text(snapshot.data['identityCountry'] != 'None'
-                                    ? snapshot.data['identityCountry']
-                                    : 'Unknown')
+                                Text(
+                                  snapshot.data['identityCountry'] != 'None'
+                                      ? snapshot.data['identityCountry']
+                                      : 'Unknown',
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .bodyMedium!
+                                      .copyWith(
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .onSecondaryContainer,
+                                      ),
+                                )
                               ],
                             )
                           ],
                         ),
                       ),
                       Container(
-                        padding: const EdgeInsets.fromLTRB(15, 20, 15, 20),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 15, vertical: 20),
                         child: Column(
                           children: [
                             Row(
                               children: [
                                 Text(
                                   'Gender',
-                                  style: TextStyle(
-                                    fontSize: 13,
-                                    color: HexColor('#787878'),
-                                  ),
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .bodyMedium!
+                                      .copyWith(
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .primary,
+                                      ),
                                 )
                               ],
                             ),
                             Row(
                               children: [
-                                Text(snapshot.data['identityGender'] != 'None'
-                                    ? snapshot.data['identityGender']
-                                    : 'Unknown')
+                                Text(
+                                  snapshot.data['identityGender'] != 'None'
+                                      ? snapshot.data['identityGender']
+                                      : 'Unknown',
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .bodyMedium!
+                                      .copyWith(
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .onSecondaryContainer,
+                                      ),
+                                )
                               ],
                             )
                           ],
@@ -1203,7 +1493,7 @@ class _IdentityVerificationScreenState
         description: 'A verification email has been sent.',
         actions: <Widget>[
           TextButton(
-            child: const Text('Ok'),
+            child: const Text('Close'),
             onPressed: () {
               Navigator.pop(context);
             },
@@ -1226,33 +1516,54 @@ class _IdentityVerificationScreenState
           return StatefulBuilder(builder: (statefulContext, setCustomState) {
             return AlertDialog(
               title: emailWasEmpty == true
-                  ? const Text('Add email')
-                  : const Text('Change email'),
+                  ? Text(
+                      'Add email',
+                      style: Theme.of(context)
+                          .textTheme
+                          .headlineMedium!
+                          .copyWith(
+                              color: Theme.of(context).colorScheme.onSurface),
+                    )
+                  : Text('Change email',
+                      style: Theme.of(context)
+                          .textTheme
+                          .headlineMedium!
+                          .copyWith(
+                              color: Theme.of(context).colorScheme.onSurface)),
               contentPadding: const EdgeInsets.all(24),
-              content: Container(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    emailWasEmpty == true
-                        ? const Text('Please pass us your email address')
-                        : const Text(
-                            'Changing your email will require you to go through the email verification process again.'),
-                    TextField(
-                      controller: controller,
-                      decoration: InputDecoration(
-                          focusedBorder: UnderlineInputBorder(
-                            borderSide: BorderSide(
-                                color: Theme.of(context).primaryColor),
-                          ),
-                          labelText: 'Email',
-                          errorText: validEmail == true ? null : errorEmail),
-                    ),
-                    const SizedBox(
-                      height: 20,
-                    ),
-                    statusMessage
-                  ],
-                ),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  emailWasEmpty == true
+                      ? Text('Please pass us your email address',
+                          style: Theme.of(context)
+                              .textTheme
+                              .bodyLarge!
+                              .copyWith(
+                                  color:
+                                      Theme.of(context).colorScheme.onSurface))
+                      : Text(
+                          'Changing your email will require you to go through the email verification process again.',
+                          style: Theme.of(context)
+                              .textTheme
+                              .bodyLarge!
+                              .copyWith(
+                                  color:
+                                      Theme.of(context).colorScheme.onSurface)),
+                  TextField(
+                    controller: controller,
+                    style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                          color: Theme.of(context).colorScheme.onSurface,
+                        ),
+                    decoration: InputDecoration(
+                        labelText: 'Email',
+                        errorText: validEmail == true ? null : errorEmail),
+                  ),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  statusMessage
+                ],
               ),
               actions: [
                 TextButton(
@@ -1311,7 +1622,7 @@ class _IdentityVerificationScreenState
 
                         setState(() {});
                       } catch (e) {
-                        print(e);
+                        logger.e(e);
                         Navigator.pop(context);
 
                         await saveEmail(oldEmail['email']!, oldEmail['sei']);
@@ -1337,28 +1648,26 @@ class _IdentityVerificationScreenState
     FlutterPkid client = await getPkidClient();
 
     var emailPKidResult = await client.getPKidDoc('email');
-    print(emailPKidResult);
+    logger.i(emailPKidResult);
     return showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text('Change your email'),
-          content: Container(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Text('Please pass us your email address'),
-                const SizedBox(height: 16),
-                TextField(
-                  controller: changeEmailController,
-                  decoration: InputDecoration(
-                      labelText: 'Email',
-                      errorText: emailInputValidated
-                          ? null
-                          : 'Please enter a valid email'),
-                ),
-              ],
-            ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text('Please pass us your email address'),
+              const SizedBox(height: 16),
+              TextField(
+                controller: changeEmailController,
+                decoration: InputDecoration(
+                    labelText: 'Email',
+                    errorText: emailInputValidated
+                        ? null
+                        : 'Please enter a valid email'),
+              ),
+            ],
           ),
           actions: <Widget>[
             TextButton(
@@ -1486,5 +1795,34 @@ class _IdentityVerificationScreenState
     Globals().smsSentOn = DateTime.now().millisecondsSinceEpoch;
 
     phoneSendDialog(context);
+  }
+
+  Future<void> getSpending() async {
+    if (Globals().spendingLimit <= 0) return;
+    try {
+      setState(() {
+        isLoading = true;
+      });
+      spending = await getMySpending();
+    } catch (e) {
+      final loadingSpendingFailure = SnackBar(
+        content: Text(
+          'Failed to load user spending',
+          style: Theme.of(context)
+              .textTheme
+              .bodyMedium!
+              .copyWith(color: Theme.of(context).colorScheme.errorContainer),
+        ),
+        duration: const Duration(seconds: 3),
+      );
+      ScaffoldMessenger.of(context).clearSnackBars();
+      ScaffoldMessenger.of(context).showSnackBar(loadingSpendingFailure);
+      logger.e('Failed to load user spending due to $e');
+      spending = 0.0;
+    } finally {
+      setState(() {
+        isLoading = false;
+      });
+    }
   }
 }

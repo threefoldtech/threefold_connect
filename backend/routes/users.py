@@ -197,6 +197,62 @@ def set_phone_verified_handler(doublename):
     return Response("Ok")
 
 
+@ api_users.route("/update", methods=["POST"])
+def update_user():
+    body = request.get_json()
+
+    if body is None:
+        return Response('Body cannot be empty', status=400)
+
+    username = body.get('username')
+    field = body.get('field')
+    value = body.get('value')
+    if username is None or field is None or value is None:
+        return Response("Username, Field, or Value is empty", status=400)
+
+    logger.debug(f"Change {field} for user {username}")
+    user = db.get_user_by_double_name(username)
+
+    if user is None:
+        return Response("Username does not exists", status=404)
+
+    try:
+        signed_data_verification_response = verify_signed_data(username, request.headers.get('Jimber-Authorization'))
+
+        if isinstance(signed_data_verification_response, Response):
+            logger.debug("Response of verification is of instance Response, Failed to Verify.")
+            return signed_data_verification_response
+
+        db.update_user(username, field, value)
+        return Response(f"Successfully updated {field}", status=200)
+
+    except Exception as e:
+        print(e)
+        return Response("Something went wrong", status=402)
+
+@ api_users.route("/<username>", methods=["DELETE"])
+def delete_user(username):
+    logger.debug(f"delete {username}")
+    user = db.get_user_by_double_name(username)
+
+    if user is None:
+        return Response(f"Username '{username}' does not exists", status=404)
+
+    try:
+        signed_data_verification_response = verify_signed_data(username, request.headers.get('Jimber-Authorization'))
+
+        if isinstance(signed_data_verification_response, Response):
+            logger.debug("Response of verification is of instance Response, Failed to Verify.")
+            return signed_data_verification_response
+
+        db.delete_user(username)
+        return Response(f"user '{username}' has been deleted successfully", status=204)
+
+    except Exception as e:
+        print(e)
+        return Response(f"Something went wrong while deleting user '{username}'", status=402)
+
+# TODO: remove this endpoint after releasing 4.0.0 of the app
 @ api_users.route("/change-email", methods=["POST"])
 def change_email_for_user():
     body = request.get_json()

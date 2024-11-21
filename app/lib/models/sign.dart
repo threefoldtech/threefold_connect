@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:typed_data';
 
+import 'package:threebotlogin/helpers/logger.dart';
 import 'package:threebotlogin/services/crypto_service.dart';
 import 'package:threebotlogin/services/shared_preference_service.dart';
 
@@ -16,22 +17,20 @@ class Sign {
   String? redirectUrl;
   String? state;
 
-  Sign({
-    this.doubleName,
-    this.hashedDataUrl,
-    this.dataUrl,
-    this.friendlyName,
-    this.isJson,
-    this.appId,
-    this.type,
-    this.randomRoom,
-    this.redirectUrl,
-    this.state
-  });
+  Sign(
+      {this.doubleName,
+      this.hashedDataUrl,
+      this.dataUrl,
+      this.friendlyName,
+      this.isJson,
+      this.appId,
+      this.type,
+      this.randomRoom,
+      this.redirectUrl,
+      this.state});
 
   Sign.fromJson(Map<String, dynamic> json)
-      :
-        doubleName = json['doubleName'],
+      : doubleName = json['doubleName'],
         hashedDataUrl = json['dataUrlHash'],
         dataUrl = json['dataUrl'],
         friendlyName = json['friendlyName'],
@@ -43,16 +42,16 @@ class Sign {
         state = json['state'];
 
   Map<String, dynamic> toJson() => {
-        'doubleName' : doubleName,
+        'doubleName': doubleName,
         'hashedDataUrl': hashedDataUrl,
         'dataUrl': dataUrl,
         'friendlyName': friendlyName,
         'isJson': isJson,
         'appId': appId,
-        'type' : type,
-        'randomRoom' : randomRoom,
-        'redirectUrl' : redirectUrl,
-        'state' : state
+        'type': type,
+        'randomRoom': randomRoom,
+        'redirectUrl': redirectUrl,
+        'state': state
       };
 
   static Future<Sign> createAndDecryptSignObject(dynamic data) async {
@@ -62,17 +61,18 @@ class Sign {
       Uint8List pk = await getPublicKey();
       Uint8List sk = await getPrivateKey();
 
-      String encryptedSignAttempt = await decrypt(data['encryptedSignAttempt'], pk, sk);
+      String encryptedSignAttempt =
+          await decrypt(data['encryptedSignAttempt'], pk, sk);
       dynamic decryptedSignAttemptMap = jsonDecode(encryptedSignAttempt);
 
-      print('Decrypted login attempt');
-      print(decryptedSignAttemptMap);
+      logger.i('Decrypted login attempt');
+      logger.i(decryptedSignAttemptMap);
 
       decryptedSignAttemptMap['type'] = data['type'];
       signData = Sign.fromJson(decryptedSignAttemptMap);
 
-      print('This is the signData');
-      print(signData);
+      logger.i('This is the signData');
+      logger.i(signData);
     } else {
       signData = Sign.fromJson(data);
     }

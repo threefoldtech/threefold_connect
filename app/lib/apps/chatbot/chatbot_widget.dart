@@ -2,18 +2,21 @@ import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:threebotlogin/apps/chatbot/chatbot_config.dart';
 import 'package:threebotlogin/browser.dart';
+import 'package:threebotlogin/helpers/logger.dart';
 import 'package:threebotlogin/widgets/layout_drawer.dart';
 
 class ChatbotWidget extends StatefulWidget {
   final String email;
 
-  ChatbotWidget({required this.email});
+  const ChatbotWidget({super.key, required this.email});
 
   @override
-  _ChatbotState createState() => new _ChatbotState(email: this.email);
+  // ignore: library_private_types_in_public_api, no_logic_in_create_state
+  _ChatbotState createState() => _ChatbotState(email: email);
 }
 
-class _ChatbotState extends State<ChatbotWidget> with AutomaticKeepAliveClientMixin {
+class _ChatbotState extends State<ChatbotWidget>
+    with AutomaticKeepAliveClientMixin {
   InAppWebViewController? webView;
 
   ChatbotConfig config = ChatbotConfig();
@@ -23,20 +26,24 @@ class _ChatbotState extends State<ChatbotWidget> with AutomaticKeepAliveClientMi
   _ChatbotState({required this.email}) {
     iaWebview = InAppWebView(
       initialUrlRequest: URLRequest(
-          url: Uri.parse('${config.url()}$email&cache_buster=' +
-              new DateTime.now().millisecondsSinceEpoch.toString())),
+          url: Uri.parse(
+              '${config.url()}$email&cache_buster=${DateTime.now().millisecondsSinceEpoch}')),
       initialOptions: InAppWebViewGroupOptions(
           crossPlatform: InAppWebViewOptions(useShouldOverrideUrlLoading: true),
-          android: AndroidInAppWebViewOptions(supportMultipleWindows: true, useHybridComposition: true)),
+          android: AndroidInAppWebViewOptions(
+              supportMultipleWindows: true, useHybridComposition: true)),
       onWebViewCreated: (InAppWebViewController controller) {
         webView = controller;
       },
-      onCreateWindow: (InAppWebViewController controller, CreateWindowAction req) {
-        inAppBrowser.openUrlRequest(urlRequest: req.request, options: InAppBrowserClassOptions());
+      onCreateWindow:
+          (InAppWebViewController controller, CreateWindowAction req) {
+        inAppBrowser.openUrlRequest(
+            urlRequest: req.request, options: InAppBrowserClassOptions());
         return Future.value(true);
       },
-      onConsoleMessage: (InAppWebViewController controller, ConsoleMessage consoleMessage) {
-        print("CB console: " + consoleMessage.message);
+      onConsoleMessage:
+          (InAppWebViewController controller, ConsoleMessage consoleMessage) {
+        logger.i('CB console: ${consoleMessage.message}');
       },
       onLoadStart: (InAppWebViewController controller, _) {
         webView = controller;
@@ -68,11 +75,6 @@ class _ChatbotState extends State<ChatbotWidget> with AutomaticKeepAliveClientMi
       },
       onProgressChanged: (InAppWebViewController controller, int progress) {},
     );
-  }
-
-  @override
-  void initState() {
-    super.initState();
   }
 
   @override

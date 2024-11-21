@@ -1,12 +1,13 @@
 import 'package:flagsmith/flagsmith.dart';
 import 'package:threebotlogin/app_config.dart';
+import 'package:threebotlogin/helpers/logger.dart';
 import 'package:threebotlogin/services/shared_preference_service.dart';
 import 'package:threebotlogin/services/tools_service.dart';
 
 import 'globals.dart';
 
 class Flags {
-  static final Flags _singleton = new Flags._internal();
+  static final Flags _singleton = Flags._internal();
 
   late FlagsmithClient client;
 
@@ -30,7 +31,7 @@ class Flags {
       }
       await client.getFeatureFlags(reload: true);
     } catch (e) {
-      print(e);
+      logger.e(e);
       setFallbackConfigs();
       throw Exception(
           'Error in initialization in Flagsmith, please try again. If this issue persist, please contact support');
@@ -60,6 +61,30 @@ class Flags {
         await Flags().hasFlagValueByFeatureName('redo-identity-verification');
     Globals().phoneVerification =
         await Flags().hasFlagValueByFeatureName('phone-verification');
+    Globals().chainUrl =
+        (await Flags().getFlagValueByFeatureName('chain-url'))!;
+    Globals().gridproxyUrl =
+        (await Flags().getFlagValueByFeatureName('gridproxy-url'))!;
+    Globals().activationUrl =
+        (await Flags().getFlagValueByFeatureName('activation-url'))!;
+    Globals().relayUrl =
+        (await Flags().getFlagValueByFeatureName('relay-url'))!;
+    Globals().termsAndConditionsUrl =
+        (await Flags().getFlagValueByFeatureName('terms-conditions-url'))!;
+    Globals().spendingLimit = int.parse(
+        (await Flags().getFlagValueByFeatureName('spending-limit')).toString());
+    Globals().newsUrl = (await Flags().getFlagValueByFeatureName('news-url'))!;
+    Globals().idenfyServiceUrl =
+        (await Flags().getFlagValueByFeatureName('idenfy-service-url'))!;
+    Globals().maximumKYCRetries = int.parse(
+        (await Flags().getFlagValueByFeatureName('max-kyc-retries'))
+            .toString());
+    Globals().minimumTFChainBalanceForKYC = int.parse(
+        (await Flags().getFlagValueByFeatureName('min-tfchain-balance-for-kyc'))
+            .toString());
+    Globals().refreshBalance = int.parse(
+        (await Flags().getFlagValueByFeatureName('refresh-balance'))
+            .toString());
   }
 
   Future<bool> hasFlagValueByFeatureName(String name) async {
@@ -85,7 +110,7 @@ class Flags {
   Future<dynamic> setDeviceTrait(Identity user) async {
     String info = await getDeviceInfo();
     TraitWithIdentity trait =
-        new TraitWithIdentity(identity: user, key: 'device', value: info);
+        TraitWithIdentity(identity: user, key: 'device', value: info);
     return (await client.createTrait(value: trait));
   }
 

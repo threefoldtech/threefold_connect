@@ -1,19 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:threebotlogin/helpers/hex_color.dart';
 
 Widget getErrorWidget(BuildContext context, FlutterErrorDetails error) {
-  return SafeArea(
+  // logger.i(Theme.of(context).textTheme);
+  return const SafeArea(
     child: Scaffold(
-      backgroundColor: HexColor('#0f296a'),
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
           Center(
             child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Text(
-                "Oops something went wrong.",
-              ),
+              padding: EdgeInsets.all(16.0),
+              child: Text('Oops something went wrong.',
+                  style: TextStyle(color: Colors.red)),
             ),
           ),
           SizedBox(
@@ -21,11 +19,13 @@ Widget getErrorWidget(BuildContext context, FlutterErrorDetails error) {
           ),
           Center(
             child: Padding(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 16.0, vertical: 16.0),
+              padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 16.0),
               child: Text(
                 'Please restart the application. If this error persists, please contact support.',
                 textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: Colors.red,
+                ),
               ),
             ),
           ),

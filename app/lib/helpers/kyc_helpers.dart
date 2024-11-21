@@ -1,6 +1,8 @@
 import 'dart:convert';
 
 import 'package:flutter_pkid/flutter_pkid.dart';
+import 'package:threebotlogin/models/idenfy.dart';
+import 'package:threebotlogin/services/idenfy_service.dart';
 import 'package:threebotlogin/services/migration_service.dart';
 import 'package:threebotlogin/services/pkid_service.dart';
 import 'package:threebotlogin/services/tools_service.dart';
@@ -11,7 +13,7 @@ import 'globals.dart';
 Future<void> fetchPKidData() async {
   FlutterPkid client = await getPkidClient();
 
-  List<String> keyWords = ['email', 'phone', 'identity'];
+  List<String> keyWords = ['email', 'phone'];
 
   var futures = keyWords.map((keyword) async {
     var pKidResult = await client.getPKidDoc(keyword);
@@ -23,12 +25,15 @@ Future<void> fetchPKidData() async {
   var pKidResult = await Future.wait(futures);
   Map<int, dynamic> dataMap = pKidResult.asMap();
 
-  await handleKYCData(dataMap[0], dataMap[1], dataMap[2]);
+  await handleKYCData(dataMap[0], dataMap[1]);
 }
 
-Future<void> handleKYCData(Map<dynamic, dynamic> emailData,
-    Map<dynamic, dynamic> phoneData, Map<dynamic, dynamic> identityData) async {
-  await saveCorrectVerificationStates(emailData, phoneData, identityData);
+Future<void> handleKYCData(
+    Map<dynamic, dynamic> emailData, Map<dynamic, dynamic> phoneData) async {
+  final identityVerificationStatus = await getVerificationStatus();
+
+  await saveCorrectVerificationStates(
+      emailData, phoneData, identityVerificationStatus);
 
   bool? isEmailVerified = await getIsEmailVerified();
   bool? isPhoneVerified = await getIsPhoneVerified();
@@ -59,23 +64,19 @@ Future<void> handleKYCData(Map<dynamic, dynamic> emailData,
 
   if (isIdentityVerified == true) {
     Globals().identityVerified.value = true;
-    await saveIdentity(
-        jsonDecode(identityData['identityName']),
-        identityData['signedIdentityNameIdentifier'],
-        identityData['identityCountry'],
-        identityData['signedIdentityCountryIdentifier'],
-        identityData['identityDOB'],
-        identityData['signedIdentityDOBIdentifier'],
-        jsonDecode(identityData['identityDocumentMeta']),
-        identityData['signedIdentityDocumentMetaIdentifier'],
-        identityData['identityGender'],
-        identityData['signedIdentityGenderIdentifier']);
+    final data = await getVerificationData();
+    final firstName = utf8.decode(latin1.encode(data.orgFirstName!));
+    final lastName = utf8.decode(latin1.encode(data.orgLastName!));
+    await saveIdentity('$lastName $firstName', data.docIssuingCountry,
+        data.docDob, data.docSex, data.idenfyRef);
   }
 }
 
-Future<void> saveCorrectVerificationStates(Map<dynamic, dynamic> emailData,
-    Map<dynamic, dynamic> phoneData, Map<dynamic, dynamic> identityData) async {
-  if (identityData.containsKey('signedIdentityNameIdentifier')) {
+Future<void> saveCorrectVerificationStates(
+    Map<dynamic, dynamic> emailData,
+    Map<dynamic, dynamic> phoneData,
+    VerificationStatus identityVerificationStatus) async {
+  if (identityVerificationStatus.status == VerificationState.VERIFIED) {
     await setIsIdentityVerified(true);
   } else {
     await setIsIdentityVerified(false);

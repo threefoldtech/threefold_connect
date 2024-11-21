@@ -5,12 +5,15 @@ import 'package:threebotlogin/apps/news/news_events.dart';
 import 'package:threebotlogin/clipboard_hack/clipboard_hack.dart';
 import 'package:threebotlogin/events/events.dart';
 import 'package:threebotlogin/events/go_home_event.dart';
+import 'package:threebotlogin/helpers/logger.dart';
 import 'package:threebotlogin/widgets/layout_drawer.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 bool created = false;
 
 class NewsWidget extends StatefulWidget {
+  const NewsWidget({super.key});
+
   @override
   _NewsState createState() => _NewsState();
 }
@@ -19,27 +22,27 @@ class _NewsState extends State<NewsWidget> with AutomaticKeepAliveClientMixin {
   late InAppWebViewController webView;
   late InAppWebView iaWebView;
 
-  String url = "";
-  String initialEndsWith = "";
+  String url = '';
+  String initialEndsWith = '';
   double progress = 0;
   var config = NewsConfig();
 
   _back(NewsBackEvent event) async {
     Uri? url = await webView.getUrl();
-    print("URL: " + url.toString());
+    logger.i('URL: $url');
     if (url.toString().endsWith(initialEndsWith)) {
       Events().emit(GoHomeEvent());
       return;
     }
-    this.webView.goBack();
+    webView.goBack();
   }
 
   _NewsState() {
-    this.initialEndsWith = new DateTime.now().millisecondsSinceEpoch.toString();
+    initialEndsWith = DateTime.now().millisecondsSinceEpoch.toString();
     iaWebView = InAppWebView(
       initialUrlRequest: URLRequest(
           url: Uri.parse(
-              'https://news.threefold.me?cache_buster=' + initialEndsWith)),
+              'https://news.threefold.me?cache_buster=$initialEndsWith')),
       initialOptions: InAppWebViewGroupOptions(
           crossPlatform: InAppWebViewOptions(),
           android: AndroidInAppWebViewOptions(
@@ -66,7 +69,7 @@ class _NewsState extends State<NewsWidget> with AutomaticKeepAliveClientMixin {
       },
       onConsoleMessage:
           (InAppWebViewController controller, ConsoleMessage consoleMessage) {
-        print("News console: " + consoleMessage.message);
+        logger.i('News console: ${consoleMessage.message}');
       },
     );
     Events().onEvent(NewsBackEvent().runtimeType, _back);

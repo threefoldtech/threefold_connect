@@ -7,7 +7,7 @@ import 'package:threebotlogin/events/events.dart';
 import 'package:threebotlogin/events/pop_all_login_event.dart';
 import 'package:threebotlogin/helpers/block_and_run_mixin.dart';
 import 'package:threebotlogin/helpers/globals.dart';
-import 'package:threebotlogin/helpers/hex_color.dart';
+import 'package:threebotlogin/helpers/logger.dart';
 import 'package:threebotlogin/helpers/login_helpers.dart';
 import 'package:threebotlogin/models/login.dart';
 import 'package:threebotlogin/services/3bot_service.dart';
@@ -18,11 +18,12 @@ import 'package:threebotlogin/widgets/login_dialogs.dart';
 import 'package:threebotlogin/widgets/preference_dialog.dart';
 
 class LoginScreen extends StatefulWidget {
+  const LoginScreen(this.loginData, {super.key});
+
   final Login loginData;
 
-  LoginScreen(this.loginData);
-
-  _LoginScreenState createState() => _LoginScreenState();
+  @override
+  State<LoginScreen> createState() => _LoginScreenState();
 }
 
 class _LoginScreenState extends State<LoginScreen> with BlockAndRunMixin {
@@ -63,7 +64,7 @@ class _LoginScreenState extends State<LoginScreen> with BlockAndRunMixin {
     }
 
     const oneSec = Duration(seconds: 1);
-    print('Starting timer ... ');
+    logger.i('Starting timer ... ');
 
     created = widget.loginData.created;
     currentTimestamp = DateTime.now().millisecondsSinceEpoch;
@@ -111,7 +112,10 @@ class _LoginScreenState extends State<LoginScreen> with BlockAndRunMixin {
                 padding: const EdgeInsets.only(right: 24.0, left: 24.0),
                 child: Text(
                   isMobileCheck ? scopeTextMobile : scopeText,
-                  style: const TextStyle(fontSize: 14.0),
+                  style: Theme.of(context)
+                      .textTheme
+                      .bodyLarge!
+                      .copyWith(color: Theme.of(context).colorScheme.onSurface),
                   textAlign: TextAlign.center,
                 ),
               ),
@@ -186,7 +190,8 @@ class _LoginScreenState extends State<LoginScreen> with BlockAndRunMixin {
                   padding: const EdgeInsets.only(right: 24.0, left: 24.0),
                   child: Text(
                     'Attempt expires in ${(timeLeft >= 0) ? timeLeft.toString() : '0'} second(s).',
-                    style: const TextStyle(fontSize: 12),
+                    style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                        color: Theme.of(context).colorScheme.onSurface),
                     textAlign: TextAlign.center,
                   ),
                 ),
@@ -205,7 +210,6 @@ class _LoginScreenState extends State<LoginScreen> with BlockAndRunMixin {
         key: _scaffoldKey,
         appBar: AppBar(
           // automaticallyImplyLeading: false,
-          backgroundColor: Theme.of(context).primaryColor,
           title: const Text('Login'),
         ),
         body: Column(
@@ -221,11 +225,9 @@ class _LoginScreenState extends State<LoginScreen> with BlockAndRunMixin {
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: TextButton(
-                    child: Text(
-                      "It wasn't me - cancel",
-                      style:
-                          TextStyle(fontSize: 16.0, color: HexColor('#0f296a')),
-                    ),
+                    child: Text("It wasn't me - cancel",
+                        style: Theme.of(context).textTheme.bodyLarge!.copyWith(
+                            color: Theme.of(context).colorScheme.error)),
                     onPressed: () {
                       cancelIt();
                       Navigator.pop(context, false);
@@ -252,7 +254,7 @@ class _LoginScreenState extends State<LoginScreen> with BlockAndRunMixin {
       });
 
       if (selectedImageId == -1) {
-        print('No image selected');
+        logger.i('No image selected');
         return;
       }
 
@@ -262,7 +264,7 @@ class _LoginScreenState extends State<LoginScreen> with BlockAndRunMixin {
       }
 
       await sendIt(false);
-      print(context);
+      logger.i(context);
       await showWrongEmojiDialog(context);
 
       if (Navigator.canPop(context)) {
@@ -315,7 +317,7 @@ class _LoginScreenState extends State<LoginScreen> with BlockAndRunMixin {
     // If the state is not passed through the regEx
     bool stateCheck = RegExp(r'[^A-Za-z0-9]+').hasMatch(state!);
     if (stateCheck) {
-      print('States can only be alphanumeric [^A-Za-z0-9]');
+      logger.i('States can only be alphanumeric [^A-Za-z0-9]');
       return;
     }
 

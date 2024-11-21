@@ -5,6 +5,7 @@ import 'dart:typed_data';
 import 'package:crypto/crypto.dart' show sha256;
 import 'package:bip39/bip39.dart' as bip39;
 import 'package:sodium_libs/sodium_libs.dart';
+import 'package:threebotlogin/helpers/logger.dart';
 import 'package:threebotlogin/services/shared_preference_service.dart';
 import 'package:pbkdf2ns/pbkdf2ns.dart';
 import 'package:pinenacl/api.dart';
@@ -76,10 +77,10 @@ Future<bool> verifySignature(Uint8List signedMessage, Uint8List pk) async {
     Uint8List data =
         sodium.crypto.sign.open(signedMessage: signedMessage, publicKey: pk);
 
-    print(utf8.decode(data));
+    logger.i(utf8.decode(data));
     return true;
   } catch (e) {
-    print(e);
+    logger.e(e);
     return false;
   }
 }
@@ -91,8 +92,7 @@ Future<Map<String, String>> encrypt(
   Uint8List nonce = sodium.randombytes.buf(24);
 
   final secretKey = Uint8List(32);
-  TweetNaClExt.crypto_sign_ed25519_sk_to_x25519_sk(
-      secretKey, sk);
+  TweetNaClExt.crypto_sign_ed25519_sk_to_x25519_sk(secretKey, sk);
 
   Uint8List message = Uint8List.fromList(data.codeUnits);
   Uint8List encryptedData = sodium.crypto.box.easy(
@@ -114,15 +114,15 @@ Future<String> decrypt(
   Sodium sodium = await SodiumInit.init();
 
   final publicKey = Uint8List(32);
-  TweetNaClExt.crypto_sign_ed25519_pk_to_x25519_pk(
-      publicKey, pk);
+  TweetNaClExt.crypto_sign_ed25519_pk_to_x25519_pk(publicKey, pk);
 
   final secretKey = Uint8List(32);
-  TweetNaClExt.crypto_sign_ed25519_sk_to_x25519_sk(
-      secretKey, sk);
+  TweetNaClExt.crypto_sign_ed25519_sk_to_x25519_sk(secretKey, sk);
 
   Uint8List decryptedData = sodium.crypto.box.sealOpen(
-      cipherText: cipherText, publicKey: publicKey, secretKey: sodium.secureCopy(secretKey));
+      cipherText: cipherText,
+      publicKey: publicKey,
+      secretKey: sodium.secureCopy(secretKey));
   return String.fromCharCodes(decryptedData);
 }
 

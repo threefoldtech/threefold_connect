@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_pkid/flutter_pkid.dart';
 import 'package:http/http.dart';
+import 'package:intl_phone_field/countries.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
 import 'package:intl_phone_field/phone_number.dart';
 import 'package:threebotlogin/helpers/globals.dart';
@@ -35,7 +36,7 @@ phoneSendDialog(context) {
       description: 'A verification sms has been sent.',
       actions: <Widget>[
         TextButton(
-          child: const Text('Ok'),
+          child: const Text('Close'),
           onPressed: () {
             Navigator.pop(context);
           },
@@ -60,11 +61,14 @@ class PhoneAlertDialog extends StatefulWidget {
 class PhoneAlertDialogState extends State<PhoneAlertDialog> {
   bool valid = false;
   String verificationPhoneNumber = '';
+  Country _country = countries.firstWhere((element) => element.code == 'US');
 
   @override
   void initState() {
     valid = false;
     verificationPhoneNumber = '';
+    _country = countries
+        .firstWhere((element) => element.code == widget.defaultCountryCode);
     super.initState();
   }
 
@@ -88,19 +92,31 @@ class PhoneAlertDialogState extends State<PhoneAlertDialog> {
                         borderSide: BorderSide(),
                       ),
                     ),
+                    style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                        color: Theme.of(context).colorScheme.onSurface),
+                    dropdownTextStyle: Theme.of(context)
+                        .textTheme
+                        .bodyMedium!
+                        .copyWith(
+                            color: Theme.of(context).colorScheme.onSurface),
                     onChanged: (phone) {
                       PhoneNumber p = phone;
-                      RegExp regExp = RegExp(
-                        r'^(\+[0-9]{1,3}|0)[0-9]{3}( ){0,1}[0-9]{7,8}\b$',
-                        caseSensitive: false,
-                        multiLine: false,
-                      );
-
                       setState(() {
-                        valid = regExp
-                            .hasMatch(p.completeNumber.replaceAll('\n', ''));
-                        verificationPhoneNumber = p.completeNumber;
+                        if (phone.number.length >= _country.minLength &&
+                            phone.number.length <= _country.maxLength) {
+                          valid = true;
+                          verificationPhoneNumber = p.completeNumber;
+                        } else {
+                          valid = false;
+                        }
                       });
+                    },
+                    onCountryChanged: (country) {
+                      if (_country != country) {
+                        valid = false;
+                      }
+                      _country = country;
+                      setState(() {});
                     },
                   ),
                 ),
@@ -116,16 +132,8 @@ class PhoneAlertDialogState extends State<PhoneAlertDialog> {
               onPressed: () {
                 Navigator.pop(context);
               }),
-          TextButton(
-              style: ButtonStyle(
-                foregroundColor: valid
-                    ? MaterialStateProperty.all(Theme.of(context).primaryColor)
-                    : MaterialStateProperty.all(Colors.grey),
-              ),
-              onPressed: verifyButton,
-              child: valid
-                  ? const Text('Add', style: TextStyle(color: Colors.white))
-                  : const Text('Ok', style: TextStyle(color: Colors.black)))
+          if (valid)
+            TextButton(onPressed: verifyButton, child: const Text('Add'))
         ]);
   }
 

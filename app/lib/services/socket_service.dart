@@ -12,6 +12,7 @@ import 'package:threebotlogin/events/go_sign_event.dart';
 import 'package:threebotlogin/events/new_login_event.dart';
 import 'package:threebotlogin/events/phone_event.dart';
 import 'package:threebotlogin/helpers/globals.dart';
+import 'package:threebotlogin/helpers/logger.dart';
 import 'package:threebotlogin/models/login.dart';
 import 'package:threebotlogin/models/sign.dart';
 import 'package:threebotlogin/screens/authentication_screen.dart';
@@ -32,7 +33,8 @@ class BackendConnection {
   BackendConnection(this.doubleName);
 
   init() async {
-    print('Creating socket connection with $threeBotSocketUrl for $doubleName');
+    logger.i(
+        'Creating socket connection with $threeBotSocketUrl for $doubleName');
 
     socket = IO.io(threeBotSocketUrl, <String, dynamic>{
       'transports': ['websocket'],
@@ -40,10 +42,10 @@ class BackendConnection {
     });
 
     socket.on('connect', (res) {
-      print('[connect]');
+      logger.i('[connect]');
 
       socket.emit('join', {'room': doubleName.toLowerCase(), 'app': true});
-      print('Joined room: ' + doubleName.toLowerCase());
+      logger.i('Joined room: ${doubleName.toLowerCase()}');
     });
 
     socket.on('email_verification', (_) {
@@ -54,13 +56,13 @@ class BackendConnection {
     });
 
     socket.on('login', (dynamic data) async {
-      print('[login]');
-      int currentTimestamp = new DateTime.now().millisecondsSinceEpoch;
+      logger.i('[login]');
+      int currentTimestamp = DateTime.now().millisecondsSinceEpoch;
 
       if (data['created'] != null &&
           ((currentTimestamp - data['created']) / 1000) >
               Globals().loginTimeout) {
-        print('We received an expired login attempt, ignoring it.');
+        logger.i('We received an expired login attempt, ignoring it.');
         return;
       }
       Login loginData = await Login.createAndDecryptLoginObject(data);
@@ -74,16 +76,16 @@ class BackendConnection {
     });
 
     socket.on('disconnect', (_) {
-      print('disconnect');
+      logger.i('disconnect');
     });
 
     Events().onEvent(CloseSocketEvent().runtimeType, closeSocketConnection);
   }
 
   void closeSocketConnection(CloseSocketEvent event) {
-    print('Closing socket connection');
+    logger.i('Closing socket connection');
 
-    print('Leaving room: ' + doubleName);
+    logger.i('Leaving room: $doubleName');
     socket.emit('leave', {'room': doubleName});
 
     socket.clearListeners();
@@ -93,12 +95,12 @@ class BackendConnection {
   }
 
   void joinRoom(roomName) {
-    print('Joining room: ' + roomName);
+    logger.i('Joining room: ' + roomName);
     socket.emit('join', {'room': roomName, 'app': true});
   }
 
   void leaveRoom(roomName) {
-    print('Leaving room: ' + roomName);
+    logger.i('Leaving room: ' + roomName);
     socket.emit('leave', {'room': roomName});
   }
 }
@@ -118,10 +120,10 @@ Future emailVerification(BuildContext context) async {
   }
 
   Map<String, dynamic> body = jsonDecode(response.body);
-  String? signedEmailIdentifier = body["signed_email_identifier"];
+  String? signedEmailIdentifier = body['signed_email_identifier'];
 
   if (signedEmailIdentifier == null || signedEmailIdentifier.isEmpty) {
-    await saveEmail(email["email"]!, null);
+    await saveEmail(email['email']!, null);
   }
 
   var vSei = jsonDecode(
@@ -133,17 +135,17 @@ Future emailVerification(BuildContext context) async {
   }
 
   await setIsEmailVerified(true);
-  await saveEmail(vSei["email"], signedEmailIdentifier);
+  await saveEmail(vSei['email'], signedEmailIdentifier);
 
   showDialog(
     context: context,
     builder: (BuildContext context) => CustomDialog(
       image: Icons.email,
-      title: "Email verified",
-      description: "Your email has been verified!",
+      title: 'Email verified',
+      description: 'Your email has been verified!',
       actions: <Widget>[
         TextButton(
-          child: new Text("Ok"),
+          child: const Text('Close'),
           onPressed: () {
             Navigator.pop(context);
           },
@@ -167,9 +169,9 @@ Future phoneVerification(BuildContext context) async {
   }
 
   Map<String, dynamic> body = jsonDecode(response.body);
-  String? signedPhoneIdentifier = body["signed_phone_identifier"];
+  String? signedPhoneIdentifier = body['signed_phone_identifier'];
   if (signedPhoneIdentifier == null || signedPhoneIdentifier.isEmpty) {
-    await savePhone(phone["phone"]!, null);
+    await savePhone(phone['phone']!, null);
   }
 
   var vSpi = jsonDecode(
@@ -181,17 +183,17 @@ Future phoneVerification(BuildContext context) async {
   }
 
   await setIsPhoneVerified(true);
-  await savePhone(vSpi["phone"], signedPhoneIdentifier);
+  await savePhone(vSpi['phone'], signedPhoneIdentifier);
 
   showDialog(
     context: context,
     builder: (BuildContext context) => CustomDialog(
       image: Icons.phone_android,
-      title: "Phone verified",
-      description: "Your phone has been verified!",
+      title: 'Phone verified',
+      description: 'Your phone has been verified!',
       actions: <Widget>[
         TextButton(
-          child: new Text("Ok"),
+          child: const Text('Close'),
           onPressed: () {
             Navigator.pop(context);
           },
@@ -207,13 +209,14 @@ Future showIdentityMessage(BuildContext context, String type) async {
       return showDialog(
         context: context,
         builder: (BuildContext context) => CustomDialog(
+          type: DialogType.Warning,
           image: Icons.warning,
-          title: "Identity verify timed out",
+          title: 'Identity verify timed out',
           description:
-              "Your verification attempt has expired, please retry and finish the flow in under 10 minutes.",
+              'Your verification attempt has expired, please retry and finish the flow in under 10 minutes.',
           actions: <Widget>[
             TextButton(
-              child: new Text("Ok"),
+              child: const Text('Close'),
               onPressed: () {
                 Navigator.pop(context);
               },
@@ -226,13 +229,14 @@ Future showIdentityMessage(BuildContext context, String type) async {
       return showDialog(
         context: context,
         builder: (BuildContext context) => CustomDialog(
-          image: Icons.warning,
-          title: "Identity verify failed",
+          type: DialogType.Error,
+          image: Icons.error,
+          title: 'Identity verification failed',
           description:
-              "Something went wrong.\nIf this issue persist, please contact support",
+              'Something went wrong.\nIf this issue persist, please contact support',
           actions: <Widget>[
             TextButton(
-              child: new Text("Ok"),
+              child: const Text('Close'),
               onPressed: () {
                 Navigator.pop(context);
               },
@@ -246,11 +250,11 @@ Future showIdentityMessage(BuildContext context, String type) async {
       context: context,
       builder: (BuildContext context) => CustomDialog(
         image: Icons.check,
-        title: "Identity verified",
-        description: "Your identity has been verified successfully",
+        title: 'Identity verified',
+        description: 'Your identity has been verified successfully',
         actions: <Widget>[
           TextButton(
-            child: new Text("Ok"),
+            child: const Text('Close'),
             onPressed: () {
               Navigator.pop(context);
             },
@@ -259,103 +263,6 @@ Future showIdentityMessage(BuildContext context, String type) async {
       ),
     );
   }
-}
-
-Future identityVerification(String reference) async {
-  String doubleName = (await getDoubleName())!.toLowerCase();
-  Response response = await getSignedIdentityIdentifierFromOpenKYC(doubleName);
-
-  if (response.statusCode != 200) {
-    return;
-  }
-
-  Map<String, dynamic> identifiersData = json.decode(response.body);
-
-  String signedIdentityNameIdentifier =
-      identifiersData["signed_identity_name_identifier"];
-  String signedIdentityCountryIdentifier =
-      identifiersData["signed_identity_country_identifier"];
-  String signedIdentityDOBIdentifier =
-      identifiersData["signed_identity_dob_identifier"];
-  String signedIdentityDocumentMetaIdentifier =
-      identifiersData["signed_identity_document_meta_identifier"];
-  String signedIdentityGenderIdentifier =
-      identifiersData["signed_identity_gender_identifier"];
-
-  if (signedIdentityNameIdentifier.isEmpty ||
-      signedIdentityCountryIdentifier.isEmpty ||
-      signedIdentityDOBIdentifier.isEmpty ||
-      signedIdentityDocumentMetaIdentifier.isEmpty ||
-      signedIdentityGenderIdentifier.isEmpty) {
-    return;
-  }
-
-  Map<String, dynamic> identifiers = jsonDecode(
-      (await verifySignedIdentityIdentifier(
-              signedIdentityNameIdentifier,
-              signedIdentityCountryIdentifier,
-              signedIdentityDOBIdentifier,
-              signedIdentityDocumentMetaIdentifier,
-              signedIdentityGenderIdentifier,
-              reference))
-          .body);
-
-  var verifiedSignedIdentityNameIdentifier =
-      jsonDecode(identifiers["signedIdentityNameIdentifierVerified"]);
-  var verifiedSignedIdentityCountryIdentifier =
-      jsonDecode(identifiers["signedIdentityCountryIdentifierVerified"]);
-  var verifiedSignedIdentityDOBIdentifier =
-      jsonDecode(identifiers["signedIdentityDOBIdentifierVerified"]);
-  var verifiedSignedIdentityDocumentMetaIdentifier =
-      jsonDecode(identifiers["signedIdentityDocumentMetaIdentifierVerified"]);
-  var verifiedSignedIdentityGenderIdentifier =
-      jsonDecode(identifiers["signedIdentityGenderIdentifierVerified"]);
-
-  if (verifiedSignedIdentityNameIdentifier == null ||
-      verifiedSignedIdentityNameIdentifier['identifier'].toString() !=
-          doubleName) {
-    return;
-  }
-
-  if (verifiedSignedIdentityCountryIdentifier == null ||
-      verifiedSignedIdentityCountryIdentifier['identifier'].toString() !=
-          doubleName) {
-    return;
-  }
-
-  if (verifiedSignedIdentityDOBIdentifier == null ||
-      verifiedSignedIdentityDOBIdentifier['identifier'].toString() !=
-          doubleName) {
-    return;
-  }
-
-  if (verifiedSignedIdentityDocumentMetaIdentifier == null ||
-      verifiedSignedIdentityDocumentMetaIdentifier['identifier'].toString() !=
-          doubleName) {
-    return;
-  }
-
-  if (verifiedSignedIdentityGenderIdentifier == null ||
-      verifiedSignedIdentityGenderIdentifier['identifier'].toString() !=
-          doubleName) {
-    return;
-  }
-
-  await setIsIdentityVerified(true);
-
-  await saveIdentity(
-      verifiedSignedIdentityNameIdentifier['name_data'],
-      signedIdentityNameIdentifier,
-      verifiedSignedIdentityCountryIdentifier['country_data'],
-      signedIdentityCountryIdentifier,
-      verifiedSignedIdentityDOBIdentifier['dob_data'],
-      signedIdentityDOBIdentifier,
-      verifiedSignedIdentityDocumentMetaIdentifier['document_meta_data'],
-      signedIdentityDocumentMetaIdentifier,
-      verifiedSignedIdentityGenderIdentifier['gender_data'],
-      signedIdentityGenderIdentifier);
-
-  return 'Verified';
 }
 
 Future openSign(BuildContext ctx, Sign signData,
@@ -373,7 +280,7 @@ Future openSign(BuildContext ctx, Sign signData,
     ctx,
     MaterialPageRoute(
       builder: (context) => AuthenticationScreen(
-          correctPin: pin!, userMessage: "Please enter your PIN code"),
+          correctPin: pin!, userMessage: 'Please enter your PIN code'),
     ),
   );
 
@@ -418,7 +325,7 @@ Future openLogin(BuildContext ctx, Login loginData,
     MaterialPageRoute(
       builder: (context) => AuthenticationScreen(
           correctPin: pin!,
-          userMessage: "Please enter your PIN code.",
+          userMessage: 'Please enter your PIN code.',
           loginData: loginData),
     ),
   );
@@ -431,7 +338,7 @@ Future openLogin(BuildContext ctx, Login loginData,
     bool? warningScreenCompleted = await Navigator.push(
       ctx,
       MaterialPageRoute(
-        builder: (context) => WarningScreen(),
+        builder: (context) => const WarningScreen(),
       ),
     );
 

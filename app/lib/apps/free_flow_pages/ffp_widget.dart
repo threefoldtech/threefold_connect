@@ -131,7 +131,7 @@
 
 //     if (scope != null && scope.contains("\"email\":")) {
 //       scopeData['email'] = await getEmail();
-//       print("adding scope");
+//       logger.i("adding scope");
 //     }
 
 //     var data = (await encrypt(jsonEncode(scopeData), publickey, privateKey));

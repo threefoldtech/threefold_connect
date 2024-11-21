@@ -1,6 +1,11 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_svg/svg.dart';
+import 'package:flutter_pkid/flutter_pkid.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:http/http.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:threebotlogin/app_config.dart';
 import 'package:threebotlogin/apps/free_flow_pages/ffp_events.dart';
@@ -8,34 +13,36 @@ import 'package:threebotlogin/events/close_socket_event.dart';
 import 'package:threebotlogin/events/events.dart';
 import 'package:threebotlogin/helpers/environment.dart';
 import 'package:threebotlogin/helpers/globals.dart';
+import 'package:threebotlogin/main.dart';
 
 import 'package:threebotlogin/screens/authentication_screen.dart';
 import 'package:threebotlogin/screens/change_pin_screen.dart';
 import 'package:threebotlogin/screens/main_screen.dart';
 import 'package:threebotlogin/services/fingerprint_service.dart';
+import 'package:threebotlogin/services/open_kyc_service.dart';
+import 'package:threebotlogin/services/pkid_service.dart';
 import 'package:threebotlogin/services/shared_preference_service.dart';
+import 'package:threebotlogin/services/wallet_service.dart';
 import 'package:threebotlogin/widgets/custom_dialog.dart';
 import 'package:threebotlogin/widgets/layout_drawer.dart';
+import 'package:threebotlogin/providers/theme_provider.dart';
+import 'package:threebotlogin/widgets/wallets/warning_dialog.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-class PreferenceScreen extends StatefulWidget {
-  PreferenceScreen({Key? key}) : super(key: key);
+class PreferenceScreen extends ConsumerStatefulWidget {
+  const PreferenceScreen({super.key});
 
   @override
-  _PreferenceScreenState createState() => _PreferenceScreenState();
+  ConsumerState<PreferenceScreen> createState() => _PreferenceScreenState();
 }
 
-class _PreferenceScreenState extends State<PreferenceScreen> {
+class _PreferenceScreenState extends ConsumerState<PreferenceScreen> {
   // FirebaseNotificationListener _listener;
   Map email = {};
   String doubleName = '';
   String phrase = '';
   bool showAdvancedOptions = false;
-  Icon showAdvancedOptionsIcon = Icon(Icons.keyboard_arrow_down);
-
-  String emailAdress = '';
-  String phoneAdress = '';
-  String identity = '';
+  Icon showAdvancedOptionsIcon = const Icon(Icons.keyboard_arrow_down);
 
   BuildContext? preferenceContext;
   bool biometricsCheck = false;
@@ -48,6 +55,7 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
   Globals globals = Globals();
 
   MaterialColor thiscolor = Colors.green;
+  bool deleteLoading = false;
 
   @override
   void initState() {
@@ -79,117 +87,200 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final themeMode = ref.watch(themeModeNotifier);
+    bool isDarkMode;
+    if (themeMode == ThemeMode.system) {
+      final brightness =
+          SchedulerBinding.instance.platformDispatcher.platformBrightness;
+      isDarkMode = brightness == Brightness.dark;
+    } else {
+      isDarkMode = themeMode == ThemeMode.dark;
+    }
     return LayoutDrawer(
       titleText: 'Settings',
-      content: Stack(
+      content: ListView(
         children: <Widget>[
-          SvgPicture.asset(
-            'assets/bg.svg',
-            alignment: Alignment.center,
-            width: MediaQuery.of(context).size.width,
-            height: MediaQuery.of(context).size.height,
+          const ListTile(
+            title: Text('Global settings'),
           ),
-          ListView(
-            children: <Widget>[
-              ListTile(
-                title: Text("Global settings"),
-              ),
-              ListTile(
-                leading: Icon(Icons.person),
-                title: Text(doubleName),
-              ),
-              FutureBuilder(
-                future: getPhrase(),
-                builder: (context, snapshot) {
-                  if (snapshot.hasData) {
-                    return ListTile(
-                      trailing: Padding(
-                        padding: new EdgeInsets.only(right: 7.5),
-                        child: Icon(Icons.visibility),
-                      ),
-                      leading: Icon(Icons.vpn_key),
-                      title: Text("Show phrase"),
-                      onTap: () async {
-                        _showPhrase();
-                      },
-                    );
+          ListTile(
+            leading: const Icon(Icons.person),
+            title: Text(doubleName),
+          ),
+          FutureBuilder(
+            future: getPhrase(),
+            builder: (context, snapshot) {
+              if (snapshot.hasData) {
+                return ListTile(
+                  trailing: const Padding(
+                    padding: EdgeInsets.only(right: 7.5),
+                    child: Icon(Icons.visibility),
+                  ),
+                  leading: const Icon(Icons.vpn_key),
+                  title: const Text('Show phrase'),
+                  onTap: () async {
+                    _showPhrase();
+                  },
+                );
+              } else {
+                return Container();
+              }
+            },
+          ),
+          FutureBuilder(
+              future: checkBiometrics(),
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  if (snapshot.data == true) {
+                    return FutureBuilder(
+                        future: getBiometricDeviceName(),
+                        builder: (context, snapshot) {
+                          if (snapshot.hasData) {
+                            if (snapshot.data == 'Not found') {
+                              return Container();
+                            }
+                            biometricDeviceName = snapshot.data;
+                            return CheckboxListTile(
+                              secondary: biometricDeviceName == 'Face ID' ||
+                                      biometricDeviceName == 'Face unlock'
+                                  ? Image.asset(
+                                      'assets/face-id.png',
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onSurface,
+                                      height: 24.0,
+                                      width: 24.0,
+                                    )
+                                  : const Icon(Icons.fingerprint),
+                              value: finger,
+                              title: Text(snapshot.data.toString()),
+                              activeColor:
+                                  Theme.of(context).colorScheme.primary,
+                              onChanged: (bool? newValue) async {
+                                _toggleFingerprint(newValue!);
+                              },
+                            );
+                          } else {
+                            return Container();
+                          }
+                        });
                   } else {
                     return Container();
                   }
-                },
-              ),
-              FutureBuilder(
-                  future: checkBiometrics(),
-                  builder: (context, snapshot) {
-                    if (snapshot.hasData) {
-                      if (snapshot.data == true) {
-                        return FutureBuilder(
-                            future: getBiometricDeviceName(),
-                            builder: (context, snapshot) {
-                              if (snapshot.hasData) {
-                                if (snapshot.data == "Not found") {
-                                  return Container();
-                                }
-                                biometricDeviceName = snapshot.data;
-                                return CheckboxListTile(
-                                  secondary: Icon(Icons.fingerprint),
-                                  value: finger,
-                                  title: Text(snapshot.data.toString()),
-                                  activeColor:
-                                      Theme.of(context).colorScheme.secondary,
-                                  onChanged: (bool? newValue) async {
-                                    _toggleFingerprint(newValue!);
-                                  },
-                                );
-                              } else {
-                                return Container();
-                              }
-                            });
-                      } else {
-                        return Container();
-                      }
-                    } else {
-                      return Container();
-                    }
-                  }),
-              ListTile(
-                leading: Icon(Icons.lock),
-                title: Text("Change pincode"),
-                onTap: () async {
-                  _changePincode();
-                },
-              ),
-              ListTile(
-                leading: Icon(Icons.perm_device_information),
-                title: Text("Version: " + version + " - " + buildNumber),
-                onTap: () {
-                  _showVersionInfo();
-                },
-              ),
-              ListTile(
-                leading: Icon(Icons.info_outline),
-                title: Text("Terms and conditions"),
-                onTap: () async => {await _showTermsAndConds()},
-              ),
-              ExpansionTile(
-                title: Text(
-                  "Advanced settings",
-                  style: TextStyle(color: Colors.black),
+                } else {
+                  return Container();
+                }
+              }),
+          ListTile(
+            leading: const Icon(Icons.lock),
+            title: const Text('Change PIN'),
+            onTap: () async {
+              _changePincode();
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.brightness_6_outlined),
+            title: const Text('Appearance'),
+            trailing: GestureDetector(
+              onTap: () {
+                ref.read(themeModeNotifier.notifier).toggleTheme();
+              },
+              child: Container(
+                width: 40,
+                height: 20,
+                decoration: BoxDecoration(
+                  color: isDarkMode
+                      ? Colors.black
+                      : Theme.of(context).colorScheme.primary,
+                  borderRadius: BorderRadius.circular(10),
+                  boxShadow: const [
+                    BoxShadow(
+                      color: Colors.black26,
+                      blurRadius: 4,
+                      offset: Offset(2, 2),
+                    ),
+                  ],
                 ),
-                children: <Widget>[
-                  ListTile(
-                    leading: Icon(Icons.person),
-                    title: Text(
-                      "Remove Account From Device",
-                      style: TextStyle(color: Colors.red),
+                child: Stack(
+                  children: [
+                    AnimatedPositioned(
+                      duration: const Duration(milliseconds: 300),
+                      left: isDarkMode ? 20 : 0,
+                      child: Container(
+                        width: 20,
+                        height: 20,
+                        decoration: const BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: Colors.white,
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black26,
+                              blurRadius: 4,
+                              offset: Offset(2, 2),
+                            ),
+                          ],
+                        ),
+                        child: Center(
+                          child: Icon(
+                            isDarkMode
+                                ? Icons.nightlight_round
+                                : Icons.wb_sunny,
+                            color: isDarkMode
+                                ? Colors.black
+                                : Theme.of(context).colorScheme.primary,
+                            size: 14,
+                          ),
+                        ),
+                      ),
                     ),
-                    trailing: Icon(
-                      Icons.remove_circle,
-                      color: Colors.red,
-                    ),
-                    onTap: _showDialog,
-                  ),
-                ],
+                  ],
+                ),
+              ),
+            ),
+          ),
+          ListTile(
+            leading: const Icon(Icons.perm_device_information),
+            title: Text('Version: $version - $buildNumber'),
+            onTap: () {
+              _showVersionInfo();
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.info_outline),
+            title: const Text('Terms and conditions'),
+            onTap: () async => {await _showTermsAndConds()},
+          ),
+          ListTile(
+            leading: const Icon(Icons.logout_outlined),
+            title: Text(
+              'Log Out',
+              style: Theme.of(context)
+                  .textTheme
+                  .bodyLarge!
+                  .copyWith(color: Theme.of(context).colorScheme.onSurface),
+            ),
+            onTap: _showDialog,
+          ),
+          ExpansionTile(
+            title: const Text(
+              'Advanced settings',
+            ),
+            children: <Widget>[
+              ListTile(
+                leading: Icon(
+                  Icons.remove_circle,
+                  color: Theme.of(context).colorScheme.error,
+                ),
+                title: Text(
+                  'Delete Account',
+                  style: Theme.of(context)
+                      .textTheme
+                      .bodyLarge!
+                      .copyWith(color: Theme.of(context).colorScheme.error),
+                ),
+                onTap: () {
+                  _showDialog(delete: true);
+                },
               ),
             ],
           ),
@@ -206,13 +297,14 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
     showDialog(
       context: context,
       builder: (BuildContext context) => CustomDialog(
-        image: Icons.error,
-        title: "Disable Fingerprint",
+        type: DialogType.Warning,
+        image: Icons.warning,
+        title: 'Disable Fingerprint',
         description:
-            "Are you sure you want to deactivate fingerprint as authentication method?",
+            'Are you sure you want to deactivate fingerprint as authentication method?',
         actions: <Widget>[
           TextButton(
-            child: new Text("Cancel"),
+            child: const Text('Cancel'),
             onPressed: () async {
               Navigator.pop(context);
               finger = true;
@@ -221,7 +313,13 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
             },
           ),
           TextButton(
-            child: new Text("Yes"),
+            child: Text(
+              'Yes',
+              style: Theme.of(context)
+                  .textTheme
+                  .bodyMedium!
+                  .copyWith(color: Theme.of(context).colorScheme.warning),
+            ),
             onPressed: () async {
               Navigator.pop(context);
               finger = false;
@@ -234,59 +332,99 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
     );
   }
 
-  void _showDialog() {
+  void _showDialog({delete = false}) {
+    String title = 'Log Out';
+    String message = 'Are you sure you want to log out?';
+    if (delete) {
+      title = 'Are you sure?';
+      message =
+          "If you confirm, your account will be deleted. You won't be able to recover your account.";
+    }
+    preferenceContext = context;
     showDialog(
       context: context,
-      builder: (BuildContext context) => CustomDialog(
-        image: Icons.error,
-        title: "Are you sure?",
-        description:
-            "If you confirm, your account will be removed from this device. You can always recover your account with your username and phrase.",
-        actions: <Widget>[
-          TextButton(
-            child: new Text("Cancel"),
-            onPressed: () {
-              Navigator.pop(context);
-            },
-          ),
-          TextButton(
-            child: new Text("Yes"),
-            onPressed: () async {
-              // try {
-              //   String deviceID = await _listener.getToken();
-              //   removeDeviceId(deviceID);
-              // } catch (e) {}
-              Events().emit(CloseSocketEvent());
-              Events().emit(FfpClearCacheEvent());
-              bool result = await clearData();
-              if (result) {
-                Navigator.pop(context);
-                await Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) =>
-                            MainScreen(initDone: true, registered: false)));
-              } else {
-                showDialog(
-                  context: preferenceContext!,
-                  builder: (BuildContext context) => CustomDialog(
-                    title: 'Error',
-                    description:
-                        'Something went wrong when trying to remove your account.',
-                    actions: <Widget>[
-                      TextButton(
-                        child: Text('Ok'),
-                        onPressed: () {
-                          Navigator.pop(context);
-                        },
-                      )
-                    ],
+      builder: (BuildContext context) => WarningDialogWidget(
+        title: title,
+        description: message,
+        onAgree: () async {
+          deleteLoading = true;
+          setState(() {});
+          if (delete) {
+            String? pin = await getPin();
+            bool? authenticated = await Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => AuthenticationScreen(
+                    correctPin: pin!,
+                    userMessage: 'Please enter your PIN code',
                   ),
-                );
+                ));
+
+            if (authenticated == null || !authenticated) {
+              deleteLoading = false;
+              setState(() {});
+              return false;
+            }
+          }
+          Events().emit(CloseSocketEvent());
+          Events().emit(FfpClearCacheEvent());
+          bool deleted = true;
+          if (delete) {
+            try {
+              Response response = await deleteUser();
+              if (response.statusCode != HttpStatus.noContent) {
+                deleted = false;
               }
-            },
-          ),
-        ],
+            } catch (e) {
+              print('Failed to delete user due to $e');
+              deleted = false;
+            }
+            if (deleted) {
+              final seedPhrase = await getPhrase();
+              FlutterPkid client = await getPkidClient(seedPhrase: seedPhrase!);
+              await client.setPKidDoc('email', '');
+              await client.setPKidDoc('phone', '');
+              await saveWalletsToPkid([]);
+            }
+          }
+          bool result = false;
+          if (deleted) {
+            result = await clearData();
+            if (result) {
+              Navigator.pop(context);
+              await Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) =>
+                          const MainScreen(initDone: true, registered: false)));
+            }
+          }
+          if (!result || !deleted) {
+            await showDialog(
+              context: preferenceContext!,
+              builder: (BuildContext context) => CustomDialog(
+                type: DialogType.Error,
+                title: 'Error',
+                description:
+                    'Something went wrong when trying to remove your account.',
+                actions: <Widget>[
+                  TextButton(
+                    child: const Text('Close'),
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                  )
+                ],
+              ),
+            );
+            deleteLoading = false;
+            setState(() {});
+            return false;
+          }
+          deleteLoading = false;
+          setState(() {});
+          return true;
+        },
       ),
     );
   }
@@ -315,7 +453,7 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
       }
     } else {
       Navigator.pop(context);
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
         content: Text('Pin invalid'),
       ));
     }
@@ -351,7 +489,7 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
         MaterialPageRoute(
           builder: (context) => AuthenticationScreen(
             correctPin: pin!,
-            userMessage: "Please enter your PIN code",
+            userMessage: 'Please enter your PIN code',
           ),
         ));
 
@@ -361,14 +499,14 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
       showDialog(
         context: context,
         builder: (BuildContext context) => CustomDialog(
-          hiddenaction: copySeedPhrase,
-          image: Icons.create,
-          title: "Please write this down on a piece of paper",
+          hiddenAction: copySeedPhrase,
+          image: Icons.info,
+          title: 'Please write this down on a piece of paper',
           description: phrase.toString(),
           actions: <Widget>[
             // usually buttons at the bottom of the dialog
             TextButton(
-              child: new Text("Close"),
+              child: const Text('Close'),
               onPressed: () {
                 Navigator.pop(context);
                 setState(() {});
@@ -388,7 +526,7 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
       MaterialPageRoute(
         builder: (context) => AuthenticationScreen(
           correctPin: pin!,
-          userMessage: "Please enter your PIN code",
+          userMessage: 'Please enter your PIN code',
         ),
       ),
     );
@@ -412,7 +550,7 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
         MaterialPageRoute(
           builder: (context) => AuthenticationScreen(
             correctPin: pin,
-            userMessage: "Please enter your PIN code",
+            userMessage: 'Please enter your PIN code',
           ),
         ),
       );
@@ -429,16 +567,16 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
         ),
       );
 
-      if (pinChanged != null && pinChanged) {
+      if (pinChanged) {
         showDialog(
           context: context,
           builder: (BuildContext context) => CustomDialog(
             image: Icons.check,
-            title: "Success",
-            description: "Your pincode was successfully changed.",
+            title: 'Success',
+            description: 'Your pincode was successfully changed.',
             actions: <Widget>[
               TextButton(
-                child: new Text("Ok"),
+                child: const Text('Close'),
                 onPressed: () async {
                   Navigator.pop(context);
                 },
@@ -474,7 +612,7 @@ class _PreferenceScreenState extends State<PreferenceScreen> {
                 'Type: ${appConfig.environment}\nGit hash: ${appConfig.githash}\nTime: ${appConfig.time}',
             actions: <Widget>[
               TextButton(
-                child: const Text('Ok'),
+                child: const Text('Close'),
                 onPressed: () {
                   Navigator.pop(context);
                   setState(() {});

@@ -2,10 +2,13 @@ import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:open_filex/open_filex.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:threebotlogin/helpers/logger.dart';
 
 // https://www.youtube.com/watch?v=6tfBflFUO7s
 Future openFile(File? file) async {
-  OpenFilex.open(file?.path);
+  if (file != null && file.path.isNotEmpty) {
+    OpenFilex.open(file.path);
+  }
 }
 
 Future<File?> downloadFile(String url, String name) async {
@@ -22,7 +25,7 @@ Future<File?> downloadFile(String url, String name) async {
     await raf.close();
     return file;
   } catch (e) {
-    print(e);
+    logger.e(e);
     return null;
   }
 }

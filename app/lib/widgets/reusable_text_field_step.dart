@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 
 class ReuseableTextFieldStep extends StatelessWidget {
-  ReuseableTextFieldStep(
-      {required this.titleText,
+  const ReuseableTextFieldStep(
+      {super.key,
+      required this.titleText,
       required this.labelText,
       required this.focusNode,
       required this.controller,
@@ -25,22 +26,31 @@ class ReuseableTextFieldStep extends StatelessWidget {
       children: <Widget>[
         Text(
           titleText,
-          style: TextStyle(fontWeight: FontWeight.bold),
+          style: Theme.of(context).textTheme.titleMedium!.copyWith(
+              color: Theme.of(context).colorScheme.onSecondaryContainer),
         ),
         Divider(
-          height: 50,
+          height: 40,
+          color: Theme.of(context)
+              .colorScheme
+              .onSecondaryContainer
+              .withOpacity(0.2),
         ),
         Padding(
           padding: const EdgeInsets.only(top: 8.5),
           child: TextFormField(
+            style: Theme.of(context).textTheme.bodyLarge!.copyWith(
+                color: Theme.of(context).colorScheme.onSecondaryContainer,
+                decorationColor:
+                    Theme.of(context).colorScheme.onSecondaryContainer),
             focusNode: focusNode,
             autofocus: true,
             keyboardType: typeText,
             decoration: InputDecoration(
-              border: OutlineInputBorder(),
+              border: const OutlineInputBorder(),
               labelText: labelText,
               suffixText: suffixText,
-              suffixStyle: TextStyle(fontWeight: FontWeight.bold),
+              suffixStyle: const TextStyle(fontWeight: FontWeight.bold),
             ),
             controller: controller,
           ),
@@ -48,17 +58,17 @@ class ReuseableTextFieldStep extends StatelessWidget {
         Row(
           children: <Widget>[
             Padding(
-              padding: EdgeInsets.only(top: 10),
+              padding: const EdgeInsets.only(top: 10),
               child: Text(
                 errorStepperText,
-                style: TextStyle(color: Colors.red),
+                style: Theme.of(context)
+                    .textTheme
+                    .bodyMedium!
+                    .copyWith(color: Theme.of(context).colorScheme.error),
                 textAlign: TextAlign.left,
               ),
             ),
           ],
-        ),
-        Divider(
-          height: 50,
         ),
       ],
     );

@@ -6,7 +6,7 @@ import 'package:flutter_pkid/flutter_pkid.dart';
 import 'package:sodium_libs/sodium_libs.dart';
 import 'package:http/http.dart';
 import 'package:threebotlogin/helpers/kyc_helpers.dart';
-import 'package:threebotlogin/helpers/globals.dart';
+import 'package:threebotlogin/helpers/logger.dart';
 import 'package:threebotlogin/services/3bot_service.dart';
 import 'package:threebotlogin/services/crypto_service.dart';
 import 'package:threebotlogin/services/migration_service.dart';
@@ -14,11 +14,12 @@ import 'package:threebotlogin/services/pkid_service.dart';
 import 'package:threebotlogin/services/shared_preference_service.dart';
 
 class RecoverScreen extends StatefulWidget {
+  const RecoverScreen({super.key, this.recoverScreen});
+
   final Widget? recoverScreen;
 
-  RecoverScreen({Key? key, this.recoverScreen}) : super(key: key);
-
-  _RecoverScreenState createState() => _RecoverScreenState();
+  @override
+  State<RecoverScreen> createState() => _RecoverScreenState();
 }
 
 class _RecoverScreenState extends State<RecoverScreen> {
@@ -45,7 +46,8 @@ class _RecoverScreenState extends State<RecoverScreen> {
 
     Map<String, dynamic> body = json.decode(userInfoResult.body);
     if (body['publicKey'] != base64.encode(keyPair.publicKey)) {
-      throw Exception('Seed phrase does not match with $doubleName');
+      throw Exception(
+          'Seed phrase does not match with ${doubleName.replaceAll('.3bot', '')}');
     }
   }
 
@@ -56,7 +58,7 @@ class _RecoverScreenState extends State<RecoverScreen> {
       await savePublicKey(keyPair.publicKey);
 
       FlutterPkid client = await getPkidClient(seedPhrase: seedPhrase);
-      List<String> keyWords = ['email', 'phone', 'identity'];
+      List<String> keyWords = ['email', 'phone'];
 
       var futures = keyWords.map((keyword) async {
         var pKidResult = await client.getPKidDoc(keyword);
@@ -73,11 +75,11 @@ class _RecoverScreenState extends State<RecoverScreen> {
       await saveFingerprint(false);
       await saveDoubleName(doubleName);
 
-      await handleKYCData(dataMap[0], dataMap[1], dataMap[2]);
+      await handleKYCData(dataMap[0], dataMap[1]);
 
       await fixPkidMigration();
     } catch (e) {
-      print(e);
+      logger.e(e);
       throw Exception('Something went wrong');
     }
   }
@@ -91,6 +93,7 @@ class _RecoverScreenState extends State<RecoverScreen> {
     }
   }
 
+  @override
   void initState() {
     super.initState();
   }
@@ -106,8 +109,7 @@ class _RecoverScreenState extends State<RecoverScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Globals.color,
-        title: const Text('Recover Account'),
+        title: const Text('Log In'),
       ),
       body: Container(
         padding: const EdgeInsets.all(20.0),
@@ -125,20 +127,25 @@ class _RecoverScreenState extends State<RecoverScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            const Padding(
-              padding: EdgeInsets.only(bottom: 12.0),
+            Padding(
+              padding: const EdgeInsets.only(bottom: 12.0),
               child: Text(
                 'Please insert your info',
-                style: TextStyle(fontWeight: FontWeight.bold),
+                style: Theme.of(context)
+                    .textTheme
+                    .titleLarge!
+                    .copyWith(color: Theme.of(context).colorScheme.onSurface),
               ),
             ),
             Padding(
-              padding: const EdgeInsets.only(top: 8.5),
+              padding: const EdgeInsets.all(20),
               child: TextFormField(
+                  style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                      color: Theme.of(context).colorScheme.onSurface,
+                      decorationColor: Theme.of(context).colorScheme.onSurface),
                   keyboardType: TextInputType.text,
                   decoration: const InputDecoration(
-                    border: OutlineInputBorder(),
-                    labelText: 'NAME',
+                    labelText: 'Name',
                     // suffixText: '.3bot',
                     suffixStyle: TextStyle(fontWeight: FontWeight.bold),
                   ),
@@ -151,12 +158,16 @@ class _RecoverScreenState extends State<RecoverScreen> {
                   }),
             ),
             Padding(
-              padding: const EdgeInsets.only(top: 8.5),
+              padding: const EdgeInsets.all(20),
               child: TextFormField(
+                style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                    color: Theme.of(context).colorScheme.onSurface,
+                    decorationColor: Theme.of(context).colorScheme.onSurface),
                 keyboardType: TextInputType.multiline,
                 maxLines: null,
                 decoration: const InputDecoration(
-                    border: OutlineInputBorder(), labelText: 'SEED PHRASE'),
+                  labelText: 'Seed Phrase',
+                ),
                 controller: seedPhraseController,
                 validator: (String? value) {
                   if (value!.isEmpty) {
@@ -171,21 +182,16 @@ class _RecoverScreenState extends State<RecoverScreen> {
             ),
             Text(
               error,
-              style: const TextStyle(
-                  color: Colors.red, fontWeight: FontWeight.bold),
+              style: Theme.of(context).textTheme.bodyLarge!.copyWith(
+                  color: Theme.of(context).colorScheme.error,
+                  fontWeight: FontWeight.bold),
             ),
             ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Theme.of(context).primaryColor,
-                shape: const RoundedRectangleBorder(
-                  borderRadius: BorderRadius.all(Radius.circular(10)),
-                ),
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 11.0, vertical: 6.0),
-              ),
-              child: const Text(
-                'Recover Account',
-                style: TextStyle(color: Colors.white),
+              style: ElevatedButton.styleFrom(),
+              child: Text(
+                'Log In',
+                style: Theme.of(context).textTheme.bodyLarge!.copyWith(
+                    color: Theme.of(context).colorScheme.onPrimaryContainer),
               ),
               onPressed: () async {
                 setState(() {
@@ -227,7 +233,7 @@ class _RecoverScreenState extends State<RecoverScreen> {
                   // to dismiss the recovery screen.
                   Navigator.pop(context, true);
                 } catch (e) {
-                  print(e);
+                  logger.e(e);
                   Navigator.pop(context);
                   error = e.toString();
                   setState(() {});
@@ -244,19 +250,27 @@ class _RecoverScreenState extends State<RecoverScreen> {
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (BuildContext context) => const Dialog(
+      builder: (BuildContext context) => Dialog(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            SizedBox(
+            const SizedBox(
               height: 10,
             ),
-            CircularProgressIndicator(),
-            SizedBox(
+            CircularProgressIndicator(
+              color: Theme.of(context).colorScheme.primary,
+            ),
+            const SizedBox(
               height: 10,
             ),
-            Text('Loading'),
-            SizedBox(
+            Text(
+              'Loading',
+              style: Theme.of(context)
+                  .textTheme
+                  .bodyMedium!
+                  .copyWith(color: Theme.of(context).colorScheme.onSurface),
+            ),
+            const SizedBox(
               height: 10,
             ),
           ],

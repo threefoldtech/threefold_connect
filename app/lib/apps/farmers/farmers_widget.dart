@@ -10,6 +10,7 @@ import 'package:threebotlogin/clipboard_hack/clipboard_hack.dart';
 import 'package:threebotlogin/events/events.dart';
 import 'package:threebotlogin/events/go_home_event.dart';
 import 'package:threebotlogin/helpers/globals.dart';
+import 'package:threebotlogin/helpers/logger.dart';
 import 'package:threebotlogin/models/wallet_data.dart';
 import 'package:threebotlogin/screens/scan_screen.dart';
 import 'package:threebotlogin/services/shared_preference_service.dart';
@@ -18,11 +19,14 @@ import 'package:threebotlogin/widgets/layout_drawer.dart';
 bool created = false;
 
 class FarmersWidget extends StatefulWidget {
+  const FarmersWidget({super.key});
+
   @override
   _FarmersState createState() => _FarmersState();
 }
 
-class _FarmersState extends State<FarmersWidget> with AutomaticKeepAliveClientMixin {
+class _FarmersState extends State<FarmersWidget>
+    with AutomaticKeepAliveClientMixin {
   late InAppWebViewController webView;
 
   double progress = 0;
@@ -30,17 +34,16 @@ class _FarmersState extends State<FarmersWidget> with AutomaticKeepAliveClientMi
   // Still use wallet configs to have the same derived key
   var walletConfig = WalletConfig();
 
-
   late InAppWebView iaWebView;
 
   _back(FarmersBackEvent event) async {
     Uri? url = await webView.getUrl();
-    String rootUrl = Globals().farmersUrl + 'farmer';
+    String rootUrl = '${Globals().farmersUrl}farmer';
     if (url.toString() == rootUrl.toString()) {
       Events().emit(GoHomeEvent());
       return;
     }
-    this.webView.goBack();
+    webView.goBack();
   }
 
   _FarmersState() {
@@ -49,18 +52,22 @@ class _FarmersState extends State<FarmersWidget> with AutomaticKeepAliveClientMi
     iaWebView = InAppWebView(
       initialUrlRequest: URLRequest(
           url: Uri.parse(
-              farmersUri + '?cache_buster=' + new DateTime.now().millisecondsSinceEpoch.toString())),
+              '$farmersUri?cache_buster=${DateTime.now().millisecondsSinceEpoch}')),
       initialOptions: InAppWebViewGroupOptions(
           crossPlatform: InAppWebViewOptions(
-              cacheEnabled: Globals().isCacheClearedFarmer, clearCache: !Globals().isCacheClearedFarmer),
+              cacheEnabled: Globals().isCacheClearedFarmer,
+              clearCache: !Globals().isCacheClearedFarmer),
           android: AndroidInAppWebViewOptions(
-              supportMultipleWindows: true, thirdPartyCookiesEnabled: true, useHybridComposition: true),
+              supportMultipleWindows: true,
+              thirdPartyCookiesEnabled: true,
+              useHybridComposition: true),
           ios: IOSInAppWebViewOptions()),
       onWebViewCreated: (InAppWebViewController controller) {
         webView = controller;
-        this.addHandler();
+        addHandler();
       },
-      onCreateWindow: (InAppWebViewController controller, CreateWindowAction req) {
+      onCreateWindow:
+          (InAppWebViewController controller, CreateWindowAction req) {
         return Future.value(true);
       },
       onLoadStop: (InAppWebViewController controller, Uri? url) async {
@@ -74,8 +81,9 @@ class _FarmersState extends State<FarmersWidget> with AutomaticKeepAliveClientMi
           this.progress = progress / 100;
         });
       },
-      onConsoleMessage: (InAppWebViewController controller, ConsoleMessage consoleMessage) {
-        print("Wallet console: " + consoleMessage.message);
+      onConsoleMessage:
+          (InAppWebViewController controller, ConsoleMessage consoleMessage) {
+        logger.i('Wallet console: ${consoleMessage.message}');
       },
     );
 
@@ -104,34 +112,41 @@ class _FarmersState extends State<FarmersWidget> with AutomaticKeepAliveClientMi
     await SystemChannels.textInput.invokeMethod('TextInput.hide');
 
     // QRCode scanner is black if we don't sleep here.
-    bool slept = await Future.delayed(const Duration(milliseconds: 400), () => true);
+    bool slept =
+        await Future.delayed(const Duration(milliseconds: 400), () => true);
 
     String? result;
     if (slept) {
-      result = await Navigator.push(context, MaterialPageRoute(builder: (context) => ScanScreen()));
+      result = await Navigator.push(
+          context, MaterialPageRoute(builder: (context) => const ScanScreen()));
     }
 
     return result;
   }
 
   addHandler() {
-    webView.addJavaScriptHandler(handlerName: "ADD_IMPORT_WALLET", callback: saveImportedWallet);
-    webView.addJavaScriptHandler(handlerName: "ADD_APP_WALLET", callback: saveAppWallet);
-    webView.addJavaScriptHandler(handlerName: "SCAN_QR", callback: scanQrCode);
-    webView.addJavaScriptHandler(handlerName: "VUE_INITIALIZED", callback: vueInitialized);
-    webView.addJavaScriptHandler(handlerName: "SAVE_WALLETS", callback: saveWalletCallback);
+    webView.addJavaScriptHandler(
+        handlerName: 'ADD_IMPORT_WALLET', callback: saveImportedWallet);
+    webView.addJavaScriptHandler(
+        handlerName: 'ADD_APP_WALLET', callback: saveAppWallet);
+    webView.addJavaScriptHandler(handlerName: 'SCAN_QR', callback: scanQrCode);
+    webView.addJavaScriptHandler(
+        handlerName: 'VUE_INITIALIZED', callback: vueInitialized);
+    webView.addJavaScriptHandler(
+        handlerName: 'SAVE_WALLETS', callback: saveWalletCallback);
   }
 
   saveWalletCallback(List<dynamic> params) async {
     try {
       List<WalletData> walletData = [];
       for (var data in params[0]) {
-        walletData.add(WalletData(data['name'], data['chain'], data['address']));
+        walletData
+            .add(WalletData(data['name'], data['chain'], data['address']));
       }
 
       await saveWallets(walletData);
     } catch (e) {
-      print(e);
+      logger.e(e);
     }
   }
 

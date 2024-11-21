@@ -1,6 +1,7 @@
 import 'package:threebotlogin/app_config_local.dart';
 import 'package:threebotlogin/helpers/env_config.dart';
 import 'package:threebotlogin/helpers/environment.dart';
+import 'package:threebotlogin/helpers/logger.dart';
 
 import 'helpers/globals.dart';
 
@@ -71,34 +72,42 @@ abstract class AppConfigImpl {
 }
 
 class AppConfigProduction extends AppConfigImpl {
+  @override
   String baseUrl() {
-    return "login.threefold.me";
+    return 'login.threefold.me';
   }
 
+  @override
   String openKycApiUrl() {
-    return "https://openkyc.threefold.me";
+    return 'https://openkyc.threefold.me';
   }
 
+  @override
   String threeBotApiUrl() {
-    return "https://login.threefold.me/api";
+    return 'https://login.threefold.me/api';
   }
 
+  @override
   String threeBotFrontEndUrl() {
-    return "https://login.threefold.me/";
+    return 'https://login.threefold.me/';
   }
 
+  @override
   String threeBotSocketUrl() {
-    return "wss://login.threefold.me";
+    return 'wss://login.threefold.me';
   }
 
+  @override
   String wizardUrl() {
     return 'https://wizard.threefold.me/';
   }
 
+  @override
   String pKidUrl() {
     return 'https://pkid.threefold.me/v1';
   }
 
+  @override
   Map<String, String> flagSmithConfig() {
     return {
       'url': 'https://flagsmith.threefold.me/api/v1/',
@@ -108,34 +117,42 @@ class AppConfigProduction extends AppConfigImpl {
 }
 
 class AppConfigStaging extends AppConfigImpl {
+  @override
   String baseUrl() {
-    return "login.staging.threefold.me";
+    return 'login.staging.threefold.me';
   }
 
+  @override
   String openKycApiUrl() {
     return 'https://kyc.staging.threefold.me';
   }
 
+  @override
   String threeBotApiUrl() {
-    return "https://login.staging.threefold.me/api";
+    return 'https://login.staging.threefold.me/api';
   }
 
+  @override
   String threeBotFrontEndUrl() {
-    return "https://login.staging.threefold.me/";
+    return 'https://login.staging.threefold.me/';
   }
 
+  @override
   String threeBotSocketUrl() {
-    return "wss://login.staging.threefold.me";
+    return 'wss://login.staging.threefold.me';
   }
 
+  @override
   String wizardUrl() {
     return 'https://wizard.staging.threefold.me/';
   }
 
+  @override
   String pKidUrl() {
     return 'https://pkid.staging.threefold.me/v1';
   }
 
+  @override
   Map<String, String> flagSmithConfig() {
     return {
       'url': 'https://flagsmith.threefold.me/api/v1/',
@@ -145,34 +162,42 @@ class AppConfigStaging extends AppConfigImpl {
 }
 
 class AppConfigTesting extends AppConfigImpl {
+  @override
   String baseUrl() {
-    return "login.testing.threefold.me";
+    return 'login.testing.threefold.me';
   }
 
+  @override
   String openKycApiUrl() {
-    return "https://openkyc.testing.threefold.me";
+    return 'https://openkyc.testing.threefold.me';
   }
 
+  @override
   String threeBotApiUrl() {
-    return "https://login.testing.threefold.me/api";
+    return 'https://login.testing.threefold.me/api';
   }
 
+  @override
   String threeBotFrontEndUrl() {
-    return "https://login.testing.threefold.me/";
+    return 'https://login.testing.threefold.me/';
   }
 
+  @override
   String threeBotSocketUrl() {
-    return "wss://login.testing.threefold.me";
+    return 'wss://login.testing.threefold.me';
   }
 
+  @override
   String wizardUrl() {
     return 'https://wizard.staging.threefold.me/';
   }
 
+  @override
   String pKidUrl() {
     return 'https://pkid.staging.threefold.me/v1';
   }
 
+  @override
   Map<String, String> flagSmithConfig() {
     return {
       'url': 'https://flagsmith.threefold.me/api/v1/',
@@ -182,13 +207,24 @@ class AppConfigTesting extends AppConfigImpl {
 }
 
 void setFallbackConfigs() {
-  print("Can't connect to FlagSmith, setting default configs... ");
+  logger.i("Can't connect to FlagSmith, setting default configs... ");
 
   Globals().isOpenKYCEnabled = false;
+  Globals().maximumKYCRetries = 5;
+  Globals().minimumTFChainBalanceForKYC = 0;
   Globals().debugMode = false;
   Globals().useNewWallet = false;
   Globals().newWalletUrl = '';
   Globals().redoIdentityVerification = false;
   Globals().timeOutSeconds = 10;
+  Globals().refreshBalance = 10;
   Globals().phoneVerification = false;
+  Globals().chainUrl = '';
+  Globals().gridproxyUrl = '';
+  Globals().activationUrl = '';
+  Globals().relayUrl = '';
+  Globals().termsAndConditionsUrl = '';
+  Globals().spendingLimit = 0;
+  Globals().newsUrl = '';
+  Globals().idenfyServiceUrl = '';
 }

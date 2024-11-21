@@ -6,7 +6,6 @@ import 'package:flutter_pkid/flutter_pkid.dart';
 import 'package:sodium_libs/sodium_libs.dart';
 import 'package:http/http.dart';
 import 'package:threebotlogin/helpers/flags.dart';
-import 'package:threebotlogin/helpers/globals.dart';
 import 'package:threebotlogin/helpers/kyc_helpers.dart';
 import 'package:threebotlogin/services/3bot_service.dart';
 import 'package:threebotlogin/services/crypto_service.dart';
@@ -19,11 +18,12 @@ import 'package:threebotlogin/widgets/reusable_text_field_step.dart';
 import 'package:threebotlogin/widgets/reusable_text_step.dart';
 
 class MobileRegistrationScreen extends StatefulWidget {
+  const MobileRegistrationScreen({super.key, this.doubleName});
+
   final String? doubleName;
 
-  MobileRegistrationScreen({this.doubleName});
-
-  _MobileRegistrationScreenState createState() =>
+  @override
+  State<MobileRegistrationScreen> createState() =>
       _MobileRegistrationScreenState();
 }
 
@@ -52,7 +52,7 @@ class _MobileRegistrationScreenState extends State<MobileRegistrationScreen> {
   final FocusNode emailFocus = FocusNode();
   final FocusNode seedFocus = FocusNode();
 
-  RegistrationData _registrationData = RegistrationData();
+  final RegistrationData _registrationData = RegistrationData();
 
   @override
   void initState() {
@@ -65,6 +65,7 @@ class _MobileRegistrationScreenState extends State<MobileRegistrationScreen> {
     super.initState();
   }
 
+  @override
   void dispose() {
     super.dispose();
   }
@@ -101,8 +102,8 @@ class _MobileRegistrationScreenState extends State<MobileRegistrationScreen> {
       doubleNameController.text = doubleNameValue;
     });
 
-    if (doubleNameController.text != null || doubleNameController.text != '') {
-      _registrationData.doubleName = doubleNameController.text + '.3bot';
+    if (doubleNameController.text.isNotEmpty) {
+      _registrationData.doubleName = '${doubleNameController.text}.3bot';
       bool doubleNameValidation = validateDoubleName(doubleNameController.text);
       if (doubleNameValidation) {
         Response userInfoResult =
@@ -182,13 +183,14 @@ class _MobileRegistrationScreenState extends State<MobileRegistrationScreen> {
       showDialog(
         context: context,
         builder: (BuildContext context) => CustomDialog(
+          type: DialogType.Error,
           image: Icons.error,
           title: 'Error',
           description:
               'Something went wrong when trying to create your account.',
           actions: <Widget>[
             TextButton(
-              child: Text('Ok'),
+              child: const Text('Close'),
               onPressed: () {
                 Navigator.pop(context);
               },
@@ -200,7 +202,7 @@ class _MobileRegistrationScreenState extends State<MobileRegistrationScreen> {
   }
 
   initKeys() async {
-    if (_registrationData.phrase == null || _registrationData.phrase == '') {
+    if (_registrationData.phrase == '') {
       _registrationData.phrase = await generateSeedPhrase();
     }
   }
@@ -274,19 +276,26 @@ class _MobileRegistrationScreenState extends State<MobileRegistrationScreen> {
     return showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (BuildContext context) => const Dialog(
+      builder: (BuildContext context) => Dialog(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            SizedBox(
+            const SizedBox(
               height: 10,
             ),
-            CircularProgressIndicator(),
-            SizedBox(
+            CircularProgressIndicator(
+                color: Theme.of(context).colorScheme.primary),
+            const SizedBox(
               height: 10,
             ),
-            Text('Loading'),
-            SizedBox(
+            Text(
+              'Loading',
+              style: Theme.of(context)
+                  .textTheme
+                  .bodyMedium!
+                  .copyWith(color: Theme.of(context).colorScheme.onSurface),
+            ),
+            const SizedBox(
               height: 10,
             ),
           ],
@@ -296,284 +305,319 @@ class _MobileRegistrationScreenState extends State<MobileRegistrationScreen> {
   }
 
   Widget registrationStepper() {
-    return Theme(
-      data: ThemeData(
-        primaryColor: Globals.color,
-        colorScheme: ColorScheme.fromSwatch().copyWith(
-          secondary: Globals.color,
-        ),
-      ),
-      child: Stepper(
-        controlsBuilder: (BuildContext context, ControlsDetails details) {
-          return Column(
-            children: <Widget>[
-              Row(
-                mainAxisSize: MainAxisSize.max,
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    return Stepper(
+      controlsBuilder: (BuildContext context, ControlsDetails details) {
+        return Column(
+          children: <Widget>[
+            Row(
+              mainAxisSize: MainAxisSize.max,
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: <Widget>[
+                ElevatedButton(
+                  onPressed: () {
+                    details.onStepCancel!();
+                  },
+                  child: Text(
+                    state == _State.DoubleName ? 'CANCEL' : 'PREVIOUS',
+                  ),
+                ),
+                ElevatedButton(
+                  onPressed: state == _State.SeedPhrase && didWriteSeed == false
+                      ? null
+                      : () {
+                          details.onStepContinue!();
+                        },
+                  child: Text(
+                    state == _State.Finish ? 'FINISH' : 'NEXT',
+                  ),
+                )
+              ],
+            ),
+          ],
+        );
+      },
+      type: StepperType.vertical,
+      steps: [
+        Step(
+          // Ask DoubleName
+          isActive: state.index >= _State.DoubleName.index,
+          state: state.index > _State.DoubleName.index
+              ? StepState.complete
+              : state == _State.DoubleName
+                  ? StepState.editing
+                  : StepState.disabled,
+          title: Text(
+            'ThreeFold Connect Id.',
+            style: Theme.of(context)
+                .textTheme
+                .titleMedium!
+                .copyWith(color: Theme.of(context).colorScheme.onSurface),
+          ),
+          subtitle: state.index > 0
+              ? Text(
+                  doubleNameController.text,
+                  style: Theme.of(context)
+                      .textTheme
+                      .bodyMedium!
+                      .copyWith(color: Theme.of(context).colorScheme.onSurface),
+                )
+              : null,
+          content: Card(
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
-                  TextButton(
-                    style: ButtonStyle(
-                      backgroundColor: MaterialStateProperty.all(
-                          Theme.of(context).colorScheme.secondary),
-                    ),
-                    onPressed: () {
-                      details.onStepCancel!();
-                    },
-                    child: Text(
-                      state == _State.DoubleName ? 'CANCEL' : 'PREVIOUS',
-                      style: const TextStyle(color: Colors.white),
+                  Text(
+                    'Hi, please choose a ThreeFold Connect username.',
+                    style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                        color:
+                            Theme.of(context).colorScheme.onSecondaryContainer),
+                  ),
+                  Divider(
+                    height: 40,
+                    color: Theme.of(context)
+                        .colorScheme
+                        .onSecondaryContainer
+                        .withOpacity(0.2),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 8.5),
+                    child: TextFormField(
+                      style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                          color: Theme.of(context)
+                              .colorScheme
+                              .onSecondaryContainer),
+                      focusNode: nameFocus,
+                      maxLength: 50,
+                      autofocus: true,
+                      keyboardType: TextInputType.text,
+                      decoration: const InputDecoration(
+                        border: OutlineInputBorder(),
+                        labelText: 'Name',
+                        // suffixText: '.3bot',
+                        suffixStyle: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      controller: doubleNameController,
+                      inputFormatters: <TextInputFormatter>[
+                        FilteringTextInputFormatter.allow(RegExp('[a-zA-Z0-9]'))
+                      ],
+                      enableSuggestions: false,
+                      autocorrect: false,
                     ),
                   ),
-                  TextButton(
-                    style: ButtonStyle(
-                      backgroundColor: MaterialStateProperty.all(
-                          Theme.of(context).colorScheme.secondary),
-                      foregroundColor: MaterialStateProperty.all(Colors.grey),
-                    ),
-                    onPressed:
-                        state == _State.SeedPhrase && didWriteSeed == false
-                            ? null
-                            : () {
-                                details.onStepContinue!();
-                              },
-                    child: Text(
-                      state == _State.Finish ? 'FINISH' : 'NEXT',
-                      style: const TextStyle(color: Colors.white),
-                    ),
-                  )
+                  Row(
+                    children: <Widget>[
+                      Padding(
+                        padding: const EdgeInsets.only(top: 10),
+                        child: Text(
+                          errorStepperText,
+                          style: Theme.of(context)
+                              .textTheme
+                              .bodyMedium!
+                              .copyWith(
+                                  color: Theme.of(context).colorScheme.error),
+                          textAlign: TextAlign.left,
+                        ),
+                      ),
+                    ],
+                  ),
                 ],
               ),
-            ],
-          );
-        },
-        type: StepperType.vertical,
-        steps: [
-          Step(
-            // Ask DoubleName
-            isActive: state.index >= _State.DoubleName.index,
-            state: state.index > _State.DoubleName.index
-                ? StepState.complete
-                : state == _State.DoubleName
-                    ? StepState.editing
-                    : StepState.disabled,
-            title: const Text('ThreeFold Connect Id.'),
-            subtitle: state.index > 0 ? Text(doubleNameController.text) : null,
-            content: Card(
-              child: Padding(
+            ),
+          ),
+        ),
+        Step(
+          isActive: state.index >= _State.Email.index,
+          state: state.index > _State.Email.index
+              ? StepState.complete
+              : state == _State.Email
+                  ? StepState.editing
+                  : StepState.disabled,
+          title: Text(
+            'Email',
+            style: Theme.of(context).textTheme.titleMedium!.copyWith(
+                  color: state.index >= _State.Email.index
+                      ? Theme.of(context).colorScheme.onSurface
+                      : Colors.grey,
+                ),
+          ),
+          subtitle: state.index > _State.Email.index
+              ? Text(
+                  emailController.text,
+                  style: Theme.of(context)
+                      .textTheme
+                      .bodyMedium!
+                      .copyWith(color: Theme.of(context).colorScheme.onSurface),
+                )
+              : null,
+          content: Card(
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: ReuseableTextFieldStep(
+                focusNode: emailFocus,
+                titleText: 'What is your email?',
+                labelText: 'Email',
+                typeText: TextInputType.emailAddress,
+                errorStepperText: errorStepperText,
+                controller: emailController,
+              ),
+            ),
+          ),
+        ),
+        Step(
+          isActive: state.index >= _State.SeedPhrase.index,
+          state: state.index > _State.SeedPhrase.index
+              ? StepState.complete
+              : state == _State.SeedPhrase
+                  ? StepState.editing
+                  : StepState.disabled,
+          title: Text(
+            'Seed phrase',
+            style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                  color: state.index >= _State.SeedPhrase.index
+                      ? Theme.of(context).colorScheme.onSurface
+                      : Colors.grey,
+                ),
+          ),
+          content: Card(
+            child: Padding(
                 padding: const EdgeInsets.all(16.0),
                 child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    const Text(
-                      'Hi, please choose a ThreeFold Connect username.',
-                      style: TextStyle(fontWeight: FontWeight.bold),
+                  children: [
+                    ReuseableTextStep(
+                      titleText:
+                          'In order to ever retrieve your tokens in case of switching to a device or app, you will have to enter your seedphrase in combination with your TF Connect username. \n\nPlease write this seedphrase and your username on a piece of paper and keep it in a secure place. Do not communicate this key to anyone. ThreeFold can not be held responsible in case of loss of this seedphrase.',
+                      extraText: _registrationData.phrase,
+                      errorStepperText: errorStepperText,
                     ),
-                    const Divider(
-                      height: 50,
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(top: 8.5),
-                      child: TextFormField(
-                        focusNode: nameFocus,
-                        maxLength: 50,
-                        autofocus: true,
-                        keyboardType: TextInputType.text,
-                        decoration: const InputDecoration(
-                          border: OutlineInputBorder(),
-                          labelText: 'Name',
-                          // suffixText: '.3bot',
-                          suffixStyle: TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                        controller: doubleNameController,
-                        inputFormatters: <TextInputFormatter>[
-                          FilteringTextInputFormatter.allow(
-                              RegExp('[a-zA-Z0-9]'))
-                        ],
-                        enableSuggestions: false,
-                        autocorrect: false,
+                    CheckboxListTile(
+                      title: const Text(
+                        'I have written down my seedphrase and username',
+                        style: TextStyle(fontSize: 14),
                       ),
-                    ),
-                    Row(
-                      children: <Widget>[
-                        Padding(
-                          padding: const EdgeInsets.only(top: 10),
-                          child: Text(
-                            errorStepperText,
-                            style: const TextStyle(color: Colors.red),
-                            textAlign: TextAlign.left,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const Divider(
-                      height: 50,
-                    ),
+                      value: didWriteSeed,
+                      onChanged: (newValue) {
+                        didWriteSeed = newValue!;
+                        setState(() {});
+                      },
+                      controlAffinity: ListTileControlAffinity
+                          .leading, //  <-- leading Checkbox
+                    )
                   ],
-                ),
-              ),
-            ),
+                )),
           ),
-          Step(
-            isActive: state.index >= _State.Email.index,
-            state: state.index > _State.Email.index
-                ? StepState.complete
-                : state == _State.Email
-                    ? StepState.editing
-                    : StepState.disabled,
-            title: const Text('Email'),
-            subtitle: state.index > _State.Email.index
-                ? Text(emailController.text)
-                : null,
-            content: Card(
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: ReuseableTextFieldStep(
-                  focusNode: emailFocus,
-                  titleText: 'What is your email?',
-                  labelText: 'Email',
-                  typeText: TextInputType.emailAddress,
-                  errorStepperText: errorStepperText,
-                  controller: emailController,
-                ),
-              ),
-            ),
-          ),
-          Step(
-            isActive: state.index >= _State.SeedPhrase.index,
-            state: state.index > _State.SeedPhrase.index
-                ? StepState.complete
-                : state == _State.SeedPhrase
-                    ? StepState.editing
-                    : StepState.disabled,
-            title: const Text('Seed phrase'),
-            content: Card(
-              child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    children: [
-                      ReuseableTextStep(
-                        titleText:
-                            'In order to ever retrieve your tokens in case of switching to a device or app, you will have to enter your seedphrase in combination with your TF Connect username. \n\nPlease write this seedphrase and your username on a piece of paper and keep it in a secure place. Do not communicate this key to anyone. ThreeFold can not be held responsible in case of loss of this seedphrase.',
-                        extraText: _registrationData.phrase,
-                        errorStepperText: errorStepperText,
-                      ),
-                      CheckboxListTile(
-                        title: const Text(
-                          'I have written down my seedphrase and username',
-                          style: TextStyle(fontSize: 14),
-                        ),
-                        value: didWriteSeed,
-                        onChanged: (newValue) {
-                          didWriteSeed = newValue!;
-                          setState(() {});
-                        },
-                        controlAffinity: ListTileControlAffinity
-                            .leading, //  <-- leading Checkbox
-                      )
-                    ],
+        ),
+        Step(
+          isActive: state.index >= _State.ConfirmSeedPhrase.index,
+          state: state.index > _State.ConfirmSeedPhrase.index
+              ? StepState.complete
+              : state == _State.ConfirmSeedPhrase
+                  ? StepState.editing
+                  : StepState.disabled,
+          title: Text('Confirm seed phrase',
+              style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                    color: state.index >= _State.ConfirmSeedPhrase.index
+                        ? Theme.of(context).colorScheme.onSurface
+                        : Colors.grey,
                   )),
-            ),
-          ),
-          Step(
-            isActive: state.index >= _State.ConfirmSeedPhrase.index,
-            state: state.index > _State.ConfirmSeedPhrase.index
-                ? StepState.complete
-                : state == _State.ConfirmSeedPhrase
-                    ? StepState.editing
-                    : StepState.disabled,
-            title: const Text('Confirm seed phrase'),
-            content: Card(
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: ReuseableTextFieldStep(
-                  focusNode: seedFocus,
-                  titleText:
-                      'Type 3 random words from your seed phrase, separated by a space.',
-                  labelText: 'Seed phrase words',
-                  typeText: TextInputType.text,
-                  errorStepperText: errorStepperText,
-                  controller: seedConfirmationController,
-                ),
+          content: Card(
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: ReuseableTextFieldStep(
+                focusNode: seedFocus,
+                titleText:
+                    'Type 3 random words from your seed phrase, separated by a space.',
+                labelText: 'Seed phrase words',
+                typeText: TextInputType.text,
+                errorStepperText: errorStepperText,
+                controller: seedConfirmationController,
               ),
             ),
           ),
-          Step(
-            isActive: state.index >= _State.Finish.index,
-            state: state.index > _State.Finish.index
-                ? StepState.complete
-                : state == _State.Finish
-                    ? StepState.editing
-                    : StepState.disabled,
-            title: const Text('Finishing'),
-            content: Card(
+        ),
+        Step(
+          isActive: state.index >= _State.Finish.index,
+          state: state.index > _State.Finish.index
+              ? StepState.complete
+              : state == _State.Finish
+                  ? StepState.editing
+                  : StepState.disabled,
+          title: Text('Finishing',
+              style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                    color: state.index >= _State.Finish.index
+                        ? Theme.of(context).colorScheme.onSurface
+                        : Colors.grey,
+                  )),
+          content: Card(
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
               child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
-                  const SizedBox(
-                    height: 10.0,
+                  Text(
+                    'Please check the data below, press finish if it is correct. Otherwise click the pencil icon to edit them.',
+                    style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                        color:
+                            Theme.of(context).colorScheme.onSecondaryContainer,
+                        fontWeight: FontWeight.bold),
                   ),
-                  const Padding(
-                    padding: EdgeInsets.all(16.0),
-                    child: Text(
-                      'Please check the data below, press finish if it is correct. Otherwise click the pencil icon to edit them.',
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
+                  Divider(
+                    height: 40,
+                    color: Theme.of(context)
+                        .colorScheme
+                        .onSecondaryContainer
+                        .withOpacity(0.2),
                   ),
-                  const SizedBox(
-                    height: 15.0,
+                  ListTile(
+                    contentPadding: EdgeInsets.zero,
+                    leading: const Icon(Icons.person),
+                    title: Text(doubleNameController.text),
+                    trailing: const Icon(Icons.edit),
+                    onTap: () => setState(() {
+                      state = _State.DoubleName;
+                      FocusScope.of(context).requestFocus(nameFocus);
+                    }),
                   ),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 8.0, bottom: 4.0),
-                    child: ListTile(
-                      leading: Icon(Icons.person),
-                      title: Text(doubleNameController.text),
-                      trailing: Icon(Icons.edit),
+                  ListTile(
+                      contentPadding: EdgeInsets.zero,
+                      leading: const Icon(Icons.email),
+                      title: Text(emailController.text),
+                      trailing: const Icon(Icons.edit),
                       onTap: () => setState(() {
-                        state = _State.DoubleName;
-                        FocusScope.of(context).requestFocus(nameFocus);
-                      }),
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 4.0, bottom: 15.0),
-                    child: ListTile(
-                        leading: Icon(Icons.email),
-                        title: Text(emailController.text),
-                        trailing: Icon(Icons.edit),
-                        onTap: () => setState(() {
-                              state = _State.Email;
-                              FocusScope.of(context).requestFocus(emailFocus);
-                            })),
-                  ),
+                            state = _State.Email;
+                            FocusScope.of(context).requestFocus(emailFocus);
+                          })),
                 ],
               ),
             ),
-          )
-        ],
-        currentStep: state.index,
-        onStepTapped: (index) {
-          setState(() {
-            state = _State.values[index];
-          });
-          checkStepFocus(state);
-        },
-        onStepContinue: () {
-          errorStepperText = '';
-          checkStep(state);
-        },
-        onStepCancel: () {
-          setState(
-            () {
-              errorStepperText = '';
-              if (state.index > _State.DoubleName.index) {
-                state = _State.values[state.index - 1];
-              } else {
-                Navigator.pop(context);
-              }
-            },
-          );
-          checkStepFocus(state);
-        },
-      ),
+          ),
+        )
+      ],
+      currentStep: state.index,
+      onStepTapped: (index) {
+        setState(() {
+          state = _State.values[index];
+        });
+        checkStepFocus(state);
+      },
+      onStepContinue: () {
+        errorStepperText = '';
+        checkStep(state);
+      },
+      onStepCancel: () {
+        setState(
+          () {
+            errorStepperText = '';
+            if (state.index > _State.DoubleName.index) {
+              state = _State.values[state.index - 1];
+            } else {
+              Navigator.pop(context);
+            }
+          },
+        );
+        checkStepFocus(state);
+      },
     );
   }
 
@@ -582,10 +626,13 @@ class _MobileRegistrationScreenState extends State<MobileRegistrationScreen> {
         ? Row(
             children: <Widget>[
               Padding(
-                padding: EdgeInsets.only(top: 10),
+                padding: const EdgeInsets.only(top: 10),
                 child: Text(
                   errorStepperText,
-                  style: TextStyle(color: Colors.red),
+                  style: Theme.of(context)
+                      .textTheme
+                      .bodyMedium!
+                      .copyWith(color: Theme.of(context).colorScheme.error),
                   textAlign: TextAlign.left,
                 ),
               ),
@@ -598,8 +645,7 @@ class _MobileRegistrationScreenState extends State<MobileRegistrationScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Globals.color,
-        title: const Text('ThreeFold Connect - Registration'),
+        title: const Text('Registration'),
       ),
       body: registrationStepper(),
     );

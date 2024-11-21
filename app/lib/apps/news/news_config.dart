@@ -32,40 +32,48 @@ abstract class NewsConfigImpls {
 }
 
 class NewsConfigStaging extends NewsConfigImpls {
+  @override
   String appId() {
     return 'news.staging.threefold.me';
   }
 
+  @override
   String redirectUrl() {
     return 'login';
   }
 }
 
 class NewsConfigProduction extends NewsConfigImpls {
+  @override
   String appId() {
     return 'news.threefold.me';
   }
 
+  @override
   String redirectUrl() {
     return 'login';
   }
 }
 
 class NewsConfigTesting extends NewsConfigImpls {
+  @override
   String appId() {
     return 'news.testing.threefold.me';
   }
 
+  @override
   String redirectUrl() {
     return 'login';
   }
 }
 
 class NewsConfigLocal extends NewsConfigImpls {
+  @override
   String appId() {
     return 'localhost:8080';
   }
 
+  @override
   String redirectUrl() {
     return 'login';
   }

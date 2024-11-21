@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:typed_data';
 
+import 'package:threebotlogin/helpers/logger.dart';
 import 'package:threebotlogin/models/scope.dart';
 import 'package:threebotlogin/services/crypto_service.dart';
 import 'package:threebotlogin/services/shared_preference_service.dart';
@@ -37,7 +38,9 @@ class Login {
   Login.fromJson(Map<String, dynamic> json)
       : doubleName = json['doubleName'],
         state = json['state'],
-        scope = (json['scope'] != null && json['scope'] != "" && json['scope'] != "null")
+        scope = (json['scope'] != null &&
+                json['scope'] != '' &&
+                json['scope'] != 'null')
             ? Scope.fromJson(jsonDecode(json['scope']))
             : null,
         appId = json['appId'],
@@ -53,7 +56,7 @@ class Login {
   Map<String, dynamic> toJson() => {
         'doubleName': doubleName,
         'state': state,
-        'scope': scope != null ? scope?.toJson() : "",
+        'scope': scope != null ? scope?.toJson() : '',
         'appId': appId,
         'appPublicKey': appPublicKey,
         'randomImageId': randomImageId,
@@ -72,11 +75,12 @@ class Login {
       Uint8List pk = await getPublicKey();
       Uint8List sk = await getPrivateKey();
 
-      String decryptedLoginAttempt = await decrypt(data['encryptedLoginAttempt'], pk, sk);
+      String decryptedLoginAttempt =
+          await decrypt(data['encryptedLoginAttempt'], pk, sk);
       dynamic decryptedLoginAttemptMap = jsonDecode(decryptedLoginAttempt);
 
-      print('Decrypted login attempt');
-      print(decryptedLoginAttempt);
+      logger.i('Decrypted login attempt');
+      logger.i(decryptedLoginAttempt);
 
       decryptedLoginAttemptMap['type'] = data['type'];
       decryptedLoginAttemptMap['created'] = data['created'];
