@@ -34,7 +34,7 @@ Future<String> getBalanceByClient(Client client) async {
       }
     }
   } catch (e) {
-    logger.i("Couldn't load the account balance due to $e");
+    logger.e("Couldn't load the account balance due to $e");
   }
   return '-1';
 }
