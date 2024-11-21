@@ -27,7 +27,6 @@ bool validateEmail(String? value) {
   return isEmail(value);
 }
 
-
 bool validateSeedWords(String seed, String confirmationWords) {
   List<String> words = confirmationWords.split(' ');
   List<String> seedWords = seed.split(' ');
@@ -45,14 +44,7 @@ bool validateSeedWords(String seed, String confirmationWords) {
 }
 
 bool validateDoubleName(String value) {
-  Pattern pattern = r'^[a-zA-Z0-9]+$';
-  RegExp regex = RegExp(pattern.toString());
-
-  if (!regex.hasMatch(value)) {
-    return false;
-  }
-
-  return true;
+  return isAlphanumeric(value) && isLength(value, 2);
 }
 
 String extract3Bot(String name) {
