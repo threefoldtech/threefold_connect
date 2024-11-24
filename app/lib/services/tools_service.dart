@@ -32,7 +32,10 @@ bool validateSeedWords(String seed, String confirmationWords) {
   List<String> seedWords = seed.split(' ');
 
   // if length is not correct return already here
-  if (words.length != 3) return false;
+  if (words.length < 3) return false;
+  if (words.length < 3 || words.toSet().length < 3) {
+    return false;
+  }
 
   for (final String word in words) {
     // check every word in list against the seed
