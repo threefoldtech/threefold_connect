@@ -821,7 +821,7 @@ class _IdentityVerificationScreenState
   Widget currentPhaseWidget(step, text, icon) {
     return GestureDetector(
         onTap: () async {
-          if (step == 1) {
+          if (step == 1 && countdownNotifier.value == -1) {
             return _changeEmailDialog(false);
           }
 
@@ -1767,7 +1767,7 @@ class _IdentityVerificationScreenState
       return;
     }
 
-    if (email == '') {
+    if (email == '' && countdownNotifier.value == -1) {
       return _changeEmailDialog(true);
     }
 
