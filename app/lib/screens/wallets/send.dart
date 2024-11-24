@@ -90,9 +90,15 @@ class _WalletSendScreenState extends State<WalletSendScreen> {
 
   bool _validateToAddress() {
     final toAddress = toController.text.trim();
+    final fromAddress = fromController.text.trim();
     toAddressError = null;
     if (toAddress.isEmpty) {
       toAddressError = "Address can't be empty";
+      return false;
+    }
+
+    if (toAddress == fromAddress) {
+      toAddressError = '"To" and "From" addresses must be different';
       return false;
     }
 
@@ -252,7 +258,8 @@ class _WalletSendScreenState extends State<WalletSendScreen> {
                   style: Theme.of(context).textTheme.bodyMedium!.copyWith(
                         color: Theme.of(context).colorScheme.onSurface,
                       ),
-                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                  keyboardType:
+                      const TextInputType.numberWithOptions(decimal: true),
                   controller: amountController,
                   decoration: InputDecoration(
                       labelText: 'Amount (Balance: $balance)',

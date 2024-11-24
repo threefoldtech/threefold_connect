@@ -102,7 +102,7 @@ Future<Response> sendVerificationSms() async {
   return http.post(url, body: encodedBody, headers: requestHeaders);
 }
 
-// TODO: Remove this method and user update user data
+// TODO: Remove this method and use update user data
 Future<Response> updateEmailAddressOfUser() async {
   String timestamp = DateTime.now().millisecondsSinceEpoch.toString();
   Uint8List sk = await getPrivateKey();
@@ -154,4 +154,26 @@ Future<Response> updateUserData(String field, String value) async {
   logger.i('Sending call: ${url.toString()}');
 
   return http.post(url, headers: loginRequestHeaders, body: encodedBody);
+}
+
+Future<Response> deleteUser() async {
+  String timestamp = DateTime.now().millisecondsSinceEpoch.toString();
+  Uint8List sk = await getPrivateKey();
+
+  Map<String, String> payload = {
+    'timestamp': timestamp,
+    'intention': 'delete-user'
+  };
+  String signedPayload = await signData(jsonEncode(payload), sk);
+
+  Map<String, String> loginRequestHeaders = {
+    'Content-type': 'application/json',
+    'Jimber-Authorization': signedPayload
+  };
+
+  final doubleName = await getDoubleName();
+  Uri url = Uri.parse('$threeBotApiUrl/users/$doubleName');
+  logger.i('Sending call: ${url.toString()}');
+
+  return http.delete(url, headers: loginRequestHeaders);
 }

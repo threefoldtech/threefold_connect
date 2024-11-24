@@ -4,6 +4,7 @@ import 'dart:io';
 import 'dart:math';
 
 import 'package:device_info_plus/device_info_plus.dart';
+import 'package:validators/validators.dart';
 
 const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
 
@@ -19,9 +20,11 @@ String randomString(int len) {
 }
 
 bool validateEmail(String? value) {
-  RegExp regex = RegExp(
-      r"^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,253}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,253}[a-zA-Z0-9])?)*$");
-  return regex.hasMatch(value.toString());
+  if (value == null || value.isEmpty) {
+    return false;
+  }
+
+  return isEmail(value);
 }
 
 bool validateSeedWords(String seed, String confirmationWords) {
@@ -29,7 +32,10 @@ bool validateSeedWords(String seed, String confirmationWords) {
   List<String> seedWords = seed.split(' ');
 
   // if length is not correct return already here
-  if (words.length != 3) return false;
+  if (words.length < 3) return false;
+  if (words.length < 3 || words.toSet().length < 3) {
+    return false;
+  }
 
   for (final String word in words) {
     // check every word in list against the seed
@@ -41,14 +47,7 @@ bool validateSeedWords(String seed, String confirmationWords) {
 }
 
 bool validateDoubleName(String value) {
-  Pattern pattern = r'^[a-zA-Z0-9]+$';
-  RegExp regex = RegExp(pattern.toString());
-
-  if (!regex.hasMatch(value)) {
-    return false;
-  }
-
-  return true;
+  return isAlphanumeric(value) && isLength(value, 2);
 }
 
 String extract3Bot(String name) {
