@@ -1,15 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:qr_code_scanner/qr_code_scanner.dart';
 import 'package:threebotlogin/helpers/globals.dart';
 import 'package:threebotlogin/models/wallet.dart';
 import 'package:threebotlogin/providers/wallets_provider.dart';
-import 'package:threebotlogin/screens/scan_screen.dart';
 import 'package:threebotlogin/screens/wallets/contacts.dart';
 import 'package:threebotlogin/services/stellar_service.dart';
 import 'package:threebotlogin/widgets/wallets/bridge_confirmation.dart';
-import 'package:threebotlogin/widgets/wallets/select_transaction_widget.dart';
+import 'package:threebotlogin/widgets/wallets/swap_transaction_widget.dart';
 import 'package:validators/validators.dart';
 import 'package:threebotlogin/services/stellar_service.dart' as Stellar;
 import 'package:threebotlogin/services/tfchain_service.dart' as TFChain;
@@ -84,6 +81,7 @@ class _WalletBridgeScreenSate extends State<WalletBridgeScreen> {
     fromController.text = type == TransactionType.Withdraw
         ? widget.wallet.tfchainAddress
         : widget.wallet.stellarAddress;
+    toController.text = '';
     transactionType = type;
     setState(() {});
   }
@@ -171,37 +169,11 @@ class _WalletBridgeScreenSate extends State<WalletBridgeScreen> {
         child: Padding(
           padding: const EdgeInsets.all(8.0),
           child: Column(children: [
-            SelectTransactionWidget(
+            const SizedBox(height: 10),
+            SwapTransactionWidget(
                 transactionType: transactionType,
                 onTransactionChange: onTransactionChange,
                 hideDeposit: hideDeposit),
-            const SizedBox(height: 40),
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 10),
-              child: TextButton(
-                onPressed: () {
-                  scanQrCode();
-                },
-                style: TextButton.styleFrom(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(2),
-                  ),
-                  side: BorderSide(
-                    color: Theme.of(context).colorScheme.primary,
-                  ),
-                ),
-                child: SizedBox(
-                  width: double.infinity,
-                  child: Text(
-                    'Scan QR Code',
-                    style: Theme.of(context).textTheme.titleLarge!.copyWith(
-                        color: Theme.of(context).colorScheme.primary,
-                        fontWeight: FontWeight.bold),
-                    textAlign: TextAlign.center,
-                  ),
-                ),
-              ),
-            ),
             const SizedBox(height: 20),
             ListTile(
               title: TextField(
@@ -254,21 +226,9 @@ class _WalletBridgeScreenSate extends State<WalletBridgeScreen> {
                       suffixText: 'TFT',
                       errorText: amountError)),
               subtitle: Text(
-                  'Max Fee: ${transactionType == TransactionType.Deposit ? 0.1 : 0.01} TFT'),
+                  'Max Fee: ${transactionType == TransactionType.Deposit ? 1.1 : 1.01} TFT'),
             ),
             const SizedBox(height: 10),
-            if (transactionType == TransactionType.Deposit)
-              ListTile(
-                title: TextField(
-                    style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                          color: Theme.of(context).colorScheme.onSurface,
-                        ),
-                    controller: memoController,
-                    decoration: const InputDecoration(
-                      labelText: 'Memo',
-                    )),
-              ),
-            const SizedBox(height: 40),
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 10),
               child: ElevatedButton(
@@ -294,33 +254,6 @@ class _WalletBridgeScreenSate extends State<WalletBridgeScreen> {
         ),
       ),
     );
-  }
-
-  scanQrCode() async {
-    await SystemChannels.textInput.invokeMethod('TextInput.hide');
-    bool slept =
-        await Future.delayed(const Duration(milliseconds: 400), () => true);
-    late Barcode result;
-    if (slept) {
-      if (context.mounted) {
-        result = await Navigator.push(context,
-            MaterialPageRoute(builder: (context) => const ScanScreen()));
-      }
-    }
-    if (result.code != null) {
-      final code = Uri.parse(result.code!);
-      toController.text = code.path;
-      if (code.queryParameters.containsKey('amount')) {
-        amountController.text = code.queryParameters['amount']!;
-      }
-      if (transactionType == TransactionType.Deposit &&
-          code.queryParameters.containsKey('message')) {
-        memoController.text = code.queryParameters['message']!;
-      }
-      setState(() {});
-    }
-
-    return result.code;
   }
 
   _bridge_confirmation() async {
