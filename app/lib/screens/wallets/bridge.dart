@@ -25,7 +25,6 @@ class _WalletBridgeScreenSate extends State<WalletBridgeScreen> {
   final fromController = TextEditingController();
   final toController = TextEditingController();
   final amountController = TextEditingController();
-  final memoController = TextEditingController();
   TransactionType transactionType = TransactionType.Withdraw;
   String? toAddressError;
   String? amountError;
@@ -43,7 +42,6 @@ class _WalletBridgeScreenSate extends State<WalletBridgeScreen> {
     fromController.dispose();
     toController.dispose();
     amountController.dispose();
-    memoController.dispose();
     reloadBalance = false;
     super.dispose();
   }
@@ -126,16 +124,18 @@ class _WalletBridgeScreenSate extends State<WalletBridgeScreen> {
       amountError = "Amount can't be less than 2";
       return false;
     }
-    if (double.parse(widget.wallet.tfchainBalance) - double.parse(amount) - 2 <
-        0) {
-      amountError = "Amount shouldn't be more than the wallet balance";
-      return false;
+    if (transactionType == TransactionType.Withdraw) {
+      if (double.parse(amount) > double.parse(widget.wallet.tfchainBalance)) {
+        amountError = "Amount shouldn't be more than the wallet balance";
+        return false;
+      }
     }
 
-    if (double.parse(widget.wallet.stellarBalance) - double.parse(amount) - 2 <
-        0) {
-      amountError = "Amount shouldn't be more than the wallet balance";
-      return false;
+    if (transactionType == TransactionType.Deposit) {
+      if (double.parse(amount) > double.parse(widget.wallet.stellarBalance)) {
+        amountError = "Amount shouldn't be more than the wallet balance";
+        return false;
+      }
     }
     return true;
   }
@@ -257,6 +257,8 @@ class _WalletBridgeScreenSate extends State<WalletBridgeScreen> {
   }
 
   _bridge_confirmation() async {
+    final memoText = await TFChain.getMemo(
+        widget.wallet.tfchainSecret, toController.text.trim());
     showModalBottomSheet(
         isScrollControlled: true,
         useSafeArea: true,
@@ -271,7 +273,7 @@ class _WalletBridgeScreenSate extends State<WalletBridgeScreen> {
               from: fromController.text.trim(),
               to: toController.text.trim(),
               amount: amountController.text.trim(),
-              memo: memoController.text.trim(),
+              memo: memoText,
               reloadBalance: transactionType == TransactionType.Deposit
                   ? _loadStellarBalance
                   : _loadTFChainBalance,

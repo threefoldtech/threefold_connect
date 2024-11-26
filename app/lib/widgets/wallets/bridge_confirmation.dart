@@ -34,7 +34,6 @@ class _BridgeConfirmationWidgetState extends State<BridgeConfirmationWidget> {
   final fromController = TextEditingController();
   final toController = TextEditingController();
   final amountController = TextEditingController();
-  final memoController = TextEditingController();
   bool loading = false;
 
   @override
@@ -42,7 +41,6 @@ class _BridgeConfirmationWidgetState extends State<BridgeConfirmationWidget> {
     fromController.text = widget.from;
     toController.text = widget.to;
     amountController.text = widget.amount;
-    memoController.text = widget.memo;
     super.initState();
   }
 
@@ -51,7 +49,6 @@ class _BridgeConfirmationWidgetState extends State<BridgeConfirmationWidget> {
     fromController.dispose();
     toController.dispose();
     amountController.dispose();
-    memoController.dispose();
     super.dispose();
   }
 
@@ -104,21 +101,8 @@ class _BridgeConfirmationWidgetState extends State<BridgeConfirmationWidget> {
                 decoration: const InputDecoration(
                     labelText: 'Amount', hintText: '100', suffixText: 'TFT')),
             subtitle: Text(
-                'Max Fee: ${widget.transactionType == TransactionType.Deposit ? 0.1 : 0.01} TFT'),
+                'Max Fee: ${widget.transactionType == TransactionType.Deposit ? 1.1 : 1.01} TFT'),
           ),
-          const SizedBox(height: 10),
-          if (widget.transactionType == TransactionType.Deposit)
-            ListTile(
-              title: TextField(
-                  readOnly: true,
-                  style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                        color: Theme.of(context).colorScheme.onSurface,
-                      ),
-                  controller: memoController,
-                  decoration: const InputDecoration(
-                    labelText: 'Memo',
-                  )),
-            ),
           const SizedBox(height: 30),
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 10),
