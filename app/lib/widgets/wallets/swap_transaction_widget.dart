@@ -50,7 +50,7 @@ class _SwapTransactionWidgetState extends State<SwapTransactionWidget> {
         : widget.depositIcon;
     final String leftChainLabel =
         currentTransactionType == TransactionType.Withdraw
-            ? 'TFChain'
+            ? 'TF Chain'
             : 'Stellar';
     final String rightIcon = currentTransactionType == TransactionType.Withdraw
         ? widget.depositIcon
@@ -58,32 +58,37 @@ class _SwapTransactionWidgetState extends State<SwapTransactionWidget> {
     final String rightChainLabel =
         currentTransactionType == TransactionType.Withdraw
             ? 'Stellar'
-            : 'TFChain';
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
+            : 'TF Chain';
+    return Container(
+      width: double.infinity, // Full width
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      padding: const EdgeInsets.all(18.0),
+      decoration: BoxDecoration(
+        color: Theme.of(context)
+            .colorScheme
+            .primary
+            .withOpacity(0.1), // Background color
+        borderRadius: BorderRadius.circular(8.0),
+      ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           // Left Icon and Labels
           SizedBox(
-            width: width / 3,
+            width: width / 4,
             child: Row(
               children: [
-                CircleAvatar(
-                  radius: 28,
-                  backgroundColor: colorScheme.primaryContainer,
-                  child: ColorFiltered(
-                    colorFilter: ColorFilter.mode(
-                      Theme.of(context).colorScheme.onSurface,
-                      BlendMode.srcIn,
-                    ),
-                    child: Image.asset(
-                      leftIcon,
-                      fit: BoxFit.contain,
-                      width: 35,
-                      height: 35,
-                    ),
+                ColorFiltered(
+                  colorFilter: ColorFilter.mode(
+                    Theme.of(context).colorScheme.onSurface,
+                    BlendMode.srcIn,
+                  ),
+                  child: Image.asset(
+                    leftIcon,
+                    fit: BoxFit.contain,
+                    width: 35,
+                    height: 35,
                   ),
                 ),
                 const SizedBox(width: 10),
@@ -93,17 +98,17 @@ class _SwapTransactionWidgetState extends State<SwapTransactionWidget> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
+                        'TFT',
+                        style: Theme.of(context).textTheme.bodySmall!.copyWith(
+                            color: Theme.of(context).colorScheme.onSurface,
+                            fontWeight: FontWeight.bold),
+                      ),
+                      Text(
                         leftChainLabel,
                         style: Theme.of(context).textTheme.bodySmall!.copyWith(
                               color: Theme.of(context).colorScheme.onSurface,
                             ),
                         overflow: TextOverflow.ellipsis,
-                      ),
-                      Text(
-                        'TFT',
-                        style: Theme.of(context).textTheme.bodySmall!.copyWith(
-                              color: Theme.of(context).colorScheme.onSurface,
-                            ),
                       ),
                     ],
                   ),
@@ -135,14 +140,33 @@ class _SwapTransactionWidgetState extends State<SwapTransactionWidget> {
           ),
           // Right Icon and Labels
           SizedBox(
-            width: width / 3,
+            width: width / 4,
             child: Row(
               children: [
+                ColorFiltered(
+                  colorFilter: ColorFilter.mode(
+                    Theme.of(context).colorScheme.onSurface,
+                    BlendMode.srcIn,
+                  ),
+                  child: Image.asset(
+                    rightIcon,
+                    fit: BoxFit.contain,
+                    width: 35,
+                    height: 35,
+                  ),
+                ),
+                const SizedBox(width: 10),
                 Expanded(
                   child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.end,
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
+                      Text(
+                        'TFT',
+                        style: Theme.of(context).textTheme.bodySmall!.copyWith(
+                            color: Theme.of(context).colorScheme.onSurface,
+                            fontWeight: FontWeight.bold),
+                      ),
                       Text(
                         rightChainLabel,
                         style: Theme.of(context).textTheme.bodySmall!.copyWith(
@@ -150,30 +174,7 @@ class _SwapTransactionWidgetState extends State<SwapTransactionWidget> {
                             ),
                         overflow: TextOverflow.ellipsis,
                       ),
-                      Text(
-                        'TFT',
-                        style: Theme.of(context).textTheme.bodySmall!.copyWith(
-                              color: Theme.of(context).colorScheme.onSurface,
-                            ),
-                      ),
                     ],
-                  ),
-                ),
-                const SizedBox(width: 10),
-                CircleAvatar(
-                  radius: 28,
-                  backgroundColor: colorScheme.primaryContainer,
-                  child: ColorFiltered(
-                    colorFilter: ColorFilter.mode(
-                      Theme.of(context).colorScheme.onSurface,
-                      BlendMode.srcIn,
-                    ),
-                    child: Image.asset(
-                      rightIcon,
-                      fit: BoxFit.contain,
-                      width: 35,
-                      height: 35,
-                    ),
                   ),
                 ),
               ],
