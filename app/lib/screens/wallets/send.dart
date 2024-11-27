@@ -273,7 +273,7 @@ class _WalletSendScreenState extends State<WalletSendScreen> {
                               color: Theme.of(context).colorScheme.onSurface,
                             ),
                         focusNode: textFieldFocusNode,
-                        keyboardType: TextInputType.number,
+                        keyboardType: const TextInputType.numberWithOptions(decimal: true),
                         controller: amountController,
                         textInputAction: TextInputAction.done,
                         decoration: InputDecoration(
