@@ -121,7 +121,7 @@ class _SwapTransactionWidgetState extends State<SwapTransactionWidget> {
                 child: CircleAvatar(
                   radius: 22,
                   backgroundColor: widget.hideDeposit
-                      ? Theme.of(context).disabledColor.withOpacity(0.7)
+                      ? Theme.of(context).disabledColor
                       : colorScheme.primaryContainer,
                   child: Icon(
                     Icons.swap_horiz,
