@@ -89,7 +89,8 @@ class _AddEditContactState extends State<AddEditContact> {
       addressError = 'Address is used in another contact';
       return false;
     } else if (!edit && contacts.isNotEmpty) {
-      addressError = 'Address exists';
+      addressError = 'Address exists in another ${contacts.first.type.name} contact';
+
       return false;
     }
     if (widget.chainType == ChainType.TFChain && contactAddress.length != 48) {
