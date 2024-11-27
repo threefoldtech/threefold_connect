@@ -26,6 +26,7 @@ class _FarmItemWidgetState extends State<FarmItemWidget> {
   final farmIdController = TextEditingController();
   bool showTfchainSecret = false;
   bool edit = false;
+  bool isSaving = false;
   final walletFocus = FocusNode();
   ChainType chainType = ChainType.Stellar;
   String? addressError;
@@ -48,38 +49,45 @@ class _FarmItemWidgetState extends State<FarmItemWidget> {
 
   _editStellarPayoutAddress() async {
     setState(() {
-      edit = !edit;
+      isSaving = true;
     });
 
-    if (!edit) {
-      final String newAddress = walletAddressController.text.trim();
-      if (newAddress == widget.farm.walletAddress) {
-        FocusScope.of(context).requestFocus(walletFocus);
-        return;
-      }
+    final String newAddress = walletAddressController.text.trim();
+    if (newAddress == widget.farm.walletAddress) {
+      FocusScope.of(context).requestFocus(walletFocus);
+      setState(() {
+        isSaving = false;
+        edit = false;
+      });
+      return;
+    }
 
-      try {
-        await addStellarAddress(
-          widget.farm.tfchainWalletSecret,
-          widget.farm.farmId,
-          newAddress,
+    try {
+      await addStellarAddress(
+        widget.farm.tfchainWalletSecret,
+        widget.farm.farmId,
+        newAddress,
+      );
+    } catch (e) {
+      logger.e('Failed to add stellar address due to $e');
+      if (context.mounted) {
+        final loadingFarmsFailure = SnackBar(
+          content: Text(
+            'Failed to Add Stellar address',
+            style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                  color: Theme.of(context).colorScheme.errorContainer,
+                ),
+          ),
+          duration: const Duration(seconds: 3),
         );
-      } catch (e) {
-        logger.e('Failed to add stellar address due to $e');
-        if (context.mounted) {
-          final loadingFarmsFailure = SnackBar(
-            content: Text(
-              'Failed to Add Stellar address',
-              style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                    color: Theme.of(context).colorScheme.errorContainer,
-                  ),
-            ),
-            duration: const Duration(seconds: 3),
-          );
-          ScaffoldMessenger.of(context).clearSnackBars();
-          ScaffoldMessenger.of(context).showSnackBar(loadingFarmsFailure);
-        }
+        ScaffoldMessenger.of(context).clearSnackBars();
+        ScaffoldMessenger.of(context).showSnackBar(loadingFarmsFailure);
       }
+    } finally {
+      setState(() {
+        edit = false;
+        isSaving = false;
+      });
     }
   }
 
@@ -143,45 +151,54 @@ class _FarmItemWidgetState extends State<FarmItemWidget> {
                           icon: const Icon(Icons.person))
                       : null)),
           subtitle: const Text('This address will be used for payout.'),
-          trailing: edit
-              ? IconButton(
-                  onPressed: addressError == null
-                      ? () {
-                          _editStellarPayoutAddress();
-                        }
-                      : null,
-                  icon: Icon(
-                    Icons.save,
-                    color: addressError == null
-                        ? Theme.of(context).colorScheme.onSurface
-                        : Theme.of(context).colorScheme.onSurfaceVariant,
-                  ),
-                )
-              : SizedBox(
-                  width: 100,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      IconButton(
-                          onPressed: () {
-                            _editStellarPayoutAddress();
-                          },
-                          icon: edit
-                              ? const Icon(Icons.save)
-                              : const Icon(Icons.edit)),
-                      IconButton(
-                        onPressed: () {
-                          Clipboard.setData(ClipboardData(
-                              text: walletAddressController.text));
-                          ScaffoldMessenger.of(context).clearSnackBars();
-                          ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text('Copied!')));
-                        },
-                        icon: const Icon(Icons.copy),
+          trailing: isSaving
+              ? Transform.scale(
+                  scale: 0.5, child: const CircularProgressIndicator())
+              : edit
+                  ? IconButton(
+                      onPressed: addressError == null
+                          ? () {
+                              _editStellarPayoutAddress();
+                            }
+                          : null,
+                      icon: Icon(
+                        Icons.save,
+                        color: addressError == null
+                            ? Theme.of(context).colorScheme.onSurface
+                            : Theme.of(context).colorScheme.onSurfaceVariant,
                       ),
-                    ],
-                  ),
-                ),
+                    )
+                  : SizedBox(
+                      width: 100,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          IconButton(
+                              onPressed: () {
+                                setState(() {
+                                  edit = !edit;
+                                });
+                                if (edit) {
+                                  FocusScope.of(context)
+                                      .requestFocus(walletFocus);
+                                }
+                              },
+                              icon: edit
+                                  ? const Icon(Icons.save)
+                                  : const Icon(Icons.edit)),
+                          IconButton(
+                            onPressed: () {
+                              Clipboard.setData(ClipboardData(
+                                  text: walletAddressController.text));
+                              ScaffoldMessenger.of(context).clearSnackBars();
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(content: Text('Copied!')));
+                            },
+                            icon: const Icon(Icons.copy),
+                          ),
+                        ],
+                      ),
+                    ),
         ),
         ListTile(
           title: TextField(
