@@ -42,15 +42,14 @@ class _SwapTransactionWidgetState extends State<SwapTransactionWidget> {
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
-    final ColorScheme colorScheme = Theme.of(context).colorScheme;
+    final colorScheme = Theme.of(context).colorScheme;
 
-    // Get the icons based on the current transaction type
     final String leftIcon = currentTransactionType == TransactionType.Withdraw
         ? widget.withdrawIcon
         : widget.depositIcon;
     final String leftChainLabel =
         currentTransactionType == TransactionType.Withdraw
-            ? 'TF Chain'
+            ? 'TFChain'
             : 'Stellar';
     final String rightIcon = currentTransactionType == TransactionType.Withdraw
         ? widget.depositIcon
@@ -58,16 +57,14 @@ class _SwapTransactionWidgetState extends State<SwapTransactionWidget> {
     final String rightChainLabel =
         currentTransactionType == TransactionType.Withdraw
             ? 'Stellar'
-            : 'TF Chain';
+            : 'TFChain';
+
     return Container(
-      width: double.infinity, // Full width
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      padding: const EdgeInsets.all(18.0),
+      width: double.infinity,
+      margin: EdgeInsets.symmetric(horizontal: width * 0.04, vertical: 8),
+      padding: const EdgeInsets.all(14.0),
       decoration: BoxDecoration(
-        color: Theme.of(context)
-            .colorScheme
-            .primary
-            .withOpacity(0.1), // Background color
+        color: colorScheme.primary.withOpacity(0.1),
         borderRadius: BorderRadius.circular(8.0),
       ),
       child: Row(
@@ -75,40 +72,39 @@ class _SwapTransactionWidgetState extends State<SwapTransactionWidget> {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           // Left Icon and Labels
-          SizedBox(
-            width: width / 4,
+          Flexible(
+            flex: 1,
             child: Row(
               children: [
                 ColorFiltered(
                   colorFilter: ColorFilter.mode(
-                    Theme.of(context).colorScheme.onSurface,
+                    colorScheme.onSurface,
                     BlendMode.srcIn,
                   ),
                   child: Image.asset(
                     leftIcon,
                     fit: BoxFit.contain,
-                    width: 35,
-                    height: 35,
+                    width: 30,
+                    height: 30,
                   ),
                 ),
-                const SizedBox(width: 10),
-                Expanded(
+                const SizedBox(width: 5),
+                Flexible(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
                         'TFT',
                         style: Theme.of(context).textTheme.bodySmall!.copyWith(
-                            color: Theme.of(context).colorScheme.onSurface,
+                            color: colorScheme.onSurface,
                             fontWeight: FontWeight.bold),
                       ),
                       Text(
                         leftChainLabel,
                         style: Theme.of(context).textTheme.bodySmall!.copyWith(
-                              color: Theme.of(context).colorScheme.onSurface,
+                              color: colorScheme.onSurface,
                             ),
-                        overflow: TextOverflow.ellipsis,
+                        softWrap: true,
                       ),
                     ],
                   ),
@@ -125,7 +121,7 @@ class _SwapTransactionWidgetState extends State<SwapTransactionWidget> {
                 child: CircleAvatar(
                   radius: 22,
                   backgroundColor: widget.hideDeposit
-                      ? Theme.of(context).disabledColor
+                      ? Theme.of(context).disabledColor.withOpacity(0.7)
                       : colorScheme.primaryContainer,
                   child: Icon(
                     Icons.swap_horiz,
@@ -139,40 +135,40 @@ class _SwapTransactionWidgetState extends State<SwapTransactionWidget> {
             ),
           ),
           // Right Icon and Labels
-          SizedBox(
-            width: width / 4,
+          Flexible(
+            flex: 1,
             child: Row(
+              mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 ColorFiltered(
                   colorFilter: ColorFilter.mode(
-                    Theme.of(context).colorScheme.onSurface,
+                    colorScheme.onSurface,
                     BlendMode.srcIn,
                   ),
                   child: Image.asset(
                     rightIcon,
                     fit: BoxFit.contain,
-                    width: 35,
-                    height: 35,
+                    width: 30,
+                    height: 30,
                   ),
                 ),
-                const SizedBox(width: 10),
-                Expanded(
+                const SizedBox(width: 5),
+                Flexible(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
                         'TFT',
                         style: Theme.of(context).textTheme.bodySmall!.copyWith(
-                            color: Theme.of(context).colorScheme.onSurface,
+                            color: colorScheme.onSurface,
                             fontWeight: FontWeight.bold),
                       ),
                       Text(
                         rightChainLabel,
                         style: Theme.of(context).textTheme.bodySmall!.copyWith(
-                              color: Theme.of(context).colorScheme.onSurface,
+                              color: colorScheme.onSurface,
                             ),
-                        overflow: TextOverflow.ellipsis,
+                        softWrap: true,
                       ),
                     ],
                   ),
