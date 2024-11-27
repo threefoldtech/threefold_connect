@@ -77,7 +77,7 @@ class _WalletAssetsWidgetState extends State<WalletAssetsWidget> {
           height: 20,
         ),
         WalletBalanceTileWidget(
-          name: 'Stellar',
+          name: ChainType.Stellar,
           balance: vestedWallets![0].tft.toString(),
           loading: false,
         ),
@@ -202,14 +202,14 @@ class _WalletAssetsWidgetState extends State<WalletAssetsWidget> {
           ),
           if (double.parse(widget.wallet.stellarBalance) >= 0)
             WalletBalanceTileWidget(
-              name: 'Stellar',
+              name: ChainType.Stellar,
               balance: widget.wallet.stellarBalance,
               loading: stellarBalaceLoading,
             ),
           const SizedBox(height: 10),
           if (double.parse(widget.wallet.tfchainBalance) >= 0)
             WalletBalanceTileWidget(
-              name: 'TFChain',
+              name: ChainType.TFChain,
               balance: widget.wallet.tfchainBalance,
               loading: tfchainBalaceLoading,
             ),

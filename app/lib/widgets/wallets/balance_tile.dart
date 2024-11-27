@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:threebotlogin/models/wallet.dart';
 
 class WalletBalanceTileWidget extends StatelessWidget {
   const WalletBalanceTileWidget({
@@ -8,7 +9,7 @@ class WalletBalanceTileWidget extends StatelessWidget {
     required this.loading,
   });
   final String balance;
-  final String name;
+  final ChainType name;
   final bool loading;
 
   @override
@@ -23,14 +24,14 @@ class WalletBalanceTileWidget extends StatelessWidget {
       leading: SizedBox(
         width: 25,
         child: Image.asset(
-          'assets/tft_icon.png',
-          fit: BoxFit.cover,
+          name == ChainType.TFChain
+              ? 'assets/tf_chain.png'
+              : 'assets/stellar.png',
           color: Theme.of(context).colorScheme.onSurface,
-          height: 50,
         ),
       ),
       title: Text(
-        name,
+        name == ChainType.Stellar ? 'Stellar' : 'TFChain',
         style: Theme.of(context).textTheme.bodyLarge!.copyWith(
               color: Theme.of(context).colorScheme.onSecondaryContainer,
             ),
