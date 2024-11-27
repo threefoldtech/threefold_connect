@@ -1680,6 +1680,7 @@ class _IdentityVerificationScreenState
                         Navigator.pop(context);
                         Navigator.pop(dialogContext);
                         resendEmailDialog(context);
+                        startEmailCountdown();
 
                         setState(() {});
                       } catch (e) {
