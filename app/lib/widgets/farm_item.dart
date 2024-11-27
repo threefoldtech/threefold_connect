@@ -68,10 +68,21 @@ class _FarmItemWidgetState extends State<FarmItemWidget> {
         widget.farm.farmId,
         newAddress,
       );
+              final savingAddressSuccess = SnackBar(
+          content: Text(
+            'Address is saved Successfully.',
+            style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                  color: Theme.of(context).colorScheme.surface,
+                ),
+          ),
+          duration: const Duration(seconds: 3),
+        );
+        ScaffoldMessenger.of(context).clearSnackBars();
+        ScaffoldMessenger.of(context).showSnackBar(savingAddressSuccess);
     } catch (e) {
       logger.e('Failed to add stellar address due to $e');
       if (context.mounted) {
-        final loadingFarmsFailure = SnackBar(
+        final savingAddressFailure = SnackBar(
           content: Text(
             'Failed to Add Stellar address',
             style: Theme.of(context).textTheme.bodyMedium!.copyWith(
@@ -81,7 +92,7 @@ class _FarmItemWidgetState extends State<FarmItemWidget> {
           duration: const Duration(seconds: 3),
         );
         ScaffoldMessenger.of(context).clearSnackBars();
-        ScaffoldMessenger.of(context).showSnackBar(loadingFarmsFailure);
+        ScaffoldMessenger.of(context).showSnackBar(savingAddressFailure);
       }
     } finally {
       setState(() {
