@@ -1,11 +1,18 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:threebotlogin/helpers/logger.dart';
 import 'package:threebotlogin/models/farm.dart';
+import 'package:threebotlogin/models/wallet.dart';
+import 'package:threebotlogin/screens/wallets/contacts.dart';
+import 'package:threebotlogin/services/stellar_service.dart';
+import 'package:threebotlogin/services/tfchain_service.dart';
 import 'package:threebotlogin/widgets/farm_node_item.dart';
 
 class FarmItemWidget extends StatefulWidget {
-  const FarmItemWidget({super.key, required this.farm});
+  const FarmItemWidget({super.key, required this.farm, required this.wallets});
   final Farm farm;
+  final List<Wallet> wallets;
 
   @override
   State<FarmItemWidget> createState() => _FarmItemWidgetState();
@@ -18,6 +25,16 @@ class _FarmItemWidgetState extends State<FarmItemWidget> {
   final twinIdController = TextEditingController();
   final farmIdController = TextEditingController();
   bool showTfchainSecret = false;
+  bool edit = false;
+  final walletFocus = FocusNode();
+  ChainType chainType = ChainType.Stellar;
+  String? addressError;
+
+  @override
+  void initState() {
+    super.initState();
+    walletAddressController.text = widget.farm.walletAddress;
+  }
 
   @override
   void dispose() {
@@ -29,9 +46,59 @@ class _FarmItemWidgetState extends State<FarmItemWidget> {
     super.dispose();
   }
 
+  _editStellarPayoutAddress() async {
+    setState(() {
+      edit = !edit;
+    });
+
+    if (!edit) {
+      final String newAddress = walletAddressController.text.trim();
+      if (newAddress == widget.farm.walletAddress) {
+        FocusScope.of(context).requestFocus(walletFocus);
+        return;
+      }
+
+      try {
+        await addStellarAddress(
+          widget.farm.tfchainWalletSecret,
+          widget.farm.farmId,
+          newAddress,
+        );
+      } catch (e) {
+        logger.e('Failed to add stellar address due to $e');
+        if (context.mounted) {
+          final loadingFarmsFailure = SnackBar(
+            content: Text(
+              'Failed to Add Stellar address',
+              style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                    color: Theme.of(context).colorScheme.errorContainer,
+                  ),
+            ),
+            duration: const Duration(seconds: 3),
+          );
+          ScaffoldMessenger.of(context).clearSnackBars();
+          ScaffoldMessenger.of(context).showSnackBar(loadingFarmsFailure);
+        }
+      }
+    }
+  }
+
+  void validateStellarAddress(String address) {
+    setState(() {
+      addressError =
+          isValidStellarAddress(address) ? null : 'Invalid Stellar address';
+    });
+  }
+
+  void _selectToAddress(String address) {
+    setState(() {
+      walletAddressController.text = address;
+      validateStellarAddress(address);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    walletAddressController.text = widget.farm.walletAddress;
     tfchainWalletSecretController.text = widget.farm.tfchainWalletSecret;
     walletNameController.text = widget.farm.walletName;
     farmIdController.text = widget.farm.farmId.toString();
@@ -48,24 +115,73 @@ class _FarmItemWidgetState extends State<FarmItemWidget> {
       children: [
         ListTile(
           title: TextField(
-              readOnly: true,
+              focusNode: walletFocus,
+              autofocus: edit,
+              readOnly: !edit,
               style: Theme.of(context).textTheme.bodyMedium!.copyWith(
                     color: Theme.of(context).colorScheme.onSurface,
                   ),
               controller: walletAddressController,
-              decoration: const InputDecoration(
-                labelText: 'Stellar Payout Address',
-              )),
-          subtitle: const Text('This address will be used for payout.'),
-          trailing: IconButton(
-              onPressed: () {
-                Clipboard.setData(
-                    ClipboardData(text: walletAddressController.text));
-                ScaffoldMessenger.of(context).clearSnackBars();
-                ScaffoldMessenger.of(context)
-                    .showSnackBar(const SnackBar(content: Text('Copied!')));
+              onChanged: (value) {
+                validateStellarAddress(value);
               },
-              icon: const Icon(Icons.copy)),
+              decoration: InputDecoration(
+                  errorText: addressError,
+                  labelText: 'Stellar Payout Address',
+                  suffixIcon: edit
+                      ? IconButton(
+                          onPressed: () {
+                            Navigator.of(context).push(MaterialPageRoute(
+                              builder: (context) => ContractsScreen(
+                                  chainType: chainType,
+                                  currentWalletAddress:
+                                      widget.farm.walletAddress,
+                                  wallets: widget.wallets,
+                                  onSelectToAddress: _selectToAddress),
+                            ));
+                          },
+                          icon: const Icon(Icons.person))
+                      : null)),
+          subtitle: const Text('This address will be used for payout.'),
+          trailing: edit
+              ? IconButton(
+                  onPressed: addressError == null
+                      ? () {
+                          _editStellarPayoutAddress();
+                        }
+                      : null,
+                  icon: Icon(
+                    Icons.save,
+                    color: addressError == null
+                        ? Theme.of(context).colorScheme.onSurface
+                        : Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
+                )
+              : SizedBox(
+                  width: 100,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      IconButton(
+                          onPressed: () {
+                            _editStellarPayoutAddress();
+                          },
+                          icon: edit
+                              ? const Icon(Icons.save)
+                              : const Icon(Icons.edit)),
+                      IconButton(
+                        onPressed: () {
+                          Clipboard.setData(ClipboardData(
+                              text: walletAddressController.text));
+                          ScaffoldMessenger.of(context).clearSnackBars();
+                          ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text('Copied!')));
+                        },
+                        icon: const Icon(Icons.copy),
+                      ),
+                    ],
+                  ),
+                ),
         ),
         ListTile(
           title: TextField(

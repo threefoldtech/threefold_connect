@@ -114,7 +114,7 @@ class _FarmScreenState extends State<FarmScreen> {
       );
     } else {
       mainWidget = ListView(
-          children: [for (final farm in farms) FarmItemWidget(farm: farm)]);
+          children: [for (final farm in farms) FarmItemWidget(farm: farm, wallets: wallets,)]);
     }
     return LayoutDrawer(
       titleText: 'Farming',
