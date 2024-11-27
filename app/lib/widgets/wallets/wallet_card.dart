@@ -96,8 +96,10 @@ class _WalletCardWidgetState extends State<WalletCardWidget> {
               SizedBox(
                   width: 35,
                   child: Image.asset(
-                    'assets/tft_icon.png',
+                    'assets/stellar.png',
                     color: Theme.of(context).colorScheme.onSurface,
+                    width: 20,
+                    height: 20,
                   )),
               Text(
                 'Stellar',
@@ -120,9 +122,10 @@ class _WalletCardWidgetState extends State<WalletCardWidget> {
               SizedBox(
                   width: 35,
                   child: Image.asset(
-                    'assets/tft_icon.png',
-                    fit: BoxFit.contain,
+                    'assets/tf_chain.png',
                     color: Theme.of(context).colorScheme.onSurface,
+                    width: 20,
+                    height: 20,
                   )),
               Text(
                 'TFChain',
