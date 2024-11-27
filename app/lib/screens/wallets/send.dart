@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
 import 'package:threebotlogin/helpers/globals.dart';
+import 'package:threebotlogin/helpers/transaction_helpers.dart';
 import 'package:threebotlogin/models/wallet.dart';
 import 'package:threebotlogin/providers/wallets_provider.dart';
 import 'package:threebotlogin/screens/scan_screen.dart';
@@ -256,7 +257,7 @@ class _WalletSendScreenState extends State<WalletSendScreen> {
                       const TextInputType.numberWithOptions(decimal: true),
                   controller: amountController,
                   decoration: InputDecoration(
-                      labelText: 'Amount (Balance: $balance)',
+                      labelText: 'Amount (Balance: ${formatAmount(balance)})',
                       hintText: '100',
                       suffixText: 'TFT',
                       errorText: amountError)),
