@@ -157,9 +157,9 @@ class _WalletBridgeScreenSate extends State<WalletBridgeScreen> {
     String balance = transactionType == BridgeOperation.Withdraw
         ? widget.wallet.tfchainBalance
         : widget.wallet.stellarBalance;
-    final bool hideDeposit = widget.wallet.stellarBalance == '-1';
+    final bool disableDeposit = widget.wallet.stellarBalance == '-1';
 
-    if (hideDeposit) {
+    if (disableDeposit) {
       onTransactionChange(BridgeOperation.Withdraw);
     }
 
@@ -173,7 +173,7 @@ class _WalletBridgeScreenSate extends State<WalletBridgeScreen> {
             SwapTransactionWidget(
                 bridgeOperation: transactionType,
                 onTransactionChange: onTransactionChange,
-                disableDeposit: hideDeposit),
+                disableDeposit: disableDeposit),
             const SizedBox(height: 20),
             ListTile(
               title: TextField(
