@@ -246,7 +246,12 @@ class _WalletSendScreenState extends State<WalletSendScreen> {
                               builder: (context) => ContractsScreen(
                                   chainType: chainType,
                                   currentWalletAddress: fromController.text,
-                                  wallets: widget.allWallets,
+                                  wallets: widget.allWallets
+                                      .where((w) => chainType ==
+                                              ChainType.Stellar
+                                          ? double.parse(w.stellarBalance) >= 0
+                                          : double.parse(w.tfchainBalance) >= 0)
+                                      .toList(),
                                   onSelectToAddress: _selectToAddress),
                             ));
                           },
