@@ -114,6 +114,15 @@ class _WalletSendScreenState extends State<WalletSendScreen> {
         toAddressError = 'Invaild Stellar address';
         return false;
       }
+
+      final matchingWallets = widget.allWallets
+          .where((wallet) => wallet.stellarAddress == toAddress);
+      final Wallet? wallet =
+          matchingWallets.isNotEmpty ? matchingWallets.first : null;
+      if (wallet != null && wallet.stellarBalance == '-1') {
+        toAddressError = 'Wallet not activated on stellar';
+        return false;
+      }
     }
     return true;
   }
