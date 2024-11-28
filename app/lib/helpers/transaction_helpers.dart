@@ -6,7 +6,5 @@ String formatAmount(String amount) {
 
   String formattedAmount = NumberFormat('#,##0.##').format(parsedAmount);
 
-  return parsedAmount == parsedAmount.roundToDouble()
-      ? formattedAmount.split('.').first
-      : formattedAmount;
+  return formattedAmount;
 }
