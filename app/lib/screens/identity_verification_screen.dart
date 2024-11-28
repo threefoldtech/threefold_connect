@@ -807,14 +807,7 @@ class _IdentityVerificationScreenState
                                 child: Text(
                                   text == '' ? 'Unknown' : text,
                                   overflow: TextOverflow.clip,
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .bodySmall!
-                                      .copyWith(
-                                          fontWeight: FontWeight.bold,
-                                          color: Theme.of(context)
-                                              .colorScheme
-                                              .onSurface),
+                                  style: TextStyle(fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onSurface)
                                 ),
                               )
                             ],
@@ -907,7 +900,6 @@ class _IdentityVerificationScreenState
                                     maxWidth:
                                         MediaQuery.of(context).size.width *
                                             0.7),
-                            padding: const EdgeInsets.all(10),
                             child: Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: <Widget>[
