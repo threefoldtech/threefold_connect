@@ -1,7 +1,12 @@
-String formatAmount(String amount) {
-  double formattedAmount = double.parse(amount);
+// ignore: depend_on_referenced_packages
+import 'package:intl/intl.dart';
 
-  return formattedAmount == formattedAmount.roundToDouble()
-      ? amount.split('.').first
-      : formattedAmount.toStringAsFixed(2);
+String formatAmount(String amount) {
+  double parsedAmount = double.parse(amount);
+
+  String formattedAmount = NumberFormat('#,##0.##').format(parsedAmount);
+
+  return parsedAmount == parsedAmount.roundToDouble()
+      ? formattedAmount.split('.').first
+      : formattedAmount;
 }
