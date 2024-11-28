@@ -31,7 +31,7 @@ class WalletBalanceTileWidget extends StatelessWidget {
         ),
       ),
       title: Text(
-        name == ChainType.Stellar ? 'Stellar' : 'TFChain',
+        name.name,
         style: Theme.of(context).textTheme.bodyLarge!.copyWith(
               color: Theme.of(context).colorScheme.onSecondaryContainer,
             ),

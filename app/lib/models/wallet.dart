@@ -2,7 +2,7 @@ enum WalletType { NATIVE, IMPORTED }
 
 enum ChainType { Stellar, TFChain }
 
-enum TransactionType { Withdraw, Deposit }
+enum BridgeOperation { Withdraw, Deposit }
 
 class Wallet {
   Wallet({

@@ -25,7 +25,7 @@ class _WalletBridgeScreenSate extends State<WalletBridgeScreen> {
   final fromController = TextEditingController();
   final toController = TextEditingController();
   final amountController = TextEditingController();
-  TransactionType transactionType = TransactionType.Withdraw;
+  BridgeOperation transactionType = BridgeOperation.Withdraw;
   String? toAddressError;
   String? amountError;
   bool reloadBalance = true;
@@ -75,8 +75,8 @@ class _WalletBridgeScreenSate extends State<WalletBridgeScreen> {
     await _reloadBalances();
   }
 
-  onTransactionChange(TransactionType type) {
-    fromController.text = type == TransactionType.Withdraw
+  onTransactionChange(BridgeOperation type) {
+    fromController.text = type == BridgeOperation.Withdraw
         ? widget.wallet.tfchainAddress
         : widget.wallet.stellarAddress;
     toController.text = '';
@@ -92,14 +92,14 @@ class _WalletBridgeScreenSate extends State<WalletBridgeScreen> {
       return false;
     }
 
-    if (transactionType == TransactionType.Deposit) {
+    if (transactionType == BridgeOperation.Deposit) {
       if (toAddress.length != 48) {
         toAddressError = 'Address length should be 48 characters';
         return false;
       }
     }
 
-    if (transactionType == TransactionType.Withdraw) {
+    if (transactionType == BridgeOperation.Withdraw) {
       if (!isValidStellarAddress(toAddress)) {
         toAddressError = 'Invaild Stellar address';
         return false;
@@ -124,14 +124,14 @@ class _WalletBridgeScreenSate extends State<WalletBridgeScreen> {
       amountError = "Amount can't be less than 2";
       return false;
     }
-    if (transactionType == TransactionType.Withdraw) {
+    if (transactionType == BridgeOperation.Withdraw) {
       if (double.parse(amount) > double.parse(widget.wallet.tfchainBalance)) {
         amountError = "Amount shouldn't be more than the wallet balance";
         return false;
       }
     }
 
-    if (transactionType == TransactionType.Deposit) {
+    if (transactionType == BridgeOperation.Deposit) {
       if (double.parse(amount) > double.parse(widget.wallet.stellarBalance)) {
         amountError = "Amount shouldn't be more than the wallet balance";
         return false;
@@ -154,13 +154,13 @@ class _WalletBridgeScreenSate extends State<WalletBridgeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    String balance = transactionType == TransactionType.Withdraw
+    String balance = transactionType == BridgeOperation.Withdraw
         ? widget.wallet.tfchainBalance
         : widget.wallet.stellarBalance;
     final bool hideDeposit = widget.wallet.stellarBalance == '-1';
 
     if (hideDeposit) {
-      onTransactionChange(TransactionType.Withdraw);
+      onTransactionChange(BridgeOperation.Withdraw);
     }
 
     return Scaffold(
@@ -171,9 +171,9 @@ class _WalletBridgeScreenSate extends State<WalletBridgeScreen> {
           child: Column(children: [
             const SizedBox(height: 10),
             SwapTransactionWidget(
-                transactionType: transactionType,
+                bridgeOperation: transactionType,
                 onTransactionChange: onTransactionChange,
-                hideDeposit: hideDeposit),
+                disableDeposit: hideDeposit),
             const SizedBox(height: 20),
             ListTile(
               title: TextField(
@@ -201,7 +201,7 @@ class _WalletBridgeScreenSate extends State<WalletBridgeScreen> {
                             Navigator.of(context).push(MaterialPageRoute(
                               builder: (context) => ContactsScreen(
                                   chainType: transactionType ==
-                                          TransactionType.Withdraw
+                                          BridgeOperation.Withdraw
                                       ? ChainType.Stellar
                                       : ChainType.TFChain,
                                   currentWalletAddress: fromController.text,
@@ -226,7 +226,7 @@ class _WalletBridgeScreenSate extends State<WalletBridgeScreen> {
                       suffixText: 'TFT',
                       errorText: amountError)),
               subtitle: Text(
-                  'Max Fee: ${transactionType == TransactionType.Deposit ? 1.1 : 1.01} TFT'),
+                  'Max Fee: ${transactionType == BridgeOperation.Deposit ? 1.1 : 1.01} TFT'),
             ),
             const SizedBox(height: 10),
             Padding(
@@ -266,15 +266,15 @@ class _WalletBridgeScreenSate extends State<WalletBridgeScreen> {
         constraints: const BoxConstraints(maxWidth: double.infinity),
         context: context,
         builder: (ctx) => BridgeConfirmationWidget(
-              transactionType: transactionType,
-              secret: transactionType == TransactionType.Deposit
+              bridgeOperation: transactionType,
+              secret: transactionType == BridgeOperation.Deposit
                   ? widget.wallet.stellarSecret
                   : widget.wallet.tfchainSecret,
               from: fromController.text.trim(),
               to: toController.text.trim(),
               amount: amountController.text.trim(),
               memo: memoText,
-              reloadBalance: transactionType == TransactionType.Deposit
+              reloadBalance: transactionType == BridgeOperation.Deposit
                   ? _loadStellarBalance
                   : _loadTFChainBalance,
             ));

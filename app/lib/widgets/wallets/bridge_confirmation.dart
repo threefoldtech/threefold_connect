@@ -8,7 +8,7 @@ import 'package:threebotlogin/widgets/custom_dialog.dart';
 class BridgeConfirmationWidget extends StatefulWidget {
   const BridgeConfirmationWidget({
     super.key,
-    required this.transactionType,
+    required this.bridgeOperation,
     required this.secret,
     required this.from,
     required this.to,
@@ -17,7 +17,7 @@ class BridgeConfirmationWidget extends StatefulWidget {
     required this.reloadBalance,
   });
 
-  final TransactionType transactionType;
+  final BridgeOperation bridgeOperation;
   final String secret;
   final String from;
   final String to;
@@ -59,9 +59,7 @@ class _BridgeConfirmationWidgetState extends State<BridgeConfirmationWidget> {
         padding: const EdgeInsets.all(16),
         child: Column(children: [
           Text(
-            widget.transactionType == TransactionType.Withdraw
-                ? 'Withdraw Confirmation'
-                : 'Deposit Confirmation',
+            'Bridge Confirmation',
             style: Theme.of(context).textTheme.headlineSmall!.copyWith(
                   color: Theme.of(context).colorScheme.onSurface,
                 ),
@@ -101,7 +99,7 @@ class _BridgeConfirmationWidgetState extends State<BridgeConfirmationWidget> {
                 decoration: const InputDecoration(
                     labelText: 'Amount', hintText: '100', suffixText: 'TFT')),
             subtitle: Text(
-                'Max Fee: ${widget.transactionType == TransactionType.Deposit ? 1.1 : 1.01} TFT'),
+                'Max Fee: ${widget.bridgeOperation == BridgeOperation.Deposit ? 1.1 : 1.01} TFT'),
           ),
           const SizedBox(height: 30),
           Padding(
@@ -137,7 +135,7 @@ class _BridgeConfirmationWidgetState extends State<BridgeConfirmationWidget> {
       loading = true;
     });
     try {
-      if (widget.transactionType == TransactionType.Deposit) {
+      if (widget.bridgeOperation == BridgeOperation.Deposit) {
         await Stellar.transfer(widget.secret, Globals().bridgeTFTAddress,
             widget.amount, widget.memo);
       } else {
