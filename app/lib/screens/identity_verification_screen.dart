@@ -86,6 +86,10 @@ class _IdentityVerificationScreenState
     if (mounted) {
       setState(() {
         emailVerified = Globals().emailVerified.value;
+        if (emailVerified){
+          countdownNotifier.value = -1;
+          emailTimer?.cancel();
+        }
       });
     }
   }
