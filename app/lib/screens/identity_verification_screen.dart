@@ -68,13 +68,22 @@ class _IdentityVerificationScreenState
   ValueNotifier<int> countdownNotifier = ValueNotifier(-1);
 
   void startEmailCountdown() {
-    emailCountdown = 60;
+    Globals().emailSentOn = DateTime.now().millisecondsSinceEpoch;
+
+    emailCountdown = Globals().emailMinutesCoolDown * 60;
+
     countdownNotifier.value = emailCountdown;
 
+    emailTimer?.cancel();
+
     emailTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
-      if (emailCountdown > 0) {
-        emailCountdown--;
-        countdownNotifier.value = emailCountdown;
+      int currentTime = DateTime.now().millisecondsSinceEpoch;
+      int lockedUntil =
+          Globals().emailSentOn + (Globals().emailMinutesCoolDown * 60 * 1000);
+      int timeLeft = ((lockedUntil - currentTime) / 1000).round();
+
+      if (timeLeft > 0) {
+        countdownNotifier.value = timeLeft;
       } else {
         countdownNotifier.value = -1;
         timer.cancel();
@@ -82,11 +91,37 @@ class _IdentityVerificationScreenState
     });
   }
 
+  void resumeEmailCountdownIfNeeded() {
+    int currentTime = DateTime.now().millisecondsSinceEpoch;
+    int lockedUntil =
+        Globals().emailSentOn + (Globals().emailMinutesCoolDown * 60 * 1000);
+    int timeLeft = ((lockedUntil - currentTime) / 1000).round();
+
+    if (timeLeft > 0) {
+      emailCountdown = timeLeft;
+      countdownNotifier.value = emailCountdown;
+
+      emailTimer?.cancel();
+
+      emailTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+        if (emailCountdown > 0) {
+          emailCountdown--;
+          countdownNotifier.value = emailCountdown;
+        } else {
+          countdownNotifier.value = -1;
+          timer.cancel();
+        }
+      });
+    } else {
+      countdownNotifier.value = -1;
+    }
+  }
+
   setEmailVerified() {
     if (mounted) {
       setState(() {
         emailVerified = Globals().emailVerified.value;
-        if (emailVerified){
+        if (emailVerified) {
           countdownNotifier.value = -1;
           emailTimer?.cancel();
         }
@@ -129,6 +164,7 @@ class _IdentityVerificationScreenState
     Globals().hidePhoneButton.addListener(setHidePhoneVerify);
     checkPhoneStatus();
     getUserValues();
+    resumeEmailCountdownIfNeeded();
   }
 
   @override
