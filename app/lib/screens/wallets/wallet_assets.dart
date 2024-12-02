@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:stellar_client/models/vesting_account.dart';
 import 'package:threebotlogin/helpers/globals.dart';
+import 'package:threebotlogin/helpers/transaction_helpers.dart';
 import 'package:threebotlogin/models/wallet.dart';
 import 'package:threebotlogin/providers/wallets_provider.dart';
 import 'package:threebotlogin/screens/wallets/receive.dart';
@@ -77,7 +78,7 @@ class _WalletAssetsWidgetState extends State<WalletAssetsWidget> {
         ),
         WalletBalanceTileWidget(
           name: 'Stellar',
-          balance: vestedWallets![0].tft.toString(),
+          balance: formatAmount(vestedWallets![0].tft.toString()),
           loading: false,
         ),
       ];
@@ -171,14 +172,14 @@ class _WalletAssetsWidgetState extends State<WalletAssetsWidget> {
           if (double.parse(widget.wallet.stellarBalance) >= 0)
             WalletBalanceTileWidget(
               name: 'Stellar',
-              balance: widget.wallet.stellarBalance,
+              balance: formatAmount(widget.wallet.stellarBalance),
               loading: stellarBalaceLoading,
             ),
           const SizedBox(height: 10),
           if (double.parse(widget.wallet.tfchainBalance) >= 0)
             WalletBalanceTileWidget(
               name: 'TFChain',
-              balance: widget.wallet.tfchainBalance,
+              balance: formatAmount(widget.wallet.tfchainBalance),
               loading: tfchainBalaceLoading,
             ),
           const SizedBox(

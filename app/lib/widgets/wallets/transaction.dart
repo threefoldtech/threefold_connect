@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:stellar_client/models/transaction.dart';
+import 'package:threebotlogin/helpers/transaction_helpers.dart';
 import 'package:threebotlogin/screens/wallets/transaction_details.dart';
 import 'package:threebotlogin/widgets/wallets/arrow_inward.dart';
 
@@ -54,8 +55,7 @@ class TransactionWidget extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Expanded(
-                        child: Text(
-                            'TFT ${double.parse(transaction.amount).toStringAsFixed(2)}',
+                        child: Text('TFT ${formatAmount(transaction.amount)}',
                             overflow: TextOverflow.ellipsis,
                             style: Theme.of(context)
                                 .textTheme
