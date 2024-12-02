@@ -261,7 +261,14 @@ class _WalletSendScreenState extends State<WalletSendScreen> {
                                         chainType: chainType,
                                         currentWalletAddress:
                                             fromController.text,
-                                        wallets: widget.allWallets,
+                                        wallets: chainType == ChainType.Stellar
+                                            ? widget.allWallets
+                                                .where((w) =>
+                                                    double.parse(
+                                                        w.stellarBalance) >=
+                                                    0)
+                                                .toList()
+                                            : widget.allWallets,
                                         onSelectToAddress: _selectToAddress),
                                   ));
                                 },
