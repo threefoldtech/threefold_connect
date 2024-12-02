@@ -67,35 +67,16 @@ class _IdentityVerificationScreenState
   Timer? emailTimer;
   ValueNotifier<int> countdownNotifier = ValueNotifier(-1);
 
-  void startEmailCountdown() {
-    Globals().emailSentOn = DateTime.now().millisecondsSinceEpoch;
-
-    emailCountdown = Globals().emailMinutesCoolDown * 60;
-
-    countdownNotifier.value = emailCountdown;
-
-    emailTimer?.cancel();
-
-    emailTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
-      int currentTime = DateTime.now().millisecondsSinceEpoch;
-      int lockedUntil =
-          Globals().emailSentOn + (Globals().emailMinutesCoolDown * 60 * 1000);
-      int timeLeft = ((lockedUntil - currentTime) / 1000).round();
-
-      if (timeLeft > 0) {
-        countdownNotifier.value = timeLeft;
-      } else {
-        countdownNotifier.value = -1;
-        timer.cancel();
-      }
-    });
-  }
-
-  void resumeEmailCountdownIfNeeded() {
+  void startOrResumeEmailCountdown({bool startNew = false}) {
     int currentTime = DateTime.now().millisecondsSinceEpoch;
     int lockedUntil =
         Globals().emailSentOn + (Globals().emailMinutesCoolDown * 60 * 1000);
     int timeLeft = ((lockedUntil - currentTime) / 1000).round();
+
+    if (startNew) {
+      Globals().emailSentOn = currentTime;
+      timeLeft = Globals().emailMinutesCoolDown * 60;
+    }
 
     if (timeLeft > 0) {
       emailCountdown = timeLeft;
@@ -104,9 +85,13 @@ class _IdentityVerificationScreenState
       emailTimer?.cancel();
 
       emailTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
-        if (emailCountdown > 0) {
-          emailCountdown--;
-          countdownNotifier.value = emailCountdown;
+        int currentTime = DateTime.now().millisecondsSinceEpoch;
+        int lockedUntil = Globals().emailSentOn +
+            (Globals().emailMinutesCoolDown * 60 * 1000);
+        int remainingTime = ((lockedUntil - currentTime) / 1000).round();
+
+        if (remainingTime > 0) {
+          countdownNotifier.value = remainingTime;
         } else {
           countdownNotifier.value = -1;
           timer.cancel();
@@ -164,7 +149,7 @@ class _IdentityVerificationScreenState
     Globals().hidePhoneButton.addListener(setHidePhoneVerify);
     checkPhoneStatus();
     getUserValues();
-    resumeEmailCountdownIfNeeded();
+    startOrResumeEmailCountdown();
   }
 
   @override
@@ -1041,7 +1026,8 @@ class _IdentityVerificationScreenState
                                           // Verify email
                                           case 1:
                                             {
-                                              startEmailCountdown();
+                                              startOrResumeEmailCountdown(
+                                                  startNew: true);
                                               verifyEmail();
                                             }
                                             break;
@@ -1720,7 +1706,7 @@ class _IdentityVerificationScreenState
                         Navigator.pop(context);
                         Navigator.pop(dialogContext);
                         resendEmailDialog(context);
-                        startEmailCountdown();
+                        startOrResumeEmailCountdown(startNew: true);
 
                         setState(() {});
                       } catch (e) {
