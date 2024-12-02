@@ -34,20 +34,38 @@ class _RecoverScreenState extends State<RecoverScreen> {
 
   String errorStepperText = '';
 
-  checkSeedPhrase(doubleName, seedPhrase) async {
-    checkSeedLength(seedPhrase);
-    KeyPair keyPair = await generateKeyPairFromSeedPhrase(seedPhrase);
+  validateNameSeed(doubleName, seedPhrase) async {
+    try {
+      Response userInfoResult = await getUserInfo(doubleName);
+      await validateName(doubleName, userInfoResult);
+      await validateSeed(seedPhrase, userInfoResult);
+    } catch (e) {
+      rethrow;
+    }
+  }
 
-    Response userInfoResult = await getUserInfo(doubleName);
-
-    if (userInfoResult.statusCode != 200) {
-      throw Exception('Name was not found.');
+  validateName(String doubleName, userInfoResult) async {
+    if (doubleName == '.3bot') {
+      throw ('Name is required.');
     }
 
-    Map<String, dynamic> body = json.decode(userInfoResult.body);
-    if (body['publicKey'] != base64.encode(keyPair.publicKey)) {
-      throw Exception(
-          'Seed phrase does not match with ${doubleName.replaceAll('.3bot', '')}');
+    if (userInfoResult.statusCode != 200) {
+      throw ('Name was not found.');
+    }
+  }
+
+  validateSeed(String seedPhrase, userInfoResult) async {
+    try {
+      checkSeedLength(seedPhrase);
+      KeyPair keyPair = await generateKeyPairFromSeedPhrase(seedPhrase);
+      Map<String, dynamic> body = json.decode(userInfoResult.body);
+      if (body['publicKey'] != base64.encode(keyPair.publicKey)) {
+        throw ('Seed phrase does not match with ${doubleName.replaceAll('.3bot', '')}');
+      }
+    } catch (e) {
+      if (e.toString().contains('Invalid mnemonic')) {
+        throw ('Invalid mnemonic');
+      }
     }
   }
 
@@ -86,10 +104,13 @@ class _RecoverScreenState extends State<RecoverScreen> {
 
   checkSeedLength(seedPhrase) {
     int seedLength = seedPhrase.split(' ').length;
+    if (seedLength == 1) {
+      throw ('Seed phrase is required.');
+    }
     if (seedLength <= 23) {
-      throw Exception('Seed phrase is too short');
+      throw ('Seed phrase is too short');
     } else if (seedLength > 24) {
-      throw Exception('Seed phrase is too long');
+      throw ('Seed phrase is too long');
     }
   }
 
@@ -109,7 +130,7 @@ class _RecoverScreenState extends State<RecoverScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Recover Account'),
+        title: const Text('Log In'),
       ),
       body: Container(
         padding: const EdgeInsets.all(20.0),
@@ -189,7 +210,7 @@ class _RecoverScreenState extends State<RecoverScreen> {
             ElevatedButton(
               style: ElevatedButton.styleFrom(),
               child: Text(
-                'Recover Account',
+                'Log In',
                 style: Theme.of(context).textTheme.bodyLarge!.copyWith(
                     color: Theme.of(context).colorScheme.onPrimaryContainer),
               ),
@@ -225,7 +246,7 @@ class _RecoverScreenState extends State<RecoverScreen> {
                 try {
                   showSpinner();
 
-                  await checkSeedPhrase(doubleName, seedPhrase);
+                  await validateNameSeed(doubleName, seedPhrase);
                   await continueRecoverAccount();
 
                   // To dismiss the spinner

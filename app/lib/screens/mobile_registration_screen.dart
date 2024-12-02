@@ -147,8 +147,8 @@ class _MobileRegistrationScreenState extends State<MobileRegistrationScreen> {
       seedConfirmationController.text = seedCheckValue;
     });
 
-    bool seedWordConfirmationValidation = validateSeedWords(
-        _registrationData.phrase, seedConfirmationController.text);
+    bool seedWordConfirmationValidation =
+        validateSeedWords(_registrationData.phrase, seedCheckValue);
 
     if (seedWordConfirmationValidation) {
       setState(() {
@@ -389,7 +389,7 @@ class _MobileRegistrationScreenState extends State<MobileRegistrationScreen> {
                               .colorScheme
                               .onSecondaryContainer),
                       focusNode: nameFocus,
-                      maxLength: 50,
+                      maxLength: 20,
                       autofocus: true,
                       keyboardType: TextInputType.text,
                       decoration: const InputDecoration(
