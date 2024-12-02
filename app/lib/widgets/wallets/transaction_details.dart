@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:stellar_client/models/transaction.dart';
+import 'package:threebotlogin/helpers/transaction_helpers.dart';
 
 class TransactionDetails extends StatelessWidget {
   final PaymentTransaction transaction;
@@ -75,7 +76,7 @@ class TransactionDetails extends StatelessWidget {
           const Divider(),
           buildDetailRow('Type', transaction.type.name),
           const Divider(),
-          buildDetailRow('Amount', transaction.amount),
+          buildDetailRow('Amount', formatAmount(transaction.amount)),
           const Divider(),
           buildDetailRow('Asset', transaction.asset),
           const Divider(),

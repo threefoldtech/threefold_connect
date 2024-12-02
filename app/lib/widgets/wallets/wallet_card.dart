@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:threebotlogin/helpers/globals.dart';
 import 'package:threebotlogin/helpers/logger.dart';
+import 'package:threebotlogin/helpers/transaction_helpers.dart';
 import 'package:threebotlogin/models/wallet.dart';
 import 'package:threebotlogin/screens/wallets/wallet_details.dart';
 import 'package:threebotlogin/services/stellar_service.dart' as StellarService;
@@ -107,7 +108,7 @@ class _WalletCardWidgetState extends State<WalletCardWidget> {
               ),
               const Spacer(),
               Text(
-                '${widget.wallet.stellarBalance} TFT',
+                '${formatAmount(widget.wallet.stellarBalance)} TFT',
                 style: Theme.of(context).textTheme.bodyLarge!.copyWith(
                       color: Theme.of(context).colorScheme.onSecondaryContainer,
                     ),
@@ -132,7 +133,7 @@ class _WalletCardWidgetState extends State<WalletCardWidget> {
               ),
               const Spacer(),
               Text(
-                '${widget.wallet.tfchainBalance} TFT',
+                '${formatAmount(widget.wallet.tfchainBalance)} TFT',
                 style: Theme.of(context).textTheme.bodyLarge!.copyWith(
                       color: Theme.of(context).colorScheme.onSecondaryContainer,
                     ),
