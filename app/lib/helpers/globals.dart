@@ -72,6 +72,9 @@ class Globals {
   int smsMinutesCoolDown = 5;
   int spendingLimit = 0;
 
+  int emailSentOn = 0;
+  int emailMinutesCoolDown = 1;
+
   ValueNotifier<bool> hidePhoneButton = ValueNotifier(false);
 
   static final Globals _singleton = Globals._internal();
