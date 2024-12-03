@@ -15,6 +15,7 @@ import 'package:threebotlogin/helpers/kyc_helpers.dart';
 import 'package:threebotlogin/helpers/logger.dart';
 import 'package:threebotlogin/main.dart';
 import 'package:threebotlogin/models/idenfy.dart';
+import 'package:threebotlogin/models/wallet.dart';
 import 'package:threebotlogin/screens/wizard/web_view.dart';
 import 'package:threebotlogin/services/gridproxy_service.dart';
 import 'package:threebotlogin/services/idenfy_service.dart';
@@ -23,6 +24,7 @@ import 'package:threebotlogin/services/open_kyc_service.dart';
 import 'package:threebotlogin/services/pkid_service.dart';
 import 'package:threebotlogin/services/tools_service.dart';
 import 'package:threebotlogin/services/shared_preference_service.dart';
+import 'package:threebotlogin/services/wallet_service.dart';
 import 'package:threebotlogin/widgets/custom_dialog.dart';
 import 'package:threebotlogin/widgets/layout_drawer.dart';
 import 'package:threebotlogin/widgets/phone_widget.dart';
@@ -58,7 +60,6 @@ class _IdentityVerificationScreenState
 
   final emailController = TextEditingController();
   final changeEmailController = TextEditingController();
-
   bool emailInputValidated = false;
 
   double spending = 0.0;
@@ -1265,6 +1266,11 @@ class _IdentityVerificationScreenState
                 ],
               ));
     } on NotEnoughBalance catch (_) {
+      final wallet = (await getPkidWallets())
+          .where((w) => w.type == WalletType.NATIVE)
+          .toList()
+          .first
+          .name;
       setState(() {
         isLoading = false;
       });
@@ -1276,7 +1282,7 @@ class _IdentityVerificationScreenState
                 image: Icons.warning,
                 title: 'Not enough balance',
                 description:
-                    'Please fund your Daily TFChain wallet with at least $minimumBalance TFTs.',
+                    'Please fund your $wallet TFChain wallet with at least $minimumBalance TFTs.',
                 actions: <Widget>[
                   TextButton(
                     child: const Text('Close'),
