@@ -82,18 +82,18 @@ class _WalletBridgeScreenState extends State<WalletBridgeScreen> {
   }
 
   onTransactionChange(BridgeOperation type) {
-    fromController.text = type == BridgeOperation.Withdraw
+    transactionType = type;
+    isWithdraw = transactionType == BridgeOperation.Withdraw ? true : false;
+    fromController.text = isWithdraw
         ? widget.wallet.tfchainAddress
         : widget.wallet.stellarAddress;
     toController.text = '';
     toAddressError = null;
     amountError = null;
-    transactionType = type;
-    isWithdraw = transactionType == BridgeOperation.Withdraw ? true : false;
     setState(() {});
   }
 
-  bool _validateToAddress() {
+  Future<bool> _validateToAddress() async {
     final toAddress = toController.text.trim();
     toAddressError = null;
     if (toAddress.isEmpty) {
@@ -106,11 +106,21 @@ class _WalletBridgeScreenState extends State<WalletBridgeScreen> {
         toAddressError = 'Address length should be 48 characters';
         return false;
       }
+      final twinId = await TFChain.getTwinIdByQueryClient(toAddress);
+      if (twinId == 0) {
+        toAddressError = 'Address must have a twin ID';
+        return false;
+      }
     }
 
     if (isWithdraw) {
       if (!isValidStellarAddress(toAddress)) {
         toAddressError = 'Invaild Stellar address';
+        return false;
+      }
+      final toAddrBalance = await Stellar.getBalanceByAccountId(toAddress);
+      if (toAddrBalance == '-1') {
+        toAddressError = 'Stellar adress must be active and have TFT trustline';
         return false;
       }
     }
@@ -149,8 +159,8 @@ class _WalletBridgeScreenState extends State<WalletBridgeScreen> {
     return true;
   }
 
-  bool _validate() {
-    final validAddress = _validateToAddress();
+  Future<bool> _validate() async {
+    final validAddress = await _validateToAddress();
     final validAmount = _validateAmount();
     setState(() {});
     return validAddress && validAmount;
@@ -209,12 +219,12 @@ class _WalletBridgeScreenState extends State<WalletBridgeScreen> {
                           onPressed: () {
                             Navigator.of(context).push(MaterialPageRoute(
                               builder: (context) => ContactsScreen(
-                                  chainType: transactionType ==
-                                          BridgeOperation.Withdraw
+                                  chainType: isWithdraw
                                       ? ChainType.Stellar
                                       : ChainType.TFChain,
                                   currentWalletAddress: fromController.text,
-                                  wallets: !isWithdraw
+                                  wallets: transactionType ==
+                                          BridgeOperation.Withdraw
                                       ? widget.allWallets
                                           .where((w) =>
                                               double.parse(w.stellarBalance) >=
@@ -247,7 +257,7 @@ class _WalletBridgeScreenState extends State<WalletBridgeScreen> {
               padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 10),
               child: ElevatedButton(
                 onPressed: () async {
-                  if (_validate()) {
+                  if (await _validate()) {
                     await _bridge_confirmation();
                   }
                 },
@@ -272,7 +282,7 @@ class _WalletBridgeScreenState extends State<WalletBridgeScreen> {
 
   _bridge_confirmation() async {
     final memoText =
-        isWithdraw ? await TFChain.getMemo(toController.text.trim()) : null;
+        isWithdraw ? await TFChain.getMemo(fromController.text.trim()) : null;
     showModalBottomSheet(
         isScrollControlled: true,
         useSafeArea: true,

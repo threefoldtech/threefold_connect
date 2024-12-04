@@ -68,6 +68,15 @@ Future<int> getTwinId(String seed) async {
   return getTwinIdByClient(client);
 }
 
+Future<int> getTwinIdByQueryClient(String address) async {
+  final chainUrl = Globals().chainUrl;
+  final client = TFChain.QueryClient(chainUrl);
+  client.connect();
+  final twinId = await client.twins.getTwinIdByAccountId(address: address);
+  client.disconnect();
+  return twinId ?? 0;
+}
+
 Future<Map<String, List<Proposal>>> getProposals() async {
   final chainUrl = Globals().chainUrl;
   final client = TFChain.QueryClient(chainUrl);
