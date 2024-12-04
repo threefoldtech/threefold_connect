@@ -24,7 +24,7 @@ dependencies:
   stellar_client:
     git:
       url: https://github.com/threefoldtech/tfgrid-sdk-dart
-      ref: main
+      ref: development
       path: packages/stellar_client
   gridproxy_client:
     git:

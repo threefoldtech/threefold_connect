@@ -88,7 +88,7 @@ class _WalletSendScreenState extends State<WalletSendScreen> {
     setState(() {});
   }
 
-  bool _validateToAddress() {
+  Future<bool> _validateToAddress() async {
     final toAddress = toController.text.trim();
     final fromAddress = fromController.text.trim();
     toAddressError = null;
@@ -122,6 +122,12 @@ class _WalletSendScreenState extends State<WalletSendScreen> {
       if (wallet != null && wallet.stellarBalance == '-1') {
         toAddressError = 'Wallet not activated on stellar';
         return false;
+      } else {
+        final balance = await Stellar.getBalanceByAccountId(toAddress);
+        if (balance == '-1') {
+          toAddressError = 'Wallet not activated on stellar';
+          return false;
+        }
       }
     }
     return true;
@@ -168,8 +174,8 @@ class _WalletSendScreenState extends State<WalletSendScreen> {
     return true;
   }
 
-  bool _validate() {
-    final validAddress = _validateToAddress();
+  Future<bool> _validate() async {
+    final validAddress = await _validateToAddress();
     final validAmount = _validateAmount();
     setState(() {});
     return validAddress && validAmount;
@@ -295,7 +301,7 @@ class _WalletSendScreenState extends State<WalletSendScreen> {
               padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 10),
               child: ElevatedButton(
                 onPressed: () async {
-                  if (_validate()) {
+                  if (await _validate()) {
                     await _send_confirmation();
                   }
                 },
