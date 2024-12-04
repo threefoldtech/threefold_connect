@@ -28,7 +28,7 @@ class _ChangePinScreenState extends State<ChangePinScreen> {
       case _State.newPinWrong:
         return 'Confirmation incorrect, please enter your new PIN';
       case _State.sameOldPin:
-        return "New PIN must not match the old one";
+        return 'New PIN must not match the old one';
       case _State.newPin:
         return 'Please enter your new PIN';
       case _State.confirm:

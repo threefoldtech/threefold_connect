@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:core';
 import 'package:flutter/gestures.dart';
@@ -62,10 +63,53 @@ class _IdentityVerificationScreenState
 
   double spending = 0.0;
 
+  int emailCountdown = 60;
+  Timer? emailTimer;
+  ValueNotifier<int> countdownNotifier = ValueNotifier(-1);
+
+  void startOrResumeEmailCountdown({bool startNew = false}) {
+    int currentTime = DateTime.now().millisecondsSinceEpoch;
+    int lockedUntil =
+        Globals().emailSentOn + (Globals().emailMinutesCoolDown * 60 * 1000);
+    int timeLeft = ((lockedUntil - currentTime) / 1000).round();
+
+    if (startNew) {
+      Globals().emailSentOn = currentTime;
+      timeLeft = Globals().emailMinutesCoolDown * 60;
+    }
+
+    if (timeLeft > 0) {
+      emailCountdown = timeLeft;
+      countdownNotifier.value = emailCountdown;
+
+      emailTimer?.cancel();
+
+      emailTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+        int currentTime = DateTime.now().millisecondsSinceEpoch;
+        int lockedUntil = Globals().emailSentOn +
+            (Globals().emailMinutesCoolDown * 60 * 1000);
+        int remainingTime = ((lockedUntil - currentTime) / 1000).round();
+
+        if (remainingTime > 0) {
+          countdownNotifier.value = remainingTime;
+        } else {
+          countdownNotifier.value = -1;
+          timer.cancel();
+        }
+      });
+    } else {
+      countdownNotifier.value = -1;
+    }
+  }
+
   setEmailVerified() {
     if (mounted) {
       setState(() {
         emailVerified = Globals().emailVerified.value;
+        if (emailVerified) {
+          countdownNotifier.value = -1;
+          emailTimer?.cancel();
+        }
       });
     }
   }
@@ -103,9 +147,16 @@ class _IdentityVerificationScreenState
     Globals().phoneVerified.addListener(setPhoneVerified);
     Globals().identityVerified.addListener(setIdentityVerified);
     Globals().hidePhoneButton.addListener(setHidePhoneVerify);
-
     checkPhoneStatus();
     getUserValues();
+    startOrResumeEmailCountdown();
+  }
+
+  @override
+  void dispose() {
+    emailTimer?.cancel();
+    countdownNotifier.dispose();
+    super.dispose();
   }
 
   checkPhoneStatus() {
@@ -795,7 +846,7 @@ class _IdentityVerificationScreenState
   Widget currentPhaseWidget(step, text, icon) {
     return GestureDetector(
         onTap: () async {
-          if (step == 1) {
+          if (step == 1 && countdownNotifier.value == -1) {
             return _changeEmailDialog(false);
           }
 
@@ -836,7 +887,7 @@ class _IdentityVerificationScreenState
                   right: const BorderSide(color: Colors.grey, width: 0.5),
                   bottom: const BorderSide(color: Colors.grey, width: 0.5),
                   top: const BorderSide(color: Colors.grey, width: 0.5))),
-          height: 75,
+          height: 90,
           width: MediaQuery.of(context).size.width * 100,
           child: Row(
             children: [
@@ -907,6 +958,35 @@ class _IdentityVerificationScreenState
                                     )
                                   ],
                                 ),
+                                if (step == 1)
+                                  ValueListenableBuilder<int>(
+                                    valueListenable: countdownNotifier,
+                                    builder: (context, countdownValue, child) {
+                                      if (countdownValue > 0) {
+                                        return Row(
+                                          children: <Widget>[
+                                            Expanded(
+                                              child: Text(
+                                                'Verification email sent, retry in $countdownValue second${countdownValue == 1 ? '' : 's'}',
+                                                overflow: TextOverflow.clip,
+                                                style: Theme.of(context)
+                                                    .textTheme
+                                                    .bodySmall!
+                                                    .copyWith(
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        color: Theme.of(context)
+                                                            .colorScheme
+                                                            .warning),
+                                              ),
+                                            ),
+                                          ],
+                                        );
+                                      } else {
+                                        return Container();
+                                      }
+                                    },
+                                  ),
                                 step == 2 &&
                                         Globals().hidePhoneButton.value == true
                                     ? const SizedBox(
@@ -935,36 +1015,43 @@ class _IdentityVerificationScreenState
                               ]))),
                   Globals().hidePhoneButton.value == true && step == 2
                       ? Container()
-                      : ElevatedButton(
-                          onPressed: () async {
-                            switch (step) {
-                              // Verify email
-                              case 1:
-                                {
-                                  verifyEmail();
-                                }
-                                break;
+                      : ValueListenableBuilder<int>(
+                          valueListenable: countdownNotifier,
+                          builder: (context, countdownValue, child) {
+                            return ElevatedButton(
+                                onPressed: countdownValue > 0
+                                    ? null
+                                    : () async {
+                                        switch (step) {
+                                          // Verify email
+                                          case 1:
+                                            {
+                                              startOrResumeEmailCountdown(
+                                                  startNew: true);
+                                              verifyEmail();
+                                            }
+                                            break;
 
-                              // Verify phone
-                              case 2:
-                                {
-                                  await verifyPhone();
-                                }
-                                break;
+                                          // Verify phone
+                                          case 2:
+                                            {
+                                              await verifyPhone();
+                                            }
+                                            break;
 
-                              // Verify identity
-                              case 3:
-                                {
-                                  termsAndConditionsDialog();
-                                  // await verifyIdentityProcess();
-                                }
-                                break;
-                              default:
-                                {}
-                                break;
-                            }
-                          },
-                          child: const Text('Verify'))
+                                          // Verify identity
+                                          case 3:
+                                            {
+                                              await verifyIdentityProcess();
+                                            }
+                                            break;
+                                          default:
+                                            {}
+                                            break;
+                                        }
+                                      },
+                                child: const Text('Verify'));
+                          })
                 ],
               ),
               const Padding(padding: EdgeInsets.only(right: 10)),
@@ -1619,6 +1706,7 @@ class _IdentityVerificationScreenState
                         Navigator.pop(context);
                         Navigator.pop(dialogContext);
                         resendEmailDialog(context);
+                        startOrResumeEmailCountdown(startNew: true);
 
                         setState(() {});
                       } catch (e) {
@@ -1706,7 +1794,7 @@ class _IdentityVerificationScreenState
       return;
     }
 
-    if (email == '') {
+    if (email == '' && countdownNotifier.value == -1) {
       return _changeEmailDialog(true);
     }
 
