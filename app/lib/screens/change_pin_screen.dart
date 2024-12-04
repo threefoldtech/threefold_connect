@@ -13,7 +13,7 @@ class ChangePinScreen extends StatefulWidget {
   State<ChangePinScreen> createState() => _ChangePinScreenState();
 }
 
-enum _State { newPinWrong, newPin, confirm, done }
+enum _State { newPinWrong, sameOldPin, newPin, confirm, done }
 
 class _ChangePinScreenState extends State<ChangePinScreen> {
   String newPin = '';
@@ -27,6 +27,8 @@ class _ChangePinScreenState extends State<ChangePinScreen> {
     switch (state) {
       case _State.newPinWrong:
         return 'Confirmation incorrect, please enter your new PIN';
+      case _State.sameOldPin:
+        return 'New PIN must not match the old one';
       case _State.newPin:
         return 'Please enter your new PIN';
       case _State.confirm:
@@ -42,9 +44,7 @@ class _ChangePinScreenState extends State<ChangePinScreen> {
     return PopScope(
       canPop: widget.hideBackButton == false,
       child: PincodeWidget(
-        title: widget.currentPin == null
-            ? 'Choose your pincode'
-            : 'Change pincode',
+        title: widget.currentPin == null ? 'Choose your PIN' : 'Change PIN',
         userMessage: getText(),
         hideBackButton: widget.hideBackButton,
         handler: changePin,
@@ -57,8 +57,18 @@ class _ChangePinScreenState extends State<ChangePinScreen> {
       switch (state) {
         case _State.newPinWrong:
         case _State.newPin:
-          newPin = enteredPinCode;
-          state = _State.confirm;
+          if (enteredPinCode == widget.currentPin) {
+            state = _State.sameOldPin;
+          } else {
+            newPin = enteredPinCode;
+            state = _State.confirm;
+          }
+          break;
+        case _State.sameOldPin:
+          if (enteredPinCode != widget.currentPin) {
+            newPin = enteredPinCode;
+            state = _State.confirm;
+          }
           break;
         case _State.confirm:
           if (newPin == enteredPinCode) {
