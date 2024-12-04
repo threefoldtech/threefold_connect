@@ -5,6 +5,7 @@ import 'package:threebotlogin/helpers/globals.dart';
 import 'package:threebotlogin/helpers/transaction_helpers.dart';
 import 'package:threebotlogin/models/wallet.dart';
 import 'package:threebotlogin/providers/wallets_provider.dart';
+import 'package:threebotlogin/screens/wallets/bridge.dart';
 import 'package:threebotlogin/screens/wallets/receive.dart';
 import 'package:threebotlogin/screens/wallets/send.dart';
 import 'package:threebotlogin/services/stellar_service.dart' as Stellar;
@@ -77,7 +78,7 @@ class _WalletAssetsWidgetState extends State<WalletAssetsWidget> {
           height: 20,
         ),
         WalletBalanceTileWidget(
-          name: 'Stellar',
+          name: ChainType.Stellar,
           balance: formatAmount(vestedWallets![0].tft.toString()),
           loading: false,
         ),
@@ -155,6 +156,37 @@ class _WalletAssetsWidgetState extends State<WalletAssetsWidget> {
                     ),
                   ],
                 ),
+                Column(
+                  children: [
+                    InkWell(
+                      onTap: () {
+                        Navigator.of(context).push(MaterialPageRoute(
+                          builder: (context) => WalletBridgeScreen(
+                            wallet: widget.wallet,
+                            allWallets: widget.allWallets,
+                          ),
+                        ));
+                      },
+                      child: CircleAvatar(
+                        radius: 30,
+                        backgroundColor:
+                            Theme.of(context).colorScheme.primaryContainer,
+                        child: Icon(
+                          Icons.swap_horiz,
+                          color:
+                              Theme.of(context).colorScheme.onPrimaryContainer,
+                          size: 35,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    Text(
+                      'Bridge',
+                      style: Theme.of(context).textTheme.titleLarge!.copyWith(
+                          color: Theme.of(context).colorScheme.primary),
+                    ),
+                  ],
+                ),
               ],
             ),
           ),
@@ -171,14 +203,14 @@ class _WalletAssetsWidgetState extends State<WalletAssetsWidget> {
           ),
           if (double.parse(widget.wallet.stellarBalance) >= 0)
             WalletBalanceTileWidget(
-              name: 'Stellar',
+              name: ChainType.Stellar,
               balance: formatAmount(widget.wallet.stellarBalance),
               loading: stellarBalaceLoading,
             ),
           const SizedBox(height: 10),
           if (double.parse(widget.wallet.tfchainBalance) >= 0)
             WalletBalanceTileWidget(
-              name: 'TFChain',
+              name: ChainType.TFChain,
               balance: formatAmount(widget.wallet.tfchainBalance),
               loading: tfchainBalaceLoading,
             ),

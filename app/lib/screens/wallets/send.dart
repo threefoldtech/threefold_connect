@@ -126,14 +126,12 @@ class _WalletSendScreenState extends State<WalletSendScreen> {
       if (wallet != null && wallet.stellarBalance == '-1') {
         toAddressError = 'Wallet not activated on stellar';
         return false;
-      }else {
+      } else {
         final balance = await Stellar.getBalanceByAccountId(toAddress);
-         if (balance == '-1') {
-        toAddressError = 'Wallet not activated on stellar';
-        return false;
-      }
-        
-
+        if (balance == '-1') {
+          toAddressError = 'Wallet not activated on stellar';
+          return false;
+        }
       }
     }
     return true;
@@ -274,7 +272,7 @@ class _WalletSendScreenState extends State<WalletSendScreen> {
                             suffixIcon: IconButton(
                                 onPressed: () {
                                   Navigator.of(context).push(MaterialPageRoute(
-                                    builder: (context) => ContractsScreen(
+                                    builder: (context) => ContactsScreen(
                                         chainType: chainType,
                                         currentWalletAddress:
                                             fromController.text,
