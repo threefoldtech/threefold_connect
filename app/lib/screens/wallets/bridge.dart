@@ -120,7 +120,7 @@ class _WalletBridgeScreenState extends State<WalletBridgeScreen> {
       }
       final toAddrBalance = await Stellar.getBalanceByAccountId(toAddress);
       if (toAddrBalance == '-1') {
-        toAddressError = 'Stellar adress must be active and have TFT trustline';
+        toAddressError = 'Address must be active and have TFT trustline';
         return false;
       }
     }
