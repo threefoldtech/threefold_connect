@@ -223,8 +223,7 @@ class _WalletBridgeScreenState extends State<WalletBridgeScreen> {
                                       ? ChainType.Stellar
                                       : ChainType.TFChain,
                                   currentWalletAddress: fromController.text,
-                                  wallets: transactionType ==
-                                          BridgeOperation.Withdraw
+                                  wallets: isWithdraw
                                       ? widget.allWallets
                                           .where((w) =>
                                               double.parse(w.stellarBalance) >=
