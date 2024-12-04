@@ -200,9 +200,9 @@ Future<void> swapToStellar(String secret, String target, BigInt amount) async {
   await client.disconnect();
 }
 
-Future<String> getMemo(String secret, String address) async {
+Future<String> getMemo(String address) async {
   final chainUrl = Globals().chainUrl;
-  final client = TFChain.Client(chainUrl, secret, 'sr25519');
+  final client = TFChain.QueryClient(chainUrl);
   await client.connect();
   var twinId = await client.twins.getTwinIdByAccountId(address: address);
   await client.disconnect();

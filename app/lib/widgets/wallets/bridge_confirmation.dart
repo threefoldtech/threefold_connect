@@ -22,7 +22,7 @@ class BridgeConfirmationWidget extends StatefulWidget {
   final String from;
   final String to;
   final String amount;
-  final String memo;
+  final String? memo;
   final void Function() reloadBalance;
 
   @override
@@ -137,7 +137,7 @@ class _BridgeConfirmationWidgetState extends State<BridgeConfirmationWidget> {
     try {
       if (widget.bridgeOperation == BridgeOperation.Deposit) {
         await Stellar.transfer(widget.secret, Globals().bridgeTFTAddress,
-            widget.amount, widget.memo);
+            widget.amount, widget.memo!);
       } else {
         await TFChain.swapToStellar(
             widget.secret, widget.to, BigInt.from(double.parse(widget.amount)));
