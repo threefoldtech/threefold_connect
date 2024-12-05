@@ -68,17 +68,17 @@ class _FarmItemWidgetState extends State<FarmItemWidget> {
         widget.farm.farmId,
         newAddress,
       );
-              final savingAddressSuccess = SnackBar(
-          content: Text(
-            'Address is saved Successfully.',
-            style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                  color: Theme.of(context).colorScheme.surface,
-                ),
-          ),
-          duration: const Duration(seconds: 3),
-        );
-        ScaffoldMessenger.of(context).clearSnackBars();
-        ScaffoldMessenger.of(context).showSnackBar(savingAddressSuccess);
+      final savingAddressSuccess = SnackBar(
+        content: Text(
+          'Address is saved Successfully.',
+          style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                color: Theme.of(context).colorScheme.surface,
+              ),
+        ),
+        duration: const Duration(seconds: 3),
+      );
+      ScaffoldMessenger.of(context).clearSnackBars();
+      ScaffoldMessenger.of(context).showSnackBar(savingAddressSuccess);
     } catch (e) {
       logger.e('Failed to add stellar address due to $e');
       if (context.mounted) {
@@ -113,6 +113,14 @@ class _FarmItemWidgetState extends State<FarmItemWidget> {
     setState(() {
       walletAddressController.text = address;
       validateStellarAddress(address);
+    });
+  }
+
+  void _cancelEdit() {
+    setState(() {
+      edit = false;
+      walletAddressController.text = widget.farm.walletAddress;
+      addressError = null;
     });
   }
 
@@ -166,17 +174,32 @@ class _FarmItemWidgetState extends State<FarmItemWidget> {
               ? Transform.scale(
                   scale: 0.5, child: const CircularProgressIndicator())
               : edit
-                  ? IconButton(
-                      onPressed: addressError == null
-                          ? () {
-                              _editStellarPayoutAddress();
-                            }
-                          : null,
-                      icon: Icon(
-                        Icons.save,
-                        color: addressError == null
-                            ? Theme.of(context).colorScheme.onSurface
-                            : Theme.of(context).colorScheme.onSurfaceVariant,
+                  ? SizedBox(
+                      width: 100,
+                      child: Row(
+                        children: [
+                          IconButton(
+                            onPressed: addressError == null
+                                ? () {
+                                    _editStellarPayoutAddress();
+                                  }
+                                : null,
+                            icon: Icon(
+                              Icons.save,
+                              color: addressError == null
+                                  ? Theme.of(context).colorScheme.onSurface
+                                  : Theme.of(context)
+                                      .colorScheme
+                                      .onSurfaceVariant,
+                            ),
+                          ),
+                          IconButton(
+                            onPressed: _cancelEdit,
+                            icon: const Icon(
+                              Icons.cancel_outlined,
+                            ),
+                          )
+                        ],
                       ),
                     )
                   : SizedBox(
