@@ -71,3 +71,19 @@ Future<void> initialize(String secret) async {
   final client = Client(NetworkType.PUBLIC, secret);
   await client.activateThroughThreefoldService();
 }
+
+Future<String> getBalanceByAccountId(String accountId) async {
+  try {
+    final stellarBalances = await getBalanceByAccountID(
+        network: NetworkType.PUBLIC, accountId: accountId);
+    for (final balance in stellarBalances) {
+      if (balance.assetCode == 'TFT') {
+        if (double.parse(balance.balance) == 0) return '0';
+        return balance.balance;
+      }
+    }
+  } catch (e) {
+    logger.i("Couldn't load the account balance due to $e");
+  }
+  return '-1';
+}
