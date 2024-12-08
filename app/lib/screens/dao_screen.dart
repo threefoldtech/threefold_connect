@@ -17,12 +17,14 @@ class _DaoPageState extends State<DaoPage> {
   final List<Proposal> inactiveList = [];
   bool loading = true;
 
-  void loadProposals() async {
+  Future<void> loadProposals() async {
     setState(() {
       loading = true;
     });
     try {
       final proposals = await getProposals();
+      activeList.clear();
+      inactiveList.clear();
       activeList.addAll(proposals['activeProposals']!);
       inactiveList.addAll(proposals['inactiveProposals']!);
     } catch (e) {
@@ -98,10 +100,14 @@ class _DaoPageState extends State<DaoPage> {
             Expanded(
               child: TabBarView(
                 children: [
-                  ProposalsWidget(proposals: activeList, active: true),
-                  ProposalsWidget(
-                    proposals: inactiveList,
-                  ),
+                  RefreshIndicator(
+                      onRefresh: loadProposals,
+                      child: ProposalsWidget(proposals: activeList)),
+                  RefreshIndicator(
+                      onRefresh: loadProposals,
+                      child: ProposalsWidget(
+                        proposals: inactiveList,
+                      )),
                 ],
               ),
             ),

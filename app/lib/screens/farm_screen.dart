@@ -28,11 +28,12 @@ class _FarmScreenState extends State<FarmScreen> {
     listFarms();
   }
 
-  listFarms() async {
+  Future<void> listFarms() async {
     setState(() {
       loading = true;
     });
     try {
+      farms.clear();
       wallets = await listWallets();
       final Map<int, Wallet> twinIdWallets = {};
       for (final w in wallets) {
@@ -113,8 +114,14 @@ class _FarmScreenState extends State<FarmScreen> {
         ),
       );
     } else {
-      mainWidget = ListView(
-          children: [for (final farm in farms) FarmItemWidget(farm: farm)]);
+      mainWidget = RefreshIndicator(
+          onRefresh: listFarms,
+          child: ListView.builder(
+              itemCount: farms.length,
+              itemBuilder: (context, i) {
+                final farm = farms[i];
+                return FarmItemWidget(farm: farm);
+              }));
     }
     return LayoutDrawer(
       titleText: 'Farming',

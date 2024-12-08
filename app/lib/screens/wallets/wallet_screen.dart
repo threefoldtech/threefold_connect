@@ -83,18 +83,17 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
         ),
       );
     } else {
-      mainWidget = ListView(
-        children: [
-          const SizedBox(height: 10),
-          for (final wallet in wallets)
-            WalletCardWidget(
+      mainWidget = RefreshIndicator(
+          onRefresh: handleRefresh,
+          child: ListView.builder(itemBuilder: (context, i) {
+            final wallet = wallets[i];
+            return WalletCardWidget(
               wallet: wallet,
               allWallets: wallets,
               onDeleteWallet: onDeleteWallet,
               onEditWallet: onEditWallet,
-            )
-        ],
-      );
+            );
+          }));
     }
 
     return LayoutDrawer(
@@ -174,5 +173,17 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
   void _addWallet(Wallet wallet) {
     wallets.add(wallet);
     setState(() {});
+  }
+
+  Future<void> handleRefresh() async {
+    try {
+      loading = true;
+      await ref.refresh(walletsNotifier.notifier).list();
+      return;
+    } catch (e) {
+      throw Exception('Something happend while reloading wallets!');
+    } finally {
+      loading = false;
+    }
   }
 }
