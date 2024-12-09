@@ -272,7 +272,7 @@ class _WalletSendScreenState extends State<WalletSendScreen> {
                             suffixIcon: IconButton(
                                 onPressed: () {
                                   Navigator.of(context).push(MaterialPageRoute(
-                                    builder: (context) => ContractsScreen(
+                                    builder: (context) => ContactsScreen(
                                         chainType: chainType,
                                         currentWalletAddress:
                                             fromController.text,

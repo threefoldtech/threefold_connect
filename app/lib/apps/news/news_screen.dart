@@ -160,7 +160,7 @@ class _NewsScreenState extends State<NewsScreen> {
                           Row(
                             children: [
                               Image.asset(
-                                'assets/tft_icon.png',
+                                'assets/tf_chain.png',
                                 color: Theme.of(context).colorScheme.onSurface,
                                 height: 20,
                                 width: 20,
