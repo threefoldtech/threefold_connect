@@ -69,8 +69,11 @@ class Globals {
   bool isCacheClearedFarmer = false;
 
   int smsSentOn = 0;
-  int smsMinutesCoolDown = 5;
+  int smsMinutesCoolDown = 2;
   int spendingLimit = 0;
+
+  int emailSentOn = 0;
+  int emailMinutesCoolDown = 1;
 
   ValueNotifier<bool> hidePhoneButton = ValueNotifier(false);
 

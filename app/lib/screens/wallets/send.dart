@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
 import 'package:threebotlogin/helpers/globals.dart';
+import 'package:threebotlogin/helpers/transaction_helpers.dart';
 import 'package:threebotlogin/models/wallet.dart';
 import 'package:threebotlogin/providers/wallets_provider.dart';
 import 'package:threebotlogin/screens/scan_screen.dart';
@@ -33,6 +35,7 @@ class _WalletSendScreenState extends State<WalletSendScreen> {
   String? toAddressError;
   String? amountError;
   bool reloadBalance = true;
+  final FocusNode textFieldFocusNode = FocusNode();
 
   @override
   void initState() {
@@ -48,6 +51,7 @@ class _WalletSendScreenState extends State<WalletSendScreen> {
     amountController.dispose();
     memoController.dispose();
     reloadBalance = false;
+    textFieldFocusNode.dispose();
     super.dispose();
   }
 
@@ -88,7 +92,7 @@ class _WalletSendScreenState extends State<WalletSendScreen> {
     setState(() {});
   }
 
-  bool _validateToAddress() {
+  Future<bool> _validateToAddress() async {
     final toAddress = toController.text.trim();
     final fromAddress = fromController.text.trim();
     toAddressError = null;
@@ -113,6 +117,21 @@ class _WalletSendScreenState extends State<WalletSendScreen> {
       if (!isValidStellarAddress(toAddress)) {
         toAddressError = 'Invaild Stellar address';
         return false;
+      }
+
+      final matchingWallets = widget.allWallets
+          .where((wallet) => wallet.stellarAddress == toAddress);
+      final Wallet? wallet =
+          matchingWallets.isNotEmpty ? matchingWallets.first : null;
+      if (wallet != null && wallet.stellarBalance == '-1') {
+        toAddressError = 'Wallet not activated on stellar';
+        return false;
+      } else {
+        final balance = await Stellar.getBalanceByAccountId(toAddress);
+        if (balance == '-1') {
+          toAddressError = 'Wallet not activated on stellar';
+          return false;
+        }
       }
     }
     return true;
@@ -159,8 +178,8 @@ class _WalletSendScreenState extends State<WalletSendScreen> {
     return true;
   }
 
-  bool _validate() {
-    final validAddress = _validateToAddress();
+  Future<bool> _validate() async {
+    final validAddress = await _validateToAddress();
     final validAmount = _validateAmount();
     setState(() {});
     return validAddress && validAmount;
@@ -182,131 +201,160 @@ class _WalletSendScreenState extends State<WalletSendScreen> {
     }
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Send')),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Column(children: [
-            SelectChainWidget(
-                chainType: chainType,
-                onChangeChain: onChangeChain,
-                hideStellar: hideStellar),
-            const SizedBox(height: 40),
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 10),
-              child: TextButton(
-                onPressed: () {
-                  scanQrCode();
-                },
-                style: TextButton.styleFrom(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(2),
-                  ),
-                  side: BorderSide(
-                    color: Theme.of(context).colorScheme.primary,
-                  ),
-                ),
-                child: SizedBox(
-                  width: double.infinity,
-                  child: Text(
-                    'Scan QR Code',
-                    style: Theme.of(context).textTheme.titleLarge!.copyWith(
-                        color: Theme.of(context).colorScheme.primary,
-                        fontWeight: FontWeight.bold),
-                    textAlign: TextAlign.center,
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(height: 20),
-            ListTile(
-              title: TextField(
-                  readOnly: true,
-                  style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                        color: Theme.of(context).colorScheme.onSurface,
-                      ),
-                  controller: fromController,
-                  decoration: InputDecoration(
-                    labelText: 'From (name: ${widget.wallet.name})',
-                  )),
-            ),
-            const SizedBox(height: 10),
-            ListTile(
-              title: TextField(
-                  style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                        color: Theme.of(context).colorScheme.onSurface,
-                      ),
-                  controller: toController,
-                  decoration: InputDecoration(
-                      labelText: 'To',
-                      errorText: toAddressError,
-                      suffixIcon: IconButton(
-                          onPressed: () {
-                            Navigator.of(context).push(MaterialPageRoute(
-                              builder: (context) => ContractsScreen(
-                                  chainType: chainType,
-                                  currentWalletAddress: fromController.text,
-                                  wallets: widget.allWallets,
-                                  onSelectToAddress: _selectToAddress),
-                            ));
-                          },
-                          icon: const Icon(Icons.person)))),
-            ),
-            const SizedBox(height: 10),
-            ListTile(
-              title: TextField(
-                  style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                        color: Theme.of(context).colorScheme.onSurface,
-                      ),
-                  keyboardType:
-                      const TextInputType.numberWithOptions(decimal: true),
-                  controller: amountController,
-                  decoration: InputDecoration(
-                      labelText: 'Amount (Balance: $balance)',
-                      hintText: '100',
-                      suffixText: 'TFT',
-                      errorText: amountError)),
-              subtitle: Text(
-                  'Max Fee: ${chainType == ChainType.Stellar ? 0.1 : 0.01} TFT'),
-            ),
-            const SizedBox(height: 10),
-            if (chainType == ChainType.Stellar)
-              ListTile(
-                title: TextField(
-                    style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                          color: Theme.of(context).colorScheme.onSurface,
+        appBar: AppBar(title: const Text('Send')),
+        body: KeyboardVisibilityBuilder(builder: (context, isKeyboardVisible) {
+          return GestureDetector(
+            behavior: HitTestBehavior.opaque,
+            onTap: () {
+              FocusScope.of(context).unfocus();
+            },
+            child: SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Column(children: [
+                  SelectChainWidget(
+                      chainType: chainType,
+                      onChangeChain: onChangeChain,
+                      hideStellar: hideStellar),
+                  const SizedBox(height: 40),
+                  Padding(
+                    padding:
+                        const EdgeInsets.symmetric(vertical: 8, horizontal: 10),
+                    child: TextButton(
+                      onPressed: () {
+                        scanQrCode();
+                      },
+                      style: TextButton.styleFrom(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(2),
                         ),
-                    controller: memoController,
-                    decoration: const InputDecoration(
-                      labelText: 'Memo',
-                    )),
-              ),
-            const SizedBox(height: 40),
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 10),
-              child: ElevatedButton(
-                onPressed: () async {
-                  if (_validate()) {
-                    await _send_confirmation();
-                  }
-                },
-                style: ElevatedButton.styleFrom(),
-                child: SizedBox(
-                  width: double.infinity,
-                  child: Text(
-                    'Transfer',
-                    style: Theme.of(context).textTheme.titleLarge!.copyWith(
-                        color: Theme.of(context).colorScheme.primary,
-                        fontWeight: FontWeight.bold),
-                    textAlign: TextAlign.center,
+                        side: BorderSide(
+                          color: Theme.of(context).colorScheme.primary,
+                        ),
+                      ),
+                      child: SizedBox(
+                        width: double.infinity,
+                        child: Text(
+                          'Scan QR Code',
+                          style: Theme.of(context)
+                              .textTheme
+                              .titleLarge!
+                              .copyWith(
+                                  color: Theme.of(context).colorScheme.primary,
+                                  fontWeight: FontWeight.bold),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    ),
                   ),
-                ),
+                  const SizedBox(height: 20),
+                  ListTile(
+                    title: TextField(
+                        readOnly: true,
+                        style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                              color: Theme.of(context).colorScheme.onSurface,
+                            ),
+                        controller: fromController,
+                        decoration: InputDecoration(
+                          labelText: 'From (name: ${widget.wallet.name})',
+                        )),
+                  ),
+                  const SizedBox(height: 10),
+                  ListTile(
+                    title: TextField(
+                        style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                              color: Theme.of(context).colorScheme.onSurface,
+                            ),
+                        controller: toController,
+                        decoration: InputDecoration(
+                            labelText: 'To',
+                            errorText: toAddressError,
+                            suffixIcon: IconButton(
+                                onPressed: () {
+                                  Navigator.of(context).push(MaterialPageRoute(
+                                    builder: (context) => ContractsScreen(
+                                        chainType: chainType,
+                                        currentWalletAddress:
+                                            fromController.text,
+                                        wallets: chainType == ChainType.Stellar
+                                            ? widget.allWallets
+                                                .where((w) =>
+                                                    double.parse(
+                                                        w.stellarBalance) >=
+                                                    0)
+                                                .toList()
+                                            : widget.allWallets,
+                                        onSelectToAddress: _selectToAddress),
+                                  ));
+                                },
+                                icon: const Icon(Icons.person)))),
+                  ),
+                  const SizedBox(height: 10),
+                  ListTile(
+                    title: TextField(
+                        style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                              color: Theme.of(context).colorScheme.onSurface,
+                            ),
+                        focusNode: textFieldFocusNode,
+                        keyboardType: const TextInputType.numberWithOptions(
+                            decimal: true),
+                        controller: amountController,
+                        textInputAction: TextInputAction.done,
+                        decoration: InputDecoration(
+                            labelText:
+                                'Amount (Balance: ${formatAmount(balance)})',
+                            hintText: '100',
+                            suffixText: 'TFT',
+                            errorText: amountError)),
+                    subtitle: Text(
+                        'Max Fee: ${chainType == ChainType.Stellar ? 0.1 : 0.01} TFT'),
+                  ),
+                  const SizedBox(height: 10),
+                  if (chainType == ChainType.Stellar)
+                    ListTile(
+                      title: TextField(
+                          style: Theme.of(context)
+                              .textTheme
+                              .bodyMedium!
+                              .copyWith(
+                                color: Theme.of(context).colorScheme.onSurface,
+                              ),
+                          controller: memoController,
+                          decoration: const InputDecoration(
+                            labelText: 'Memo',
+                          )),
+                    ),
+                  const SizedBox(height: 40),
+                  Padding(
+                    padding:
+                        const EdgeInsets.symmetric(vertical: 8, horizontal: 10),
+                    child: ElevatedButton(
+                      onPressed: () async {
+                        if (await _validate()) {
+                          await _send_confirmation();
+                        }
+                      },
+                      style: ElevatedButton.styleFrom(),
+                      child: SizedBox(
+                        width: double.infinity,
+                        child: Text(
+                          'Transfer',
+                          style: Theme.of(context)
+                              .textTheme
+                              .titleLarge!
+                              .copyWith(
+                                  color: Theme.of(context).colorScheme.primary,
+                                  fontWeight: FontWeight.bold),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    ),
+                  ),
+                ]),
               ),
             ),
-          ]),
-        ),
-      ),
-    );
+          );
+        }));
   }
 
   scanQrCode() async {

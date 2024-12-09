@@ -64,7 +64,6 @@ class _PincodeWidgetState extends State<PincodeWidget> {
             children: [
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 24),
-
                 child: Text(
                   widget.userMessage,
                   style: Theme.of(context)

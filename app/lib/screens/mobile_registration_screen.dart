@@ -147,8 +147,8 @@ class _MobileRegistrationScreenState extends State<MobileRegistrationScreen> {
       seedConfirmationController.text = seedCheckValue;
     });
 
-    bool seedWordConfirmationValidation = validateSeedWords(
-        _registrationData.phrase, seedCheckValue);
+    bool seedWordConfirmationValidation =
+        validateSeedWords(_registrationData.phrase, seedCheckValue);
 
     if (seedWordConfirmationValidation) {
       setState(() {
