@@ -5,6 +5,7 @@ import 'package:threebotlogin/models/idenfy.dart';
 import 'package:threebotlogin/services/idenfy_service.dart';
 import 'package:threebotlogin/services/migration_service.dart';
 import 'package:threebotlogin/services/pkid_service.dart';
+import 'package:threebotlogin/services/tfchain_service.dart';
 import 'package:threebotlogin/services/tools_service.dart';
 import 'package:threebotlogin/services/shared_preference_service.dart';
 
@@ -30,7 +31,9 @@ Future<void> fetchPKidData() async {
 
 Future<void> handleKYCData(
     Map<dynamic, dynamic> emailData, Map<dynamic, dynamic> phoneData) async {
-  final identityVerificationStatus = await getVerificationStatus();
+  final address = await getMyAddress();
+  final identityVerificationStatus =
+      await getVerificationStatus(address: address);
 
   await saveCorrectVerificationStates(
       emailData, phoneData, identityVerificationStatus);

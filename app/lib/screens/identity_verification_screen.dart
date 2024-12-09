@@ -21,6 +21,7 @@ import 'package:threebotlogin/services/idenfy_service.dart';
 import 'package:threebotlogin/services/identity_service.dart';
 import 'package:threebotlogin/services/open_kyc_service.dart';
 import 'package:threebotlogin/services/pkid_service.dart';
+import 'package:threebotlogin/services/tfchain_service.dart';
 import 'package:threebotlogin/services/tools_service.dart';
 import 'package:threebotlogin/services/shared_preference_service.dart';
 import 'package:threebotlogin/widgets/custom_dialog.dart';
@@ -552,7 +553,8 @@ class _IdentityVerificationScreenState
   Future<void> handleIdenfyResponse() async {
     VerificationStatus verificationStatus;
     try {
-      verificationStatus = await getVerificationStatus();
+      final address = await getMyAddress();
+      verificationStatus = await getVerificationStatus(address: address);
     } catch (e) {
       setState(() {
         isLoading = false;
