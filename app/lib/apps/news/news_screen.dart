@@ -27,12 +27,14 @@ class _NewsScreenState extends State<NewsScreen> {
   final newsUrl = Globals().newsUrl;
 
   Future<void> getArticles() async {
-    setState(() {
-      isLoading = true;
-      if (currentPage == 0) {
-        isInitialLoading = true;
-      }
-    });
+    if (mounted) {
+      setState(() {
+        isLoading = true;
+        if (currentPage == 0) {
+          isInitialLoading = true;
+        }
+      });
+    }
 
     final url = Uri.parse(newsUrl);
     final response = await http.get(url);
@@ -100,11 +102,16 @@ class _NewsScreenState extends State<NewsScreen> {
       content: Column(
         children: [
           Expanded(
+              child: RefreshIndicator(
+            onRefresh: () {
+              isInitialLoading = true;
+              return getArticles();
+            },
             child: ListView.builder(
               controller: _scrollController,
               itemCount: visibleArticles.length + (isLoading ? 1 : 0),
               itemBuilder: (context, index) {
-                if (index == visibleArticles.length && isInitialLoading) {
+                if (isInitialLoading) {
                   return Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.center,
@@ -253,7 +260,7 @@ class _NewsScreenState extends State<NewsScreen> {
                 );
               },
             ),
-          ),
+          )),
           if (isLoading && !isInitialLoading)
             const Center(
               child: Padding(

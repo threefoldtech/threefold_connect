@@ -46,12 +46,14 @@ class WalletsNotifier extends StateNotifier<List<Wallet>> {
             wallet.tfchainBalance = tfchainBalance;
           }
         }
-        state = currentState;
+        if (mounted) {
+          state = currentState;
+        }
       });
     }
     final refreshBalance = Globals().refreshBalance;
     await Future.delayed(Duration(seconds: refreshBalance));
-    reloadBalances();
+    if (mounted) reloadBalances();
   }
 
   void stopReloadingBalance() {
