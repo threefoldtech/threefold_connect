@@ -178,7 +178,7 @@ class _IdentityVerificationScreenState
               mainAxisSize: MainAxisSize.max,
               children: [
                 Padding(
-                  padding: const EdgeInsets.all(15),
+                  padding: const EdgeInsets.fromLTRB(0, 24, 15, 24),
                   child: Column(
                     children: [
                       AnimatedBuilder(
@@ -199,15 +199,22 @@ class _IdentityVerificationScreenState
                                         : 'Unknown',
                                   ),
                                 ),
+                                Center(
+                                  child: SizedBox(
+                                    width: MediaQuery.of(context).size.width *
+                                        0.85,
+                                    child: const Divider(
+                                      thickness: 0.5,
+                                      color: Colors.grey,
+                                    ),
+                                  ),
+                                ),
                                 FutureBuilder(
                                   future: getPhrase(),
                                   builder: (context, snapshot) {
                                     if (snapshot.hasData) {
                                       return ListTile(
-                                        trailing: const Padding(
-                                          padding: EdgeInsets.only(right: 7.5),
-                                          child: Icon(Icons.visibility),
-                                        ),
+                                        trailing: Icon(Icons.visibility),
                                         leading: const Icon(Icons.vpn_key),
                                         title: const Text('Show phrase'),
                                         onTap: () async {
@@ -219,6 +226,16 @@ class _IdentityVerificationScreenState
                                     }
                                   },
                                 ),
+                                Center(
+                                  child: SizedBox(
+                                    width: MediaQuery.of(context).size.width *
+                                        0.85,
+                                    child: const Divider(
+                                      thickness: 0.5,
+                                      color: Colors.grey,
+                                    ),
+                                  ),
+                                ),
                                 // Step one: verify email
                                 _fillCard(
                                     getCorrectState(1, emailVerified,
@@ -226,7 +243,16 @@ class _IdentityVerificationScreenState
                                     1,
                                     email,
                                     Icons.email),
-
+                                Center(
+                                  child: SizedBox(
+                                    width: MediaQuery.of(context).size.width *
+                                        0.85,
+                                    child: const Divider(
+                                      thickness: 0.5,
+                                      color: Colors.grey,
+                                    ),
+                                  ),
+                                ),
                                 // Step two: verify phone
                                 (Globals().phoneVerification == true ||
                                         (Globals().spendingLimit > 0 &&
@@ -238,7 +264,16 @@ class _IdentityVerificationScreenState
                                         phone,
                                         Icons.phone)
                                     : Container(),
-
+                                Center(
+                                  child: SizedBox(
+                                    width: MediaQuery.of(context).size.width *
+                                        0.85,
+                                    child: const Divider(
+                                      thickness: 0.5,
+                                      color: Colors.grey,
+                                    ),
+                                  ),
+                                ),
                                 // Step three: verify identity
                                 (Globals().isOpenKYCEnabled ||
                                         (Globals().spendingLimit > 0 &&
@@ -804,11 +839,13 @@ class _IdentityVerificationScreenState
                           Row(
                             children: <Widget>[
                               Expanded(
-                                child: Text(
-                                  text == '' ? 'Unknown' : text,
-                                  overflow: TextOverflow.clip,
-                                  style: TextStyle(fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onSurface)
-                                ),
+                                child: Text(text == '' ? 'Unknown' : text,
+                                    overflow: TextOverflow.clip,
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .onSurface)),
                               )
                             ],
                           ),
@@ -947,35 +984,37 @@ class _IdentityVerificationScreenState
                                 ]))),
                     Globals().hidePhoneButton.value == true && step == 2
                         ? Container()
-                        : ElevatedButton(
-                            onPressed: () async {
-                              switch (step) {
-                                // Verify email
-                                case 1:
-                                  {
-                                    verifyEmail();
-                                  }
-                                  break;
+                        : Padding(
+                            padding: EdgeInsets.only(left: 15),
+                            child: ElevatedButton(
+                                onPressed: () async {
+                                  switch (step) {
+                                    // Verify email
+                                    case 1:
+                                      {
+                                        verifyEmail();
+                                      }
+                                      break;
 
-                                // Verify phone
-                                case 2:
-                                  {
-                                    await verifyPhone();
-                                  }
-                                  break;
+                                    // Verify phone
+                                    case 2:
+                                      {
+                                        await verifyPhone();
+                                      }
+                                      break;
 
-                                // Verify identity
-                                case 3:
-                                  {
-                                    await verifyIdentityProcess();
+                                    // Verify identity
+                                    case 3:
+                                      {
+                                        await verifyIdentityProcess();
+                                      }
+                                      break;
+                                    default:
+                                      {}
+                                      break;
                                   }
-                                  break;
-                                default:
-                                  {}
-                                  break;
-                              }
-                            },
-                            child: const Text('Verify'))
+                                },
+                                child: const Text('Verify'))),
                   ],
                 ),
               ))
@@ -1061,8 +1100,11 @@ class _IdentityVerificationScreenState
                             ? const Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                    Icon(
-                                      Icons.edit,
+                                    Padding(
+                                      padding: EdgeInsets.only(left: 15),
+                                      child: Icon(
+                                        Icons.edit,
+                                      ),
                                     ),
                                   ])
                             : const Column(),
@@ -1070,8 +1112,11 @@ class _IdentityVerificationScreenState
                             ? const Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                    Icon(
-                                      Icons.chevron_right,
+                                    Padding(
+                                      padding: EdgeInsets.only(left: 15),
+                                      child: Icon(
+                                        Icons.chevron_right,
+                                      ),
                                     ),
                                   ])
                             : const Column()
