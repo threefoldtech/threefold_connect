@@ -39,8 +39,6 @@ class PreferenceScreen extends ConsumerStatefulWidget {
 class _PreferenceScreenState extends ConsumerState<PreferenceScreen> {
   // FirebaseNotificationListener _listener;
   Map email = {};
-  String doubleName = '';
-  String phrase = '';
   bool showAdvancedOptions = false;
   Icon showAdvancedOptionsIcon = const Icon(Icons.keyboard_arrow_down);
 
@@ -102,30 +100,6 @@ class _PreferenceScreenState extends ConsumerState<PreferenceScreen> {
         children: <Widget>[
           const ListTile(
             title: Text('Global settings'),
-          ),
-          ListTile(
-            leading: const Icon(Icons.person),
-            title: Text(doubleName),
-          ),
-          FutureBuilder(
-            future: getPhrase(),
-            builder: (context, snapshot) {
-              if (snapshot.hasData) {
-                return ListTile(
-                  trailing: const Padding(
-                    padding: EdgeInsets.only(right: 7.5),
-                    child: Icon(Icons.visibility),
-                  ),
-                  leading: const Icon(Icons.vpn_key),
-                  title: const Text('Show phrase'),
-                  onTap: () async {
-                    _showPhrase();
-                  },
-                );
-              } else {
-                return Container();
-              }
-            },
           ),
           FutureBuilder(
               future: checkBiometrics(),
@@ -461,16 +435,6 @@ class _PreferenceScreenState extends ConsumerState<PreferenceScreen> {
   }
 
   void getUserValues() {
-    getDoubleName().then((dn) {
-      setState(() {
-        doubleName = dn!.substring(0, dn.length - 5);
-      });
-    });
-    getPhrase().then((seedPhrase) {
-      setState(() {
-        phrase = seedPhrase!;
-      });
-    });
     getFingerprint().then((fingerprint) {
       setState(() {
         if (fingerprint == null) {
