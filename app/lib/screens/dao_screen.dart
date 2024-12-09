@@ -12,10 +12,11 @@ class DaoPage extends StatefulWidget {
   State<DaoPage> createState() => _DaoPageState();
 }
 
-class _DaoPageState extends State<DaoPage> {
+class _DaoPageState extends State<DaoPage> with SingleTickerProviderStateMixin {
   final List<Proposal> activeList = [];
   final List<Proposal> inactiveList = [];
   bool loading = true;
+  late final TabController _tabController;
 
   Future<void> loadProposals() async {
     setState(() {
@@ -23,8 +24,8 @@ class _DaoPageState extends State<DaoPage> {
     });
     try {
       final proposals = await getProposals();
-      activeList.clear();
-      inactiveList.clear();
+      if (activeList.isNotEmpty) activeList.clear();
+      if (inactiveList.isNotEmpty) inactiveList.clear();
       activeList.addAll(proposals['activeProposals']!);
       inactiveList.addAll(proposals['inactiveProposals']!);
     } catch (e) {
@@ -52,8 +53,9 @@ class _DaoPageState extends State<DaoPage> {
 
   @override
   void initState() {
-    loadProposals();
     super.initState();
+    loadProposals();
+    _tabController = TabController(length: 2, vsync: this);
   }
 
   @override
@@ -84,6 +86,7 @@ class _DaoPageState extends State<DaoPage> {
               child: Container(
                 color: Theme.of(context).scaffoldBackgroundColor,
                 child: TabBar(
+                  controller: _tabController,
                   labelColor: Theme.of(context).colorScheme.primary,
                   indicatorColor: Theme.of(context).colorScheme.primary,
                   unselectedLabelColor: Theme.of(context).colorScheme.onSurface,
@@ -99,6 +102,7 @@ class _DaoPageState extends State<DaoPage> {
             ),
             Expanded(
               child: TabBarView(
+                controller: _tabController,
                 children: [
                   RefreshIndicator(
                       onRefresh: loadProposals,
