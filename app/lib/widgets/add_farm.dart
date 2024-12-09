@@ -93,6 +93,7 @@ class _NewFarmState extends State<NewFarm> {
             Icons.check,
             DialogType.Info);
       } else {
+        saveLoading = false;
         showDialog(
             context: context,
             builder: (BuildContext context) => CustomDialog(
