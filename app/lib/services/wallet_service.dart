@@ -22,7 +22,7 @@ Future<FlutterPkid> _getPkidClient() async {
   return client;
 }
 
-Future<List<PkidWallet>> _getPkidWallets() async {
+Future<List<PkidWallet>> getPkidWallets() async {
   FlutterPkid client = await _getPkidClient();
   final pKidResult = await client.getPKidDoc('purse');
   final result =
@@ -41,7 +41,7 @@ Future<List<PkidWallet>> _getPkidWallets() async {
 }
 
 Future<List<Wallet>> listWallets() async {
-  List<PkidWallet> pkidWallets = await _getPkidWallets();
+  List<PkidWallet> pkidWallets = await getPkidWallets();
   final String chainUrl = Globals().chainUrl;
   final List<Wallet> wallets = await compute((void _) async {
     final List<Future<Wallet>> walletFutures = [];
@@ -114,7 +114,7 @@ Future<Wallet> loadWallet(String walletName, String walletSeed,
 
 Future<void> addWallet(String walletName, String walletSecret,
     {WalletType type = WalletType.IMPORTED}) async {
-  List<PkidWallet> wallets = await _getPkidWallets();
+  List<PkidWallet> wallets = await getPkidWallets();
   wallets.add(PkidWallet(
       name: walletName,
       index: type == WalletType.NATIVE ? 0 : -1,
@@ -125,7 +125,7 @@ Future<void> addWallet(String walletName, String walletSecret,
 }
 
 Future<void> editWallet(String oldName, String newName) async {
-  List<PkidWallet> wallets = await _getPkidWallets();
+  List<PkidWallet> wallets = await getPkidWallets();
   for (final w in wallets) {
     if (w.name == oldName) {
       w.name = newName;
@@ -136,7 +136,7 @@ Future<void> editWallet(String oldName, String newName) async {
 }
 
 Future<void> deleteWallet(String walletName) async {
-  List<PkidWallet> wallets = await _getPkidWallets();
+  List<PkidWallet> wallets = await getPkidWallets();
   wallets = wallets.where((w) => w.name != walletName).toList();
   await saveWalletsToPkid(wallets);
 }
@@ -163,7 +163,7 @@ Future<Map<int, Map<String, String>>> getWalletTwinId(String walletName,
 }
 
 Future<Map<int, Map<String, String>>> getWalletsTwinIds() async {
-  List<PkidWallet> pkidWallets = await _getPkidWallets();
+  List<PkidWallet> pkidWallets = await getPkidWallets();
   final String chainUrl = Globals().chainUrl;
   final Map<int, Map<String, String>> twinWallets =
       await compute((void _) async {
