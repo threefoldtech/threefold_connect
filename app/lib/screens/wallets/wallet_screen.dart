@@ -85,15 +85,17 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
     } else {
       mainWidget = RefreshIndicator(
           onRefresh: handleRefresh,
-          child: ListView.builder(itemBuilder: (context, i) {
-            final wallet = wallets[i];
-            return WalletCardWidget(
-              wallet: wallet,
-              allWallets: wallets,
-              onDeleteWallet: onDeleteWallet,
-              onEditWallet: onEditWallet,
-            );
-          }));
+          child: ListView.builder(
+              itemCount: wallets.length,
+              itemBuilder: (context, i) {
+                final wallet = wallets[i];
+                return WalletCardWidget(
+                  wallet: wallet,
+                  allWallets: wallets,
+                  onDeleteWallet: onDeleteWallet,
+                  onEditWallet: onEditWallet,
+                );
+              }));
     }
 
     return LayoutDrawer(
