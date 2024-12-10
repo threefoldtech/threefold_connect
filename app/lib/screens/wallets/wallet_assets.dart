@@ -68,7 +68,7 @@ class _WalletAssetsWidgetState extends State<WalletAssetsWidget> {
         const Divider(),
         const SizedBox(height: 10),
         Text(
-          'Vest',
+          'Vested',
           style: Theme.of(context).textTheme.headlineSmall!.copyWith(
               color: Theme.of(context).colorScheme.onSecondaryContainer,
               fontWeight: FontWeight.bold),
