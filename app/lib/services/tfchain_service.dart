@@ -71,9 +71,9 @@ Future<int> getTwinId(String seed) async {
 Future<int> getTwinIdByQueryClient(String address) async {
   final chainUrl = Globals().chainUrl;
   final client = TFChain.QueryClient(chainUrl);
-  client.connect();
+  await client.connect();
   final twinId = await client.twins.getTwinIdByAccountId(address: address);
-  client.disconnect();
+  await client.disconnect();
   return twinId ?? 0;
 }
 
@@ -210,11 +210,6 @@ Future<void> swapToStellar(String secret, String target, BigInt amount) async {
 }
 
 Future<String> getMemo(String address) async {
-  final chainUrl = Globals().chainUrl;
-  final client = TFChain.QueryClient(chainUrl);
-  await client.connect();
-  var twinId = await client.twins.getTwinIdByAccountId(address: address);
-  await client.disconnect();
-
+  final twinId = await getTwinIdByQueryClient(address);
   return 'twin_$twinId';
 }

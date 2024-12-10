@@ -278,7 +278,7 @@ class _WalletBridgeScreenState extends State<WalletBridgeScreen> {
 
   _bridge_confirmation() async {
     final memoText =
-        isWithdraw ? await TFChain.getMemo(toController.text.trim()) : null;
+        !isWithdraw ? await TFChain.getMemo(toController.text.trim()) : null;
     showModalBottomSheet(
         isScrollControlled: true,
         useSafeArea: true,
