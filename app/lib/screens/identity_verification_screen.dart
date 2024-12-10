@@ -1279,8 +1279,8 @@ class _IdentityVerificationScreenState
                 image: Icons.warning,
                 title: 'Not enough balance',
                 description: wallets.isEmpty
-                    ? 'Please initialize a wallet and fund it with at least $minimumBalance TFTs.'
-                    : 'Please fund your ${wallet.name} TFChain wallet with at least $minimumBalance TFTs.',
+                    ? 'Please, initialize a wallet and fund it with at least $minimumBalance TFTs.'
+                    : 'Please, fund your ${wallet.name} TFChain wallet with at least $minimumBalance TFTs.',
                 actions: <Widget>[
                   TextButton(
                     child: const Text('Close'),
