@@ -27,14 +27,10 @@ class _WalletBridgeScreenState extends State<WalletBridgeScreen> {
   final toController = TextEditingController();
   final amountController = TextEditingController();
   BridgeOperation transactionType = BridgeOperation.Withdraw;
-  late bool isWithdraw;
+  bool isWithdraw = true;
   String? toAddressError;
   String? amountError;
   bool reloadBalance = true;
-
-  _WalletBridgeScreenState() {
-    isWithdraw = true;
-  }
 
   @override
   void initState() {
@@ -114,7 +110,8 @@ class _WalletBridgeScreenState extends State<WalletBridgeScreen> {
     }
 
     if (isWithdraw) {
-      if (!isValidStellarAddress(toAddress)) {
+      if (!isValidStellarAddress(toAddress) ||
+          toAddress == Globals().bridgeTFTAddress) {
         toAddressError = 'Invaild Stellar address';
         return false;
       }
@@ -281,7 +278,7 @@ class _WalletBridgeScreenState extends State<WalletBridgeScreen> {
 
   _bridge_confirmation() async {
     final memoText =
-        isWithdraw ? await TFChain.getMemo(fromController.text.trim()) : null;
+        isWithdraw ? await TFChain.getMemo(toController.text.trim()) : null;
     showModalBottomSheet(
         isScrollControlled: true,
         useSafeArea: true,
@@ -290,15 +287,15 @@ class _WalletBridgeScreenState extends State<WalletBridgeScreen> {
         context: context,
         builder: (ctx) => BridgeConfirmationWidget(
               bridgeOperation: transactionType,
-              secret: !isWithdraw
-                  ? widget.wallet.stellarSecret
-                  : widget.wallet.tfchainSecret,
+              secret: isWithdraw
+                  ? widget.wallet.tfchainSecret
+                  : widget.wallet.stellarSecret,
               from: fromController.text.trim(),
               to: toController.text.trim(),
               amount: amountController.text.trim(),
               memo: memoText,
               reloadBalance:
-                  !isWithdraw ? _loadStellarBalance : _loadTFChainBalance,
+                  isWithdraw ? _loadTFChainBalance : _loadStellarBalance,
             ));
   }
 }
