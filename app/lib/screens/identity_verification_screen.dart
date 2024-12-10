@@ -15,6 +15,7 @@ import 'package:threebotlogin/helpers/kyc_helpers.dart';
 import 'package:threebotlogin/helpers/logger.dart';
 import 'package:threebotlogin/main.dart';
 import 'package:threebotlogin/models/idenfy.dart';
+import 'package:threebotlogin/models/wallet.dart';
 import 'package:threebotlogin/screens/wizard/web_view.dart';
 import 'package:threebotlogin/services/gridproxy_service.dart';
 import 'package:threebotlogin/services/idenfy_service.dart';
@@ -23,6 +24,7 @@ import 'package:threebotlogin/services/open_kyc_service.dart';
 import 'package:threebotlogin/services/pkid_service.dart';
 import 'package:threebotlogin/services/tools_service.dart';
 import 'package:threebotlogin/services/shared_preference_service.dart';
+import 'package:threebotlogin/services/wallet_service.dart';
 import 'package:threebotlogin/widgets/custom_dialog.dart';
 import 'package:threebotlogin/widgets/layout_drawer.dart';
 import 'package:threebotlogin/widgets/phone_widget.dart';
@@ -58,7 +60,6 @@ class _IdentityVerificationScreenState
 
   final emailController = TextEditingController();
   final changeEmailController = TextEditingController();
-
   bool emailInputValidated = false;
 
   double spending = 0.0;
@@ -1265,6 +1266,8 @@ class _IdentityVerificationScreenState
                 ],
               ));
     } on NotEnoughBalance catch (_) {
+      final wallets = await getPkidWallets();
+      final wallet = wallets.firstWhere((w) => w.type == WalletType.NATIVE);
       setState(() {
         isLoading = false;
       });
@@ -1275,8 +1278,9 @@ class _IdentityVerificationScreenState
                 type: DialogType.Warning,
                 image: Icons.warning,
                 title: 'Not enough balance',
-                description:
-                    'Please fund your account with at least $minimumBalance TFTs.',
+                description: wallets.isEmpty
+                    ? 'Please, initialize a wallet and fund it with at least $minimumBalance TFTs.'
+                    : 'Please, fund your ${wallet.name} TFChain wallet with at least $minimumBalance TFTs.',
                 actions: <Widget>[
                   TextButton(
                     child: const Text('Close'),
