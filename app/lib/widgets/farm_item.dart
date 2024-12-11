@@ -110,7 +110,7 @@ class _FarmItemWidgetState extends State<FarmItemWidget> {
   void validateStellarAddress(String address) async {
     setState(() {
       addressError =
-          isValidStellarAddress(address) ? null : 'Invalid Stellar address';
+          isValidStellarAddress(address.trim()) ? null : 'Invalid Stellar address';
     });
 
     if (addressError == null) {
