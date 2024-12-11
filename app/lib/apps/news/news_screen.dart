@@ -97,6 +97,22 @@ class _NewsScreenState extends State<NewsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    if (isInitialLoading) {
+      return Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const CircularProgressIndicator(),
+          const SizedBox(height: 15),
+          Text(
+            'Loading Articles...',
+            style: Theme.of(context).textTheme.bodyLarge!.copyWith(
+                color: Theme.of(context).colorScheme.onSurface,
+                fontWeight: FontWeight.bold),
+          ),
+        ],
+      );
+    }
+
     return LayoutDrawer(
       titleText: 'News',
       content: Column(
@@ -111,29 +127,6 @@ class _NewsScreenState extends State<NewsScreen> {
               controller: _scrollController,
               itemCount: visibleArticles.length + (isLoading ? 1 : 0),
               itemBuilder: (context, index) {
-                if (isInitialLoading) {
-                  return Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Padding(
-                        padding: EdgeInsets.only(
-                            bottom: 4,
-                            top: MediaQuery.of(context).size.height * 0.4),
-                        child: const CircularProgressIndicator(),
-                      ),
-                      Text(
-                        'Loading Articles...',
-                        style: Theme.of(context)
-                            .textTheme
-                            .titleMedium!
-                            .copyWith(
-                              color: Theme.of(context).colorScheme.onSurface,
-                            ),
-                      ),
-                    ],
-                  );
-                }
                 var entry = visibleArticles[index];
 
                 var title = entry['title']?['\$t'] ?? 'No Title';
