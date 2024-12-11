@@ -75,7 +75,7 @@ class _NewFarmState extends State<NewFarm> {
     Farm? farm;
     try {
       final kycVerified =
-          await getVerificationStatus(address: _selectedWallet!.tfchainSecret);
+          await getVerificationStatus(address: _selectedWallet!.tfchainAddress);
       if (kycVerified.status == VerificationState.VERIFIED) {
         final f = await createFarm(farmName, _selectedWallet!.tfchainSecret,
             _selectedWallet!.stellarAddress);
@@ -100,7 +100,8 @@ class _NewFarmState extends State<NewFarm> {
                   type: DialogType.Warning,
                   image: Icons.warning,
                   title: 'Unauthorized',
-                  description: 'Please verify your wallet first',
+                  description:
+                      'KYC verification is required for the selected wallet',
                   actions: <Widget>[
                     TextButton(
                       child: const Text('Close'),
@@ -110,6 +111,7 @@ class _NewFarmState extends State<NewFarm> {
                     ),
                   ],
                 ));
+        return;
       }
     } catch (e) {
       logger.e(e);
