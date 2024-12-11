@@ -33,7 +33,6 @@ class _WalletDetailsWidgetState extends State<WalletDetailsWidget> {
   bool showTfchainSecret = false;
   bool showStellarSecret = false;
   bool edit = false;
-  late final VerificationStatus identityVerificationStatus;
 
   Future<bool> _deleteWallet() async {
     try {
@@ -63,27 +62,6 @@ class _WalletDetailsWidgetState extends State<WalletDetailsWidget> {
   }
 
   _editWallet() async {
-    identityVerificationStatus =
-        await getVerificationStatus(address: widget.wallet.tfchainSecret);
-    if (identityVerificationStatus.status != VerificationState.VERIFIED) {
-      showDialog(
-          context: context,
-          builder: (BuildContext context) => CustomDialog(
-                type: DialogType.Warning,
-                image: Icons.warning,
-                title: 'Unauthorized',
-                description: 'Please verify your wallet first',
-                actions: <Widget>[
-                  TextButton(
-                    child: const Text('Close'),
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
-                  ),
-                ],
-              ));
-      return;
-    }
     edit = !edit;
     final String newName = walletNameController.text.trim();
     if (walletName == newName) {
