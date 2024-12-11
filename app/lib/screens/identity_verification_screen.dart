@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:core';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_pkid/flutter_pkid.dart';
 import 'package:http/http.dart';
 import 'package:idenfy_sdk_flutter/idenfy_sdk_flutter.dart';
@@ -15,6 +16,7 @@ import 'package:threebotlogin/helpers/kyc_helpers.dart';
 import 'package:threebotlogin/helpers/logger.dart';
 import 'package:threebotlogin/main.dart';
 import 'package:threebotlogin/models/idenfy.dart';
+import 'package:threebotlogin/screens/authentication_screen.dart';
 import 'package:threebotlogin/screens/wizard/web_view.dart';
 import 'package:threebotlogin/services/gridproxy_service.dart';
 import 'package:threebotlogin/services/idenfy_service.dart';
@@ -39,6 +41,7 @@ class IdentityVerificationScreen extends StatefulWidget {
 class _IdentityVerificationScreenState
     extends State<IdentityVerificationScreen> {
   String doubleName = '';
+  String phrase = '';
   String email = '';
   String phone = '';
 
@@ -175,6 +178,11 @@ class _IdentityVerificationScreenState
         doubleName = dn!;
       });
     });
+    getPhrase().then((seedPhrase) {
+      setState(() {
+        phrase = seedPhrase!;
+      });
+    });
     getEmail().then((emailMap) {
       setState(() {
         if (emailMap['email'] != null) {
@@ -206,6 +214,20 @@ class _IdentityVerificationScreenState
     getSpending();
   }
 
+  Widget customDivider({
+    required BuildContext context,
+  }) {
+    return Center(
+      child: SizedBox(
+        width: MediaQuery.of(context).size.width * 0.85,
+        child: const Divider(
+          thickness: 0.5,
+          color: Colors.grey,
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return LayoutDrawer(
@@ -222,7 +244,7 @@ class _IdentityVerificationScreenState
               mainAxisSize: MainAxisSize.max,
               children: [
                 Padding(
-                  padding: const EdgeInsets.all(15),
+                  padding: const EdgeInsets.fromLTRB(0, 24, 15, 24),
                   child: Column(
                     children: [
                       AnimatedBuilder(
@@ -234,6 +256,35 @@ class _IdentityVerificationScreenState
                           builder: (BuildContext context, _) {
                             return Column(
                               children: [
+                                ListTile(
+                                  leading: const Icon(Icons.person),
+                                  title: Text(
+                                    doubleName.isNotEmpty
+                                        ? doubleName.substring(
+                                            0, doubleName.length - 5)
+                                        : 'Unknown',
+                                  ),
+                                ),
+                                customDivider(context: context),
+                                FutureBuilder(
+                                  future: getPhrase(),
+                                  builder: (context, snapshot) {
+                                    if (snapshot.hasData) {
+                                      return ListTile(
+                                        trailing: Icon(Icons.visibility),
+                                        leading: const Icon(Icons.vpn_key),
+                                        title: const Text('Show phrase'),
+                                        onTap: () async {
+                                          _showPhrase();
+                                        },
+                                      );
+                                    } else {
+                                      return Container();
+                                    }
+                                  },
+                                ),
+                                customDivider(context: context),
+
                                 // Step one: verify email
                                 _fillCard(
                                     getCorrectState(1, emailVerified,
@@ -241,6 +292,7 @@ class _IdentityVerificationScreenState
                                     1,
                                     email,
                                     Icons.email),
+                                customDivider(context: context),
 
                                 // Step two: verify phone
                                 (Globals().phoneVerification == true ||
@@ -253,6 +305,7 @@ class _IdentityVerificationScreenState
                                         phone,
                                         Icons.phone)
                                     : Container(),
+                                customDivider(context: context),
 
                                 // Step three: verify identity
                                 (Globals().isOpenKYCEnabled ||
@@ -515,6 +568,52 @@ class _IdentityVerificationScreenState
     );
   }
 
+  Future copySeedPhrase() async {
+    Clipboard.setData(ClipboardData(text: (await getPhrase()).toString()));
+
+    const seedCopied = SnackBar(
+      content: Text('Seed phrase copied to clipboard'),
+      duration: Duration(seconds: 1),
+    );
+
+    ScaffoldMessenger.of(context).showSnackBar(seedCopied);
+  }
+
+  void _showPhrase() async {
+    String? pin = await getPin();
+    bool? authenticated = await Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => AuthenticationScreen(
+            correctPin: pin!,
+            userMessage: 'Please enter your PIN code',
+          ),
+        ));
+
+    if (authenticated != null && authenticated) {
+      final phrase = await getPhrase();
+
+      showDialog(
+        context: context,
+        builder: (BuildContext context) => CustomDialog(
+          hiddenAction: copySeedPhrase,
+          image: Icons.info,
+          title: 'Please write this down on a piece of paper',
+          description: phrase.toString(),
+          actions: <Widget>[
+            // usually buttons at the bottom of the dialog
+            TextButton(
+              child: const Text('Close'),
+              onPressed: () {
+                Navigator.pop(context);
+              },
+            ),
+          ],
+        ),
+      );
+    }
+  }
+
   Future<void> initIdenfySdk(String token) async {
     IdenfyIdentificationResult? idenfySDKresult;
     try {
@@ -761,86 +860,52 @@ class _IdentityVerificationScreenState
         onTap: () async {},
         child: Opacity(
           opacity: 0.5,
-          child: Container(
-            decoration: BoxDecoration(
-                border: Border.all(width: 0.5, color: Colors.grey)),
-            height: 75,
-            width: MediaQuery.of(context).size.width * 100,
-            child: Row(
-              children: [
-                const Padding(padding: EdgeInsets.only(left: 10)),
-                Container(
-                  width: 30.0,
-                  height: 30.0,
-                  decoration: BoxDecoration(
-                      border: Border.all(
-                          color: Theme.of(context).colorScheme.primary,
-                          width: 2),
-                      shape: BoxShape.circle,
-                      color: Theme.of(context).colorScheme.surface),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text('0$step',
-                          style: TextStyle(
-                              color: Theme.of(context).colorScheme.primary,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 12))
-                    ],
-                  ),
-                ),
-                const Padding(padding: EdgeInsets.only(left: 20)),
-                Icon(
-                  icon,
-                  size: 20,
-                ),
-                const Padding(padding: EdgeInsets.only(left: 15)),
-                Flexible(
-                    child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: <Widget>[
-                      Row(
-                        children: <Widget>[
-                          Expanded(
-                            child: Text(
-                              text == '' ? 'Unknown' : text,
-                              overflow: TextOverflow.clip,
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .bodySmall!
-                                  .copyWith(
-                                      fontWeight: FontWeight.bold,
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .onSurface),
-                            ),
-                          )
-                        ],
-                      ),
-                      const SizedBox(
-                        height: 5,
-                      ),
-                      Row(
-                        children: <Widget>[
-                          Icon(
-                            Icons.close,
-                            color: Theme.of(context).colorScheme.error,
-                            size: 18.0,
+          child: Column(
+            children: [
+              Padding(
+                  padding: const EdgeInsets.only(bottom: 10.0),
+                  child: ListTile(
+                    leading: Icon(icon),
+                    title: Flexible(
+                        child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: <Widget>[
+                          Row(
+                            children: <Widget>[
+                              Expanded(
+                                child: Text(text == '' ? 'Unknown' : text,
+                                    overflow: TextOverflow.clip,
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .onSurface)),
+                              )
+                            ],
                           ),
-                          const Padding(padding: EdgeInsets.only(left: 5)),
-                          Text(
-                            'Not verified',
-                            style: TextStyle(
+                          const SizedBox(
+                            height: 5,
+                          ),
+                          Row(
+                            children: <Widget>[
+                              Icon(
+                                Icons.close,
                                 color: Theme.of(context).colorScheme.error,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 12),
-                          )
-                        ],
-                      ),
-                    ])),
-                const Padding(padding: EdgeInsets.only(right: 10))
-              ],
-            ),
+                                size: 18.0,
+                              ),
+                              const Padding(padding: EdgeInsets.only(left: 5)),
+                              Text(
+                                'Not verified',
+                                style: TextStyle(
+                                    color: Theme.of(context).colorScheme.error,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 12),
+                              )
+                            ],
+                          ),
+                        ])),
+                  ))
+            ],
           ),
         ));
   }
@@ -881,185 +946,113 @@ class _IdentityVerificationScreenState
             }
           }
         },
-        child: Container(
-          decoration: BoxDecoration(
-              border: Border(
-                  left: BorderSide(
-                      color: Theme.of(context).colorScheme.primary, width: 5),
-                  right: const BorderSide(color: Colors.grey, width: 0.5),
-                  bottom: const BorderSide(color: Colors.grey, width: 0.5),
-                  top: const BorderSide(color: Colors.grey, width: 0.5))),
-          height: 90,
-          width: MediaQuery.of(context).size.width * 100,
-          child: Row(
-            children: [
-              const Padding(padding: EdgeInsets.only(left: 10)),
-              Container(
-                width: 30.0,
-                height: 30.0,
-                decoration: BoxDecoration(
-                    border: Border.all(
-                        color: Theme.of(context).colorScheme.primary, width: 2),
-                    shape: BoxShape.circle,
-                    color: Theme.of(context).colorScheme.surface),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
+        child: Column(children: [
+          Padding(
+              padding: const EdgeInsets.only(bottom: 10.0),
+              child: ListTile(
+                leading: Icon(icon),
+                title: Row(
+                  mainAxisSize: MainAxisSize.min,
                   children: [
-                    Text('0$step',
-                        style: TextStyle(
-                            color: Theme.of(context).colorScheme.primary,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 12))
+                    Flexible(
+                        child: Container(
+                            constraints: Globals().hidePhoneButton.value ==
+                                        false ||
+                                    (step != 2 &&
+                                        Globals().hidePhoneButton.value == true)
+                                ? BoxConstraints(
+                                    minWidth:
+                                        MediaQuery.of(context).size.width * 0.5,
+                                    maxWidth:
+                                        MediaQuery.of(context).size.width * 0.5)
+                                : BoxConstraints(
+                                    minWidth:
+                                        MediaQuery.of(context).size.width * 0.7,
+                                    maxWidth:
+                                        MediaQuery.of(context).size.width *
+                                            0.7),
+                            child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: <Widget>[
+                                  Row(
+                                    children: <Widget>[
+                                      Expanded(
+                                        child: Text(
+                                          step == 3
+                                              ? 'Identity'
+                                              : (text.isEmpty
+                                                  ? 'Unknown'
+                                                  : text),
+                                        ),
+                                      )
+                                    ],
+                                  ),
+                                  step == 2 &&
+                                          Globals().hidePhoneButton.value ==
+                                              true
+                                      ? const SizedBox(
+                                          height: 5,
+                                        )
+                                      : Container(),
+                                  step == 2 &&
+                                          Globals().hidePhoneButton.value ==
+                                              true
+                                      ? Row(
+                                          children: <Widget>[
+                                            Text(
+                                              'SMS sent, retry in ${calculateMinutes()} minute${calculateMinutes() == '1' ? '' : 's'}',
+                                              overflow: TextOverflow.clip,
+                                              style: Theme.of(context)
+                                                  .textTheme
+                                                  .bodySmall!
+                                                  .copyWith(
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      color: Theme.of(context)
+                                                          .colorScheme
+                                                          .warning),
+                                            )
+                                          ],
+                                        )
+                                      : Container(),
+                                ]))),
+                    Globals().hidePhoneButton.value == true && step == 2
+                        ? Container()
+                        : Padding(
+                            padding: EdgeInsets.only(left: 15),
+                            child: ElevatedButton(
+                                onPressed: () async {
+                                  switch (step) {
+                                    // Verify email
+                                    case 1:
+                                      {
+                                        verifyEmail();
+                                      }
+                                      break;
+
+                                    // Verify phone
+                                    case 2:
+                                      {
+                                        await verifyPhone();
+                                      }
+                                      break;
+
+                                    // Verify identity
+                                    case 3:
+                                      {
+                                        await verifyIdentityProcess();
+                                      }
+                                      break;
+                                    default:
+                                      {}
+                                      break;
+                                  }
+                                },
+                                child: const Text('Verify'))),
                   ],
                 ),
-              ),
-              const Padding(padding: EdgeInsets.only(left: 15)),
-              Icon(
-                icon,
-                size: 20,
-              ),
-              const Padding(padding: EdgeInsets.only(left: 10)),
-              Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Flexible(
-                      child: Container(
-                          constraints: Globals().hidePhoneButton.value ==
-                                      false ||
-                                  (step != 2 &&
-                                      Globals().hidePhoneButton.value == true)
-                              ? BoxConstraints(
-                                  minWidth:
-                                      MediaQuery.of(context).size.width * 0.4,
-                                  maxWidth:
-                                      MediaQuery.of(context).size.width * 0.4)
-                              : BoxConstraints(
-                                  minWidth:
-                                      MediaQuery.of(context).size.width * 0.6,
-                                  maxWidth:
-                                      MediaQuery.of(context).size.width * 0.6),
-                          padding: const EdgeInsets.all(10),
-                          child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: <Widget>[
-                                Row(
-                                  children: <Widget>[
-                                    Expanded(
-                                      child: Text(
-                                        text == '' ? 'Unknown' : text,
-                                        overflow: TextOverflow.clip,
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .bodySmall!
-                                            .copyWith(
-                                                fontWeight: FontWeight.bold,
-                                                color: Theme.of(context)
-                                                    .colorScheme
-                                                    .onSurface),
-                                      ),
-                                    )
-                                  ],
-                                ),
-                                if (step == 1)
-                                  ValueListenableBuilder<int>(
-                                    valueListenable: countdownNotifier,
-                                    builder: (context, countdownValue, child) {
-                                      if (countdownValue > 0) {
-                                        return Row(
-                                          children: <Widget>[
-                                            Expanded(
-                                              child: Text(
-                                                'Verification email sent, retry in $countdownValue second${countdownValue == 1 ? '' : 's'}',
-                                                overflow: TextOverflow.clip,
-                                                style: Theme.of(context)
-                                                    .textTheme
-                                                    .bodySmall!
-                                                    .copyWith(
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                        color: Theme.of(context)
-                                                            .colorScheme
-                                                            .warning),
-                                              ),
-                                            ),
-                                          ],
-                                        );
-                                      } else {
-                                        return Container();
-                                      }
-                                    },
-                                  ),
-                                step == 2 &&
-                                        Globals().hidePhoneButton.value == true
-                                    ? const SizedBox(
-                                        height: 5,
-                                      )
-                                    : Container(),
-                                step == 2 &&
-                                        Globals().hidePhoneButton.value == true
-                                    ? Row(
-                                        children: <Widget>[
-                                          Text(
-                                            'SMS sent, retry in ${calculateMinutes()} minute${calculateMinutes() == '1' ? '' : 's'}',
-                                            overflow: TextOverflow.clip,
-                                            style: Theme.of(context)
-                                                .textTheme
-                                                .bodySmall!
-                                                .copyWith(
-                                                    fontWeight: FontWeight.bold,
-                                                    color: Theme.of(context)
-                                                        .colorScheme
-                                                        .warning),
-                                          )
-                                        ],
-                                      )
-                                    : Container(),
-                              ]))),
-                  Globals().hidePhoneButton.value == true && step == 2
-                      ? Container()
-                      : ValueListenableBuilder<int>(
-                          valueListenable: countdownNotifier,
-                          builder: (context, countdownValue, child) {
-                            return ElevatedButton(
-                                onPressed: countdownValue > 0
-                                    ? null
-                                    : () async {
-                                        switch (step) {
-                                          // Verify email
-                                          case 1:
-                                            {
-                                              startOrResumeEmailCountdown(
-                                                  startNew: true);
-                                              verifyEmail();
-                                            }
-                                            break;
-
-                                          // Verify phone
-                                          case 2:
-                                            {
-                                              await verifyPhone();
-                                            }
-                                            break;
-
-                                          // Verify identity
-                                          case 3:
-                                            {
-                                              await verifyIdentityProcess();
-                                            }
-                                            break;
-                                          default:
-                                            {}
-                                            break;
-                                        }
-                                      },
-                                child: const Text('Verify'));
-                          })
-                ],
-              ),
-              const Padding(padding: EdgeInsets.only(right: 10)),
-            ],
-          ),
-        ));
+              ))
+        ]));
   }
 
   String calculateMinutes() {
@@ -1078,115 +1071,95 @@ class _IdentityVerificationScreenState
 
   Widget verifiedWidget(step, text, icon) {
     return GestureDetector(
-      onTap: () async {
-        if (step == 1) {
-          return _changeEmailDialog(false);
-        }
-        // Only make this section clickable if it is Identity Verification + Current Phase
-        if (step != 3) {
-          return;
-        }
+        onTap: () async {
+          if (step == 1) {
+            return _changeEmailDialog(false);
+          }
+          // Only make this section clickable if it is Identity Verification + Current Phase
+          if (step != 3) {
+            return;
+          }
 
-        return showIdentityDetails();
-      },
-      child: Container(
-        decoration:
-            BoxDecoration(border: Border.all(width: 0.5, color: Colors.grey)),
-        height: 75,
-        width: MediaQuery.of(context).size.width * 100,
-        child: Row(
-          children: [
-            const Padding(padding: EdgeInsets.only(left: 10)),
-            Container(
-              width: 30.0,
-              height: 30.0,
-              decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: Theme.of(context).colorScheme.primary),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.check,
-                    size: 15.0,
-                    color: Theme.of(context).colorScheme.onPrimary,
-                  ),
-                ],
-              ),
-            ),
-            const Padding(padding: EdgeInsets.only(left: 20)),
-            Icon(
-              icon,
-              size: 20,
-            ),
-            const Padding(padding: EdgeInsets.only(left: 15)),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.start,
+          return showIdentityDetails();
+        },
+        child: Column(children: [
+          Padding(
+              padding: const EdgeInsets.only(bottom: 10.0),
+              child: ListTile(
+                leading: Icon(icon),
+                title: Row(
                   children: [
                     Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Container(
-                            constraints: BoxConstraints(
-                                minWidth:
-                                    MediaQuery.of(context).size.width * 0.55,
-                                maxWidth:
-                                    MediaQuery.of(context).size.width * 0.55),
-                            child: Text(text == '' ? 'Unknown' : text,
-                                overflow: TextOverflow.clip,
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .bodySmall!
-                                    .copyWith(
-                                        fontWeight: FontWeight.bold,
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .onSurface)))
+                        Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                Container(
+                                    constraints: BoxConstraints(
+                                        minWidth:
+                                            MediaQuery.of(context).size.width *
+                                                0.65,
+                                        maxWidth:
+                                            MediaQuery.of(context).size.width *
+                                                0.65),
+                                    child: Text(
+                                      text == '' ? 'Unknown' : text,
+                                      overflow: TextOverflow.clip,
+                                    ))
+                              ],
+                            ),
+                            const SizedBox(height: 5),
+                            Row(
+                              children: [
+                                Text(
+                                  'Verified',
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .bodySmall!
+                                      .copyWith(
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .primary,
+                                          fontWeight: FontWeight.bold),
+                                )
+                              ],
+                            )
+                          ],
+                        ),
+                        step == 1
+                            ? const Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                    Padding(
+                                      padding: EdgeInsets.only(left: 15),
+                                      child: Icon(
+                                        Icons.edit,
+                                      ),
+                                    ),
+                                  ])
+                            : const Column(),
+                        step == 3
+                            ? const Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                    Padding(
+                                      padding: EdgeInsets.only(left: 15),
+                                      child: Icon(
+                                        Icons.chevron_right,
+                                      ),
+                                    ),
+                                  ])
+                            : const Column()
                       ],
                     ),
-                    const SizedBox(height: 5),
-                    Row(
-                      children: [
-                        Text(
-                          'Verified',
-                          style: Theme.of(context)
-                              .textTheme
-                              .bodySmall!
-                              .copyWith(
-                                  color: Theme.of(context).colorScheme.primary,
-                                  fontWeight: FontWeight.bold),
-                        )
-                      ],
-                    )
                   ],
                 ),
-                step == 1
-                    ? const Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [Icon(Icons.edit, size: 20)],
-                      )
-                    : const Column(),
-                step == 3
-                    ? const Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(
-                            Icons.chevron_right,
-                            size: 20,
-                          )
-                        ],
-                      )
-                    : const Column()
-              ],
-            ),
-            const Padding(padding: EdgeInsets.only(right: 10))
-          ],
-        ),
-      ),
-    );
+              ))
+        ]));
   }
 
   Future verifyIdentityProcess() async {

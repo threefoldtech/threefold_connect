@@ -39,8 +39,6 @@ class PreferenceScreen extends ConsumerStatefulWidget {
 class _PreferenceScreenState extends ConsumerState<PreferenceScreen> {
   // FirebaseNotificationListener _listener;
   Map email = {};
-  String doubleName = '';
-  String phrase = '';
   bool showAdvancedOptions = false;
   Icon showAdvancedOptionsIcon = const Icon(Icons.keyboard_arrow_down);
 
@@ -102,30 +100,6 @@ class _PreferenceScreenState extends ConsumerState<PreferenceScreen> {
         children: <Widget>[
           const ListTile(
             title: Text('Global settings'),
-          ),
-          ListTile(
-            leading: const Icon(Icons.person),
-            title: Text(doubleName),
-          ),
-          FutureBuilder(
-            future: getPhrase(),
-            builder: (context, snapshot) {
-              if (snapshot.hasData) {
-                return ListTile(
-                  trailing: const Padding(
-                    padding: EdgeInsets.only(right: 7.5),
-                    child: Icon(Icons.visibility),
-                  ),
-                  leading: const Icon(Icons.vpn_key),
-                  title: const Text('Show phrase'),
-                  onTap: () async {
-                    _showPhrase();
-                  },
-                );
-              } else {
-                return Container();
-              }
-            },
           ),
           FutureBuilder(
               future: checkBiometrics(),
@@ -429,48 +403,7 @@ class _PreferenceScreenState extends ConsumerState<PreferenceScreen> {
     );
   }
 
-  Future copySeedPhrase() async {
-    Clipboard.setData(ClipboardData(text: (await getPhrase()).toString()));
-
-    const seedCopied = SnackBar(
-      content: Text('Seed phrase copied to clipboard'),
-      duration: Duration(seconds: 1),
-    );
-
-    ScaffoldMessenger.of(context).showSnackBar(seedCopied);
-  }
-
-  void checkPin(pin, callbackParam) async {
-    if (pin == await getPin()) {
-      Navigator.pop(context);
-      switch (callbackParam) {
-        case 'phrase':
-          _showPhrase();
-          break;
-        case 'fingerprint':
-          _showDisableFingerprint();
-          break;
-      }
-    } else {
-      Navigator.pop(context);
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-        content: Text('Pin invalid'),
-      ));
-    }
-    setState(() {});
-  }
-
   void getUserValues() {
-    getDoubleName().then((dn) {
-      setState(() {
-        doubleName = dn!.substring(0, dn.length - 5);
-      });
-    });
-    getPhrase().then((seedPhrase) {
-      setState(() {
-        phrase = seedPhrase!;
-      });
-    });
     getFingerprint().then((fingerprint) {
       setState(() {
         if (fingerprint == null) {
@@ -480,42 +413,6 @@ class _PreferenceScreenState extends ConsumerState<PreferenceScreen> {
         }
       });
     });
-  }
-
-  void _showPhrase() async {
-    String? pin = await getPin();
-    bool? authenticated = await Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => AuthenticationScreen(
-            correctPin: pin!,
-            userMessage: 'Please enter your PIN code',
-          ),
-        ));
-
-    if (authenticated != null && authenticated) {
-      final phrase = await getPhrase();
-
-      showDialog(
-        context: context,
-        builder: (BuildContext context) => CustomDialog(
-          hiddenAction: copySeedPhrase,
-          image: Icons.info,
-          title: 'Please write this down on a piece of paper',
-          description: phrase.toString(),
-          actions: <Widget>[
-            // usually buttons at the bottom of the dialog
-            TextButton(
-              child: const Text('Close'),
-              onPressed: () {
-                Navigator.pop(context);
-                setState(() {});
-              },
-            ),
-          ],
-        ),
-      );
-    }
   }
 
   void _toggleFingerprint(bool newFingerprintValue) async {
