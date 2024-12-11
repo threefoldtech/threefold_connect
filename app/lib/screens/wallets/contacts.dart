@@ -5,8 +5,8 @@ import 'package:threebotlogin/services/contact_service.dart';
 import 'package:threebotlogin/widgets/wallets/add_edit_contact.dart';
 import 'package:threebotlogin/widgets/wallets/contacts_widget.dart';
 
-class ContractsScreen extends StatefulWidget {
-  const ContractsScreen(
+class ContactsScreen extends StatefulWidget {
+  const ContactsScreen(
       {super.key,
       required this.chainType,
       required this.currentWalletAddress,
@@ -19,10 +19,10 @@ class ContractsScreen extends StatefulWidget {
   final void Function(String address) onSelectToAddress;
 
   @override
-  State<ContractsScreen> createState() => _ContractsScreenState();
+  State<ContactsScreen> createState() => _ContactsScreenState();
 }
 
-class _ContractsScreenState extends State<ContractsScreen> {
+class _ContactsScreenState extends State<ContactsScreen> {
   List<PkidContact> myWalletContacts = [];
   List<PkidContact> myPkidContacts = [];
 
