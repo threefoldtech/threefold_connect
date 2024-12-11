@@ -852,7 +852,7 @@ class _IdentityVerificationScreenState
 
           if (step == 2) {
             if (Globals().hidePhoneButton.value == true) {
-              return;
+              return _changePhoneDialog(false);
             }
 
             await addPhoneNumberDialog(context);
@@ -1036,6 +1036,7 @@ class _IdentityVerificationScreenState
                                           case 2:
                                             {
                                               await verifyPhone();
+                                              startPhoneNumberCounter();
                                             }
                                             break;
 
@@ -1079,6 +1080,9 @@ class _IdentityVerificationScreenState
       onTap: () async {
         if (step == 1) {
           return _changeEmailDialog(false);
+        }
+        if (step == 2) {
+          return _changePhoneDialog(false);
         }
         // Only make this section clickable if it is Identity Verification + Current Phase
         if (step != 3) {
@@ -1732,6 +1736,147 @@ class _IdentityVerificationScreenState
         });
   }
 
+  void _changePhoneDialog(bool phoneWasEmpty) {
+    TextEditingController controller = TextEditingController();
+
+    bool validPhone = false;
+    String? errorPhone;
+    Text statusMessage = const Text('');
+
+    showDialog(
+        context: context,
+        builder: (BuildContext dialogContext) {
+          return StatefulBuilder(builder: (statefulContext, setCustomState) {
+            return AlertDialog(
+              title: phoneWasEmpty == true
+                  ? Text(
+                      'Add Phone Number',
+                      style: Theme.of(context)
+                          .textTheme
+                          .headlineMedium!
+                          .copyWith(
+                              color: Theme.of(context).colorScheme.onSurface),
+                    )
+                  : Text('Change phone',
+                      style: Theme.of(context)
+                          .textTheme
+                          .headlineMedium!
+                          .copyWith(
+                              color: Theme.of(context).colorScheme.onSurface)),
+              contentPadding: const EdgeInsets.all(24),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  phoneWasEmpty == true
+                      ? Text('Please pass us your phone number',
+                          style: Theme.of(context)
+                              .textTheme
+                              .bodyLarge!
+                              .copyWith(
+                                  color:
+                                      Theme.of(context).colorScheme.onSurface))
+                      : Text(
+                          'Changing your phone will require you to go through the phone verification process again.',
+                          style: Theme.of(context)
+                              .textTheme
+                              .bodyLarge!
+                              .copyWith(
+                                  color:
+                                      Theme.of(context).colorScheme.onSurface)),
+                  TextField(
+                    controller: controller,
+                    style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                          color: Theme.of(context).colorScheme.onSurface,
+                        ),
+                    keyboardType: TextInputType.number,
+                    decoration: InputDecoration(
+                        labelText: 'Phone',
+                        errorText: validPhone == true ? null : errorPhone),
+                  ),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  statusMessage
+                ],
+              ),
+              actions: [
+                TextButton(
+                    onPressed: () {
+                      Navigator.pop(dialogContext);
+                    },
+                    child: const Text('Cancel')),
+                TextButton(
+                    onPressed: () async {
+                      _loadingDialog();
+
+                      String phoneValue = controller.text;
+                      // validate phone
+                      bool isValidPhone = validateEmail(phoneValue);
+
+                      var oldPhone = await getPhone();
+
+                      if (oldPhone['phone'] == phoneValue) {
+                        validPhone = false;
+                        errorPhone = 'Please enter a different number';
+                        setCustomState(() {});
+                        Navigator.pop(context);
+                        return;
+                      }
+
+                      if (isValidPhone == false) {
+                        validPhone = false;
+                        errorPhone = 'Please enter a valid number';
+                        setCustomState(() {});
+                        Navigator.pop(context);
+                        return;
+                      }
+
+                      try {
+                        errorPhone = null;
+                        await savePhone(phoneValue, null);
+
+                        Response res =
+                            await updateUserData('phone', phoneValue);
+
+                        if (res.statusCode != 200) {
+                          throw Exception();
+                        }
+                        startPhoneNumberCounter();
+
+                        phone = phoneValue;
+
+                        await setIsPhoneVerified(false);
+                        await savePhoneToPKid();
+
+                        Navigator.pop(context);
+                        Navigator.pop(dialogContext);
+                        // resendEmailDialog(context);
+                        // startOrResumeEmailCountdown(startNew: true);
+
+                        setState(() {});
+                      } catch (e) {
+                        logger.e(e);
+                        Navigator.pop(context);
+
+                        await savePhone(oldPhone['phone']!, oldPhone['spi']!);
+                        await savePhoneToPKid();
+
+                        statusMessage = const Text('Something went wrong',
+                            style: TextStyle(
+                                color: Colors.red,
+                                fontWeight: FontWeight.bold));
+
+                        setState(() {});
+                        setCustomState(() {});
+                      }
+                    },
+                    child: const Text('Ok'))
+              ],
+            );
+          });
+        });
+  }
+
   Future<dynamic> showEmailChangeDialog() async {
     FlutterPkid client = await getPkidClient();
 
@@ -1828,7 +1973,9 @@ class _IdentityVerificationScreenState
 
       return;
     }
+  }
 
+  void startPhoneNumberCounter() {
     int currentTime = DateTime.now().millisecondsSinceEpoch;
     if (globals.tooManySmsAttempts && globals.lockedSmsUntil > currentTime) {
       globals.sendSmsAttempts = 0;
