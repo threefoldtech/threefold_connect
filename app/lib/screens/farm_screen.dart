@@ -120,7 +120,10 @@ class _FarmScreenState extends State<FarmScreen> {
               itemCount: farms.length,
               itemBuilder: (context, i) {
                 final farm = farms[i];
-                return FarmItemWidget(farm: farm);
+                return FarmItemWidget(
+                  farm: farm,
+                  wallets: wallets,
+                );
               }));
     }
     return LayoutDrawer(
