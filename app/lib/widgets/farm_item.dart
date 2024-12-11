@@ -110,7 +110,7 @@ class _FarmItemWidgetState extends State<FarmItemWidget> {
   void validateStellarAddress(String address) async {
     setState(() {
       addressError =
-          isValidStellarAddress(address.trim()) ? null : 'Invalid Stellar address';
+          isValidStellarAddress(address) ? null : 'Invalid Stellar address';
     });
 
     if (addressError == null) {
@@ -170,7 +170,7 @@ class _FarmItemWidgetState extends State<FarmItemWidget> {
                   ),
               controller: walletAddressController,
               onChanged: (value) {
-                validateStellarAddress(value);
+                validateStellarAddress(value.trim());
               },
               decoration: InputDecoration(
                   errorText: addressError,
