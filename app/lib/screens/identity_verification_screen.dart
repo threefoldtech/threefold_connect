@@ -270,7 +270,7 @@ class _IdentityVerificationScreenState
                                   builder: (context, snapshot) {
                                     if (snapshot.hasData) {
                                       return ListTile(
-                                        trailing: Icon(Icons.visibility),
+                                        trailing: const Icon(Icons.visibility),
                                         leading: const Icon(Icons.vpn_key),
                                         title: const Text('Show phrase'),
                                         onTap: () async {
@@ -1017,7 +1017,7 @@ class _IdentityVerificationScreenState
                     Globals().hidePhoneButton.value == true && step == 2
                         ? Container()
                         : Padding(
-                            padding: EdgeInsets.only(left: 15),
+                            padding: const EdgeInsets.only(left: 15),
                             child: ElevatedButton(
                                 onPressed: () async {
                                   switch (step) {
