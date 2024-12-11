@@ -1,11 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:threebotlogin/helpers/logger.dart';
-import 'package:threebotlogin/models/idenfy.dart';
 import 'package:threebotlogin/models/wallet.dart';
-import 'package:threebotlogin/services/idenfy_service.dart';
 import 'package:threebotlogin/services/wallet_service.dart';
-import 'package:threebotlogin/widgets/custom_dialog.dart';
 import 'package:threebotlogin/widgets/wallets/warning_dialog.dart';
 
 class WalletDetailsWidget extends StatefulWidget {

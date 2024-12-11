@@ -34,12 +34,14 @@ class _FarmItemWidgetState extends State<FarmItemWidget> {
   ChainType chainType = ChainType.Stellar;
   String? addressError;
   String? currentAddress;
+  String? tfchainAddress;
 
   @override
   void initState() {
     super.initState();
     currentAddress = widget.farm.walletAddress;
     walletAddressController.text = currentAddress!;
+    tfchainAddress = widget.wallets.where((w)=> w.name == widget.farm.walletName).toString();
   }
 
   @override
@@ -234,7 +236,7 @@ class _FarmItemWidgetState extends State<FarmItemWidget> {
                           IconButton(
                               onPressed: () async {
                                 final kycVerified = await getVerificationStatus(
-                                    address: widget.farm.walletAddress);
+                                    address: tfchainAddress!);
                                 if (kycVerified.status !=
                                     VerificationState.VERIFIED) {
                                   showDialog(
