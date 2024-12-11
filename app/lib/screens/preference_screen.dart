@@ -403,37 +403,6 @@ class _PreferenceScreenState extends ConsumerState<PreferenceScreen> {
     );
   }
 
-  Future copySeedPhrase() async {
-    Clipboard.setData(ClipboardData(text: (await getPhrase()).toString()));
-
-    const seedCopied = SnackBar(
-      content: Text('Seed phrase copied to clipboard'),
-      duration: Duration(seconds: 1),
-    );
-
-    ScaffoldMessenger.of(context).showSnackBar(seedCopied);
-  }
-
-  void checkPin(pin, callbackParam) async {
-    if (pin == await getPin()) {
-      Navigator.pop(context);
-      switch (callbackParam) {
-        case 'phrase':
-          _showPhrase();
-          break;
-        case 'fingerprint':
-          _showDisableFingerprint();
-          break;
-      }
-    } else {
-      Navigator.pop(context);
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-        content: Text('Pin invalid'),
-      ));
-    }
-    setState(() {});
-  }
-
   void getUserValues() {
     getFingerprint().then((fingerprint) {
       setState(() {
@@ -444,42 +413,6 @@ class _PreferenceScreenState extends ConsumerState<PreferenceScreen> {
         }
       });
     });
-  }
-
-  void _showPhrase() async {
-    String? pin = await getPin();
-    bool? authenticated = await Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => AuthenticationScreen(
-            correctPin: pin!,
-            userMessage: 'Please enter your PIN code',
-          ),
-        ));
-
-    if (authenticated != null && authenticated) {
-      final phrase = await getPhrase();
-
-      showDialog(
-        context: context,
-        builder: (BuildContext context) => CustomDialog(
-          hiddenAction: copySeedPhrase,
-          image: Icons.info,
-          title: 'Please write this down on a piece of paper',
-          description: phrase.toString(),
-          actions: <Widget>[
-            // usually buttons at the bottom of the dialog
-            TextButton(
-              child: const Text('Close'),
-              onPressed: () {
-                Navigator.pop(context);
-                setState(() {});
-              },
-            ),
-          ],
-        ),
-      );
-    }
   }
 
   void _toggleFingerprint(bool newFingerprintValue) async {

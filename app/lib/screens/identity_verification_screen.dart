@@ -213,6 +213,20 @@ class _IdentityVerificationScreenState
     getSpending();
   }
 
+  Widget customDivider({
+    required BuildContext context,
+  }) {
+    return Center(
+      child: SizedBox(
+        width: MediaQuery.of(context).size.width * 0.85,
+        child: const Divider(
+          thickness: 0.5,
+          color: Colors.grey,
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return LayoutDrawer(
@@ -250,16 +264,7 @@ class _IdentityVerificationScreenState
                                         : 'Unknown',
                                   ),
                                 ),
-                                Center(
-                                  child: SizedBox(
-                                    width: MediaQuery.of(context).size.width *
-                                        0.85,
-                                    child: const Divider(
-                                      thickness: 0.5,
-                                      color: Colors.grey,
-                                    ),
-                                  ),
-                                ),
+                                customDivider(context: context),
                                 FutureBuilder(
                                   future: getPhrase(),
                                   builder: (context, snapshot) {
@@ -277,16 +282,8 @@ class _IdentityVerificationScreenState
                                     }
                                   },
                                 ),
-                                Center(
-                                  child: SizedBox(
-                                    width: MediaQuery.of(context).size.width *
-                                        0.85,
-                                    child: const Divider(
-                                      thickness: 0.5,
-                                      color: Colors.grey,
-                                    ),
-                                  ),
-                                ),
+                                customDivider(context: context),
+
                                 // Step one: verify email
                                 _fillCard(
                                     getCorrectState(1, emailVerified,
@@ -294,16 +291,8 @@ class _IdentityVerificationScreenState
                                     1,
                                     email,
                                     Icons.email),
-                                Center(
-                                  child: SizedBox(
-                                    width: MediaQuery.of(context).size.width *
-                                        0.85,
-                                    child: const Divider(
-                                      thickness: 0.5,
-                                      color: Colors.grey,
-                                    ),
-                                  ),
-                                ),
+                                customDivider(context: context),
+
                                 // Step two: verify phone
                                 (Globals().phoneVerification == true ||
                                         (Globals().spendingLimit > 0 &&
@@ -315,16 +304,8 @@ class _IdentityVerificationScreenState
                                         phone,
                                         Icons.phone)
                                     : Container(),
-                                Center(
-                                  child: SizedBox(
-                                    width: MediaQuery.of(context).size.width *
-                                        0.85,
-                                    child: const Divider(
-                                      thickness: 0.5,
-                                      color: Colors.grey,
-                                    ),
-                                  ),
-                                ),
+                                customDivider(context: context),
+
                                 // Step three: verify identity
                                 (Globals().isOpenKYCEnabled ||
                                         (Globals().spendingLimit > 0 &&
