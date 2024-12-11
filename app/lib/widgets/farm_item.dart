@@ -30,11 +30,14 @@ class _FarmItemWidgetState extends State<FarmItemWidget> {
   final walletFocus = FocusNode();
   ChainType chainType = ChainType.Stellar;
   String? addressError;
+  String? currentAddress;
+
 
   @override
   void initState() {
     super.initState();
     walletAddressController.text = widget.farm.walletAddress;
+    currentAddress = widget.farm.walletAddress;
   }
 
   @override
@@ -177,12 +180,10 @@ class _FarmItemWidgetState extends State<FarmItemWidget> {
                               builder: (context) => ContractsScreen(
                                   chainType: chainType,
                                   currentWalletAddress:
-                                      widget.farm.walletAddress,
+                                      currentAddress!,
                                   wallets: widget.wallets
                                       .where((w) =>
-                                          double.parse(w.stellarBalance) >= 0 &&
-                                          w.stellarAddress !=
-                                              widget.farm.walletAddress)
+                                          double.parse(w.stellarBalance) >= 0)
                                       .toList(),
                                   onSelectToAddress: _selectToAddress),
                             ));
