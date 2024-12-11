@@ -129,10 +129,9 @@ class _FarmItemWidgetState extends State<FarmItemWidget> {
     }
   }
 
-  void _selectToAddress(String address) {
+  void _selectAddress(String address) {
     setState(() {
       walletAddressController.text = address;
-      validateStellarAddress(address);
     });
   }
 
@@ -186,7 +185,7 @@ class _FarmItemWidgetState extends State<FarmItemWidget> {
                                       .where((w) =>
                                           double.parse(w.stellarBalance) >= 0)
                                       .toList(),
-                                  onSelectToAddress: _selectToAddress),
+                                  onSelectToAddress: _selectAddress),
                             ));
                           },
                           icon: const Icon(Icons.person))
