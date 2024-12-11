@@ -172,6 +172,26 @@ Future<Farm?> createFarm(
   }
 }
 
+Future<void> addStellarAddress(
+    String tfchainSeed, int farmId, String stellarAddress) async {
+  final chainUrl = Globals().chainUrl;
+  final client = TFChain.Client(chainUrl, tfchainSeed, 'sr25519');
+
+  try {
+    final twinId = await getTwinIdByClient(client);
+    if (twinId == 0) {
+      await activateAccount(tfchainSeed);
+    }
+    await client.connect();
+    await client.farms
+        .addStellarAddress(farmId: farmId, stellarAddress: stellarAddress);
+  } catch (e) {
+    throw Exception('Failed to add stellar address to farm due to $e');
+  } finally {
+    await client.disconnect();
+  }
+}
+
 Future<void> transfer(String secret, String dest, String amount) async {
   final chainUrl = Globals().chainUrl;
   final client = TFChain.Client(chainUrl, secret, 'sr25519');
