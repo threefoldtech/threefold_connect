@@ -102,11 +102,26 @@ class _FarmItemWidgetState extends State<FarmItemWidget> {
     }
   }
 
-  void validateStellarAddress(String address) {
+  void validateStellarAddress(String address) async {
     setState(() {
       addressError =
           isValidStellarAddress(address) ? null : 'Invalid Stellar address';
     });
+
+    if (addressError == null) {
+      try {
+        final balance = await getBalanceByAccountId(address);
+        if (balance == '-1') {
+          setState(() {
+            addressError = 'Wallet not activated on stellar';
+          });
+        }
+      } catch (e) {
+        setState(() {
+          addressError = 'Error fetching account balance';
+        });
+      }
+    }
   }
 
   void _selectToAddress(String address) {
@@ -163,7 +178,12 @@ class _FarmItemWidgetState extends State<FarmItemWidget> {
                                   chainType: chainType,
                                   currentWalletAddress:
                                       widget.farm.walletAddress,
-                                  wallets: widget.wallets,
+                                  wallets: widget.wallets
+                                      .where((w) =>
+                                          double.parse(w.stellarBalance) >= 0 &&
+                                          w.stellarAddress !=
+                                              widget.farm.walletAddress)
+                                      .toList(),
                                   onSelectToAddress: _selectToAddress),
                             ));
                           },
