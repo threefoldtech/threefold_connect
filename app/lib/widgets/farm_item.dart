@@ -32,12 +32,11 @@ class _FarmItemWidgetState extends State<FarmItemWidget> {
   String? addressError;
   String? currentAddress;
 
-
   @override
   void initState() {
     super.initState();
-    walletAddressController.text = widget.farm.walletAddress;
     currentAddress = widget.farm.walletAddress;
+    walletAddressController.text = currentAddress!;
   }
 
   @override
@@ -56,7 +55,7 @@ class _FarmItemWidgetState extends State<FarmItemWidget> {
     });
 
     final String newAddress = walletAddressController.text.trim();
-    if (newAddress == widget.farm.walletAddress) {
+    if (newAddress == currentAddress) {
       FocusScope.of(context).requestFocus(walletFocus);
       setState(() {
         isSaving = false;
@@ -80,6 +79,9 @@ class _FarmItemWidgetState extends State<FarmItemWidget> {
         ),
         duration: const Duration(seconds: 3),
       );
+      setState(() {
+        currentAddress = newAddress;
+      });
       ScaffoldMessenger.of(context).clearSnackBars();
       ScaffoldMessenger.of(context).showSnackBar(savingAddressSuccess);
     } catch (e) {
@@ -137,7 +139,7 @@ class _FarmItemWidgetState extends State<FarmItemWidget> {
   void _cancelEdit() {
     setState(() {
       edit = false;
-      walletAddressController.text = widget.farm.walletAddress;
+      walletAddressController.text = currentAddress!;
       addressError = null;
     });
   }
@@ -179,8 +181,7 @@ class _FarmItemWidgetState extends State<FarmItemWidget> {
                             Navigator.of(context).push(MaterialPageRoute(
                               builder: (context) => ContractsScreen(
                                   chainType: chainType,
-                                  currentWalletAddress:
-                                      currentAddress!,
+                                  currentWalletAddress: currentAddress!,
                                   wallets: widget.wallets
                                       .where((w) =>
                                           double.parse(w.stellarBalance) >= 0)
