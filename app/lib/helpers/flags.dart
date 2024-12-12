@@ -85,6 +85,9 @@ class Flags {
     Globals().refreshBalance = int.parse(
         (await Flags().getFlagValueByFeatureName('refresh-balance'))
             .toString());
+
+    Globals().bridgeTFTAddress =
+        (await Flags().getFlagValueByFeatureName('bridge-address'))!;
   }
 
   Future<bool> hasFlagValueByFeatureName(String name) async {
