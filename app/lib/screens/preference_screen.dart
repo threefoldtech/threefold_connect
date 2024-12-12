@@ -12,7 +12,7 @@ import 'package:threebotlogin/events/close_socket_event.dart';
 import 'package:threebotlogin/events/events.dart';
 import 'package:threebotlogin/helpers/environment.dart';
 import 'package:threebotlogin/helpers/globals.dart';
-import 'package:threebotlogin/main.dart';
+import 'package:threebotlogin/helpers/logger.dart';
 
 import 'package:threebotlogin/screens/authentication_screen.dart';
 import 'package:threebotlogin/screens/change_pin_screen.dart';
@@ -266,45 +266,6 @@ class _PreferenceScreenState extends ConsumerState<PreferenceScreen> {
     return await checkBiometricsAvailable();
   }
 
-  void _showDisableFingerprint() {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) => CustomDialog(
-        type: DialogType.Warning,
-        image: Icons.warning,
-        title: 'Disable Fingerprint',
-        description:
-            'Are you sure you want to deactivate fingerprint as authentication method?',
-        actions: <Widget>[
-          TextButton(
-            child: const Text('Cancel'),
-            onPressed: () async {
-              Navigator.pop(context);
-              finger = true;
-              await saveFingerprint(true);
-              setState(() {});
-            },
-          ),
-          TextButton(
-            child: Text(
-              'Yes',
-              style: Theme.of(context)
-                  .textTheme
-                  .bodyMedium!
-                  .copyWith(color: Theme.of(context).colorScheme.warning),
-            ),
-            onPressed: () async {
-              Navigator.pop(context);
-              finger = false;
-              await saveFingerprint(false);
-              setState(() {});
-            },
-          ),
-        ],
-      ),
-    );
-  }
-
   void _showDialog({delete = false}) {
     String title = 'Log Out';
     String message = 'Are you sure you want to log out?';
@@ -349,7 +310,7 @@ class _PreferenceScreenState extends ConsumerState<PreferenceScreen> {
                 deleted = false;
               }
             } catch (e) {
-              print('Failed to delete user due to $e');
+              logger.e('Failed to delete user due to $e');
               deleted = false;
             }
             if (deleted) {

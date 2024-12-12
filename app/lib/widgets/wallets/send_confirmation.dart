@@ -164,6 +164,8 @@ class _SendConfirmationWidgetState extends State<SendConfirmationWidget> {
         loading = false;
       });
       return;
+    } finally {
+      Navigator.pop(context);
     }
 
     setState(() {
