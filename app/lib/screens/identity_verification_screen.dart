@@ -1241,8 +1241,9 @@ class _IdentityVerificationScreenState
                 ],
               ));
     } on NotEnoughBalance catch (_) {
-      final wallets = await getPkidWallets();
-      final wallet = wallets.where((w) => w.type == WalletType.NATIVE).toList();
+      final wallets = (await getPkidWallets())
+          .where((w) => w.type == WalletType.NATIVE)
+          .toList();
       setState(() {
         isLoading = false;
       });
@@ -1255,7 +1256,7 @@ class _IdentityVerificationScreenState
                 title: 'Not enough balance',
                 description: wallets.isEmpty
                     ? 'Please, initialize a wallet and fund it with at least $minimumBalance TFTs.'
-                    : 'Please, fund your ${wallet.first.name} TFChain wallet with at least $minimumBalance TFTs.',
+                    : 'Please, fund your ${wallets.first.name} TFChain wallet with at least $minimumBalance TFTs.',
                 actions: <Widget>[
                   TextButton(
                     child: const Text('Close'),
