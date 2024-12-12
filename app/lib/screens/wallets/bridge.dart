@@ -110,9 +110,12 @@ class _WalletBridgeScreenState extends State<WalletBridgeScreen> {
     }
 
     if (isWithdraw) {
-      if (!isValidStellarAddress(toAddress) ||
-          toAddress == Globals().bridgeTFTAddress) {
+      if (!isValidStellarAddress(toAddress)) {
         toAddressError = 'Invaild Stellar address';
+        return false;
+      }
+      if (toAddress == Globals().bridgeTFTAddress) {
+        toAddressError = "Bridge address can't be the destination";
         return false;
       }
       final toAddrBalance = await Stellar.getBalanceByAccountId(toAddress);
