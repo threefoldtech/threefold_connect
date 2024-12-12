@@ -4,6 +4,7 @@ import 'package:threebotlogin/helpers/logger.dart';
 import 'package:threebotlogin/models/farm.dart';
 import 'package:threebotlogin/models/idenfy.dart';
 import 'package:threebotlogin/models/wallet.dart';
+import 'package:threebotlogin/screens/wallets/contacts.dart';
 import 'package:threebotlogin/services/idenfy_service.dart';
 import 'package:threebotlogin/services/stellar_service.dart';
 import 'package:threebotlogin/services/tfchain_service.dart';
@@ -184,7 +185,7 @@ class _FarmItemWidgetState extends State<FarmItemWidget> {
                       ? IconButton(
                           onPressed: () {
                             Navigator.of(context).push(MaterialPageRoute(
-                              builder: (context) => ContractsScreen(
+                              builder: (context) => ContactsScreen(
                                   chainType: chainType,
                                   currentWalletAddress: currentAddress!,
                                   wallets: widget.wallets
