@@ -89,6 +89,10 @@ class _WalletSendScreenState extends State<WalletSendScreen> {
         ? widget.wallet.stellarAddress
         : widget.wallet.tfchainAddress;
     chainType = type;
+    toController.text = '';
+    toAddressError = null;
+    amountController.text = '';
+    amountError = null;
     setState(() {});
   }
 
