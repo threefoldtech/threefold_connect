@@ -36,7 +36,7 @@ class _WalletSendScreenState extends State<WalletSendScreen> {
   String? amountError;
   bool reloadBalance = true;
   final FocusNode textFieldFocusNode = FocusNode();
-
+  List percentages = [25, 50, 75, 100];
   @override
   void initState() {
     fromController.text = widget.wallet.stellarAddress;
@@ -306,10 +306,29 @@ class _WalletSendScreenState extends State<WalletSendScreen> {
                             hintText: '100',
                             suffixText: 'TFT',
                             errorText: amountError)),
-                    subtitle: Text(
-                        'Max Fee: ${chainType == ChainType.Stellar ? 0.1 : 0.01} TFT'),
+                    subtitle: Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 8.0),
+                        child: Text(
+                            'Max Fee: ${chainType == ChainType.Stellar ? 0.1 : 0.01} TFT')),
                   ),
                   const SizedBox(height: 10),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 15.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: percentages
+                          .map(
+                            (percentage) => OutlinedButton(
+                              style: OutlinedButton.styleFrom(
+                                  shape: const RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.zero)),
+                              onPressed: () => calculateAmount(percentage),
+                              child: Text('$percentage%'),
+                            ),
+                          )
+                          .toList(),
+                    ),
+                  ),
                   if (chainType == ChainType.Stellar)
                     ListTile(
                       title: TextField(
@@ -383,6 +402,16 @@ class _WalletSendScreenState extends State<WalletSendScreen> {
     }
 
     return result.code;
+  }
+
+  calculateAmount(int percentage) {
+    final fee = chainType == ChainType.Stellar ? 0.1 : 0.01;
+    final amount = double.parse(chainType == ChainType.TFChain
+                ? widget.wallet.tfchainBalance
+                : widget.wallet.stellarBalance) *
+            (percentage / 100) -
+        fee;
+    amountController.text = formatAmount(amount.toString());
   }
 
   _send_confirmation() async {

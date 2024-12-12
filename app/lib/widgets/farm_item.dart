@@ -40,7 +40,10 @@ class _FarmItemWidgetState extends State<FarmItemWidget> {
     super.initState();
     currentAddress = widget.farm.walletAddress;
     walletAddressController.text = currentAddress!;
-    tfchainAddress = widget.wallets.where((w)=> w.name == widget.farm.walletName).first.tfchainAddress;
+    tfchainAddress = widget.wallets
+        .where((w) => w.name == widget.farm.walletName)
+        .first
+        .tfchainAddress;
   }
 
   @override

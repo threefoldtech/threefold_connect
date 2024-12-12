@@ -119,7 +119,7 @@ class _NewFarmState extends State<NewFarm> {
           Icons.error, DialogType.Error);
       return;
     }
-    widget.onAddFarm(farm!);
+    widget.onAddFarm(farm);
     if (!context.mounted) return;
     Navigator.pop(context);
   }
