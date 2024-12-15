@@ -158,10 +158,10 @@ class _WalletSendScreenState extends State<WalletSendScreen> {
         amountError = "Amount can't be less than 0.01";
         return false;
       }
-      if (double.parse(widget.wallet.tfchainBalance) -
-              double.parse(amount) -
+      // Used epsilon as a tolerance
+      if ((double.parse(widget.wallet.tfchainBalance) - double.parse(amount)) -
               0.01 <
-          0) {
+          -1e-10) {
         amountError = "Amount shouldn't be more than the wallet balance";
         return false;
       }
