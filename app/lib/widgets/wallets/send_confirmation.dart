@@ -157,6 +157,7 @@ class _SendConfirmationWidgetState extends State<SendConfirmationWidget> {
       }
       await _showDialog('Success!', 'Tokens have been transferred successfully',
           Icons.check, DialogType.Info);
+      Navigator.pop(context);
     } catch (e) {
       _showDialog('Error', 'Failed to transfer. Please try again.', Icons.error,
           DialogType.Error);
