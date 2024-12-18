@@ -317,23 +317,28 @@ class _WalletSendScreenState extends State<WalletSendScreen> {
                             'Max Fee: ${chainType == ChainType.Stellar ? 0.1 : 0.01} TFT')),
                   ),
                   const SizedBox(height: 10),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 15.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: percentages
-                          .map(
-                            (percentage) => OutlinedButton(
-                              style: OutlinedButton.styleFrom(
-                                  shape: const RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.zero)),
-                              onPressed: () => calculateAmount(percentage),
-                              child: Text('$percentage%'),
-                            ),
-                          )
-                          .toList(),
+                  if (chainType == ChainType.Stellar &&
+                          double.parse(widget.wallet.stellarBalance) > 0.1 ||
+                      chainType == ChainType.TFChain &&
+                          double.parse(widget.wallet.tfchainBalance) > 0.01)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 15.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: percentages
+                            .map(
+                              (percentage) => OutlinedButton(
+                                style: OutlinedButton.styleFrom(
+                                    shape: const RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.all(
+                                            Radius.circular(5)))),
+                                onPressed: () => calculateAmount(percentage),
+                                child: Text('$percentage%'),
+                              ),
+                            )
+                            .toList(),
+                      ),
                     ),
-                  ),
                   if (chainType == ChainType.Stellar)
                     ListTile(
                       title: TextField(
