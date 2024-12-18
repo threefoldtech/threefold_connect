@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:threebotlogin/helpers/globals.dart';
 import 'package:threebotlogin/models/wallet.dart';
 import 'package:threebotlogin/services/stellar_service.dart' as Stellar;
 import 'package:threebotlogin/services/tfchain_service.dart' as TFChain;
 import 'package:threebotlogin/widgets/custom_dialog.dart';
 
-class SendConfirmationWidget extends StatefulWidget {
-  const SendConfirmationWidget({
+class BridgeConfirmationWidget extends StatefulWidget {
+  const BridgeConfirmationWidget({
     super.key,
-    required this.chainType,
+    required this.bridgeOperation,
     required this.secret,
     required this.from,
     required this.to,
@@ -16,23 +17,23 @@ class SendConfirmationWidget extends StatefulWidget {
     required this.reloadBalance,
   });
 
-  final ChainType chainType;
+  final BridgeOperation bridgeOperation;
   final String secret;
   final String from;
   final String to;
   final String amount;
-  final String memo;
+  final String? memo;
   final void Function() reloadBalance;
 
   @override
-  State<SendConfirmationWidget> createState() => _SendConfirmationWidgetState();
+  State<BridgeConfirmationWidget> createState() =>
+      _BridgeConfirmationWidgetState();
 }
 
-class _SendConfirmationWidgetState extends State<SendConfirmationWidget> {
+class _BridgeConfirmationWidgetState extends State<BridgeConfirmationWidget> {
   final fromController = TextEditingController();
   final toController = TextEditingController();
   final amountController = TextEditingController();
-  final memoController = TextEditingController();
   bool loading = false;
 
   @override
@@ -40,7 +41,6 @@ class _SendConfirmationWidgetState extends State<SendConfirmationWidget> {
     fromController.text = widget.from;
     toController.text = widget.to;
     amountController.text = widget.amount;
-    memoController.text = widget.memo;
     super.initState();
   }
 
@@ -49,7 +49,6 @@ class _SendConfirmationWidgetState extends State<SendConfirmationWidget> {
     fromController.dispose();
     toController.dispose();
     amountController.dispose();
-    memoController.dispose();
     super.dispose();
   }
 
@@ -60,7 +59,7 @@ class _SendConfirmationWidgetState extends State<SendConfirmationWidget> {
         padding: const EdgeInsets.all(16),
         child: Column(children: [
           Text(
-            'Send Confirmation',
+            'Bridge Confirmation',
             style: Theme.of(context).textTheme.headlineSmall!.copyWith(
                   color: Theme.of(context).colorScheme.onSurface,
                 ),
@@ -100,21 +99,8 @@ class _SendConfirmationWidgetState extends State<SendConfirmationWidget> {
                 decoration: const InputDecoration(
                     labelText: 'Amount', hintText: '100', suffixText: 'TFT')),
             subtitle: Text(
-                'Max Fee: ${widget.chainType == ChainType.Stellar ? 0.1 : 0.01} TFT'),
+                'Max Fee: ${widget.bridgeOperation == BridgeOperation.Deposit ? 1.1 : 1.01} TFT'),
           ),
-          const SizedBox(height: 10),
-          if (widget.chainType == ChainType.Stellar)
-            ListTile(
-              title: TextField(
-                  readOnly: true,
-                  style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                        color: Theme.of(context).colorScheme.onSurface,
-                      ),
-                  controller: memoController,
-                  decoration: const InputDecoration(
-                    labelText: 'Memo',
-                  )),
-            ),
           const SizedBox(height: 30),
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 10),
@@ -149,15 +135,15 @@ class _SendConfirmationWidgetState extends State<SendConfirmationWidget> {
       loading = true;
     });
     try {
-      if (widget.chainType == ChainType.Stellar) {
-        await Stellar.transfer(
-            widget.secret, widget.to, widget.amount, widget.memo);
+      if (widget.bridgeOperation == BridgeOperation.Deposit) {
+        await Stellar.transfer(widget.secret, Globals().bridgeTFTAddress,
+            widget.amount, widget.memo!);
       } else {
-        await TFChain.transfer(widget.secret, widget.to, widget.amount);
+        await TFChain.swapToStellar(
+            widget.secret, widget.to, BigInt.from(double.parse(widget.amount)));
       }
       await _showDialog('Success!', 'Tokens have been transferred successfully',
           Icons.check, DialogType.Info);
-      Navigator.pop(context);
     } catch (e) {
       _showDialog('Error', 'Failed to transfer. Please try again.', Icons.error,
           DialogType.Error);

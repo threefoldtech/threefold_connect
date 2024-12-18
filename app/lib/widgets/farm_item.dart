@@ -185,7 +185,7 @@ class _FarmItemWidgetState extends State<FarmItemWidget> {
                       ? IconButton(
                           onPressed: () {
                             Navigator.of(context).push(MaterialPageRoute(
-                              builder: (context) => ContractsScreen(
+                              builder: (context) => ContactsScreen(
                                   chainType: chainType,
                                   currentWalletAddress: currentAddress!,
                                   wallets: widget.wallets

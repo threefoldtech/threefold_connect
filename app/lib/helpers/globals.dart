@@ -60,6 +60,7 @@ class Globals {
   String chainUrl = '';
   String gridproxyUrl = '';
   String activationUrl = '';
+  String bridgeTFTAddress = '';
   String relayUrl = '';
   String termsAndConditionsUrl = '';
   String newsUrl = '';
