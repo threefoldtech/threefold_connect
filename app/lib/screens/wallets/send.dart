@@ -200,7 +200,7 @@ class _WalletSendScreenState extends State<WalletSendScreen> {
         (BigInt.from((double.parse(balance) * 1e18).toInt()) *
             BigInt.from(p) ~/
             BigInt.from(100)) >
-        BigInt.from(1e17));
+        BigInt.from(fee * 1e18));
 
     final bool hideStellar = widget.wallet.stellarBalance == '-1';
     if (hideStellar) {
