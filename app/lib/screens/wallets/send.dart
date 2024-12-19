@@ -196,11 +196,8 @@ class _WalletSendScreenState extends State<WalletSendScreen> {
     String balance = chainType == ChainType.Stellar
         ? widget.wallet.stellarBalance
         : widget.wallet.tfchainBalance;
-    final isBiggerThanFee = percentages.every((p) =>
-        (BigInt.from((double.parse(balance) * 1e18).toInt()) *
-            BigInt.from(p) ~/
-            BigInt.from(100)) >
-        BigInt.from(fee * 1e18));
+    final isBiggerThanFee =
+        percentages.every((p) => double.parse(balance) * p / 100 > fee);
 
     final bool hideStellar = widget.wallet.stellarBalance == '-1';
     if (hideStellar) {
