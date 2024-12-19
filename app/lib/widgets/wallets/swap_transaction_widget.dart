@@ -45,11 +45,11 @@ class _SwapTransactionWidgetState extends State<SwapTransactionWidget> {
     final String rightChainLabel;
 
     if (currentOperation == BridgeOperation.Withdraw) {
-      leftChainLabel = 'TFChain';
+      leftChainLabel = 'TF Chain';
       rightChainLabel = widget.depositChain.name;
     } else {
       leftChainLabel = widget.depositChain.name;
-      rightChainLabel = 'TFChain';
+      rightChainLabel = 'TF Chain';
     }
 
     return Container(
@@ -147,9 +147,7 @@ class _ChainLabelsState extends State<_ChainLabels> {
   @override
   void initState() {
     super.initState();
-    selectedChain = widget.chains.contains(widget.chainLabel)
-        ? widget.chainLabel
-        : widget.chains.first;
+    selectedChain = widget.chainLabel;
   }
 
   @override
