@@ -91,6 +91,9 @@ class _WalletSendScreenState extends State<WalletSendScreen> {
         ? widget.wallet.stellarAddress
         : widget.wallet.tfchainAddress;
     chainType = type;
+    toController.text = '';
+    toAddressError = null;
+    amountError = null;
     fee = Decimal.one
         .shift(chainType == ChainType.Stellar ? -1 : -2); // 0.1 : 0.01
     setState(() {});
