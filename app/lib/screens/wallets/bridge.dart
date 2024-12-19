@@ -1,3 +1,4 @@
+import 'package:decimal/decimal.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:threebotlogin/helpers/globals.dart';
@@ -28,9 +29,11 @@ class _WalletBridgeScreenState extends State<WalletBridgeScreen> {
   final amountController = TextEditingController();
   BridgeOperation transactionType = BridgeOperation.Withdraw;
   bool isWithdraw = true;
+  Decimal fee = Decimal.parse('1.01');
   String? toAddressError;
   String? amountError;
   bool reloadBalance = true;
+  List percentages = [25, 50, 75, 100];
 
   @override
   void initState() {
@@ -86,6 +89,7 @@ class _WalletBridgeScreenState extends State<WalletBridgeScreen> {
     toController.text = '';
     toAddressError = null;
     amountError = null;
+    fee = isWithdraw ? Decimal.parse('1.01') : Decimal.parse('1.1');
     setState(() {});
   }
 
@@ -139,22 +143,16 @@ class _WalletBridgeScreenState extends State<WalletBridgeScreen> {
       amountError = 'Amount should have numeric values only';
       return false;
     }
-    if (double.parse(amount) < 2) {
+    if (Decimal.parse(amount) < Decimal.fromInt(2)) {
       amountError = "Amount can't be less than 2";
       return false;
     }
-    if (isWithdraw) {
-      if (double.parse(amount) > double.parse(widget.wallet.tfchainBalance)) {
-        amountError = "Amount shouldn't be more than the wallet balance";
-        return false;
-      }
-    }
-
-    if (!isWithdraw) {
-      if (double.parse(amount) > double.parse(widget.wallet.stellarBalance)) {
-        amountError = "Amount shouldn't be more than the wallet balance";
-        return false;
-      }
+    final balance = roundAmount(isWithdraw
+        ? widget.wallet.tfchainBalance
+        : widget.wallet.stellarBalance);
+    if (balance - Decimal.parse(amount) - fee < Decimal.zero) {
+      amountError = 'Balance is not enough';
+      return false;
     }
     return true;
   }
@@ -173,14 +171,15 @@ class _WalletBridgeScreenState extends State<WalletBridgeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    String balance = isWithdraw
-        ? widget.wallet.tfchainBalance
-        : widget.wallet.stellarBalance;
     final bool disableDeposit = widget.wallet.stellarBalance == '-1';
-
     if (disableDeposit && !isWithdraw) {
       onTransactionChange(BridgeOperation.Withdraw);
     }
+
+    String balance = isWithdraw
+        ? widget.wallet.tfchainBalance
+        : widget.wallet.stellarBalance;
+    final isBiggerThanFee = roundAmount(balance) > fee;
 
     return Scaffold(
       appBar: AppBar(title: const Text('Bridge')),
@@ -252,6 +251,26 @@ class _WalletBridgeScreenState extends State<WalletBridgeScreen> {
               subtitle: Text('Max Fee: ${!isWithdraw ? 1.1 : 1.01} TFT'),
             ),
             const SizedBox(height: 10),
+            if (isBiggerThanFee)
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 15.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: percentages
+                      .map(
+                        (percentage) => OutlinedButton(
+                          style: OutlinedButton.styleFrom(
+                              shape: const RoundedRectangleBorder(
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(5)))),
+                          onPressed: () => calculateAmount(percentage),
+                          child: Text('$percentage%'),
+                        ),
+                      )
+                      .toList(),
+                ),
+              ),
+            const SizedBox(height: 30),
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 10),
               child: ElevatedButton(
@@ -277,6 +296,15 @@ class _WalletBridgeScreenState extends State<WalletBridgeScreen> {
         ),
       ),
     );
+  }
+
+  calculateAmount(int percentage) {
+    final amount = (Decimal.parse(isWithdraw
+                ? widget.wallet.tfchainBalance
+                : widget.wallet.stellarBalance) -
+            fee) *
+        (Decimal.fromInt(percentage).shift(-2));
+    amountController.text = roundAmount(amount.toString()).toString();
   }
 
   _bridge_confirmation() async {
