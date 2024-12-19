@@ -1,3 +1,4 @@
+import 'package:decimal/decimal.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
@@ -32,7 +33,7 @@ class _WalletSendScreenState extends State<WalletSendScreen> {
   final amountController = TextEditingController();
   final memoController = TextEditingController();
   ChainType chainType = ChainType.Stellar;
-  double fee = 0.1;
+  Decimal fee = Decimal.one.shift(-1); // 0.1
   String? toAddressError;
   String? amountError;
   bool reloadBalance = true;
@@ -90,9 +91,8 @@ class _WalletSendScreenState extends State<WalletSendScreen> {
         ? widget.wallet.stellarAddress
         : widget.wallet.tfchainAddress;
     chainType = type;
-    fee = chainType == ChainType.Stellar
-        ? double.parse('0.1')
-        : double.parse('.01');
+    fee = Decimal.one
+        .shift(chainType == ChainType.Stellar ? -1 : -2); // 0.1 : 0.01
     setState(() {});
   }
 
@@ -153,28 +153,13 @@ class _WalletSendScreenState extends State<WalletSendScreen> {
       amountError = 'Amount should have numeric values only';
       return false;
     }
-    if (double.parse(amount) < fee) {
-      amountError = "Amount can't be less than $fee";
+    final balance = roundAmount(chainType == ChainType.TFChain
+        ? widget.wallet.tfchainBalance
+        : widget.wallet.stellarBalance);
+
+    if (balance - Decimal.parse(amount) - fee < Decimal.zero) {
+      amountError = 'Balance is not enough';
       return false;
-    }
-    if (chainType == ChainType.TFChain) {
-      // Used epsilon as a tolerance
-      if (double.parse(widget.wallet.tfchainBalance) -
-              double.parse(amount) -
-              fee <
-          -1e-10) {
-        amountError = "Amount shouldn't be more than the wallet balance";
-        return false;
-      }
-    }
-    if (chainType == ChainType.Stellar) {
-      if (double.parse(widget.wallet.stellarBalance) -
-              double.parse(amount) -
-              0.1 <
-          -1e-10) {
-        amountError = "Amount shouldn't be more than the wallet balance";
-        return false;
-      }
     }
     return true;
   }
@@ -193,16 +178,14 @@ class _WalletSendScreenState extends State<WalletSendScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final bool hideStellar = widget.wallet.stellarBalance == '-1';
+    if (hideStellar && chainType == ChainType.Stellar) {
+      onChangeChain(ChainType.TFChain);
+    }
     String balance = chainType == ChainType.Stellar
         ? widget.wallet.stellarBalance
         : widget.wallet.tfchainBalance;
-    final isBiggerThanFee =
-        percentages.every((p) => double.parse(balance) * p / 100 > fee);
-
-    final bool hideStellar = widget.wallet.stellarBalance == '-1';
-    if (hideStellar) {
-      onChangeChain(ChainType.TFChain);
-    }
+    final isBiggerThanFee = roundAmount(balance) > fee;
 
     return Scaffold(
         appBar: AppBar(title: const Text('Send')),
@@ -315,7 +298,7 @@ class _WalletSendScreenState extends State<WalletSendScreen> {
                         child: Text('Max Fee: $fee TFT')),
                   ),
                   const SizedBox(height: 10),
-                  if (double.parse(balance) > fee && isBiggerThanFee)
+                  if (isBiggerThanFee)
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 15.0),
                       child: Row(
@@ -410,12 +393,12 @@ class _WalletSendScreenState extends State<WalletSendScreen> {
   }
 
   calculateAmount(int percentage) {
-    final amount = double.parse(chainType == ChainType.TFChain
+    final amount = (Decimal.parse(chainType == ChainType.TFChain
                 ? widget.wallet.tfchainBalance
-                : widget.wallet.stellarBalance) *
-            (percentage / 100) -
-        fee;
-    amountController.text = amount.toStringAsFixed(2);
+                : widget.wallet.stellarBalance) -
+            fee) *
+        (Decimal.fromInt(percentage).shift(-2));
+    amountController.text = roundAmount(amount.toString()).toString();
   }
 
   _send_confirmation() async {
