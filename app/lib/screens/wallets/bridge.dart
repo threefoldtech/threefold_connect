@@ -33,6 +33,7 @@ class _WalletBridgeScreenState extends State<WalletBridgeScreen> {
   String? toAddressError;
   String? amountError;
   bool reloadBalance = true;
+  List percentages = [25, 50, 75, 100];
 
   @override
   void initState() {
@@ -170,14 +171,15 @@ class _WalletBridgeScreenState extends State<WalletBridgeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    String balance = isWithdraw
-        ? widget.wallet.tfchainBalance
-        : widget.wallet.stellarBalance;
     final bool disableDeposit = widget.wallet.stellarBalance == '-1';
-
     if (disableDeposit && !isWithdraw) {
       onTransactionChange(BridgeOperation.Withdraw);
     }
+
+    String balance = isWithdraw
+        ? widget.wallet.tfchainBalance
+        : widget.wallet.stellarBalance;
+    final isBiggerThanFee = roundAmount(balance) > fee;
 
     return Scaffold(
       appBar: AppBar(title: const Text('Bridge')),
@@ -249,6 +251,26 @@ class _WalletBridgeScreenState extends State<WalletBridgeScreen> {
               subtitle: Text('Max Fee: ${!isWithdraw ? 1.1 : 1.01} TFT'),
             ),
             const SizedBox(height: 10),
+            if (isBiggerThanFee)
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 15.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: percentages
+                      .map(
+                        (percentage) => OutlinedButton(
+                          style: OutlinedButton.styleFrom(
+                              shape: const RoundedRectangleBorder(
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(5)))),
+                          onPressed: () => calculateAmount(percentage),
+                          child: Text('$percentage%'),
+                        ),
+                      )
+                      .toList(),
+                ),
+              ),
+            const SizedBox(height: 30),
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 10),
               child: ElevatedButton(
@@ -274,6 +296,15 @@ class _WalletBridgeScreenState extends State<WalletBridgeScreen> {
         ),
       ),
     );
+  }
+
+  calculateAmount(int percentage) {
+    final amount = (Decimal.parse(isWithdraw
+                ? widget.wallet.tfchainBalance
+                : widget.wallet.stellarBalance) -
+            fee) *
+        (Decimal.fromInt(percentage).shift(-2));
+    amountController.text = roundAmount(amount.toString()).toString();
   }
 
   _bridge_confirmation() async {
