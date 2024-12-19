@@ -1,3 +1,4 @@
+import 'package:decimal/decimal.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:threebotlogin/helpers/globals.dart';
@@ -28,6 +29,7 @@ class _WalletBridgeScreenState extends State<WalletBridgeScreen> {
   final amountController = TextEditingController();
   BridgeOperation transactionType = BridgeOperation.Withdraw;
   bool isWithdraw = true;
+  Decimal fee = Decimal.parse('1.01');
   String? toAddressError;
   String? amountError;
   bool reloadBalance = true;
@@ -86,6 +88,7 @@ class _WalletBridgeScreenState extends State<WalletBridgeScreen> {
     toController.text = '';
     toAddressError = null;
     amountError = null;
+    fee = isWithdraw ? Decimal.parse('1.01') : Decimal.parse('1.1');
     setState(() {});
   }
 
@@ -139,22 +142,16 @@ class _WalletBridgeScreenState extends State<WalletBridgeScreen> {
       amountError = 'Amount should have numeric values only';
       return false;
     }
-    if (double.parse(amount) < 2) {
+    if (Decimal.parse(amount) < Decimal.fromInt(2)) {
       amountError = "Amount can't be less than 2";
       return false;
     }
-    if (isWithdraw) {
-      if (double.parse(amount) > double.parse(widget.wallet.tfchainBalance)) {
-        amountError = "Amount shouldn't be more than the wallet balance";
-        return false;
-      }
-    }
-
-    if (!isWithdraw) {
-      if (double.parse(amount) > double.parse(widget.wallet.stellarBalance)) {
-        amountError = "Amount shouldn't be more than the wallet balance";
-        return false;
-      }
+    final balance = roundAmount(isWithdraw
+        ? widget.wallet.tfchainBalance
+        : widget.wallet.stellarBalance);
+    if (balance - Decimal.parse(amount) - fee < Decimal.zero) {
+      amountError = 'Balance is not enough';
+      return false;
     }
     return true;
   }
