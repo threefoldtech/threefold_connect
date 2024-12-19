@@ -32,6 +32,7 @@ class _WalletSendScreenState extends State<WalletSendScreen> {
   final amountController = TextEditingController();
   final memoController = TextEditingController();
   ChainType chainType = ChainType.Stellar;
+  double fee = 0.1;
   String? toAddressError;
   String? amountError;
   bool reloadBalance = true;
@@ -89,10 +90,9 @@ class _WalletSendScreenState extends State<WalletSendScreen> {
         ? widget.wallet.stellarAddress
         : widget.wallet.tfchainAddress;
     chainType = type;
-    toController.text = '';
-    toAddressError = null;
-    amountController.text = '';
-    amountError = null;
+    fee = chainType == ChainType.Stellar
+        ? double.parse('0.1')
+        : double.parse('.01');
     setState(() {});
   }
 
@@ -153,29 +153,25 @@ class _WalletSendScreenState extends State<WalletSendScreen> {
       amountError = 'Amount should have numeric values only';
       return false;
     }
+    if (double.parse(amount) < fee) {
+      amountError = "Amount can't be less than $fee";
+      return false;
+    }
     if (chainType == ChainType.TFChain) {
-      if (double.parse(amount) < 0.01) {
-        amountError = "Amount can't be less than 0.01";
-        return false;
-      }
       // Used epsilon as a tolerance
       if (double.parse(widget.wallet.tfchainBalance) -
               double.parse(amount) -
-              0.01 <
+              fee <
           -1e-10) {
         amountError = "Amount shouldn't be more than the wallet balance";
         return false;
       }
     }
     if (chainType == ChainType.Stellar) {
-      if (double.parse(amount) < 0.1) {
-        amountError = "Amount can't be less than 0.1";
-        return false;
-      }
       if (double.parse(widget.wallet.stellarBalance) -
               double.parse(amount) -
               0.1 <
-          0) {
+          -1e-10) {
         amountError = "Amount shouldn't be more than the wallet balance";
         return false;
       }
@@ -200,6 +196,12 @@ class _WalletSendScreenState extends State<WalletSendScreen> {
     String balance = chainType == ChainType.Stellar
         ? widget.wallet.stellarBalance
         : widget.wallet.tfchainBalance;
+    final isBiggerThanFee = percentages.every((p) =>
+        (BigInt.from((double.parse(balance) * 1e18).toInt()) *
+            BigInt.from(p) ~/
+            BigInt.from(100)) >
+        BigInt.from(1e17));
+
     final bool hideStellar = widget.wallet.stellarBalance == '-1';
     if (hideStellar) {
       onChangeChain(ChainType.TFChain);
@@ -313,14 +315,10 @@ class _WalletSendScreenState extends State<WalletSendScreen> {
                             errorText: amountError)),
                     subtitle: Padding(
                         padding: const EdgeInsets.symmetric(vertical: 8.0),
-                        child: Text(
-                            'Max Fee: ${chainType == ChainType.Stellar ? 0.1 : 0.01} TFT')),
+                        child: Text('Max Fee: $fee TFT')),
                   ),
                   const SizedBox(height: 10),
-                  if (chainType == ChainType.Stellar &&
-                          double.parse(widget.wallet.stellarBalance) > 0.1 ||
-                      chainType == ChainType.TFChain &&
-                          double.parse(widget.wallet.tfchainBalance) > 0.01)
+                  if (double.parse(balance) > fee && isBiggerThanFee)
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 15.0),
                       child: Row(
@@ -415,13 +413,12 @@ class _WalletSendScreenState extends State<WalletSendScreen> {
   }
 
   calculateAmount(int percentage) {
-    final fee = chainType == ChainType.Stellar ? 0.1 : 0.01;
     final amount = double.parse(chainType == ChainType.TFChain
                 ? widget.wallet.tfchainBalance
                 : widget.wallet.stellarBalance) *
             (percentage / 100) -
         fee;
-    amountController.text = formatAmount(amount.toString());
+    amountController.text = amount.toStringAsFixed(2);
   }
 
   _send_confirmation() async {
