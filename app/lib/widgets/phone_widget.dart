@@ -14,7 +14,7 @@ import 'package:threebotlogin/services/shared_preference_service.dart';
 
 import 'custom_dialog.dart';
 
-Future<void> addPhoneNumberDialog(context) async {
+Future<void> addPhoneNumberDialog(context, {required bool newPhone}) async {
   Response res = await getCountry();
   var countryCode = res.body.replaceAll('\n', '');
 
@@ -22,7 +22,7 @@ Future<void> addPhoneNumberDialog(context) async {
     context: context,
     barrierDismissible: false,
     builder: (BuildContext context) =>
-        PhoneAlertDialog(defaultCountryCode: countryCode),
+        PhoneAlertDialog(defaultCountryCode: countryCode, newPhone: newPhone),
   );
 }
 
@@ -48,8 +48,10 @@ phoneSendDialog(context) {
 
 class PhoneAlertDialog extends StatefulWidget {
   final String defaultCountryCode;
+  final bool newPhone;
 
-  const PhoneAlertDialog({Key? key, required this.defaultCountryCode})
+  const PhoneAlertDialog(
+      {Key? key, required this.defaultCountryCode, required this.newPhone})
       : super(key: key);
 
   @override
@@ -76,50 +78,79 @@ class PhoneAlertDialogState extends State<PhoneAlertDialog> {
   Widget build(BuildContext context) {
     return CustomDialog(
         image: Icons.phone,
-        title: 'Add phone number',
+        title: widget.newPhone
+            ? 'Add phone number'
+            : 'Change phone number',
         widgetDescription: SizedBox(
-          height: 100,
-          child: Row(
-            children: <Widget>[
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: IntlPhoneField(
-                    initialCountryCode: widget.defaultCountryCode,
-                    decoration: const InputDecoration(
-                      labelText: 'Phone Number',
-                      border: OutlineInputBorder(
-                        borderSide: BorderSide(),
+          height: widget.newPhone ? 100 : 180,
+          child: Column(
+            children: [
+              if (!widget.newPhone)
+                Row(
+                  children: <Widget>[
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        child: Text(
+                          'Changing your phone will require you to go through the phone verification process again.',
+                          style: Theme.of(context)
+                              .textTheme
+                              .bodyLarge!
+                              .copyWith(
+                                  color:
+                                      Theme.of(context).colorScheme.onSurface),
+                        ),
                       ),
                     ),
-                    style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                        color: Theme.of(context).colorScheme.onSurface),
-                    dropdownTextStyle: Theme.of(context)
-                        .textTheme
-                        .bodyMedium!
-                        .copyWith(
-                            color: Theme.of(context).colorScheme.onSurface),
-                    onChanged: (phone) {
-                      PhoneNumber p = phone;
-                      setState(() {
-                        if (phone.number.length >= _country.minLength &&
-                            phone.number.length <= _country.maxLength) {
-                          valid = true;
-                          verificationPhoneNumber = p.completeNumber;
-                        } else {
-                          valid = false;
-                        }
-                      });
-                    },
-                    onCountryChanged: (country) {
-                      if (_country != country) {
-                        valid = false;
-                      }
-                      _country = country;
-                      setState(() {});
-                    },
-                  ),
+                  ],
                 ),
+              if (!widget.newPhone)
+                const SizedBox(
+                  height: 20,
+                ),
+              Row(
+                children: <Widget>[
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: IntlPhoneField(
+                        initialCountryCode: widget.defaultCountryCode,
+                        decoration: const InputDecoration(
+                          labelText: 'Phone Number',
+                          border: OutlineInputBorder(
+                            borderSide: BorderSide(),
+                          ),
+                        ),
+                        style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                            color: Theme.of(context).colorScheme.onSurface),
+                        dropdownTextStyle: Theme.of(context)
+                            .textTheme
+                            .bodyMedium!
+                            .copyWith(
+                                color: Theme.of(context).colorScheme.onSurface),
+                        onChanged: (phone) {
+                          PhoneNumber p = phone;
+                          setState(() {
+                            if (phone.number.length >= _country.minLength &&
+                                phone.number.length <= _country.maxLength) {
+                              valid = true;
+                              verificationPhoneNumber = p.completeNumber;
+                            } else {
+                              valid = false;
+                            }
+                          });
+                        },
+                        onCountryChanged: (country) {
+                          if (_country != country) {
+                            valid = false;
+                          }
+                          _country = country;
+                          setState(() {});
+                        },
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
