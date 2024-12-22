@@ -21,6 +21,10 @@ class SwapTransactionWidget extends StatefulWidget {
 
 class _SwapTransactionWidgetState extends State<SwapTransactionWidget> {
   late BridgeOperation currentOperation;
+  final GlobalKey<_ChainLabelsState> _leftChainKey =
+      GlobalKey<_ChainLabelsState>();
+  final GlobalKey<_ChainLabelsState> _rightChainKey =
+      GlobalKey<_ChainLabelsState>();
 
   @override
   void initState() {
@@ -35,6 +39,15 @@ class _SwapTransactionWidgetState extends State<SwapTransactionWidget> {
           : BridgeOperation.Withdraw;
     });
     widget.onTransactionChange(currentOperation);
+
+    // Swap the selected chains
+    final leftChain = _leftChainKey.currentState?.selectedChain.value;
+    final rightChain = _rightChainKey.currentState?.selectedChain.value;
+
+    if (leftChain != null && rightChain != null) {
+      _leftChainKey.currentState?.updateSelectedChain(rightChain);
+      _rightChainKey.currentState?.updateSelectedChain(leftChain);
+    }
   }
 
   @override
@@ -64,9 +77,10 @@ class _SwapTransactionWidgetState extends State<SwapTransactionWidget> {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          _buildChainInfo(context, leftChainLabel),
+          _buildChainInfo(context, leftChainLabel, key: _leftChainKey),
           _buildSwapButton(context),
-          _buildChainInfo(context, rightChainLabel, isLeftSide: false),
+          _buildChainInfo(context, rightChainLabel,
+              isLeftSide: false, key: _rightChainKey),
         ],
       ),
     );
@@ -75,6 +89,7 @@ class _SwapTransactionWidgetState extends State<SwapTransactionWidget> {
   Widget _buildChainInfo(
     BuildContext context,
     String chainLabel, {
+    required Key key,
     bool isLeftSide = true,
   }) {
     final colorScheme = Theme.of(context).colorScheme;
@@ -88,9 +103,13 @@ class _SwapTransactionWidgetState extends State<SwapTransactionWidget> {
           const SizedBox(width: 5),
           Flexible(
             child: _ChainLabels(
+              key: key,
               chainLabel: chainLabel,
               colorScheme: colorScheme,
               textTheme: Theme.of(context).textTheme,
+              excludeChain: isLeftSide
+                  ? null
+                  : _leftChainKey.currentState?.selectedChain.value,
             ),
           ),
         ],
@@ -130,98 +149,128 @@ class _ChainLabels extends StatefulWidget {
   final ColorScheme colorScheme;
   final TextTheme textTheme;
   final List<String> chains = ['TF Chain', 'Stellar', 'Solana'];
+  final String? excludeChain;
 
   _ChainLabels({
+    required Key key,
     required this.chainLabel,
     required this.colorScheme,
     required this.textTheme,
-  });
+    this.excludeChain,
+  }) : super(key: key);
 
   @override
   _ChainLabelsState createState() => _ChainLabelsState();
 }
 
 class _ChainLabelsState extends State<_ChainLabels> {
-  late String selectedChain;
+  late ValueNotifier<String> selectedChain;
 
   @override
   void initState() {
     super.initState();
-    selectedChain = widget.chainLabel;
+    selectedChain = ValueNotifier(widget.chainLabel);
+  }
+
+  void updateSelectedChain(String newChain) {
+    selectedChain.value = newChain;
   }
 
   @override
   Widget build(BuildContext context) {
+    final filteredChains = widget.excludeChain != null
+        ? widget.chains.where((chain) => chain != widget.excludeChain).toList()
+        : widget.chains;
+
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         DropdownButtonHideUnderline(
-          child: DropdownButton<String>(
-            value: selectedChain,
-            selectedItemBuilder: (BuildContext context) {
-              return widget.chains.map((String value) {
-                return Row(
-                  children: [
-                    Image.asset(
-                      _getChainIcon(value),
-                      fit: BoxFit.contain,
-                      color: widget.colorScheme.onSurface,
-                      width: 30,
-                      height: 30,
-                    ),
-                    const SizedBox(width: 5),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+          child: ValueListenableBuilder<String>(
+            valueListenable: selectedChain,
+            builder: (context, value, child) {
+              return DropdownButton<String>(
+                value: value,
+                selectedItemBuilder: (BuildContext context) {
+                  return filteredChains.map((String value) {
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 6.0),
+                      child: Row(
+                        children: [
+                          Image.asset(
+                            _getChainIcon(value),
+                            fit: BoxFit.contain,
+                            color: widget.colorScheme.onSurface,
+                            width: 30,
+                            height: 30,
+                          ),
+                          const SizedBox(width: 5),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'TFT',
+                                style: widget.textTheme.bodySmall!.copyWith(
+                                  color: widget.colorScheme.onSurface,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              const SizedBox(height: 2),
+                              Text(
+                                value,
+                                style: widget.textTheme.bodySmall!.copyWith(
+                                  color: widget.colorScheme.onSurface,
+                                ),
+                                softWrap: true,
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    );
+                  }).toList();
+                },
+                items: filteredChains.map((String value) {
+                  return DropdownMenuItem<String>(
+                    value: value,
+                    child: Row(
                       children: [
-                        Text(
-                          'TFT',
-                          style: widget.textTheme.bodySmall!.copyWith(
-                            color: widget.colorScheme.onSurface,
-                            fontWeight: FontWeight.bold,
-                          ),
+                        Image.asset(
+                          _getChainIcon(value),
+                          fit: BoxFit.contain,
+                          color: widget.colorScheme.onSurface,
+                          width: 20,
+                          height: 20,
                         ),
-                        const SizedBox(height: 2),
-                        Text(
-                          value,
-                          style: widget.textTheme.bodySmall!.copyWith(
-                            color: widget.colorScheme.onSurface,
-                          ),
-                          softWrap: true,
+                        const SizedBox(width: 5),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'TFT',
+                              style: widget.textTheme.bodySmall!.copyWith(
+                                color: widget.colorScheme.onSurface,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            const SizedBox(height: 2),
+                            Text(
+                              value,
+                              style: widget.textTheme.bodySmall!.copyWith(
+                                color: widget.colorScheme.onSurface,
+                              ),
+                              softWrap: true,
+                            ),
+                          ],
                         ),
                       ],
                     ),
-                  ],
-                );
-              }).toList();
-            },
-            items: widget.chains.map((String value) {
-              return DropdownMenuItem<String>(
-                value: value,
-                child: Row(
-                  children: [
-                    Image.asset(
-                      _getChainIcon(value),
-                      fit: BoxFit.contain,
-                      color: widget.colorScheme.onSurface,
-                      width: 20,
-                      height: 20,
-                    ),
-                    const SizedBox(width: 5),
-                    Text(
-                      value,
-                      style: widget.textTheme.bodySmall!.copyWith(
-                        color: widget.colorScheme.onSurface,
-                      ),
-                      softWrap: true,
-                    ),
-                  ],
-                ),
+                  );
+                }).toList(),
+                onChanged: (String? newValue) {
+                  selectedChain.value = newValue!;
+                },
               );
-            }).toList(),
-            onChanged: (String? newValue) {
-              setState(() {
-                selectedChain = newValue!;
-              });
             },
           ),
         ),
