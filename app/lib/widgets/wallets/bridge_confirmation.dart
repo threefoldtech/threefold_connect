@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:threebotlogin/helpers/globals.dart';
+import 'package:threebotlogin/helpers/transaction_helpers.dart';
 import 'package:threebotlogin/models/wallet.dart';
 import 'package:threebotlogin/services/stellar_service.dart' as Stellar;
 import 'package:threebotlogin/services/tfchain_service.dart' as TFChain;
@@ -34,6 +35,7 @@ class _BridgeConfirmationWidgetState extends State<BridgeConfirmationWidget> {
   final fromController = TextEditingController();
   final toController = TextEditingController();
   final amountController = TextEditingController();
+  final feeController = TextEditingController();
   bool loading = false;
 
   @override
@@ -41,6 +43,8 @@ class _BridgeConfirmationWidgetState extends State<BridgeConfirmationWidget> {
     fromController.text = widget.from;
     toController.text = widget.to;
     amountController.text = widget.amount;
+    feeController.text =
+        widget.bridgeOperation == BridgeOperation.Deposit ? '1.1' : '1.01';
     super.initState();
   }
 
@@ -98,9 +102,36 @@ class _BridgeConfirmationWidgetState extends State<BridgeConfirmationWidget> {
                 controller: amountController,
                 decoration: const InputDecoration(
                     labelText: 'Amount', hintText: '100', suffixText: 'TFT')),
-            subtitle: Text(
-                'Max Fee: ${widget.bridgeOperation == BridgeOperation.Deposit ? 1.1 : 1.01} TFT'),
           ),
+          const SizedBox(height: 10),
+          ListTile(
+            title: TextField(
+                readOnly: true,
+                style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                      color: Theme.of(context).colorScheme.onSurface,
+                    ),
+                keyboardType: TextInputType.number,
+                controller: feeController,
+                decoration:
+                    const InputDecoration(labelText: 'Fee', suffixText: 'TFT')),
+          ),
+          const SizedBox(height: 30),
+          ListTile(
+              leading: Text(
+                'Total',
+                style: Theme.of(context).textTheme.titleLarge!.copyWith(
+                    color: Theme.of(context).colorScheme.onSurface,
+                    fontWeight: FontWeight.bold),
+              ),
+              trailing: Text(
+                (roundAmount(amountController.text) +
+                            roundAmount(feeController.text))
+                        .toString() +
+                    ' TFT',
+                style: Theme.of(context).textTheme.titleLarge!.copyWith(
+                    color: Theme.of(context).colorScheme.onSurface,
+                    fontWeight: FontWeight.bold),
+              )),
           const SizedBox(height: 30),
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 10),
