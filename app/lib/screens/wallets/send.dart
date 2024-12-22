@@ -93,6 +93,7 @@ class _WalletSendScreenState extends State<WalletSendScreen> {
     chainType = type;
     toController.text = '';
     toAddressError = null;
+    amountController.text = '';
     amountError = null;
     fee = Decimal.one
         .shift(chainType == ChainType.Stellar ? -1 : -2); // 0.1 : 0.01

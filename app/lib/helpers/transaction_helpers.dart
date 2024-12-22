@@ -1,5 +1,5 @@
-// ignore: depend_on_referenced_packages
 import 'package:decimal/decimal.dart';
+// ignore: depend_on_referenced_packages
 import 'package:intl/intl.dart';
 
 String formatAmount(String amount) {
