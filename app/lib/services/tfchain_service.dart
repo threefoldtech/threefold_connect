@@ -68,6 +68,15 @@ Future<int> getTwinId(String seed) async {
   return getTwinIdByClient(client);
 }
 
+Future<int> getTwinIdByQueryClient(String address) async {
+  final chainUrl = Globals().chainUrl;
+  final client = TFChain.QueryClient(chainUrl);
+  await client.connect();
+  final twinId = await client.twins.getTwinIdByAccountId(address: address);
+  await client.disconnect();
+  return twinId ?? 0;
+}
+
 Future<Map<String, List<Proposal>>> getProposals() async {
   final chainUrl = Globals().chainUrl;
   final client = TFChain.QueryClient(chainUrl);
@@ -172,6 +181,26 @@ Future<Farm?> createFarm(
   }
 }
 
+Future<void> addStellarAddress(
+    String tfchainSeed, int farmId, String stellarAddress) async {
+  final chainUrl = Globals().chainUrl;
+  final client = TFChain.Client(chainUrl, tfchainSeed, 'sr25519');
+
+  try {
+    final twinId = await getTwinIdByClient(client);
+    if (twinId == 0) {
+      await activateAccount(tfchainSeed);
+    }
+    await client.connect();
+    await client.farms
+        .addStellarAddress(farmId: farmId, stellarAddress: stellarAddress);
+  } catch (e) {
+    throw Exception('Failed to add stellar address to farm due to $e');
+  } finally {
+    await client.disconnect();
+  }
+}
+
 Future<void> transfer(String secret, String dest, String amount) async {
   final chainUrl = Globals().chainUrl;
   final client = TFChain.Client(chainUrl, secret, 'sr25519');
@@ -190,4 +219,17 @@ Future<void> disconnect() async {
   final client = TFChain.QueryClient(chainUrl);
   await client.connect();
   await client.disconnect();
+}
+
+Future<void> swapToStellar(String secret, String target, BigInt amount) async {
+  final chainUrl = Globals().chainUrl;
+  final client = TFChain.Client(chainUrl, secret, 'sr25519');
+  await client.connect();
+  await client.bridge.swapToStellar(target: target, amount: amount);
+  await client.disconnect();
+}
+
+Future<String> getMemo(String address) async {
+  final twinId = await getTwinIdByQueryClient(address);
+  return 'twin_$twinId';
 }

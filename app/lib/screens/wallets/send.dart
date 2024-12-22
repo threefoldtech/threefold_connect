@@ -1,3 +1,4 @@
+import 'package:decimal/decimal.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
@@ -32,11 +33,12 @@ class _WalletSendScreenState extends State<WalletSendScreen> {
   final amountController = TextEditingController();
   final memoController = TextEditingController();
   ChainType chainType = ChainType.Stellar;
+  Decimal fee = Decimal.one.shift(-1); // 0.1
   String? toAddressError;
   String? amountError;
   bool reloadBalance = true;
   final FocusNode textFieldFocusNode = FocusNode();
-
+  List percentages = [25, 50, 75, 100];
   @override
   void initState() {
     fromController.text = widget.wallet.stellarAddress;
@@ -89,6 +91,12 @@ class _WalletSendScreenState extends State<WalletSendScreen> {
         ? widget.wallet.stellarAddress
         : widget.wallet.tfchainAddress;
     chainType = type;
+    toController.text = '';
+    toAddressError = null;
+    amountController.text = '';
+    amountError = null;
+    fee = Decimal.one
+        .shift(chainType == ChainType.Stellar ? -1 : -2); // 0.1 : 0.01
     setState(() {});
   }
 
@@ -149,31 +157,13 @@ class _WalletSendScreenState extends State<WalletSendScreen> {
       amountError = 'Amount should have numeric values only';
       return false;
     }
-    if (chainType == ChainType.TFChain) {
-      if (double.parse(amount) < 0.01) {
-        amountError = "Amount can't be less than 0.01";
-        return false;
-      }
-      if (double.parse(widget.wallet.tfchainBalance) -
-              double.parse(amount) -
-              0.01 <
-          0) {
-        amountError = "Amount shouldn't be more than the wallet balance";
-        return false;
-      }
-    }
-    if (chainType == ChainType.Stellar) {
-      if (double.parse(amount) < 0.1) {
-        amountError = "Amount can't be less than 0.1";
-        return false;
-      }
-      if (double.parse(widget.wallet.stellarBalance) -
-              double.parse(amount) -
-              0.1 <
-          0) {
-        amountError = "Amount shouldn't be more than the wallet balance";
-        return false;
-      }
+    final balance = roundAmount(chainType == ChainType.TFChain
+        ? widget.wallet.tfchainBalance
+        : widget.wallet.stellarBalance);
+
+    if (balance - Decimal.parse(amount) - fee < Decimal.zero) {
+      amountError = 'Balance is not enough';
+      return false;
     }
     return true;
   }
@@ -192,13 +182,14 @@ class _WalletSendScreenState extends State<WalletSendScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final bool hideStellar = widget.wallet.stellarBalance == '-1';
+    if (hideStellar && chainType == ChainType.Stellar) {
+      onChangeChain(ChainType.TFChain);
+    }
     String balance = chainType == ChainType.Stellar
         ? widget.wallet.stellarBalance
         : widget.wallet.tfchainBalance;
-    final bool hideStellar = widget.wallet.stellarBalance == '-1';
-    if (hideStellar) {
-      onChangeChain(ChainType.TFChain);
-    }
+    final isBiggerThanFee = roundAmount(balance) > fee;
 
     return Scaffold(
         appBar: AppBar(title: const Text('Send')),
@@ -272,7 +263,7 @@ class _WalletSendScreenState extends State<WalletSendScreen> {
                             suffixIcon: IconButton(
                                 onPressed: () {
                                   Navigator.of(context).push(MaterialPageRoute(
-                                    builder: (context) => ContractsScreen(
+                                    builder: (context) => ContactsScreen(
                                         chainType: chainType,
                                         currentWalletAddress:
                                             fromController.text,
@@ -306,10 +297,30 @@ class _WalletSendScreenState extends State<WalletSendScreen> {
                             hintText: '100',
                             suffixText: 'TFT',
                             errorText: amountError)),
-                    subtitle: Text(
-                        'Max Fee: ${chainType == ChainType.Stellar ? 0.1 : 0.01} TFT'),
+                    subtitle: Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 8.0),
+                        child: Text('Max Fee: $fee TFT')),
                   ),
                   const SizedBox(height: 10),
+                  if (isBiggerThanFee)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 15.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: percentages
+                            .map(
+                              (percentage) => OutlinedButton(
+                                style: OutlinedButton.styleFrom(
+                                    shape: const RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.all(
+                                            Radius.circular(5)))),
+                                onPressed: () => calculateAmount(percentage),
+                                child: Text('$percentage%'),
+                              ),
+                            )
+                            .toList(),
+                      ),
+                    ),
                   if (chainType == ChainType.Stellar)
                     ListTile(
                       title: TextField(
@@ -383,6 +394,15 @@ class _WalletSendScreenState extends State<WalletSendScreen> {
     }
 
     return result.code;
+  }
+
+  calculateAmount(int percentage) {
+    final amount = (Decimal.parse(chainType == ChainType.TFChain
+                ? widget.wallet.tfchainBalance
+                : widget.wallet.stellarBalance) -
+            fee) *
+        (Decimal.fromInt(percentage).shift(-2));
+    amountController.text = roundAmount(amount.toString()).toString();
   }
 
   _send_confirmation() async {

@@ -27,12 +27,14 @@ class _NewsScreenState extends State<NewsScreen> {
   final newsUrl = Globals().newsUrl;
 
   Future<void> getArticles() async {
-    setState(() {
-      isLoading = true;
-      if (currentPage == 0) {
-        isInitialLoading = true;
-      }
-    });
+    if (mounted) {
+      setState(() {
+        isLoading = true;
+        if (currentPage == 0) {
+          isInitialLoading = true;
+        }
+      });
+    }
 
     final url = Uri.parse(newsUrl);
     final response = await http.get(url);
@@ -95,38 +97,36 @@ class _NewsScreenState extends State<NewsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    if (isInitialLoading) {
+      return Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const CircularProgressIndicator(),
+          const SizedBox(height: 15),
+          Text(
+            'Loading Articles...',
+            style: Theme.of(context).textTheme.bodyLarge!.copyWith(
+                color: Theme.of(context).colorScheme.onSurface,
+                fontWeight: FontWeight.bold),
+          ),
+        ],
+      );
+    }
+
     return LayoutDrawer(
       titleText: 'News',
       content: Column(
         children: [
           Expanded(
+              child: RefreshIndicator(
+            onRefresh: () {
+              isInitialLoading = true;
+              return getArticles();
+            },
             child: ListView.builder(
               controller: _scrollController,
               itemCount: visibleArticles.length + (isLoading ? 1 : 0),
               itemBuilder: (context, index) {
-                if (index == visibleArticles.length && isInitialLoading) {
-                  return Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Padding(
-                        padding: EdgeInsets.only(
-                            bottom: 4,
-                            top: MediaQuery.of(context).size.height * 0.4),
-                        child: const CircularProgressIndicator(),
-                      ),
-                      Text(
-                        'Loading Articles...',
-                        style: Theme.of(context)
-                            .textTheme
-                            .titleMedium!
-                            .copyWith(
-                              color: Theme.of(context).colorScheme.onSurface,
-                            ),
-                      ),
-                    ],
-                  );
-                }
                 var entry = visibleArticles[index];
 
                 var title = entry['title']?['\$t'] ?? 'No Title';
@@ -160,7 +160,7 @@ class _NewsScreenState extends State<NewsScreen> {
                           Row(
                             children: [
                               Image.asset(
-                                'assets/tft_icon.png',
+                                'assets/tf_chain.png',
                                 color: Theme.of(context).colorScheme.onSurface,
                                 height: 20,
                                 width: 20,
@@ -253,7 +253,7 @@ class _NewsScreenState extends State<NewsScreen> {
                 );
               },
             ),
-          ),
+          )),
           if (isLoading && !isInitialLoading)
             const Center(
               child: Padding(

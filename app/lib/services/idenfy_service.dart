@@ -49,9 +49,9 @@ Future<Token> getToken() async {
   throw Exception('Failed to get token due to ${response.body}');
 }
 
-Future<VerificationStatus> getVerificationStatus() async {
+Future<VerificationStatus> getVerificationStatus(
+    {required String address}) async {
   final idenfyServiceUrl = Globals().idenfyServiceUrl;
-  final address = await getMyAddress();
 
   final response = await http.get(
     Uri.https(idenfyServiceUrl, '/api/v1/status', {'client_id': address}),

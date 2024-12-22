@@ -2,8 +2,10 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:threebotlogin/helpers/logger.dart';
 import 'package:threebotlogin/models/farm.dart';
+import 'package:threebotlogin/models/idenfy.dart';
 import 'package:threebotlogin/models/wallet.dart';
 import 'package:threebotlogin/services/gridproxy_service.dart';
+import 'package:threebotlogin/services/idenfy_service.dart';
 import 'package:threebotlogin/services/tfchain_service.dart';
 import 'package:threebotlogin/widgets/custom_dialog.dart';
 
@@ -70,23 +72,47 @@ class _NewFarmState extends State<NewFarm> {
   }
 
   _add(String farmName) async {
-    Farm farm;
+    Farm? farm;
     try {
-      final f = await createFarm(farmName, _selectedWallet!.tfchainSecret,
-          _selectedWallet!.stellarAddress);
-      farm = Farm(
-          name: farmName,
-          walletAddress: _selectedWallet!.stellarAddress,
-          tfchainWalletSecret: _selectedWallet!.tfchainSecret,
-          walletName: _selectedWallet!.name,
-          twinId: f!.twinId,
-          farmId: f.id,
-          nodes: []);
-      await _showDialog(
-          'Farm Created!',
-          'Farm $farmName has been added successfully',
-          Icons.check,
-          DialogType.Info);
+      final kycVerified =
+          await getVerificationStatus(address: _selectedWallet!.tfchainAddress);
+      if (kycVerified.status == VerificationState.VERIFIED) {
+        final f = await createFarm(farmName, _selectedWallet!.tfchainSecret,
+            _selectedWallet!.stellarAddress);
+        farm = Farm(
+            name: farmName,
+            walletAddress: _selectedWallet!.stellarAddress,
+            tfchainWalletSecret: _selectedWallet!.tfchainSecret,
+            walletName: _selectedWallet!.name,
+            twinId: f!.twinId,
+            farmId: f.id,
+            nodes: []);
+        await _showDialog(
+            'Farm Created!',
+            'Farm $farmName has been added successfully',
+            Icons.check,
+            DialogType.Info);
+      } else {
+        saveLoading = false;
+        showDialog(
+            context: context,
+            builder: (BuildContext context) => CustomDialog(
+                  type: DialogType.Warning,
+                  image: Icons.warning,
+                  title: 'Unauthorized',
+                  description:
+                      'KYC verification is required for the selected wallet',
+                  actions: <Widget>[
+                    TextButton(
+                      child: const Text('Close'),
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                    ),
+                  ],
+                ));
+        return;
+      }
     } catch (e) {
       logger.e(e);
       _showDialog('Error', 'Failed to create farm. Please try again.',

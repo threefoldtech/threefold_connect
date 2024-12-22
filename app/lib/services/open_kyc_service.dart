@@ -102,7 +102,6 @@ Future<Response> sendVerificationSms() async {
   return http.post(url, body: encodedBody, headers: requestHeaders);
 }
 
-// TODO: Remove this method and use update user data
 Future<Response> updateEmailAddressOfUser() async {
   String timestamp = DateTime.now().millisecondsSinceEpoch.toString();
   Uint8List sk = await getPrivateKey();
