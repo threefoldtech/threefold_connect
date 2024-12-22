@@ -98,7 +98,7 @@ class _RecoverScreenState extends State<RecoverScreen> {
       await fixPkidMigration();
     } catch (e) {
       logger.e(e);
-      throw Exception('Something went wrong');
+      throw ('Something went wrong');
     }
   }
 
