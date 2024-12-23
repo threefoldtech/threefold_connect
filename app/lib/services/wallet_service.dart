@@ -37,7 +37,10 @@ Future<List<PkidWallet>> getPkidWallets() async {
   Map<int, dynamic> dataMap = result.asMap();
   final pkidWallets =
       dataMap.values.map((e) => PkidWallet.fromJson(e)).toList();
-  return pkidWallets;
+  Set<String> walletsSet = {};
+  final filteredWallets =
+      pkidWallets.where((p) => walletsSet.add(p.seed)).toList();
+  return filteredWallets;
 }
 
 Future<List<Wallet>> listWallets() async {
@@ -96,8 +99,13 @@ Future<Wallet> loadWallet(String walletName, String walletSeed,
     WalletType walletType, String chainUrl) async {
   final (stellarClient, tfchainClient) =
       await loadWalletClients(walletName, walletSeed, walletType, chainUrl);
-  final stellarBalance = await StellarService.getBalanceByClient(stellarClient);
-  final tfchainBalance = await TFChainService.getBalanceByClient(tfchainClient);
+  final balances = await Future.wait([
+    StellarService.getBalanceByClient(stellarClient),
+    TFChainService.getBalanceByClient(tfchainClient)
+  ]);
+  final stellarBalance = balances.first.toString();
+  final tfchainBalance =
+      balances.last.toString() == '0.0' ? '0' : balances.last.toString();
   final wallet = Wallet(
     name: walletName,
     stellarSecret: stellarClient.secretSeed,
@@ -105,8 +113,7 @@ Future<Wallet> loadWallet(String walletName, String walletSeed,
     tfchainSecret: tfchainClient.mnemonicOrSecretSeed,
     tfchainAddress: tfchainClient.address,
     stellarBalance: stellarBalance,
-    tfchainBalance:
-        tfchainBalance.toString() == '0.0' ? '0' : tfchainBalance.toString(),
+    tfchainBalance: tfchainBalance,
     type: walletType,
   );
   return wallet;
