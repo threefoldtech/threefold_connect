@@ -13,10 +13,8 @@ import 'package:threebotlogin/widgets/wallets/arrow_inward.dart';
 import 'package:threebotlogin/widgets/wallets/balance_tile.dart';
 
 class WalletAssetsWidget extends StatefulWidget {
-  const WalletAssetsWidget(
-      {super.key, required this.wallet, required this.allWallets});
+  const WalletAssetsWidget({super.key, required this.wallet});
   final Wallet wallet;
-  final List<Wallet> allWallets;
 
   @override
   State<WalletAssetsWidget> createState() => _WalletAssetsWidgetState();
@@ -103,7 +101,6 @@ class _WalletAssetsWidgetState extends State<WalletAssetsWidget> {
                         Navigator.of(context).push(MaterialPageRoute(
                           builder: (context) => WalletSendScreen(
                             wallet: widget.wallet,
-                            allWallets: widget.allWallets,
                           ),
                         ));
                       },
@@ -163,7 +160,6 @@ class _WalletAssetsWidgetState extends State<WalletAssetsWidget> {
                         Navigator.of(context).push(MaterialPageRoute(
                           builder: (context) => WalletBridgeScreen(
                             wallet: widget.wallet,
-                            allWallets: widget.allWallets,
                           ),
                         ));
                       },
