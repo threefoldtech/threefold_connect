@@ -2,18 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:threebotlogin/helpers/logger.dart';
 import 'package:threebotlogin/models/wallet.dart';
+import 'package:threebotlogin/providers/wallets_provider.dart';
 import 'package:threebotlogin/services/wallet_service.dart';
 import 'package:threebotlogin/widgets/wallets/warning_dialog.dart';
 
 class WalletDetailsWidget extends StatefulWidget {
-  const WalletDetailsWidget(
-      {super.key,
-      required this.wallet,
-      required this.onDeleteWallet,
-      required this.onEditWallet});
+  const WalletDetailsWidget({
+    super.key,
+    required this.wallet,
+  });
   final Wallet wallet;
-  final void Function(String name) onDeleteWallet;
-  final void Function(String oldName, String newName) onEditWallet;
 
   @override
   State<WalletDetailsWidget> createState() => _WalletDetailsWidgetState();
@@ -30,11 +28,11 @@ class _WalletDetailsWidgetState extends State<WalletDetailsWidget> {
   bool showTfchainSecret = false;
   bool showStellarSecret = false;
   bool edit = false;
+  WalletsNotifier walletsNotifier = WalletsNotifier();
 
   Future<bool> _deleteWallet() async {
     try {
-      await deleteWallet(walletNameController.text);
-      widget.onDeleteWallet(walletNameController.text);
+      await walletsNotifier.removeWallet(walletNameController.text);
       return true;
     } catch (e) {
       logger.e('Failed to delete wallet due to $e');
@@ -68,7 +66,7 @@ class _WalletDetailsWidgetState extends State<WalletDetailsWidget> {
     }
     try {
       await editWallet(walletName, newName);
-      widget.onEditWallet(walletName, newName);
+      // widget.onEditWallet(walletName, newName);
       walletName = newName;
       widget.wallet.name = newName;
     } catch (e) {

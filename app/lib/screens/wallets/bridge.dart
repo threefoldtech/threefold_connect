@@ -13,17 +13,15 @@ import 'package:validators/validators.dart';
 import 'package:threebotlogin/services/stellar_service.dart' as Stellar;
 import 'package:threebotlogin/services/tfchain_service.dart' as TFChain;
 
-class WalletBridgeScreen extends StatefulWidget {
-  const WalletBridgeScreen(
-      {super.key, required this.wallet, required this.allWallets});
+class WalletBridgeScreen extends ConsumerStatefulWidget {
+  const WalletBridgeScreen({super.key, required this.wallet});
   final Wallet wallet;
-  final List<Wallet> allWallets;
 
   @override
-  State<WalletBridgeScreen> createState() => _WalletBridgeScreenState();
+  ConsumerState<WalletBridgeScreen> createState() => _WalletBridgeScreenState();
 }
 
-class _WalletBridgeScreenState extends State<WalletBridgeScreen> {
+class _WalletBridgeScreenState extends ConsumerState<WalletBridgeScreen> {
   final fromController = TextEditingController();
   final toController = TextEditingController();
   final amountController = TextEditingController();
@@ -171,6 +169,7 @@ class _WalletBridgeScreenState extends State<WalletBridgeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    List<Wallet> wallets = ref.read(walletsNotifier);
     final bool disableDeposit = widget.wallet.stellarBalance == '-1';
     if (disableDeposit && !isWithdraw) {
       onTransactionChange(BridgeOperation.Withdraw);
@@ -223,12 +222,12 @@ class _WalletBridgeScreenState extends State<WalletBridgeScreen> {
                                       : ChainType.TFChain,
                                   currentWalletAddress: fromController.text,
                                   wallets: isWithdraw
-                                      ? widget.allWallets
+                                      ? wallets
                                           .where((w) =>
                                               double.parse(w.stellarBalance) >=
                                               0)
                                           .toList()
-                                      : widget.allWallets,
+                                      : wallets,
                                   onSelectToAddress: _selectToAddress),
                             ));
                           },

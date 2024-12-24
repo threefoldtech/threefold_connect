@@ -5,16 +5,8 @@ import 'package:threebotlogin/screens/wallets/wallet_assets.dart';
 import 'package:threebotlogin/screens/wallets/wallet_info.dart';
 
 class WalletDetailsScreen extends StatefulWidget {
-  const WalletDetailsScreen(
-      {super.key,
-      required this.wallet,
-      required this.allWallets,
-      required this.onDeleteWallet,
-      required this.onEditWallet});
+  const WalletDetailsScreen({super.key, required this.wallet});
   final Wallet wallet;
-  final List<Wallet> allWallets;
-  final void Function(String name) onDeleteWallet;
-  final void Function(String oldName, String newName) onEditWallet;
 
   @override
   State<WalletDetailsScreen> createState() => _WalletDetailsScreenState();
@@ -29,12 +21,6 @@ class _WalletDetailsScreenState extends State<WalletDetailsScreen> {
     });
   }
 
-  void _onEditWallet(String oldName, String newName) {
-    widget.wallet.name = newName;
-    widget.onEditWallet(oldName, newName);
-    setState(() {});
-  }
-
   @override
   Widget build(BuildContext context) {
     Widget content;
@@ -45,12 +31,9 @@ class _WalletDetailsScreenState extends State<WalletDetailsScreen> {
     } else if (currentScreenIndex == 2) {
       content = WalletDetailsWidget(
         wallet: widget.wallet,
-        onDeleteWallet: widget.onDeleteWallet,
-        onEditWallet: _onEditWallet,
       );
     } else {
       content = WalletAssetsWidget(
-        allWallets: widget.allWallets,
         wallet: widget.wallet,
       );
     }

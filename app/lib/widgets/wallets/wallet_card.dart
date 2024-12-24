@@ -1,32 +1,26 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:threebotlogin/helpers/globals.dart';
 import 'package:threebotlogin/helpers/logger.dart';
 import 'package:threebotlogin/helpers/transaction_helpers.dart';
 import 'package:threebotlogin/models/wallet.dart';
+import 'package:threebotlogin/providers/wallets_provider.dart';
 import 'package:threebotlogin/screens/wallets/wallet_details.dart';
 import 'package:threebotlogin/services/stellar_service.dart' as StellarService;
 import 'package:threebotlogin/services/tfchain_service.dart' as TFChainService;
 import 'package:threebotlogin/services/wallet_service.dart';
 
-class WalletCardWidget extends StatefulWidget {
-  const WalletCardWidget(
-      {super.key,
-      required this.wallet,
-      required this.allWallets,
-      required this.onDeleteWallet,
-      required this.onEditWallet});
+class WalletCardWidget extends ConsumerStatefulWidget {
+  const WalletCardWidget({super.key, required this.wallet});
   final Wallet wallet;
-  final List<Wallet> allWallets;
-  final void Function(String name) onDeleteWallet;
-  final void Function(String oldName, String newName) onEditWallet;
 
   @override
-  State<WalletCardWidget> createState() => _WalletCardWidgetState();
+  ConsumerState<WalletCardWidget> createState() => _WalletCardWidgetState();
 }
 
-class _WalletCardWidgetState extends State<WalletCardWidget> {
+class _WalletCardWidgetState extends ConsumerState<WalletCardWidget> {
   bool initialWalletLoading = false;
-
+  List<Wallet> wallets = [];
   _initializeWallet() async {
     setState(() {
       initialWalletLoading = true;
@@ -67,6 +61,7 @@ class _WalletCardWidgetState extends State<WalletCardWidget> {
   @override
   Widget build(BuildContext context) {
     List<Widget> cardContent = [];
+    wallets = ref.read(walletsNotifier);
     if (widget.wallet.type == WalletType.NATIVE &&
         widget.wallet.stellarBalance == '-1') {
       cardContent = [
@@ -158,9 +153,6 @@ class _WalletCardWidgetState extends State<WalletCardWidget> {
           Navigator.of(context).push(MaterialPageRoute(
             builder: (context) => WalletDetailsScreen(
               wallet: widget.wallet,
-              allWallets: widget.allWallets,
-              onDeleteWallet: widget.onDeleteWallet,
-              onEditWallet: widget.onEditWallet,
             ),
           ));
         },

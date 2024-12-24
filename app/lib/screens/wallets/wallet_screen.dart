@@ -25,19 +25,6 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
   List<Wallet> wallets = [];
   late WalletsNotifier walletRef;
 
-  onDeleteWallet(String name) {
-    walletRef.removeWallet(name);
-  }
-
-  onEditWallet(String oldName, String newName) {
-    for (final w in wallets) {
-      if (w.name == oldName) {
-        w.name = newName;
-      }
-    }
-    setState(() {});
-  }
-
   @override
   void initState() {
     super.initState();
@@ -91,9 +78,6 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
                 final wallet = wallets[i];
                 return WalletCardWidget(
                   wallet: wallet,
-                  allWallets: wallets,
-                  onDeleteWallet: onDeleteWallet,
-                  onEditWallet: onEditWallet,
                 );
               }));
     }
@@ -118,8 +102,7 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
       loading = true;
     });
     try {
-      await walletRef.list();
-      await Future.delayed(const Duration(milliseconds: 100));
+      wallets = ref.read(walletsNotifier);
       if (wallets.isEmpty) {
         await _addInitialWallet();
       }

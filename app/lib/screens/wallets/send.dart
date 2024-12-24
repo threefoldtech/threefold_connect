@@ -17,17 +17,15 @@ import 'package:validators/validators.dart';
 import 'package:threebotlogin/services/stellar_service.dart' as Stellar;
 import 'package:threebotlogin/services/tfchain_service.dart' as TFChain;
 
-class WalletSendScreen extends StatefulWidget {
-  const WalletSendScreen(
-      {super.key, required this.wallet, required this.allWallets});
+class WalletSendScreen extends ConsumerStatefulWidget {
+  const WalletSendScreen({super.key, required this.wallet});
   final Wallet wallet;
-  final List<Wallet> allWallets;
 
   @override
-  State<WalletSendScreen> createState() => _WalletSendScreenState();
+  ConsumerState<WalletSendScreen> createState() => _WalletSendScreenState();
 }
 
-class _WalletSendScreenState extends State<WalletSendScreen> {
+class _WalletSendScreenState extends ConsumerState<WalletSendScreen> {
   final fromController = TextEditingController();
   final toController = TextEditingController();
   final amountController = TextEditingController();
@@ -39,9 +37,12 @@ class _WalletSendScreenState extends State<WalletSendScreen> {
   bool reloadBalance = true;
   final FocusNode textFieldFocusNode = FocusNode();
   List percentages = [25, 50, 75, 100];
+  List<Wallet> wallets = [];
+
   @override
   void initState() {
     fromController.text = widget.wallet.stellarAddress;
+    wallets = ref.read(walletsNotifier);
     _reloadBalances();
     super.initState();
   }
@@ -127,8 +128,8 @@ class _WalletSendScreenState extends State<WalletSendScreen> {
         return false;
       }
 
-      final matchingWallets = widget.allWallets
-          .where((wallet) => wallet.stellarAddress == toAddress);
+      final matchingWallets =
+          wallets.where((wallet) => wallet.stellarAddress == toAddress);
       final Wallet? wallet =
           matchingWallets.isNotEmpty ? matchingWallets.first : null;
       if (wallet != null && wallet.stellarBalance == '-1') {
@@ -268,13 +269,13 @@ class _WalletSendScreenState extends State<WalletSendScreen> {
                                         currentWalletAddress:
                                             fromController.text,
                                         wallets: chainType == ChainType.Stellar
-                                            ? widget.allWallets
+                                            ? wallets
                                                 .where((w) =>
                                                     double.parse(
                                                         w.stellarBalance) >=
                                                     0)
                                                 .toList()
-                                            : widget.allWallets,
+                                            : wallets,
                                         onSelectToAddress: _selectToAddress),
                                   ));
                                 },
