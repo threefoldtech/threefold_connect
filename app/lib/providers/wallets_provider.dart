@@ -14,16 +14,16 @@ class WalletsNotifier extends StateNotifier<List<Wallet>> {
 
   bool _reload = true;
   bool _loading = true;
-  bool _hasFetched = false;
+  bool _isListed = false;
   final Mutex _mutex = Mutex();
 
-  bool get hasFetched => _hasFetched;
+  bool get isListed => _isListed;
   Future<void> list() async {
-    if (_hasFetched) return;
+    if (_isListed) return;
     _loading = true;
     state = await listWallets();
     _loading = false;
-    _hasFetched = true;
+    _isListed = true;
   }
 
   Future<void> removeWallet(String name) async {

@@ -21,26 +21,26 @@ class _FarmScreenState extends ConsumerState<FarmScreen> {
   List<Farm> farms = [];
   List<Wallet> wallets = [];
   bool loading = true;
-  late bool isWalletListed;
+  late bool areWalletsListed;
 
   @override
   void initState() {
     super.initState();
-    isWalletListed =
-        ref.read(walletsNotifier.notifier.select((n) => n.hasFetched));
+    areWalletsListed =
+        ref.read(walletsNotifier.notifier.select((n) => n.isListed));
     _listFarms();
   }
 
   Future<void> _listFarms() async {
-    if (isWalletListed) {
+    if (areWalletsListed) {
       await listFarms();
       return;
     }
-    while (!isWalletListed) {
+    while (!areWalletsListed) {
       await Future.delayed(const Duration(seconds: 5));
-      isWalletListed =
-          ref.read(walletsNotifier.notifier.select((n) => n.hasFetched));
-      if (isWalletListed) {
+      areWalletsListed =
+          ref.read(walletsNotifier.notifier.select((n) => n.isListed));
+      if (areWalletsListed) {
         await listFarms();
         break;
       }
