@@ -922,8 +922,7 @@ class _IdentityVerificationScreenState
             if (Globals().hidePhoneButton.value == true) {
               return;
             }
-
-            await addPhoneNumberDialog(context);
+            await addPhoneNumberDialog(context, newPhone: false);
 
             var phoneMap = (await getPhone());
             if (phoneMap.isEmpty || !phoneMap.containsKey('phone')) {
@@ -1072,14 +1071,25 @@ class _IdentityVerificationScreenState
 
   Widget verifiedWidget(step, text, icon) {
     return GestureDetector(
-        onTap: () async {
-          if (step == 1) {
-            return _changeEmailDialog(false);
+      onTap: () async {
+        if (step == 1) {
+          return _changeEmailDialog(false);
+        }
+        if (step == 2) {
+          await addPhoneNumberDialog(context, newPhone: false);
+          var phoneMap = (await getPhone());
+          String? phoneNumber = phoneMap['phone'];
+          if (phone != phoneNumber) {
+            setState(() {
+              phone = phoneNumber!;
+            });
           }
-          // Only make this section clickable if it is Identity Verification + Current Phase
-          if (step != 3) {
-            return;
-          }
+          return;
+        }
+        // Only make this section clickable if it is Identity Verification + Current Phase
+        if (step != 3) {
+          return;
+        }
 
           return showIdentityDetails();
         },
@@ -1788,7 +1798,7 @@ class _IdentityVerificationScreenState
     }
 
     if (phone.isEmpty) {
-      await addPhoneNumberDialog(context);
+      await addPhoneNumberDialog(context, newPhone: true);
 
       var phoneMap = (await getPhone());
       if (phoneMap.isEmpty || !phoneMap.containsKey('phone')) {
@@ -1806,9 +1816,15 @@ class _IdentityVerificationScreenState
       FlutterPkid client = await getPkidClient();
       client.setPKidDoc('phone', json.encode({'phone': phone}));
 
+      startPhoneNumberCounter();
+      return;
+    } else {
+      PhoneAlertDialogState().sendPhoneVerification();
       return;
     }
+  }
 
+  void startPhoneNumberCounter() {
     int currentTime = DateTime.now().millisecondsSinceEpoch;
     if (globals.tooManySmsAttempts && globals.lockedSmsUntil > currentTime) {
       globals.sendSmsAttempts = 0;
