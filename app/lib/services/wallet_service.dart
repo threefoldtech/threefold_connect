@@ -4,7 +4,9 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_pkid/flutter_pkid.dart';
 import 'package:threebotlogin/apps/wallet/wallet_config.dart';
 import 'package:threebotlogin/helpers/globals.dart';
+import 'package:threebotlogin/models/idenfy.dart';
 import 'package:threebotlogin/models/wallet.dart';
+import 'package:threebotlogin/services/idenfy_service.dart';
 import 'package:threebotlogin/services/pkid_service.dart';
 import 'package:threebotlogin/services/shared_preference_service.dart';
 import 'package:stellar_client/stellar_client.dart' as Stellar;
@@ -98,6 +100,9 @@ Future<Wallet> loadWallet(String walletName, String walletSeed,
       await loadWalletClients(walletName, walletSeed, walletType, chainUrl);
   final stellarBalance = await StellarService.getBalanceByClient(stellarClient);
   final tfchainBalance = await TFChainService.getBalanceByClient(tfchainClient);
+  VerificationStatus kycResult = await getVerificationStatus(
+          address: walletSeed);
+  // print('KYC RESULT: ${kycResult.status}');        
   final wallet = Wallet(
     name: walletName,
     stellarSecret: stellarClient.secretSeed,
@@ -108,6 +113,7 @@ Future<Wallet> loadWallet(String walletName, String walletSeed,
     tfchainBalance:
         tfchainBalance.toString() == '0.0' ? '0' : tfchainBalance.toString(),
     type: walletType,
+    verificationStatus: kycResult.status.name,
   );
   return wallet;
 }

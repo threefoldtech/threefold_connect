@@ -71,7 +71,7 @@ class _IdentityVerificationScreenState
   int emailCountdown = 60;
   Timer? emailTimer;
   ValueNotifier<int> countdownNotifier = ValueNotifier(-1);
-
+  
   void startOrResumeEmailCountdown({bool startNew = false}) {
     int currentTime = DateTime.now().millisecondsSinceEpoch;
     int lockedUntil =
@@ -687,8 +687,11 @@ class _IdentityVerificationScreenState
         final data = await getVerificationData();
         final firstName = utf8.decode(latin1.encode(data.orgFirstName!));
         final lastName = utf8.decode(latin1.encode(data.orgLastName!));
+        final wallets = (await getPkidWallets())
+          .where((w) => w.type == WalletType.NATIVE)
+          .toList();
         await saveIdentity('$lastName $firstName', data.docIssuingCountry,
-            data.docDob, data.docSex, data.idenfyRef);
+            data.docDob, data.docSex, data.idenfyRef, wallets.first.seed );
         Events().emit(IdentityCallbackEvent(type: 'success'));
       } on BadRequest catch (e) {
         setState(() {

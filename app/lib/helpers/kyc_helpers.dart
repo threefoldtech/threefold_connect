@@ -2,12 +2,14 @@ import 'dart:convert';
 
 import 'package:flutter_pkid/flutter_pkid.dart';
 import 'package:threebotlogin/models/idenfy.dart';
+import 'package:threebotlogin/models/wallet.dart';
 import 'package:threebotlogin/services/idenfy_service.dart';
 import 'package:threebotlogin/services/migration_service.dart';
 import 'package:threebotlogin/services/pkid_service.dart';
 import 'package:threebotlogin/services/tfchain_service.dart';
 import 'package:threebotlogin/services/tools_service.dart';
 import 'package:threebotlogin/services/shared_preference_service.dart';
+import 'package:threebotlogin/services/wallet_service.dart';
 
 import 'globals.dart';
 
@@ -15,6 +17,9 @@ Future<void> fetchPKidData() async {
   FlutterPkid client = await getPkidClient();
 
   List<String> keyWords = ['email', 'phone'];
+  final wallets = (await getPkidWallets())
+          .where((w) => w.type == WalletType.NATIVE)
+          .toList();
 
   var futures = keyWords.map((keyword) async {
     var pKidResult = await client.getPKidDoc(keyword);
@@ -26,11 +31,11 @@ Future<void> fetchPKidData() async {
   var pKidResult = await Future.wait(futures);
   Map<int, dynamic> dataMap = pKidResult.asMap();
 
-  await handleKYCData(dataMap[0], dataMap[1]);
+  await handleKYCData(dataMap[0], dataMap[1], wallets.first.seed);
 }
 
 Future<void> handleKYCData(
-    Map<dynamic, dynamic> emailData, Map<dynamic, dynamic> phoneData) async {
+    Map<dynamic, dynamic> emailData, Map<dynamic, dynamic> phoneData, String walletSecret) async {
   final address = await getMyAddress();
   final identityVerificationStatus =
       await getVerificationStatus(address: address);
@@ -71,7 +76,7 @@ Future<void> handleKYCData(
     final firstName = utf8.decode(latin1.encode(data.orgFirstName!));
     final lastName = utf8.decode(latin1.encode(data.orgLastName!));
     await saveIdentity('$lastName $firstName', data.docIssuingCountry,
-        data.docDob, data.docSex, data.idenfyRef);
+        data.docDob, data.docSex, data.idenfyRef, walletSecret);
   }
 }
 
