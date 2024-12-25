@@ -36,11 +36,8 @@ Future<List<PkidWallet>> getPkidWallets() async {
 
   Map<int, dynamic> dataMap = result.asMap();
   final pkidWallets =
-      dataMap.values.map((e) => PkidWallet.fromJson(e)).toList();
-  Set<String> walletsSet = {};
-  final filteredWallets =
-      pkidWallets.where((p) => walletsSet.add(p.seed)).toList();
-  return filteredWallets;
+      dataMap.values.map((e) => PkidWallet.fromJson(e)).toSet().toList();
+  return pkidWallets;
 }
 
 Future<List<Wallet>> listWallets() async {
@@ -122,11 +119,13 @@ Future<Wallet> loadWallet(String walletName, String walletSeed,
 Future<void> addWallet(String walletName, String walletSecret,
     {WalletType type = WalletType.IMPORTED}) async {
   List<PkidWallet> wallets = await getPkidWallets();
-  wallets.add(PkidWallet(
-      name: walletName,
-      index: type == WalletType.NATIVE ? 0 : -1,
-      seed: walletSecret,
-      type: type));
+  wallets.any((w) => w.seed == walletSecret)
+      ? throw Exception('Wallet already exists.')
+      : wallets.add(PkidWallet(
+          name: walletName,
+          index: type == WalletType.NATIVE ? 0 : -1,
+          seed: walletSecret,
+          type: type));
 
   await saveWalletsToPkid(wallets);
 }

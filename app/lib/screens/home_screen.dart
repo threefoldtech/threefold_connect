@@ -1,9 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-
-//import 'package:threebotlogin/apps/free_flow_pages/ffp.dart';
-//import 'package:threebotlogin/apps/free_flow_pages/ffp_events.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:threebotlogin/events/email_event.dart';
 import 'package:threebotlogin/events/go_news_event.dart';
 import 'package:threebotlogin/events/go_reservations_event.dart';
@@ -18,6 +16,7 @@ import 'package:threebotlogin/events/go_wallet_event.dart';
 import 'package:threebotlogin/events/new_login_event.dart';
 import 'package:threebotlogin/events/uni_link_event.dart';
 import 'package:threebotlogin/helpers/globals.dart';
+import 'package:threebotlogin/providers/wallets_provider.dart';
 import 'package:threebotlogin/screens/authentication_screen.dart';
 import 'package:threebotlogin/services/socket_service.dart';
 import 'package:threebotlogin/services/uni_link_service.dart';
@@ -230,6 +229,8 @@ class _HomeScreenState extends State<HomeScreen>
 
   @override
   Widget build(BuildContext context) {
+    ProviderScope.containerOf(context, listen: false)
+        .read(walletsNotifier.notifier);
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: PreferredSize(
