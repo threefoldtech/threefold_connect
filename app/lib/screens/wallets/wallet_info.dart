@@ -266,7 +266,34 @@ class _WalletDetailsWidgetState extends State<WalletDetailsWidget> {
                     ),
                   ),
                 ),
-              )
+              ),
+            Text(
+              'KYC Verification',
+              style: Theme.of(context).textTheme.titleLarge!.copyWith(
+                    color: Theme.of(context).colorScheme.onSurface,
+                  ),
+            ),
+            if (widget.wallet.verificationStatus == 'UNVERIFIED')
+              Center(
+                child: SizedBox(
+                  width: MediaQuery.of(context).size.width - 40,
+                  child: ElevatedButton(
+                    onPressed: () async {
+                      // await verifyIdentityProcess();
+                    },
+                    style: ElevatedButton.styleFrom(
+                        backgroundColor:
+                            Theme.of(context).colorScheme.errorContainer),
+                    child: Text(
+                      'Verify your Identity',
+                      style: Theme.of(context).textTheme.bodyLarge!.copyWith(
+                            color:
+                                Theme.of(context).colorScheme.onErrorContainer,
+                          ),
+                    ),
+                  ),
+                ),
+              ),
           ],
         ),
       ),

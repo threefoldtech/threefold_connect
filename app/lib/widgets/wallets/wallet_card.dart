@@ -180,15 +180,20 @@ class _WalletCardWidgetState extends State<WalletCardWidget> {
                               .onSecondaryContainer,
                         ),
                   ),
-                    const Spacer(),
-                  //   Text(
-                  //   widget.wallet.verificationStatus,
-                  //   style: Theme.of(context).textTheme.titleLarge!.copyWith(
-                  //         color: Theme.of(context)
-                  //             .colorScheme
-                  //             .onSecondaryContainer,
-                  //       ),
-                  // ),
+                  const Spacer(),
+                  Text(
+                    widget.wallet.verificationStatus,
+                    style: widget.wallet.verificationStatus == 'VERIFIED'
+                        ? Theme.of(context).textTheme.bodySmall!.copyWith(
+                              color: Theme.of(context).colorScheme.primary,
+                              fontWeight: FontWeight.bold,
+                            )
+                        : TextStyle(
+                            color: Theme.of(context).colorScheme.error,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 12,
+                          ),
+                  ),
                 ],
               ),
               const SizedBox(height: 10),

@@ -100,8 +100,8 @@ Future<Wallet> loadWallet(String walletName, String walletSeed,
       await loadWalletClients(walletName, walletSeed, walletType, chainUrl);
   final stellarBalance = await StellarService.getBalanceByClient(stellarClient);
   final tfchainBalance = await TFChainService.getBalanceByClient(tfchainClient);
-  VerificationStatus kycResult = await getVerificationStatus(
-          address: walletSeed);
+  final kycVerified =
+          await getVerificationStatus(address: tfchainClient.keypair!.address);
   // print('KYC RESULT: ${kycResult.status}');        
   final wallet = Wallet(
     name: walletName,
@@ -113,7 +113,7 @@ Future<Wallet> loadWallet(String walletName, String walletSeed,
     tfchainBalance:
         tfchainBalance.toString() == '0.0' ? '0' : tfchainBalance.toString(),
     type: walletType,
-    verificationStatus: kycResult.status.name,
+    verificationStatus: kycVerified.status.name,
   );
   return wallet;
 }
