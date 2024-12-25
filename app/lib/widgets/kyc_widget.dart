@@ -6,17 +6,9 @@ import 'package:threebotlogin/models/wallet.dart';
 
 class IdentityVerificationService {
   final BuildContext context;
-  final Future<void> Function(String authToken) initIdenfySdk;
-  final Future<void> Function() handleIdenfyResponse;
-  final Logger logger;
-  final Globals globals;
 
   IdentityVerificationService({
     required this.context,
-    required this.initIdenfySdk,
-    required this.handleIdenfyResponse,
-    required this.logger,
-    required this.globals,
   });
 
   Future<void> verifyIdentityProcess({
@@ -98,17 +90,3 @@ class IdentityVerificationService {
   }
 }
 
-// Example usage:
-// final service = IdentityVerificationService(
-//   context: context,
-//   getToken: getToken,
-//   initIdenfySdk: initIdenfySdk,
-//   getPkidWallets: getPkidWallets,
-//   handleIdenfyResponse: handleIdenfyResponse,
-//   logger: logger,
-//   globals: globals,
-// );
-// service.verifyIdentityProcess(
-//   isLoadingNotifier: ValueNotifier(false),
-//   isInIdentityProcessNotifier: ValueNotifier(false),
-// );
