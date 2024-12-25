@@ -64,6 +64,7 @@ class PhoneAlertDialogState extends State<PhoneAlertDialog> {
   bool valid = false;
   String verificationPhoneNumber = '';
   Country _country = countries.firstWhere((element) => element.code == 'US');
+  String oldPhone = '';
 
   @override
   void initState() {
@@ -71,6 +72,15 @@ class PhoneAlertDialogState extends State<PhoneAlertDialog> {
     verificationPhoneNumber = '';
     _country = countries
         .firstWhere((element) => element.code == widget.defaultCountryCode);
+    if (!widget.newPhone) {
+      getPhone().then((phoneMap) {
+        setState(() {
+          if (phoneMap['phone'] != null) {
+            oldPhone = phoneMap['phone']!;
+          }
+        });
+      });
+    }
     super.initState();
   }
 
@@ -78,9 +88,7 @@ class PhoneAlertDialogState extends State<PhoneAlertDialog> {
   Widget build(BuildContext context) {
     return CustomDialog(
         image: Icons.phone,
-        title: widget.newPhone
-            ? 'Add phone number'
-            : 'Change phone number',
+        title: widget.newPhone ? 'Add phone number' : 'Change phone number',
         widgetDescription: SizedBox(
           height: widget.newPhone ? 100 : 180,
           child: Column(
@@ -131,7 +139,10 @@ class PhoneAlertDialogState extends State<PhoneAlertDialog> {
                         onChanged: (phone) {
                           PhoneNumber p = phone;
                           setState(() {
-                            if (phone.number.length >= _country.minLength &&
+                            if (p.completeNumber == oldPhone) {
+                              valid = false;
+                            } else if (phone.number.length >=
+                                    _country.minLength &&
                                 phone.number.length <= _country.maxLength) {
                               valid = true;
                               verificationPhoneNumber = p.completeNumber;

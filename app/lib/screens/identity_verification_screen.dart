@@ -1153,6 +1153,18 @@ class _IdentityVerificationScreenState
                                     ),
                                   ])
                             : const Column(),
+                        step == 2
+                            ? const Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                    Padding(
+                                      padding: EdgeInsets.only(left: 15),
+                                      child: Icon(
+                                        Icons.edit,
+                                      ),
+                                    ),
+                                  ])
+                            : const Column(),    
                         step == 3
                             ? const Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
