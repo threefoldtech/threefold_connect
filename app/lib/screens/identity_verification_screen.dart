@@ -1632,7 +1632,7 @@ class _IdentityVerificationScreenState
                                   color:
                                       Theme.of(context).colorScheme.onSurface))
                       : Text(
-                          'Changing your email will require you to go through the email verification process again.',
+                          'Changing your email will require re-verification.',
                           style: Theme.of(context)
                               .textTheme
                               .bodyLarge!

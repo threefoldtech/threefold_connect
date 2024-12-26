@@ -100,7 +100,7 @@ class PhoneAlertDialogState extends State<PhoneAlertDialog> {
                       child: Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 16),
                         child: Text(
-                          'Changing your phone will require you to go through the phone verification process again.',
+                          'Changing your phone will require re-verification',
                           style: Theme.of(context)
                               .textTheme
                               .bodyLarge!
@@ -114,7 +114,7 @@ class PhoneAlertDialogState extends State<PhoneAlertDialog> {
                 ),
               if (!widget.newPhone)
                 const SizedBox(
-                  height: 20,
+                  height: 30,
                 ),
               Row(
                 children: <Widget>[
