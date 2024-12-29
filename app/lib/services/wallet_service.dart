@@ -45,10 +45,11 @@ Future<List<PkidWallet>> getPkidWallets() async {
 Future<List<Wallet>> listWallets() async {
   List<PkidWallet> pkidWallets = await getPkidWallets();
   final String chainUrl = Globals().chainUrl;
+  final idenfyServiceUrl = Globals().idenfyServiceUrl;
   final List<Wallet> wallets = await compute((void _) async {
     final List<Future<Wallet>> walletFutures = [];
     for (final w in pkidWallets) {
-      final walletFuture = loadWallet(w.name, w.seed, w.type, chainUrl);
+      final walletFuture = loadWallet(w.name, w.seed, w.type, chainUrl, idenfyServiceUrl);
       walletFutures.add(walletFuture);
     }
     return await Future.wait(walletFutures);
@@ -95,13 +96,13 @@ Future<(Stellar.Client, TFChain.Client)> loadWalletClients(String walletName,
 }
 
 Future<Wallet> loadWallet(String walletName, String walletSeed,
-    WalletType walletType, String chainUrl) async {
+    WalletType walletType, String chainUrl, String idenfyServiceUrl) async {
   final (stellarClient, tfchainClient) =
       await loadWalletClients(walletName, walletSeed, walletType, chainUrl);
   final stellarBalance = await StellarService.getBalanceByClient(stellarClient);
   final tfchainBalance = await TFChainService.getBalanceByClient(tfchainClient);
   final kycVerified =
-          await getVerificationStatus(address: tfchainClient.keypair!.address);
+          await getVerificationStatus(address: tfchainClient.keypair!.address,idenfyServiceUrl: idenfyServiceUrl );
   final wallet = Wallet(
     name: walletName,
     stellarSecret: stellarClient.secretSeed,

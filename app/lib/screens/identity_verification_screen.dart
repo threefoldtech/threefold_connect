@@ -667,7 +667,8 @@ class _IdentityVerificationScreenState
     VerificationStatus verificationStatus;
     try {
       final address = await getMyAddress();
-      verificationStatus = await getVerificationStatus(address: address);
+      final idenfyServiceUrl = Globals().idenfyServiceUrl;
+      verificationStatus = await getVerificationStatus(address: address, idenfyServiceUrl: idenfyServiceUrl);
     } catch (e) {
       setState(() {
         isLoading = false;

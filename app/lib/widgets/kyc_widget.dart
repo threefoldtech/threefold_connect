@@ -24,12 +24,17 @@ Future<void> verifyIdentityProcess({
 }) async {
   setLoading(true);
 
-  late Token token;
+  Token token;
   try {
     token = await getToken();
 
     setLoading(false);
     setIdentityProcess(true);
+      await initIdenfySdk(
+      context: context,
+      token.authToken,
+      setLoading: setLoading,
+      setIdentityVerified: setIdentityProcess);
   } on BadRequest catch (e) {
     setLoading(false);
     await showWarningDialog(
@@ -88,12 +93,6 @@ Future<void> verifyIdentityProcess({
           'Something went wrong. \nIf this issue persist, please contact support.',
     );
   }
-
-  await initIdenfySdk(
-      context: context,
-      token.authToken,
-      setLoading: setLoading,
-      setIdentityVerified: setIdentityProcess);
 }
 
 Future<void> handleIdenfyResponse({
@@ -104,7 +103,8 @@ Future<void> handleIdenfyResponse({
   VerificationStatus verificationStatus;
   try {
     final address = await getMyAddress();
-    verificationStatus = await getVerificationStatus(address: address);
+    final idenfyServiceUrl = Globals().idenfyServiceUrl;
+    verificationStatus = await getVerificationStatus(address: address, idenfyServiceUrl: idenfyServiceUrl);
   } catch (e) {
     setLoading(false);
     logger.e(e);

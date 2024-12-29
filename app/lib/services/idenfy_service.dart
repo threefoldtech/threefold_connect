@@ -50,8 +50,7 @@ Future<Token> getToken() async {
 }
 
 Future<VerificationStatus> getVerificationStatus(
-    {required String address}) async {
-  final idenfyServiceUrl = Globals().idenfyServiceUrl;
+    {required String address, required String idenfyServiceUrl}) async {
 
   final response = await http.get(
     Uri.https(idenfyServiceUrl, '/api/v1/status', {'client_id': address}),

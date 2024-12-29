@@ -37,8 +37,9 @@ Future<void> fetchPKidData() async {
 Future<void> handleKYCData(
     Map<dynamic, dynamic> emailData, Map<dynamic, dynamic> phoneData, String walletSecret) async {
   final address = await getMyAddress();
+  final idenfyServiceUrl = Globals().idenfyServiceUrl;
   final identityVerificationStatus =
-      await getVerificationStatus(address: address);
+      await getVerificationStatus(address: address, idenfyServiceUrl: idenfyServiceUrl);
 
   await saveCorrectVerificationStates(
       emailData, phoneData, identityVerificationStatus);
