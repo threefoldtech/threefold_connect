@@ -279,7 +279,7 @@ class _WalletDetailsWidgetState extends State<WalletDetailsWidget> {
                   width: MediaQuery.of(context).size.width - 40,
                   child: ElevatedButton(
                     onPressed: () async {
-                      // await verifyIdentityProcess();
+                      // await verifyIdentityProcess(context: context);
                     },
                     style: ElevatedButton.styleFrom(
                         backgroundColor:
@@ -294,6 +294,7 @@ class _WalletDetailsWidgetState extends State<WalletDetailsWidget> {
                   ),
                 ),
               ),
+              //  else get verified data and show dialog
           ],
         ),
       ),
