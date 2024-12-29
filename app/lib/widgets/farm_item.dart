@@ -197,8 +197,7 @@ class _FarmItemWidgetState extends State<FarmItemWidget> {
                           },
                           icon: const Icon(Icons.person))
                       : null)),
-          subtitle: const Padding(padding: EdgeInsets.only(top:10),
-            child: Text('This address will be used for payout.')),
+          subtitle: const Text('This address will be used for payout.'),
           trailing: isSaving
               ? Transform.scale(
                   scale: 0.5, child: const CircularProgressIndicator())
@@ -288,56 +287,36 @@ class _FarmItemWidgetState extends State<FarmItemWidget> {
                     ),
         ),
         ListTile(
-          title: Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Expanded(
-                child: TextField(
-                  readOnly: true,
-                  obscureText: !showTfchainSecret,
-                  style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                        color: Theme.of(context).colorScheme.onSurface,
-                      ),
-                  controller: tfchainWalletSecretController,
-                  decoration: InputDecoration(
-                    labelText: 'TFChain Secret',
-                    suffixIcon: IconButton(
-                      onPressed: () {
-                        setState(() {
-                          showTfchainSecret = !showTfchainSecret;
-                        });
-                      },
-                      icon: Icon(
-                        showTfchainSecret
-                            ? Icons.visibility
-                            : Icons.visibility_off,
-                      ),
-                    ),
+          title: TextField(
+              readOnly: true,
+              obscureText: !showTfchainSecret,
+              style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                    color: Theme.of(context).colorScheme.onSurface,
                   ),
-                ),
-              ),
-              Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const SizedBox(height: 30),
-                    IconButton(
-                      onPressed: () {
-                        Clipboard.setData(ClipboardData(
-                            text: tfchainWalletSecretController.text));
-                        ScaffoldMessenger.of(context).clearSnackBars();
-                        ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('Copied!')));
-                      },
-                      icon: const Icon(Icons.copy),
-                    ),
-                  ],
-                ),
-              
-            ],
-          ),
+              controller: tfchainWalletSecretController,
+              decoration: InputDecoration(
+                labelText: 'TFChain Secret',
+                suffixIcon: IconButton(
+                    onPressed: () {
+                      setState(() {
+                        showTfchainSecret = !showTfchainSecret;
+                      });
+                    },
+                    icon: Icon(showTfchainSecret
+                        ? Icons.visibility
+                        : Icons.visibility_off)),
+              )),
           subtitle: const Text(
-            'Use this secret to log in to the ThreeFold Dashboard for farm management.',
-          ),
+              'Use this secret to log in to the ThreeFold Dashboard.'),
+          trailing: IconButton(
+              onPressed: () {
+                Clipboard.setData(
+                    ClipboardData(text: tfchainWalletSecretController.text));
+                ScaffoldMessenger.of(context).clearSnackBars();
+                ScaffoldMessenger.of(context)
+                    .showSnackBar(const SnackBar(content: Text('Copied!')));
+              },
+              icon: const Icon(Icons.copy)),
         ),
         ListTile(
           title: TextField(
