@@ -23,14 +23,12 @@ Future<void> verifyIdentityProcess({
 }) async {
   setLoading(true);
 
-  Token? token;
+  late Token token;
   try {
     token = await getToken();
 
     setLoading(false);
     setIdentityProcess(true);
-
-    // await initIdenfySdk(token.authToken);
   } on BadRequest catch (e) {
     setLoading(false);
     await showWarningDialog(
@@ -75,11 +73,6 @@ Future<void> verifyIdentityProcess({
             'Your account is not activated.\nPlease go to wallet section and initialize your wallet.');
   } on AlreadyVerified catch (_) {
     setLoading(false);
-    await showErrorDialog(
-        context: context,
-        title: 'Failed to setup process',
-        description:
-            'Something went wrong. \nIf this issue persist, please contact support.');
     await handleIdenfyResponse(
         context: context,
         setLoading: setLoading,
@@ -97,7 +90,7 @@ Future<void> verifyIdentityProcess({
 
   await initIdenfySdk(
       context: context,
-      token!.authToken,
+      token.authToken,
       setLoading: setLoading,
       setIdentityVerified: setIdentityProcess);
 }
