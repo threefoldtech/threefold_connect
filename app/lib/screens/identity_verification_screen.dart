@@ -6,18 +6,28 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_pkid/flutter_pkid.dart';
 import 'package:http/http.dart';
+import 'package:idenfy_sdk_flutter/idenfy_sdk_flutter.dart';
+import 'package:idenfy_sdk_flutter/models/auto_identification_status.dart';
+import 'package:idenfy_sdk_flutter/models/idenfy_identification_status.dart';
+import 'package:threebotlogin/events/events.dart';
+import 'package:threebotlogin/events/identity_callback_event.dart';
 import 'package:threebotlogin/helpers/globals.dart';
 import 'package:threebotlogin/helpers/kyc_helpers.dart';
 import 'package:threebotlogin/helpers/logger.dart';
 import 'package:threebotlogin/main.dart';
+import 'package:threebotlogin/models/idenfy.dart';
+import 'package:threebotlogin/models/wallet.dart';
 import 'package:threebotlogin/screens/authentication_screen.dart';
 import 'package:threebotlogin/screens/wizard/web_view.dart';
 import 'package:threebotlogin/services/gridproxy_service.dart';
+import 'package:threebotlogin/services/idenfy_service.dart';
 import 'package:threebotlogin/services/identity_service.dart';
 import 'package:threebotlogin/services/open_kyc_service.dart';
 import 'package:threebotlogin/services/pkid_service.dart';
+import 'package:threebotlogin/services/tfchain_service.dart';
 import 'package:threebotlogin/services/tools_service.dart';
 import 'package:threebotlogin/services/shared_preference_service.dart';
+import 'package:threebotlogin/services/wallet_service.dart';
 import 'package:threebotlogin/widgets/custom_dialog.dart';
 import 'package:threebotlogin/widgets/kyc_widget.dart';
 import 'package:threebotlogin/widgets/layout_drawer.dart';
@@ -315,14 +325,14 @@ class _IdentityVerificationScreenState
                                         identityVerified == true
                                     ? ElevatedButton(
                                         onPressed: () async {
-                                          await verifyIdentityProcess(
-                                              context: context,
-                                              setIdentityProcess: (value) =>
-                                                  setState(() =>
-                                                      isInIdentityProcess =
-                                                          value),
-                                              setLoading: (value) => setState(
-                                                  () => isLoading = value));
+                                          // await verifyIdentityProcess(
+                                          //     context: context,
+                                          //     setIdentityProcess: (value) =>
+                                          //         setState(() =>
+                                          //             isInIdentityProcess =
+                                          //                 value),
+                                          //     setLoading: (value) => setState(
+                                          //         () => isLoading = value));
                                         },
                                         child: const Text(
                                             'Redo identity verification'))
@@ -511,12 +521,12 @@ class _IdentityVerificationScreenState
                   onPressed: isAccepted
                       ? () async {
                           Navigator.pop(customContext);
-                          await verifyIdentityProcess(
-                              context: context,
-                              setIdentityProcess: (value) =>
-                                  setState(() => isInIdentityProcess = value),
-                              setLoading: (value) =>
-                                  setState(() => isLoading = value));
+                          // await verifyIdentityProcess(
+                          //     context: context,
+                          //     setIdentityProcess: (value) =>
+                          //         setState(() => isInIdentityProcess = value),
+                          //     setLoading: (value) =>
+                          //         setState(() => isLoading = value));
                         }
                       : null,
                   child: Text(
@@ -618,158 +628,158 @@ class _IdentityVerificationScreenState
     }
   }
 
-  // Future<void> initIdenfySdk(String token) async {
-  //   IdenfyIdentificationResult? idenfySDKresult;
-  //   try {
-  //     idenfySDKresult = await IdenfySdkFlutter.start(token);
-  //   } catch (e) {
-  //     logger.e(e);
-  //     if (context.mounted) {
-  //       showDialog(
-  //         context: context,
-  //         barrierDismissible: false,
-  //         builder: (BuildContext dialogContext) => CustomDialog(
-  //           type: DialogType.Error,
-  //           image: Icons.close,
-  //           title: 'Error',
-  //           description:
-  //               'Something went wrong. Please contact support if this issue persists.',
-  //           actions: [
-  //             TextButton(
-  //                 onPressed: () {
-  //                   Navigator.pop(dialogContext);
-  //                 },
-  //                 child: const Text('Close'))
-  //           ],
-  //         ),
-  //       );
-  //     }
-  //   }
-  //   await Future.delayed(const Duration(seconds: 5));
-  //   if (idenfySDKresult != null &&
-  //       idenfySDKresult.autoIdentificationStatus !=
-  //           AutoIdentificationStatus.UNVERIFIED) {
-  //     await handleIdenfyResponse();
-  //   }
-  // }
+  Future<void> initIdenfySdk(String token) async {
+    IdenfyIdentificationResult? idenfySDKresult;
+    try {
+      idenfySDKresult = await IdenfySdkFlutter.start(token);
+    } catch (e) {
+      logger.e(e);
+      if (context.mounted) {
+        showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (BuildContext dialogContext) => CustomDialog(
+            type: DialogType.Error,
+            image: Icons.close,
+            title: 'Error',
+            description:
+                'Something went wrong. Please contact support if this issue persists.',
+            actions: [
+              TextButton(
+                  onPressed: () {
+                    Navigator.pop(dialogContext);
+                  },
+                  child: const Text('Close'))
+            ],
+          ),
+        );
+      }
+    }
+    await Future.delayed(const Duration(seconds: 5));
+    if (idenfySDKresult != null &&
+        idenfySDKresult.autoIdentificationStatus !=
+            AutoIdentificationStatus.UNVERIFIED) {
+      await handleIdenfyResponse();
+    }
+  }
 
-  // Future<void> handleIdenfyResponse() async {
-  //   VerificationStatus verificationStatus;
-  //   try {
-  //     final address = await getMyAddress();
-  //     verificationStatus = await getVerificationStatus(address: address);
-  //   } catch (e) {
-  //     setState(() {
-  //       isLoading = false;
-  //     });
-  //     logger.e(e);
-  //     return showDialog(
-  //       context: context,
-  //       builder: (BuildContext context) => CustomDialog(
-  //         type: DialogType.Error,
-  //         image: Icons.error,
-  //         title: 'Error',
-  //         description:
-  //             'Failed to get the verification status. \nIf this issue persist, please contact support.',
-  //         actions: <Widget>[
-  //           TextButton(
-  //             child: const Text('Close'),
-  //             onPressed: () {
-  //               Navigator.pop(context);
-  //             },
-  //           ),
-  //         ],
-  //       ),
-  //     );
-  //   }
-  //   if (verificationStatus.status == VerificationState.VERIFIED) {
-  //     identityVerified = true;
-  //     setIsIdentityVerified(true);
-  //     Globals().identityVerified.value = true;
-  //     try {
-  //       final data = await getVerificationData();
-  //       final firstName = utf8.decode(latin1.encode(data.orgFirstName!));
-  //       final lastName = utf8.decode(latin1.encode(data.orgLastName!));
-  //       final wallets = (await getPkidWallets())
-  //         .where((w) => w.type == WalletType.NATIVE)
-  //         .toList();
-  //       await saveIdentity('$lastName $firstName', data.docIssuingCountry,
-  //           data.docDob, data.docSex, data.idenfyRef, wallets.first.seed );
-  //       Events().emit(IdentityCallbackEvent(type: 'success'));
-  //     } on BadRequest catch (e) {
-  //       setState(() {
-  //         isLoading = false;
-  //       });
-  //       return showDialog(
-  //           context: context,
-  //           builder: (BuildContext context) => CustomDialog(
-  //                 type: DialogType.Warning,
-  //                 image: Icons.warning,
-  //                 title: 'Bad Request',
-  //                 description:
-  //                     '$e \nIf this issue persist, please contact support.',
-  //                 actions: <Widget>[
-  //                   TextButton(
-  //                     child: const Text('Close'),
-  //                     onPressed: () {
-  //                       Navigator.pop(context);
-  //                     },
-  //                   ),
-  //                 ],
-  //               ));
-  //     } on Unauthorized catch (e) {
-  //       setState(() {
-  //         isLoading = false;
-  //       });
-  //       return showDialog(
-  //           context: context,
-  //           builder: (BuildContext context) => CustomDialog(
-  //                 type: DialogType.Warning,
-  //                 image: Icons.warning,
-  //                 title: 'Unauthorized',
-  //                 description:
-  //                     '$e \nIf this issue persist, please contact support.',
-  //                 actions: <Widget>[
-  //                   TextButton(
-  //                     child: const Text('Close'),
-  //                     onPressed: () {
-  //                       Navigator.pop(context);
-  //                     },
-  //                   ),
-  //                 ],
-  //               ));
-  //     } catch (e) {
-  //       setState(() {
-  //         isLoading = false;
-  //       });
-  //       logger.e(e);
-  //       return showDialog(
-  //         context: context,
-  //         builder: (BuildContext context) => CustomDialog(
-  //           type: DialogType.Error,
-  //           image: Icons.error,
-  //           title: 'Error',
-  //           description:
-  //               'Failed to process the verification details. \nIf this issue persist, please contact support.',
-  //           actions: <Widget>[
-  //             TextButton(
-  //               child: const Text('Close'),
-  //               onPressed: () {
-  //                 Navigator.pop(context);
-  //               },
-  //             ),
-  //           ],
-  //         ),
-  //       );
-  //     }
-  //   } else {
-  //     identityVerified = false;
-  //     setIsIdentityVerified(false);
-  //     Globals().identityVerified.value = false;
-  //     Events().emit(IdentityCallbackEvent(type: 'failed'));
-  //   }
-  //   setState(() {});
-  // }
+  Future<void> handleIdenfyResponse() async {
+    VerificationStatus verificationStatus;
+    try {
+      final address = await getMyAddress();
+      verificationStatus = await getVerificationStatus(address: address);
+    } catch (e) {
+      setState(() {
+        isLoading = false;
+      });
+      logger.e(e);
+      return showDialog(
+        context: context,
+        builder: (BuildContext context) => CustomDialog(
+          type: DialogType.Error,
+          image: Icons.error,
+          title: 'Error',
+          description:
+              'Failed to get the verification status. \nIf this issue persist, please contact support.',
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Close'),
+              onPressed: () {
+                Navigator.pop(context);
+              },
+            ),
+          ],
+        ),
+      );
+    }
+    if (verificationStatus.status == VerificationState.VERIFIED) {
+      identityVerified = true;
+      setIsIdentityVerified(true);
+      Globals().identityVerified.value = true;
+      try {
+        final data = await getVerificationData();
+        final firstName = utf8.decode(latin1.encode(data.orgFirstName!));
+        final lastName = utf8.decode(latin1.encode(data.orgLastName!));
+        final wallets = (await getPkidWallets())
+          .where((w) => w.type == WalletType.NATIVE)
+          .toList();
+        await saveIdentity('$lastName $firstName', data.docIssuingCountry,
+            data.docDob, data.docSex, data.idenfyRef, wallets.first.seed );
+        Events().emit(IdentityCallbackEvent(type: 'success'));
+      } on BadRequest catch (e) {
+        setState(() {
+          isLoading = false;
+        });
+        return showDialog(
+            context: context,
+            builder: (BuildContext context) => CustomDialog(
+                  type: DialogType.Warning,
+                  image: Icons.warning,
+                  title: 'Bad Request',
+                  description:
+                      '$e \nIf this issue persist, please contact support.',
+                  actions: <Widget>[
+                    TextButton(
+                      child: const Text('Close'),
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                    ),
+                  ],
+                ));
+      } on Unauthorized catch (e) {
+        setState(() {
+          isLoading = false;
+        });
+        return showDialog(
+            context: context,
+            builder: (BuildContext context) => CustomDialog(
+                  type: DialogType.Warning,
+                  image: Icons.warning,
+                  title: 'Unauthorized',
+                  description:
+                      '$e \nIf this issue persist, please contact support.',
+                  actions: <Widget>[
+                    TextButton(
+                      child: const Text('Close'),
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                    ),
+                  ],
+                ));
+      } catch (e) {
+        setState(() {
+          isLoading = false;
+        });
+        logger.e(e);
+        return showDialog(
+          context: context,
+          builder: (BuildContext context) => CustomDialog(
+            type: DialogType.Error,
+            image: Icons.error,
+            title: 'Error',
+            description:
+                'Failed to process the verification details. \nIf this issue persist, please contact support.',
+            actions: <Widget>[
+              TextButton(
+                child: const Text('Close'),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              ),
+            ],
+          ),
+        );
+      }
+    } else {
+      identityVerified = false;
+      setIsIdentityVerified(false);
+      Globals().identityVerified.value = false;
+      Events().emit(IdentityCallbackEvent(type: 'failed'));
+    }
+    setState(() {});
+  }
 
   Widget _pleaseWait() {
     return Dialog(
@@ -1047,14 +1057,14 @@ class _IdentityVerificationScreenState
                                     // Verify identity
                                     case 3:
                                       {
-                                        await verifyIdentityProcess(
-                                            context: context,
-                                            setIdentityProcess: (value) =>
-                                                setState(() =>
-                                                    isInIdentityProcess =
-                                                        value),
-                                            setLoading: (value) => setState(
-                                                () => isLoading = value));
+                                        // await verifyIdentityProcess(
+                                        //     context: context,
+                                        //     setIdentityProcess: (value) =>
+                                        //         setState(() =>
+                                        //             isInIdentityProcess =
+                                        //                 value),
+                                        //     setLoading: (value) => setState(
+                                        //         () => isLoading = value));
                                       }
                                       break;
                                     default:

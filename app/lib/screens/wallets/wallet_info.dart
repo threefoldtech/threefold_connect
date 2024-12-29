@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:threebotlogin/helpers/logger.dart';
 import 'package:threebotlogin/models/wallet.dart';
 import 'package:threebotlogin/services/wallet_service.dart';
+import 'package:threebotlogin/widgets/kyc_widget.dart';
 import 'package:threebotlogin/widgets/wallets/warning_dialog.dart';
 
 class WalletDetailsWidget extends StatefulWidget {
@@ -279,7 +280,11 @@ class _WalletDetailsWidgetState extends State<WalletDetailsWidget> {
                   width: MediaQuery.of(context).size.width - 40,
                   child: ElevatedButton(
                     onPressed: () async {
-                      // await verifyIdentityProcess(context: context);
+                      await verifyIdentityProcess(
+                          context: context,
+                          walletName: widget.wallet.name,
+                          setIdentityProcess: (value) {},
+                          setLoading: (value) {});
                     },
                     style: ElevatedButton.styleFrom(
                         backgroundColor:
@@ -294,7 +299,7 @@ class _WalletDetailsWidgetState extends State<WalletDetailsWidget> {
                   ),
                 ),
               ),
-              //  else get verified data and show dialog
+            //  else get verified data and show dialog
           ],
         ),
       ),

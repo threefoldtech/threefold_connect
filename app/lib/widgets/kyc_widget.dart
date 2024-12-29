@@ -18,6 +18,7 @@ import 'package:idenfy_sdk_flutter/models/auto_identification_status.dart';
 
 Future<void> verifyIdentityProcess({
   required BuildContext context,
+  required String walletName,
   required ValueChanged<bool> setLoading,
   required ValueChanged<bool> setIdentityProcess,
 }) async {
@@ -54,7 +55,7 @@ Future<void> verifyIdentityProcess({
     );
   } on NotEnoughBalance catch (_) {
     final wallets = (await getPkidWallets())
-        .where((w) => w.type == WalletType.NATIVE)
+        .where((w) => w.name == walletName)
         .toList();
     setLoading(false);
     final minimumBalance = Globals().minimumTFChainBalanceForKYC;

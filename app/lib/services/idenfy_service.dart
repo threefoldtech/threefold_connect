@@ -54,7 +54,7 @@ Future<VerificationStatus> getVerificationStatus(
   final idenfyServiceUrl = Globals().idenfyServiceUrl;
 
   final response = await http.get(
-    Uri.https('kyc.grid.tf', '/api/v1/status', {'client_id': address}),
+    Uri.https(idenfyServiceUrl, '/api/v1/status', {'client_id': address}),
   );
   if (response.statusCode == HttpStatus.ok) {
     return VerificationStatus.fromJson(jsonDecode(response.body)['result']);
