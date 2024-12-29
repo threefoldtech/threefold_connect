@@ -58,8 +58,11 @@ class _VoteDialogState extends ConsumerState<VoteDialog> {
 
   @override
   void initState() {
-    getFarms();
     super.initState();
+    Future.microtask(() async {
+      await ref.read(walletsNotifier.notifier).list();
+    });
+    getFarms();
   }
 
   List<DropdownMenuEntry<int>> _buildDropdownMenuEntries(List<Farm> farms) {
