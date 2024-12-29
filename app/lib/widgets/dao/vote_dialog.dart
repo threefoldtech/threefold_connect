@@ -45,7 +45,8 @@ class _VoteDialogState extends ConsumerState<VoteDialog> {
 
       await Future.wait(twinIdFutures);
 
-      farms = await getFarmsByTwinIds(twinIdWallets.keys.toList());
+      farms =
+          await getFarmsByTwinIds(twinIdWallets.keys.toList(), hasUpNode: true);
     } catch (e) {
       throw Exception('Failed to get farms due to $e');
     } finally {
