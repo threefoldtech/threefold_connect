@@ -102,7 +102,6 @@ Future<Wallet> loadWallet(String walletName, String walletSeed,
   final tfchainBalance = await TFChainService.getBalanceByClient(tfchainClient);
   final kycVerified =
           await getVerificationStatus(address: tfchainClient.keypair!.address);
-  // print('KYC RESULT: ${kycResult.status}');        
   final wallet = Wallet(
     name: walletName,
     stellarSecret: stellarClient.secretSeed,
