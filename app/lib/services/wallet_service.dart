@@ -2,9 +2,11 @@ import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter_pkid/flutter_pkid.dart';
+import 'package:gridproxy_client/models/farms.dart';
 import 'package:threebotlogin/apps/wallet/wallet_config.dart';
 import 'package:threebotlogin/helpers/globals.dart';
 import 'package:threebotlogin/models/wallet.dart';
+import 'package:threebotlogin/services/gridproxy_service.dart';
 import 'package:threebotlogin/services/pkid_service.dart';
 import 'package:threebotlogin/services/shared_preference_service.dart';
 import 'package:stellar_client/stellar_client.dart' as Stellar;
@@ -168,28 +170,21 @@ Future<Map<int, Map<String, String>>> getWalletTwinId(String walletName,
   return twinIdWallet;
 }
 
-Future<Map<int, Map<String, String>>> getWalletsTwinIds() async {
-  List<PkidWallet> pkidWallets = await getPkidWallets();
-  final String chainUrl = Globals().chainUrl;
-  final Map<int, Map<String, String>> twinWallets =
-      await compute((void _) async {
-    final List<Future<Map<int, Map<String, String>>>> twinIdWalletFutures = [];
-    final Map<int, Map<String, String>> twinWallets = {};
-    for (final w in pkidWallets) {
-      final twinIdWalletFuture =
-          getWalletTwinId(w.name, w.seed, w.type, chainUrl);
-      twinIdWalletFutures.add(twinIdWalletFuture);
-    }
+Future<List<Farm>> getDaoFarms(List<Wallet> wallets) async {
+  final Map<int, Wallet> twinIdWallets = {};
 
-    final twinWalletMaps = await Future.wait(twinIdWalletFutures);
-    for (var element in twinWalletMaps) {
-      twinWallets.addAll(element);
+  final twinIdFutures = wallets.map((w) async {
+    final twinId = await TFChainService.getTwinId(w.tfchainSecret);
+    if (twinId != 0) {
+      twinIdWallets[twinId] = w;
     }
-    return twinWallets;
-  }, null);
+  }).toList();
 
-  twinWallets.removeWhere((key, value) => key == 0);
-  return twinWallets;
+  await Future.wait(twinIdFutures);
+
+  final farms =
+      await getFarmsByTwinIds(twinIdWallets.keys.toList(), hasUpNode: true);
+  return farms;
 }
 
 Future<void> initializeWallet(String stellarSecret, String tfchainSeed) async {

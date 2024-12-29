@@ -3,9 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gridproxy_client/models/farms.dart';
 import 'package:threebotlogin/providers/wallets_provider.dart';
-import 'package:threebotlogin/models/wallet.dart';
 import 'package:threebotlogin/services/tfchain_service.dart';
-import 'package:threebotlogin/services/gridproxy_service.dart';
+import 'package:threebotlogin/services/wallet_service.dart';
 import 'package:threebotlogin/widgets/custom_dialog.dart';
 
 class VoteDialog extends ConsumerStatefulWidget {
@@ -32,21 +31,9 @@ class _VoteDialogState extends ConsumerState<VoteDialog> {
       setState(() {
         loading = true;
       });
-      farms.clear();
+      await ref.read(walletsNotifier.notifier).list();
       final wallets = ref.read(walletsNotifier);
-      final Map<int, Wallet> twinIdWallets = {};
-
-      final twinIdFutures = wallets.map((w) async {
-        final twinId = await getTwinId(w.tfchainSecret);
-        if (twinId != 0) {
-          twinIdWallets[twinId] = w;
-        }
-      }).toList();
-
-      await Future.wait(twinIdFutures);
-
-      farms =
-          await getFarmsByTwinIds(twinIdWallets.keys.toList(), hasUpNode: true);
+      farms = await getDaoFarms(wallets);
     } catch (e) {
       throw Exception('Failed to get farms due to $e');
     } finally {
@@ -59,9 +46,6 @@ class _VoteDialogState extends ConsumerState<VoteDialog> {
   @override
   void initState() {
     super.initState();
-    Future.microtask(() async {
-      await ref.read(walletsNotifier.notifier).list();
-    });
     getFarms();
   }
 
