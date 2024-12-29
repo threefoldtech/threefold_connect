@@ -1,13 +1,13 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gridproxy_client/models/farms.dart';
-
+import 'package:threebotlogin/providers/wallets_provider.dart';
 import 'package:threebotlogin/services/tfchain_service.dart';
-import 'package:threebotlogin/services/gridproxy_service.dart';
 import 'package:threebotlogin/services/wallet_service.dart';
 import 'package:threebotlogin/widgets/custom_dialog.dart';
 
-class VoteDialog extends StatefulWidget {
+class VoteDialog extends ConsumerStatefulWidget {
   final String proposalHash;
   const VoteDialog({
     required this.proposalHash,
@@ -15,34 +15,38 @@ class VoteDialog extends StatefulWidget {
   });
 
   @override
-  State<VoteDialog> createState() => _VoteDialogState();
+  ConsumerState<VoteDialog> createState() => _VoteDialogState();
 }
 
-class _VoteDialogState extends State<VoteDialog> {
+class _VoteDialogState extends ConsumerState<VoteDialog> {
   int? farmId;
-  final List<Farm> farms = [];
+  List<Farm> farms = [];
   Map<int, Map<String, String>> twinIdWallets = {};
   bool loading = true;
   bool yesLoading = false;
   bool noLoading = false;
 
   void getFarms() async {
-    setState(() {
-      loading = true;
-    });
-    twinIdWallets = await getWalletsTwinIds();
-    List<Farm> farmsList =
-        await getFarmsByTwinIds(twinIdWallets.keys.toList(), hasUpNode: true);
-    farms.addAll(farmsList);
-    setState(() {
-      loading = false;
-    });
+    try {
+      setState(() {
+        loading = true;
+      });
+      await ref.read(walletsNotifier.notifier).list();
+      final wallets = ref.read(walletsNotifier);
+      farms = await getDaoFarms(wallets);
+    } catch (e) {
+      throw Exception('Failed to get farms due to $e');
+    } finally {
+      setState(() {
+        loading = false;
+      });
+    }
   }
 
   @override
   void initState() {
-    getFarms();
     super.initState();
+    getFarms();
   }
 
   List<DropdownMenuEntry<int>> _buildDropdownMenuEntries(List<Farm> farms) {
