@@ -102,8 +102,9 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
       loading = true;
     });
     try {
-      wallets = ref.read(walletsNotifier);
-      if (wallets.isEmpty) {
+      await walletRef.list();
+      await Future.delayed(const Duration(seconds: 1));
+      if (walletRef.isListed && wallets.isEmpty) {
         await _addInitialWallet();
       }
     } catch (e) {
