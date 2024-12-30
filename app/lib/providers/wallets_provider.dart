@@ -70,6 +70,10 @@ class WalletsNotifier extends StateNotifier<List<Wallet>> {
     _reload = true;
   }
 
+  void clear() {
+    _isListed = false;
+  }
+
   Wallet? getUpdatedWallet(String name) {
     return state.where((w) => w.name == name).firstOrNull;
   }
