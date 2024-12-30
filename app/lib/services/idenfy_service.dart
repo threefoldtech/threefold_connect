@@ -6,10 +6,9 @@ import 'package:threebotlogin/services/tfchain_service.dart';
 import 'package:convert/convert.dart';
 import 'package:threebotlogin/models/idenfy.dart';
 
-Future<Map<String, String>> _prepareRequestHeaders() async {
+Future<Map<String, String>> _prepareRequestHeaders({required String walletSecretSeed} ) async {
   final idenfyServiceUrl = Globals().idenfyServiceUrl;
-  final signer = await getMySigner();
-  final address = signer.keypair!.address;
+  final signer = await getSignerFromSeed(walletSecretSeed);
   final now = DateTime.now().millisecondsSinceEpoch;
   final content = '$idenfyServiceUrl:$now';
   final contentHex = hex.encode(content.codeUnits);
@@ -17,16 +16,16 @@ Future<Map<String, String>> _prepareRequestHeaders() async {
   final headers = {
     'Accept': 'application/json',
     'Content-Type': 'application/json',
-    'X-Client-ID': address,
+    'X-Client-ID': signer.keypair!.address,
     'X-Challenge': contentHex,
     'X-Signature': signedContent,
   };
   return headers;
 }
 
-Future<Token> getToken() async {
+Future<Token> getToken(String seed) async {
   final idenfyServiceUrl = Globals().idenfyServiceUrl;
-  final headers = await _prepareRequestHeaders();
+  final headers = await _prepareRequestHeaders(walletSecretSeed: seed);
 
   final response = await http.post(
     Uri.https(idenfyServiceUrl, '/api/v1/token'),
@@ -69,9 +68,9 @@ Future<VerificationStatus> getVerificationStatus(
   }
 }
 
-Future<VerificationData> getVerificationData() async {
+Future<VerificationData> getVerificationData(String seed) async {
   final idenfyServiceUrl = Globals().idenfyServiceUrl;
-  final headers = await _prepareRequestHeaders();
+  final headers = await _prepareRequestHeaders(walletSecretSeed: seed);
 
   final response = await http.get(
     Uri.https(idenfyServiceUrl, '/api/v1/data'),

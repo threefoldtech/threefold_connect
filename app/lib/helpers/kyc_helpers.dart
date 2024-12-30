@@ -35,11 +35,10 @@ Future<void> fetchPKidData() async {
 }
 
 Future<void> handleKYCData(
-    Map<dynamic, dynamic> emailData, Map<dynamic, dynamic> phoneData, String walletSecret) async {
-  final address = await getMyAddress();
+    Map<dynamic, dynamic> emailData, Map<dynamic, dynamic> phoneData, String walletAddress) async {
   final idenfyServiceUrl = Globals().idenfyServiceUrl;
   final identityVerificationStatus =
-      await getVerificationStatus(address: address, idenfyServiceUrl: idenfyServiceUrl);
+      await getVerificationStatus(address: walletAddress, idenfyServiceUrl: idenfyServiceUrl);
 
   await saveCorrectVerificationStates(
       emailData, phoneData, identityVerificationStatus);
@@ -73,11 +72,11 @@ Future<void> handleKYCData(
 
   if (isIdentityVerified == true) {
     Globals().identityVerified.value = true;
-    final data = await getVerificationData();
+    final data = await getVerificationData(walletAddress);
     final firstName = utf8.decode(latin1.encode(data.orgFirstName!));
     final lastName = utf8.decode(latin1.encode(data.orgLastName!));
     await saveIdentity('$lastName $firstName', data.docIssuingCountry,
-        data.docDob, data.docSex, data.idenfyRef, walletSecret);
+        data.docDob, data.docSex, data.idenfyRef, walletAddress);
   }
 }
 

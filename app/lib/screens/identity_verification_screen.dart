@@ -659,128 +659,128 @@ class _IdentityVerificationScreenState
     if (idenfySDKresult != null &&
         idenfySDKresult.autoIdentificationStatus !=
             AutoIdentificationStatus.UNVERIFIED) {
-      await handleIdenfyResponse();
+      // await handleIdenfyResponse();
     }
   }
 
-  Future<void> handleIdenfyResponse() async {
-    VerificationStatus verificationStatus;
-    try {
-      final address = await getMyAddress();
-      final idenfyServiceUrl = Globals().idenfyServiceUrl;
-      verificationStatus = await getVerificationStatus(address: address, idenfyServiceUrl: idenfyServiceUrl);
-    } catch (e) {
-      setState(() {
-        isLoading = false;
-      });
-      logger.e(e);
-      return showDialog(
-        context: context,
-        builder: (BuildContext context) => CustomDialog(
-          type: DialogType.Error,
-          image: Icons.error,
-          title: 'Error',
-          description:
-              'Failed to get the verification status. \nIf this issue persist, please contact support.',
-          actions: <Widget>[
-            TextButton(
-              child: const Text('Close'),
-              onPressed: () {
-                Navigator.pop(context);
-              },
-            ),
-          ],
-        ),
-      );
-    }
-    if (verificationStatus.status == VerificationState.VERIFIED) {
-      identityVerified = true;
-      setIsIdentityVerified(true);
-      Globals().identityVerified.value = true;
-      try {
-        final data = await getVerificationData();
-        final firstName = utf8.decode(latin1.encode(data.orgFirstName!));
-        final lastName = utf8.decode(latin1.encode(data.orgLastName!));
-        final wallets = (await getPkidWallets())
-          .where((w) => w.type == WalletType.NATIVE)
-          .toList();
-        await saveIdentity('$lastName $firstName', data.docIssuingCountry,
-            data.docDob, data.docSex, data.idenfyRef, wallets.first.seed );
-        Events().emit(IdentityCallbackEvent(type: 'success'));
-      } on BadRequest catch (e) {
-        setState(() {
-          isLoading = false;
-        });
-        return showDialog(
-            context: context,
-            builder: (BuildContext context) => CustomDialog(
-                  type: DialogType.Warning,
-                  image: Icons.warning,
-                  title: 'Bad Request',
-                  description:
-                      '$e \nIf this issue persist, please contact support.',
-                  actions: <Widget>[
-                    TextButton(
-                      child: const Text('Close'),
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
-                    ),
-                  ],
-                ));
-      } on Unauthorized catch (e) {
-        setState(() {
-          isLoading = false;
-        });
-        return showDialog(
-            context: context,
-            builder: (BuildContext context) => CustomDialog(
-                  type: DialogType.Warning,
-                  image: Icons.warning,
-                  title: 'Unauthorized',
-                  description:
-                      '$e \nIf this issue persist, please contact support.',
-                  actions: <Widget>[
-                    TextButton(
-                      child: const Text('Close'),
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
-                    ),
-                  ],
-                ));
-      } catch (e) {
-        setState(() {
-          isLoading = false;
-        });
-        logger.e(e);
-        return showDialog(
-          context: context,
-          builder: (BuildContext context) => CustomDialog(
-            type: DialogType.Error,
-            image: Icons.error,
-            title: 'Error',
-            description:
-                'Failed to process the verification details. \nIf this issue persist, please contact support.',
-            actions: <Widget>[
-              TextButton(
-                child: const Text('Close'),
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-              ),
-            ],
-          ),
-        );
-      }
-    } else {
-      identityVerified = false;
-      setIsIdentityVerified(false);
-      Globals().identityVerified.value = false;
-      Events().emit(IdentityCallbackEvent(type: 'failed'));
-    }
-    setState(() {});
-  }
+  // Future<void> handleIdenfyResponse() async {
+  //   VerificationStatus verificationStatus;
+  //   try {
+  //     final address = await getMyAddress();
+  //     final idenfyServiceUrl = Globals().idenfyServiceUrl;
+  //     verificationStatus = await getVerificationStatus(address: address, idenfyServiceUrl: idenfyServiceUrl);
+  //   } catch (e) {
+  //     setState(() {
+  //       isLoading = false;
+  //     });
+  //     logger.e(e);
+  //     return showDialog(
+  //       context: context,
+  //       builder: (BuildContext context) => CustomDialog(
+  //         type: DialogType.Error,
+  //         image: Icons.error,
+  //         title: 'Error',
+  //         description:
+  //             'Failed to get the verification status. \nIf this issue persist, please contact support.',
+  //         actions: <Widget>[
+  //           TextButton(
+  //             child: const Text('Close'),
+  //             onPressed: () {
+  //               Navigator.pop(context);
+  //             },
+  //           ),
+  //         ],
+  //       ),
+  //     );
+  //   }
+  //   if (verificationStatus.status == VerificationState.VERIFIED) {
+  //     identityVerified = true;
+  //     setIsIdentityVerified(true);
+  //     Globals().identityVerified.value = true;
+  //     try {
+  //       final data = await getVerificationData(address);
+  //       final firstName = utf8.decode(latin1.encode(data.orgFirstName!));
+  //       final lastName = utf8.decode(latin1.encode(data.orgLastName!));
+  //       final wallets = (await getPkidWallets())
+  //         .where((w) => w.type == WalletType.NATIVE)
+  //         .toList();
+  //       await saveIdentity('$lastName $firstName', data.docIssuingCountry,
+  //           data.docDob, data.docSex, data.idenfyRef, wallets.first.seed );
+  //       Events().emit(IdentityCallbackEvent(type: 'success'));
+  //     } on BadRequest catch (e) {
+  //       setState(() {
+  //         isLoading = false;
+  //       });
+  //       return showDialog(
+  //           context: context,
+  //           builder: (BuildContext context) => CustomDialog(
+  //                 type: DialogType.Warning,
+  //                 image: Icons.warning,
+  //                 title: 'Bad Request',
+  //                 description:
+  //                     '$e \nIf this issue persist, please contact support.',
+  //                 actions: <Widget>[
+  //                   TextButton(
+  //                     child: const Text('Close'),
+  //                     onPressed: () {
+  //                       Navigator.pop(context);
+  //                     },
+  //                   ),
+  //                 ],
+  //               ));
+  //     } on Unauthorized catch (e) {
+  //       setState(() {
+  //         isLoading = false;
+  //       });
+  //       return showDialog(
+  //           context: context,
+  //           builder: (BuildContext context) => CustomDialog(
+  //                 type: DialogType.Warning,
+  //                 image: Icons.warning,
+  //                 title: 'Unauthorized',
+  //                 description:
+  //                     '$e \nIf this issue persist, please contact support.',
+  //                 actions: <Widget>[
+  //                   TextButton(
+  //                     child: const Text('Close'),
+  //                     onPressed: () {
+  //                       Navigator.pop(context);
+  //                     },
+  //                   ),
+  //                 ],
+  //               ));
+  //     } catch (e) {
+  //       setState(() {
+  //         isLoading = false;
+  //       });
+  //       logger.e(e);
+  //       return showDialog(
+  //         context: context,
+  //         builder: (BuildContext context) => CustomDialog(
+  //           type: DialogType.Error,
+  //           image: Icons.error,
+  //           title: 'Error',
+  //           description:
+  //               'Failed to process the verification details. \nIf this issue persist, please contact support.',
+  //           actions: <Widget>[
+  //             TextButton(
+  //               child: const Text('Close'),
+  //               onPressed: () {
+  //                 Navigator.pop(context);
+  //               },
+  //             ),
+  //           ],
+  //         ),
+  //       );
+  //     }
+  //   } else {
+  //     identityVerified = false;
+  //     setIsIdentityVerified(false);
+  //     Globals().identityVerified.value = false;
+  //     Events().emit(IdentityCallbackEvent(type: 'failed'));
+  //   }
+  //   setState(() {});
+  // }
 
   Widget _pleaseWait() {
     return Dialog(

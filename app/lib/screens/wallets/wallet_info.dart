@@ -268,37 +268,55 @@ class _WalletDetailsWidgetState extends State<WalletDetailsWidget> {
                   ),
                 ),
               ),
+              const SizedBox(height: 40),
             Text(
               'KYC Verification',
               style: Theme.of(context).textTheme.titleLarge!.copyWith(
                     color: Theme.of(context).colorScheme.onSurface,
                   ),
             ),
-            if (widget.wallet.verificationStatus == 'UNVERIFIED')
-              Center(
-                child: SizedBox(
-                  width: MediaQuery.of(context).size.width - 40,
-                  child: ElevatedButton(
-                    onPressed: () async {
+            Center(
+              child: SizedBox(
+                width: MediaQuery.of(context).size.width - 40,
+                child: ElevatedButton(
+                  onPressed: () async {
+                    if (widget.wallet.verificationStatus != 'VERIFIED') {
                       await verifyIdentityProcess(
-                          context: context,
-                          walletName: widget.wallet.name,
-                          setIdentityProcess: (value) {},
-                          setLoading: (value) {});
-                    },
-                    style: ElevatedButton.styleFrom(
-                        backgroundColor:
-                            Theme.of(context).colorScheme.errorContainer),
-                    child: Text(
-                      'Verify your Identity',
-                      style: Theme.of(context).textTheme.bodyLarge!.copyWith(
-                            color:
-                                Theme.of(context).colorScheme.onErrorContainer,
-                          ),
-                    ),
+                        context: context,
+                        walletName: widget.wallet.name,
+                        setIdentityProcess: (value) {},
+                        setLoading: (value) {},
+                        walletAddress: widget.wallet.tfchainSecret
+                      );
+                      setState(() {
+                        
+                      });
+                    } else {
+                      showIdentityDetails(context);
+                    }
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor:
+                        widget.wallet.verificationStatus != 'VERIFIED'
+                            ? Theme.of(context).colorScheme.errorContainer
+                            : Theme.of(context).colorScheme.primaryContainer,
+                  ),
+                  child: Text(
+                    widget.wallet.verificationStatus != 'VERIFIED'
+                        ? 'Verify your Identity'
+                        : 'Show Verified Data',
+                    style: Theme.of(context).textTheme.bodyLarge!.copyWith(
+                          color: widget.wallet.verificationStatus != 'VERIFIED'
+                              ? Theme.of(context).colorScheme.onErrorContainer
+                              : Theme.of(context)
+                                  .colorScheme
+                                  .onPrimaryContainer,
+                        ),
                   ),
                 ),
               ),
+            )
+
             //  else get verified data and show dialog
           ],
         ),

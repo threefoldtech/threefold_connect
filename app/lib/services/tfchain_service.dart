@@ -36,6 +36,17 @@ Future<Signer> getMySigner() async {
   return signer;
 }
 
+Future<Signer> getSignerFromSeed(String seed) async {
+  final signer = Signer();
+  if (seed.startsWith('0x')) {
+    signer.fromHexSeed(seed, KPType.sr25519);
+  } else {
+    //TODO: test this with mnemonic
+    signer.fromMnemonic(seed, KPType.sr25519);
+  }
+  return signer;
+}
+
 Future<String> getMyAddress() async {
   final signer = await getMySigner();
   return signer.keypair!.address;

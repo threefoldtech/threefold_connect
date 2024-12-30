@@ -9,7 +9,6 @@ import 'package:threebotlogin/models/idenfy.dart';
 import 'package:threebotlogin/services/idenfy_service.dart';
 import 'package:threebotlogin/helpers/globals.dart';
 import 'package:threebotlogin/helpers/logger.dart';
-import 'package:threebotlogin/services/tfchain_service.dart';
 import 'package:threebotlogin/services/wallet_service.dart';
 import 'package:threebotlogin/services/shared_preference_service.dart';
 import 'package:threebotlogin/widgets/custom_dialog.dart';
@@ -21,20 +20,16 @@ Future<void> verifyIdentityProcess({
   required String walletName,
   required ValueChanged<bool> setLoading,
   required ValueChanged<bool> setIdentityProcess,
+  required String walletAddress,
 }) async {
   setLoading(true);
 
   Token token;
   try {
-    token = await getToken();
+    token = await getToken(walletAddress);
 
     setLoading(false);
     setIdentityProcess(true);
-      await initIdenfySdk(
-      context: context,
-      token.authToken,
-      setLoading: setLoading,
-      setIdentityVerified: setIdentityProcess);
   } on BadRequest catch (e) {
     setLoading(false);
     await showWarningDialog(
@@ -42,6 +37,7 @@ Future<void> verifyIdentityProcess({
       title: 'Bad Request',
       description: '$e \nIf this issue persist, please contact support.',
     );
+    return;
   } on Unauthorized catch (e) {
     setLoading(false);
     await showWarningDialog(
@@ -49,6 +45,7 @@ Future<void> verifyIdentityProcess({
       title: 'Unauthorized',
       description: '$e \nIf this issue persist, please contact support.',
     );
+    return;
   } on TooManyRequests catch (_) {
     setLoading(false);
     final maxRetries = Globals().maximumKYCRetries;
@@ -58,10 +55,10 @@ Future<void> verifyIdentityProcess({
       description:
           'You already had $maxRetries requests in last 24 hours.\nPlease try again in 24 hours.',
     );
+    return;
   } on NotEnoughBalance catch (_) {
-    final wallets = (await getPkidWallets())
-        .where((w) => w.name == walletName)
-        .toList();
+    final wallets =
+        (await getPkidWallets()).where((w) => w.name == walletName).toList();
     setLoading(false);
     final minimumBalance = Globals().minimumTFChainBalanceForKYC;
     await showWarningDialog(
@@ -70,6 +67,7 @@ Future<void> verifyIdentityProcess({
         description: wallets.isEmpty
             ? 'Please initialize a wallet and fund it with at least $minimumBalance TFTs.'
             : 'Please fund your ${wallets.first.name} TFChain wallet with at least $minimumBalance TFTs.');
+    return;
   } on NoTwinId catch (_) {
     setLoading(false);
     await showWarningDialog(
@@ -77,12 +75,15 @@ Future<void> verifyIdentityProcess({
         title: "Account doesn't exist",
         description:
             'Your account is not activated.\nPlease go to wallet section and initialize your wallet.');
+    return;
   } on AlreadyVerified catch (_) {
     setLoading(false);
-    await handleIdenfyResponse(
+    return await handleIdenfyResponse(
         context: context,
         setLoading: setLoading,
-        setIdentityVerified: setIdentityProcess);
+        setIdentityVerified: setIdentityProcess,
+        walletName: walletName,
+        walletAddress: walletAddress);
   } catch (e) {
     setLoading(false);
     logger.e(e);
@@ -92,19 +93,28 @@ Future<void> verifyIdentityProcess({
       description:
           'Something went wrong. \nIf this issue persist, please contact support.',
     );
+    return;
   }
+  await initIdenfySdk(token.authToken,
+      context: context,
+      setLoading: setLoading,
+      setIdentityVerified: setIdentityProcess,
+      walletName: walletName,
+      walletAddress: walletAddress);
 }
 
 Future<void> handleIdenfyResponse({
   required BuildContext context,
   required ValueChanged<bool> setLoading,
   required ValueChanged<bool> setIdentityVerified,
+  required String walletName,
+  required String walletAddress,
 }) async {
   VerificationStatus verificationStatus;
   try {
-    final address = await getMyAddress();
     final idenfyServiceUrl = Globals().idenfyServiceUrl;
-    verificationStatus = await getVerificationStatus(address: address, idenfyServiceUrl: idenfyServiceUrl);
+    verificationStatus = await getVerificationStatus(
+        address: walletAddress, idenfyServiceUrl: idenfyServiceUrl);
   } catch (e) {
     setLoading(false);
     logger.e(e);
@@ -122,12 +132,11 @@ Future<void> handleIdenfyResponse({
     Globals().identityVerified.value = true;
 
     try {
-      final data = await getVerificationData();
+      final data = await getVerificationData(walletAddress);
       final firstName = utf8.decode(latin1.encode(data.orgFirstName!));
       final lastName = utf8.decode(latin1.encode(data.orgLastName!));
-      final wallets = (await getPkidWallets())
-          .where((w) => w.type == WalletType.NATIVE)
-          .toList();
+      final wallets =
+          (await getPkidWallets()).where((w) => w.name == walletName).toList();
       await saveIdentity('$lastName $firstName', data.docIssuingCountry,
           data.docDob, data.docSex, data.idenfyRef, wallets.first.seed);
       Events().emit(IdentityCallbackEvent(type: 'success'));
@@ -162,7 +171,9 @@ Future<void> handleIdenfyResponse({
 Future<void> initIdenfySdk(String token,
     {required BuildContext context,
     required ValueChanged<bool> setLoading,
-    required ValueChanged<bool> setIdentityVerified}) async {
+    required ValueChanged<bool> setIdentityVerified,
+    required String walletName,
+    required String walletAddress}) async {
   IdenfyIdentificationResult? idenfySDKresult;
   try {
     idenfySDKresult = await IdenfySdkFlutter.start(token);
@@ -183,7 +194,9 @@ Future<void> initIdenfySdk(String token,
     await handleIdenfyResponse(
         context: context,
         setLoading: setLoading,
-        setIdentityVerified: setIdentityVerified);
+        setIdentityVerified: setIdentityVerified,
+        walletName: walletName,
+        walletAddress: walletAddress);
   }
 }
 
@@ -233,4 +246,260 @@ Future<void> showErrorDialog({
       ],
     ),
   );
+}
+
+Widget pleaseWait(BuildContext context) {
+  return Dialog(
+    child: Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        const SizedBox(
+          height: 10,
+        ),
+        CircularProgressIndicator(
+          color: Theme.of(context).colorScheme.primary,
+        ),
+        const SizedBox(
+          height: 10,
+        ),
+        Text(
+          'One moment please',
+          style: Theme.of(context)
+              .textTheme
+              .bodyMedium!
+              .copyWith(color: Theme.of(context).colorScheme.onSurface),
+        ),
+        const SizedBox(
+          height: 10,
+        ),
+      ],
+    ),
+  );
+}
+
+Future<dynamic> showIdentityDetails(BuildContext context) {
+  return showDialog(
+      context: context,
+      builder: (BuildContext context) => Dialog(
+            child: FutureBuilder(
+              future: getIdentity(),
+              builder: (BuildContext customContext,
+                  AsyncSnapshot<dynamic> snapshot) {
+                if (!snapshot.hasData) {
+                  return pleaseWait(context);
+                }
+                String name = snapshot.data['identityName'];
+                return Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const SizedBox(
+                      height: 10,
+                    ),
+                    Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 15, vertical: 10),
+                        child: Column(
+                          children: [
+                            Text(
+                              'ID CARD',
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .titleLarge!
+                                  .copyWith(
+                                      fontWeight: FontWeight.bold,
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onSecondaryContainer),
+                              textAlign: TextAlign.center,
+                            ),
+                            const SizedBox(height: 5),
+                            Row(children: [
+                              Text(
+                                'Your own personal KYC ID CARD',
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .titleMedium!
+                                    .copyWith(
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .onSecondaryContainer),
+                              ),
+                            ]),
+                          ],
+                        )),
+                    Container(
+                      color: Theme.of(context).colorScheme.secondaryContainer,
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 15, vertical: 20),
+                      child: Column(
+                        children: [
+                          Row(
+                            children: [
+                              Text(
+                                'Full name',
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodyMedium!
+                                    .copyWith(
+                                      color:
+                                          Theme.of(context).colorScheme.primary,
+                                    ),
+                              )
+                            ],
+                          ),
+                          Row(
+                            children: [
+                              Text(
+                                name,
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodyMedium!
+                                    .copyWith(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onSecondaryContainer,
+                                    ),
+                              )
+                            ],
+                          )
+                        ],
+                      ),
+                    ),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 15, vertical: 20),
+                      child: Column(
+                        children: [
+                          Row(
+                            children: [
+                              Text(
+                                'Birthday',
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodyMedium!
+                                    .copyWith(
+                                      color:
+                                          Theme.of(context).colorScheme.primary,
+                                    ),
+                              ),
+                            ],
+                          ),
+                          Row(
+                            children: [
+                              Text(
+                                snapshot.data['identityDOB'] != 'None'
+                                    ? snapshot.data['identityDOB']
+                                    : 'Unknown',
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodyMedium!
+                                    .copyWith(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onSecondaryContainer,
+                                    ),
+                              )
+                            ],
+                          )
+                        ],
+                      ),
+                    ),
+                    Container(
+                      color: Theme.of(context).colorScheme.secondaryContainer,
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 15, vertical: 20),
+                      child: Column(
+                        children: [
+                          Row(
+                            children: [
+                              Text(
+                                'Country',
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodyMedium!
+                                    .copyWith(
+                                      color:
+                                          Theme.of(context).colorScheme.primary,
+                                    ),
+                              )
+                            ],
+                          ),
+                          Row(
+                            children: [
+                              Text(
+                                snapshot.data['identityCountry'] != 'None'
+                                    ? snapshot.data['identityCountry']
+                                    : 'Unknown',
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodyMedium!
+                                    .copyWith(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onSecondaryContainer,
+                                    ),
+                              )
+                            ],
+                          )
+                        ],
+                      ),
+                    ),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 15, vertical: 20),
+                      child: Column(
+                        children: [
+                          Row(
+                            children: [
+                              Text(
+                                'Gender',
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodyMedium!
+                                    .copyWith(
+                                      color:
+                                          Theme.of(context).colorScheme.primary,
+                                    ),
+                              )
+                            ],
+                          ),
+                          Row(
+                            children: [
+                              Text(
+                                snapshot.data['identityGender'] != 'None'
+                                    ? snapshot.data['identityGender']
+                                    : 'Unknown',
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodyMedium!
+                                    .copyWith(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onSecondaryContainer,
+                                    ),
+                              )
+                            ],
+                          )
+                        ],
+                      ),
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        TextButton(
+                            onPressed: () {
+                              Navigator.pop(customContext);
+                            },
+                            child: const Text('OK')),
+                        const SizedBox(
+                          height: 10,
+                        ),
+                      ],
+                    )
+                  ],
+                );
+              },
+            ),
+          ));
 }
