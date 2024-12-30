@@ -7,11 +7,10 @@ import 'package:threebotlogin/services/wallet_service.dart';
 import 'package:threebotlogin/widgets/wallets/warning_dialog.dart';
 
 class WalletDetailsWidget extends StatefulWidget {
-  const WalletDetailsWidget({
-    super.key,
-    required this.wallet,
-  });
+  const WalletDetailsWidget(
+      {super.key, required this.wallet, required this.onEditWallet});
   final Wallet wallet;
+  final void Function(String oldName, String newName) onEditWallet;
 
   @override
   State<WalletDetailsWidget> createState() => _WalletDetailsWidgetState();
@@ -66,7 +65,7 @@ class _WalletDetailsWidgetState extends State<WalletDetailsWidget> {
     }
     try {
       await editWallet(walletName, newName);
-      // widget.onEditWallet(walletName, newName);
+      widget.onEditWallet(walletName, newName);
       walletName = newName;
       widget.wallet.name = newName;
     } catch (e) {
