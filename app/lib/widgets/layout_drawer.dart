@@ -175,6 +175,18 @@ class _LayoutDrawerState extends State<LayoutDrawer> {
                   globals.tabController.animateTo(6);
                 },
               ),
+              if (Globals().council)
+                ListTile(
+                  minLeadingWidth: 10,
+                  leading: const Padding(
+                      padding: EdgeInsets.only(left: 10),
+                      child: Icon(Icons.how_to_vote_outlined, size: 18)),
+                  title: const Text('Council'),
+                  onTap: () {
+                    Navigator.pop(context);
+                    globals.tabController.animateTo(7);
+                  },
+                ),
             ],
           ),
         ),
