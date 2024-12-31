@@ -281,18 +281,13 @@ class _WalletDetailsWidgetState extends State<WalletDetailsWidget> {
                 child: ElevatedButton(
                   onPressed: () async {
                     if (widget.wallet.verificationStatus != 'VERIFIED') {
-                      await verifyIdentityProcess(
+                      await termsAndConditionsDialog(
                         context: context,
                         walletName: widget.wallet.name,
-                        setIdentityProcess: (value) {},
-                        setLoading: (value) {},
                         walletAddress: widget.wallet.tfchainSecret
                       );
-                      setState(() {
-                        
-                      });
                     } else {
-                      showIdentityDetails(context);
+                      showIdentityDetails(context, widget.wallet.tfchainSecret);
                     }
                   },
                   style: ElevatedButton.styleFrom(
@@ -316,8 +311,6 @@ class _WalletDetailsWidgetState extends State<WalletDetailsWidget> {
                 ),
               ),
             )
-
-            //  else get verified data and show dialog
           ],
         ),
       ),

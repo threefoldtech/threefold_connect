@@ -1,37 +1,196 @@
 import 'dart:convert';
 
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:idenfy_sdk_flutter/idenfy_sdk_flutter.dart';
 import 'package:idenfy_sdk_flutter/models/idenfy_identification_status.dart';
 import 'package:threebotlogin/events/events.dart';
 import 'package:threebotlogin/events/identity_callback_event.dart';
 import 'package:threebotlogin/models/idenfy.dart';
+import 'package:threebotlogin/screens/wizard/web_view.dart';
 import 'package:threebotlogin/services/idenfy_service.dart';
 import 'package:threebotlogin/helpers/globals.dart';
 import 'package:threebotlogin/helpers/logger.dart';
 import 'package:threebotlogin/services/wallet_service.dart';
 import 'package:threebotlogin/services/shared_preference_service.dart';
 import 'package:threebotlogin/widgets/custom_dialog.dart';
-import 'package:threebotlogin/models/wallet.dart';
 import 'package:idenfy_sdk_flutter/models/auto_identification_status.dart';
+
+termsAndConditionsDialog(
+    {required BuildContext context,
+    required String walletName,
+    required String walletAddress}) {
+  bool isAccepted = false;
+
+  showDialog(
+    context: context,
+    barrierDismissible: false,
+    builder: (BuildContext customContext) {
+      return StatefulBuilder(
+        builder: (BuildContext context, StateSetter setState) {
+          return CustomDialog(
+            title: 'Terms and Conditions',
+            type: DialogType.Info,
+            image: Icons.info,
+            widgetDescription: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  SizedBox(height: MediaQuery.of(context).size.height * 0.01),
+                  RichText(
+                    text: TextSpan(
+                      text:
+                          "As part of the verification process, we utilize iDenfy to verify your identity. Please ensure you review iDenfy's ",
+                      style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                            color: Theme.of(context).colorScheme.onSurface,
+                          ),
+                      children: [
+                        TextSpan(
+                          text: 'Security and Compliance',
+                          style: Theme.of(context)
+                              .textTheme
+                              .bodyMedium!
+                              .copyWith(
+                                fontWeight: FontWeight.bold,
+                                color: Theme.of(context).colorScheme.onSurface,
+                              ),
+                        ),
+                        TextSpan(
+                          text: ', which include their ',
+                          style: Theme.of(context)
+                              .textTheme
+                              .bodyMedium!
+                              .copyWith(
+                                color: Theme.of(context).colorScheme.onSurface,
+                              ),
+                        ),
+                        TextSpan(
+                          text: 'Terms & Conditions, Privacy Policy,',
+                          style: Theme.of(context)
+                              .textTheme
+                              .bodyMedium!
+                              .copyWith(
+                                fontWeight: FontWeight.bold,
+                                color: Theme.of(context).colorScheme.onSurface,
+                              ),
+                        ),
+                        TextSpan(
+                          text: ' and other relevant documents.',
+                          style: Theme.of(context)
+                              .textTheme
+                              .bodyMedium!
+                              .copyWith(
+                                color: Theme.of(context).colorScheme.onSurface,
+                              ),
+                        )
+                        //
+                      ],
+                    ),
+                  ),
+                  Row(
+                    children: [
+                      Checkbox(
+                        value: isAccepted,
+                        onChanged: (bool? value) {
+                          setState(() {
+                            isAccepted = value ?? false;
+                          });
+                        },
+                      ),
+                      Expanded(
+                        child: RichText(
+                          text: TextSpan(
+                            text: 'I have read and agreed to ',
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodyMedium!
+                                .copyWith(
+                                  color:
+                                      Theme.of(context).colorScheme.onSurface,
+                                ),
+                            children: [
+                              TextSpan(
+                                text: 'iDenfy Terms and Conditions.',
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodyMedium!
+                                    .copyWith(
+                                      color:
+                                          Theme.of(context).colorScheme.primary,
+                                      decoration: TextDecoration.underline,
+                                    ),
+                                recognizer: TapGestureRecognizer()
+                                  ..onTap = () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => const WebView(
+                                          url:
+                                              'https://www.idenfy.com/security/',
+                                          title: 'iDenfy Terms and Conditions',
+                                        ),
+                                      ),
+                                    );
+                                  },
+                              ),
+                              TextSpan(
+                                text: '.',
+                                style: Theme.of(context).textTheme.bodyMedium,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  )
+                ],
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(customContext);
+                },
+                child: const Text('Cancel'),
+              ),
+              TextButton(
+                onPressed: isAccepted
+                    ? () async {
+                        Navigator.pop(customContext);
+                        await verifyIdentityProcess(
+                            context: context,
+                            walletName: walletName,
+                            walletAddress: walletAddress);
+                      }
+                    : null,
+                child: Text(
+                  'Continue',
+                  style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                        color: isAccepted
+                            ? Theme.of(context).colorScheme.primary
+                            : Theme.of(context).disabledColor,
+                      ),
+                ),
+              ),
+            ],
+          );
+        },
+      );
+    },
+  );
+}
 
 Future<void> verifyIdentityProcess({
   required BuildContext context,
   required String walletName,
-  required ValueChanged<bool> setLoading,
-  required ValueChanged<bool> setIdentityProcess,
   required String walletAddress,
 }) async {
-  setLoading(true);
-
   Token token;
   try {
     token = await getToken(walletAddress);
-
-    setLoading(false);
-    setIdentityProcess(true);
   } on BadRequest catch (e) {
-    setLoading(false);
     await showWarningDialog(
       context: context,
       title: 'Bad Request',
@@ -39,7 +198,6 @@ Future<void> verifyIdentityProcess({
     );
     return;
   } on Unauthorized catch (e) {
-    setLoading(false);
     await showWarningDialog(
       context: context,
       title: 'Unauthorized',
@@ -47,7 +205,6 @@ Future<void> verifyIdentityProcess({
     );
     return;
   } on TooManyRequests catch (_) {
-    setLoading(false);
     final maxRetries = Globals().maximumKYCRetries;
     await showWarningDialog(
       context: context,
@@ -59,7 +216,6 @@ Future<void> verifyIdentityProcess({
   } on NotEnoughBalance catch (_) {
     final wallets =
         (await getPkidWallets()).where((w) => w.name == walletName).toList();
-    setLoading(false);
     final minimumBalance = Globals().minimumTFChainBalanceForKYC;
     await showWarningDialog(
         context: context,
@@ -69,7 +225,6 @@ Future<void> verifyIdentityProcess({
             : 'Please fund your ${wallets.first.name} TFChain wallet with at least $minimumBalance TFTs.');
     return;
   } on NoTwinId catch (_) {
-    setLoading(false);
     await showWarningDialog(
         context: context,
         title: "Account doesn't exist",
@@ -77,15 +232,9 @@ Future<void> verifyIdentityProcess({
             'Your account is not activated.\nPlease go to wallet section and initialize your wallet.');
     return;
   } on AlreadyVerified catch (_) {
-    setLoading(false);
     return await handleIdenfyResponse(
-        context: context,
-        setLoading: setLoading,
-        setIdentityVerified: setIdentityProcess,
-        walletName: walletName,
-        walletAddress: walletAddress);
+        context: context, walletName: walletName, walletAddress: walletAddress);
   } catch (e) {
-    setLoading(false);
     logger.e(e);
     await showErrorDialog(
       context: context,
@@ -96,17 +245,11 @@ Future<void> verifyIdentityProcess({
     return;
   }
   await initIdenfySdk(token.authToken,
-      context: context,
-      setLoading: setLoading,
-      setIdentityVerified: setIdentityProcess,
-      walletName: walletName,
-      walletAddress: walletAddress);
+      context: context, walletName: walletName, walletAddress: walletAddress);
 }
 
 Future<void> handleIdenfyResponse({
   required BuildContext context,
-  required ValueChanged<bool> setLoading,
-  required ValueChanged<bool> setIdentityVerified,
   required String walletName,
   required String walletAddress,
 }) async {
@@ -116,7 +259,6 @@ Future<void> handleIdenfyResponse({
     verificationStatus = await getVerificationStatus(
         address: walletAddress, idenfyServiceUrl: idenfyServiceUrl);
   } catch (e) {
-    setLoading(false);
     logger.e(e);
     await showErrorDialog(
       context: context,
@@ -128,7 +270,6 @@ Future<void> handleIdenfyResponse({
   }
 
   if (verificationStatus.status == VerificationState.VERIFIED) {
-    setIdentityVerified(true);
     Globals().identityVerified.value = true;
 
     try {
@@ -141,19 +282,16 @@ Future<void> handleIdenfyResponse({
           data.docDob, data.docSex, data.idenfyRef, wallets.first.seed);
       Events().emit(IdentityCallbackEvent(type: 'success'));
     } on BadRequest catch (e) {
-      setLoading(false);
       await showWarningDialog(
           context: context,
           title: 'Bad Request',
           description: '$e \nIf this issue persist, please contact support.');
     } on Unauthorized catch (e) {
-      setLoading(false);
       await showWarningDialog(
           context: context,
           title: 'Unauthorized',
           description: '$e \nIf this issue persist, please contact support.');
     } catch (e) {
-      setLoading(false);
       logger.e(e);
       await showErrorDialog(
         context: context,
@@ -162,7 +300,6 @@ Future<void> handleIdenfyResponse({
       );
     }
   } else {
-    setIdentityVerified(false);
     Globals().identityVerified.value = false;
     Events().emit(IdentityCallbackEvent(type: 'failed'));
   }
@@ -170,8 +307,6 @@ Future<void> handleIdenfyResponse({
 
 Future<void> initIdenfySdk(String token,
     {required BuildContext context,
-    required ValueChanged<bool> setLoading,
-    required ValueChanged<bool> setIdentityVerified,
     required String walletName,
     required String walletAddress}) async {
   IdenfyIdentificationResult? idenfySDKresult;
@@ -187,16 +322,12 @@ Future<void> initIdenfySdk(String token,
               'Something went wrong. Please contact support if this issue persists.');
     }
   }
-  await Future.delayed(const Duration(seconds: 5));
+  await Future.delayed(const Duration(seconds: 7));
   if (idenfySDKresult != null &&
       idenfySDKresult.autoIdentificationStatus !=
           AutoIdentificationStatus.UNVERIFIED) {
     await handleIdenfyResponse(
-        context: context,
-        setLoading: setLoading,
-        setIdentityVerified: setIdentityVerified,
-        walletName: walletName,
-        walletAddress: walletAddress);
+        context: context, walletName: walletName, walletAddress: walletAddress);
   }
 }
 
@@ -277,18 +408,52 @@ Widget pleaseWait(BuildContext context) {
   );
 }
 
-Future<dynamic> showIdentityDetails(BuildContext context) {
+Future<dynamic> showIdentityDetails(
+    BuildContext context, String walletAddress) {
   return showDialog(
       context: context,
       builder: (BuildContext context) => Dialog(
             child: FutureBuilder(
-              future: getIdentity(),
+              future: getVerificationData(walletAddress),
               builder: (BuildContext customContext,
                   AsyncSnapshot<dynamic> snapshot) {
-                if (!snapshot.hasData) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
                   return pleaseWait(context);
+                } else if (snapshot.connectionState == ConnectionState.done &&
+                    snapshot.data == null) {
+                  return Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      Text(
+                        'No data available for the provided wallet address.',
+                        style: Theme.of(context).textTheme.bodyMedium,
+                        textAlign: TextAlign.center,
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          TextButton(
+                              onPressed: () {
+                                Navigator.pop(customContext);
+                              },
+                              child: const Text('OK')),
+                          const SizedBox(
+                            height: 10,
+                          ),
+                        ],
+                      )
+                    ],
+                  );
                 }
-                String name = snapshot.data['identityName'];
+                final data = snapshot.data;
+                final firstName =
+                    utf8.decode(latin1.encode(data.orgFirstName!));
+                final lastName = utf8.decode(latin1.encode(data.orgLastName!));
+                final fullName = '$firstName $lastName';
                 return Column(
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -351,7 +516,7 @@ Future<dynamic> showIdentityDetails(BuildContext context) {
                           Row(
                             children: [
                               Text(
-                                name,
+                                fullName,
                                 style: Theme.of(context)
                                     .textTheme
                                     .bodyMedium!
@@ -388,9 +553,7 @@ Future<dynamic> showIdentityDetails(BuildContext context) {
                           Row(
                             children: [
                               Text(
-                                snapshot.data['identityDOB'] != 'None'
-                                    ? snapshot.data['identityDOB']
-                                    : 'Unknown',
+                                data.docDob != 'None' ? data.docDob : 'Unknown',
                                 style: Theme.of(context)
                                     .textTheme
                                     .bodyMedium!
@@ -428,8 +591,8 @@ Future<dynamic> showIdentityDetails(BuildContext context) {
                           Row(
                             children: [
                               Text(
-                                snapshot.data['identityCountry'] != 'None'
-                                    ? snapshot.data['identityCountry']
+                                data.docIssuingCountry != 'None'
+                                    ? data.docIssuingCountry
                                     : 'Unknown',
                                 style: Theme.of(context)
                                     .textTheme
@@ -467,9 +630,7 @@ Future<dynamic> showIdentityDetails(BuildContext context) {
                           Row(
                             children: [
                               Text(
-                                snapshot.data['identityGender'] != 'None'
-                                    ? snapshot.data['identityGender']
-                                    : 'Unknown',
+                                data.docSex != 'None' ? data.docSex : 'Unknown',
                                 style: Theme.of(context)
                                     .textTheme
                                     .bodyMedium!
