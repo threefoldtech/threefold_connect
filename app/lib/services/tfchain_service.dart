@@ -2,6 +2,7 @@
 
 import 'dart:convert';
 
+import 'package:tfchain_client/generated/dev/types/pallet_collective/votes.dart';
 import 'package:tfchain_client/generated/dev/types/tfchain_support/types/farm.dart';
 import 'package:threebotlogin/apps/wallet/wallet_config.dart';
 import 'package:threebotlogin/helpers/globals.dart';
@@ -232,4 +233,57 @@ Future<void> swapToStellar(String secret, String target, BigInt amount) async {
 Future<String> getMemo(String address) async {
   final twinId = await getTwinIdByQueryClient(address);
   return 'twin_$twinId';
+}
+
+Future<List<String>> getCouncilProposals(String chainUrl) async {
+  final client = TFChain.QueryClient(chainUrl);
+  try {
+    await client.connect();
+    final proposals = await client.council.getProposals();
+    return proposals;
+  } catch (e) {
+    throw Exception('Failed to get council proposals due to $e');
+  } finally {
+    await client.disconnect();
+  }
+}
+
+Future<ProposalInfo> getCouncilProposal(String chainUrl, String hash) async {
+  final client = TFChain.QueryClient(chainUrl);
+  try {
+    await client.connect();
+    final proposal = await client.council.getProposal(hash: hash);
+    return proposal!;
+  } catch (e) {
+    throw Exception('Failed to get council proposals due to $e');
+  } finally {
+    await client.disconnect();
+  }
+}
+
+Future<Votes> councilVote(
+    String chainUrl, bool vote, String hash, String seed) async {
+  final client = TFChain.Client(chainUrl, seed, 'sr25519');
+  try {
+    await client.connect();
+    final votes = await client.council.vote(hash: hash, approve: vote);
+    return votes;
+  } catch (e) {
+    throw Exception('Failed to vote due to $e');
+  } finally {
+    await client.disconnect();
+  }
+}
+
+Future<Votes> getCouncilProposalVotes(String chainUrl, String hash) async {
+  final client = TFChain.QueryClient(chainUrl);
+  try {
+    await client.connect();
+    final votes = await client.council.getProposalVotes(hash: hash);
+    return votes;
+  } catch (e) {
+    throw Exception('Failed to get council proposals votes due to $e');
+  } finally {
+    await client.disconnect();
+  }
 }
