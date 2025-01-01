@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:threebotlogin/helpers/globals.dart';
 import 'package:threebotlogin/helpers/logger.dart';
 import 'package:threebotlogin/helpers/transaction_helpers.dart';
-import 'package:threebotlogin/models/idenfy.dart';
 import 'package:threebotlogin/models/wallet.dart';
 import 'package:threebotlogin/screens/wallets/wallet_details.dart';
 import 'package:threebotlogin/services/stellar_service.dart' as StellarService;

@@ -17,9 +17,7 @@ import 'package:threebotlogin/widgets/custom_dialog.dart';
 import 'package:idenfy_sdk_flutter/models/auto_identification_status.dart';
 
 termsAndConditionsDialog(
-    {required BuildContext context,
-    required String walletName,
-    required String walletAddress}) {
+    {required BuildContext context, required String walletSeed}) {
   bool isAccepted = false;
 
   showDialog(
@@ -27,7 +25,7 @@ termsAndConditionsDialog(
     barrierDismissible: false,
     builder: (BuildContext customContext) {
       return StatefulBuilder(
-        builder: (BuildContext context, StateSetter setState) {
+        builder: (BuildContext childContext, StateSetter setState) {
           return CustomDialog(
             title: 'Terms and Conditions',
             type: DialogType.Info,
@@ -38,51 +36,51 @@ termsAndConditionsDialog(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  SizedBox(height: MediaQuery.of(context).size.height * 0.01),
+                  SizedBox(height: MediaQuery.of(childContext).size.height * 0.01),
                   RichText(
                     text: TextSpan(
                       text:
                           "As part of the verification process, we utilize iDenfy to verify your identity. Please ensure you review iDenfy's ",
-                      style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                            color: Theme.of(context).colorScheme.onSurface,
+                      style: Theme.of(childContext).textTheme.bodyMedium!.copyWith(
+                            color: Theme.of(childContext).colorScheme.onSurface,
                           ),
                       children: [
                         TextSpan(
                           text: 'Security and Compliance',
-                          style: Theme.of(context)
+                          style: Theme.of(childContext)
                               .textTheme
                               .bodyMedium!
                               .copyWith(
                                 fontWeight: FontWeight.bold,
-                                color: Theme.of(context).colorScheme.onSurface,
+                                color: Theme.of(childContext).colorScheme.onSurface,
                               ),
                         ),
                         TextSpan(
                           text: ', which include their ',
-                          style: Theme.of(context)
+                          style: Theme.of(childContext)
                               .textTheme
                               .bodyMedium!
                               .copyWith(
-                                color: Theme.of(context).colorScheme.onSurface,
+                                color: Theme.of(childContext).colorScheme.onSurface,
                               ),
                         ),
                         TextSpan(
                           text: 'Terms & Conditions, Privacy Policy,',
-                          style: Theme.of(context)
+                          style: Theme.of(childContext)
                               .textTheme
                               .bodyMedium!
                               .copyWith(
                                 fontWeight: FontWeight.bold,
-                                color: Theme.of(context).colorScheme.onSurface,
+                                color: Theme.of(childContext).colorScheme.onSurface,
                               ),
                         ),
                         TextSpan(
                           text: ' and other relevant documents.',
-                          style: Theme.of(context)
+                          style: Theme.of(childContext)
                               .textTheme
                               .bodyMedium!
                               .copyWith(
-                                color: Theme.of(context).colorScheme.onSurface,
+                                color: Theme.of(childContext).colorScheme.onSurface,
                               ),
                         )
                         //
@@ -103,28 +101,28 @@ termsAndConditionsDialog(
                         child: RichText(
                           text: TextSpan(
                             text: 'I have read and agreed to ',
-                            style: Theme.of(context)
+                            style: Theme.of(childContext)
                                 .textTheme
                                 .bodyMedium!
                                 .copyWith(
                                   color:
-                                      Theme.of(context).colorScheme.onSurface,
+                                      Theme.of(childContext).colorScheme.onSurface,
                                 ),
                             children: [
                               TextSpan(
                                 text: 'iDenfy Terms and Conditions.',
-                                style: Theme.of(context)
+                                style: Theme.of(childContext)
                                     .textTheme
                                     .bodyMedium!
                                     .copyWith(
                                       color:
-                                          Theme.of(context).colorScheme.primary,
+                                          Theme.of(childContext).colorScheme.primary,
                                       decoration: TextDecoration.underline,
                                     ),
                                 recognizer: TapGestureRecognizer()
                                   ..onTap = () {
                                     Navigator.push(
-                                      context,
+                                      childContext,
                                       MaterialPageRoute(
                                         builder: (context) => const WebView(
                                           url:
@@ -137,7 +135,7 @@ termsAndConditionsDialog(
                               ),
                               TextSpan(
                                 text: '.',
-                                style: Theme.of(context).textTheme.bodyMedium,
+                                style: Theme.of(childContext).textTheme.bodyMedium,
                               ),
                             ],
                           ),
@@ -160,17 +158,15 @@ termsAndConditionsDialog(
                     ? () async {
                         Navigator.pop(customContext);
                         await verifyIdentityProcess(
-                            context: context,
-                            walletName: walletName,
-                            walletAddress: walletAddress);
+                            context: context, walletSeed: walletSeed);
                       }
                     : null,
                 child: Text(
                   'Continue',
-                  style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                  style: Theme.of(childContext).textTheme.bodyMedium!.copyWith(
                         color: isAccepted
-                            ? Theme.of(context).colorScheme.primary
-                            : Theme.of(context).disabledColor,
+                            ? Theme.of(childContext).colorScheme.primary
+                            : Theme.of(childContext).disabledColor,
                       ),
                 ),
               ),
@@ -184,21 +180,20 @@ termsAndConditionsDialog(
 
 Future<void> verifyIdentityProcess({
   required BuildContext context,
-  required String walletName,
-  required String walletAddress,
+  required String walletSeed,
 }) async {
   Token token;
   try {
-    token = await getToken(walletAddress);
+    token = await getToken(walletSeed);
   } on BadRequest catch (e) {
-    await showWarningDialog(
+    showWarningDialog(
       context: context,
       title: 'Bad Request',
       description: '$e \nIf this issue persist, please contact support.',
     );
     return;
   } on Unauthorized catch (e) {
-    await showWarningDialog(
+    showWarningDialog(
       context: context,
       title: 'Unauthorized',
       description: '$e \nIf this issue persist, please contact support.',
@@ -206,7 +201,7 @@ Future<void> verifyIdentityProcess({
     return;
   } on TooManyRequests catch (_) {
     final maxRetries = Globals().maximumKYCRetries;
-    await showWarningDialog(
+    showWarningDialog(
       context: context,
       title: 'Maximum Requests Reached',
       description:
@@ -215,9 +210,9 @@ Future<void> verifyIdentityProcess({
     return;
   } on NotEnoughBalance catch (_) {
     final wallets =
-        (await getPkidWallets()).where((w) => w.name == walletName).toList();
+        (await getPkidWallets()).where((w) => w.seed == walletSeed).toList();
     final minimumBalance = Globals().minimumTFChainBalanceForKYC;
-    await showWarningDialog(
+    showWarningDialog(
         context: context,
         title: 'Not enough balance',
         description: wallets.isEmpty
@@ -225,18 +220,17 @@ Future<void> verifyIdentityProcess({
             : 'Please fund your ${wallets.first.name} TFChain wallet with at least $minimumBalance TFTs.');
     return;
   } on NoTwinId catch (_) {
-    await showWarningDialog(
+    showWarningDialog(
         context: context,
         title: "Account doesn't exist",
         description:
             'Your account is not activated.\nPlease go to wallet section and initialize your wallet.');
     return;
   } on AlreadyVerified catch (_) {
-    return await handleIdenfyResponse(
-        context: context, walletName: walletName, walletAddress: walletAddress);
+    return await handleIdenfyResponse(context: context, walletSeed: walletSeed);
   } catch (e) {
     logger.e(e);
-    await showErrorDialog(
+    showErrorDialog(
       context: context,
       title: 'Failed to setup process',
       description:
@@ -245,22 +239,21 @@ Future<void> verifyIdentityProcess({
     return;
   }
   await initIdenfySdk(token.authToken,
-      context: context, walletName: walletName, walletAddress: walletAddress);
+      context: context, walletSeed: walletSeed);
 }
 
 Future<void> handleIdenfyResponse({
   required BuildContext context,
-  required String walletName,
-  required String walletAddress,
+  required String walletSeed,
 }) async {
   VerificationStatus verificationStatus;
   try {
     final idenfyServiceUrl = Globals().idenfyServiceUrl;
     verificationStatus = await getVerificationStatus(
-        address: walletAddress, idenfyServiceUrl: idenfyServiceUrl);
+        address: walletSeed, idenfyServiceUrl: idenfyServiceUrl);
   } catch (e) {
     logger.e(e);
-    await showErrorDialog(
+    showErrorDialog(
       context: context,
       title: 'Error',
       description:
@@ -273,27 +266,27 @@ Future<void> handleIdenfyResponse({
     Globals().identityVerified.value = true;
 
     try {
-      final data = await getVerificationData(walletAddress);
+      final data = await getVerificationData(walletSeed);
       final firstName = utf8.decode(latin1.encode(data.orgFirstName!));
       final lastName = utf8.decode(latin1.encode(data.orgLastName!));
       final wallets =
-          (await getPkidWallets()).where((w) => w.name == walletName).toList();
+          (await getPkidWallets()).where((w) => w.name == walletSeed).toList();
       await saveIdentity('$lastName $firstName', data.docIssuingCountry,
           data.docDob, data.docSex, data.idenfyRef, wallets.first.seed);
       Events().emit(IdentityCallbackEvent(type: 'success'));
     } on BadRequest catch (e) {
-      await showWarningDialog(
+      showWarningDialog(
           context: context,
           title: 'Bad Request',
           description: '$e \nIf this issue persist, please contact support.');
     } on Unauthorized catch (e) {
-      await showWarningDialog(
+      showWarningDialog(
           context: context,
           title: 'Unauthorized',
           description: '$e \nIf this issue persist, please contact support.');
     } catch (e) {
       logger.e(e);
-      await showErrorDialog(
+      showErrorDialog(
         context: context,
         title: 'Error',
         description: 'Failed to process verification details',
@@ -306,16 +299,14 @@ Future<void> handleIdenfyResponse({
 }
 
 Future<void> initIdenfySdk(String token,
-    {required BuildContext context,
-    required String walletName,
-    required String walletAddress}) async {
+    {required BuildContext context, required String walletSeed}) async {
   IdenfyIdentificationResult? idenfySDKresult;
   try {
     idenfySDKresult = await IdenfySdkFlutter.start(token);
   } catch (e) {
     logger.e(e);
     if (context.mounted) {
-      await showErrorDialog(
+      showErrorDialog(
           context: context,
           title: 'Error',
           description:
@@ -326,17 +317,16 @@ Future<void> initIdenfySdk(String token,
   if (idenfySDKresult != null &&
       idenfySDKresult.autoIdentificationStatus !=
           AutoIdentificationStatus.UNVERIFIED) {
-    await handleIdenfyResponse(
-        context: context, walletName: walletName, walletAddress: walletAddress);
+    await handleIdenfyResponse(context: context, walletSeed: walletSeed);
   }
 }
 
-Future<void> showWarningDialog({
+void showWarningDialog({
   required BuildContext context,
   required String title,
   required String description,
-}) async {
-  await showDialog(
+}) {
+  showDialog(
     context: context,
     builder: (BuildContext context) => CustomDialog(
       type: DialogType.Warning,
@@ -355,12 +345,12 @@ Future<void> showWarningDialog({
   );
 }
 
-Future<void> showErrorDialog({
+void showErrorDialog({
   required BuildContext context,
   required String title,
   required String description,
-}) async {
-  await showDialog(
+}) {
+  showDialog(
     context: context,
     builder: (BuildContext context) => CustomDialog(
       type: DialogType.Error,
@@ -408,13 +398,12 @@ Widget pleaseWait(BuildContext context) {
   );
 }
 
-Future<dynamic> showIdentityDetails(
-    BuildContext context, String walletAddress) {
+Future<dynamic> showIdentityDetails(BuildContext context, String walletSeed) {
   return showDialog(
       context: context,
       builder: (BuildContext context) => Dialog(
             child: FutureBuilder(
-              future: getVerificationData(walletAddress),
+              future: getVerificationData(walletSeed),
               builder: (BuildContext customContext,
                   AsyncSnapshot<dynamic> snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
