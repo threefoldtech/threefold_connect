@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:threebotlogin/widgets/council/councils.dart';
 import 'package:threebotlogin/widgets/layout_drawer.dart';
 
 class CouncilScreen extends StatefulWidget {
@@ -70,7 +71,10 @@ class _CouncilScreenState extends State<CouncilScreen> {
           const SizedBox(height: 50),
           ElevatedButton(
               onPressed: () {
-                //TODO: Go to the next page
+                Navigator.of(context).push(MaterialPageRoute(
+                  builder: (context) =>
+                      CouncilsWidget(chainUrl: urlController.text),
+                ));
               },
               child: SizedBox(
                   width: double.infinity,
