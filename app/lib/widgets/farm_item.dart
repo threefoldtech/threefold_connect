@@ -309,7 +309,7 @@ class _FarmItemWidgetState extends State<FarmItemWidget> {
                         : Icons.visibility_off)),
               )),
           subtitle: const Text(
-              'You can login into ThreeFold Dashboard using this secret for more farm management.'),
+              'Use this secret to log in to the ThreeFold Dashboard.'),
           trailing: IconButton(
               onPressed: () {
                 Clipboard.setData(

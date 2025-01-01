@@ -2,11 +2,13 @@ import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter_pkid/flutter_pkid.dart';
+import 'package:gridproxy_client/models/farms.dart';
 import 'package:threebotlogin/apps/wallet/wallet_config.dart';
 import 'package:threebotlogin/helpers/globals.dart';
 import 'package:threebotlogin/models/idenfy.dart';
 import 'package:threebotlogin/models/wallet.dart';
 import 'package:threebotlogin/services/idenfy_service.dart';
+import 'package:threebotlogin/services/gridproxy_service.dart';
 import 'package:threebotlogin/services/pkid_service.dart';
 import 'package:threebotlogin/services/shared_preference_service.dart';
 import 'package:stellar_client/stellar_client.dart' as Stellar;
@@ -38,7 +40,7 @@ Future<List<PkidWallet>> getPkidWallets() async {
 
   Map<int, dynamic> dataMap = result.asMap();
   final pkidWallets =
-      dataMap.values.map((e) => PkidWallet.fromJson(e)).toList();
+      dataMap.values.map((e) => PkidWallet.fromJson(e)).toSet().toList();
   return pkidWallets;
 }
 
@@ -99,8 +101,13 @@ Future<Wallet> loadWallet(String walletName, String walletSeed,
     WalletType walletType, String chainUrl, String idenfyServiceUrl) async {
   final (stellarClient, tfchainClient) =
       await loadWalletClients(walletName, walletSeed, walletType, chainUrl);
-  final stellarBalance = await StellarService.getBalanceByClient(stellarClient);
-  final tfchainBalance = await TFChainService.getBalanceByClient(tfchainClient);
+  final balances = await Future.wait([
+    StellarService.getBalanceByClient(stellarClient),
+    TFChainService.getBalanceByClient(tfchainClient)
+  ]);
+  final stellarBalance = balances.first.toString();
+  final tfchainBalance =
+      balances.last.toString() == '0.0' ? '0' : balances.last.toString();
   final kycVerified =
           await getVerificationStatus(address: tfchainClient.keypair!.address,idenfyServiceUrl: idenfyServiceUrl );
   final wallet = Wallet(
@@ -110,8 +117,7 @@ Future<Wallet> loadWallet(String walletName, String walletSeed,
     tfchainSecret: tfchainClient.mnemonicOrSecretSeed,
     tfchainAddress: tfchainClient.address,
     stellarBalance: stellarBalance,
-    tfchainBalance:
-        tfchainBalance.toString() == '0.0' ? '0' : tfchainBalance.toString(),
+    tfchainBalance: tfchainBalance,
     type: walletType,
     verificationStatus: kycVerified.status.name,
   );
@@ -121,11 +127,13 @@ Future<Wallet> loadWallet(String walletName, String walletSeed,
 Future<void> addWallet(String walletName, String walletSecret,
     {WalletType type = WalletType.IMPORTED}) async {
   List<PkidWallet> wallets = await getPkidWallets();
-  wallets.add(PkidWallet(
-      name: walletName,
-      index: type == WalletType.NATIVE ? 0 : -1,
-      seed: walletSecret,
-      type: type));
+  wallets.any((w) => w.seed == walletSecret)
+      ? throw Exception('Wallet already exists.')
+      : wallets.add(PkidWallet(
+          name: walletName,
+          index: type == WalletType.NATIVE ? 0 : -1,
+          seed: walletSecret,
+          type: type));
 
   await saveWalletsToPkid(wallets);
 }
@@ -168,28 +176,21 @@ Future<Map<int, Map<String, String>>> getWalletTwinId(String walletName,
   return twinIdWallet;
 }
 
-Future<Map<int, Map<String, String>>> getWalletsTwinIds() async {
-  List<PkidWallet> pkidWallets = await getPkidWallets();
-  final String chainUrl = Globals().chainUrl;
-  final Map<int, Map<String, String>> twinWallets =
-      await compute((void _) async {
-    final List<Future<Map<int, Map<String, String>>>> twinIdWalletFutures = [];
-    final Map<int, Map<String, String>> twinWallets = {};
-    for (final w in pkidWallets) {
-      final twinIdWalletFuture =
-          getWalletTwinId(w.name, w.seed, w.type, chainUrl);
-      twinIdWalletFutures.add(twinIdWalletFuture);
-    }
+Future<List<Farm>> getDaoFarms(List<Wallet> wallets) async {
+  final Map<int, Wallet> twinIdWallets = {};
 
-    final twinWalletMaps = await Future.wait(twinIdWalletFutures);
-    for (var element in twinWalletMaps) {
-      twinWallets.addAll(element);
+  final twinIdFutures = wallets.map((w) async {
+    final twinId = await TFChainService.getTwinId(w.tfchainSecret);
+    if (twinId != 0) {
+      twinIdWallets[twinId] = w;
     }
-    return twinWallets;
-  }, null);
+  }).toList();
 
-  twinWallets.removeWhere((key, value) => key == 0);
-  return twinWallets;
+  await Future.wait(twinIdFutures);
+
+  final farms =
+      await getFarmsByTwinIds(twinIdWallets.keys.toList(), hasUpNode: true);
+  return farms;
 }
 
 Future<void> initializeWallet(String stellarSecret, String tfchainSeed) async {
