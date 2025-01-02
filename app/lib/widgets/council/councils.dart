@@ -3,7 +3,6 @@ import 'package:tfchain_client/models/council.dart';
 import 'package:threebotlogin/helpers/logger.dart';
 import 'package:threebotlogin/services/tfchain_service.dart';
 import 'package:threebotlogin/widgets/council/card.dart';
-import 'package:threebotlogin/widgets/layout_drawer.dart';
 
 class CouncilsWidget extends StatefulWidget {
   const CouncilsWidget({super.key, required this.chainUrl});
@@ -88,7 +87,10 @@ class _CouncilsWidgetState extends State<CouncilsWidget> {
               itemCount: proposals.length,
               itemBuilder: (context, i) {
                 final proposal = proposals[i];
-                return CouncilCard(proposal: proposal);
+                return CouncilCard(
+                  proposal: proposal,
+                  chainUrl: widget.chainUrl,
+                );
               }));
     }
     return Scaffold(

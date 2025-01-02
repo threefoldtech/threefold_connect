@@ -88,7 +88,8 @@ class Flags {
 
     Globals().bridgeTFTAddress =
         (await Flags().getFlagValueByFeatureName('bridge-address'))!;
-    Globals().council = await Flags().hasFlagValueByFeatureName('council');
+    Globals().council =
+        await Flags().hasFlagValueByFeatureName('council-member');
   }
 
   Future<bool> hasFlagValueByFeatureName(String name) async {

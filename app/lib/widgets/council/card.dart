@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:tfchain_client/models/council.dart';
+import 'package:threebotlogin/widgets/dao/show_result_dialog.dart';
 
 class CouncilCard extends StatefulWidget {
-  const CouncilCard({super.key, required this.proposal});
+  const CouncilCard(
+      {super.key, required this.proposal, required this.chainUrl});
   final CouncilProposal proposal;
+  final String chainUrl;
 
   @override
   State<CouncilCard> createState() => _CouncilCardState();
@@ -102,8 +105,7 @@ class _CouncilCardState extends State<CouncilCard> {
                   : MainAxisAlignment.center,
               children: [
                 ElevatedButton(
-                  // onPressed: _showVoteResult,
-                  onPressed: () {},
+                  onPressed: _showVoteResult,
                   style: ElevatedButton.styleFrom(
                     backgroundColor:
                         Theme.of(context).colorScheme.secondaryContainer,
@@ -134,13 +136,15 @@ class _CouncilCardState extends State<CouncilCard> {
     );
   }
 
-  // _showVoteResult() {
-  //   showDialog(
-  //       context: context,
-  //       builder: (_) => ShowResultDialog(
-  //             proposalHash: widget.proposal.hash,
-  //           ));
-  // }
+  _showVoteResult() {
+    showDialog(
+        context: context,
+        builder: (_) => ShowResultDialog(
+              proposalHash: widget.proposal.hash,
+              type: ProposalType.Council,
+              chainUrl: widget.chainUrl,
+            ));
+  }
 
   // _showVoteDialog() {
   //   showDialog(
