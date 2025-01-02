@@ -94,10 +94,7 @@ class _RecoverScreenState extends State<RecoverScreen> {
       await savePhrase(seedPhrase);
       await saveFingerprint(false);
       await saveDoubleName(doubleName);
-      final wallets = (await getPkidWallets())
-          .where((w) => w.type == WalletType.NATIVE)
-          .toList();
-      await handleKYCData(dataMap[0], dataMap[1], wallets.first.seed);
+      await handleKYCData(dataMap[0], dataMap[1]);
 
       await fixPkidMigration();
     } catch (e) {

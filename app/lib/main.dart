@@ -49,12 +49,10 @@ Future<void> main() async {
 Future<void> setGlobalValues() async {
   Map<String, String?> email = await getEmail();
   Map<String, String?> phone = await getPhone();
-  Map<String, dynamic> identity = await getIdentity();
 
   Globals().emailVerified.value = (email['sei'] != null);
   Globals().phoneVerified.value = (phone['spi'] != null);
-  Globals().identityVerified.value =
-      (identity['signedIdentityNameIdentifier'] != null);
+
 }
 
 class MyApp extends ConsumerWidget {

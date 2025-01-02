@@ -193,12 +193,13 @@ class _IdentityVerificationScreenState
       ),
     );
   }
-
+  
   @override
   Widget build(BuildContext context) {
     return LayoutDrawer(
       titleText: 'Identity',
-      content: FutureBuilder(
+      content: 
+      FutureBuilder(
         future: getEmail(),
         builder: (ctx, snapshot) {
           if (snapshot.connectionState == ConnectionState.done) {
@@ -402,6 +403,8 @@ class _IdentityVerificationScreenState
   }
 
   Widget unVerifiedWidget(step, text, icon) {
+    print("HELLO EMAIL");
+    print(text);
     return GestureDetector(
         onTap: () async {},
         child: Opacity(

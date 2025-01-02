@@ -246,35 +246,6 @@ Future<bool?> getIsIdentityVerified() async {
   return prefs.getBool('isIdentityVerified');
 }
 
-Future<Map<String, dynamic>> getIdentity() async {
-  final SharedPreferences prefs = await SharedPreferences.getInstance();
-  return {
-    'identityName': prefs.getString('identityName'),
-    'identityCountry': prefs.getString('identityCountry'),
-    'identityDOB': prefs.getString('identityDOB'),
-    'identityGender': prefs.getString('identityGender'),
-    'walletSecret': prefs.getString('walletSecret'),
-  };
-}
-
-Future<void> saveIdentity(String? identityName, String? identityCountry,
-    String? identityDOB, String? identityGender, String? referenceId, String? walletSecret) async {
-  final SharedPreferences prefs = await SharedPreferences.getInstance();
-  prefs.remove('identityName');
-  prefs.remove('identityCountry');
-  prefs.remove('identityDOB');
-  prefs.remove('identityGender');
-  prefs.remove('walletSecret');
-
-  prefs.setString('identityName', identityName!);
-  prefs.setString('identityCountry', identityCountry!);
-  prefs.setString('identityDOB', identityDOB!);
-  prefs.setString('identityGender', identityGender!);
-  prefs.setString('walletSecret', walletSecret!);
-
-  updateUserData('identity_reference', referenceId!);
-  Globals().identityVerified.value = true;
-}
 
 ///
 ///

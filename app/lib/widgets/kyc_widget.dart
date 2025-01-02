@@ -36,12 +36,16 @@ termsAndConditionsDialog(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  SizedBox(height: MediaQuery.of(childContext).size.height * 0.01),
+                  SizedBox(
+                      height: MediaQuery.of(childContext).size.height * 0.01),
                   RichText(
                     text: TextSpan(
                       text:
                           "As part of the verification process, we utilize iDenfy to verify your identity. Please ensure you review iDenfy's ",
-                      style: Theme.of(childContext).textTheme.bodyMedium!.copyWith(
+                      style: Theme.of(childContext)
+                          .textTheme
+                          .bodyMedium!
+                          .copyWith(
                             color: Theme.of(childContext).colorScheme.onSurface,
                           ),
                       children: [
@@ -52,7 +56,9 @@ termsAndConditionsDialog(
                               .bodyMedium!
                               .copyWith(
                                 fontWeight: FontWeight.bold,
-                                color: Theme.of(childContext).colorScheme.onSurface,
+                                color: Theme.of(childContext)
+                                    .colorScheme
+                                    .onSurface,
                               ),
                         ),
                         TextSpan(
@@ -61,7 +67,9 @@ termsAndConditionsDialog(
                               .textTheme
                               .bodyMedium!
                               .copyWith(
-                                color: Theme.of(childContext).colorScheme.onSurface,
+                                color: Theme.of(childContext)
+                                    .colorScheme
+                                    .onSurface,
                               ),
                         ),
                         TextSpan(
@@ -71,7 +79,9 @@ termsAndConditionsDialog(
                               .bodyMedium!
                               .copyWith(
                                 fontWeight: FontWeight.bold,
-                                color: Theme.of(childContext).colorScheme.onSurface,
+                                color: Theme.of(childContext)
+                                    .colorScheme
+                                    .onSurface,
                               ),
                         ),
                         TextSpan(
@@ -80,7 +90,9 @@ termsAndConditionsDialog(
                               .textTheme
                               .bodyMedium!
                               .copyWith(
-                                color: Theme.of(childContext).colorScheme.onSurface,
+                                color: Theme.of(childContext)
+                                    .colorScheme
+                                    .onSurface,
                               ),
                         )
                         //
@@ -105,8 +117,9 @@ termsAndConditionsDialog(
                                 .textTheme
                                 .bodyMedium!
                                 .copyWith(
-                                  color:
-                                      Theme.of(childContext).colorScheme.onSurface,
+                                  color: Theme.of(childContext)
+                                      .colorScheme
+                                      .onSurface,
                                 ),
                             children: [
                               TextSpan(
@@ -115,8 +128,9 @@ termsAndConditionsDialog(
                                     .textTheme
                                     .bodyMedium!
                                     .copyWith(
-                                      color:
-                                          Theme.of(childContext).colorScheme.primary,
+                                      color: Theme.of(childContext)
+                                          .colorScheme
+                                          .primary,
                                       decoration: TextDecoration.underline,
                                     ),
                                 recognizer: TapGestureRecognizer()
@@ -135,7 +149,8 @@ termsAndConditionsDialog(
                               ),
                               TextSpan(
                                 text: '.',
-                                style: Theme.of(childContext).textTheme.bodyMedium,
+                                style:
+                                    Theme.of(childContext).textTheme.bodyMedium,
                               ),
                             ],
                           ),
@@ -248,9 +263,11 @@ Future<void> handleIdenfyResponse({
 }) async {
   VerificationStatus verificationStatus;
   try {
+    logger.d('Fetching verification status from iDenfy service...');
     final idenfyServiceUrl = Globals().idenfyServiceUrl;
     verificationStatus = await getVerificationStatus(
         address: walletSeed, idenfyServiceUrl: idenfyServiceUrl);
+    logger.d('Fetched verification status: ${verificationStatus.status}');
   } catch (e) {
     logger.e(e);
     showErrorDialog(
@@ -263,39 +280,18 @@ Future<void> handleIdenfyResponse({
   }
 
   if (verificationStatus.status == VerificationState.VERIFIED) {
-    Globals().identityVerified.value = true;
+    logger.d('Verification status is VERIFIED. Updating global state.');
 
-    try {
-      final data = await getVerificationData(walletSeed);
-      final firstName = utf8.decode(latin1.encode(data.orgFirstName!));
-      final lastName = utf8.decode(latin1.encode(data.orgLastName!));
-      final wallets =
-          (await getPkidWallets()).where((w) => w.name == walletSeed).toList();
-      await saveIdentity('$lastName $firstName', data.docIssuingCountry,
-          data.docDob, data.docSex, data.idenfyRef, wallets.first.seed);
-      Events().emit(IdentityCallbackEvent(type: 'success'));
-    } on BadRequest catch (e) {
-      showWarningDialog(
-          context: context,
-          title: 'Bad Request',
-          description: '$e \nIf this issue persist, please contact support.');
-    } on Unauthorized catch (e) {
-      showWarningDialog(
-          context: context,
-          title: 'Unauthorized',
-          description: '$e \nIf this issue persist, please contact support.');
-    } catch (e) {
-      logger.e(e);
-      showErrorDialog(
-        context: context,
-        title: 'Error',
-        description: 'Failed to process verification details',
-      );
-    }
+    Globals().identityVerified.value = true;
+    Events().emit(IdentityCallbackEvent(type: 'success'));
+
   } else {
+    logger.d('Verification status is not VERIFIED. Marking as failed.');
+
     Globals().identityVerified.value = false;
     Events().emit(IdentityCallbackEvent(type: 'failed'));
   }
+  logger.d('Finished handleIdenfyResponse for walletSeed: $walletSeed');
 }
 
 Future<void> initIdenfySdk(String token,
@@ -313,7 +309,7 @@ Future<void> initIdenfySdk(String token,
               'Something went wrong. Please contact support if this issue persists.');
     }
   }
-  await Future.delayed(const Duration(seconds: 7));
+  await Future.delayed(const Duration(seconds: 13));
   if (idenfySDKresult != null &&
       idenfySDKresult.autoIdentificationStatus !=
           AutoIdentificationStatus.UNVERIFIED) {
@@ -419,7 +415,8 @@ Future<dynamic> showIdentityDetails(BuildContext context, String walletSeed) {
                       ),
                       Text(
                         'No data available for the provided wallet address.',
-                        style: Theme.of(context).textTheme.bodyMedium,
+                        style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                            color: Theme.of(context).colorScheme.onSurface),
                         textAlign: TextAlign.center,
                       ),
                       Row(
