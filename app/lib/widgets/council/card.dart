@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:tfchain_client/models/council.dart';
+import 'package:threebotlogin/widgets/council/vote.dart';
 import 'package:threebotlogin/widgets/dao/show_result_dialog.dart';
 
 class CouncilCard extends StatefulWidget {
@@ -33,19 +34,6 @@ class _CouncilCardState extends State<CouncilCard> {
             Divider(
               thickness: 2,
               color: Theme.of(context).colorScheme.onSecondaryContainer,
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 8),
-              child: Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  'You can vote until:',
-                  style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                      color: Theme.of(context).colorScheme.onSecondaryContainer,
-                      fontWeight: FontWeight.bold),
-                  textAlign: TextAlign.start,
-                ),
-              ),
             ),
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 8),
@@ -91,6 +79,19 @@ class _CouncilCardState extends State<CouncilCard> {
               child: Align(
                 alignment: Alignment.centerLeft,
                 child: Text(
+                  'You can vote until:',
+                  style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                      color: Theme.of(context).colorScheme.onSecondaryContainer,
+                      fontWeight: FontWeight.bold),
+                  textAlign: TextAlign.start,
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8),
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
                   widget.proposal.end.formatDateTime(),
                   style: Theme.of(context).textTheme.bodyMedium!.copyWith(
                       color:
@@ -118,8 +119,7 @@ class _CouncilCardState extends State<CouncilCard> {
                 ),
                 if (widget.proposal.active)
                   ElevatedButton(
-                    // onPressed: _showVoteDialog,
-                    onPressed: () {},
+                    onPressed: _showVoteDialog,
                     child: Text(
                       'Vote',
                       style: Theme.of(context).textTheme.bodyLarge!.copyWith(
@@ -146,11 +146,12 @@ class _CouncilCardState extends State<CouncilCard> {
             ));
   }
 
-  // _showVoteDialog() {
-  //   showDialog(
-  //       context: context,
-  //       builder: (_) => VoteDialog(
-  //             proposalHash: widget.proposal.hash,
-  //           ));
-  // }
+  _showVoteDialog() {
+    showDialog(
+        context: context,
+        builder: (_) => CouncilVoteDialog(
+              proposalHash: widget.proposal.hash,
+              chainUrl: widget.chainUrl,
+            ));
+  }
 }

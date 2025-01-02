@@ -249,6 +249,19 @@ Future<List<CouncilProposal>> getCouncilProposals(String chainUrl) async {
   }
 }
 
+Future<List<String>> getCouncilMembers(String chainUrl) async {
+  final client = TFChain.QueryClient(chainUrl);
+  try {
+    await client.connect();
+    final members = await client.council.members();
+    return members;
+  } catch (e) {
+    throw Exception('Failed to get council members due to $e');
+  } finally {
+    await client.disconnect();
+  }
+}
+
 Future<Votes> councilVote(
     String chainUrl, bool vote, String hash, String seed) async {
   final client = TFChain.Client(chainUrl, seed, 'sr25519');

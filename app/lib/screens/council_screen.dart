@@ -36,14 +36,14 @@ class _CouncilScreenState extends State<CouncilScreen> {
                   style: ElevatedButton.styleFrom(
                       fixedSize: const Size.fromWidth(size)),
                   onPressed: () {
-                    urlController.text = 'wss://tfchain.dev.grid.tf/ws';
+                    urlController.text = 'wss://tfchain.dev.grid.tf';
                   },
                   child: const Text('Devnet')),
               ElevatedButton(
                   style: ElevatedButton.styleFrom(
                       fixedSize: const Size.fromWidth(size)),
                   onPressed: () {
-                    urlController.text = 'wss://tfchain.qa.grid.tf/ws';
+                    urlController.text = 'wss://tfchain.qa.grid.tf';
                   },
                   child: const Text('QAnet')),
             ],
@@ -56,14 +56,14 @@ class _CouncilScreenState extends State<CouncilScreen> {
                   style: ElevatedButton.styleFrom(
                       fixedSize: const Size.fromWidth(size)),
                   onPressed: () {
-                    urlController.text = 'wss://tfchain.test.grid.tf/ws';
+                    urlController.text = 'wss://tfchain.test.grid.tf';
                   },
                   child: const Text('Testnet')),
               ElevatedButton(
                   style: ElevatedButton.styleFrom(
                       fixedSize: const Size.fromWidth(size)),
                   onPressed: () {
-                    urlController.text = 'wss://tfchain.grid.tf/ws';
+                    urlController.text = 'wss://tfchain.grid.tf';
                   },
                   child: const Text('Mainnet')),
             ],
