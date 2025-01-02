@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:tfchain_client/models/dao.dart';
+import 'package:tfchain_client/models/council.dart';
 import 'package:threebotlogin/helpers/logger.dart';
 import 'package:threebotlogin/services/tfchain_service.dart';
 import 'package:threebotlogin/widgets/council/card.dart';
@@ -15,7 +15,7 @@ class CouncilsWidget extends StatefulWidget {
 
 class _CouncilsWidgetState extends State<CouncilsWidget> {
   bool loading = false;
-  List<ProposalInfo> proposals = [];
+  List<CouncilProposal> proposals = [];
 
   Future<void> listProposals() async {
     setState(() {
@@ -23,12 +23,7 @@ class _CouncilsWidgetState extends State<CouncilsWidget> {
       proposals.clear();
     });
     try {
-      final proposalHashes = await getCouncilProposals(widget.chainUrl);
-      final proposalFutures = proposalHashes.map((hash) async {
-        final proposal = await getCouncilProposal(widget.chainUrl, hash);
-        proposals.add(proposal);
-      });
-      await Future.wait(proposalFutures);
+      proposals = await getCouncilProposals(widget.chainUrl);
     } catch (e) {
       logger.e('Failed to get council proposals due to $e');
       if (context.mounted) {
@@ -93,12 +88,12 @@ class _CouncilsWidgetState extends State<CouncilsWidget> {
               itemCount: proposals.length,
               itemBuilder: (context, i) {
                 final proposal = proposals[i];
-                // return CouncilCard();
+                return CouncilCard(proposal: proposal);
               }));
     }
-    return LayoutDrawer(
-      titleText: 'Council',
-      content: mainWidget,
+    return Scaffold(
+      appBar: AppBar(title: const Text('Council')),
+      body: mainWidget,
     );
   }
 }

@@ -4,6 +4,7 @@ import 'dart:convert';
 
 import 'package:tfchain_client/generated/dev/types/pallet_collective/votes.dart';
 import 'package:tfchain_client/generated/dev/types/tfchain_support/types/farm.dart';
+import 'package:tfchain_client/models/council.dart';
 import 'package:threebotlogin/apps/wallet/wallet_config.dart';
 import 'package:threebotlogin/helpers/globals.dart';
 import 'package:threebotlogin/services/shared_preference_service.dart';
@@ -235,25 +236,12 @@ Future<String> getMemo(String address) async {
   return 'twin_$twinId';
 }
 
-Future<List<String>> getCouncilProposals(String chainUrl) async {
+Future<List<CouncilProposal>> getCouncilProposals(String chainUrl) async {
   final client = TFChain.QueryClient(chainUrl);
   try {
     await client.connect();
-    final proposals = await client.council.getProposals();
+    final proposals = await client.council.get();
     return proposals;
-  } catch (e) {
-    throw Exception('Failed to get council proposals due to $e');
-  } finally {
-    await client.disconnect();
-  }
-}
-
-Future<ProposalInfo> getCouncilProposal(String chainUrl, String hash) async {
-  final client = TFChain.QueryClient(chainUrl);
-  try {
-    await client.connect();
-    final proposal = await client.council.getProposal(hash: hash);
-    return proposal!;
   } catch (e) {
     throw Exception('Failed to get council proposals due to $e');
   } finally {
