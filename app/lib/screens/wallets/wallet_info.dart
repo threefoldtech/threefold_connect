@@ -75,7 +75,6 @@ class _WalletDetailsWidgetState extends ConsumerState<WalletDetailsWidget> {
       await walletsRef.editWallet(walletName, newName);
       walletName = newName;
       widget.wallet.name = newName;
-      setState(() {});
     } catch (e) {
       logger.e('Failed to modify wallet due to $e');
       if (context.mounted) {

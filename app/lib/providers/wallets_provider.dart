@@ -44,6 +44,7 @@ class WalletsNotifier extends StateNotifier<List<Wallet>> {
       if (wallet != null) {
         wallet.name = newName;
       }
+      state = [...state];
     });
   }
 

@@ -21,11 +21,6 @@ class _WalletDetailsScreenState extends State<WalletDetailsScreen> {
     });
   }
 
-  // void _onEditWallet(String oldName, String newName) {
-  //   widget.wallet.name = newName;
-  //   setState(() {});
-  // }
-
   @override
   Widget build(BuildContext context) {
     Widget content;
