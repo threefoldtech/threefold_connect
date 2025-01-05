@@ -403,8 +403,6 @@ class _IdentityVerificationScreenState
   }
 
   Widget unVerifiedWidget(step, text, icon) {
-    print("HELLO EMAIL");
-    print(text);
     return GestureDetector(
         onTap: () async {},
         child: Opacity(
