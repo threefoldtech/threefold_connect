@@ -8,16 +8,22 @@ import 'package:threebotlogin/services/stellar_service.dart' as StellarService;
 import 'package:threebotlogin/services/tfchain_service.dart' as TFChainService;
 
 class WalletsNotifier extends StateNotifier<List<Wallet>> {
-  WalletsNotifier() : super([]);
+  WalletsNotifier() : super([]) {
+    list();
+  }
 
   bool _reload = true;
   bool _loading = true;
+  bool _isListed = false;
   final Mutex _mutex = Mutex();
 
+  bool get isListed => _isListed;
   Future<void> list() async {
+    if (_isListed) return;
     _loading = true;
     state = await listWallets();
     _loading = false;
+    _isListed = true;
   }
 
   Future<void> removeWallet(String name) async {
