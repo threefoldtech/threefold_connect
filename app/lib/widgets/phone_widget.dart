@@ -5,7 +5,6 @@ import 'package:flutter_pkid/flutter_pkid.dart';
 import 'package:http/http.dart';
 import 'package:intl_phone_field/countries.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
-import 'package:intl_phone_field/phone_number.dart';
 import 'package:threebotlogin/helpers/globals.dart';
 import 'package:threebotlogin/services/open_kyc_service.dart';
 import 'package:threebotlogin/services/phone_service.dart';
@@ -14,15 +13,18 @@ import 'package:threebotlogin/services/shared_preference_service.dart';
 
 import 'custom_dialog.dart';
 
-Future<void> addPhoneNumberDialog(context, {required bool newPhone}) async {
+Future<void> addPhoneNumberDialog(context,
+    {required bool newPhone, required String oldPhone}) async {
   Response res = await getCountry();
   var countryCode = res.body.replaceAll('\n', '');
 
   await showDialog(
     context: context,
     barrierDismissible: false,
-    builder: (BuildContext context) =>
-        PhoneAlertDialog(defaultCountryCode: countryCode, newPhone: newPhone),
+    builder: (BuildContext context) => PhoneAlertDialog(
+        defaultCountryCode: countryCode,
+        newPhone: newPhone,
+        oldPhone: oldPhone),
   );
 }
 
@@ -49,9 +51,13 @@ phoneSendDialog(context) {
 class PhoneAlertDialog extends StatefulWidget {
   final String defaultCountryCode;
   final bool newPhone;
+  final String oldPhone;
 
   const PhoneAlertDialog(
-      {Key? key, required this.defaultCountryCode, required this.newPhone})
+      {Key? key,
+      required this.defaultCountryCode,
+      required this.newPhone,
+      required this.oldPhone})
       : super(key: key);
 
   @override
@@ -64,7 +70,6 @@ class PhoneAlertDialogState extends State<PhoneAlertDialog> {
   bool valid = false;
   String verificationPhoneNumber = '';
   Country _country = countries.firstWhere((element) => element.code == 'US');
-  String oldPhone = '';
 
   @override
   void initState() {
@@ -72,15 +77,6 @@ class PhoneAlertDialogState extends State<PhoneAlertDialog> {
     verificationPhoneNumber = '';
     _country = countries
         .firstWhere((element) => element.code == widget.defaultCountryCode);
-    if (!widget.newPhone) {
-      getPhone().then((phoneMap) {
-        setState(() {
-          if (phoneMap['phone'] != null) {
-            oldPhone = phoneMap['phone']!;
-          }
-        });
-      });
-    }
     super.initState();
   }
 
@@ -90,7 +86,7 @@ class PhoneAlertDialogState extends State<PhoneAlertDialog> {
         image: Icons.phone,
         title: widget.newPhone ? 'Add phone number' : 'Change phone number',
         widgetDescription: SizedBox(
-          height: widget.newPhone ? 100 : 180,
+          height: widget.newPhone ? 100 : 155,
           child: Column(
             children: [
               if (!widget.newPhone)
@@ -136,21 +132,28 @@ class PhoneAlertDialogState extends State<PhoneAlertDialog> {
                             .bodyMedium!
                             .copyWith(
                                 color: Theme.of(context).colorScheme.onSurface),
-                        onChanged: (phone) {
-                          PhoneNumber p = phone;
-                          setState(() {
-                            if (p.completeNumber == oldPhone) {
+                        validator: (phone) {
+                          if (phone!.completeNumber == widget.oldPhone) {
+                            setState(() {
                               valid = false;
-                            } else if (phone.number.length >=
-                                    _country.minLength &&
-                                phone.number.length <= _country.maxLength) {
+                            });
+                            return 'Please enter a different number';
+                          } else if (phone.number.length >=
+                                  _country.minLength &&
+                              phone.number.length <= _country.maxLength) {
+                            setState(() {
                               valid = true;
-                              verificationPhoneNumber = p.completeNumber;
-                            } else {
+                            });
+                            verificationPhoneNumber = phone.completeNumber;
+                            return null;
+                          } else {
+                            setState(() {
                               valid = false;
-                            }
-                          });
+                            });
+                            return 'Invalid Mobile Number';
+                          }
                         },
+                        disableLengthCheck: true,
                         onCountryChanged: (country) {
                           if (_country != country) {
                             valid = false;
@@ -167,15 +170,19 @@ class PhoneAlertDialogState extends State<PhoneAlertDialog> {
           ),
         ),
         actions: <Widget>[
-          TextButton(
-              child: const Text(
-                'Cancel',
-              ),
-              onPressed: () {
-                Navigator.pop(context);
-              }),
-          if (valid)
-            TextButton(onPressed: verifyButton, child: const Text('Add'))
+          Transform.translate(
+              offset: const Offset(0, -20),
+              child: Row(children: [
+                TextButton(
+                    child: const Text(
+                      'Cancel',
+                    ),
+                    onPressed: () {
+                      Navigator.pop(context);
+                    }),
+                if (valid)
+                  TextButton(onPressed: verifyButton, child: const Text('Add'))
+              ]))
         ]);
   }
 

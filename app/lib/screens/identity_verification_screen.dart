@@ -922,7 +922,7 @@ class _IdentityVerificationScreenState
             if (Globals().hidePhoneButton.value == true) {
               return;
             }
-            await addPhoneNumberDialog(context, newPhone: false);
+            await addPhoneNumberDialog(context, newPhone: false, oldPhone: phone);
 
             var phoneMap = (await getPhone());
             if (phoneMap.isEmpty || !phoneMap.containsKey('phone')) {
@@ -1076,7 +1076,7 @@ class _IdentityVerificationScreenState
           return _changeEmailDialog(false);
         }
         if (step == 2) {
-          await addPhoneNumberDialog(context, newPhone: false);
+          await addPhoneNumberDialog(context, newPhone: false, oldPhone: phone);
           var phoneMap = (await getPhone());
           String? phoneNumber = phoneMap['phone'];
           if (phone != phoneNumber) {
@@ -1810,7 +1810,7 @@ class _IdentityVerificationScreenState
     }
 
     if (phone.isEmpty) {
-      await addPhoneNumberDialog(context, newPhone: true);
+      await addPhoneNumberDialog(context, newPhone: true, oldPhone: phone);
 
       var phoneMap = (await getPhone());
       if (phoneMap.isEmpty || !phoneMap.containsKey('phone')) {
