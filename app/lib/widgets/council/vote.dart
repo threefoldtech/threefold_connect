@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:threebotlogin/helpers/logger.dart';
 import 'package:threebotlogin/models/wallet.dart';
 import 'package:threebotlogin/providers/wallets_provider.dart';
 import 'package:threebotlogin/services/tfchain_service.dart';
@@ -232,18 +233,13 @@ class _CouncilVoteDialogState extends ConsumerState<CouncilVoteDialog> {
       return;
     }
     try {
-      print("--------------------------------------------");
-      print(widget.chainUrl);
-      print(approve);
-      print(widget.proposalHash);
-      print(seed);
       await councilVote(widget.chainUrl, approve, widget.proposalHash, seed);
 
       _showDialog('Voted!', 'You have voted successfully.', Icons.check,
           DialogType.Info);
     } catch (e) {
       _showDialog('Error', 'Failed to Vote.', Icons.error, DialogType.Error);
-      print(e);
+      logger.e(e);
     } finally {
       setState(() {
         yesLoading = false;

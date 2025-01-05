@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:threebotlogin/widgets/council/councils.dart';
 import 'package:threebotlogin/widgets/layout_drawer.dart';
+import 'package:validators/validators.dart';
 
 class CouncilScreen extends StatefulWidget {
   const CouncilScreen({super.key});
@@ -11,6 +12,7 @@ class CouncilScreen extends StatefulWidget {
 
 class _CouncilScreenState extends State<CouncilScreen> {
   final urlController = TextEditingController();
+  String? errorMessage;
 
   @override
   Widget build(BuildContext context) {
@@ -25,8 +27,31 @@ class _CouncilScreenState extends State<CouncilScreen> {
                     color: Theme.of(context).colorScheme.onSurface,
                   ),
               controller: urlController,
-              decoration: const InputDecoration(
+              onChanged: (value) {
+                final v = value.trim();
+                if (v.isEmpty) {
+                  errorMessage = 'URL is required';
+                  setState(() {});
+                  return;
+                }
+                if (!v.startsWith('wss://') && !v.startsWith('ws://')) {
+                  errorMessage = 'Not a valid websocket URL';
+                  setState(() {});
+                  return;
+                }
+                if (!isFQDN(v.replaceFirst('wss://', '')) &&
+                    !isFQDN(v.replaceFirst('ws://', ''))) {
+                  errorMessage = 'Not a valid websocket URL';
+                  setState(() {});
+                  return;
+                }
+                errorMessage = null;
+                setState(() {});
+                return;
+              },
+              decoration: InputDecoration(
                 labelText: 'TFChain URL',
+                errorText: errorMessage,
               )),
           const SizedBox(height: 50),
           Row(
@@ -37,6 +62,8 @@ class _CouncilScreenState extends State<CouncilScreen> {
                       fixedSize: const Size.fromWidth(size)),
                   onPressed: () {
                     urlController.text = 'wss://tfchain.dev.grid.tf';
+                    errorMessage = null;
+                    setState(() {});
                   },
                   child: const Text('Devnet')),
               ElevatedButton(
@@ -44,6 +71,8 @@ class _CouncilScreenState extends State<CouncilScreen> {
                       fixedSize: const Size.fromWidth(size)),
                   onPressed: () {
                     urlController.text = 'wss://tfchain.qa.grid.tf';
+                    errorMessage = null;
+                    setState(() {});
                   },
                   child: const Text('QAnet')),
             ],
@@ -57,6 +86,8 @@ class _CouncilScreenState extends State<CouncilScreen> {
                       fixedSize: const Size.fromWidth(size)),
                   onPressed: () {
                     urlController.text = 'wss://tfchain.test.grid.tf';
+                    errorMessage = null;
+                    setState(() {});
                   },
                   child: const Text('Testnet')),
               ElevatedButton(
@@ -64,6 +95,8 @@ class _CouncilScreenState extends State<CouncilScreen> {
                       fixedSize: const Size.fromWidth(size)),
                   onPressed: () {
                     urlController.text = 'wss://tfchain.grid.tf';
+                    errorMessage = null;
+                    setState(() {});
                   },
                   child: const Text('Mainnet')),
             ],
@@ -71,16 +104,24 @@ class _CouncilScreenState extends State<CouncilScreen> {
           const SizedBox(height: 50),
           ElevatedButton(
               onPressed: () {
-                Navigator.of(context).push(MaterialPageRoute(
-                  builder: (context) =>
-                      CouncilsWidget(chainUrl: urlController.text),
-                ));
+                if (errorMessage == null) {
+                  Navigator.of(context).push(MaterialPageRoute(
+                    builder: (context) =>
+                        CouncilsWidget(chainUrl: urlController.text),
+                  ));
+                }
               },
+              style: ElevatedButton.styleFrom(
+                  backgroundColor: errorMessage == null
+                      ? Theme.of(context).colorScheme.primaryContainer
+                      : Theme.of(context).colorScheme.surfaceContainerHighest),
               child: SizedBox(
                   width: double.infinity,
                   child: Text(
                     style: Theme.of(context).textTheme.titleLarge!.copyWith(
-                        color: Theme.of(context).colorScheme.primary,
+                        color: errorMessage == null
+                            ? Theme.of(context).colorScheme.primary
+                            : Colors.grey,
                         fontWeight: FontWeight.bold),
                     'Connect',
                     textAlign: TextAlign.center,
