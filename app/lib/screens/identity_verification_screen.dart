@@ -521,6 +521,17 @@ class _IdentityVerificationScreenState
                             child: Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: <Widget>[
+                                  Row(
+                                    children: <Widget>[
+                                      Expanded(
+                                        child: Text(
+                                              (text.isEmpty
+                                                  ? 'Unknown'
+                                                  : text),
+                                        ),
+                                      )
+                                    ],
+                                  ),
                                   step == 2 &&
                                           Globals().hidePhoneButton.value ==
                                               true
