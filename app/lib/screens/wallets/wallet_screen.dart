@@ -139,7 +139,6 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
         constraints: const BoxConstraints(maxWidth: double.infinity),
         context: context,
         builder: (ctx) => NewWallet(
-              onAddWallet: _addWallet,
               wallets: wallets,
             ));
   }
@@ -154,11 +153,6 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
         type: WalletType.NATIVE);
     await addWallet(walletName, walletSecret, type: WalletType.NATIVE);
     wallets.add(wallet);
-  }
-
-  void _addWallet(Wallet wallet) {
-    wallets.add(wallet);
-    setState(() {});
   }
 
   Future<void> handleRefresh() async {

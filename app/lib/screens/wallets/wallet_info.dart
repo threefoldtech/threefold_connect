@@ -1,22 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:threebotlogin/helpers/logger.dart';
 import 'package:threebotlogin/models/wallet.dart';
 import 'package:threebotlogin/providers/wallets_provider.dart';
 import 'package:threebotlogin/services/wallet_service.dart';
 import 'package:threebotlogin/widgets/wallets/warning_dialog.dart';
 
-class WalletDetailsWidget extends StatefulWidget {
-  const WalletDetailsWidget(
-      {super.key, required this.wallet, required this.onEditWallet});
+class WalletDetailsWidget extends ConsumerStatefulWidget {
+  const WalletDetailsWidget({super.key, required this.wallet});
   final Wallet wallet;
-  final void Function(String oldName, String newName) onEditWallet;
 
   @override
-  State<WalletDetailsWidget> createState() => _WalletDetailsWidgetState();
+  ConsumerState<WalletDetailsWidget> createState() =>
+      _WalletDetailsWidgetState();
 }
 
-class _WalletDetailsWidgetState extends State<WalletDetailsWidget> {
+class _WalletDetailsWidgetState extends ConsumerState<WalletDetailsWidget> {
   final stellarSecretController = TextEditingController();
   final stellarAddressController = TextEditingController();
   final tfchainSecretController = TextEditingController();
@@ -27,11 +27,18 @@ class _WalletDetailsWidgetState extends State<WalletDetailsWidget> {
   bool showTfchainSecret = false;
   bool showStellarSecret = false;
   bool edit = false;
-  WalletsNotifier walletsNotifier = WalletsNotifier();
+  late WalletsNotifier walletsRef;
+
+  @override
+  void initState() {
+    super.initState();
+    walletsRef = ref.read(walletsNotifier.notifier);
+  }
 
   Future<bool> _deleteWallet() async {
     try {
-      await walletsNotifier.removeWallet(walletNameController.text);
+      await deleteWallet(walletNameController.text);
+      await walletsRef.removeWallet(walletNameController.text);
       return true;
     } catch (e) {
       logger.e('Failed to delete wallet due to $e');
@@ -65,9 +72,10 @@ class _WalletDetailsWidgetState extends State<WalletDetailsWidget> {
     }
     try {
       await editWallet(walletName, newName);
-      widget.onEditWallet(walletName, newName);
+      await walletsRef.editWallet(walletName, newName);
       walletName = newName;
       widget.wallet.name = newName;
+      setState(() {});
     } catch (e) {
       logger.e('Failed to modify wallet due to $e');
       if (context.mounted) {

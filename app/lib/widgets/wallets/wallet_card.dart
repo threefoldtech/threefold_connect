@@ -61,7 +61,7 @@ class _WalletCardWidgetState extends ConsumerState<WalletCardWidget> {
   @override
   Widget build(BuildContext context) {
     List<Widget> cardContent = [];
-    wallets = ref.read(walletsNotifier);
+    wallets = ref.watch(walletsNotifier);
     if (widget.wallet.type == WalletType.NATIVE &&
         widget.wallet.stellarBalance == '-1') {
       cardContent = [

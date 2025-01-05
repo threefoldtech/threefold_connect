@@ -21,10 +21,10 @@ class _WalletDetailsScreenState extends State<WalletDetailsScreen> {
     });
   }
 
-  void _onEditWallet(String oldName, String newName) {
-    widget.wallet.name = newName;
-    setState(() {});
-  }
+  // void _onEditWallet(String oldName, String newName) {
+  //   widget.wallet.name = newName;
+  //   setState(() {});
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -34,8 +34,7 @@ class _WalletDetailsScreenState extends State<WalletDetailsScreen> {
         wallet: widget.wallet,
       );
     } else if (currentScreenIndex == 2) {
-      content = WalletDetailsWidget(
-          wallet: widget.wallet, onEditWallet: _onEditWallet);
+      content = WalletDetailsWidget(wallet: widget.wallet);
     } else {
       content = WalletAssetsWidget(
         wallet: widget.wallet,
