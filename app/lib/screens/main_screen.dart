@@ -65,10 +65,12 @@ class _AppState extends State<MainScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            const Hero(
-              tag: 'logo',
-              child: HomeLogoWidget(
-                animate: true,
+            const Expanded(
+              child: Hero(
+                tag: 'logo',
+                child: HomeLogoWidget(
+                  animate: true,
+                ),
               ),
             ),
             const SizedBox(height: 50),

@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:core';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_pkid/flutter_pkid.dart';
@@ -10,6 +11,7 @@ import 'package:threebotlogin/helpers/kyc_helpers.dart';
 import 'package:threebotlogin/helpers/logger.dart';
 import 'package:threebotlogin/main.dart';
 import 'package:threebotlogin/screens/authentication_screen.dart';
+import 'package:threebotlogin/screens/wizard/web_view.dart';
 import 'package:threebotlogin/services/gridproxy_service.dart';
 import 'package:threebotlogin/services/identity_service.dart';
 import 'package:threebotlogin/services/open_kyc_service.dart';
@@ -206,50 +208,52 @@ class _IdentityVerificationScreenState
             if (isLoading) {
               return pleaseWait(context);
             }
-
-            return Column(
-              mainAxisSize: MainAxisSize.max,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(0, 24, 15, 24),
-                  child: Column(
-                    children: [
-                      AnimatedBuilder(
-                          animation: Listenable.merge([
-                            Globals().emailVerified,
-                            Globals().phoneVerified,
-                          ]),
-                          builder: (BuildContext context, _) {
-                            return Column(
-                              children: [
-                                ListTile(
-                                  leading: const Icon(Icons.person),
-                                  title: Text(
-                                    doubleName.isNotEmpty
-                                        ? doubleName.substring(
-                                            0, doubleName.length - 5)
-                                        : 'Unknown',
-                                  ),
-                                ),
-                                customDivider(context: context),
-                                FutureBuilder(
-                                  future: getPhrase(),
-                                  builder: (context, snapshot) {
-                                    if (snapshot.hasData) {
-                                      return ListTile(
-                                        trailing: const Icon(Icons.visibility),
-                                        leading: const Icon(Icons.vpn_key),
-                                        title: const Text('Show phrase'),
-                                        onTap: () async {
-                                          _showPhrase();
-                                        },
-                                      );
-                                    } else {
-                                      return Container();
-                                    }
-                                  },
-                                ),
-                                customDivider(context: context),
+            return Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 4.0),
+              child: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    const SizedBox(height: 20),
+                    AnimatedBuilder(
+                      animation: Listenable.merge([
+                        Globals().emailVerified,
+                        Globals().phoneVerified,
+                        Globals().identityVerified
+                      ]),
+                      builder: (BuildContext context, _) {
+                        return Column(
+                          children: [
+                            ListTile(
+                              leading: const Icon(Icons.person),
+                              title: Text(
+                                doubleName.isNotEmpty
+                                    ? doubleName.substring(
+                                        0, doubleName.length - 5)
+                                    : 'Unknown',
+                              ),
+                            ),
+                            customDivider(context: context),
+                            FutureBuilder(
+                              future: getPhrase(),
+                              builder: (context, snapshot) {
+                                if (snapshot.hasData) {
+                                  return Padding(
+                                    padding: const EdgeInsets.only(right: 2.0),
+                                    child: ListTile(
+                                      trailing: const Icon(Icons.visibility),
+                                      leading: const Icon(Icons.vpn_key),
+                                      title: const Text('Show phrase'),
+                                      onTap: () async {
+                                        _showPhrase();
+                                      },
+                                    ),
+                                  );
+                                } else {
+                                  return Container();
+                                }
+                              },
+                            ),
+                            customDivider(context: context),
 
                                 // Step one: verify email
                                 _fillCard(
@@ -277,7 +281,7 @@ class _IdentityVerificationScreenState
                                   title: Text(
                                     'KYC Verification has been moved to wallet page.'
                                   ),
-                                ),
+                                ),                                
 
                               ],
                             );
@@ -285,7 +289,7 @@ class _IdentityVerificationScreenState
                     ],
                   ),
                 )
-              ],
+              
             );
           }
           return pleaseWait(context);
@@ -293,7 +297,7 @@ class _IdentityVerificationScreenState
       ),
     );
   }
-
+   
   Future copySeedPhrase() async {
     Clipboard.setData(ClipboardData(text: (await getPhrase()).toString()));
 
@@ -404,57 +408,62 @@ class _IdentityVerificationScreenState
 
   Widget unVerifiedWidget(step, text, icon) {
     return GestureDetector(
-        onTap: () async {},
-        child: Opacity(
-          opacity: 0.5,
-          child: Column(
-            children: [
-              Padding(
-                  padding: const EdgeInsets.only(bottom: 10.0),
-                  child: ListTile(
-                    leading: Icon(icon),
-                    title: Flexible(
-                        child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: <Widget>[
-                          Row(
-                            children: <Widget>[
-                              Expanded(
-                                child: Text(text == '' ? 'Unknown' : text,
-                                    overflow: TextOverflow.clip,
-                                    style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .onSurface)),
-                              )
-                            ],
+      onTap: () async {},
+      child: Opacity(
+        opacity: 0.5,
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.only(bottom: 10.0),
+              child: ListTile(
+                leading: Icon(icon),
+                title: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Row(
+                      children: <Widget>[
+                        Expanded(
+                          child: Text(
+                            text == '' ? 'Unknown' : text,
+                            overflow: TextOverflow.clip,
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Theme.of(context).colorScheme.onSurface,
+                            ),
                           ),
-                          const SizedBox(
-                            height: 5,
+                        )
+                      ],
+                    ),
+                    const SizedBox(
+                      height: 5,
+                    ),
+                    Row(
+                      children: <Widget>[
+                        Icon(
+                          Icons.close,
+                          color: Theme.of(context).colorScheme.error,
+                          size: 18.0,
+                        ),
+                        const SizedBox(width: 5),
+                        Text(
+                          'Not verified',
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.error,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 12,
                           ),
-                          Row(
-                            children: <Widget>[
-                              Icon(
-                                Icons.close,
-                                color: Theme.of(context).colorScheme.error,
-                                size: 18.0,
-                              ),
-                              const Padding(padding: EdgeInsets.only(left: 5)),
-                              Text(
-                                'Not verified',
-                                style: TextStyle(
-                                    color: Theme.of(context).colorScheme.error,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 12),
-                              )
-                            ],
-                          ),
-                        ])),
-                  ))
-            ],
-          ),
-        ));
+                        )
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   Widget currentPhaseWidget(step, text, icon) {
