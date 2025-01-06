@@ -9,9 +9,11 @@ class WalletDetailsWidget extends StatefulWidget {
   const WalletDetailsWidget(
       {super.key,
       required this.wallet,
+      required this.wallets,
       required this.onDeleteWallet,
       required this.onEditWallet});
   final Wallet wallet;
+  final List<Wallet> wallets;
   final void Function(String name) onDeleteWallet;
   final void Function(String oldName, String newName) onEditWallet;
 
@@ -65,6 +67,22 @@ class _WalletDetailsWidgetState extends State<WalletDetailsWidget> {
       FocusScope.of(context).requestFocus(nameFocus);
       setState(() {});
       return;
+    }
+    final w = widget.wallets.where((element) => element.name == walletName);
+    if (w.isNotEmpty) {
+      final editingWalletFailure = SnackBar(
+        content: Text(
+          'Name exists',
+          style: Theme.of(context)
+              .textTheme
+              .bodyMedium!
+              .copyWith(color: Theme.of(context).colorScheme.errorContainer),
+        ),
+        duration: const Duration(seconds: 3),
+      );
+      ScaffoldMessenger.of(context).clearSnackBars();
+      ScaffoldMessenger.of(context).showSnackBar(editingWalletFailure);
+      return false;
     }
     try {
       await editWallet(walletName, newName);
@@ -243,9 +261,26 @@ class _WalletDetailsWidgetState extends State<WalletDetailsWidget> {
                   decoration: const InputDecoration(
                     labelText: 'Wallet Name',
                   )),
-              trailing: IconButton(
-                  onPressed: _editWallet,
-                  icon: edit ? const Icon(Icons.save) : const Icon(Icons.edit)),
+              trailing: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  if (edit)
+                    IconButton(
+                      onPressed: _editWallet,
+                      icon: const Icon(Icons.save),
+                    ),
+                  if (edit)
+                    IconButton(
+                      onPressed: _cancelEdit,
+                      icon: const Icon(Icons.cancel),
+                    ),
+                  if (!edit)
+                    IconButton(
+                      onPressed: _editWallet,
+                      icon: const Icon(Icons.edit),
+                    ),
+                ],
+              ),
             ),
             const SizedBox(height: 40),
             if (widget.wallet.type == WalletType.IMPORTED)
@@ -283,5 +318,12 @@ class _WalletDetailsWidgetState extends State<WalletDetailsWidget> {
         onAgree: _deleteWallet,
       ),
     );
+  }
+
+  void _cancelEdit() {
+    setState(() {
+      edit = false;
+      walletNameController.text = widget.wallet.name;
+    });
   }
 }

@@ -45,6 +45,7 @@ class _WalletDetailsScreenState extends State<WalletDetailsScreen> {
     } else if (currentScreenIndex == 2) {
       content = WalletDetailsWidget(
         wallet: widget.wallet,
+        wallets: widget.allWallets,
         onDeleteWallet: widget.onDeleteWallet,
         onEditWallet: _onEditWallet,
       );
