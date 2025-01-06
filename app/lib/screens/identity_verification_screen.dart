@@ -240,116 +240,126 @@ class _IdentityVerificationScreenState
             if (isLoading) {
               return _pleaseWait();
             }
-            return Column(
-              children: [
-                AnimatedBuilder(
-                    animation: Listenable.merge([
-                      Globals().emailVerified,
-                      Globals().phoneVerified,
-                      Globals().identityVerified
-                    ]),
-                    builder: (BuildContext context, _) {
-                      return Column(
-                        children: [
-                          ListTile(
-                            leading: const Icon(Icons.person),
-                            title: Text(
-                              doubleName.isNotEmpty
-                                  ? doubleName.substring(
-                                      0, doubleName.length - 5)
-                                  : 'Unknown',
+            return Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 4.0),
+              child: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    const SizedBox(height: 20),
+                    AnimatedBuilder(
+                      animation: Listenable.merge([
+                        Globals().emailVerified,
+                        Globals().phoneVerified,
+                        Globals().identityVerified
+                      ]),
+                      builder: (BuildContext context, _) {
+                        return Column(
+                          children: [
+                            ListTile(
+                              leading: const Icon(Icons.person),
+                              title: Text(
+                                doubleName.isNotEmpty
+                                    ? doubleName.substring(
+                                        0, doubleName.length - 5)
+                                    : 'Unknown',
+                              ),
                             ),
-                          ),
-                          customDivider(context: context),
-                          FutureBuilder(
-                            future: getPhrase(),
-                            builder: (context, snapshot) {
-                              if (snapshot.hasData) {
-                                return ListTile(
-                                  trailing: const Icon(Icons.visibility),
-                                  leading: const Icon(Icons.vpn_key),
-                                  title: const Text('Show phrase'),
-                                  onTap: () async {
-                                    _showPhrase();
-                                  },
-                                );
-                              } else {
-                                return Container();
-                              }
-                            },
-                          ),
-                          customDivider(context: context),
+                            customDivider(context: context),
+                            FutureBuilder(
+                              future: getPhrase(),
+                              builder: (context, snapshot) {
+                                if (snapshot.hasData) {
+                                  return Padding(
+                                    padding: const EdgeInsets.only(right: 2.0),
+                                    child: ListTile(
+                                      trailing: const Icon(Icons.visibility),
+                                      leading: const Icon(Icons.vpn_key),
+                                      title: const Text('Show phrase'),
+                                      onTap: () async {
+                                        _showPhrase();
+                                      },
+                                    ),
+                                  );
+                                } else {
+                                  return Container();
+                                }
+                              },
+                            ),
+                            customDivider(context: context),
 
-                          // Step one: verify email
-                          _fillCard(
-                              getCorrectState(1, emailVerified, phoneVerified,
-                                  identityVerified),
-                              1,
-                              email,
-                              Icons.email),
-                          customDivider(context: context),
+                            // Step one: verify email
+                            _fillCard(
+                                getCorrectState(1, emailVerified, phoneVerified,
+                                    identityVerified),
+                                1,
+                                email,
+                                Icons.email),
+                            customDivider(context: context),
 
-                          // Step two: verify phone
-                          (Globals().phoneVerification == true ||
-                                  (Globals().spendingLimit > 0 &&
-                                      spending > Globals().spendingLimit))
-                              ? _fillCard(
-                                  getCorrectState(2, emailVerified,
-                                      phoneVerified, identityVerified),
-                                  2,
-                                  phone,
-                                  Icons.phone)
-                              : Container(),
-                          customDivider(context: context),
+                            // Step two: verify phone
+                            (Globals().phoneVerification == true ||
+                                    (Globals().spendingLimit > 0 &&
+                                        spending > Globals().spendingLimit))
+                                ? _fillCard(
+                                    getCorrectState(2, emailVerified,
+                                        phoneVerified, identityVerified),
+                                    2,
+                                    phone,
+                                    Icons.phone)
+                                : Container(),
+                            customDivider(context: context),
 
-                          // Step three: verify identity
-                          (Globals().isOpenKYCEnabled ||
-                                  (Globals().spendingLimit > 0 &&
-                                      spending > Globals().spendingLimit))
-                              ? _fillCard(
-                                  getCorrectState(3, emailVerified,
-                                      phoneVerified, identityVerified),
-                                  3,
-                                  extract3Bot(doubleName),
-                                  Icons.perm_identity)
-                              : Container(),
+                            // Step three: verify identity
+                            (Globals().isOpenKYCEnabled ||
+                                    (Globals().spendingLimit > 0 &&
+                                        spending > Globals().spendingLimit))
+                                ? _fillCard(
+                                    getCorrectState(3, emailVerified,
+                                        phoneVerified, identityVerified),
+                                    3,
+                                    extract3Bot(doubleName),
+                                    Icons.perm_identity)
+                                : Container(),
 
-                          Globals().redoIdentityVerification &&
-                                  identityVerified == true
-                              ? ElevatedButton(
-                                  onPressed: () async {
-                                    await verifyIdentityProcess();
-                                  },
-                                  child:
-                                      const Text('Redo identity verification'))
-                              : Container(),
-                          Globals().debugMode == true
-                              ? ElevatedButton(
-                                  onPressed: () async {
-                                    bool? isEmailVerified =
-                                        await getIsEmailVerified();
-                                    bool? isPhoneVerified =
-                                        await getIsPhoneVerified();
-                                    bool? isIdentityVerified =
-                                        await getIsIdentityVerified();
+                            Globals().redoIdentityVerification &&
+                                    identityVerified == true
+                                ? ElevatedButton(
+                                    onPressed: () async {
+                                      await verifyIdentityProcess();
+                                    },
+                                    child: const Text(
+                                        'Redo identity verification'))
+                                : Container(),
+                            Globals().debugMode == true
+                                ? ElevatedButton(
+                                    onPressed: () async {
+                                      bool? isEmailVerified =
+                                          await getIsEmailVerified();
+                                      bool? isPhoneVerified =
+                                          await getIsPhoneVerified();
+                                      bool? isIdentityVerified =
+                                          await getIsIdentityVerified();
 
-                                    kycLogs = '';
-                                    kycLogs +=
-                                        'Email verified: $isEmailVerified\n';
-                                    kycLogs +=
-                                        'Phone verified: $isPhoneVerified\n';
-                                    kycLogs +=
-                                        'Identity verified: $isIdentityVerified\n';
+                                      kycLogs = '';
+                                      kycLogs +=
+                                          'Email verified: $isEmailVerified\n';
+                                      kycLogs +=
+                                          'Phone verified: $isPhoneVerified\n';
+                                      kycLogs +=
+                                          'Identity verified: $isIdentityVerified\n';
 
-                                    setState(() {});
-                                  },
-                                  child: const Text('KYC Status'))
-                              : Container(),
-                          Text(kycLogs),
-                        ],
-                      );
-                    })
-              ],
+                                      setState(() {});
+                                    },
+                                    child: const Text('KYC Status'))
+                                : Container(),
+                            Text(kycLogs),
+                          ],
+                        );
+                      },
+                    ),
+                  ],
+                ),
+              ),
             );
           }
           return _pleaseWait();
