@@ -532,6 +532,37 @@ class _IdentityVerificationScreenState
                                       )
                                     ],
                                   ),
+                                  if (step == 1)
+                                    ValueListenableBuilder<int>(
+                                      valueListenable: countdownNotifier,
+                                      builder:
+                                          (context, countdownValue, child) {
+                                        if (countdownValue > 0) {
+                                          return Row(
+                                            children: <Widget>[
+                                              Expanded(
+                                                child: Text(
+                                                  'Verification email sent, retry in $countdownValue second${countdownValue == 1 ? '' : 's'}',
+                                                  overflow: TextOverflow.clip,
+                                                  style: Theme.of(context)
+                                                      .textTheme
+                                                      .bodySmall!
+                                                      .copyWith(
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                          color:
+                                                              Theme.of(context)
+                                                                  .colorScheme
+                                                                  .warning),
+                                                ),
+                                              ),
+                                            ],
+                                          );
+                                        } else {
+                                          return Container();
+                                        }
+                                      },
+                                    ),
                                   step == 2 &&
                                           Globals().hidePhoneButton.value ==
                                               true
@@ -563,17 +594,24 @@ class _IdentityVerificationScreenState
                                 ]))),
                     Globals().hidePhoneButton.value == true && step == 2
                         ? Container()
-                        : Padding(
-                            padding: const EdgeInsets.only(left: 15),
-                            child: ElevatedButton(
-                                onPressed: () async {
-                                  switch (step) {
-                                    // Verify email
-                                    case 1:
-                                      {
-                                        verifyEmail();
-                                      }
-                                      break;
+                        : ValueListenableBuilder(
+                            valueListenable: countdownNotifier,
+                            builder: (context, countdownValue, child) {
+                              return Padding(
+                                padding: const EdgeInsets.only(left: 12),
+                                child: ElevatedButton(
+                                    onPressed: countdownValue > 0
+                                        ? null
+                                        : () async {
+                                            switch (step) {
+                                              // Verify email
+                                              case 1:
+                                                {
+                                                  startOrResumeEmailCountdown(
+                                                      startNew: true);
+                                                  verifyEmail();
+                                                }
+                                                break;
 
                                     // Verify phone
                                     case 2:
@@ -586,7 +624,9 @@ class _IdentityVerificationScreenState
                                       break;
                                   }
                                 },
-                                child: const Text('Verify'))),
+                                child: const Text('Verify')));
+                            }
+                        )
                   ],
                 ),
               ))
