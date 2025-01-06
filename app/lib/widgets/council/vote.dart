@@ -224,8 +224,9 @@ class _CouncilVoteDialogState extends ConsumerState<CouncilVoteDialog> {
         .any((voter) => keyring.encodeAddress(voter) == wallet.tfchainAddress);
 
     if ((approve && hasVotedYes) || (!approve && hasVotedNo)) {
-      _showDialog('Voted!', 'You have voted successfully.', Icons.check,
+      await _showDialog('Voted!', 'You have voted successfully.', Icons.check,
           DialogType.Info);
+      Navigator.of(context).pop();
       setState(() {
         yesLoading = false;
         noLoading = false;
@@ -234,9 +235,9 @@ class _CouncilVoteDialogState extends ConsumerState<CouncilVoteDialog> {
     }
     try {
       await councilVote(widget.chainUrl, approve, widget.proposalHash, seed);
-
-      _showDialog('Voted!', 'You have voted successfully.', Icons.check,
+      await _showDialog('Voted!', 'You have voted successfully.', Icons.check,
           DialogType.Info);
+      Navigator.of(context).pop();
     } catch (e) {
       _showDialog('Error', 'Failed to Vote.', Icons.error, DialogType.Error);
       logger.e(e);
@@ -248,7 +249,7 @@ class _CouncilVoteDialogState extends ConsumerState<CouncilVoteDialog> {
     }
   }
 
-  _showDialog(
+  Future<void> _showDialog(
       String title, String description, IconData icon, DialogType type) async {
     if (context.mounted) {
       showDialog(

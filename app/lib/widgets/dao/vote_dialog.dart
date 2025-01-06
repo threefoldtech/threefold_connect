@@ -216,8 +216,9 @@ class _VoteDialogState extends ConsumerState<VoteDialog> {
     final hasVotedNo = votes.nays.any((vote) => vote.farmId == farmId);
 
     if ((approve && hasVotedYes) || (!approve && hasVotedNo)) {
-      _showDialog('Voted!', 'You have voted successfully.', Icons.check,
+      await _showDialog('Voted!', 'You have voted successfully.', Icons.check,
           DialogType.Info);
+      Navigator.of(context).pop();
       setState(() {
         yesLoading = false;
         noLoading = false;
@@ -226,9 +227,9 @@ class _VoteDialogState extends ConsumerState<VoteDialog> {
     }
     try {
       await vote(approve, widget.proposalHash, farmId!, seed!);
-
-      _showDialog('Voted!', 'You have voted successfully.', Icons.check,
+      await _showDialog('Voted!', 'You have voted successfully.', Icons.check,
           DialogType.Info);
+      Navigator.of(context).pop();
     } catch (e) {
       _showDialog('Error', 'Failed to Vote.', Icons.error, DialogType.Error);
     } finally {
@@ -239,7 +240,7 @@ class _VoteDialogState extends ConsumerState<VoteDialog> {
     }
   }
 
-  _showDialog(
+  Future<void> _showDialog(
       String title, String description, IconData icon, DialogType type) async {
     if (context.mounted) {
       showDialog(
