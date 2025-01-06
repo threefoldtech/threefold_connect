@@ -387,7 +387,7 @@ class _IdentityVerificationScreenState
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    // SizedBox(height: MediaQuery.of(context).size.height * 0.01),
+                    SizedBox(height: MediaQuery.of(context).size.height * 0.01),
                     RichText(
                       text: TextSpan(
                         text:
