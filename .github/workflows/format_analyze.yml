@@ -19,6 +19,9 @@ jobs:
         with:
           flutter-version: 'stable'
       
+      - name: Install Dart SDK
+        run: sudo apt-get install -y dart
+
       - run: cd app && dart pub get
       
       - run: dart format app/lib
