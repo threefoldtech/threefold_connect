@@ -7,6 +7,7 @@ import 'package:idenfy_sdk_flutter/models/idenfy_identification_status.dart';
 import 'package:threebotlogin/events/events.dart';
 import 'package:threebotlogin/events/identity_callback_event.dart';
 import 'package:threebotlogin/models/idenfy.dart';
+import 'package:threebotlogin/models/wallet.dart';
 import 'package:threebotlogin/screens/wizard/web_view.dart';
 import 'package:threebotlogin/services/idenfy_service.dart';
 import 'package:threebotlogin/helpers/globals.dart';
@@ -16,7 +17,7 @@ import 'package:threebotlogin/widgets/custom_dialog.dart';
 import 'package:idenfy_sdk_flutter/models/auto_identification_status.dart';
 
 termsAndConditionsDialog(
-    {required BuildContext context, required String walletSeed}) {
+    {required BuildContext context, required Wallet wallet}) {
   bool isAccepted = false;
 
   showDialog(
@@ -172,7 +173,7 @@ termsAndConditionsDialog(
                     ? () async {
                         Navigator.pop(customContext);
                         await verifyIdentityProcess(
-                            context: context, walletSeed: walletSeed);
+                            context: context, wallet: wallet);
                       }
                     : null,
                 child: Text(
@@ -194,11 +195,11 @@ termsAndConditionsDialog(
 
 Future<void> verifyIdentityProcess({
   required BuildContext context,
-  required String walletSeed,
+  required Wallet wallet,
 }) async {
   Token token;
   try {
-    token = await getToken(walletSeed);
+    token = await getToken(wallet.tfchainSecret);
   } on BadRequest catch (e) {
     showWarningDialog(
       context: context,
@@ -223,8 +224,9 @@ Future<void> verifyIdentityProcess({
     );
     return;
   } on NotEnoughBalance catch (_) {
-    final wallets =
-        (await getPkidWallets()).where((w) => w.seed == walletSeed).toList();
+    final wallets = (await getPkidWallets())
+        .where((w) => w.seed == wallet.tfchainSecret)
+        .toList();
     final minimumBalance = Globals().minimumTFChainBalanceForKYC;
     showWarningDialog(
         context: context,
@@ -241,7 +243,8 @@ Future<void> verifyIdentityProcess({
             'Your account is not activated.\nPlease go to wallet section and initialize your wallet.');
     return;
   } on AlreadyVerified catch (_) {
-    return await handleIdenfyResponse(context: context, walletSeed: walletSeed);
+    return await handleIdenfyResponse(
+        context: context, walletAddress: wallet.tfchainAddress);
   } catch (e) {
     logger.e(e);
     showErrorDialog(
@@ -253,48 +256,20 @@ Future<void> verifyIdentityProcess({
     return;
   }
   await initIdenfySdk(token.authToken,
-      context: context, walletSeed: walletSeed);
+      context: context, walletAddress: wallet.tfchainAddress);
 }
 
 Future<void> handleIdenfyResponse({
   required BuildContext context,
-  required String walletSeed,
+  required String walletAddress,
   AutoIdentificationStatus? idenfyState,
 }) async {
   VerificationStatus verificationStatus;
-
-  const timeoutDuration = Duration(minutes: 2);
-  const retryInterval = Duration(seconds: 5);
-  final startTime = DateTime.now();
   try {
-    while (DateTime.now().difference(startTime) < timeoutDuration) {
-      final idenfyServiceUrl = Globals().idenfyServiceUrl;
-      verificationStatus = await getVerificationStatus(
-        address: walletSeed,
-        idenfyServiceUrl: idenfyServiceUrl,
-      );
-
-      if (_areStatesMatching(idenfyState, verificationStatus.status)) {
-        if (verificationStatus.status == VerificationState.VERIFIED) {
-          Events().emit(IdentityCallbackEvent(type: 'success'));
-        } else {
-          Events().emit(IdentityCallbackEvent(type: 'failed'));
-        }
-        return;
-      }
-
-      logger.i(
-          'States do not match yet. Retrying in ${retryInterval.inSeconds} seconds...');
-      await Future.delayed(retryInterval);
-    }
-
-    Events().emit(IdentityCallbackEvent(type: 'failed'));
-    logger.e('Timeout reached. States still do not match.');
-    showErrorDialog(
-      context: context,
-      title: 'Error',
-      description:
-          'Something went wrong. Please contact support if this issue persists.',
+    final idenfyServiceUrl = Globals().idenfyServiceUrl;
+    verificationStatus = await getVerificationStatus(
+      address: walletAddress,
+      idenfyServiceUrl: idenfyServiceUrl,
     );
   } catch (e) {
     Events().emit(IdentityCallbackEvent(type: 'failed'));
@@ -307,10 +282,15 @@ Future<void> handleIdenfyResponse({
     );
     return;
   }
+  if (verificationStatus.status == VerificationState.VERIFIED) {
+    Events().emit(IdentityCallbackEvent(type: 'success'));
+  } else {
+    Events().emit(IdentityCallbackEvent(type: 'failed'));
+  }
 }
 
 Future<void> initIdenfySdk(String token,
-    {required BuildContext context, required String walletSeed}) async {
+    {required BuildContext context, required String walletAddress}) async {
   IdenfyIdentificationResult? idenfySDKresult;
   try {
     idenfySDKresult = await IdenfySdkFlutter.start(token);
@@ -328,7 +308,7 @@ Future<void> initIdenfySdk(String token,
   if (idenfySDKresult != null) {
     await handleIdenfyResponse(
         context: context,
-        walletSeed: walletSeed,
+        walletAddress: walletAddress,
         idenfyState: idenfySDKresult.autoIdentificationStatus);
   }
 }

@@ -283,7 +283,7 @@ class _WalletDetailsWidgetState extends State<WalletDetailsWidget> {
                     if (widget.wallet.verificationStatus != 'VERIFIED') {
                       await termsAndConditionsDialog(
                         context: context,
-                        walletSeed: widget.wallet.tfchainSecret
+                        wallet: widget.wallet
                       );
                       setState(() {}); 
                     } else {
