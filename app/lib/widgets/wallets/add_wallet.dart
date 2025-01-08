@@ -138,6 +138,11 @@ class _NewWalletState extends State<NewWallet> {
       return false;
     }
 
+    if (walletSecret.startsWith('S') && widget.wallets.any((wallet) => wallet.stellarSecret == walletSecret)){
+      secretError = 'Secret already exists';
+      return false;
+    }
+
     if (isValidStellarSecret(walletSecret)) {
       return true;
     }
