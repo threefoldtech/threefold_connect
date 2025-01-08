@@ -2,11 +2,20 @@ import 'package:flutter/material.dart';
 import 'package:threebotlogin/services/tfchain_service.dart';
 import 'package:threebotlogin/widgets/custom_dialog.dart';
 
+enum ProposalType {
+  DAO,
+  Council,
+}
+
 class ShowResultDialog extends StatefulWidget {
   final String proposalHash;
+  final ProposalType type;
+  final chainUrl;
   const ShowResultDialog({
-    required this.proposalHash,
     super.key,
+    required this.proposalHash,
+    this.type = ProposalType.DAO,
+    this.chainUrl = '',
   });
 
   @override
@@ -29,7 +38,13 @@ class _ShowResultDialogState extends State<ShowResultDialog>
     setState(() {
       loading = true;
     });
-    final votes = await getProposalVotes(widget.proposalHash);
+    late dynamic votes;
+    if (widget.type == ProposalType.DAO) {
+      votes = await getProposalVotes(widget.proposalHash);
+    } else {
+      votes =
+          await getCouncilProposalVotes(widget.chainUrl, widget.proposalHash);
+    }
     totalVotes = votes.ayes.length + votes.nays.length;
     noVotes = votes.nays.length;
     yesVotes = votes.ayes.length;
