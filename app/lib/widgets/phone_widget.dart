@@ -85,104 +85,84 @@ class PhoneAlertDialogState extends State<PhoneAlertDialog> {
     return CustomDialog(
         image: Icons.phone,
         title: widget.newPhone ? 'Add phone number' : 'Change phone number',
-        widgetDescription: SizedBox(
-          height: widget.newPhone ? 100 : 155,
-          child: Column(
-            children: [
-              if (!widget.newPhone)
-                Row(
-                  children: <Widget>[
-                    Expanded(
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
-                        child: Text(
-                          'Changing your phone will require re-verification',
-                          style: Theme.of(context)
-                              .textTheme
-                              .bodyLarge!
-                              .copyWith(
-                                  color:
-                                      Theme.of(context).colorScheme.onSurface),
-                        ),
-                      ),
-                    ),
-                  ],
+        widgetDescription: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (!widget.newPhone)
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Text(
+                  'Changing your phone will require re-verification',
+                  style: Theme.of(context)
+                      .textTheme
+                      .bodyLarge!
+                      .copyWith(color: Theme.of(context).colorScheme.onSurface),
                 ),
-              if (!widget.newPhone)
-                const SizedBox(
-                  height: 30,
-                ),
-              Row(
-                children: <Widget>[
-                  Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      child: IntlPhoneField(
-                        initialCountryCode: widget.defaultCountryCode,
-                        decoration: const InputDecoration(
-                          labelText: 'Phone Number',
-                          border: OutlineInputBorder(
-                            borderSide: BorderSide(),
-                          ),
-                        ),
-                        style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                            color: Theme.of(context).colorScheme.onSurface),
-                        dropdownTextStyle: Theme.of(context)
-                            .textTheme
-                            .bodyMedium!
-                            .copyWith(
-                                color: Theme.of(context).colorScheme.onSurface),
-                        validator: (phone) {
-                          if (phone!.completeNumber == widget.oldPhone) {
-                            setState(() {
-                              valid = false;
-                            });
-                            return 'Please enter a different number';
-                          } else if (phone.number.length >=
-                                  _country.minLength &&
-                              phone.number.length <= _country.maxLength) {
-                            setState(() {
-                              valid = true;
-                            });
-                            verificationPhoneNumber = phone.completeNumber;
-                            return null;
-                          } else {
-                            setState(() {
-                              valid = false;
-                            });
-                            return 'Invalid Mobile Number';
-                          }
-                        },
-                        disableLengthCheck: true,
-                        onCountryChanged: (country) {
-                          if (_country != country) {
-                            valid = false;
-                          }
-                          _country = country;
-                          setState(() {});
-                        },
-                      ),
-                    ),
-                  ),
-                ],
               ),
-            ],
-          ),
+            if (!widget.newPhone)
+              const SizedBox(
+                height: 30,
+              ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: IntlPhoneField(
+                initialCountryCode: widget.defaultCountryCode,
+                decoration: const InputDecoration(
+                  labelText: 'Phone Number',
+                  border: OutlineInputBorder(
+                    borderSide: BorderSide(),
+                  ),
+                ),
+                style: Theme.of(context)
+                    .textTheme
+                    .bodyMedium!
+                    .copyWith(color: Theme.of(context).colorScheme.onSurface),
+                dropdownTextStyle: Theme.of(context)
+                    .textTheme
+                    .bodyMedium!
+                    .copyWith(color: Theme.of(context).colorScheme.onSurface),
+                validator: (phone) {
+                  if (phone!.completeNumber == widget.oldPhone) {
+                    setState(() {
+                      valid = false;
+                    });
+                    return 'Please enter a different number';
+                  } else if (phone.number.length >= _country.minLength &&
+                      phone.number.length <= _country.maxLength) {
+                    setState(() {
+                      valid = true;
+                    });
+                    verificationPhoneNumber = phone.completeNumber;
+                    return null;
+                  } else {
+                    setState(() {
+                      valid = false;
+                    });
+                    return 'Invalid Mobile Number';
+                  }
+                },
+                disableLengthCheck: true,
+                onCountryChanged: (country) {
+                  if (_country != country) {
+                    valid = false;
+                  }
+                  _country = country;
+                  setState(() {});
+                },
+              ),
+            ),
+          ],
         ),
         actions: <Widget>[
-          Transform.translate(
-              offset: const Offset(0, -20),
-              child: Row(children: [
-                TextButton(
-                    child: const Text(
-                      'Cancel',
-                    ),
-                    onPressed: () {
-                      Navigator.pop(context);
-                    }),
-                if (valid)
-                  TextButton(onPressed: verifyButton, child: const Text('Add'))
-              ]))
+          TextButton(
+              child: const Text(
+                'Cancel',
+              ),
+              onPressed: () {
+                Navigator.pop(context);
+              }),
+          if (valid)
+            TextButton(onPressed: verifyButton, child: const Text('Add'))
         ]);
   }
 

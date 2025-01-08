@@ -922,7 +922,8 @@ class _IdentityVerificationScreenState
             if (Globals().hidePhoneButton.value == true) {
               return;
             }
-            await addPhoneNumberDialog(context, newPhone: false, oldPhone: phone);
+            await addPhoneNumberDialog(context,
+                newPhone: false, oldPhone: phone);
 
             var phoneMap = (await getPhone());
             if (phoneMap.isEmpty || !phoneMap.containsKey('phone')) {
@@ -1111,25 +1112,26 @@ class _IdentityVerificationScreenState
 
   Widget verifiedWidget(step, text, icon) {
     return GestureDetector(
-      onTap: () async {
-        if (step == 1) {
-          return _changeEmailDialog(false);
-        }
-        if (step == 2) {
-          await addPhoneNumberDialog(context, newPhone: false, oldPhone: phone);
-          var phoneMap = (await getPhone());
-          String? phoneNumber = phoneMap['phone'];
-          if (phone != phoneNumber) {
-            setState(() {
-              phone = phoneNumber!;
-            });
+        onTap: () async {
+          if (step == 1) {
+            return _changeEmailDialog(false);
           }
-          return;
-        }
-        // Only make this section clickable if it is Identity Verification + Current Phase
-        if (step != 3) {
-          return;
-        }
+          if (step == 2) {
+            await addPhoneNumberDialog(context,
+                newPhone: false, oldPhone: phone);
+            var phoneMap = (await getPhone());
+            String? phoneNumber = phoneMap['phone'];
+            if (phone != phoneNumber) {
+              setState(() {
+                phone = phoneNumber!;
+              });
+            }
+            return;
+          }
+          // Only make this section clickable if it is Identity Verification + Current Phase
+          if (step != 3) {
+            return;
+          }
 
           return showIdentityDetails();
         },
@@ -1204,7 +1206,7 @@ class _IdentityVerificationScreenState
                                       ),
                                     ),
                                   ])
-                            : const Column(),    
+                            : const Column(),
                         step == 3
                             ? const Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
