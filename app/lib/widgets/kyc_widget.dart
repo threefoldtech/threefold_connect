@@ -12,7 +12,6 @@ import 'package:threebotlogin/services/idenfy_service.dart';
 import 'package:threebotlogin/helpers/globals.dart';
 import 'package:threebotlogin/helpers/logger.dart';
 import 'package:threebotlogin/services/wallet_service.dart';
-import 'package:threebotlogin/services/shared_preference_service.dart';
 import 'package:threebotlogin/widgets/custom_dialog.dart';
 import 'package:idenfy_sdk_flutter/models/auto_identification_status.dart';
 
@@ -263,11 +262,9 @@ Future<void> handleIdenfyResponse({
 }) async {
   VerificationStatus verificationStatus;
   try {
-    logger.d('Fetching verification status from iDenfy service...');
     final idenfyServiceUrl = Globals().idenfyServiceUrl;
     verificationStatus = await getVerificationStatus(
         address: walletSeed, idenfyServiceUrl: idenfyServiceUrl);
-    logger.d('Fetched verification status: ${verificationStatus.status}');
   } catch (e) {
     logger.e(e);
     showErrorDialog(
@@ -280,18 +277,12 @@ Future<void> handleIdenfyResponse({
   }
 
   if (verificationStatus.status == VerificationState.VERIFIED) {
-    logger.d('Verification status is VERIFIED. Updating global state.');
-
     Globals().identityVerified.value = true;
     Events().emit(IdentityCallbackEvent(type: 'success'));
-
   } else {
-    logger.d('Verification status is not VERIFIED. Marking as failed.');
-
     Globals().identityVerified.value = false;
     Events().emit(IdentityCallbackEvent(type: 'failed'));
   }
-  logger.d('Finished handleIdenfyResponse for walletSeed: $walletSeed');
 }
 
 Future<void> initIdenfySdk(String token,
