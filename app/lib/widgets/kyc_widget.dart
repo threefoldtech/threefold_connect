@@ -262,33 +262,46 @@ Future<void> handleIdenfyResponse({
   AutoIdentificationStatus? idenfyState,
 }) async {
   VerificationStatus verificationStatus;
+
+  const timeoutDuration = Duration(minutes: 2);
+  const retryInterval = Duration(seconds: 5);
+  final startTime = DateTime.now();
   try {
-    final idenfyServiceUrl = Globals().idenfyServiceUrl;
-    verificationStatus = await getVerificationStatus(
-        address: walletSeed, idenfyServiceUrl: idenfyServiceUrl);
-    bool statesMatch =
-        _areStatesMatching(idenfyState, verificationStatus.status);
-
-    if (!statesMatch) {
-      logger.i('States do not match. Retrying after 5 seconds...');
-      await Future.delayed(const Duration(seconds: 5));
-
+    while (DateTime.now().difference(startTime) < timeoutDuration) {
+      final idenfyServiceUrl = Globals().idenfyServiceUrl;
       verificationStatus = await getVerificationStatus(
-          address: walletSeed, idenfyServiceUrl: idenfyServiceUrl);
+        address: walletSeed,
+        idenfyServiceUrl: idenfyServiceUrl,
+      );
 
-      statesMatch = _areStatesMatching(idenfyState, verificationStatus.status);
-
-      if (!statesMatch) {
-        showErrorDialog(
-          context: context,
-          title: 'Error',
-          description:
-              'Something went wrong. Please contact support if this issue persists.',
-        );
+      if (_areStatesMatching(idenfyState, verificationStatus.status)) {
+        if (verificationStatus.status == VerificationState.VERIFIED) {
+          Globals().identityVerified.value = true;
+          Events().emit(IdentityCallbackEvent(type: 'success'));
+        } else {
+          Globals().identityVerified.value = false;
+          Events().emit(IdentityCallbackEvent(type: 'failed'));
+        }
         return;
       }
+
+      logger.i(
+          'States do not match yet. Retrying in ${retryInterval.inSeconds} seconds...');
+      await Future.delayed(retryInterval);
     }
+
+    Globals().identityVerified.value = false;
+    Events().emit(IdentityCallbackEvent(type: 'failed'));
+    logger.e('Timeout reached. States still do not match.');
+    showErrorDialog(
+      context: context,
+      title: 'Error',
+      description:
+          'Something went wrong. Please contact support if this issue persists.',
+    );
   } catch (e) {
+    Globals().identityVerified.value = false;
+    Events().emit(IdentityCallbackEvent(type: 'failed'));
     logger.e(e);
     showErrorDialog(
       context: context,
@@ -297,14 +310,6 @@ Future<void> handleIdenfyResponse({
           'Failed to get the verification status. \nIf this issue persist, please contact support.',
     );
     return;
-  }
-
-  if (verificationStatus.status == VerificationState.VERIFIED) {
-    Globals().identityVerified.value = true;
-    Events().emit(IdentityCallbackEvent(type: 'success'));
-  } else {
-    Globals().identityVerified.value = false;
-    Events().emit(IdentityCallbackEvent(type: 'failed'));
   }
 }
 
