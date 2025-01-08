@@ -151,6 +151,10 @@ class _NewWalletState extends State<NewWallet> {
       secretError = 'Invalid seed';
       return false;
     }
+    if (widget.wallets.any((wallet) => wallet.tfchainSecret == walletSecret)){
+      secretError = 'Secret already exists';
+      return false;      
+    }
     if (!walletSecret.startsWith('0x') && walletSecret.length != 64) {
       secretError = 'Invalid seed length';
       return false;
