@@ -276,10 +276,8 @@ Future<void> handleIdenfyResponse({
 
       if (_areStatesMatching(idenfyState, verificationStatus.status)) {
         if (verificationStatus.status == VerificationState.VERIFIED) {
-          Globals().identityVerified.value = true;
           Events().emit(IdentityCallbackEvent(type: 'success'));
         } else {
-          Globals().identityVerified.value = false;
           Events().emit(IdentityCallbackEvent(type: 'failed'));
         }
         return;
@@ -290,7 +288,6 @@ Future<void> handleIdenfyResponse({
       await Future.delayed(retryInterval);
     }
 
-    Globals().identityVerified.value = false;
     Events().emit(IdentityCallbackEvent(type: 'failed'));
     logger.e('Timeout reached. States still do not match.');
     showErrorDialog(
@@ -300,7 +297,6 @@ Future<void> handleIdenfyResponse({
           'Something went wrong. Please contact support if this issue persists.',
     );
   } catch (e) {
-    Globals().identityVerified.value = false;
     Events().emit(IdentityCallbackEvent(type: 'failed'));
     logger.e(e);
     showErrorDialog(

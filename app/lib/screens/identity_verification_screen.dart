@@ -115,21 +115,12 @@ class _IdentityVerificationScreenState
     }
   }
 
-  setHidePhoneVerify() {
-    if (mounted) {
-      setState(() {
-        hidePhoneVerifyButton = Globals().identityVerified.value;
-      });
-    }
-  }
-
   @override
   void initState() {
     super.initState();
 
     Globals().emailVerified.addListener(setEmailVerified);
     Globals().phoneVerified.addListener(setPhoneVerified);
-    Globals().hidePhoneButton.addListener(setHidePhoneVerify);
     checkPhoneStatus();
     getUserValues();
     startOrResumeEmailCountdown();
@@ -218,7 +209,6 @@ class _IdentityVerificationScreenState
                       animation: Listenable.merge([
                         Globals().emailVerified,
                         Globals().phoneVerified,
-                        Globals().identityVerified
                       ]),
                       builder: (BuildContext context, _) {
                         return Column(

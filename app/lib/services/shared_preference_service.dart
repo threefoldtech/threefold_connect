@@ -230,22 +230,6 @@ Future<void> savePhone(String phone, String? signedPhoneIdentifier) async {
   client.setPKidDoc('phone', json.encode({'phone': phone}));
 }
 
-///
-///
-/// Identity methods in Shared Preferences
-///
-///
-
-Future<void> setIsIdentityVerified(bool isIdentityVerified) async {
-  final SharedPreferences prefs = await SharedPreferences.getInstance();
-  prefs.setBool('isIdentityVerified', isIdentityVerified);
-}
-
-Future<bool?> getIsIdentityVerified() async {
-  final SharedPreferences prefs = await SharedPreferences.getInstance();
-  return prefs.getBool('isIdentityVerified');
-}
-
 
 ///
 ///

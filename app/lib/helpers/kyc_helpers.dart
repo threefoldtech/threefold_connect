@@ -31,7 +31,6 @@ Future<void> handleKYCData(
 
   bool? isEmailVerified = await getIsEmailVerified();
   bool? isPhoneVerified = await getIsPhoneVerified();
-  bool? isIdentityVerified = await getIsIdentityVerified();
 
   // This method got refactored due my mistake in one little mapping in the migration from no pkid to pkid
   if (isEmailVerified == false) {
@@ -54,10 +53,6 @@ Future<void> handleKYCData(
   if (isPhoneVerified == true) {
     Globals().phoneVerified.value = true;
     await savePhoneInCorrectFormatPKid(phoneData);
-  }
-
-  if (isIdentityVerified == true) {
-    Globals().identityVerified.value = true;
   }
 }
 
