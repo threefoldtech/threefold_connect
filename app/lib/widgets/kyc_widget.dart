@@ -259,12 +259,35 @@ Future<void> verifyIdentityProcess({
 Future<void> handleIdenfyResponse({
   required BuildContext context,
   required String walletSeed,
+  AutoIdentificationStatus? idenfyState,
 }) async {
   VerificationStatus verificationStatus;
   try {
     final idenfyServiceUrl = Globals().idenfyServiceUrl;
     verificationStatus = await getVerificationStatus(
         address: walletSeed, idenfyServiceUrl: idenfyServiceUrl);
+    bool statesMatch =
+        _areStatesMatching(idenfyState, verificationStatus.status);
+
+    if (!statesMatch) {
+      logger.i('States do not match. Retrying after 5 seconds...');
+      await Future.delayed(const Duration(seconds: 5));
+
+      verificationStatus = await getVerificationStatus(
+          address: walletSeed, idenfyServiceUrl: idenfyServiceUrl);
+
+      statesMatch = _areStatesMatching(idenfyState, verificationStatus.status);
+
+      if (!statesMatch) {
+        showErrorDialog(
+          context: context,
+          title: 'Error',
+          description:
+              'Something went wrong. Please contact support if this issue persists.',
+        );
+        return;
+      }
+    }
   } catch (e) {
     logger.e(e);
     showErrorDialog(
@@ -300,11 +323,12 @@ Future<void> initIdenfySdk(String token,
               'Something went wrong. Please contact support if this issue persists.');
     }
   }
-  await Future.delayed(const Duration(seconds: 13));
-  if (idenfySDKresult != null &&
-      idenfySDKresult.autoIdentificationStatus !=
-          AutoIdentificationStatus.UNVERIFIED) {
-    await handleIdenfyResponse(context: context, walletSeed: walletSeed);
+  await Future.delayed(const Duration(seconds: 10));
+  if (idenfySDKresult != null) {
+    await handleIdenfyResponse(
+        context: context,
+        walletSeed: walletSeed,
+        idenfyState: idenfySDKresult.autoIdentificationStatus);
   }
 }
 
@@ -640,4 +664,20 @@ Future<dynamic> showIdentityDetails(BuildContext context, String walletSeed) {
               },
             ),
           ));
+}
+
+bool _areStatesMatching(AutoIdentificationStatus? idenfyState,
+    VerificationState? verificationState) {
+  if (idenfyState == null || verificationState == null) {
+    return false;
+  }
+
+  final stateMapping = {
+    'APPROVED': VerificationState.VERIFIED,
+    'FAILED': VerificationState.REJECTED,
+    'UNVERIFIED': VerificationState.UNVERIFIED,
+  };
+
+  final mappedState = stateMapping[idenfyState.name];
+  return mappedState == verificationState;
 }
