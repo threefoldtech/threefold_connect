@@ -11,6 +11,9 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: app
     steps:
       - name: Set up Repository
         uses: actions/checkout@v4
@@ -21,10 +24,16 @@ jobs:
           channel: 'stable'
 
       - name: Get dependencies
-        run: cd app && flutter pub get
+        run: flutter pub get
+
+      - name: Init build script
+        run: ./build.sh --init
+
+      - name: Initialize Reflectable
+        run: dart run build_runner build
 
       - name: Format Dart files
-        run: dart format app/lib
+        run: dart format lib
 
       - name: Analyze Dart code
-        run: dart analyze app/lib
+        run: dart analyze lib

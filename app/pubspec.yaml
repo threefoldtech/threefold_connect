@@ -19,7 +19,7 @@ dependencies:
   tfchain_client:
     git:
       url: https://github.com/threefoldtech/tfgrid-sdk-dart
-      ref: main
+      ref: development
       path: packages/tfchain_client
   stellar_client:
     git:
