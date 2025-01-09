@@ -33,6 +33,17 @@ class _WalletDetailsWidgetState extends State<WalletDetailsWidget> {
   bool showStellarSecret = false;
   bool edit = false;
 
+  @override
+  void initState() {
+    super.initState();
+    stellarSecretController.text = widget.wallet.stellarSecret;
+    stellarAddressController.text = widget.wallet.stellarAddress;
+    tfchainSecretController.text = widget.wallet.tfchainSecret;
+    tfchainAddressController.text = widget.wallet.tfchainAddress;
+    walletNameController.text = widget.wallet.name;
+    walletName = widget.wallet.name;
+  }
+
   Future<bool> _deleteWallet() async {
     try {
       await deleteWallet(walletNameController.text);
@@ -60,29 +71,34 @@ class _WalletDetailsWidgetState extends State<WalletDetailsWidget> {
     }
   }
 
+  String? get _errorText {
+    final text = walletNameController.value.text;
+    if (text.isEmpty) {
+      return 'Name can\'t be empty';
+    }
+    final duplicateWallet = widget.wallets
+        .where((element) => element.name == text && element != widget.wallet);
+    if (duplicateWallet.isNotEmpty) {
+      return 'Name exists';
+    }
+
+    return null;
+  }
+
   _editWallet() async {
-    edit = !edit;
-    final String newName = walletNameController.text.trim();
-    if (walletName == newName) {
+    setState(() {
+      edit = !edit;
+    });
+
+    if (edit) {
       FocusScope.of(context).requestFocus(nameFocus);
-      setState(() {});
       return;
     }
-    final w = widget.wallets.where((element) => element.name == walletName);
-    if (w.isNotEmpty) {
-      final editingWalletFailure = SnackBar(
-        content: Text(
-          'Name exists',
-          style: Theme.of(context)
-              .textTheme
-              .bodyMedium!
-              .copyWith(color: Theme.of(context).colorScheme.errorContainer),
-        ),
-        duration: const Duration(seconds: 3),
-      );
-      ScaffoldMessenger.of(context).clearSnackBars();
-      ScaffoldMessenger.of(context).showSnackBar(editingWalletFailure);
-      return false;
+
+    final String newName = walletNameController.text.trim();
+    if (walletName == newName) {
+      setState(() {});
+      return;
     }
     try {
       await editWallet(walletName, newName);
@@ -122,13 +138,6 @@ class _WalletDetailsWidgetState extends State<WalletDetailsWidget> {
 
   @override
   Widget build(BuildContext context) {
-    stellarSecretController.text = widget.wallet.stellarSecret;
-    stellarAddressController.text = widget.wallet.stellarAddress;
-    tfchainSecretController.text = widget.wallet.tfchainSecret;
-    tfchainAddressController.text = widget.wallet.tfchainAddress;
-    walletNameController.text = widget.wallet.name;
-    walletName = widget.wallet.name;
-
     return SingleChildScrollView(
       child: Padding(
         padding: const EdgeInsets.all(10),
@@ -258,8 +267,10 @@ class _WalletDetailsWidgetState extends State<WalletDetailsWidget> {
                         color: Theme.of(context).colorScheme.onSurface,
                       ),
                   controller: walletNameController,
-                  decoration: const InputDecoration(
+                  onChanged: (_) => setState(() {}),
+                  decoration: InputDecoration(
                     labelText: 'Wallet Name',
+                    errorText: _errorText,
                   )),
               trailing: Row(
                 mainAxisSize: MainAxisSize.min,
