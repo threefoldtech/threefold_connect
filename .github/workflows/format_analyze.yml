@@ -8,20 +8,30 @@ on:
     branches:
       - development
 
-
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
       - name: Set up Repository
         uses: actions/checkout@v4
-      - uses: subosito/flutter-action@v2
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
         with:
           channel: 'stable'
           flutter-version: '3.19.0'
-      
-      - run: cd app && dart pub get
-      
-      - run: dart format app/lib
-      
-      - run: dart analyze app/lib
+
+      - name: Verify Flutter Setup
+        run: flutter doctor
+
+      - name: Get dependencies
+        run: flutter pub get
+        working-directory: app
+
+      - name: Format Dart files
+        run: dart format lib
+        working-directory: app
+
+      - name: Analyze Dart code
+        run: dart analyze lib
+        working-directory: app
