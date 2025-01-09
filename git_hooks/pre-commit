@@ -11,6 +11,15 @@ run_command() {
   echo "$result"
 }
 
+# Ensure git hooks path is set only once
+if ! git config --get core.hooksPath | grep -q "git_hooks"; then
+  echo "Setting git hooks path..."
+  git config core.hooksPath git_hooks
+  echo "Git hooks path set to 'git_hooks'."
+else
+  echo "Git hooks path already set. Skipping..."
+fi
+
 # Change directory to app/lib and run dart format
 run_command "app/lib" "dart format ." "dart format"
 
