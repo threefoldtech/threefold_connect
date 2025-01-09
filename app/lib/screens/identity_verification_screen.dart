@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:core';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_pkid/flutter_pkid.dart';
@@ -11,7 +10,6 @@ import 'package:threebotlogin/helpers/kyc_helpers.dart';
 import 'package:threebotlogin/helpers/logger.dart';
 import 'package:threebotlogin/main.dart';
 import 'package:threebotlogin/screens/authentication_screen.dart';
-import 'package:threebotlogin/screens/wizard/web_view.dart';
 import 'package:threebotlogin/services/gridproxy_service.dart';
 import 'package:threebotlogin/services/identity_service.dart';
 import 'package:threebotlogin/services/open_kyc_service.dart';
@@ -467,8 +465,8 @@ class _IdentityVerificationScreenState
             if (Globals().hidePhoneButton.value == true) {
               return;
             }
-
-            await addPhoneNumberDialog(context);
+            await addPhoneNumberDialog(context,
+                newPhone: false, oldPhone: phone);
 
             var phoneMap = (await getPhone());
             if (phoneMap.isEmpty || !phoneMap.containsKey('phone')) {
@@ -652,6 +650,18 @@ class _IdentityVerificationScreenState
           if (step == 1) {
             return _changeEmailDialog(false);
           }
+          if (step == 2) {
+            await addPhoneNumberDialog(context,
+                newPhone: false, oldPhone: phone);
+            var phoneMap = (await getPhone());
+            String? phoneNumber = phoneMap['phone'];
+            if (phone != phoneNumber) {
+              setState(() {
+                phone = phoneNumber!;
+              });
+            }
+            return;
+          }
         },
         child: Column(children: [
           Padding(
@@ -702,6 +712,18 @@ class _IdentityVerificationScreenState
                           ],
                         ),
                         step == 1
+                            ? const Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                    Padding(
+                                      padding: EdgeInsets.only(left: 15),
+                                      child: Icon(
+                                        Icons.edit,
+                                      ),
+                                    ),
+                                  ])
+                            : const Column(),
+                        step == 2
                             ? const Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
@@ -781,7 +803,7 @@ class _IdentityVerificationScreenState
                                   color:
                                       Theme.of(context).colorScheme.onSurface))
                       : Text(
-                          'Changing your email will require you to go through the email verification process again.',
+                          'Changing your email will require re-verification.',
                           style: Theme.of(context)
                               .textTheme
                               .bodyLarge!
@@ -959,7 +981,7 @@ class _IdentityVerificationScreenState
     }
 
     if (phone.isEmpty) {
-      await addPhoneNumberDialog(context);
+      await addPhoneNumberDialog(context, newPhone: true, oldPhone: phone);
 
       var phoneMap = (await getPhone());
       if (phoneMap.isEmpty || !phoneMap.containsKey('phone')) {
@@ -977,9 +999,15 @@ class _IdentityVerificationScreenState
       FlutterPkid client = await getPkidClient();
       client.setPKidDoc('phone', json.encode({'phone': phone}));
 
+      startPhoneNumberCounter();
+      return;
+    } else {
+      PhoneAlertDialogState().sendPhoneVerification();
       return;
     }
+  }
 
+  void startPhoneNumberCounter() {
     int currentTime = DateTime.now().millisecondsSinceEpoch;
     if (globals.tooManySmsAttempts && globals.lockedSmsUntil > currentTime) {
       globals.sendSmsAttempts = 0;
