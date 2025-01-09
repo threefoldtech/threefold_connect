@@ -356,7 +356,9 @@ class _PreferenceScreenState extends ConsumerState<PreferenceScreen> {
             return false;
           }
           deleteLoading = false;
-          setState(() {});
+          if (mounted) {
+            setState(() {});
+          }
           return true;
         },
       ),
