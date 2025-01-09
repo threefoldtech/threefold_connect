@@ -6,6 +6,7 @@ import 'package:threebotlogin/models/wallet.dart';
 import 'package:threebotlogin/providers/wallets_provider.dart';
 import 'package:threebotlogin/services/tfchain_service.dart';
 import 'package:threebotlogin/widgets/custom_dialog.dart';
+// ignore: depend_on_referenced_packages
 import 'package:polkadart_keyring/polkadart_keyring.dart';
 
 class CouncilVoteDialog extends ConsumerStatefulWidget {
