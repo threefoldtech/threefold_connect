@@ -1661,8 +1661,8 @@ packages:
     dependency: "direct main"
     description:
       path: "packages/tfchain_client"
-      ref: main
-      resolved-ref: "07cca7b13403815a8556a28a9437ae451bd0eef2"
+      ref: development
+      resolved-ref: a66b92b9947cbc6ce7adf289f4321153ac42b936
       url: "https://github.com/threefoldtech/tfgrid-sdk-dart"
     source: git
     version: "0.1.0"

@@ -240,125 +240,126 @@ class _IdentityVerificationScreenState
             if (isLoading) {
               return _pleaseWait();
             }
+            return Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 4.0),
+              child: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    const SizedBox(height: 20),
+                    AnimatedBuilder(
+                      animation: Listenable.merge([
+                        Globals().emailVerified,
+                        Globals().phoneVerified,
+                        Globals().identityVerified
+                      ]),
+                      builder: (BuildContext context, _) {
+                        return Column(
+                          children: [
+                            ListTile(
+                              leading: const Icon(Icons.person),
+                              title: Text(
+                                doubleName.isNotEmpty
+                                    ? doubleName.substring(
+                                        0, doubleName.length - 5)
+                                    : 'Unknown',
+                              ),
+                            ),
+                            customDivider(context: context),
+                            FutureBuilder(
+                              future: getPhrase(),
+                              builder: (context, snapshot) {
+                                if (snapshot.hasData) {
+                                  return Padding(
+                                    padding: const EdgeInsets.only(right: 2.0),
+                                    child: ListTile(
+                                      trailing: const Icon(Icons.visibility),
+                                      leading: const Icon(Icons.vpn_key),
+                                      title: const Text('Show phrase'),
+                                      onTap: () async {
+                                        _showPhrase();
+                                      },
+                                    ),
+                                  );
+                                } else {
+                                  return Container();
+                                }
+                              },
+                            ),
+                            customDivider(context: context),
 
-            return Column(
-              mainAxisSize: MainAxisSize.max,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(0, 24, 15, 24),
-                  child: Column(
-                    children: [
-                      AnimatedBuilder(
-                          animation: Listenable.merge([
-                            Globals().emailVerified,
-                            Globals().phoneVerified,
-                            Globals().identityVerified
-                          ]),
-                          builder: (BuildContext context, _) {
-                            return Column(
-                              children: [
-                                ListTile(
-                                  leading: const Icon(Icons.person),
-                                  title: Text(
-                                    doubleName.isNotEmpty
-                                        ? doubleName.substring(
-                                            0, doubleName.length - 5)
-                                        : 'Unknown',
-                                  ),
-                                ),
-                                customDivider(context: context),
-                                FutureBuilder(
-                                  future: getPhrase(),
-                                  builder: (context, snapshot) {
-                                    if (snapshot.hasData) {
-                                      return ListTile(
-                                        trailing: const Icon(Icons.visibility),
-                                        leading: const Icon(Icons.vpn_key),
-                                        title: const Text('Show phrase'),
-                                        onTap: () async {
-                                          _showPhrase();
-                                        },
-                                      );
-                                    } else {
-                                      return Container();
-                                    }
-                                  },
-                                ),
-                                customDivider(context: context),
+                            // Step one: verify email
+                            _fillCard(
+                                getCorrectState(1, emailVerified, phoneVerified,
+                                    identityVerified),
+                                1,
+                                email,
+                                Icons.email),
+                            customDivider(context: context),
 
-                                // Step one: verify email
-                                _fillCard(
-                                    getCorrectState(1, emailVerified,
+                            // Step two: verify phone
+                            (Globals().phoneVerification == true ||
+                                    (Globals().spendingLimit > 0 &&
+                                        spending > Globals().spendingLimit))
+                                ? _fillCard(
+                                    getCorrectState(2, emailVerified,
                                         phoneVerified, identityVerified),
-                                    1,
-                                    email,
-                                    Icons.email),
-                                customDivider(context: context),
+                                    2,
+                                    phone,
+                                    Icons.phone)
+                                : Container(),
+                            customDivider(context: context),
 
-                                // Step two: verify phone
-                                (Globals().phoneVerification == true ||
-                                        (Globals().spendingLimit > 0 &&
-                                            spending > Globals().spendingLimit))
-                                    ? _fillCard(
-                                        getCorrectState(2, emailVerified,
-                                            phoneVerified, identityVerified),
-                                        2,
-                                        phone,
-                                        Icons.phone)
-                                    : Container(),
-                                customDivider(context: context),
+                            // Step three: verify identity
+                            (Globals().isOpenKYCEnabled ||
+                                    (Globals().spendingLimit > 0 &&
+                                        spending > Globals().spendingLimit))
+                                ? _fillCard(
+                                    getCorrectState(3, emailVerified,
+                                        phoneVerified, identityVerified),
+                                    3,
+                                    extract3Bot(doubleName),
+                                    Icons.perm_identity)
+                                : Container(),
 
-                                // Step three: verify identity
-                                (Globals().isOpenKYCEnabled ||
-                                        (Globals().spendingLimit > 0 &&
-                                            spending > Globals().spendingLimit))
-                                    ? _fillCard(
-                                        getCorrectState(3, emailVerified,
-                                            phoneVerified, identityVerified),
-                                        3,
-                                        extract3Bot(doubleName),
-                                        Icons.perm_identity)
-                                    : Container(),
+                            Globals().redoIdentityVerification &&
+                                    identityVerified == true
+                                ? ElevatedButton(
+                                    onPressed: () async {
+                                      await verifyIdentityProcess();
+                                    },
+                                    child: const Text(
+                                        'Redo identity verification'))
+                                : Container(),
+                            Globals().debugMode == true
+                                ? ElevatedButton(
+                                    onPressed: () async {
+                                      bool? isEmailVerified =
+                                          await getIsEmailVerified();
+                                      bool? isPhoneVerified =
+                                          await getIsPhoneVerified();
+                                      bool? isIdentityVerified =
+                                          await getIsIdentityVerified();
 
-                                Globals().redoIdentityVerification &&
-                                        identityVerified == true
-                                    ? ElevatedButton(
-                                        onPressed: () async {
-                                          await verifyIdentityProcess();
-                                        },
-                                        child: const Text(
-                                            'Redo identity verification'))
-                                    : Container(),
-                                Globals().debugMode == true
-                                    ? ElevatedButton(
-                                        onPressed: () async {
-                                          bool? isEmailVerified =
-                                              await getIsEmailVerified();
-                                          bool? isPhoneVerified =
-                                              await getIsPhoneVerified();
-                                          bool? isIdentityVerified =
-                                              await getIsIdentityVerified();
+                                      kycLogs = '';
+                                      kycLogs +=
+                                          'Email verified: $isEmailVerified\n';
+                                      kycLogs +=
+                                          'Phone verified: $isPhoneVerified\n';
+                                      kycLogs +=
+                                          'Identity verified: $isIdentityVerified\n';
 
-                                          kycLogs = '';
-                                          kycLogs +=
-                                              'Email verified: $isEmailVerified\n';
-                                          kycLogs +=
-                                              'Phone verified: $isPhoneVerified\n';
-                                          kycLogs +=
-                                              'Identity verified: $isIdentityVerified\n';
-
-                                          setState(() {});
-                                        },
-                                        child: const Text('KYC Status'))
-                                    : Container(),
-                                Text(kycLogs),
-                              ],
-                            );
-                          })
-                    ],
-                  ),
-                )
-              ],
+                                      setState(() {});
+                                    },
+                                    child: const Text('KYC Status'))
+                                : Container(),
+                            Text(kycLogs),
+                          ],
+                        );
+                      },
+                    ),
+                  ],
+                ),
+              ),
             );
           }
           return _pleaseWait();
@@ -858,57 +859,62 @@ class _IdentityVerificationScreenState
 
   Widget unVerifiedWidget(step, text, icon) {
     return GestureDetector(
-        onTap: () async {},
-        child: Opacity(
-          opacity: 0.5,
-          child: Column(
-            children: [
-              Padding(
-                  padding: const EdgeInsets.only(bottom: 10.0),
-                  child: ListTile(
-                    leading: Icon(icon),
-                    title: Flexible(
-                        child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: <Widget>[
-                          Row(
-                            children: <Widget>[
-                              Expanded(
-                                child: Text(text == '' ? 'Unknown' : text,
-                                    overflow: TextOverflow.clip,
-                                    style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .onSurface)),
-                              )
-                            ],
+      onTap: () async {},
+      child: Opacity(
+        opacity: 0.5,
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.only(bottom: 10.0),
+              child: ListTile(
+                leading: Icon(icon),
+                title: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Row(
+                      children: <Widget>[
+                        Expanded(
+                          child: Text(
+                            text == '' ? 'Unknown' : text,
+                            overflow: TextOverflow.clip,
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Theme.of(context).colorScheme.onSurface,
+                            ),
                           ),
-                          const SizedBox(
-                            height: 5,
+                        )
+                      ],
+                    ),
+                    const SizedBox(
+                      height: 5,
+                    ),
+                    Row(
+                      children: <Widget>[
+                        Icon(
+                          Icons.close,
+                          color: Theme.of(context).colorScheme.error,
+                          size: 18.0,
+                        ),
+                        const SizedBox(width: 5),
+                        Text(
+                          'Not verified',
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.error,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 12,
                           ),
-                          Row(
-                            children: <Widget>[
-                              Icon(
-                                Icons.close,
-                                color: Theme.of(context).colorScheme.error,
-                                size: 18.0,
-                              ),
-                              const Padding(padding: EdgeInsets.only(left: 5)),
-                              Text(
-                                'Not verified',
-                                style: TextStyle(
-                                    color: Theme.of(context).colorScheme.error,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 12),
-                              )
-                            ],
-                          ),
-                        ])),
-                  ))
-            ],
-          ),
-        ));
+                        )
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   Widget currentPhaseWidget(step, text, icon) {
@@ -922,8 +928,8 @@ class _IdentityVerificationScreenState
             if (Globals().hidePhoneButton.value == true) {
               return;
             }
-
-            await addPhoneNumberDialog(context);
+            await addPhoneNumberDialog(context,
+                newPhone: false, oldPhone: phone);
 
             var phoneMap = (await getPhone());
             if (phoneMap.isEmpty || !phoneMap.containsKey('phone')) {
@@ -988,6 +994,37 @@ class _IdentityVerificationScreenState
                                       )
                                     ],
                                   ),
+                                  if (step == 1)
+                                    ValueListenableBuilder<int>(
+                                      valueListenable: countdownNotifier,
+                                      builder:
+                                          (context, countdownValue, child) {
+                                        if (countdownValue > 0) {
+                                          return Row(
+                                            children: <Widget>[
+                                              Expanded(
+                                                child: Text(
+                                                  'Verification email sent, retry in $countdownValue second${countdownValue == 1 ? '' : 's'}',
+                                                  overflow: TextOverflow.clip,
+                                                  style: Theme.of(context)
+                                                      .textTheme
+                                                      .bodySmall!
+                                                      .copyWith(
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                          color:
+                                                              Theme.of(context)
+                                                                  .colorScheme
+                                                                  .warning),
+                                                ),
+                                              ),
+                                            ],
+                                          );
+                                        } else {
+                                          return Container();
+                                        }
+                                      },
+                                    ),
                                   step == 2 &&
                                           Globals().hidePhoneButton.value ==
                                               true
@@ -1019,37 +1056,46 @@ class _IdentityVerificationScreenState
                                 ]))),
                     Globals().hidePhoneButton.value == true && step == 2
                         ? Container()
-                        : Padding(
-                            padding: const EdgeInsets.only(left: 15),
-                            child: ElevatedButton(
-                                onPressed: () async {
-                                  switch (step) {
-                                    // Verify email
-                                    case 1:
-                                      {
-                                        verifyEmail();
-                                      }
-                                      break;
+                        : ValueListenableBuilder(
+                            valueListenable: countdownNotifier,
+                            builder: (context, countdownValue, child) {
+                              return Padding(
+                                padding: const EdgeInsets.only(left: 12),
+                                child: ElevatedButton(
+                                    onPressed: countdownValue > 0
+                                        ? null
+                                        : () async {
+                                            switch (step) {
+                                              // Verify email
+                                              case 1:
+                                                {
+                                                  startOrResumeEmailCountdown(
+                                                      startNew: true);
+                                                  verifyEmail();
+                                                }
+                                                break;
 
-                                    // Verify phone
-                                    case 2:
-                                      {
-                                        await verifyPhone();
-                                      }
-                                      break;
+                                              // Verify phone
+                                              case 2:
+                                                {
+                                                  await verifyPhone();
+                                                }
+                                                break;
 
-                                    // Verify identity
-                                    case 3:
-                                      {
-                                        await verifyIdentityProcess();
-                                      }
-                                      break;
-                                    default:
-                                      {}
-                                      break;
-                                  }
-                                },
-                                child: const Text('Verify'))),
+                                              // Verify identity
+                                              case 3:
+                                                {
+                                                  await verifyIdentityProcess();
+                                                }
+                                                break;
+                                              default:
+                                                {}
+                                                break;
+                                            }
+                                          },
+                                    child: const Text('Verify')),
+                              );
+                            })
                   ],
                 ),
               ))
@@ -1075,6 +1121,18 @@ class _IdentityVerificationScreenState
         onTap: () async {
           if (step == 1) {
             return _changeEmailDialog(false);
+          }
+          if (step == 2) {
+            await addPhoneNumberDialog(context,
+                newPhone: false, oldPhone: phone);
+            var phoneMap = (await getPhone());
+            String? phoneNumber = phoneMap['phone'];
+            if (phone != phoneNumber) {
+              setState(() {
+                phone = phoneNumber!;
+              });
+            }
+            return;
           }
           // Only make this section clickable if it is Identity Verification + Current Phase
           if (step != 3) {
@@ -1132,6 +1190,18 @@ class _IdentityVerificationScreenState
                           ],
                         ),
                         step == 1
+                            ? const Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                    Padding(
+                                      padding: EdgeInsets.only(left: 15),
+                                      child: Icon(
+                                        Icons.edit,
+                                      ),
+                                    ),
+                                  ])
+                            : const Column(),
+                        step == 2
                             ? const Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
@@ -1610,7 +1680,7 @@ class _IdentityVerificationScreenState
                                   color:
                                       Theme.of(context).colorScheme.onSurface))
                       : Text(
-                          'Changing your email will require you to go through the email verification process again.',
+                          'Changing your email will require re-verification.',
                           style: Theme.of(context)
                               .textTheme
                               .bodyLarge!
@@ -1788,7 +1858,7 @@ class _IdentityVerificationScreenState
     }
 
     if (phone.isEmpty) {
-      await addPhoneNumberDialog(context);
+      await addPhoneNumberDialog(context, newPhone: true, oldPhone: phone);
 
       var phoneMap = (await getPhone());
       if (phoneMap.isEmpty || !phoneMap.containsKey('phone')) {
@@ -1806,9 +1876,15 @@ class _IdentityVerificationScreenState
       FlutterPkid client = await getPkidClient();
       client.setPKidDoc('phone', json.encode({'phone': phone}));
 
+      startPhoneNumberCounter();
+      return;
+    } else {
+      PhoneAlertDialogState().sendPhoneVerification();
       return;
     }
+  }
 
+  void startPhoneNumberCounter() {
     int currentTime = DateTime.now().millisecondsSinceEpoch;
     if (globals.tooManySmsAttempts && globals.lockedSmsUntil > currentTime) {
       globals.sendSmsAttempts = 0;

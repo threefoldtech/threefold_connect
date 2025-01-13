@@ -1,41 +1,46 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:gridproxy_client/models/farms.dart';
+import 'package:threebotlogin/helpers/logger.dart';
+import 'package:threebotlogin/models/wallet.dart';
 import 'package:threebotlogin/providers/wallets_provider.dart';
 import 'package:threebotlogin/services/tfchain_service.dart';
-import 'package:threebotlogin/services/wallet_service.dart';
 import 'package:threebotlogin/widgets/custom_dialog.dart';
+// ignore: depend_on_referenced_packages
+import 'package:polkadart_keyring/polkadart_keyring.dart';
 
-class VoteDialog extends ConsumerStatefulWidget {
+class CouncilVoteDialog extends ConsumerStatefulWidget {
   final String proposalHash;
-  const VoteDialog({
+  final String chainUrl;
+  const CouncilVoteDialog({
     required this.proposalHash,
+    required this.chainUrl,
     super.key,
   });
 
   @override
-  ConsumerState<VoteDialog> createState() => _VoteDialogState();
+  ConsumerState<CouncilVoteDialog> createState() => _CouncilVoteDialogState();
 }
 
-class _VoteDialogState extends ConsumerState<VoteDialog> {
-  int? farmId;
-  List<Farm> farms = [];
-  Map<int, Map<String, String>> twinIdWallets = {};
+class _CouncilVoteDialogState extends ConsumerState<CouncilVoteDialog> {
   bool loading = true;
   bool yesLoading = false;
   bool noLoading = false;
+  List<Wallet> wallets = [];
+  String walletName = '';
 
-  void getFarms() async {
+  void getWallets() async {
     try {
       setState(() {
         loading = true;
       });
       await ref.read(walletsNotifier.notifier).list();
-      final wallets = ref.read(walletsNotifier);
-      farms = await getDaoFarms(wallets);
+      wallets = ref.read(walletsNotifier);
+      final members = await getCouncilMembers(widget.chainUrl);
+      wallets =
+          wallets.where((w) => members.contains(w.tfchainAddress)).toList();
     } catch (e) {
-      throw Exception('Failed to get farms due to $e');
+      throw Exception('Failed to get wallets due to $e');
     } finally {
       setState(() {
         loading = false;
@@ -46,15 +51,16 @@ class _VoteDialogState extends ConsumerState<VoteDialog> {
   @override
   void initState() {
     super.initState();
-    getFarms();
+    getWallets();
   }
 
-  List<DropdownMenuEntry<int>> _buildDropdownMenuEntries(List<Farm> farms) {
-    return farms.map((farm) {
-      return DropdownMenuEntry<int>(
-        value: farm.farmID,
-        label: farm.name,
-        labelWidget: Text(farm.name,
+  List<DropdownMenuEntry<String>> _buildDropdownMenuEntries(
+      List<Wallet> wallets) {
+    return wallets.map((wallet) {
+      return DropdownMenuEntry<String>(
+        value: wallet.name,
+        label: wallet.name,
+        labelWidget: Text(wallet.name,
             style: Theme.of(context).textTheme.bodyLarge!.copyWith(
                   color: Theme.of(context).colorScheme.onSurface,
                 )),
@@ -76,7 +82,7 @@ class _VoteDialogState extends ConsumerState<VoteDialog> {
             const CircularProgressIndicator(),
             const SizedBox(height: 15),
             Text(
-              'Loading Farms...',
+              'Loading Wallets...',
               style: Theme.of(context).textTheme.bodyLarge!.copyWith(
                   color: Theme.of(context).colorScheme.onSurface,
                   fontWeight: FontWeight.bold),
@@ -85,9 +91,9 @@ class _VoteDialogState extends ConsumerState<VoteDialog> {
         ),
       );
     } else {
-      if (farms.isEmpty) {
+      if (wallets.isEmpty) {
         content = Text(
-          'No farms available with online node to vote.',
+          'No wallets available to vote.',
           style: Theme.of(context).textTheme.bodyLarge!.copyWith(
                 color: Theme.of(context).colorScheme.onSurface,
               ),
@@ -134,16 +140,16 @@ class _VoteDialogState extends ConsumerState<VoteDialog> {
                   ),
                 ),
                 label: Text(
-                  'Select Farm',
+                  'Select Wallet',
                   style: Theme.of(context).textTheme.bodyLarge!.copyWith(
                         color:
                             Theme.of(context).colorScheme.onSecondaryContainer,
                       ),
                 ),
-                dropdownMenuEntries: _buildDropdownMenuEntries(farms),
-                onSelected: (int? value) {
+                dropdownMenuEntries: _buildDropdownMenuEntries(wallets),
+                onSelected: (String? value) {
                   if (value != null) {
-                    farmId = value;
+                    walletName = value;
                   }
                 },
               ),
@@ -156,7 +162,7 @@ class _VoteDialogState extends ConsumerState<VoteDialog> {
       title: 'Vote',
       widgetDescription: content,
       image: Icons.how_to_vote_outlined,
-      actions: farms.isEmpty && !loading
+      actions: wallets.isEmpty && !loading
           ? <Widget>[
               TextButton(
                 child: const Text('Close'),
@@ -203,17 +209,20 @@ class _VoteDialogState extends ConsumerState<VoteDialog> {
   }
 
   void _vote(bool approve) async {
-    if (yesLoading || noLoading || farmId == null) return;
+    if (yesLoading || noLoading || walletName == '') return;
     setState(() {
       approve ? (yesLoading = true) : (noLoading = true);
     });
-    final farm = farms.firstWhere((farm) => farm.farmID == farmId);
-    final twinId = farm.twinId;
-    final seed = twinIdWallets[twinId]!['tfchainSeed'];
-    final votes = await getProposalVotes(widget.proposalHash);
+    final wallet = wallets.firstWhere((wallet) => wallet.name == walletName);
+    final seed = wallet.tfchainSecret;
+    final votes =
+        await getCouncilProposalVotes(widget.chainUrl, widget.proposalHash);
+    final keyring = Keyring();
 
-    final hasVotedYes = votes.ayes.any((vote) => vote.farmId == farmId);
-    final hasVotedNo = votes.nays.any((vote) => vote.farmId == farmId);
+    final hasVotedYes = votes.ayes
+        .any((voter) => keyring.encodeAddress(voter) == wallet.tfchainAddress);
+    final hasVotedNo = votes.nays
+        .any((voter) => keyring.encodeAddress(voter) == wallet.tfchainAddress);
 
     if ((approve && hasVotedYes) || (!approve && hasVotedNo)) {
       await _showDialog('Voted!', 'You have voted successfully.', Icons.check,
@@ -226,12 +235,13 @@ class _VoteDialogState extends ConsumerState<VoteDialog> {
       return;
     }
     try {
-      await vote(approve, widget.proposalHash, farmId!, seed!);
+      await councilVote(widget.chainUrl, approve, widget.proposalHash, seed);
       await _showDialog('Voted!', 'You have voted successfully.', Icons.check,
           DialogType.Info);
       Navigator.of(context).pop();
     } catch (e) {
       _showDialog('Error', 'Failed to Vote.', Icons.error, DialogType.Error);
+      logger.e(e);
     } finally {
       setState(() {
         yesLoading = false;

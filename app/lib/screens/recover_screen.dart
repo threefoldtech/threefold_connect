@@ -55,6 +55,9 @@ class _RecoverScreenState extends State<RecoverScreen> {
   }
 
   validateSeed(String seedPhrase, userInfoResult) async {
+    if (seedPhrase.isEmpty) {
+      throw ('Seed Phrase is required');
+    }
     try {
       checkSeedLength(seedPhrase);
       KeyPair keyPair = await generateKeyPairFromSeedPhrase(seedPhrase);
