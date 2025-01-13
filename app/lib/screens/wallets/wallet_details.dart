@@ -1,18 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:threebotlogin/models/wallet.dart';
+import 'package:threebotlogin/providers/wallets_provider.dart';
 import 'package:threebotlogin/screens/wallets/transactions.dart';
 import 'package:threebotlogin/screens/wallets/wallet_assets.dart';
 import 'package:threebotlogin/screens/wallets/wallet_info.dart';
 
-class WalletDetailsScreen extends StatefulWidget {
+class WalletDetailsScreen extends ConsumerStatefulWidget {
   const WalletDetailsScreen({super.key, required this.wallet});
   final Wallet wallet;
 
   @override
-  State<WalletDetailsScreen> createState() => _WalletDetailsScreenState();
+  ConsumerState<WalletDetailsScreen> createState() =>
+      _WalletDetailsScreenState();
 }
 
-class _WalletDetailsScreenState extends State<WalletDetailsScreen> {
+class _WalletDetailsScreenState extends ConsumerState<WalletDetailsScreen> {
   int currentScreenIndex = 0;
 
   void _selectScreen(int index) {
@@ -24,6 +27,7 @@ class _WalletDetailsScreenState extends State<WalletDetailsScreen> {
   @override
   Widget build(BuildContext context) {
     Widget content;
+    ref.watch(walletsNotifier).firstWhere((w) => w.name == widget.wallet.name);
     if (currentScreenIndex == 1) {
       content = WalletTransactionsWidget(
         wallet: widget.wallet,
