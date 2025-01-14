@@ -32,6 +32,22 @@ class WalletsNotifier extends StateNotifier<List<Wallet>> {
     });
   }
 
+  Future<void> addWallet(Wallet wallet) async {
+    await _mutex.protect(() async {
+      state = [...state, wallet];
+    });
+  }
+
+  Future<void> editWallet(String oldName, String newName) async {
+    await _mutex.protect(() async {
+      final wallet = state.where((w) => w.name == oldName).firstOrNull;
+      if (wallet != null) {
+        wallet.name = newName;
+      }
+      state = [...state];
+    });
+  }
+
   void reloadBalances() async {
     if (!_reload) return await TFChainService.disconnect();
     if (!_loading) {
@@ -68,6 +84,10 @@ class WalletsNotifier extends StateNotifier<List<Wallet>> {
 
   void startReloadingBalance() {
     _reload = true;
+  }
+
+  void clear() {
+    _isListed = false;
   }
 
   Wallet? getUpdatedWallet(String name) {
