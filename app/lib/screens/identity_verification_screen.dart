@@ -72,6 +72,37 @@ class _IdentityVerificationScreenState
   Timer? emailTimer;
   ValueNotifier<int> countdownNotifier = ValueNotifier(-1);
 
+  int phoneCountdown = 120;
+  Timer? phoneTimer;
+  ValueNotifier<int> phoneCountdownNotifier = ValueNotifier(-1);
+
+  void startOrResumePhoneCountdown() {
+    int currentTime = DateTime.now().millisecondsSinceEpoch;
+    int lockedUntil =
+        Globals().smsSentOn + (Globals().smsMinutesCoolDown * 60 * 1000);
+    int timeLeft = ((lockedUntil - currentTime) / 1000).round();
+
+    if (timeLeft > 0) {
+      phoneCountdownNotifier.value = timeLeft;
+
+      phoneTimer?.cancel();
+      phoneTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+        int remainingTime =
+            ((lockedUntil - DateTime.now().millisecondsSinceEpoch) / 1000)
+                .round();
+
+        if (remainingTime > 0) {
+          phoneCountdownNotifier.value = remainingTime;
+        } else {
+          phoneCountdownNotifier.value = -1;
+          timer.cancel();
+        }
+      });
+    } else {
+      phoneCountdownNotifier.value = -1;
+    }
+  }
+
   void startOrResumeEmailCountdown({bool startNew = false}) {
     int currentTime = DateTime.now().millisecondsSinceEpoch;
     int lockedUntil =
@@ -123,6 +154,10 @@ class _IdentityVerificationScreenState
     if (mounted) {
       setState(() {
         phoneVerified = Globals().phoneVerified.value;
+        if (phoneVerified){
+          phoneCountdownNotifier.value = -1;
+          phoneTimer?.cancel();
+        }
         Globals().smsSentOn = 0;
       });
     }
@@ -155,22 +190,28 @@ class _IdentityVerificationScreenState
     checkPhoneStatus();
     getUserValues();
     startOrResumeEmailCountdown();
+    startOrResumePhoneCountdown();
   }
 
   @override
   void dispose() {
     emailTimer?.cancel();
+    phoneTimer?.cancel();
+    phoneCountdownNotifier.dispose();
     countdownNotifier.dispose();
     super.dispose();
   }
 
   checkPhoneStatus() {
-    if (Globals().smsSentOn + (Globals().smsMinutesCoolDown * 60 * 1000) >
-        DateTime.now().millisecondsSinceEpoch) {
-      return Globals().hidePhoneButton.value = true;
-    }
+    int currentTime = DateTime.now().millisecondsSinceEpoch;
+    int lockedUntil =
+        Globals().smsSentOn + (Globals().smsMinutesCoolDown * 60 * 1000);
 
-    return Globals().hidePhoneButton.value = false;
+    if (lockedUntil > currentTime) {
+      Globals().hidePhoneButton.value = true;
+    } else if (phoneCountdownNotifier.value <= 0) {
+      Globals().hidePhoneButton.value = false;
+    }
   }
 
   void getUserValues() {
@@ -924,7 +965,7 @@ class _IdentityVerificationScreenState
             return _changeEmailDialog(false);
           }
 
-          if (step == 2) {
+          if (step == 2 && phoneCountdownNotifier.value == -1) {
             if (Globals().hidePhoneButton.value == true) {
               return;
             }
@@ -1035,29 +1076,50 @@ class _IdentityVerificationScreenState
                                   step == 2 &&
                                           Globals().hidePhoneButton.value ==
                                               true
-                                      ? Row(
-                                          children: <Widget>[
-                                            Text(
-                                              'SMS sent, retry in ${calculateMinutes()} minute${calculateMinutes() == '1' ? '' : 's'}',
-                                              overflow: TextOverflow.clip,
-                                              style: Theme.of(context)
-                                                  .textTheme
-                                                  .bodySmall!
-                                                  .copyWith(
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                      color: Theme.of(context)
-                                                          .colorScheme
-                                                          .warning),
-                                            )
-                                          ],
-                                        )
+                                      ? Row(children: <Widget>[
+                                          ValueListenableBuilder<int>(
+                                            valueListenable:
+                                                phoneCountdownNotifier,
+                                            builder: (context, remainingTime,
+                                                child) {
+                                              if (remainingTime > 0) {
+                                                String formattedTime;
+                                                if (remainingTime >= 60) {
+                                                  int minutes = remainingTime ~/
+                                                      60;
+                                                  int seconds = remainingTime %
+                                                      60;
+                                                  formattedTime =
+                                                      '${minutes}m ${seconds}s';
+                                                } else {
+                                                  formattedTime =
+                                                      '${remainingTime}s';
+                                                }
+
+                                                return Text(
+                                                  'SMS sent, retry in $formattedTime',
+                                                  style: Theme.of(context)
+                                                      .textTheme
+                                                      .bodySmall!
+                                                      .copyWith(
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        color: Theme.of(context)
+                                                            .colorScheme
+                                                            .warning,
+                                                      ),
+                                                );
+                                              }
+                                              return Container();
+                                            },
+                                          )
+                                        ])
                                       : Container(),
                                 ]))),
                     Globals().hidePhoneButton.value == true && step == 2
                         ? Container()
                         : ValueListenableBuilder(
-                            valueListenable: countdownNotifier,
+                            valueListenable: step == 1 ? countdownNotifier : phoneCountdownNotifier,
                             builder: (context, countdownValue, child) {
                               return Padding(
                                 padding: const EdgeInsets.only(left: 12),
@@ -1106,13 +1168,11 @@ class _IdentityVerificationScreenState
     int currentTime = DateTime.now().millisecondsSinceEpoch;
     int lockedUntil =
         Globals().smsSentOn + (Globals().smsMinutesCoolDown * 60 * 1000);
-    String difference =
-        ((lockedUntil - currentTime) / 1000 / 60).round().toString();
+    int remainingTime = ((lockedUntil - currentTime) / 1000).round();
 
-    if (int.parse(difference) >= 0) {
-      return difference;
+    if (remainingTime > 0) {
+      return (remainingTime / 60).ceil().toString();
     }
-
     return '0';
   }
 
@@ -1876,10 +1936,10 @@ class _IdentityVerificationScreenState
       FlutterPkid client = await getPkidClient();
       client.setPKidDoc('phone', json.encode({'phone': phone}));
 
-      startPhoneNumberCounter();
       return;
     } else {
       PhoneAlertDialogState().sendPhoneVerification();
+      startPhoneNumberCounter();
       return;
     }
   }
@@ -1938,6 +1998,7 @@ class _IdentityVerificationScreenState
     Globals().hidePhoneButton.value = true;
     Globals().smsSentOn = DateTime.now().millisecondsSinceEpoch;
 
+    startOrResumePhoneCountdown();
     phoneSendDialog(context);
   }
 
