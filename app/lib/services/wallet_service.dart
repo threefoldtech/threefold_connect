@@ -5,7 +5,6 @@ import 'package:flutter_pkid/flutter_pkid.dart';
 import 'package:gridproxy_client/models/farms.dart';
 import 'package:threebotlogin/apps/wallet/wallet_config.dart';
 import 'package:threebotlogin/helpers/globals.dart';
-import 'package:threebotlogin/models/idenfy.dart';
 import 'package:threebotlogin/models/wallet.dart';
 import 'package:threebotlogin/services/idenfy_service.dart';
 import 'package:threebotlogin/services/gridproxy_service.dart';

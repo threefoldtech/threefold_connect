@@ -646,19 +646,3 @@ Future<dynamic> showIdentityDetails(BuildContext context, String walletSeed) {
             ),
           ));
 }
-
-bool _areStatesMatching(AutoIdentificationStatus? idenfyState,
-    VerificationState? verificationState) {
-  if (idenfyState == null || verificationState == null) {
-    return false;
-  }
-
-  final stateMapping = {
-    'APPROVED': VerificationState.VERIFIED,
-    'FAILED': VerificationState.REJECTED,
-    'UNVERIFIED': VerificationState.UNVERIFIED,
-  };
-
-  final mappedState = stateMapping[idenfyState.name];
-  return mappedState == verificationState;
-}

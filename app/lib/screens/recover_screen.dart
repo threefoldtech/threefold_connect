@@ -7,13 +7,11 @@ import 'package:sodium_libs/sodium_libs.dart';
 import 'package:http/http.dart';
 import 'package:threebotlogin/helpers/kyc_helpers.dart';
 import 'package:threebotlogin/helpers/logger.dart';
-import 'package:threebotlogin/models/wallet.dart';
 import 'package:threebotlogin/services/3bot_service.dart';
 import 'package:threebotlogin/services/crypto_service.dart';
 import 'package:threebotlogin/services/migration_service.dart';
 import 'package:threebotlogin/services/pkid_service.dart';
 import 'package:threebotlogin/services/shared_preference_service.dart';
-import 'package:threebotlogin/services/wallet_service.dart';
 
 class RecoverScreen extends StatefulWidget {
   const RecoverScreen({super.key, this.recoverScreen});
