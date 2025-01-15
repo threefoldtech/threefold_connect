@@ -208,9 +208,9 @@ class _IdentityVerificationScreenState
         Globals().smsSentOn + (Globals().smsMinutesCoolDown * 60 * 1000);
 
     if (lockedUntil > currentTime) {
-      Globals().hidePhoneButton.value = true;
+      return Globals().hidePhoneButton.value = true;
     } else if (phoneCountdownNotifier.value <= 0) {
-      Globals().hidePhoneButton.value = false;
+      return Globals().hidePhoneButton.value = false;
     }
   }
 
