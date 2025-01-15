@@ -2,6 +2,7 @@ import 'package:mutex/mutex.dart';
 import 'package:threebotlogin/helpers/globals.dart';
 import 'package:threebotlogin/models/wallet.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:threebotlogin/services/idenfy_service.dart';
 import 'package:threebotlogin/services/wallet_service.dart';
 
 import 'package:threebotlogin/services/stellar_service.dart' as StellarService;
@@ -44,6 +45,20 @@ class WalletsNotifier extends StateNotifier<List<Wallet>> {
       if (wallet != null) {
         wallet.name = newName;
       }
+      state = [...state];
+    });
+  }
+
+  Future<void> verifyWallet(String walletName) async {
+    await _mutex.protect(() async {
+      final idenfyServiceUrl = Globals().idenfyServiceUrl;
+      final wallet = state.where((w) => w.name == walletName).firstOrNull;
+      final updatedVerificationStatus = await getVerificationStatus(
+          address: wallet!.tfchainAddress, idenfyServiceUrl: idenfyServiceUrl);
+
+      if (wallet.verificationStatus != updatedVerificationStatus.status.name) {
+        wallet.verificationStatus = updatedVerificationStatus.status.name;
+      } else {}
       state = [...state];
     });
   }

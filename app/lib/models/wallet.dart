@@ -24,7 +24,7 @@ class Wallet {
   String stellarBalance;
   String tfchainBalance;
   final WalletType type;
-  final String verificationStatus; 
+  late String verificationStatus; 
 }
 
 class PkidWallet {

@@ -115,6 +115,8 @@ class _WalletDetailsWidgetState extends ConsumerState<WalletDetailsWidget> {
     tfchainAddressController.text = widget.wallet.tfchainAddress;
     walletNameController.text = widget.wallet.name;
     walletName = widget.wallet.name;
+    final wallet =
+        ref.watch(walletsNotifier).firstWhere((w) => w.name == walletName);
 
     return SingleChildScrollView(
       child: Padding(
@@ -272,7 +274,7 @@ class _WalletDetailsWidgetState extends ConsumerState<WalletDetailsWidget> {
                   ),
                 ),
               ),
-              const SizedBox(height: 40),
+            const SizedBox(height: 40),
             Text(
               'KYC Verification',
               style: Theme.of(context).textTheme.titleLarge!.copyWith(
@@ -284,28 +286,25 @@ class _WalletDetailsWidgetState extends ConsumerState<WalletDetailsWidget> {
                 width: MediaQuery.of(context).size.width - 40,
                 child: ElevatedButton(
                   onPressed: () async {
-                    if (widget.wallet.verificationStatus != 'VERIFIED') {
+                    if (wallet.verificationStatus != 'VERIFIED') {
                       await termsAndConditionsDialog(
-                        context: context,
-                        wallet: widget.wallet
-                      );
-                      setState(() {}); 
+                          context: context, wallet: wallet);
+                      await walletsRef.verifyWallet(wallet.name);
                     } else {
-                      showIdentityDetails(context, widget.wallet.tfchainSecret);
+                      showIdentityDetails(context, wallet.tfchainSecret);
                     }
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor:
-                        widget.wallet.verificationStatus != 'VERIFIED'
-                            ? Theme.of(context).colorScheme.errorContainer
-                            : Theme.of(context).colorScheme.primaryContainer,
+                    backgroundColor: wallet.verificationStatus != 'VERIFIED'
+                        ? Theme.of(context).colorScheme.errorContainer
+                        : Theme.of(context).colorScheme.primaryContainer,
                   ),
                   child: Text(
-                    widget.wallet.verificationStatus != 'VERIFIED'
+                    wallet.verificationStatus != 'VERIFIED'
                         ? 'Verify your Identity'
                         : 'Show Verified Data',
                     style: Theme.of(context).textTheme.bodyLarge!.copyWith(
-                          color: widget.wallet.verificationStatus != 'VERIFIED'
+                          color: wallet.verificationStatus != 'VERIFIED'
                               ? Theme.of(context).colorScheme.onErrorContainer
                               : Theme.of(context)
                                   .colorScheme
