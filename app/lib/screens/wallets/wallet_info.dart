@@ -1,6 +1,10 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:threebotlogin/events/events.dart';
+import 'package:threebotlogin/events/identity_callback_event.dart';
 import 'package:threebotlogin/helpers/logger.dart';
 import 'package:threebotlogin/models/wallet.dart';
 import 'package:threebotlogin/providers/wallets_provider.dart';
@@ -289,7 +293,30 @@ class _WalletDetailsWidgetState extends ConsumerState<WalletDetailsWidget> {
                     if (wallet.verificationStatus != 'VERIFIED') {
                       await termsAndConditionsDialog(
                           context: context, wallet: wallet);
-                      await walletsRef.verifyWallet(wallet.name);
+
+                      final completer = Completer<void>();
+                      StreamSubscription? subscription;
+                      try {
+                        subscription =
+                            Events().onEvent(IdentityCallbackEvent, (event) {
+                          if (event is IdentityCallbackEvent &&
+                              event.type == 'success') {
+                            logger.i(
+                                '[Event Listener] IdentityCallbackEvent with success received.');
+                            completer.complete();
+                          }
+                        });
+
+                        await completer.future;
+                        await walletsRef.verifyWallet(wallet.name);
+                      } catch (e) {
+                        logger.e(
+                            '[Event Listener] Error while waiting for event: $e');
+                      } finally {
+                        if (subscription != null) {
+                          await subscription.cancel();
+                        }
+                      }
                     } else {
                       showIdentityDetails(context, wallet.tfchainSecret);
                     }

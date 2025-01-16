@@ -1,5 +1,6 @@
 import 'package:mutex/mutex.dart';
 import 'package:threebotlogin/helpers/globals.dart';
+import 'package:threebotlogin/helpers/logger.dart';
 import 'package:threebotlogin/models/wallet.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:threebotlogin/services/idenfy_service.dart';
@@ -49,19 +50,24 @@ class WalletsNotifier extends StateNotifier<List<Wallet>> {
     });
   }
 
-  Future<void> verifyWallet(String walletName) async {
-    final idenfyServiceUrl = Globals().idenfyServiceUrl;
-    await _mutex.protect(() async {
-      final wallet = state.where((w) => w.name == walletName).firstOrNull;
-      final updatedVerificationStatus = await getVerificationStatus(
-          address: wallet!.tfchainAddress, idenfyServiceUrl: idenfyServiceUrl);
-
-      if (wallet.verificationStatus != updatedVerificationStatus.status.name) {
+Future<void> verifyWallet(String walletName) async {
+  final idenfyServiceUrl = Globals().idenfyServiceUrl;
+  await _mutex.protect(() async {
+    final wallet = state.where((w) => w.name == walletName).firstOrNull;
+    if (wallet != null) {
+      try {
+        final updatedVerificationStatus = await getVerificationStatus(
+          address: wallet.tfchainAddress,
+          idenfyServiceUrl: idenfyServiceUrl,
+        );
         wallet.verificationStatus = updatedVerificationStatus.status.name;
+        state = [...state];
+      } catch (e) {
+        logger.e('[verifyWallet] Error during verification: $e');
       }
-      state = [...state];
-    });
-  }
+    }
+  });
+}
 
   void reloadBalances() async {
     if (!_reload) return await TFChainService.disconnect();
