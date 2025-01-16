@@ -8,21 +8,43 @@ import 'package:threebotlogin/services/stellar_service.dart' as StellarService;
 import 'package:threebotlogin/services/tfchain_service.dart' as TFChainService;
 
 class WalletsNotifier extends StateNotifier<List<Wallet>> {
-  WalletsNotifier() : super([]);
+  WalletsNotifier() : super([]) {
+    list();
+  }
 
   bool _reload = true;
   bool _loading = true;
+  bool _isListed = false;
   final Mutex _mutex = Mutex();
 
+  bool get isListed => _isListed;
   Future<void> list() async {
+    if (_isListed) return;
     _loading = true;
     state = await listWallets();
     _loading = false;
+    _isListed = true;
   }
 
   Future<void> removeWallet(String name) async {
     await _mutex.protect(() async {
       state = state.where((wallet) => wallet.name != name).toList();
+    });
+  }
+
+  Future<void> addWallet(Wallet wallet) async {
+    await _mutex.protect(() async {
+      state = [...state, wallet];
+    });
+  }
+
+  Future<void> editWallet(String oldName, String newName) async {
+    await _mutex.protect(() async {
+      final wallet = state.where((w) => w.name == oldName).firstOrNull;
+      if (wallet != null) {
+        wallet.name = newName;
+      }
+      state = [...state];
     });
   }
 
@@ -62,6 +84,10 @@ class WalletsNotifier extends StateNotifier<List<Wallet>> {
 
   void startReloadingBalance() {
     _reload = true;
+  }
+
+  void clear() {
+    _isListed = false;
   }
 
   Wallet? getUpdatedWallet(String name) {

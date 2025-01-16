@@ -27,7 +27,7 @@
                         <v-text-field @input="checkNameAvailability" :disabled="nameCheckStatus.checking"
                                       :rules="nameRules"
                                       v-model="doubleName" box label="Type in your ThreeFold Connect ID"
-                                      :hint="doubleName ? `Your ThreeFold ID: ${doubleName}.3bot` : `Whats your ThreeFold ID?`"
+                                      :hint="doubleName ? `Your ThreeFold ID: ${doubleName}` : `Whats your ThreeFold ID?`"
                                       required
                                       counter=50></v-text-field>
                     </v-card-text>

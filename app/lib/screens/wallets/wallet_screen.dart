@@ -25,19 +25,6 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
   List<Wallet> wallets = [];
   late WalletsNotifier walletRef;
 
-  onDeleteWallet(String name) {
-    walletRef.removeWallet(name);
-  }
-
-  onEditWallet(String oldName, String newName) {
-    for (final w in wallets) {
-      if (w.name == oldName) {
-        w.name = newName;
-      }
-    }
-    setState(() {});
-  }
-
   @override
   void initState() {
     super.initState();
@@ -91,9 +78,6 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
                 final wallet = wallets[i];
                 return WalletCardWidget(
                   wallet: wallet,
-                  allWallets: wallets,
-                  onDeleteWallet: onDeleteWallet,
-                  onEditWallet: onEditWallet,
                 );
               }));
     }
@@ -119,8 +103,8 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
     });
     try {
       await walletRef.list();
-      await Future.delayed(const Duration(milliseconds: 100));
-      if (wallets.isEmpty) {
+      await Future.delayed(const Duration(seconds: 1));
+      if (walletRef.isListed && wallets.isEmpty) {
         await _addInitialWallet();
       }
     } catch (e) {
@@ -155,7 +139,6 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
         constraints: const BoxConstraints(maxWidth: double.infinity),
         context: context,
         builder: (ctx) => NewWallet(
-              onAddWallet: _addWallet,
               wallets: wallets,
             ));
   }
@@ -170,11 +153,6 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
         type: WalletType.NATIVE);
     await addWallet(walletName, walletSecret, type: WalletType.NATIVE);
     wallets.add(wallet);
-  }
-
-  void _addWallet(Wallet wallet) {
-    wallets.add(wallet);
-    setState(() {});
   }
 
   Future<void> handleRefresh() async {

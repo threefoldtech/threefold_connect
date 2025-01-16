@@ -13,6 +13,7 @@ import 'package:threebotlogin/events/events.dart';
 import 'package:threebotlogin/helpers/environment.dart';
 import 'package:threebotlogin/helpers/globals.dart';
 import 'package:threebotlogin/helpers/logger.dart';
+import 'package:threebotlogin/providers/wallets_provider.dart';
 
 import 'package:threebotlogin/screens/authentication_screen.dart';
 import 'package:threebotlogin/screens/change_pin_screen.dart';
@@ -324,6 +325,7 @@ class _PreferenceScreenState extends ConsumerState<PreferenceScreen> {
           bool result = false;
           if (deleted) {
             result = await clearData();
+            ref.read(walletsNotifier.notifier).clear();
             if (result) {
               Navigator.pop(context);
               await Navigator.pushReplacement(
@@ -356,7 +358,9 @@ class _PreferenceScreenState extends ConsumerState<PreferenceScreen> {
             return false;
           }
           deleteLoading = false;
-          setState(() {});
+          if (mounted) {
+            setState(() {});
+          }
           return true;
         },
       ),

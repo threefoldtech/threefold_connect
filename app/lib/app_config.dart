@@ -227,4 +227,5 @@ void setFallbackConfigs() {
   Globals().spendingLimit = 0;
   Globals().newsUrl = '';
   Globals().idenfyServiceUrl = '';
+  Globals().council = false;
 }
