@@ -62,6 +62,7 @@ class _WalletCardWidgetState extends ConsumerState<WalletCardWidget> {
   Widget build(BuildContext context) {
     List<Widget> cardContent = [];
     wallets = ref.watch(walletsNotifier);
+    final wallet = wallets.where((w) => w.name == widget.wallet.name).firstOrNull;
     if (widget.wallet.type == WalletType.NATIVE &&
         widget.wallet.stellarBalance == '-1') {
       cardContent = [
@@ -173,8 +174,8 @@ class _WalletCardWidgetState extends ConsumerState<WalletCardWidget> {
                   ),
                   const Spacer(),
                   Text(
-                    widget.wallet.verificationStatus,
-                    style: widget.wallet.verificationStatus == 'VERIFIED'
+                    wallet!.verificationStatus,
+                    style: wallet.verificationStatus == 'VERIFIED'
                         ? Theme.of(context).textTheme.bodySmall!.copyWith(
                               color: Theme.of(context).colorScheme.primary,
                               fontWeight: FontWeight.bold,

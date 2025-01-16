@@ -435,7 +435,7 @@ Future<dynamic> showIdentityDetails(BuildContext context, String walletSeed) {
                 final firstName =
                     utf8.decode(latin1.encode(data.orgFirstName!));
                 final lastName = utf8.decode(latin1.encode(data.orgLastName!));
-                final fullName = '$firstName $lastName';
+                final fullName = '$lastName $firstName';
                 return Column(
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start,

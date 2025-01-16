@@ -50,15 +50,15 @@ class WalletsNotifier extends StateNotifier<List<Wallet>> {
   }
 
   Future<void> verifyWallet(String walletName) async {
+    final idenfyServiceUrl = Globals().idenfyServiceUrl;
     await _mutex.protect(() async {
-      final idenfyServiceUrl = Globals().idenfyServiceUrl;
       final wallet = state.where((w) => w.name == walletName).firstOrNull;
       final updatedVerificationStatus = await getVerificationStatus(
           address: wallet!.tfchainAddress, idenfyServiceUrl: idenfyServiceUrl);
 
       if (wallet.verificationStatus != updatedVerificationStatus.status.name) {
         wallet.verificationStatus = updatedVerificationStatus.status.name;
-      } else {}
+      }
       state = [...state];
     });
   }
