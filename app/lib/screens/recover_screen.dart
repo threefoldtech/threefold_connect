@@ -55,7 +55,7 @@ class _RecoverScreenState extends State<RecoverScreen> {
   }
 
   validateSeed(String seedPhrase, userInfoResult) async {
-    if (seedPhrase.isEmpty){
+    if (seedPhrase.isEmpty) {
       throw ('Seed Phrase is required');
     }
     try {

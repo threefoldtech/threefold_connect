@@ -1,26 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:threebotlogin/models/wallet.dart';
+import 'package:threebotlogin/providers/wallets_provider.dart';
 import 'package:threebotlogin/screens/wallets/transactions.dart';
 import 'package:threebotlogin/screens/wallets/wallet_assets.dart';
 import 'package:threebotlogin/screens/wallets/wallet_info.dart';
 
-class WalletDetailsScreen extends StatefulWidget {
-  const WalletDetailsScreen(
-      {super.key,
-      required this.wallet,
-      required this.allWallets,
-      required this.onDeleteWallet,
-      required this.onEditWallet});
+class WalletDetailsScreen extends ConsumerStatefulWidget {
+  const WalletDetailsScreen({super.key, required this.wallet});
   final Wallet wallet;
-  final List<Wallet> allWallets;
-  final void Function(String name) onDeleteWallet;
-  final void Function(String oldName, String newName) onEditWallet;
 
   @override
-  State<WalletDetailsScreen> createState() => _WalletDetailsScreenState();
+  ConsumerState<WalletDetailsScreen> createState() =>
+      _WalletDetailsScreenState();
 }
 
-class _WalletDetailsScreenState extends State<WalletDetailsScreen> {
+class _WalletDetailsScreenState extends ConsumerState<WalletDetailsScreen> {
   int currentScreenIndex = 0;
 
   void _selectScreen(int index) {
@@ -29,29 +24,18 @@ class _WalletDetailsScreenState extends State<WalletDetailsScreen> {
     });
   }
 
-  void _onEditWallet(String oldName, String newName) {
-    widget.wallet.name = newName;
-    widget.onEditWallet(oldName, newName);
-    setState(() {});
-  }
-
   @override
   Widget build(BuildContext context) {
     Widget content;
+    ref.watch(walletsNotifier).firstWhere((w) => w.name == widget.wallet.name);
     if (currentScreenIndex == 1) {
       content = WalletTransactionsWidget(
         wallet: widget.wallet,
       );
     } else if (currentScreenIndex == 2) {
-      content = WalletDetailsWidget(
-        wallet: widget.wallet,
-        wallets: widget.allWallets,
-        onDeleteWallet: widget.onDeleteWallet,
-        onEditWallet: _onEditWallet,
-      );
+      content = WalletDetailsWidget(wallet: widget.wallet);
     } else {
       content = WalletAssetsWidget(
-        allWallets: widget.allWallets,
         wallet: widget.wallet,
       );
     }

@@ -4,10 +4,12 @@ import 'package:bip39/bip39.dart';
 import 'package:convert/convert.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hashlib/hashlib.dart';
 import 'package:threebotlogin/helpers/globals.dart';
 import 'package:threebotlogin/helpers/logger.dart';
 import 'package:threebotlogin/models/wallet.dart';
+import 'package:threebotlogin/providers/wallets_provider.dart';
 import 'package:threebotlogin/services/stellar_service.dart';
 import 'package:threebotlogin/services/wallet_service.dart';
 import 'package:tfchain_client/src/utils.dart';
@@ -18,21 +20,20 @@ import 'package:stellar_client/stellar_client.dart' as Stellar;
 import 'package:bip39/bip39.dart';
 import 'package:substrate_bip39/substrate_bip39.dart';
 
-class NewWallet extends StatefulWidget {
-  const NewWallet(
-      {super.key, required this.onAddWallet, required this.wallets});
-  final void Function(Wallet addedWallet) onAddWallet;
+class NewWallet extends ConsumerStatefulWidget {
+  const NewWallet({super.key, required this.wallets});
   final List<Wallet> wallets;
 
   @override
-  State<StatefulWidget> createState() {
+  ConsumerState<ConsumerStatefulWidget> createState() {
     return _NewWalletState();
   }
 }
 
-class _NewWalletState extends State<NewWallet> {
+class _NewWalletState extends ConsumerState<NewWallet> {
   final _nameController = TextEditingController();
   final _secretController = TextEditingController();
+  late WalletsNotifier walletRef = ref.read(walletsNotifier.notifier);
   bool saveLoading = false;
   String? nameError;
   String? secretError;
@@ -190,6 +191,7 @@ class _NewWalletState extends State<NewWallet> {
     }
     try {
       await addWallet(walletName, walletSecret);
+      walletRef.addWallet(wallet);
       await _showDialog(
           'Wallet Added!',
           'Wallet $walletName has been added successfully',
@@ -203,7 +205,6 @@ class _NewWalletState extends State<NewWallet> {
       setState(() {});
       return;
     }
-    widget.onAddWallet(wallet);
     saveLoading = false;
     setState(() {});
     if (!context.mounted) return;
