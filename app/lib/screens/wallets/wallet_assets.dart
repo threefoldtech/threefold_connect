@@ -29,7 +29,7 @@ class _WalletAssetsWidgetState extends State<WalletAssetsWidget> {
   _listVestedAccounts() async {
     vestedWallets =
         await Stellar.listVestedAccounts(widget.wallet.stellarSecret);
-    setState(() {});
+    if (mounted) setState(() {});
   }
 
   _reloadBalances() async {
