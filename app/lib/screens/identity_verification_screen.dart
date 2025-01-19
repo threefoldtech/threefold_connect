@@ -154,7 +154,7 @@ class _IdentityVerificationScreenState
     if (mounted) {
       setState(() {
         phoneVerified = Globals().phoneVerified.value;
-        if (phoneVerified){
+        if (phoneVerified) {
           phoneCountdownNotifier.value = -1;
           phoneTimer?.cancel();
         }
@@ -1084,18 +1084,8 @@ class _IdentityVerificationScreenState
                                                 child) {
                                               if (remainingTime > 0) {
                                                 String formattedTime;
-                                                if (remainingTime >= 60) {
-                                                  int minutes = remainingTime ~/
-                                                      60;
-                                                  int seconds = remainingTime %
-                                                      60;
-                                                  formattedTime =
-                                                      '${minutes}m ${seconds}s';
-                                                } else {
-                                                  formattedTime =
-                                                      '${remainingTime}s';
-                                                }
-
+                                                formattedTime =
+                                                    _formatTime(remainingTime);
                                                 return Text(
                                                   'SMS sent, retry in $formattedTime',
                                                   style: Theme.of(context)
@@ -1119,7 +1109,9 @@ class _IdentityVerificationScreenState
                     Globals().hidePhoneButton.value == true && step == 2
                         ? Container()
                         : ValueListenableBuilder(
-                            valueListenable: step == 1 ? countdownNotifier : phoneCountdownNotifier,
+                            valueListenable: step == 1
+                                ? countdownNotifier
+                                : phoneCountdownNotifier,
                             builder: (context, countdownValue, child) {
                               return Padding(
                                 padding: const EdgeInsets.only(left: 12),
@@ -1162,6 +1154,16 @@ class _IdentityVerificationScreenState
                 ),
               ))
         ]));
+  }
+
+  String _formatTime(int remainingTime) {
+    if (remainingTime >= 60) {
+      int minutes = remainingTime ~/ 60;
+      int seconds = remainingTime % 60;
+      return '${minutes}m ${seconds}s';
+    } else {
+      return '${remainingTime}s';
+    }
   }
 
   String calculateMinutes() {
