@@ -275,7 +275,7 @@ class _WalletDetailsWidgetState extends ConsumerState<WalletDetailsWidget> {
                 children: [
                   if (edit)
                     IconButton(
-                      onPressed: _editWallet,
+                      onPressed: _errorText == null ? _editWallet : null,
                       icon: const Icon(Icons.save),
                     ),
                   if (edit)
