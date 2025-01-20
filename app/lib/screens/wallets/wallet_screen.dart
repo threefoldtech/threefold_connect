@@ -152,7 +152,7 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
     final wallet = await loadAddedWallet(walletName, walletSecret,
         type: WalletType.NATIVE);
     await addWallet(walletName, walletSecret, type: WalletType.NATIVE);
-    wallets.add(wallet);
+    walletRef.addWallet(wallet);
   }
 
   Future<void> handleRefresh() async {
