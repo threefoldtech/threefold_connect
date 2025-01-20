@@ -44,10 +44,11 @@ Future<String> getBalance(String secret) async {
   return getBalanceByClient(client);
 }
 
-Future<List<ITransaction>> listTransactions(String secret) async {
+Future<List<ITransaction>> listTransactions(
+    String secret, int offset, int limit) async {
   final client = Client(NetworkType.PUBLIC, secret);
-  final transactions = await client.getTransactions(assetCodeFilter: 'TFT');
-  return transactions;
+  return await client.getTransactions(
+      assetCodeFilter: 'TFT', limit: limit, offset: offset);
 }
 
 Future<List<VestingAccount>?> listVestedAccounts(String secret) async {
