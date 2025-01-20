@@ -5,7 +5,6 @@ import 'package:flutter_pkid/flutter_pkid.dart';
 import 'package:gridproxy_client/models/farms.dart';
 import 'package:threebotlogin/apps/wallet/wallet_config.dart';
 import 'package:threebotlogin/helpers/globals.dart';
-import 'package:threebotlogin/helpers/logger.dart';
 import 'package:threebotlogin/models/wallet.dart';
 import 'package:threebotlogin/services/gridproxy_service.dart';
 import 'package:threebotlogin/services/pkid_service.dart';
@@ -27,17 +26,7 @@ Future<FlutterPkid> _getPkidClient() async {
 
 Future<List<PkidWallet>> getPkidWallets() async {
   FlutterPkid client = await _getPkidClient();
-  Map<String, dynamic> pKidResult;
-  try {
-    pKidResult = await client.getPKidDoc('purse');
-    if (pKidResult.containsKey('error')) {
-      logger.e('Error in pKidResult : ${pKidResult['error']}');
-      throw Exception('Error fetching wallets');
-    }
-  } catch (e) {
-    logger.e('Error while requesting pkidWallets');
-    throw Exception('Error fetching wallets');
-  }
+  final pKidResult = await client.getPKidDoc('purse');
   final result =
       pKidResult.containsKey('data') && pKidResult.containsKey('success')
           ? jsonDecode(pKidResult['data'])
@@ -54,13 +43,7 @@ Future<List<PkidWallet>> getPkidWallets() async {
 }
 
 Future<List<Wallet>> listWallets() async {
-  List<PkidWallet> pkidWallets = [];
-  try {
-    pkidWallets = await getPkidWallets();
-  } catch (e) {
-    logger.e('Error fetching PKID wallets: $e');
-    throw Exception('Error fetching wallets');
-  }
+  List<PkidWallet> pkidWallets = await getPkidWallets();
   final String chainUrl = Globals().chainUrl;
   final List<Wallet> wallets = await compute((void _) async {
     final List<Future<Wallet>> walletFutures = [];
