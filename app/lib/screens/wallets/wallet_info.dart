@@ -28,17 +28,15 @@ class _WalletDetailsWidgetState extends ConsumerState<WalletDetailsWidget> {
   bool showStellarSecret = false;
   bool edit = false;
   late WalletsNotifier walletsRef;
+  String? _errorText;
 
   @override
   void initState() {
     super.initState();
-    stellarSecretController.text = widget.wallet.stellarSecret;
-    stellarAddressController.text = widget.wallet.stellarAddress;
-    tfchainSecretController.text = widget.wallet.tfchainSecret;
-    tfchainAddressController.text = widget.wallet.tfchainAddress;
+    walletsRef = ref.read(walletsNotifier.notifier);
     walletNameController.text = widget.wallet.name;
     walletName = widget.wallet.name;
-    walletsRef = ref.read(walletsNotifier.notifier);
+    walletNameController.addListener(_validateWalletName);
   }
 
   Future<bool> _deleteWallet() async {
@@ -68,33 +66,34 @@ class _WalletDetailsWidgetState extends ConsumerState<WalletDetailsWidget> {
     }
   }
 
-  String? get _errorText {
-    final text = walletNameController.value.text;
+  void _validateWalletName() {
+    final text = walletNameController.text.trim();
+    String? error;
+
     if (text.isEmpty) {
-      return 'Name can\'t be empty';
-    }
-    final wallets = ref.read(walletsNotifier);
-    final duplicateWallet = wallets
-        .where((element) => element.name == text && element != widget.wallet);
-    if (duplicateWallet.isNotEmpty) {
-      return 'Name exists';
+      error = 'Name can\'t be empty';
+    } else {
+      final wallets = ref.read(walletsNotifier);
+      final duplicateWallet = wallets.where(
+        (element) => element.name == text && element != widget.wallet,
+      );
+      if (duplicateWallet.isNotEmpty) {
+        error = 'Name exists';
+      }
     }
 
-    return null;
+    if (_errorText != error) {
+      setState(() {
+        _errorText = error;
+      });
+    }
   }
 
   _editWallet() async {
-    setState(() {
-      edit = !edit;
-    });
-
-    if (edit) {
-      FocusScope.of(context).requestFocus(nameFocus);
-      return;
-    }
-
+    edit = !edit;
     final String newName = walletNameController.text.trim();
     if (walletName == newName) {
+      FocusScope.of(context).requestFocus(nameFocus);
       setState(() {});
       return;
     }
@@ -130,12 +129,17 @@ class _WalletDetailsWidgetState extends ConsumerState<WalletDetailsWidget> {
     stellarAddressController.dispose();
     tfchainSecretController.dispose();
     tfchainAddressController.dispose();
+    walletNameController.removeListener(_validateWalletName);
     walletNameController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    stellarSecretController.text = widget.wallet.stellarSecret;
+    stellarAddressController.text = widget.wallet.stellarAddress;
+    tfchainSecretController.text = widget.wallet.tfchainSecret;
+    tfchainAddressController.text = widget.wallet.tfchainAddress;
     return SingleChildScrollView(
       child: Padding(
         padding: const EdgeInsets.all(10),
@@ -265,7 +269,6 @@ class _WalletDetailsWidgetState extends ConsumerState<WalletDetailsWidget> {
                         color: Theme.of(context).colorScheme.onSurface,
                       ),
                   controller: walletNameController,
-                  onChanged: (_) => setState(() {}),
                   decoration: InputDecoration(
                     labelText: 'Wallet Name',
                     errorText: _errorText,
