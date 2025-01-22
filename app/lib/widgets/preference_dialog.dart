@@ -58,7 +58,7 @@ class _PreferenceDialogState extends State<PreferenceDialog> {
       Map<String, dynamic> previousScopePermissionsObject;
 
       previousScopePermissionsObject = jsonDecode(previousScopePermissions);
-    
+
       if (!scopeIsEqual(scopeAsMap, previousScopePermissionsObject)) {
         previousScopePermissionsObject = widget.scope!.toJson();
         await savePreviousScopePermissions(

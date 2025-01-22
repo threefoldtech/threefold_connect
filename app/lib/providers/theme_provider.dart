@@ -27,7 +27,7 @@ class ThemeModeNotifier extends StateNotifier<ThemeMode> {
   Future<void> loadTheme() async {
     String? savedTheme = await getTheme();
     state = savedTheme == 'dark' ? ThemeMode.dark : ThemeMode.light;
-    }
+  }
 }
 
 final themeModeNotifier = StateNotifierProvider<ThemeModeNotifier, ThemeMode>(

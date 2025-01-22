@@ -214,7 +214,7 @@ class _AppState extends State<MainScreen> {
       String? seedPhrase = await getPhrase();
 
       if ((await isPKidMigrationIssueSolved() == false ||
-              await isPKidMigrationIssueSolved() == null)) {
+          await isPKidMigrationIssueSolved() == null)) {
         fixPkidMigration();
       }
 
@@ -317,6 +317,6 @@ class _AppState extends State<MainScreen> {
       twinId = await TFChain.getMyTwinId();
       await saveTwinId(twinId);
       await updateUserData('twin_id', twinId.toString());
-        }
+    }
   }
 }

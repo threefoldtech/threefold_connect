@@ -310,8 +310,7 @@ Future openLogin(BuildContext ctx, Login loginData,
     BackendConnection backendConnection) async {
   String? messageType = loginData.type;
 
-  if (messageType != 'login' ||
-      loginData.isMobile == true) {
+  if (messageType != 'login' || loginData.isMobile == true) {
     return;
   }
 
