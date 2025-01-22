@@ -26,7 +26,7 @@ Future<Uint8List> getPublicKey() async {
 
   if (isPublicKeyFixed == true) {
     String? encodedPublicKey = prefs.getString('publickey');
-    return base64.decode(encodedPublicKey);
+    return base64.decode(encodedPublicKey!);
   }
 
   var userInfoResponse = await getUserInfo(await getDoubleName());
@@ -42,7 +42,7 @@ Future<Uint8List> getPublicKey() async {
   }
 
   String? encodedPublicKey = prefs.getString('publickey');
-  return base64.decode(encodedPublicKey);
+  return base64.decode(encodedPublicKey!);
 }
 
 Future<void> savePublicKey(Uint8List publicKey) async {
@@ -72,7 +72,7 @@ Future<Uint8List> getPrivateKey() async {
   final SharedPreferences prefs = await SharedPreferences.getInstance();
 
   String? privateKey = prefs.getString('privatekey');
-  Uint8List decodedPrivateKey = base64.decode(privateKey);
+  Uint8List decodedPrivateKey = base64.decode(privateKey!);
 
   return decodedPrivateKey;
 }
@@ -310,6 +310,11 @@ Future<bool?> getFingerprint() async {
   final SharedPreferences prefs = await SharedPreferences.getInstance();
   bool? result = prefs.getBool('useFingerPrint');
 
+  if (result == null) {
+    prefs.setBool('useFingerPrint', false);
+    result = prefs.getBool('useFingerPrint');
+  }
+
   return result;
 }
 
@@ -357,6 +362,10 @@ Future<bool> getInitDone() async {
   final SharedPreferences prefs = await SharedPreferences.getInstance();
 
   bool? initDone = prefs.getBool('initDone');
+  if (initDone == null) {
+    prefs.setBool('initDone', false);
+    initDone = prefs.getBool('initDone');
+  }
 
   bool isInitDone = initDone == true;
   return isInitDone;
@@ -441,7 +450,11 @@ Future<List<dynamic>> getLocationIdList() async {
 
   List<dynamic> locationIdList = [];
 
-  locationIdList = jsonDecode(locationIdListAsJson);
+  if (locationIdListAsJson != null) {
+    locationIdList = jsonDecode(locationIdListAsJson);
+  } else {
+    locationIdList = [];
+  }
 
   return locationIdList;
 }

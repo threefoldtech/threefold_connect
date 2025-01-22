@@ -11,7 +11,7 @@ Future<FlutterPkid> getPkidClient({String seedPhrase = ''}) async {
   String pKidUrl = AppConfig().pKidUrl();
 
   String? phrase = seedPhrase != '' ? seedPhrase : await getPhrase();
-  KeyPair keyPair = await generateKeyPairFromSeedPhrase(phrase);
+  KeyPair keyPair = await generateKeyPairFromSeedPhrase(phrase!);
 
   return FlutterPkid(pKidUrl, keyPair);
 }

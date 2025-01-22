@@ -289,7 +289,7 @@ class _LoginScreenState extends State<LoginScreen> with BlockAndRunMixin {
 
   cancelIt() async {
     String? doubleName = await getDoubleName();
-    cancelLogin(doubleName);
+    cancelLogin(doubleName!);
   }
 
   sendIt(bool includeData) async {
@@ -300,10 +300,11 @@ class _LoginScreenState extends State<LoginScreen> with BlockAndRunMixin {
       int? created = widget.loginData.created;
       int currentTimestamp = DateTime.now().millisecondsSinceEpoch;
 
-      if (((currentTimestamp - created) / 1000) > Globals().loginTimeout) {
+      if (created != null &&
+          ((currentTimestamp - created) / 1000) > Globals().loginTimeout) {
         await showExpiredDialog(context);
         await sendData(
-            state, null, selectedImageId, null, widget.loginData.appId!);
+            state!, null, selectedImageId, null, widget.loginData.appId!);
 
         if (Navigator.canPop(context)) {
           Navigator.pop(context, false);
@@ -314,7 +315,7 @@ class _LoginScreenState extends State<LoginScreen> with BlockAndRunMixin {
     }
 
     // If the state is not passed through the regEx
-    bool stateCheck = RegExp(r'[^A-Za-z0-9]+').hasMatch(state);
+    bool stateCheck = RegExp(r'[^A-Za-z0-9]+').hasMatch(state!);
     if (stateCheck) {
       logger.i('States can only be alphanumeric [^A-Za-z0-9]');
       return;

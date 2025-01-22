@@ -4,13 +4,13 @@ import 'package:threebotlogin/helpers/logger.dart';
 class MyInAppBrowser extends InAppBrowser {
   @override
   void onLoadStart(Uri? url) {
-    super.onLoadStart(WebUri.uri(url!));
+    super.onLoadStart(url);
     logger.i('\n\nStarted $url\n\n');
   }
 
   @override
   void onLoadStop(Uri? url) {
-    super.onLoadStop(WebUri.uri(url!));
+    super.onLoadStop(url);
     logger.i('\n\nStopped $url\n\n');
   }
 

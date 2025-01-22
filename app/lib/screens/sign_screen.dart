@@ -460,6 +460,6 @@ class _SignScreenState extends State<SignScreen> with BlockAndRunMixin {
 
   cancelSignAttempt() async {
     String? doubleName = await getDoubleName();
-    cancelSign(doubleName);
+    cancelSign(doubleName!);
   }
 }

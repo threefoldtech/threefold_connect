@@ -587,12 +587,12 @@ class _IdentityVerificationScreenState
         context,
         MaterialPageRoute(
           builder: (context) => AuthenticationScreen(
-            correctPin: pin,
+            correctPin: pin!,
             userMessage: 'Please enter your PIN code',
           ),
         ));
 
-    if (authenticated) {
+    if (authenticated != null && authenticated) {
       final phrase = await getPhrase();
 
       showDialog(
@@ -937,7 +937,7 @@ class _IdentityVerificationScreenState
             }
 
             String? phoneNumber = phoneMap['phone'];
-            if (phoneNumber.isEmpty) {
+            if (phoneNumber == null || phoneNumber.isEmpty) {
               return;
             }
 
@@ -1129,7 +1129,7 @@ class _IdentityVerificationScreenState
             String? phoneNumber = phoneMap['phone'];
             if (phone != phoneNumber) {
               setState(() {
-                phone = phoneNumber;
+                phone = phoneNumber!;
               });
             }
             return;
@@ -1865,7 +1865,7 @@ class _IdentityVerificationScreenState
         return;
       }
       String? phoneNumber = phoneMap['phone'];
-      if (phoneNumber.isEmpty) {
+      if (phoneNumber == null || phoneNumber.isEmpty) {
         return;
       }
 

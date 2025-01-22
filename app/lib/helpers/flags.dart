@@ -94,17 +94,21 @@ class Flags {
 
   Future<bool> hasFlagValueByFeatureName(String name) async {
     String? doubleName = await getDoubleName();
-    Identity user = Identity(identifier: doubleName);
-    return (await client.hasFeatureFlag(name, user: user) &&
-        await client.isFeatureFlagEnabled(name, user: user));
+    if (doubleName != null) {
+      Identity user = Identity(identifier: doubleName);
+      return (await client.hasFeatureFlag(name, user: user) &&
+          await client.isFeatureFlagEnabled(name, user: user));
+    }
     return (await client.hasFeatureFlag(name) &&
         await client.isFeatureFlagEnabled(name));
   }
 
   Future<String?> getFlagValueByFeatureName(String name) async {
     String? doubleName = await getDoubleName();
-    Identity user = Identity(identifier: doubleName);
-    return (await client.getFeatureFlagValue(name, user: user));
+    if (doubleName != null) {
+      Identity user = Identity(identifier: doubleName);
+      return (await client.getFeatureFlagValue(name, user: user));
+    }
     return (await client.getFeatureFlagValue(name));
   }
 

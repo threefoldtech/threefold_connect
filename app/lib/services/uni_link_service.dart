@@ -53,11 +53,11 @@ void handleLoginUniLink(Uri link, BuildContext context) async {
     context,
     MaterialPageRoute(
       builder: (context) => AuthenticationScreen(
-          correctPin: pin, userMessage: 'Please enter your PIN code'),
+          correctPin: pin!, userMessage: 'Please enter your PIN code'),
     ),
   );
 
-  if (authenticated == false) {
+  if (authenticated == null || authenticated == false) {
     return;
   }
 
@@ -68,7 +68,7 @@ void handleLoginUniLink(Uri link, BuildContext context) async {
     ),
   );
 
-  if (loggedIn == false) {
+  if (loggedIn == null || loggedIn == false) {
     return;
   }
 
@@ -122,11 +122,11 @@ Future<void> handleSignUniLink(Uri link, BuildContext context) async {
     context,
     MaterialPageRoute(
       builder: (context) => AuthenticationScreen(
-          correctPin: pin, userMessage: 'Please enter your PIN code'),
+          correctPin: pin!, userMessage: 'Please enter your PIN code'),
     ),
   );
 
-  if (authenticated == false) {
+  if (authenticated == null || authenticated == false) {
     return;
   }
 
@@ -137,7 +137,7 @@ Future<void> handleSignUniLink(Uri link, BuildContext context) async {
     ),
   );
 
-  if (loggedIn == false) {
+  if (loggedIn == null || loggedIn == false) {
     return;
   }
 

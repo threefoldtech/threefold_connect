@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
-// import 'package:qr_code_scanner/qr_code_scanner.dart';
+import 'package:qr_code_scanner/qr_code_scanner.dart';
 import 'package:threebotlogin/apps/wallet/wallet_config.dart';
 import 'package:threebotlogin/apps/wallet/wallet_events.dart';
 import 'package:threebotlogin/apps/wallet/wallet_user_data.dart';
@@ -52,9 +52,9 @@ class _WalletState extends State<WalletWidget>
         : 'https://${config.appId()}/init';
 
     iaWebView = InAppWebView(
-      // initialUrlRequest: URLRequest(
-      //     url: Uri.parse(
-      //         '$walletUri?cache_buster=${DateTime.now().millisecondsSinceEpoch}')),
+      initialUrlRequest: URLRequest(
+          url: Uri.parse(
+              '$walletUri?cache_buster=${DateTime.now().millisecondsSinceEpoch}')),
       initialOptions: InAppWebViewGroupOptions(
           crossPlatform: InAppWebViewOptions(
               cacheEnabled: Globals().isCacheClearedWallet,
@@ -132,8 +132,7 @@ class _WalletState extends State<WalletWidget>
     // QRCode scanner is black if we don't sleep here.
     bool slept =
         await Future.delayed(const Duration(milliseconds: 400), () => true);
-    // late Barcode result;
-    late dynamic result;
+    late Barcode result;
     if (slept) {
       result = await Navigator.push(
           context, MaterialPageRoute(builder: (context) => const ScanScreen()));
