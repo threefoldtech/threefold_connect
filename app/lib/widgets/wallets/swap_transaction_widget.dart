@@ -21,15 +21,24 @@ class SwapTransactionWidget extends StatefulWidget {
 
 class _SwapTransactionWidgetState extends State<SwapTransactionWidget> {
   late BridgeOperation currentOperation;
-  final GlobalKey<_ChainLabelsState> _leftChainKey =
-      GlobalKey<_ChainLabelsState>();
-  final GlobalKey<_ChainLabelsState> _rightChainKey =
-      GlobalKey<_ChainLabelsState>();
+  late String leftSelectedChain;
+  late String rightSelectedChain;
 
   @override
   void initState() {
     super.initState();
     currentOperation = widget.bridgeOperation;
+    _initializeChains();
+  }
+
+  void _initializeChains() {
+    if (currentOperation == BridgeOperation.Withdraw) {
+      leftSelectedChain = 'TF Chain';
+      rightSelectedChain = widget.depositChain.name;
+    } else {
+      leftSelectedChain = widget.depositChain.name;
+      rightSelectedChain = 'TF Chain';
+    }
   }
 
   void _swapTransactionType() {
@@ -37,33 +46,28 @@ class _SwapTransactionWidgetState extends State<SwapTransactionWidget> {
       currentOperation = currentOperation == BridgeOperation.Withdraw
           ? BridgeOperation.Deposit
           : BridgeOperation.Withdraw;
+      // Swap chains
+      final temp = leftSelectedChain;
+      leftSelectedChain = rightSelectedChain;
+      rightSelectedChain = temp;
     });
     widget.onTransactionChange(currentOperation);
+  }
 
-    // Swap the selected chains
-    final leftChain = _leftChainKey.currentState?.selectedChain.value;
-    final rightChain = _rightChainKey.currentState?.selectedChain.value;
+  void _handleLeftChainChange(String newChain) {
+    setState(() => leftSelectedChain = newChain);
+  }
 
-    if (leftChain != null && rightChain != null) {
-      _leftChainKey.currentState?.updateSelectedChain(rightChain);
-      _rightChainKey.currentState?.updateSelectedChain(leftChain);
-    }
+  void _handleRightChainChange(String newChain) {
+    setState(() => rightSelectedChain = newChain);
   }
 
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
     final colorScheme = Theme.of(context).colorScheme;
-    final String leftChainLabel;
-    final String rightChainLabel;
-
-    if (currentOperation == BridgeOperation.Withdraw) {
-      leftChainLabel = 'TF Chain';
-      rightChainLabel = widget.depositChain.name;
-    } else {
-      leftChainLabel = widget.depositChain.name;
-      rightChainLabel = 'TF Chain';
-    }
+    final disableSwap = rightSelectedChain == 'Solana' ||
+        widget.disableDeposit && rightSelectedChain == 'Stellar';
 
     return Container(
       width: double.infinity,
@@ -77,39 +81,46 @@ class _SwapTransactionWidgetState extends State<SwapTransactionWidget> {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          _buildChainInfo(context, leftChainLabel, key: _leftChainKey),
-          _buildSwapButton(context),
-          _buildChainInfo(context, rightChainLabel,
-              isLeftSide: false, key: _rightChainKey),
+          _buildChainInfo(
+            context,
+            selectedChain: leftSelectedChain,
+            excludeChains: ['Solana', rightSelectedChain],
+            onChainChanged: _handleLeftChainChange,
+          ),
+          _buildSwapButton(context, disableSwap),
+          _buildChainInfo(
+            context,
+            selectedChain: rightSelectedChain,
+            excludeChains: [leftSelectedChain],
+            onChainChanged: _handleRightChainChange,
+            isLeft: false,
+          ),
         ],
       ),
     );
   }
 
   Widget _buildChainInfo(
-    BuildContext context,
-    String chainLabel, {
-    required Key key,
-    bool isLeftSide = true,
+    BuildContext context, {
+    required String selectedChain,
+    required List<String> excludeChains,
+    required ValueChanged<String> onChainChanged,
+    bool isLeft = true,
   }) {
-    final colorScheme = Theme.of(context).colorScheme;
-
     return Flexible(
       flex: 1,
       child: Row(
         mainAxisAlignment:
-            isLeftSide ? MainAxisAlignment.start : MainAxisAlignment.end,
+            isLeft ? MainAxisAlignment.start : MainAxisAlignment.end,
         children: [
           const SizedBox(width: 5),
           Flexible(
-            child: _ChainLabels(
-              key: key,
-              chainLabel: chainLabel,
-              colorScheme: colorScheme,
+            child: ChainDropdown(
+              selectedChain: selectedChain,
+              excludeChains: excludeChains,
+              onChanged: onChainChanged,
+              colorScheme: Theme.of(context).colorScheme,
               textTheme: Theme.of(context).textTheme,
-              excludeChain: isLeftSide
-                  ? null
-                  : _leftChainKey.currentState?.selectedChain.value,
             ),
           ),
         ],
@@ -117,22 +128,22 @@ class _SwapTransactionWidgetState extends State<SwapTransactionWidget> {
     );
   }
 
-  Widget _buildSwapButton(BuildContext context) {
+  Widget _buildSwapButton(BuildContext context, bool disableSwap) {
     final colorScheme = Theme.of(context).colorScheme;
 
     return SizedBox(
       width: 50,
       child: Center(
         child: GestureDetector(
-          onTap: widget.disableDeposit ? null : _swapTransactionType,
+          onTap: disableSwap ? null : _swapTransactionType,
           child: CircleAvatar(
             radius: 22,
-            backgroundColor: widget.disableDeposit
+            backgroundColor: disableSwap
                 ? Theme.of(context).disabledColor
                 : colorScheme.primaryContainer,
             child: Icon(
               Icons.swap_horiz,
-              color: widget.disableDeposit
+              color: disableSwap
                   ? colorScheme.onSurface.withOpacity(0.5)
                   : colorScheme.onPrimaryContainer,
               size: 25,
@@ -144,135 +155,91 @@ class _SwapTransactionWidgetState extends State<SwapTransactionWidget> {
   }
 }
 
-class _ChainLabels extends StatefulWidget {
-  final String chainLabel;
+class ChainDropdown extends StatelessWidget {
+  final String selectedChain;
+  final List<String> excludeChains;
+  final ValueChanged<String> onChanged;
   final ColorScheme colorScheme;
   final TextTheme textTheme;
-  final List<String> chains = ['TF Chain', 'Stellar', 'Solana'];
-  final String? excludeChain;
 
-  _ChainLabels({
-    required Key key,
-    required this.chainLabel,
+  const ChainDropdown({
+    super.key,
+    required this.selectedChain,
+    required this.excludeChains,
+    required this.onChanged,
     required this.colorScheme,
     required this.textTheme,
-    this.excludeChain,
-  }) : super(key: key);
-
-  @override
-  _ChainLabelsState createState() => _ChainLabelsState();
-}
-
-class _ChainLabelsState extends State<_ChainLabels> {
-  late ValueNotifier<String> selectedChain;
-
-  @override
-  void initState() {
-    super.initState();
-    selectedChain = ValueNotifier(widget.chainLabel);
-  }
-
-  void updateSelectedChain(String newChain) {
-    selectedChain.value = newChain;
-  }
+  });
 
   @override
   Widget build(BuildContext context) {
-    final filteredChains = widget.excludeChain != null
-        ? widget.chains.where((chain) => chain != widget.excludeChain).toList()
-        : widget.chains;
+    final chains = ['TF Chain', 'Stellar', 'Solana']
+        .where((c) => !excludeChains.contains(c))
+        .toList();
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.center,
+    return DropdownButtonHideUnderline(
+      child: DropdownButton<String>(
+        value: selectedChain,
+        items: chains.map((chain) {
+          return DropdownMenuItem<String>(
+            value: chain,
+            child: _ChainItem(chain: chain, colorScheme: colorScheme),
+          );
+        }).toList(),
+        selectedItemBuilder: (context) => chains.map((chain) {
+          return _ChainItem(
+            chain: chain,
+            colorScheme: colorScheme,
+            isSelected: true,
+          );
+        }).toList(),
+        onChanged: (value) => value != null ? onChanged(value) : null,
+      ),
+    );
+  }
+}
+
+class _ChainItem extends StatelessWidget {
+  final String chain;
+  final ColorScheme colorScheme;
+  final bool isSelected;
+
+  const _ChainItem({
+    required this.chain,
+    required this.colorScheme,
+    this.isSelected = false,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
       children: [
-        DropdownButtonHideUnderline(
-          child: ValueListenableBuilder<String>(
-            valueListenable: selectedChain,
-            builder: (context, value, child) {
-              return DropdownButton<String>(
-                value: value,
-                selectedItemBuilder: (BuildContext context) {
-                  return filteredChains.map((String value) {
-                    return Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 6.0),
-                      child: Row(
-                        children: [
-                          Image.asset(
-                            _getChainIcon(value),
-                            fit: BoxFit.contain,
-                            color: widget.colorScheme.onSurface,
-                            width: 30,
-                            height: 30,
-                          ),
-                          const SizedBox(width: 5),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'TFT',
-                                style: widget.textTheme.bodySmall!.copyWith(
-                                  color: widget.colorScheme.onSurface,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              const SizedBox(height: 2),
-                              Text(
-                                value,
-                                style: widget.textTheme.bodySmall!.copyWith(
-                                  color: widget.colorScheme.onSurface,
-                                ),
-                                softWrap: true,
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    );
-                  }).toList();
-                },
-                items: filteredChains.map((String value) {
-                  return DropdownMenuItem<String>(
-                    value: value,
-                    child: Row(
-                      children: [
-                        Image.asset(
-                          _getChainIcon(value),
-                          fit: BoxFit.contain,
-                          color: widget.colorScheme.onSurface,
-                          width: 20,
-                          height: 20,
-                        ),
-                        const SizedBox(width: 5),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'TFT',
-                              style: widget.textTheme.bodySmall!.copyWith(
-                                color: widget.colorScheme.onSurface,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            const SizedBox(height: 2),
-                            Text(
-                              value,
-                              style: widget.textTheme.bodySmall!.copyWith(
-                                color: widget.colorScheme.onSurface,
-                              ),
-                              softWrap: true,
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  );
-                }).toList(),
-                onChanged: (String? newValue) {
-                  selectedChain.value = newValue!;
-                },
-              );
-            },
-          ),
+        Image.asset(
+          _getChainIcon(chain),
+          width: isSelected ? 30 : 20,
+          height: isSelected ? 30 : 20,
+          color: colorScheme.onSurface,
+        ),
+        const SizedBox(width: 8),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'TFT',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: isSelected ? 14 : 12,
+                color: colorScheme.onSurface,
+              ),
+            ),
+            Text(
+              chain,
+              style: TextStyle(
+                fontSize: isSelected ? 12 : 10,
+                color: colorScheme.onSurface,
+              ),
+            ),
+          ],
         ),
       ],
     );
