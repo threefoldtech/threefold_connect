@@ -843,14 +843,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.19.0"
-  intl_phone_field:
+  intl_mobile_field:
     dependency: "direct main"
     description:
-      name: intl_phone_field
-      sha256: "73819d3dfcb68d2c85663606f6842597c3ddf6688ac777f051b17814fe767bbf"
+      name: intl_mobile_field
+      sha256: f1a004c1e05d88da01d199812b94249e3dfbaa39ee017037a4ec8886b264854a
       url: "https://pub.dev"
     source: hosted
-    version: "3.2.0"
+    version: "1.1.1"
   io:
     dependency: transitive
     description:
