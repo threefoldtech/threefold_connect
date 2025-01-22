@@ -53,8 +53,8 @@ class _WalletState extends State<WalletWidget>
 
     iaWebView = InAppWebView(
       initialUrlRequest: URLRequest(
-          url: Uri.parse(
-              '$walletUri?cache_buster=${DateTime.now().millisecondsSinceEpoch}')),
+          url: WebUri.uri(Uri.parse(
+              '$walletUri?cache_buster=${DateTime.now().millisecondsSinceEpoch}'))),
       initialOptions: InAppWebViewGroupOptions(
           crossPlatform: InAppWebViewOptions(
               cacheEnabled: Globals().isCacheClearedWallet,
