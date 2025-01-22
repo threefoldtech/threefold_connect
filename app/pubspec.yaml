@@ -31,60 +31,60 @@ dependencies:
       url: https://github.com/threefoldtech/tfgrid-sdk-dart
       ref: main
       path: packages/gridproxy_client
-  flutter_svg: ^2.0.6
+  flutter_svg: ^2.0.17
   bip39: ^1.0.6
-  socket_io_client: ^1.0.2
+  socket_io_client: ^3.0.2
   local_auth: 1.1.7
-  url_launcher: ^6.0.10
-  shared_preferences: ^2.0.7
-  http: ^1.0.0
-  package_info_plus: ^4.0.2
-  cupertino_icons: ^1.0.4
-  google_fonts: ^5.0.0
-  intl_phone_field: ^3.1.0
-  flagsmith: ^3.1.0
-  flutter_inappwebview: ^5.3.2
-  sodium_libs: ^2.1.0+1
+  url_launcher: ^6.3.1
+  shared_preferences: ^2.3.5
+  http: ^1.3.0
+  package_info_plus: ^8.1.3
+  cupertino_icons: ^1.0.8
+  google_fonts: ^6.2.1
+  intl_phone_field: ^3.2.0
+  flagsmith: ^6.0.0
+  flutter_inappwebview: ^6.1.5
+  sodium_libs: ^3.4.3+1
   uni_links: ^0.5.1
   pbkdf2ns: ^0.0.2
-  qr_code_scanner: ^1.0.1
+  # qr_code_scanner: ^1.0.1
   flutter_json_viewer: ^1.0.1
-  device_info_plus: ^9.0.2
-  permission_handler: ^10.2.0
-  path_provider: ^2.0.2
-  dio: ^5.0.0
-  open_filex: ^4.3.2
-  country_picker: ^2.0.20
+  device_info_plus: ^11.2.1
+  permission_handler: ^11.3.1
+  path_provider: ^2.1.5
+  dio: ^5.7.0
+  open_filex: ^4.6.0
+  country_picker: ^2.0.27
   pinenacl: ^0.6.0
-  pinput: 3.0.1
-  build_runner: ^2.4.9
+  pinput: ^5.0.1
+  build_runner: ^2.4.13
   smooth_page_indicator: ^1.2.0+3
-  webview_flutter: ^4.8.0
+  webview_flutter: ^4.10.0
   qr_flutter: ^4.1.0
-  screen_brightness: ^1.0.1
+  screen_brightness: ^2.1.1
   validators: ^3.0.0
-  lottie: ^3.1.2
-  crisp_chat: 2.0.3
-  xml2json: ^6.2.3
+  lottie: ^3.3.1
+  crisp_chat: ^2.2.3
+  xml2json: ^6.2.6
   timeago: ^3.7.0
-  flutter_widget_from_html: ^0.15.2
-  idenfy_sdk_flutter: 2.5.3
-  flutter_riverpod: 2.5.1
+  flutter_widget_from_html: ^0.15.3
+  idenfy_sdk_flutter: ^2.6.0
+  flutter_riverpod: ^2.6.1
 
-  convert: any
-  crypto: any
-  hashlib: any
-  stellar_flutter_sdk: ^1.8.9
-  flutter_launcher_icons: ^0.14.1
-  logger: ^2.4.0
+  convert: ^3.1.2
+  crypto: ^3.0.6
+  hashlib: ^1.21.1
+  stellar_flutter_sdk: ^1.9.2
+  flutter_launcher_icons: ^0.14.3
+  logger: ^2.5.0
   flutter_keyboard_visibility: ^6.0.0
   mutex: ^3.1.0
-  decimal: ^3.1.0
+  decimal: ^3.2.1
   infinite_scroll_pagination: ^4.1.0
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: ^2.0.0
+  flutter_lints: ^5.0.0
 
 dependency_overrides:
   intl: ^0.19.0
