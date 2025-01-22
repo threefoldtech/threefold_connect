@@ -67,6 +67,7 @@ class _SwapTransactionWidgetState extends State<SwapTransactionWidget> {
   void _handleRightChainChange(String newChain) {
     setState(() => rightSelectedChain = newChain);
     widget.updateIsSolana(newChain == 'Solana');
+    widget.onTransactionChange(currentOperation);
   }
 
   @override

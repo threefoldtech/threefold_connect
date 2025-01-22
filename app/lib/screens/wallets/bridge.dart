@@ -89,7 +89,9 @@ class _WalletBridgeScreenState extends ConsumerState<WalletBridgeScreen> {
     toController.text = '';
     toAddressError = null;
     amountError = null;
-    fee = isWithdraw ? Decimal.parse('1.01') : Decimal.parse('1.1');
+    fee = isWithdraw
+        ? Decimal.parse('1.01')
+        : (isSolana ? Decimal.parse('50') : Decimal.parse('1.1'));
     setState(() {});
   }
 
@@ -102,6 +104,10 @@ class _WalletBridgeScreenState extends ConsumerState<WalletBridgeScreen> {
     }
 
     if (!isWithdraw) {
+      if (isSolana && !isValidSolanaAddress(toAddress)) {
+        toAddressError = 'Invaild Solana address';
+        return false;
+      }
       if (toAddress.length != 48) {
         toAddressError = 'Address length should be 48 characters';
         return false;
@@ -114,10 +120,6 @@ class _WalletBridgeScreenState extends ConsumerState<WalletBridgeScreen> {
     }
 
     if (isWithdraw) {
-      if (isSolana && !isValidSolanaAddress(toAddress)) {
-        toAddressError = 'Invaild Solana address';
-        return false;
-      }
       if (!isValidStellarAddress(toAddress)) {
         toAddressError = 'Invaild Stellar address';
         return false;
@@ -269,7 +271,7 @@ class _WalletBridgeScreenState extends ConsumerState<WalletBridgeScreen> {
                       hintText: '100',
                       suffixText: 'TFT',
                       errorText: amountError)),
-              subtitle: Text('Max Fee: ${!isWithdraw ? 1.1 : 1.01} TFT'),
+              subtitle: Text('Max Fee: $fee TFT'),
             ),
             const SizedBox(height: 10),
             if (isBiggerThanFee)
