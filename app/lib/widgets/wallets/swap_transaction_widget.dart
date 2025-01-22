@@ -7,13 +7,13 @@ class SwapTransactionWidget extends StatefulWidget {
     required this.bridgeOperation,
     required this.onTransactionChange,
     required this.disableDeposit,
-    required this.depositChain,
+    required this.updateIsSolana,
   });
 
   final void Function(BridgeOperation bridgeOperation) onTransactionChange;
   final BridgeOperation bridgeOperation;
   final bool disableDeposit;
-  final DepositChain depositChain;
+  final Function(bool) updateIsSolana;
 
   @override
   _SwapTransactionWidgetState createState() => _SwapTransactionWidgetState();
@@ -34,9 +34,9 @@ class _SwapTransactionWidgetState extends State<SwapTransactionWidget> {
   void _initializeChains() {
     if (currentOperation == BridgeOperation.Withdraw) {
       leftSelectedChain = 'TF Chain';
-      rightSelectedChain = widget.depositChain.name;
+      rightSelectedChain = 'Stellar';
     } else {
-      leftSelectedChain = widget.depositChain.name;
+      leftSelectedChain = 'Stellar';
       rightSelectedChain = 'TF Chain';
     }
   }
@@ -66,6 +66,7 @@ class _SwapTransactionWidgetState extends State<SwapTransactionWidget> {
 
   void _handleRightChainChange(String newChain) {
     setState(() => rightSelectedChain = newChain);
+    widget.updateIsSolana(newChain == 'Solana');
   }
 
   @override
@@ -186,20 +187,20 @@ class ChainDropdown extends StatelessWidget {
     return DropdownButtonHideUnderline(
       child: DropdownButton<String>(
         value: selectedChain,
-        items: chains.map((chain) {
+        items: chains.map((c) {
           return DropdownMenuItem<String>(
-            value: chain,
-            child: _ChainItem(chain: chain, colorScheme: colorScheme),
+            value: c,
+            child: _ChainItem(chain: c, colorScheme: colorScheme),
           );
         }).toList(),
-        selectedItemBuilder: (context) => chains.map((chain) {
+        selectedItemBuilder: (context) => chains.map((c) {
           return _ChainItem(
-            chain: chain,
+            chain: c,
             colorScheme: colorScheme,
             isSelected: true,
           );
         }).toList(),
-        onChanged: (value) => value != null ? onChanged(value) : null,
+        onChanged: (v) => v != null ? onChanged(v) : null,
       ),
     );
   }

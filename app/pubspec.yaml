@@ -70,6 +70,7 @@ dependencies:
   flutter_widget_from_html: ^0.15.2
   idenfy_sdk_flutter: 2.5.3
   flutter_riverpod: 2.5.1
+  bs58: ^1.0.0
 
   convert: any
   crypto: any

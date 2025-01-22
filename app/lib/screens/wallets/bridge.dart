@@ -1,3 +1,4 @@
+import 'package:bs58/bs58.dart';
 import 'package:decimal/decimal.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -32,6 +33,7 @@ class _WalletBridgeScreenState extends ConsumerState<WalletBridgeScreen> {
   String? amountError;
   bool reloadBalance = true;
   List percentages = [25, 50, 75, 100];
+  bool isSolana = false;
 
   @override
   void initState() {
@@ -112,6 +114,10 @@ class _WalletBridgeScreenState extends ConsumerState<WalletBridgeScreen> {
     }
 
     if (isWithdraw) {
+      if (isSolana && !isValidSolanaAddress(toAddress)) {
+        toAddressError = 'Invaild Solana address';
+        return false;
+      }
       if (!isValidStellarAddress(toAddress)) {
         toAddressError = 'Invaild Stellar address';
         return false;
@@ -127,6 +133,15 @@ class _WalletBridgeScreenState extends ConsumerState<WalletBridgeScreen> {
       }
     }
     return true;
+  }
+
+  bool isValidSolanaAddress(String address) {
+    try {
+      final decodeBytes = base58.decode(address);
+      return decodeBytes.length == 32;
+    } catch (e) {
+      return false;
+    }
   }
 
   bool _validateAmount() {
@@ -167,11 +182,16 @@ class _WalletBridgeScreenState extends ConsumerState<WalletBridgeScreen> {
     setState(() {});
   }
 
+  updateIsSolana(bool value) {
+    setState(() {
+      isSolana = value;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     List<Wallet> wallets = ref.read(walletsNotifier);
     final bool disableDeposit = widget.wallet.stellarBalance == '-1';
-    const DepositChain depositChain = DepositChain.Solana;
     if (disableDeposit && !isWithdraw) {
       onTransactionChange(BridgeOperation.Withdraw);
     }
@@ -192,7 +212,7 @@ class _WalletBridgeScreenState extends ConsumerState<WalletBridgeScreen> {
                 bridgeOperation: transactionType,
                 onTransactionChange: onTransactionChange,
                 disableDeposit: disableDeposit,
-                depositChain: depositChain),
+                updateIsSolana: updateIsSolana),
             const SizedBox(height: 20),
             ListTile(
               title: TextField(
