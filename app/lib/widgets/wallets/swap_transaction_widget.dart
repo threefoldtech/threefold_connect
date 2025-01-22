@@ -55,7 +55,13 @@ class _SwapTransactionWidgetState extends State<SwapTransactionWidget> {
   }
 
   void _handleLeftChainChange(String newChain) {
-    setState(() => leftSelectedChain = newChain);
+    setState(() {
+      leftSelectedChain = newChain;
+      currentOperation = newChain == 'TF Chain'
+          ? BridgeOperation.Withdraw
+          : BridgeOperation.Deposit;
+    });
+    widget.onTransactionChange(currentOperation);
   }
 
   void _handleRightChainChange(String newChain) {
