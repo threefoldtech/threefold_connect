@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:threebotlogin/events/events.dart';
 import 'package:threebotlogin/events/identity_callback_event.dart';
 import 'package:threebotlogin/helpers/logger.dart';
+import 'package:threebotlogin/models/idenfy.dart';
 import 'package:threebotlogin/models/wallet.dart';
 import 'package:threebotlogin/providers/wallets_provider.dart';
 import 'package:threebotlogin/services/wallet_service.dart';
@@ -280,7 +281,7 @@ class _WalletDetailsWidgetState extends ConsumerState<WalletDetailsWidget> {
               ),
             const SizedBox(height: 40),
             Text(
-              'KYC Verification',
+              'KYC',
               style: Theme.of(context).textTheme.titleLarge!.copyWith(
                     color: Theme.of(context).colorScheme.onSurface,
                   ),
@@ -290,7 +291,8 @@ class _WalletDetailsWidgetState extends ConsumerState<WalletDetailsWidget> {
                 width: MediaQuery.of(context).size.width - 40,
                 child: ElevatedButton(
                   onPressed: () async {
-                    if (wallet.verificationStatus != 'VERIFIED') {
+                    if (wallet.verificationStatus !=
+                        VerificationState.VERIFIED.name) {
                       await termsAndConditionsDialog(
                           context: context, wallet: wallet);
 
@@ -322,20 +324,16 @@ class _WalletDetailsWidgetState extends ConsumerState<WalletDetailsWidget> {
                     }
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: wallet.verificationStatus != 'VERIFIED'
-                        ? Theme.of(context).colorScheme.errorContainer
-                        : Theme.of(context).colorScheme.primaryContainer,
+                    backgroundColor:
+                        Theme.of(context).colorScheme.primaryContainer,
                   ),
                   child: Text(
-                    wallet.verificationStatus != 'VERIFIED'
-                        ? 'Verify your Identity'
-                        : 'Show Verified Data',
+                    wallet.verificationStatus != VerificationState.VERIFIED.name
+                        ? 'Verify'
+                        : 'Show Data',
                     style: Theme.of(context).textTheme.bodyLarge!.copyWith(
-                          color: wallet.verificationStatus != 'VERIFIED'
-                              ? Theme.of(context).colorScheme.onErrorContainer
-                              : Theme.of(context)
-                                  .colorScheme
-                                  .onPrimaryContainer,
+                          color:
+                              Theme.of(context).colorScheme.onPrimaryContainer,
                         ),
                   ),
                 ),
