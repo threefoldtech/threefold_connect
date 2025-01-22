@@ -213,8 +213,7 @@ class _AppState extends State<MainScreen> {
     try {
       String? seedPhrase = await getPhrase();
 
-      if (seedPhrase != null &&
-          (await isPKidMigrationIssueSolved() == false ||
+      if ((await isPKidMigrationIssueSolved() == false ||
               await isPKidMigrationIssueSolved() == null)) {
         fixPkidMigration();
       }
@@ -314,12 +313,10 @@ class _AppState extends State<MainScreen> {
 
   Future<void> loadTwinId() async {
     int? twinId = await getTwinId();
-    if (twinId == null || twinId == 0) {
+    if (twinId == 0) {
       twinId = await TFChain.getMyTwinId();
-      if (twinId != null) {
-        await saveTwinId(twinId);
-        await updateUserData('twin_id', twinId.toString());
-      }
-    }
+      await saveTwinId(twinId);
+      await updateUserData('twin_id', twinId.toString());
+        }
   }
 }

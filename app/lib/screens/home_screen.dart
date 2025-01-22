@@ -54,7 +54,7 @@ class _HomeScreenState extends State<HomeScreen>
       context,
       MaterialPageRoute(
         builder: (context) => AuthenticationScreen(
-          correctPin: pin!,
+          correctPin: pin,
           userMessage: 'Please enter your PIN code',
         ),
       ),
@@ -62,7 +62,7 @@ class _HomeScreenState extends State<HomeScreen>
 
     pinCheckOpen = false;
 
-    if (authenticated != null && authenticated) {
+    if (authenticated) {
       lastCheck = DateTime.now().millisecondsSinceEpoch;
       timeoutExpiredInBackground = false;
       globals.tabController.animateTo(indexIfAuthIsSuccess);

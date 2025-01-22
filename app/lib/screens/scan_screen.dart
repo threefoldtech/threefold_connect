@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:qr_code_scanner/qr_code_scanner.dart';
+// import 'package:qr_code_scanner/qr_code_scanner.dart';
 
 class ScanScreen extends StatefulWidget {
   const ScanScreen({super.key});
@@ -24,24 +24,24 @@ class _ScanScreenState extends State<ScanScreen> {
     return Scaffold(
       body: Stack(
         children: [
-          QRView(
-            key: qrKey,
-            onQRViewCreated: _onQRViewCreated,
-          ),
+          // QRView(
+          //   key: qrKey,
+          //   onQRViewCreated: _onQRViewCreated,
+          // ),
           Align(alignment: Alignment.bottomCenter, child: content()),
         ],
       ),
     );
   }
 
-  void _onQRViewCreated(QRViewController controller) {
-    controller.scannedDataStream.listen((scanData) {
-      if (!popped) {
-        popped = true;
-        Navigator.pop(context, scanData);
-      }
-    });
-  }
+  // void _onQRViewCreated(QRViewController controller) {
+  //   controller.scannedDataStream.listen((scanData) {
+  //     if (!popped) {
+  //       popped = true;
+  //       Navigator.pop(context, scanData);
+  //     }
+  //   });
+  // }
 
   Widget content() {
     double height = MediaQuery.of(context).size.height;

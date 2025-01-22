@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:qr_code_scanner/qr_code_scanner.dart';
+// import 'package:qr_code_scanner/qr_code_scanner.dart';
 import 'package:threebotlogin/helpers/globals.dart';
 import 'package:threebotlogin/helpers/transaction_helpers.dart';
 import 'package:threebotlogin/models/wallet.dart';
@@ -374,7 +374,9 @@ class _WalletSendScreenState extends ConsumerState<WalletSendScreen> {
     // QRCode scanner is black if we don't sleep here.
     bool slept =
         await Future.delayed(const Duration(milliseconds: 400), () => true);
-    late Barcode result;
+    // late Barcode result;
+    late dynamic result;
+
     if (slept) {
       if (context.mounted) {
         result = await Navigator.push(context,

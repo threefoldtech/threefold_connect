@@ -94,22 +94,18 @@ class Flags {
 
   Future<bool> hasFlagValueByFeatureName(String name) async {
     String? doubleName = await getDoubleName();
-    if (doubleName != null) {
-      Identity user = Identity(identifier: doubleName);
-      return (await client.hasFeatureFlag(name, user: user) &&
-          await client.isFeatureFlagEnabled(name, user: user));
-    }
-    return (await client.hasFeatureFlag(name) &&
+    Identity user = Identity(identifier: doubleName);
+    return (await client.hasFeatureFlag(name, user: user) &&
+        await client.isFeatureFlagEnabled(name, user: user));
+      return (await client.hasFeatureFlag(name) &&
         await client.isFeatureFlagEnabled(name));
   }
 
   Future<String?> getFlagValueByFeatureName(String name) async {
     String? doubleName = await getDoubleName();
-    if (doubleName != null) {
-      Identity user = Identity(identifier: doubleName);
-      return (await client.getFeatureFlagValue(name, user: user));
-    }
-    return (await client.getFeatureFlagValue(name));
+    Identity user = Identity(identifier: doubleName);
+    return (await client.getFeatureFlagValue(name, user: user));
+      return (await client.getFeatureFlagValue(name));
   }
 
   Future<dynamic> setDeviceTrait(Identity user) async {

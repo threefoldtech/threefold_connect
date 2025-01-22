@@ -58,8 +58,7 @@ class AuthenticationScreenState extends State<AuthenticationScreen> {
     int? created = widget.loginData!.created;
     int currentTimestamp = DateTime.now().millisecondsSinceEpoch;
 
-    if (created != null &&
-        ((currentTimestamp - created) / 1000) > Globals().loginTimeout) {
+    if (((currentTimestamp - created) / 1000) > Globals().loginTimeout) {
       timer.cancel();
 
       await showDialog(

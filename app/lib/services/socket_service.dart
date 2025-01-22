@@ -269,7 +269,7 @@ Future openSign(BuildContext ctx, Sign signData,
     BackendConnection backendConnection) async {
   String? messageType = signData.type;
 
-  if (messageType == null || messageType != 'sign') {
+  if (messageType != 'sign') {
     return;
   }
 
@@ -280,11 +280,11 @@ Future openSign(BuildContext ctx, Sign signData,
     ctx,
     MaterialPageRoute(
       builder: (context) => AuthenticationScreen(
-          correctPin: pin!, userMessage: 'Please enter your PIN code'),
+          correctPin: pin, userMessage: 'Please enter your PIN code'),
     ),
   );
 
-  if (authenticated == null || authenticated == false) {
+  if (authenticated == false) {
     return;
   }
 
@@ -297,7 +297,7 @@ Future openSign(BuildContext ctx, Sign signData,
     ),
   );
 
-  if (signAccepted == null || signAccepted == false) {
+  if (signAccepted == false) {
     backendConnection.joinRoom(signData.doubleName);
     return;
   }
@@ -310,8 +310,7 @@ Future openLogin(BuildContext ctx, Login loginData,
     BackendConnection backendConnection) async {
   String? messageType = loginData.type;
 
-  if (messageType == null ||
-      messageType != 'login' ||
+  if (messageType != 'login' ||
       loginData.isMobile == true) {
     return;
   }
@@ -324,13 +323,13 @@ Future openLogin(BuildContext ctx, Login loginData,
     ctx,
     MaterialPageRoute(
       builder: (context) => AuthenticationScreen(
-          correctPin: pin!,
+          correctPin: pin,
           userMessage: 'Please enter your PIN code.',
           loginData: loginData),
     ),
   );
 
-  if (authenticated == null || authenticated == false) {
+  if (authenticated == false) {
     return;
   }
 
@@ -342,7 +341,7 @@ Future openLogin(BuildContext ctx, Login loginData,
       ),
     );
 
-    if (warningScreenCompleted == null || !warningScreenCompleted) {
+    if (!warningScreenCompleted) {
       return;
     }
 
@@ -358,7 +357,7 @@ Future openLogin(BuildContext ctx, Login loginData,
     ),
   );
 
-  if (loggedIn == null || loggedIn == false) {
+  if (loggedIn == false) {
     backendConnection.joinRoom(loginData.doubleName);
     return;
   }

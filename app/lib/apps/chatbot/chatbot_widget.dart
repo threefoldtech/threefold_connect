@@ -26,8 +26,8 @@ class _ChatbotState extends State<ChatbotWidget>
   _ChatbotState({required this.email}) {
     iaWebview = InAppWebView(
       initialUrlRequest: URLRequest(
-          url: Uri.parse(
-              '${config.url()}$email&cache_buster=${DateTime.now().millisecondsSinceEpoch}')),
+          url: WebUri.uri(Uri.parse(
+              '${config.url()}$email&cache_buster=${DateTime.now().millisecondsSinceEpoch}'))),
       initialOptions: InAppWebViewGroupOptions(
           crossPlatform: InAppWebViewOptions(useShouldOverrideUrlLoading: true),
           android: AndroidInAppWebViewOptions(

@@ -77,7 +77,7 @@ class _PreferenceScreenState extends ConsumerState<PreferenceScreen> {
         context,
         MaterialPageRoute(
           builder: (context) => AuthenticationScreen(
-            correctPin: pin!,
+            correctPin: pin,
             userMessage: 'Please enter your PIN code',
           ),
         ));
@@ -290,12 +290,12 @@ class _PreferenceScreenState extends ConsumerState<PreferenceScreen> {
                 context,
                 MaterialPageRoute(
                   builder: (context) => AuthenticationScreen(
-                    correctPin: pin!,
+                    correctPin: pin,
                     userMessage: 'Please enter your PIN code',
                   ),
                 ));
 
-            if (authenticated == null || !authenticated) {
+            if (!authenticated) {
               deleteLoading = false;
               setState(() {});
               return false;
@@ -386,13 +386,13 @@ class _PreferenceScreenState extends ConsumerState<PreferenceScreen> {
       context,
       MaterialPageRoute(
         builder: (context) => AuthenticationScreen(
-          correctPin: pin!,
+          correctPin: pin,
           userMessage: 'Please enter your PIN code',
         ),
       ),
     );
 
-    if (authenticated != null && authenticated) {
+    if (authenticated) {
       finger = newFingerprintValue;
       await saveFingerprint(newFingerprintValue);
       setState(() {});
@@ -403,7 +403,7 @@ class _PreferenceScreenState extends ConsumerState<PreferenceScreen> {
     String? pin = await getPin();
     bool? authenticated = false;
 
-    if (pin == null || pin.isEmpty) {
+    if (pin.isEmpty) {
       authenticated = true; // In case the pin wasn't set.
     } else {
       authenticated = await Navigator.push(
@@ -417,7 +417,7 @@ class _PreferenceScreenState extends ConsumerState<PreferenceScreen> {
       );
     }
 
-    if (authenticated != null && authenticated) {
+    if (authenticated) {
       bool pinChanged = await Navigator.push(
         context,
         MaterialPageRoute(
