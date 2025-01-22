@@ -363,29 +363,28 @@ void showErrorDialog({
 
 Widget pleaseWait(BuildContext context) {
   return Dialog(
-    child: Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        const SizedBox(
-          height: 10,
-        ),
-        CircularProgressIndicator(
-          color: Theme.of(context).colorScheme.primary,
-        ),
-        const SizedBox(
-          height: 10,
-        ),
-        Text(
-          'One moment please',
-          style: Theme.of(context)
-              .textTheme
-              .bodyMedium!
-              .copyWith(color: Theme.of(context).colorScheme.onSurface),
-        ),
-        const SizedBox(
-          height: 10,
-        ),
-      ],
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(12),
+    ),
+    child: Padding(
+      padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          CircularProgressIndicator(
+            color: Theme.of(context).colorScheme.primary,
+          ),
+          const SizedBox(height: 12),
+          Text(
+            'One moment please',
+            textAlign: TextAlign.center,
+            style: Theme.of(context)
+                .textTheme
+                .bodyMedium!
+                .copyWith(color: Theme.of(context).colorScheme.onSurface),
+          ),
+        ],
+      ),
     ),
   );
 }
@@ -409,11 +408,17 @@ Future<dynamic> showIdentityDetails(BuildContext context, String walletSeed) {
                       const SizedBox(
                         height: 10,
                       ),
-                      Text(
-                        'No data available for the provided wallet address.',
-                        style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                            color: Theme.of(context).colorScheme.onSurface),
-                        textAlign: TextAlign.center,
+                      Center(
+                        child: Text(
+                          'No data available for the provided wallet address.',
+                          style: Theme.of(context)
+                              .textTheme
+                              .bodyMedium!
+                              .copyWith(
+                                  color:
+                                      Theme.of(context).colorScheme.onSurface),
+                          textAlign: TextAlign.center,
+                        ),
                       ),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,

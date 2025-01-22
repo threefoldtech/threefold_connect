@@ -286,6 +286,7 @@ class _WalletDetailsWidgetState extends ConsumerState<WalletDetailsWidget> {
                     color: Theme.of(context).colorScheme.onSurface,
                   ),
             ),
+            const SizedBox(height: 10,),
             Center(
               child: SizedBox(
                 width: MediaQuery.of(context).size.width - 40,
