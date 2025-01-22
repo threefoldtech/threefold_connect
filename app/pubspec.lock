@@ -1019,6 +1019,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.6"
+  mobile_scanner:
+    dependency: "direct main"
+    description:
+      name: mobile_scanner
+      sha256: "57d6269d10912d5d583606b46d963d7c5d0299d2c37add8b7192dd769d40a319"
+      url: "https://pub.dev"
+    source: hosted
+    version: "6.0.3"
   moment_dart:
     dependency: transitive
     description:
