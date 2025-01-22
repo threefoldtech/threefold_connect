@@ -4,8 +4,6 @@ enum ChainType { Stellar, TFChain }
 
 enum BridgeOperation { Withdraw, Deposit }
 
-enum DepositChain { Stellar, Solana }
-
 class Wallet {
   Wallet({
     required this.name,
