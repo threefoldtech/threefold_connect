@@ -9,6 +9,7 @@ import 'package:threebotlogin/screens/wallets/wallet_details.dart';
 import 'package:threebotlogin/services/stellar_service.dart' as StellarService;
 import 'package:threebotlogin/services/tfchain_service.dart' as TFChainService;
 import 'package:threebotlogin/services/wallet_service.dart';
+import 'package:threebotlogin/widgets/wallets/add_wallet.dart';
 
 class WalletCardWidget extends ConsumerStatefulWidget {
   const WalletCardWidget({super.key, required this.wallet});
@@ -58,6 +59,18 @@ class _WalletCardWidgetState extends ConsumerState<WalletCardWidget> {
     }
   }
 
+  _openAddWalletOverlay() {
+    showModalBottomSheet(
+        isScrollControlled: true,
+        useSafeArea: true,
+        isDismissible: false,
+        constraints: const BoxConstraints(maxWidth: double.infinity),
+        context: context,
+        builder: (ctx) => NewWallet(
+              wallets: wallets,
+            ));
+  }
+
   @override
   Widget build(BuildContext context) {
     List<Widget> cardContent = [];
@@ -67,21 +80,40 @@ class _WalletCardWidgetState extends ConsumerState<WalletCardWidget> {
       cardContent = [
         Container(
             alignment: Alignment.centerRight,
-            child: ElevatedButton(
-              onPressed: _initializeWallet,
-              child: initialWalletLoading
-                  ? const SizedBox(
-                      width: 20,
-                      height: 20,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2,
-                      ))
-                  : Text(
-                      'Initialize Wallet',
-                      style: Theme.of(context).textTheme.bodyLarge!.copyWith(
-                          color:
-                              Theme.of(context).colorScheme.onPrimaryContainer),
-                    ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                ElevatedButton(
+                  onPressed: _openAddWalletOverlay,
+                  child: Text(
+                    'Import Wallet',
+                    style: Theme.of(context).textTheme.bodyLarge!.copyWith(
+                        color:
+                            Theme.of(context).colorScheme.onPrimaryContainer),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                ElevatedButton(
+                  onPressed: _initializeWallet,
+                  child: initialWalletLoading
+                      ? const SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                          ))
+                      : Text(
+                          'Initialize Wallet',
+                          style: Theme.of(context)
+                              .textTheme
+                              .bodyLarge!
+                              .copyWith(
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .onPrimaryContainer),
+                        ),
+                ),
+              ],
             ))
       ];
     } else {

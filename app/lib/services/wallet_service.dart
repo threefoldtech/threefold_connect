@@ -31,11 +31,14 @@ Future<List<PkidWallet>> getPkidWallets() async {
   try {
     pKidResult = await client.getPKidDoc('purse');
     if (pKidResult.containsKey('error')) {
+      if (pKidResult.containsValue('Keypair not found')){
+        return [];
+      }
       logger.e('Error in pKidResult : ${pKidResult['error']}');
       throw Exception('Error fetching wallets');
     }
   } catch (e) {
-    logger.e('Error while requesting pkidWallets');
+    logger.e('Error while requesting pkidWallets: $e');
     throw Exception('Error fetching wallets');
   }
   final result =
