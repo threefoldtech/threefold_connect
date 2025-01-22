@@ -598,9 +598,11 @@ packages:
   flutter_pkid:
     dependency: "direct main"
     description:
-      path: "../../threefold_connect_flutter_pkid_client"
-      relative: true
-    source: path
+      path: "."
+      ref: master_update
+      resolved-ref: ccae3c8ee136a88305de178ca69211b1784bfc04
+      url: "https://github.com/threefoldtech/threefold_connect_flutter_pkid_client"
+    source: git
     version: "0.0.1"
   flutter_plugin_android_lifecycle:
     dependency: transitive
@@ -751,9 +753,11 @@ packages:
   gridproxy_client:
     dependency: "direct main"
     description:
-      path: "../../../codescalers/tfgrid-sdk-dart/packages/gridproxy_client"
-      relative: true
-    source: path
+      path: "packages/gridproxy_client"
+      ref: development_upgrade
+      resolved-ref: "78ab0cc09dfe72a25e94b40c783a4ec3a1f81e36"
+      url: "https://github.com/threefoldtech/tfgrid-sdk-dart"
+    source: git
     version: "1.0.0"
   hashlib:
     dependency: "direct main"
@@ -1692,9 +1696,11 @@ packages:
   stellar_client:
     dependency: "direct main"
     description:
-      path: "../../../codescalers/tfgrid-sdk-dart/packages/stellar_client"
-      relative: true
-    source: path
+      path: "packages/stellar_client"
+      ref: development_upgrade
+      resolved-ref: "78ab0cc09dfe72a25e94b40c783a4ec3a1f81e36"
+      url: "https://github.com/threefoldtech/tfgrid-sdk-dart"
+    source: git
     version: "0.1.0"
   stellar_flutter_sdk:
     dependency: "direct main"
@@ -1779,9 +1785,11 @@ packages:
   tfchain_client:
     dependency: "direct main"
     description:
-      path: "../../../codescalers/tfgrid-sdk-dart/packages/tfchain_client"
-      relative: true
-    source: path
+      path: "packages/tfchain_client"
+      ref: development_upgrade
+      resolved-ref: "78ab0cc09dfe72a25e94b40c783a4ec3a1f81e36"
+      url: "https://github.com/threefoldtech/tfgrid-sdk-dart"
+    source: git
     version: "0.1.0"
   timeago:
     dependency: "direct main"
