@@ -13,6 +13,7 @@ import 'package:threebotlogin/services/shared_preference_service.dart';
 import 'package:tfchain_client/tfchain_client.dart' as TFChain;
 import 'package:tfchain_client/models/dao.dart';
 import 'package:tfchain_client/generated/dev/types/pallet_dao/proposal/dao_votes.dart';
+import 'package:tfchain_client/generated/dev/types/pallet_dao/proposal/vote_weight.dart';
 import 'package:crypto/crypto.dart';
 import 'package:http/http.dart' as http;
 import 'package:hashlib/hashlib.dart' as hashlib;
@@ -118,6 +119,21 @@ Future<DaoVotes> getProposalVotes(String hash) async {
     return votes;
   } catch (e) {
     throw Exception('Failed to get dao proposals votes due to $e');
+  } finally {
+    await client.disconnect();
+  }
+}
+
+Future<int> getProposalProgress(
+    List<VoteWeight> ayes, List<VoteWeight> nayes, bool typeAye) async {
+  final chainUrl = Globals().chainUrl;
+  final client = TFChain.QueryClient(chainUrl);
+  try {
+    await client.connect();
+    final progress = client.dao.getProgress(ayes, nayes, typeAye);
+    return progress;
+  } catch (e) {
+    throw Exception('Failed to get dao proposals progress due to $e');
   } finally {
     await client.disconnect();
   }
