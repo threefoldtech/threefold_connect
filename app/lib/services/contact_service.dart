@@ -3,6 +3,7 @@ import 'dart:typed_data';
 
 import 'package:flutter_pkid/flutter_pkid.dart';
 import 'package:threebotlogin/apps/wallet/wallet_config.dart';
+import 'package:threebotlogin/helpers/logger.dart';
 import 'package:threebotlogin/models/contact.dart';
 import 'package:threebotlogin/models/wallet.dart';
 import 'package:threebotlogin/services/pkid_service.dart';
@@ -19,7 +20,20 @@ Future<FlutterPkid> _getPkidClient() async {
 
 Future<List<PkidContact>> getPkidContacts() async {
   FlutterPkid client = await _getPkidClient();
-  final pKidResult = await client.getPKidDoc('contacts');
+  Map<String, dynamic> pKidResult;
+  try {
+    pKidResult = await client.getPKidDoc('contacts');
+    if (pKidResult.containsKey('error')) {
+      if (pKidResult.containsValue('Keypair not found')){
+        return [];
+      }
+      logger.e('Error in pKidResult : ${pKidResult['error']}');
+      throw Exception('Error fetching contacts');
+    }
+  } catch (e) {
+    logger.e('Error while requesting pkidContacts: $e');
+    throw Exception('Error fetching contacts');
+  }
   final result =
       pKidResult.containsKey('data') && pKidResult.containsKey('success')
           ? jsonDecode(pKidResult['data'])
