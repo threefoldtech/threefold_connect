@@ -68,7 +68,7 @@ dependencies:
   xml2json: ^6.2.6
   timeago: ^3.7.0
   flutter_widget_from_html: ^0.15.3
-  idenfy_sdk_flutter: ^2.6.0
+  idenfy_sdk_flutter: 2.5.6
   flutter_riverpod: ^2.6.1
 
   convert: ^3.1.2
@@ -82,7 +82,7 @@ dependencies:
   decimal: ^3.2.1
   infinite_scroll_pagination: ^4.1.0
   intl_mobile_field: ^1.1.1
-  mobile_scanner: ^6.0.3
+  mobile_scanner: 5.2.3
 dev_dependencies:
   flutter_test:
     sdk: flutter

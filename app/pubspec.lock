@@ -819,10 +819,10 @@ packages:
     dependency: "direct main"
     description:
       name: idenfy_sdk_flutter
-      sha256: de34db373c3fdd5e93b5dc1f0cd70740a7a80bfbd2a390dedf7f0afe5738593e
+      sha256: "89eebaca7b6fb0c955d51416546b81f3c76a944dfbfa4354c3a044d0cdd10010"
       url: "https://pub.dev"
     source: hosted
-    version: "2.6.0"
+    version: "2.5.6"
   image:
     dependency: transitive
     description:
@@ -1027,10 +1027,10 @@ packages:
     dependency: "direct main"
     description:
       name: mobile_scanner
-      sha256: "57d6269d10912d5d583606b46d963d7c5d0299d2c37add8b7192dd769d40a319"
+      sha256: d234581c090526676fd8fab4ada92f35c6746e3fb4f05a399665d75a399fb760
       url: "https://pub.dev"
     source: hosted
-    version: "6.0.3"
+    version: "5.2.3"
   moment_dart:
     dependency: transitive
     description:
