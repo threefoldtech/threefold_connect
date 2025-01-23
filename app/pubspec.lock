@@ -599,8 +599,8 @@ packages:
     dependency: "direct main"
     description:
       path: "."
-      ref: master_update
-      resolved-ref: ccae3c8ee136a88305de178ca69211b1784bfc04
+      ref: master
+      resolved-ref: ab13fa12bfe14b0fc6d482d3a23ac24d416d8167
       url: "https://github.com/threefoldtech/threefold_connect_flutter_pkid_client"
     source: git
     version: "0.0.1"
@@ -754,8 +754,8 @@ packages:
     dependency: "direct main"
     description:
       path: "packages/gridproxy_client"
-      ref: development_upgrade
-      resolved-ref: "78ab0cc09dfe72a25e94b40c783a4ec3a1f81e36"
+      ref: development
+      resolved-ref: "77f8f563f35d13016aada278feb6431fcfc6731d"
       url: "https://github.com/threefoldtech/tfgrid-sdk-dart"
     source: git
     version: "1.0.0"
@@ -1547,8 +1547,8 @@ packages:
     dependency: transitive
     description:
       path: "packages/signer"
-      ref: development_upgrade
-      resolved-ref: "78ab0cc09dfe72a25e94b40c783a4ec3a1f81e36"
+      ref: development
+      resolved-ref: "77f8f563f35d13016aada278feb6431fcfc6731d"
       url: "https://github.com/threefoldtech/tfgrid-sdk-dart.git"
     source: git
     version: "0.1.0"
@@ -1697,8 +1697,8 @@ packages:
     dependency: "direct main"
     description:
       path: "packages/stellar_client"
-      ref: development_upgrade
-      resolved-ref: "78ab0cc09dfe72a25e94b40c783a4ec3a1f81e36"
+      ref: development
+      resolved-ref: "77f8f563f35d13016aada278feb6431fcfc6731d"
       url: "https://github.com/threefoldtech/tfgrid-sdk-dart"
     source: git
     version: "0.1.0"
@@ -1786,8 +1786,8 @@ packages:
     dependency: "direct main"
     description:
       path: "packages/tfchain_client"
-      ref: development_upgrade
-      resolved-ref: "78ab0cc09dfe72a25e94b40c783a4ec3a1f81e36"
+      ref: development
+      resolved-ref: "77f8f563f35d13016aada278feb6431fcfc6731d"
       url: "https://github.com/threefoldtech/tfgrid-sdk-dart"
     source: git
     version: "0.1.0"
