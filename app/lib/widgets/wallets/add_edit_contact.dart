@@ -227,7 +227,9 @@ class _AddEditContactState extends State<AddEditContact> {
                   keyboardType: TextInputType.multiline,
                   maxLines: null,
                   decoration: InputDecoration(
-                    label: const Text('Address'),
+                    label: Text(widget.chainType == ChainType.TFChain
+                        ? 'TFChain Address'
+                        : 'Stellar Address'),
                     errorText: addressError,
                   ),
                   controller: _addressController,
