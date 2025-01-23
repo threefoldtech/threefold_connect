@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
-import 'package:qr_code_scanner/qr_code_scanner.dart';
+import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:threebotlogin/apps/wallet/wallet_config.dart';
 import 'package:threebotlogin/apps/wallet/wallet_events.dart';
 import 'package:threebotlogin/apps/wallet/wallet_user_data.dart';
@@ -53,8 +53,8 @@ class _WalletState extends State<WalletWidget>
 
     iaWebView = InAppWebView(
       initialUrlRequest: URLRequest(
-          url: Uri.parse(
-              '$walletUri?cache_buster=${DateTime.now().millisecondsSinceEpoch}')),
+          url: WebUri.uri(Uri.parse(
+              '$walletUri?cache_buster=${DateTime.now().millisecondsSinceEpoch}'))),
       initialOptions: InAppWebViewGroupOptions(
           crossPlatform: InAppWebViewOptions(
               cacheEnabled: Globals().isCacheClearedWallet,
@@ -137,7 +137,7 @@ class _WalletState extends State<WalletWidget>
       result = await Navigator.push(
           context, MaterialPageRoute(builder: (context) => const ScanScreen()));
     }
-    return result.code;
+    return result.rawValue;
   }
 
   addHandler() {

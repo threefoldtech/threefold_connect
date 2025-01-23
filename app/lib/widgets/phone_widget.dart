@@ -3,8 +3,8 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_pkid/flutter_pkid.dart';
 import 'package:http/http.dart';
-import 'package:intl_phone_field/countries.dart';
-import 'package:intl_phone_field/intl_phone_field.dart';
+import 'package:intl_mobile_field/countries.dart';
+import 'package:intl_mobile_field/intl_mobile_field.dart';
 import 'package:threebotlogin/helpers/globals.dart';
 import 'package:threebotlogin/services/open_kyc_service.dart';
 import 'package:threebotlogin/services/phone_service.dart';
@@ -105,7 +105,7 @@ class PhoneAlertDialogState extends State<PhoneAlertDialog> {
               ),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: IntlPhoneField(
+              child: IntlMobileField(
                 initialCountryCode: widget.defaultCountryCode,
                 decoration: const InputDecoration(
                   labelText: 'Phone Number',
