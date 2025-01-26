@@ -5,9 +5,7 @@ import 'package:threebotlogin/models/payment_request.dart';
 
 class NoAnimationTabController extends TabController {
   NoAnimationTabController(
-      {super.initialIndex,
-      required super.length,
-      required super.vsync});
+      {super.initialIndex, required super.length, required super.vsync});
 
   @override
   void animateTo(int value,

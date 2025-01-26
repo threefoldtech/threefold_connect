@@ -15,6 +15,7 @@ class BridgeConfirmationWidget extends StatefulWidget {
     required this.to,
     required this.amount,
     required this.memo,
+    required this.isSolana,
     required this.reloadBalance,
   });
 
@@ -24,6 +25,7 @@ class BridgeConfirmationWidget extends StatefulWidget {
   final String to;
   final String amount;
   final String? memo;
+  final bool isSolana;
   final void Function() reloadBalance;
 
   @override
@@ -167,8 +169,16 @@ class _BridgeConfirmationWidgetState extends State<BridgeConfirmationWidget> {
     });
     try {
       if (widget.bridgeOperation == BridgeOperation.Deposit) {
-        await Stellar.transfer(widget.secret, Globals().bridgeTFTAddress,
-            widget.amount, widget.memo!);
+        if (widget.isSolana) {
+          await Stellar.transfer(
+              widget.secret,
+              'GDGIQWZDFVWJPAFG7PJ5AXMOK7NVFVFWELZILI5MLHGSZULBTBGIBYHW',
+              widget.amount,
+              widget.memo!);
+        } else {
+          await Stellar.transfer(widget.secret, Globals().bridgeTFTAddress,
+              widget.amount, widget.memo!);
+        }
       } else {
         await TFChain.swapToStellar(
             widget.secret, widget.to, BigInt.from(double.parse(widget.amount)));

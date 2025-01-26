@@ -89,9 +89,9 @@ class _WalletBridgeScreenState extends ConsumerState<WalletBridgeScreen> {
     toController.text = '';
     toAddressError = null;
     amountError = null;
-    fee = isWithdraw
-        ? Decimal.parse('1.01')
-        : (isSolana ? Decimal.parse('50') : Decimal.parse('1.1'));
+    fee = !isWithdraw
+        ? Decimal.parse('1.1')
+        : (isSolana ? Decimal.parse('50') : Decimal.parse('1.01'));
     setState(() {});
   }
 
@@ -104,10 +104,6 @@ class _WalletBridgeScreenState extends ConsumerState<WalletBridgeScreen> {
     }
 
     if (!isWithdraw) {
-      if (isSolana && !isValidSolanaAddress(toAddress)) {
-        toAddressError = 'Invaild Solana address';
-        return false;
-      }
       if (toAddress.length != 48) {
         toAddressError = 'Address length should be 48 characters';
         return false;
@@ -120,30 +116,33 @@ class _WalletBridgeScreenState extends ConsumerState<WalletBridgeScreen> {
     }
 
     if (isWithdraw) {
-      if (!isValidStellarAddress(toAddress)) {
-        toAddressError = 'Invaild Stellar address';
-        return false;
-      }
-      if (toAddress == Globals().bridgeTFTAddress) {
-        toAddressError = "Bridge address can't be the destination";
-        return false;
-      }
-      final toAddrBalance = await Stellar.getBalanceByAccountId(toAddress);
-      if (toAddrBalance == '-1') {
-        toAddressError = 'Address must be active and have TFT trustline';
-        return false;
+      if (isSolana) {
+        if (!isValidSolanaAddress(toAddress)) {
+          toAddressError = 'Invaild Solana address';
+          return false;
+        }
+      } else {
+        if (!isValidStellarAddress(toAddress)) {
+          toAddressError = 'Invaild Stellar address';
+          return false;
+        }
+        if (toAddress == Globals().bridgeTFTAddress) {
+          toAddressError = "Bridge address can't be the destination";
+          return false;
+        }
+        final toAddrBalance = await Stellar.getBalanceByAccountId(toAddress);
+        if (toAddrBalance == '-1') {
+          toAddressError = 'Address must be active and have TFT trustline';
+          return false;
+        }
       }
     }
     return true;
   }
 
   bool isValidSolanaAddress(String address) {
-    try {
-      final decodeBytes = base58.decode(address);
-      return decodeBytes.length == 32;
-    } catch (e) {
-      return false;
-    }
+    final decodeBytes = base58.decode(address);
+    return decodeBytes.length == 32;
   }
 
   bool _validateAmount() {
@@ -347,6 +346,7 @@ class _WalletBridgeScreenState extends ConsumerState<WalletBridgeScreen> {
               from: fromController.text.trim(),
               to: toController.text.trim(),
               amount: amountController.text.trim(),
+              isSolana: isSolana,
               memo: memoText,
               reloadBalance:
                   isWithdraw ? _loadTFChainBalance : _loadStellarBalance,
