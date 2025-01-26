@@ -36,7 +36,6 @@ class _WalletDetailsWidgetState extends ConsumerState<WalletDetailsWidget> {
     walletsRef = ref.read(walletsNotifier.notifier);
     walletNameController.text = widget.wallet.name;
     walletName = widget.wallet.name;
-    walletNameController.addListener(_validateWalletName);
   }
 
   Future<bool> _deleteWallet() async {
@@ -129,7 +128,6 @@ class _WalletDetailsWidgetState extends ConsumerState<WalletDetailsWidget> {
     stellarAddressController.dispose();
     tfchainSecretController.dispose();
     tfchainAddressController.dispose();
-    walletNameController.removeListener(_validateWalletName);
     walletNameController.dispose();
     super.dispose();
   }
@@ -269,6 +267,9 @@ class _WalletDetailsWidgetState extends ConsumerState<WalletDetailsWidget> {
                         color: Theme.of(context).colorScheme.onSurface,
                       ),
                   controller: walletNameController,
+                  onChanged: (text) {
+                    _validateWalletName();
+                  },
                   decoration: InputDecoration(
                     labelText: 'Wallet Name',
                     errorText: _errorText,
