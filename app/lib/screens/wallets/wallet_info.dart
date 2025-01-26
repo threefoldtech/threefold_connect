@@ -129,6 +129,23 @@ class _WalletDetailsWidgetState extends ConsumerState<WalletDetailsWidget> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            ListTile(
+              title: TextField(
+                  focusNode: nameFocus,
+                  autofocus: edit,
+                  readOnly: !edit,
+                  style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                        color: Theme.of(context).colorScheme.onSurface,
+                      ),
+                  controller: walletNameController,
+                  decoration: const InputDecoration(
+                    labelText: 'Wallet Name',
+                  )),
+              trailing: IconButton(
+                  onPressed: _editWallet,
+                  icon: edit ? const Icon(Icons.save) : const Icon(Icons.edit)),
+            ),
+            const SizedBox(height: 40),
             Text(
               'Addresses',
               style: Theme.of(context).textTheme.titleLarge!.copyWith(
@@ -243,50 +260,44 @@ class _WalletDetailsWidgetState extends ConsumerState<WalletDetailsWidget> {
                   icon: const Icon(Icons.copy)),
             ),
             const SizedBox(height: 40),
-            ListTile(
-              title: TextField(
-                  focusNode: nameFocus,
-                  autofocus: edit,
-                  readOnly: !edit,
-                  style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+            Row(
+              children: [
+                Text(
+                  'KYC',
+                  style: Theme.of(context).textTheme.titleLarge!.copyWith(
                         color: Theme.of(context).colorScheme.onSurface,
                       ),
-                  controller: walletNameController,
-                  decoration: const InputDecoration(
-                    labelText: 'Wallet Name',
-                  )),
-              trailing: IconButton(
-                  onPressed: _editWallet,
-                  icon: edit ? const Icon(Icons.save) : const Icon(Icons.edit)),
-            ),
-            const SizedBox(height: 40),
-            if (widget.wallet.type == WalletType.IMPORTED)
-              Center(
-                child: SizedBox(
-                  width: MediaQuery.of(context).size.width - 40,
-                  child: ElevatedButton(
-                    onPressed: _showDeleteConfirmationDialog,
-                    style: ElevatedButton.styleFrom(
-                        backgroundColor:
-                            Theme.of(context).colorScheme.errorContainer),
-                    child: Text(
-                      'Delete',
-                      style: Theme.of(context).textTheme.bodyLarge!.copyWith(
-                            color:
-                                Theme.of(context).colorScheme.onErrorContainer,
-                          ),
-                    ),
-                  ),
                 ),
-              ),
-            const SizedBox(height: 40),
-            Text(
-              'KYC',
-              style: Theme.of(context).textTheme.titleLarge!.copyWith(
-                    color: Theme.of(context).colorScheme.onSurface,
+                const Spacer(),
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  decoration: BoxDecoration(
+                    border: Border.all(
+                      color: wallet.verificationStatus ==
+                              VerificationState.VERIFIED.name
+                          ? Theme.of(context).colorScheme.primary
+                          : Theme.of(context).colorScheme.error,
+                    ),
+                    borderRadius: BorderRadius.circular(20),
                   ),
+                  child: Text(
+                      wallet.verificationStatus.toLowerCase().replaceFirst(
+                            wallet.verificationStatus[0].toLowerCase(),
+                            wallet.verificationStatus[0].toUpperCase(),
+                          ),
+                      style: Theme.of(context).textTheme.bodySmall!.copyWith(
+                            color: wallet.verificationStatus ==
+                                    VerificationState.VERIFIED.name
+                                ? Theme.of(context).colorScheme.primary
+                                : Theme.of(context).colorScheme.error,
+                          )),
+                ),
+              ],
             ),
-            const SizedBox(height: 10,),
+            const SizedBox(
+              height: 10,
+            ),
             Center(
               child: SizedBox(
                 width: MediaQuery.of(context).size.width - 40,
@@ -339,7 +350,27 @@ class _WalletDetailsWidgetState extends ConsumerState<WalletDetailsWidget> {
                   ),
                 ),
               ),
-            )
+            ),
+            const SizedBox(height: 40),
+            if (widget.wallet.type == WalletType.IMPORTED)
+              Center(
+                child: SizedBox(
+                  width: MediaQuery.of(context).size.width - 40,
+                  child: ElevatedButton(
+                    onPressed: _showDeleteConfirmationDialog,
+                    style: ElevatedButton.styleFrom(
+                        backgroundColor:
+                            Theme.of(context).colorScheme.errorContainer),
+                    child: Text(
+                      'Delete',
+                      style: Theme.of(context).textTheme.bodyLarge!.copyWith(
+                            color:
+                                Theme.of(context).colorScheme.onErrorContainer,
+                          ),
+                    ),
+                  ),
+                ),
+              ),
           ],
         ),
       ),
