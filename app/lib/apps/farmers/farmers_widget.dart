@@ -51,8 +51,8 @@ class _FarmersState extends State<FarmersWidget>
 
     iaWebView = InAppWebView(
       initialUrlRequest: URLRequest(
-          url: Uri.parse(
-              '$farmersUri?cache_buster=${DateTime.now().millisecondsSinceEpoch}')),
+          url: WebUri.uri(Uri.parse(
+              '$farmersUri?cache_buster=${DateTime.now().millisecondsSinceEpoch}'))),
       initialOptions: InAppWebViewGroupOptions(
           crossPlatform: InAppWebViewOptions(
               cacheEnabled: Globals().isCacheClearedFarmer,
