@@ -28,14 +28,10 @@ class _ContactsScreenState extends State<ContactsScreen> {
 
   _loadMyWalletContacts() {
     for (final w in widget.wallets) {
-      if (widget.chainType == ChainType.Stellar) {
         myWalletContacts.add(PkidContact(
             name: w.name, address: w.stellarAddress, type: ChainType.Stellar));
-      }
-      if (widget.chainType == ChainType.TFChain) {
         myWalletContacts.add(PkidContact(
             name: w.name, address: w.tfchainAddress, type: ChainType.TFChain));
-      }
     }
   }
 

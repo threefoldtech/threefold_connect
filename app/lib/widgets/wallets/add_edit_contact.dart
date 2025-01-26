@@ -250,19 +250,17 @@ class _AddEditContactState extends State<AddEditContact> {
                                 Theme.of(context).colorScheme.onSurface),
                       ),
                       const SizedBox(width: 10),
-                      DropdownButton<String>(
-                        value: _selectedChainType!.name,
-                        onChanged: (String? newValue) {
+                      DropdownButton<ChainType>(
+                        value: _selectedChainType,
+                        onChanged: (ChainType? newValue) {
                           setState(() {
-                            _selectedChainType = ChainType.values
-                                .firstWhere((type) => type.name == newValue);
+                            _selectedChainType = newValue!;
                           });
                         },
                         items: ChainType.values
-                            .map<DropdownMenuItem<String>>((ChainType type) {
-                          return DropdownMenuItem<String>(
-                            value: type
-                                .name,
+                            .map<DropdownMenuItem<ChainType>>((ChainType type) {
+                          return DropdownMenuItem<ChainType>(
+                            value: type,
                             child: Text(
                               type.name,
                               style: Theme.of(context)
