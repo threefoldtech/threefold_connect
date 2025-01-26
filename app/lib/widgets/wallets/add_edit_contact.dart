@@ -39,6 +39,7 @@ class _AddEditContactState extends State<AddEditContact> {
   bool saveLoading = false;
   String? nameError;
   String? addressError;
+  String _selectedChainType = ChainType.TFChain.name;
   Future<void> _showDialog(
       String title, String message, IconData icon, DialogType type) async {
     showDialog(
@@ -94,11 +95,12 @@ class _AddEditContactState extends State<AddEditContact> {
 
       return false;
     }
-    if (widget.chainType == ChainType.TFChain && contactAddress.length != 48) {
+    if (_selectedChainType == ChainType.TFChain.name &&
+        contactAddress.length != 48) {
       addressError = 'Address length should be 48 characters';
       return false;
     }
-    if (widget.chainType == ChainType.Stellar &&
+    if (_selectedChainType == ChainType.Stellar.name &&
         !isValidStellarAddress(contactAddress)) {
       addressError = 'Invaild Stellar address';
       return false;
@@ -107,8 +109,11 @@ class _AddEditContactState extends State<AddEditContact> {
   }
 
   _add(String contactName, String contactAddress) async {
+    final chainType = _selectedChainType == ChainType.Stellar.name
+        ? ChainType.Stellar
+        : ChainType.TFChain;
     try {
-      await addContact(contactName, contactAddress, widget.chainType);
+      await addContact(contactName, contactAddress, chainType);
       await _showDialog(
           'Contact Added!',
           'Contact $contactName has been added successfully',
@@ -121,7 +126,7 @@ class _AddEditContactState extends State<AddEditContact> {
       return;
     }
     widget.onAddContact!(PkidContact(
-        name: contactName, address: contactAddress, type: widget.chainType));
+        name: contactName, address: contactAddress, type: chainType));
     if (!context.mounted) return;
     Navigator.pop(context);
   }
@@ -227,16 +232,40 @@ class _AddEditContactState extends State<AddEditContact> {
                   keyboardType: TextInputType.multiline,
                   maxLines: null,
                   decoration: InputDecoration(
-                    label: Text(widget.chainType == ChainType.TFChain
-                        ? 'TFChain Address'
-                        : 'Stellar Address'),
+                    label: const Text('Address'),
                     errorText: addressError,
                   ),
                   controller: _addressController,
                 ),
-                const SizedBox(
-                  height: 30,
-                ),
+                const SizedBox(height: 20),
+                if (widget.operation == ContactOperation.Add)
+                  Row(
+                    children: [
+                      const Text(
+                        'Chain Type:',
+                        style: TextStyle(fontSize: 16),
+                      ),
+                      const SizedBox(width: 10),
+                      DropdownButton<String>(
+                        value: _selectedChainType,
+                        onChanged: (String? newValue) {
+                          setState(() {
+                            _selectedChainType = newValue!;
+                          });
+                        },
+                        items: <String>[
+                          ChainType.Stellar.name,
+                          ChainType.TFChain.name
+                        ].map<DropdownMenuItem<String>>((String value) {
+                          return DropdownMenuItem<String>(
+                            value: value,
+                            child: Text(value),
+                          );
+                        }).toList(),
+                      ),
+                    ],
+                  ),
+                const SizedBox(height: 30),
                 Row(
                   children: [
                     const Spacer(),
@@ -246,9 +275,7 @@ class _AddEditContactState extends State<AddEditContact> {
                           Navigator.pop(context);
                         },
                         child: const Text('Close')),
-                    const SizedBox(
-                      width: 5,
-                    ),
+                    const SizedBox(width: 5),
                     ElevatedButton(
                         onPressed: widget.operation == ContactOperation.Add
                             ? _validateAndAdd
