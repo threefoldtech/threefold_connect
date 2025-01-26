@@ -24,7 +24,7 @@ Future<List<PkidContact>> getPkidContacts() async {
   try {
     pKidResult = await client.getPKidDoc('contacts');
     if (pKidResult.containsKey('error')) {
-      if (pKidResult.containsValue('Keypair not found')){
+      if (pKidResult.containsValue('Key is not found')){
         return [];
       }
       logger.e('Error in pKidResult : ${pKidResult['error']}');

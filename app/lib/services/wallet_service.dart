@@ -31,7 +31,7 @@ Future<List<PkidWallet>> getPkidWallets() async {
   try {
     pKidResult = await client.getPKidDoc('purse');
     if (pKidResult.containsKey('error')) {
-      if (pKidResult.containsValue('Keypair not found')){
+      if (pKidResult.containsValue('Key is not found')){
         return [];
       }
       logger.e('Error in pKidResult : ${pKidResult['error']}');
@@ -57,13 +57,7 @@ Future<List<PkidWallet>> getPkidWallets() async {
 }
 
 Future<List<Wallet>> listWallets() async {
-  List<PkidWallet> pkidWallets = [];
-  try {
-    pkidWallets = await getPkidWallets();
-  } catch (e) {
-    logger.e('Error fetching PKID wallets: $e');
-    throw Exception('Error fetching wallets');
-  }
+  final pkidWallets = await getPkidWallets();
   final String chainUrl = Globals().chainUrl;
   final List<Wallet> wallets = await compute((void _) async {
     final List<Future<Wallet>> walletFutures = [];
