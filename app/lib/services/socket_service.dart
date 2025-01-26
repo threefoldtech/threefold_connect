@@ -36,12 +36,16 @@ class BackendConnection {
     logger.i(
         'Creating socket connection with $threeBotSocketUrl for $doubleName');
 
-    socket = IO.io(threeBotSocketUrl, <String, dynamic>{
-      'transports': ['websocket'],
-      'forceNew': true
+    socket = IO.io(
+        threeBotSocketUrl,
+        IO.OptionBuilder()
+            .setTransports(['websocket'])
+            .enableForceNew()
+            .build());
+    socket.onError((e) {
+      logger.e('Failed to start websocket connection: $e');
     });
-
-    socket.on('connect', (res) {
+    socket.onConnect((_) {
       logger.i('[connect]');
 
       socket.emit('join', {'room': doubleName.toLowerCase(), 'app': true});
@@ -75,7 +79,7 @@ class BackendConnection {
       Events().emit(NewSignEvent(signData: signData));
     });
 
-    socket.on('disconnect', (_) {
+    socket.onDisconnect((_) {
       logger.i('disconnect');
     });
 

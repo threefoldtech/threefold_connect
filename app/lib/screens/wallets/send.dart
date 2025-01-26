@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:qr_code_scanner/qr_code_scanner.dart';
+import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:threebotlogin/helpers/globals.dart';
 import 'package:threebotlogin/helpers/transaction_helpers.dart';
 import 'package:threebotlogin/models/wallet.dart';
@@ -17,17 +17,15 @@ import 'package:validators/validators.dart';
 import 'package:threebotlogin/services/stellar_service.dart' as Stellar;
 import 'package:threebotlogin/services/tfchain_service.dart' as TFChain;
 
-class WalletSendScreen extends StatefulWidget {
-  const WalletSendScreen(
-      {super.key, required this.wallet, required this.allWallets});
+class WalletSendScreen extends ConsumerStatefulWidget {
+  const WalletSendScreen({super.key, required this.wallet});
   final Wallet wallet;
-  final List<Wallet> allWallets;
 
   @override
-  State<WalletSendScreen> createState() => _WalletSendScreenState();
+  ConsumerState<WalletSendScreen> createState() => _WalletSendScreenState();
 }
 
-class _WalletSendScreenState extends State<WalletSendScreen> {
+class _WalletSendScreenState extends ConsumerState<WalletSendScreen> {
   final fromController = TextEditingController();
   final toController = TextEditingController();
   final amountController = TextEditingController();
@@ -39,9 +37,12 @@ class _WalletSendScreenState extends State<WalletSendScreen> {
   bool reloadBalance = true;
   final FocusNode textFieldFocusNode = FocusNode();
   List percentages = [25, 50, 75, 100];
+  List<Wallet> wallets = [];
+
   @override
   void initState() {
     fromController.text = widget.wallet.stellarAddress;
+    wallets = ref.read(walletsNotifier);
     _reloadBalances();
     super.initState();
   }
@@ -127,8 +128,8 @@ class _WalletSendScreenState extends State<WalletSendScreen> {
         return false;
       }
 
-      final matchingWallets = widget.allWallets
-          .where((wallet) => wallet.stellarAddress == toAddress);
+      final matchingWallets =
+          wallets.where((wallet) => wallet.stellarAddress == toAddress);
       final Wallet? wallet =
           matchingWallets.isNotEmpty ? matchingWallets.first : null;
       if (wallet != null && wallet.stellarBalance == '-1') {
@@ -268,13 +269,13 @@ class _WalletSendScreenState extends State<WalletSendScreen> {
                                         currentWalletAddress:
                                             fromController.text,
                                         wallets: chainType == ChainType.Stellar
-                                            ? widget.allWallets
+                                            ? wallets
                                                 .where((w) =>
                                                     double.parse(
                                                         w.stellarBalance) >=
                                                     0)
                                                 .toList()
-                                            : widget.allWallets,
+                                            : wallets,
                                         onSelectToAddress: _selectToAddress),
                                   ));
                                 },
@@ -380,8 +381,8 @@ class _WalletSendScreenState extends State<WalletSendScreen> {
             MaterialPageRoute(builder: (context) => const ScanScreen()));
       }
     }
-    if (result.code != null) {
-      final code = Uri.parse(result.code!);
+    if (result.rawValue != null) {
+      final code = Uri.parse(result.rawValue!);
       toController.text = code.path;
       if (code.queryParameters.containsKey('amount')) {
         amountController.text = code.queryParameters['amount']!;
@@ -393,7 +394,7 @@ class _WalletSendScreenState extends State<WalletSendScreen> {
       setState(() {});
     }
 
-    return result.code;
+    return result.rawValue!;
   }
 
   calculateAmount(int percentage) {

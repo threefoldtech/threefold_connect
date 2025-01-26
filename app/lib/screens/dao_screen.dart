@@ -106,7 +106,10 @@ class _DaoPageState extends State<DaoPage> with SingleTickerProviderStateMixin {
                 children: [
                   RefreshIndicator(
                       onRefresh: loadProposals,
-                      child: ProposalsWidget(proposals: activeList)),
+                      child: ProposalsWidget(
+                        proposals: activeList,
+                        active: true,
+                      )),
                   RefreshIndicator(
                       onRefresh: loadProposals,
                       child: ProposalsWidget(

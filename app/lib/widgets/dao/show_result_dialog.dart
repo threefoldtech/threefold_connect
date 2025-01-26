@@ -31,8 +31,8 @@ class _ShowResultDialogState extends State<ShowResultDialog>
 
   bool loading = true;
   int totalVotes = 0;
-  int noVotes = 0;
-  int yesVotes = 0;
+  int noVotesPercentage = 0;
+  int yesVotesPercentage = 0;
   int threshold = 1;
   void getVotes() async {
     setState(() {
@@ -41,13 +41,20 @@ class _ShowResultDialogState extends State<ShowResultDialog>
     late dynamic votes;
     if (widget.type == ProposalType.DAO) {
       votes = await getProposalVotes(widget.proposalHash);
+      totalVotes = votes.ayes.length + votes.nays.length;
+      noVotesPercentage =
+          await getProposalProgress(votes.ayes, votes.nays, false);
+      yesVotesPercentage =
+          await getProposalProgress(votes.ayes, votes.nays, true);
     } else {
       votes =
           await getCouncilProposalVotes(widget.chainUrl, widget.proposalHash);
+      totalVotes = votes.ayes.length + votes.nays.length;
+      final noVotes = votes.nays.length;
+      final yesVotes = votes.ayes.length;
+      noVotesPercentage = (noVotes / totalVotes * 100).round();
+      yesVotesPercentage = (yesVotes / totalVotes * 100).round();
     }
-    totalVotes = votes.ayes.length + votes.nays.length;
-    noVotes = votes.nays.length;
-    yesVotes = votes.ayes.length;
     threshold = votes.threshold;
     setState(() {
       loading = false;
@@ -59,12 +66,12 @@ class _ShowResultDialogState extends State<ShowResultDialog>
 
     _noAnimation = Tween<double>(
       begin: 0.0,
-      end: totalVotes != 0 ? (noVotes / totalVotes * 1.0) : 0,
+      end: totalVotes != 0 ? (noVotesPercentage / 100 * 1.0) : 0,
     ).animate(_animationController);
 
     _yesAnimation = Tween<double>(
       begin: 0.0,
-      end: totalVotes != 0 ? (yesVotes / totalVotes * 1.0) : 0,
+      end: totalVotes != 0 ? (yesVotesPercentage / 100 * 1.0) : 0,
     ).animate(_animationController);
 
     _animation = Tween<double>(
@@ -145,10 +152,7 @@ class _ShowResultDialogState extends State<ShowResultDialog>
                   style: Theme.of(context).textTheme.bodyLarge!.copyWith(
                         color: Theme.of(context).colorScheme.onSurface,
                       )),
-              Text(
-                  totalVotes == 0
-                      ? '0%'
-                      : '${((yesVotes / totalVotes) * 100).toStringAsFixed(0)}%',
+              Text(totalVotes == 0 ? '0%' : '$yesVotesPercentage%',
                   style: Theme.of(context).textTheme.bodyLarge!.copyWith(
                         color: Theme.of(context).colorScheme.onSurface,
                       )),
@@ -172,10 +176,7 @@ class _ShowResultDialogState extends State<ShowResultDialog>
                   style: Theme.of(context).textTheme.bodyLarge!.copyWith(
                         color: Theme.of(context).colorScheme.onSurface,
                       )),
-              Text(
-                  totalVotes == 0
-                      ? '0%'
-                      : '${(noVotes / totalVotes * 100).toStringAsFixed(0)}%',
+              Text(totalVotes == 0 ? '0%' : '$noVotesPercentage%',
                   style: Theme.of(context).textTheme.bodyLarge!.copyWith(
                         color: Theme.of(context).colorScheme.onSurface,
                       )),

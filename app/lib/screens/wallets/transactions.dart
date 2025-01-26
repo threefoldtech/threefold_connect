@@ -5,6 +5,7 @@ import 'package:threebotlogin/models/wallet.dart';
 import 'package:threebotlogin/services/stellar_service.dart';
 import 'package:threebotlogin/widgets/wallets/transaction.dart';
 import 'package:threebotlogin/widgets/wallets/vertical_divider.dart';
+import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 
 class WalletTransactionsWidget extends StatefulWidget {
   const WalletTransactionsWidget({super.key, required this.wallet});
@@ -16,25 +17,26 @@ class WalletTransactionsWidget extends StatefulWidget {
 }
 
 class _WalletTransactionsWidgetState extends State<WalletTransactionsWidget> {
-  List<PaymentTransaction?> transactions = [];
-  bool loading = true;
+  final _pageSize = 10;
+  final PagingController<int, ITransaction> _pagingController =
+      PagingController(firstPageKey: 1); // Start from page 1
 
-  _listTransactions() async {
-    setState(() {
-      loading = true;
-    });
+  Future<void> _listTransactions(int pageKey) async {
     try {
-      final txs = await listTransactions(widget.wallet.stellarSecret);
-      final transactionsList = txs.map((tx) {
-        if (tx is PaymentTransaction) {
-          return tx;
-        }
-      }).toList();
-      transactions = transactionsList.where((tx) => tx != null).toList();
+      final offset = (pageKey - 1) * _pageSize;
+      final txs = await listTransactions(
+          widget.wallet.stellarSecret, offset, _pageSize);
+      final isLastPage = txs.length < _pageSize;
+      if (isLastPage) {
+        _pagingController.appendLastPage(txs);
+      } else {
+        _pagingController.appendPage(txs, pageKey + 1);
+      }
     } catch (e) {
       logger.e('Failed to load transactions due to $e');
+      _pagingController.error(e);
       if (context.mounted) {
-        final loadingFarmsFailure = SnackBar(
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           content: Text(
             'Failed to load transaction',
             style: Theme.of(context)
@@ -43,14 +45,8 @@ class _WalletTransactionsWidgetState extends State<WalletTransactionsWidget> {
                 .copyWith(color: Theme.of(context).colorScheme.errorContainer),
           ),
           duration: const Duration(seconds: 3),
-        );
-        ScaffoldMessenger.of(context).clearSnackBars();
-        ScaffoldMessenger.of(context).showSnackBar(loadingFarmsFailure);
+        ));
       }
-    } finally {
-      setState(() {
-        loading = false;
-      });
     }
   }
 
@@ -58,35 +54,20 @@ class _WalletTransactionsWidgetState extends State<WalletTransactionsWidget> {
   void initState() {
     super.initState();
     if (widget.wallet.stellarBalance != '-1') {
-      _listTransactions();
-    } else {
-      setState(() {
-        loading = false;
-        transactions = [];
-      });
+      _pagingController.addPageRequestListener(_listTransactions);
     }
   }
 
   @override
+  void dispose() {
+    _pagingController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    Widget mainWidget;
-    if (loading) {
-      mainWidget = Center(
-          child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          const CircularProgressIndicator(),
-          const SizedBox(height: 15),
-          Text(
-            'Loading Transactions...',
-            style: Theme.of(context).textTheme.bodyLarge!.copyWith(
-                color: Theme.of(context).colorScheme.onSurface,
-                fontWeight: FontWeight.bold),
-          ),
-        ],
-      ));
-    } else if (transactions.isEmpty) {
-      mainWidget = Center(
+    if (widget.wallet.stellarBalance == '-1') {
+      return Center(
         child: Text(
           'No transactions yet.',
           style: Theme.of(context)
@@ -95,21 +76,45 @@ class _WalletTransactionsWidgetState extends State<WalletTransactionsWidget> {
               .copyWith(color: Theme.of(context).colorScheme.onSurface),
         ),
       );
-    } else {
-      mainWidget = ListView(
-        children: [
-          for (final tx in transactions)
-            Column(
-              children: [
-                TransactionWidget(transaction: tx!),
-                tx == transactions.last
-                    ? const SizedBox()
-                    : const CustomVerticalDivider()
-              ],
-            )
-        ],
-      );
     }
-    return mainWidget;
+
+    return PagedListView<int, ITransaction>(
+      pagingController: _pagingController,
+      builderDelegate: PagedChildBuilderDelegate<ITransaction>(
+        itemBuilder: (context, item, index) => Column(
+          children: [
+            TransactionWidget(transaction: item as PaymentTransaction),
+            if (index < _pagingController.itemList!.length - 1)
+              const CustomVerticalDivider()
+            else
+              const SizedBox(height: 5),
+          ],
+        ),
+        firstPageProgressIndicatorBuilder: (context) => Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const CircularProgressIndicator(),
+              const SizedBox(height: 15),
+              Text(
+                'Loading Transactions...',
+                style: Theme.of(context).textTheme.bodyLarge!.copyWith(
+                    color: Theme.of(context).colorScheme.onSurface,
+                    fontWeight: FontWeight.bold),
+              ),
+            ],
+          ),
+        ),
+        noItemsFoundIndicatorBuilder: (context) => Center(
+          child: Text(
+            'No transactions yet.',
+            style: Theme.of(context)
+                .textTheme
+                .bodyLarge!
+                .copyWith(color: Theme.of(context).colorScheme.onSurface),
+          ),
+        ),
+      ),
+    );
   }
 }
