@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:qr_code_scanner/qr_code_scanner.dart';
+import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:threebotlogin/helpers/globals.dart';
 import 'package:threebotlogin/helpers/transaction_helpers.dart';
 import 'package:threebotlogin/models/wallet.dart';
@@ -381,8 +381,8 @@ class _WalletSendScreenState extends ConsumerState<WalletSendScreen> {
             MaterialPageRoute(builder: (context) => const ScanScreen()));
       }
     }
-    if (result.code != null) {
-      final code = Uri.parse(result.code!);
+    if (result.rawValue != null) {
+      final code = Uri.parse(result.rawValue!);
       toController.text = code.path;
       if (code.queryParameters.containsKey('amount')) {
         amountController.text = code.queryParameters['amount']!;
@@ -394,7 +394,7 @@ class _WalletSendScreenState extends ConsumerState<WalletSendScreen> {
       setState(() {});
     }
 
-    return result.code;
+    return result.rawValue!;
   }
 
   calculateAmount(int percentage) {
