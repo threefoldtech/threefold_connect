@@ -268,31 +268,19 @@ class _WalletDetailsWidgetState extends ConsumerState<WalletDetailsWidget> {
                         color: Theme.of(context).colorScheme.onSurface,
                       ),
                 ),
-                const Spacer(),
-                Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                  decoration: BoxDecoration(
-                    border: Border.all(
-                      color: wallet.verificationStatus ==
-                              VerificationState.VERIFIED.name
-                          ? Theme.of(context).colorScheme.primary
-                          : Theme.of(context).colorScheme.error,
-                    ),
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Text(
-                      wallet.verificationStatus.toLowerCase().replaceFirst(
-                            wallet.verificationStatus[0].toLowerCase(),
-                            wallet.verificationStatus[0].toUpperCase(),
-                          ),
-                      style: Theme.of(context).textTheme.bodySmall!.copyWith(
-                            color: wallet.verificationStatus ==
-                                    VerificationState.VERIFIED.name
-                                ? Theme.of(context).colorScheme.primary
-                                : Theme.of(context).colorScheme.error,
-                          )),
+                const SizedBox(
+                  width: 8,
                 ),
+                Icon(
+                    wallet.verificationStatus == VerificationState.VERIFIED.name
+                        ? Icons.check_circle_outline_rounded
+                        : Icons.cancel_outlined,
+                    color: wallet.verificationStatus ==
+                            VerificationState.VERIFIED.name
+                        ? Theme.of(context).colorScheme.primary
+                        : Theme.of(context).colorScheme.error,
+                    size: 16,
+                  ),
               ],
             ),
             const SizedBox(
