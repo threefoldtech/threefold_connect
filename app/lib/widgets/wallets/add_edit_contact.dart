@@ -39,7 +39,7 @@ class _AddEditContactState extends State<AddEditContact> {
   bool saveLoading = false;
   String? nameError;
   String? addressError;
-  String _selectedChainType = ChainType.TFChain.name;
+  ChainType? _selectedChainType;
   Future<void> _showDialog(
       String title, String message, IconData icon, DialogType type) async {
     showDialog(
@@ -95,12 +95,12 @@ class _AddEditContactState extends State<AddEditContact> {
 
       return false;
     }
-    if (_selectedChainType == ChainType.TFChain.name &&
+    if (_selectedChainType == ChainType.TFChain &&
         contactAddress.length != 48) {
       addressError = 'Address length should be 48 characters';
       return false;
     }
-    if (_selectedChainType == ChainType.Stellar.name &&
+    if (_selectedChainType == ChainType.Stellar &&
         !isValidStellarAddress(contactAddress)) {
       addressError = 'Invaild Stellar address';
       return false;
@@ -109,7 +109,7 @@ class _AddEditContactState extends State<AddEditContact> {
   }
 
   _add(String contactName, String contactAddress) async {
-    final chainType = _selectedChainType == ChainType.Stellar.name
+    final chainType = _selectedChainType == ChainType.Stellar
         ? ChainType.Stellar
         : ChainType.TFChain;
     try {
@@ -188,6 +188,7 @@ class _AddEditContactState extends State<AddEditContact> {
       _nameController.text = widget.name;
       _addressController.text = widget.address;
     }
+    _selectedChainType = widget.chainType;
     super.initState();
   }
 
@@ -241,25 +242,39 @@ class _AddEditContactState extends State<AddEditContact> {
                 if (widget.operation == ContactOperation.Add)
                   Row(
                     children: [
-                      const Text(
+                      Text(
                         'Chain Type:',
-                        style: TextStyle(fontSize: 16),
+                        style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                            color: Theme.of(context).colorScheme.onSurface,
+                            decorationColor:
+                                Theme.of(context).colorScheme.onSurface),
                       ),
                       const SizedBox(width: 10),
                       DropdownButton<String>(
-                        value: _selectedChainType,
+                        value: _selectedChainType!.name,
                         onChanged: (String? newValue) {
                           setState(() {
-                            _selectedChainType = newValue!;
+                            _selectedChainType = ChainType.values
+                                .firstWhere((type) => type.name == newValue);
                           });
                         },
-                        items: <String>[
-                          ChainType.Stellar.name,
-                          ChainType.TFChain.name
-                        ].map<DropdownMenuItem<String>>((String value) {
+                        items: ChainType.values
+                            .map<DropdownMenuItem<String>>((ChainType type) {
                           return DropdownMenuItem<String>(
-                            value: value,
-                            child: Text(value),
+                            value: type
+                                .name,
+                            child: Text(
+                              type.name,
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodyMedium!
+                                  .copyWith(
+                                    color:
+                                        Theme.of(context).colorScheme.onSurface,
+                                    decorationColor:
+                                        Theme.of(context).colorScheme.onSurface,
+                                  ),
+                            ),
                           );
                         }).toList(),
                       ),
