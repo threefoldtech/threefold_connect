@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:qr_code_scanner/qr_code_scanner.dart';
+import 'package:mobile_scanner/mobile_scanner.dart';
 
 class ScanScreen extends StatefulWidget {
   const ScanScreen({super.key});
@@ -15,18 +15,13 @@ class _ScanScreenState extends State<ScanScreen> {
   final GlobalKey qrKey = GlobalKey(debugLabel: 'QR');
 
   @override
-  void initState() {
-    super.initState();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Stack(
         children: [
-          QRView(
-            key: qrKey,
-            onQRViewCreated: _onQRViewCreated,
+          MobileScanner(
+            onDetect: _handleBarcode,
+            fit: BoxFit.contain,
           ),
           Align(alignment: Alignment.bottomCenter, child: content()),
         ],
@@ -34,13 +29,11 @@ class _ScanScreenState extends State<ScanScreen> {
     );
   }
 
-  void _onQRViewCreated(QRViewController controller) {
-    controller.scannedDataStream.listen((scanData) {
-      if (!popped) {
-        popped = true;
-        Navigator.pop(context, scanData);
-      }
-    });
+  void _handleBarcode(BarcodeCapture barcodes) {
+    if (!popped) {
+      popped = true;
+      Navigator.pop(context, barcodes.barcodes.firstOrNull);
+    }
   }
 
   Widget content() {
