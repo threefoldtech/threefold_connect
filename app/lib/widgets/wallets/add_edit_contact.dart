@@ -125,8 +125,10 @@ class _AddEditContactState extends State<AddEditContact> {
           Icons.error, DialogType.Error);
       return;
     }
-    widget.onAddContact!(PkidContact(
-        name: contactName, address: contactAddress, type: chainType));
+    if (chainType == widget.chainType) {
+      widget.onAddContact!(PkidContact(
+          name: contactName, address: contactAddress, type: chainType));
+    }
     if (!context.mounted) return;
     Navigator.pop(context);
   }
