@@ -161,12 +161,33 @@ class _WalletDetailsWidgetState extends ConsumerState<WalletDetailsWidget> {
                         color: Theme.of(context).colorScheme.onSurface,
                       ),
                   controller: walletNameController,
-                  decoration: const InputDecoration(
+                  onChanged: (text) {
+                    _validateWalletName();
+                  },
+                  decoration: InputDecoration(
                     labelText: 'Wallet Name',
+                    errorText: _errorText,
                   )),
-              trailing: IconButton(
-                  onPressed: _editWallet,
-                  icon: edit ? const Icon(Icons.save) : const Icon(Icons.edit)),
+              trailing: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  if (edit)
+                    IconButton(
+                      onPressed: _errorText == null ? _editWallet : null,
+                      icon: const Icon(Icons.save),
+                    ),
+                  if (edit)
+                    IconButton(
+                      onPressed: _cancelEdit,
+                      icon: const Icon(Icons.cancel),
+                    ),
+                  if (!edit)
+                    IconButton(
+                      onPressed: _editWallet,
+                      icon: const Icon(Icons.edit),
+                    ),
+                ],
+              ),
             ),
             const SizedBox(height: 40),
             Text(
