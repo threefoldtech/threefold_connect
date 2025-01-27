@@ -362,29 +362,24 @@ void showErrorDialog({
 }
 
 Widget pleaseWait(BuildContext context) {
-  return Dialog(
-    shape: RoundedRectangleBorder(
-      borderRadius: BorderRadius.circular(12),
-    ),
-    child: Padding(
-      padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          CircularProgressIndicator(
-            color: Theme.of(context).colorScheme.primary,
-          ),
-          const SizedBox(height: 12),
-          Text(
-            'One moment please',
-            textAlign: TextAlign.center,
-            style: Theme.of(context)
-                .textTheme
-                .bodyMedium!
-                .copyWith(color: Theme.of(context).colorScheme.onSurface),
-          ),
-        ],
-      ),
+  return Padding(
+    padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
+    child: Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        CircularProgressIndicator(
+          color: Theme.of(context).colorScheme.primary,
+        ),
+        const SizedBox(height: 12),
+        Text(
+          'One moment please',
+          textAlign: TextAlign.center,
+          style: Theme.of(context)
+              .textTheme
+              .bodyMedium!
+              .copyWith(color: Theme.of(context).colorScheme.onSurface),
+        ),
+      ],
     ),
   );
 }
