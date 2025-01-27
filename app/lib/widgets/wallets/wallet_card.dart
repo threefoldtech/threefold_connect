@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:threebotlogin/helpers/globals.dart';
+import 'package:threebotlogin/helpers/kyc_helpers.dart';
 import 'package:threebotlogin/helpers/logger.dart';
 import 'package:threebotlogin/helpers/transaction_helpers.dart';
+import 'package:threebotlogin/models/idenfy.dart';
 import 'package:threebotlogin/models/wallet.dart';
 import 'package:threebotlogin/providers/wallets_provider.dart';
 import 'package:threebotlogin/screens/wallets/wallet_details.dart';
@@ -62,6 +64,8 @@ class _WalletCardWidgetState extends ConsumerState<WalletCardWidget> {
   Widget build(BuildContext context) {
     List<Widget> cardContent = [];
     wallets = ref.watch(walletsNotifier);
+    final wallet =
+        wallets.where((w) => w.name == widget.wallet.name).firstOrNull;
     if (widget.wallet.type == WalletType.NATIVE &&
         widget.wallet.stellarBalance == '-1') {
       cardContent = [
@@ -161,11 +165,38 @@ class _WalletCardWidgetState extends ConsumerState<WalletCardWidget> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                widget.wallet.name,
-                style: Theme.of(context).textTheme.titleLarge!.copyWith(
-                      color: Theme.of(context).colorScheme.onSecondaryContainer,
+              Row(
+                children: [
+                  Text(
+                    widget.wallet.name,
+                    style: Theme.of(context).textTheme.titleLarge!.copyWith(
+                          color: Theme.of(context)
+                              .colorScheme
+                              .onSecondaryContainer,
+                        ),
+                  ),
+                  const Spacer(),
+                  Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    decoration: BoxDecoration(
+                      border: Border.all(
+                        color: wallet!.verificationStatus ==
+                                VerificationState.VERIFIED
+                            ? Theme.of(context).colorScheme.primary
+                            : Theme.of(context).colorScheme.error,
+                      ),
+                      borderRadius: BorderRadius.circular(20),
                     ),
+                    child: Text(capitalize(wallet.verificationStatus.name),                   
+                        style: Theme.of(context).textTheme.bodySmall!.copyWith(
+                              color: wallet.verificationStatus ==
+                                      VerificationState.VERIFIED
+                                  ? Theme.of(context).colorScheme.primary
+                                  : Theme.of(context).colorScheme.error,
+                            )),
+                  ),
+                ],
               ),
               const SizedBox(height: 10),
               ...cardContent,

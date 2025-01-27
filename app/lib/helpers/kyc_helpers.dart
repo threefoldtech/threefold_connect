@@ -1,11 +1,8 @@
 import 'dart:convert';
 
 import 'package:flutter_pkid/flutter_pkid.dart';
-import 'package:threebotlogin/models/idenfy.dart';
-import 'package:threebotlogin/services/idenfy_service.dart';
 import 'package:threebotlogin/services/migration_service.dart';
 import 'package:threebotlogin/services/pkid_service.dart';
-import 'package:threebotlogin/services/tfchain_service.dart';
 import 'package:threebotlogin/services/tools_service.dart';
 import 'package:threebotlogin/services/shared_preference_service.dart';
 
@@ -31,16 +28,9 @@ Future<void> fetchPKidData() async {
 
 Future<void> handleKYCData(
     Map<dynamic, dynamic> emailData, Map<dynamic, dynamic> phoneData) async {
-  final address = await getMyAddress();
-  final identityVerificationStatus =
-      await getVerificationStatus(address: address);
-
-  await saveCorrectVerificationStates(
-      emailData, phoneData, identityVerificationStatus);
-
+  await saveCorrectVerificationStates(emailData, phoneData);
   bool? isEmailVerified = await getIsEmailVerified();
   bool? isPhoneVerified = await getIsPhoneVerified();
-  bool? isIdentityVerified = await getIsIdentityVerified();
 
   // This method got refactored due my mistake in one little mapping in the migration from no pkid to pkid
   if (isEmailVerified == false) {
@@ -64,27 +54,21 @@ Future<void> handleKYCData(
     Globals().phoneVerified.value = true;
     await savePhoneInCorrectFormatPKid(phoneData);
   }
+}
 
-  if (isIdentityVerified == true) {
-    Globals().identityVerified.value = true;
-    final data = await getVerificationData();
-    final firstName = utf8.decode(latin1.encode(data.orgFirstName!));
-    final lastName = utf8.decode(latin1.encode(data.orgLastName!));
-    await saveIdentity('$lastName $firstName', data.docIssuingCountry,
-        data.docDob, data.docSex, data.idenfyRef);
-  }
+bool checkEmail(String email) {
+  String? emailValue =
+      email.toLowerCase().trim().replaceAll(RegExp(r'\s+'), ' ');
+  return validateEmail(emailValue);
+}
+
+String capitalize(String input) {
+  if (input.isEmpty) return input;
+  return '${input[0].toUpperCase()}${input.substring(1).toLowerCase()}';
 }
 
 Future<void> saveCorrectVerificationStates(
-    Map<dynamic, dynamic> emailData,
-    Map<dynamic, dynamic> phoneData,
-    VerificationStatus identityVerificationStatus) async {
-  if (identityVerificationStatus.status == VerificationState.VERIFIED) {
-    await setIsIdentityVerified(true);
-  } else {
-    await setIsIdentityVerified(false);
-  }
-
+    Map<dynamic, dynamic> emailData, Map<dynamic, dynamic> phoneData) async {
   if (phoneData.containsKey('spi')) {
     await setIsPhoneVerified(true);
   } else {
@@ -96,10 +80,4 @@ Future<void> saveCorrectVerificationStates(
   } else {
     await setIsEmailVerified(false);
   }
-}
-
-bool checkEmail(String email) {
-  String? emailValue =
-      email.toLowerCase().trim().replaceAll(RegExp(r'\s+'), ' ');
-  return validateEmail(emailValue);
 }

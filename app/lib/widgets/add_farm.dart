@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:threebotlogin/helpers/globals.dart';
 import 'package:threebotlogin/helpers/logger.dart';
 import 'package:threebotlogin/models/farm.dart';
 import 'package:threebotlogin/models/idenfy.dart';
@@ -74,8 +75,9 @@ class _NewFarmState extends State<NewFarm> {
   _add(String farmName) async {
     Farm? farm;
     try {
+      final idenfyServiceUrl = Globals().idenfyServiceUrl;
       final kycVerified =
-          await getVerificationStatus(address: _selectedWallet!.tfchainAddress);
+          await getVerificationStatus(address: _selectedWallet!.tfchainAddress, idenfyServiceUrl: idenfyServiceUrl);
       if (kycVerified.status == VerificationState.VERIFIED) {
         final f = await createFarm(farmName, _selectedWallet!.tfchainSecret,
             _selectedWallet!.stellarAddress);
