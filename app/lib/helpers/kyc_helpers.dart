@@ -28,7 +28,7 @@ Future<void> fetchPKidData() async {
 
 Future<void> handleKYCData(
     Map<dynamic, dynamic> emailData, Map<dynamic, dynamic> phoneData) async {
-
+  await saveCorrectVerificationStates(emailData, phoneData);
   bool? isEmailVerified = await getIsEmailVerified();
   bool? isPhoneVerified = await getIsPhoneVerified();
 
@@ -56,9 +56,28 @@ Future<void> handleKYCData(
   }
 }
 
-
 bool checkEmail(String email) {
   String? emailValue =
       email.toLowerCase().trim().replaceAll(RegExp(r'\s+'), ' ');
   return validateEmail(emailValue);
+}
+
+String capitalize(String input) {
+  if (input.isEmpty) return input;
+  return '${input[0].toUpperCase()}${input.substring(1).toLowerCase()}';
+}
+
+Future<void> saveCorrectVerificationStates(
+    Map<dynamic, dynamic> emailData, Map<dynamic, dynamic> phoneData) async {
+  if (phoneData.containsKey('spi')) {
+    await setIsPhoneVerified(true);
+  } else {
+    await setIsPhoneVerified(false);
+  }
+
+  if (emailData.containsKey('sei')) {
+    await setIsEmailVerified(true);
+  } else {
+    await setIsEmailVerified(false);
+  }
 }

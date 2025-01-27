@@ -1,3 +1,5 @@
+import 'package:threebotlogin/models/idenfy.dart';
+
 enum WalletType { NATIVE, IMPORTED }
 
 enum ChainType { Stellar, TFChain }
@@ -24,7 +26,7 @@ class Wallet {
   String stellarBalance;
   String tfchainBalance;
   final WalletType type;
-  String verificationStatus; 
+  VerificationState verificationStatus; 
 }
 
 class PkidWallet {

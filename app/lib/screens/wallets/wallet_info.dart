@@ -272,11 +272,11 @@ class _WalletDetailsWidgetState extends ConsumerState<WalletDetailsWidget> {
                   width: 8,
                 ),
                 Icon(
-                    wallet.verificationStatus == VerificationState.VERIFIED.name
+                    wallet.verificationStatus == VerificationState.VERIFIED
                         ? Icons.check_circle_outline_rounded
                         : Icons.cancel_outlined,
                     color: wallet.verificationStatus ==
-                            VerificationState.VERIFIED.name
+                            VerificationState.VERIFIED
                         ? Theme.of(context).colorScheme.primary
                         : Theme.of(context).colorScheme.error,
                     size: 16,
@@ -292,7 +292,7 @@ class _WalletDetailsWidgetState extends ConsumerState<WalletDetailsWidget> {
                 child: ElevatedButton(
                   onPressed: () async {
                     if (wallet.verificationStatus !=
-                        VerificationState.VERIFIED.name) {
+                        VerificationState.VERIFIED) {
                       await termsAndConditionsDialog(
                           context: context, wallet: wallet);
 
@@ -328,7 +328,7 @@ class _WalletDetailsWidgetState extends ConsumerState<WalletDetailsWidget> {
                         Theme.of(context).colorScheme.primaryContainer,
                   ),
                   child: Text(
-                    wallet.verificationStatus != VerificationState.VERIFIED.name
+                    wallet.verificationStatus != VerificationState.VERIFIED
                         ? 'Verify'
                         : 'Show Data',
                     style: Theme.of(context).textTheme.bodyLarge!.copyWith(

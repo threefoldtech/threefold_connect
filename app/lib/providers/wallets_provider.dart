@@ -60,7 +60,7 @@ Future<void> verifyWallet(String walletName) async {
           address: wallet.tfchainAddress,
           idenfyServiceUrl: idenfyServiceUrl,
         );
-        wallet.verificationStatus = updatedVerificationStatus.status.name;
+        wallet.verificationStatus = updatedVerificationStatus.status;
         state = [...state];
       } catch (e) {
         logger.e('[verifyWallet] Error during verification: $e');

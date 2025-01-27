@@ -118,7 +118,7 @@ Future<Wallet> loadWallet(String walletName, String walletSeed,
     stellarBalance: stellarBalance,
     tfchainBalance: tfchainBalance,
     type: walletType,
-    verificationStatus: kycVerified.status.name,
+    verificationStatus: kycVerified.status,
   );
   return wallet;
 }

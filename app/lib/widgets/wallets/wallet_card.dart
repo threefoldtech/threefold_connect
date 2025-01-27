@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:threebotlogin/helpers/globals.dart';
+import 'package:threebotlogin/helpers/kyc_helpers.dart';
 import 'package:threebotlogin/helpers/logger.dart';
 import 'package:threebotlogin/helpers/transaction_helpers.dart';
 import 'package:threebotlogin/models/idenfy.dart';
@@ -181,20 +182,16 @@ class _WalletCardWidgetState extends ConsumerState<WalletCardWidget> {
                     decoration: BoxDecoration(
                       border: Border.all(
                         color: wallet!.verificationStatus ==
-                                VerificationState.VERIFIED.name
+                                VerificationState.VERIFIED
                             ? Theme.of(context).colorScheme.primary
                             : Theme.of(context).colorScheme.error,
                       ),
                       borderRadius: BorderRadius.circular(20),
                     ),
-                    child: Text(
-                        wallet.verificationStatus.toLowerCase().replaceFirst(
-                              wallet.verificationStatus[0].toLowerCase(),
-                              wallet.verificationStatus[0].toUpperCase(),
-                            ),
+                    child: Text(capitalize(wallet.verificationStatus.name),                   
                         style: Theme.of(context).textTheme.bodySmall!.copyWith(
                               color: wallet.verificationStatus ==
-                                      VerificationState.VERIFIED.name
+                                      VerificationState.VERIFIED
                                   ? Theme.of(context).colorScheme.primary
                                   : Theme.of(context).colorScheme.error,
                             )),
