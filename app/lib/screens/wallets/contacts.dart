@@ -142,7 +142,7 @@ class _ContactsScreenState extends State<ContactsScreen> {
                     ContactsWidget(
                         contacts: myWalletContacts
                             .where(
-                                (c) => c.address != widget.currentWalletAddress)
+                                (c) => c.address != widget.currentWalletAddress && c.type == widget.chainType)
                             .toList(),
                         onSelectToAddress: widget.onSelectToAddress),
                     ContactsWidget(
