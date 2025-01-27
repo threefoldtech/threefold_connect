@@ -70,23 +70,24 @@ class _WalletCardWidgetState extends ConsumerState<WalletCardWidget> {
         widget.wallet.stellarBalance == '-1') {
       cardContent = [
         Container(
-            alignment: Alignment.centerRight,
-            child: ElevatedButton(
-              onPressed: _initializeWallet,
-              child: initialWalletLoading
-                  ? const SizedBox(
-                      width: 20,
-                      height: 20,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2,
-                      ))
-                  : Text(
-                      'Initialize Wallet',
-                      style: Theme.of(context).textTheme.bodyLarge!.copyWith(
-                          color:
-                              Theme.of(context).colorScheme.onPrimaryContainer),
-                    ),
-            ))
+          alignment: Alignment.centerRight,
+          child: ElevatedButton(
+            onPressed: _initializeWallet,
+            child: initialWalletLoading
+                ? const SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                    ))
+                : Text(
+                    'Initialize Wallet',
+                    style: Theme.of(context).textTheme.bodyLarge!.copyWith(
+                        color:
+                            Theme.of(context).colorScheme.onPrimaryContainer),
+                  ),
+          ),
+        )
       ];
     } else {
       cardContent = [
