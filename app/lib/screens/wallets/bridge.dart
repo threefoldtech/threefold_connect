@@ -89,9 +89,9 @@ class _WalletBridgeScreenState extends ConsumerState<WalletBridgeScreen> {
     toController.text = '';
     toAddressError = null;
     amountError = null;
-    fee = !isWithdraw
-        ? Decimal.parse('1.1')
-        : (isSolana ? Decimal.parse('50') : Decimal.parse('1.01'));
+    fee = isWithdraw
+        ? Decimal.parse('1.01')
+        : (isSolana ? Decimal.parse('50') : Decimal.parse('1.1'));
     setState(() {});
   }
 
@@ -104,6 +104,13 @@ class _WalletBridgeScreenState extends ConsumerState<WalletBridgeScreen> {
     }
 
     if (!isWithdraw) {
+      if (isSolana) {
+        final isValidSolana = isValidSolanaAddress(toAddress);
+        if (!isValidSolana) {
+          toAddressError = 'Invaild Solana address';
+        }
+        return isValidSolana;
+      }
       if (toAddress.length != 48) {
         toAddressError = 'Address length should be 48 characters';
         return false;
@@ -113,15 +120,8 @@ class _WalletBridgeScreenState extends ConsumerState<WalletBridgeScreen> {
         toAddressError = 'Address must have a twin ID';
         return false;
       }
-    }
 
-    if (isWithdraw) {
-      if (isSolana) {
-        if (!isValidSolanaAddress(toAddress)) {
-          toAddressError = 'Invaild Solana address';
-          return false;
-        }
-      } else {
+      if (isWithdraw) {
         if (!isValidStellarAddress(toAddress)) {
           toAddressError = 'Invaild Stellar address';
           return false;
@@ -330,8 +330,10 @@ class _WalletBridgeScreenState extends ConsumerState<WalletBridgeScreen> {
   }
 
   _bridge_confirmation() async {
-    final memoText =
-        !isWithdraw ? await TFChain.getMemo(toController.text.trim()) : null;
+    final memoHash = isSolana ? base58.decode(toController.text.trim()) : null;
+    final memoText = !isWithdraw && !isSolana
+        ? await TFChain.getMemo(toController.text.trim())
+        : null;
     showModalBottomSheet(
         isScrollControlled: true,
         useSafeArea: true,
@@ -348,6 +350,7 @@ class _WalletBridgeScreenState extends ConsumerState<WalletBridgeScreen> {
               amount: amountController.text.trim(),
               isSolana: isSolana,
               memo: memoText,
+              memoHash: memoHash,
               reloadBalance:
                   isWithdraw ? _loadTFChainBalance : _loadStellarBalance,
             ));

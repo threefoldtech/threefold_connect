@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:threebotlogin/helpers/globals.dart';
 import 'package:threebotlogin/helpers/transaction_helpers.dart';
@@ -15,6 +17,7 @@ class BridgeConfirmationWidget extends StatefulWidget {
     required this.to,
     required this.amount,
     required this.memo,
+    required this.memoHash,
     required this.isSolana,
     required this.reloadBalance,
   });
@@ -25,6 +28,7 @@ class BridgeConfirmationWidget extends StatefulWidget {
   final String to;
   final String amount;
   final String? memo;
+  final Uint8List? memoHash;
   final bool isSolana;
   final void Function() reloadBalance;
 
@@ -45,8 +49,11 @@ class _BridgeConfirmationWidgetState extends State<BridgeConfirmationWidget> {
     fromController.text = widget.from;
     toController.text = widget.to;
     amountController.text = widget.amount;
-    feeController.text =
-        widget.bridgeOperation == BridgeOperation.Deposit ? '1.1' : '1.01';
+    feeController.text = widget.bridgeOperation == BridgeOperation.Deposit
+        ? widget.isSolana
+            ? '50'
+            : '1.1'
+        : '1.01';
     super.initState();
   }
 
@@ -174,7 +181,8 @@ class _BridgeConfirmationWidgetState extends State<BridgeConfirmationWidget> {
               widget.secret,
               'GDGIQWZDFVWJPAFG7PJ5AXMOK7NVFVFWELZILI5MLHGSZULBTBGIBYHW',
               widget.amount,
-              widget.memo!);
+              '',
+              memoHash: widget.memoHash);
         } else {
           await Stellar.transfer(widget.secret, Globals().bridgeTFTAddress,
               widget.amount, widget.memo!);
