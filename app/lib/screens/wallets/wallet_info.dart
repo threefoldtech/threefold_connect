@@ -34,11 +34,14 @@ class _WalletDetailsWidgetState extends ConsumerState<WalletDetailsWidget> {
   bool showStellarSecret = false;
   bool edit = false;
   late WalletsNotifier walletsRef;
+  String? _errorText;
 
   @override
   void initState() {
     super.initState();
     walletsRef = ref.read(walletsNotifier.notifier);
+    walletNameController.text = widget.wallet.name;
+    walletName = widget.wallet.name;
   }
 
   Future<bool> _deleteWallet() async {
@@ -65,6 +68,29 @@ class _WalletDetailsWidgetState extends ConsumerState<WalletDetailsWidget> {
       return false;
     } finally {
       if (context.mounted) Navigator.of(context).pop();
+    }
+  }
+
+  void _validateWalletName() {
+    final text = walletNameController.text.trim();
+    String? error;
+
+    if (text.isEmpty) {
+      error = 'Name can\'t be empty';
+    } else {
+      final wallets = ref.read(walletsNotifier);
+      final duplicateWallet = wallets.where(
+        (element) => element.name == text && element != widget.wallet,
+      );
+      if (duplicateWallet.isNotEmpty) {
+        error = 'Name exists';
+      }
+    }
+
+    if (_errorText != error) {
+      setState(() {
+        _errorText = error;
+      });
     }
   }
 
@@ -118,11 +144,8 @@ class _WalletDetailsWidgetState extends ConsumerState<WalletDetailsWidget> {
     stellarAddressController.text = widget.wallet.stellarAddress;
     tfchainSecretController.text = widget.wallet.tfchainSecret;
     tfchainAddressController.text = widget.wallet.tfchainAddress;
-    walletNameController.text = widget.wallet.name;
-    walletName = widget.wallet.name;
     final wallet =
         ref.watch(walletsNotifier).firstWhere((w) => w.name == walletName);
-
     return SingleChildScrollView(
       child: Padding(
         padding: const EdgeInsets.all(10),
@@ -272,15 +295,14 @@ class _WalletDetailsWidgetState extends ConsumerState<WalletDetailsWidget> {
                   width: 8,
                 ),
                 Icon(
-                    wallet.verificationStatus == VerificationState.VERIFIED
-                        ? Icons.check_circle_outline_rounded
-                        : Icons.cancel_outlined,
-                    color: wallet.verificationStatus ==
-                            VerificationState.VERIFIED
-                        ? Theme.of(context).colorScheme.primary
-                        : Theme.of(context).colorScheme.error,
-                    size: 16,
-                  ),
+                  wallet.verificationStatus == VerificationState.VERIFIED
+                      ? Icons.check_circle_outline_rounded
+                      : Icons.cancel_outlined,
+                  color: wallet.verificationStatus == VerificationState.VERIFIED
+                      ? Theme.of(context).colorScheme.primary
+                      : Theme.of(context).colorScheme.error,
+                  size: 16,
+                ),
               ],
             ),
             const SizedBox(
@@ -375,5 +397,13 @@ class _WalletDetailsWidgetState extends ConsumerState<WalletDetailsWidget> {
         onAgree: _deleteWallet,
       ),
     );
+  }
+
+  void _cancelEdit() {
+    setState(() {
+      edit = false;
+      walletNameController.text = widget.wallet.name;
+      _errorText = null;
+    });
   }
 }
