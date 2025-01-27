@@ -337,6 +337,7 @@ class _WalletDetailsWidgetState extends ConsumerState<WalletDetailsWidget> {
     setState(() {
       edit = false;
       walletNameController.text = widget.wallet.name;
+      _errorText = null;
     });
   }
 }
