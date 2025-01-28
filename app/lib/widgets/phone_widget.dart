@@ -211,6 +211,7 @@ class PhoneAlertDialogState extends State<PhoneAlertDialog> {
 
     if (Globals().tooManySmsAttempts &&
         Globals().lockedSmsUntil > currentTime) {
+      if (!mounted) return;
       Globals().sendSmsAttempts = 0;
       showDialog(
         context: context,
@@ -238,6 +239,7 @@ class PhoneAlertDialogState extends State<PhoneAlertDialog> {
       Globals().tooManySmsAttempts = true;
       Globals().lockedSmsUntil = currentTime + 60000;
 
+      if (!mounted) return;
       showDialog(
         context: context,
         builder: (BuildContext context) {
@@ -264,8 +266,9 @@ class PhoneAlertDialogState extends State<PhoneAlertDialog> {
     Globals().hidePhoneButton.value = true;
     Globals().smsSentOn = DateTime.now().millisecondsSinceEpoch;
 
-    phoneSendDialog(context);
-
-    Navigator.pop(context);
+    if (mounted) {
+      phoneSendDialog(context);
+      Navigator.pop(context);
+    }
   }
 }
