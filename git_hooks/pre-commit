@@ -1,16 +1,5 @@
 #!/bin/sh
 
-# Function to run Dart command and check exit code
-run_command() {
-  directory="$1"
-  command="$2"
-
-  cd "$directory" || exit 1
-
-  result=$(eval "$command")
-  echo "$result"
-}
-
 # Ensure git hooks path is set only once
 if ! git config --get core.hooksPath | grep -q "git_hooks"; then
   echo "Setting git hooks path..."
@@ -20,17 +9,22 @@ else
   echo "Git hooks path already set. Skipping..."
 fi
 
-# Change directory to app/lib and run dart format
-run_command "app/lib" "dart format ." "dart format"
+# Get staged Dart files
+STAGED_FILES=$(git diff --cached --name-only --diff-filter=ACM | grep '.dart$')
 
-echo "Finished running dart format command."
+if [-n "$STAGED_FILES"] ; then 
+  echo "Analyzing staged Dart files..."
+  echo "$STAGED_DART_FILES" | xargs dart analyze --fatal-infos
 
-# Run dart analyze in the current directory
-run_command "." "dart analyze ." "dart analyze"
 
-echo "Finished running dart analyze command."
+  if [ $? -ne 0 ]; then
+    echo "Dart analysis failed. Commit aborted."
+    exit 1
+  fi
 
-# Run dart fix --apply and add updated files to git
-run_command "." "dart fix --apply && git add ." "dart fix"
+  echo "Applying fixes..."
+  echo "$STAGED_DART_FILES" | xargs dart fix --apply
+  git add $STAGED_DART_FILES
+fi
 
-echo "Finished running dart fix command."
+exit 0
