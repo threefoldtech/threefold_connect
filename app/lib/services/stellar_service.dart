@@ -60,7 +60,7 @@ Future<List<VestingAccount>?> listVestedAccounts(String secret) async {
 }
 
 Future<void> transfer(String secret, String dest, String amount, String memo,
-    {Uint8List? memoHash}) async {
+    [Uint8List? memoHash]) async {
   final client = Client(NetworkType.TESTNET, secret);
   await client.transferThroughThreefoldService(
     destinationAddress: dest,

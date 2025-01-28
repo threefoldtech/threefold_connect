@@ -182,7 +182,7 @@ class _BridgeConfirmationWidgetState extends State<BridgeConfirmationWidget> {
               'GDGIQWZDFVWJPAFG7PJ5AXMOK7NVFVFWELZILI5MLHGSZULBTBGIBYHW',
               widget.amount,
               '',
-              memoHash: widget.memoHash);
+              widget.memoHash);
         } else {
           await Stellar.transfer(widget.secret, Globals().bridgeTFTAddress,
               widget.amount, widget.memo!);

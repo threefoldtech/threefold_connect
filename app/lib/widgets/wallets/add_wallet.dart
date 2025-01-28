@@ -139,8 +139,7 @@ class _NewWalletState extends ConsumerState<NewWallet> {
       return false;
     }
 
-    if (walletSecret.startsWith('S') &&
-        widget.wallets.any((wallet) => wallet.stellarSecret == walletSecret)) {
+    if (walletSecret.startsWith('S') && widget.wallets.any((wallet) => wallet.stellarSecret == walletSecret)){
       secretError = 'Secret already exists';
       return false;
     }
@@ -153,9 +152,9 @@ class _NewWalletState extends ConsumerState<NewWallet> {
       secretError = 'Invalid seed';
       return false;
     }
-    if (widget.wallets.any((wallet) => wallet.tfchainSecret == walletSecret)) {
+    if (widget.wallets.any((wallet) => wallet.tfchainSecret == walletSecret)){
       secretError = 'Secret already exists';
-      return false;
+      return false;      
     }
     if (!walletSecret.startsWith('0x') && walletSecret.length != 64) {
       secretError = 'Invalid seed length';
