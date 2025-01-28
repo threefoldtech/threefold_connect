@@ -54,10 +54,11 @@ class PhoneAlertDialog extends StatefulWidget {
   final String oldPhone;
 
   const PhoneAlertDialog(
-      {super.key,
+      {Key? key,
       required this.defaultCountryCode,
       required this.newPhone,
-      required this.oldPhone});
+      required this.oldPhone})
+      : super(key: key);
 
   @override
   State<StatefulWidget> createState() {

@@ -5,7 +5,7 @@ import 'package:threebotlogin/widgets/custom_dialog.dart';
 import 'package:threebotlogin/helpers/globals.dart';
 
 class TermsAndConditions extends StatefulWidget {
-  const TermsAndConditions({super.key});
+  const TermsAndConditions({Key? key}) : super(key: key);
 
   @override
   State<TermsAndConditions> createState() => _TermsAndConditionsState();
