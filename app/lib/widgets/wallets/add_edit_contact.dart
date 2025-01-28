@@ -39,6 +39,7 @@ class _AddEditContactState extends State<AddEditContact> {
   bool saveLoading = false;
   String? nameError;
   String? addressError;
+  ChainType? _selectedChainType;
   Future<void> _showDialog(
       String title, String message, IconData icon, DialogType type) async {
     showDialog(
@@ -94,11 +95,12 @@ class _AddEditContactState extends State<AddEditContact> {
 
       return false;
     }
-    if (widget.chainType == ChainType.TFChain && contactAddress.length != 48) {
+    if (_selectedChainType == ChainType.TFChain &&
+        contactAddress.length != 48) {
       addressError = 'Address length should be 48 characters';
       return false;
     }
-    if (widget.chainType == ChainType.Stellar &&
+    if (_selectedChainType == ChainType.Stellar &&
         !isValidStellarAddress(contactAddress)) {
       addressError = 'Invaild Stellar address';
       return false;
@@ -107,8 +109,11 @@ class _AddEditContactState extends State<AddEditContact> {
   }
 
   _add(String contactName, String contactAddress) async {
+    final chainType = _selectedChainType == ChainType.Stellar
+        ? ChainType.Stellar
+        : ChainType.TFChain;
     try {
-      await addContact(contactName, contactAddress, widget.chainType);
+      await addContact(contactName, contactAddress, chainType);
       await _showDialog(
           'Contact Added!',
           'Contact $contactName has been added successfully',
@@ -120,8 +125,10 @@ class _AddEditContactState extends State<AddEditContact> {
           Icons.error, DialogType.Error);
       return;
     }
-    widget.onAddContact!(PkidContact(
-        name: contactName, address: contactAddress, type: widget.chainType));
+    if (chainType == widget.chainType) {
+      widget.onAddContact!(PkidContact(
+          name: contactName, address: contactAddress, type: chainType));
+    }
     if (!context.mounted) return;
     Navigator.pop(context);
   }
@@ -183,6 +190,7 @@ class _AddEditContactState extends State<AddEditContact> {
       _nameController.text = widget.name;
       _addressController.text = widget.address;
     }
+    _selectedChainType = widget.chainType;
     super.initState();
   }
 
@@ -232,9 +240,47 @@ class _AddEditContactState extends State<AddEditContact> {
                   ),
                   controller: _addressController,
                 ),
-                const SizedBox(
-                  height: 30,
-                ),
+                const SizedBox(height: 20),
+                if (widget.operation == ContactOperation.Add)
+                  Row(
+                    children: [
+                      Text(
+                        'Chain Type:',
+                        style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                            color: Theme.of(context).colorScheme.onSurface,
+                            decorationColor:
+                                Theme.of(context).colorScheme.onSurface),
+                      ),
+                      const SizedBox(width: 10),
+                      DropdownButton<ChainType>(
+                        value: _selectedChainType,
+                        onChanged: (ChainType? newValue) {
+                          setState(() {
+                            _selectedChainType = newValue!;
+                          });
+                        },
+                        items: ChainType.values
+                            .map<DropdownMenuItem<ChainType>>((ChainType type) {
+                          return DropdownMenuItem<ChainType>(
+                            value: type,
+                            child: Text(
+                              type.name,
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodyMedium!
+                                  .copyWith(
+                                    color:
+                                        Theme.of(context).colorScheme.onSurface,
+                                    decorationColor:
+                                        Theme.of(context).colorScheme.onSurface,
+                                  ),
+                            ),
+                          );
+                        }).toList(),
+                      ),
+                    ],
+                  ),
+                const SizedBox(height: 30),
                 Row(
                   children: [
                     const Spacer(),
@@ -244,9 +290,7 @@ class _AddEditContactState extends State<AddEditContact> {
                           Navigator.pop(context);
                         },
                         child: const Text('Close')),
-                    const SizedBox(
-                      width: 5,
-                    ),
+                    const SizedBox(width: 5),
                     ElevatedButton(
                         onPressed: widget.operation == ContactOperation.Add
                             ? _validateAndAdd

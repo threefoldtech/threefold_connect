@@ -5,7 +5,9 @@ import 'package:flutter_pkid/flutter_pkid.dart';
 import 'package:gridproxy_client/models/farms.dart';
 import 'package:threebotlogin/apps/wallet/wallet_config.dart';
 import 'package:threebotlogin/helpers/globals.dart';
+import 'package:threebotlogin/helpers/logger.dart';
 import 'package:threebotlogin/models/wallet.dart';
+import 'package:threebotlogin/services/idenfy_service.dart';
 import 'package:threebotlogin/services/gridproxy_service.dart';
 import 'package:threebotlogin/services/pkid_service.dart';
 import 'package:threebotlogin/services/shared_preference_service.dart';
@@ -26,7 +28,20 @@ Future<FlutterPkid> _getPkidClient() async {
 
 Future<List<PkidWallet>> getPkidWallets() async {
   FlutterPkid client = await _getPkidClient();
-  final pKidResult = await client.getPKidDoc('purse');
+  Map<String, dynamic> pKidResult;
+  try {
+    pKidResult = await client.getPKidDoc('purse');
+    if (pKidResult.containsKey('error')) {
+      if (pKidResult.containsValue('Key is not found')){
+        return [];
+      }
+      logger.e('Error in pKidResult : ${pKidResult['error']}');
+      throw Exception('Error fetching wallets');
+    }
+  } catch (e) {
+    logger.e('Error while requesting pkidWallets: $e');
+    throw Exception('Error fetching wallets');
+  }
   final result =
       pKidResult.containsKey('data') && pKidResult.containsKey('success')
           ? jsonDecode(pKidResult['data'])
@@ -43,12 +58,13 @@ Future<List<PkidWallet>> getPkidWallets() async {
 }
 
 Future<List<Wallet>> listWallets() async {
-  List<PkidWallet> pkidWallets = await getPkidWallets();
+  final pkidWallets = await getPkidWallets();
   final String chainUrl = Globals().chainUrl;
+  final idenfyServiceUrl = Globals().idenfyServiceUrl;
   final List<Wallet> wallets = await compute((void _) async {
     final List<Future<Wallet>> walletFutures = [];
     for (final w in pkidWallets) {
-      final walletFuture = loadWallet(w.name, w.seed, w.type, chainUrl);
+      final walletFuture = loadWallet(w.name, w.seed, w.type, chainUrl, idenfyServiceUrl);
       walletFutures.add(walletFuture);
     }
     return await Future.wait(walletFutures);
@@ -95,7 +111,7 @@ Future<(Stellar.Client, TFChain.Client)> loadWalletClients(String walletName,
 }
 
 Future<Wallet> loadWallet(String walletName, String walletSeed,
-    WalletType walletType, String chainUrl) async {
+    WalletType walletType, String chainUrl, String idenfyServiceUrl) async {
   final (stellarClient, tfchainClient) =
       await loadWalletClients(walletName, walletSeed, walletType, chainUrl);
   final balances = await Future.wait([
@@ -105,6 +121,8 @@ Future<Wallet> loadWallet(String walletName, String walletSeed,
   final stellarBalance = balances.first.toString();
   final tfchainBalance =
       balances.last.toString() == '0.0' ? '0' : balances.last.toString();
+  final kycVerified =
+          await getVerificationStatus(address: tfchainClient.keypair!.address,idenfyServiceUrl: idenfyServiceUrl );
   final wallet = Wallet(
     name: walletName,
     stellarSecret: stellarClient.secretSeed,
@@ -114,6 +132,7 @@ Future<Wallet> loadWallet(String walletName, String walletSeed,
     stellarBalance: stellarBalance,
     tfchainBalance: tfchainBalance,
     type: walletType,
+    verificationStatus: kycVerified.status,
   );
   return wallet;
 }

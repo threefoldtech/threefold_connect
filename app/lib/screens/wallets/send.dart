@@ -268,14 +268,7 @@ class _WalletSendScreenState extends ConsumerState<WalletSendScreen> {
                                         chainType: chainType,
                                         currentWalletAddress:
                                             fromController.text,
-                                        wallets: chainType == ChainType.Stellar
-                                            ? wallets
-                                                .where((w) =>
-                                                    double.parse(
-                                                        w.stellarBalance) >=
-                                                    0)
-                                                .toList()
-                                            : wallets,
+                                        wallets: wallets,
                                         onSelectToAddress: _selectToAddress),
                                   ));
                                 },

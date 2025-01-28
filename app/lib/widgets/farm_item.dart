@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:threebotlogin/helpers/globals.dart';
 import 'package:threebotlogin/helpers/logger.dart';
 import 'package:threebotlogin/models/farm.dart';
 import 'package:threebotlogin/models/idenfy.dart';
@@ -237,8 +238,9 @@ class _FarmItemWidgetState extends State<FarmItemWidget> {
                         children: [
                           IconButton(
                               onPressed: () async {
+                                final idenfyServiceUrl = Globals().idenfyServiceUrl;
                                 final kycVerified = await getVerificationStatus(
-                                    address: tfchainAddress!);
+                                    address: tfchainAddress!, idenfyServiceUrl: idenfyServiceUrl);
                                 if (kycVerified.status !=
                                     VerificationState.VERIFIED) {
                                   showDialog(

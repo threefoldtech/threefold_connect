@@ -2,6 +2,8 @@
 
 import 'dart:convert';
 
+import 'package:bip39/bip39.dart';
+import 'package:convert/convert.dart';
 import 'package:tfchain_client/generated/dev/types/pallet_collective/votes.dart';
 import 'package:tfchain_client/generated/dev/types/tfchain_support/types/farm.dart';
 import 'package:tfchain_client/models/council.dart';
@@ -16,6 +18,7 @@ import 'package:crypto/crypto.dart';
 import 'package:http/http.dart' as http;
 import 'package:hashlib/hashlib.dart' as hashlib;
 import 'package:signer/signer.dart';
+import 'package:substrate_bip39/substrate_bip39.dart';
 
 Future<String> getMySeed() async {
   final derivedSeed = await getDerivedSeed(WalletConfig().appId());
@@ -36,6 +39,19 @@ Future<Signer> getMySigner() async {
   final seed = await getMySeed();
   final signer = Signer();
   signer.fromHexSeed(seed, KPType.sr25519);
+  return signer;
+}
+
+Future<Signer> getSignerFromSeed(String walletSeed) async {
+  final signer = Signer();
+  if (walletSeed.startsWith('0x')) {
+    signer.fromHexSeed(walletSeed, KPType.sr25519);
+  } else {
+    final entropy = mnemonicToEntropy(walletSeed);
+    final seed = await CryptoScheme.seedFromEntropy(hex.decode(entropy));
+    final hexSeed = '0x${hex.encode(seed).substring(0, 64)}';
+    signer.fromHexSeed(hexSeed, KPType.sr25519);
+  }
   return signer;
 }
 

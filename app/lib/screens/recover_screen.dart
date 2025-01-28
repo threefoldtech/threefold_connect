@@ -95,7 +95,6 @@ class _RecoverScreenState extends State<RecoverScreen> {
       await savePhrase(seedPhrase);
       await saveFingerprint(false);
       await saveDoubleName(doubleName);
-
       await handleKYCData(dataMap[0], dataMap[1]);
 
       await fixPkidMigration();

@@ -1,10 +1,16 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:threebotlogin/events/events.dart';
+import 'package:threebotlogin/events/identity_callback_event.dart';
 import 'package:threebotlogin/helpers/logger.dart';
+import 'package:threebotlogin/models/idenfy.dart';
 import 'package:threebotlogin/models/wallet.dart';
 import 'package:threebotlogin/providers/wallets_provider.dart';
 import 'package:threebotlogin/services/wallet_service.dart';
+import 'package:threebotlogin/widgets/kyc_widget.dart';
 import 'package:threebotlogin/widgets/wallets/warning_dialog.dart';
 
 class WalletDetailsWidget extends ConsumerStatefulWidget {
@@ -28,11 +34,14 @@ class _WalletDetailsWidgetState extends ConsumerState<WalletDetailsWidget> {
   bool showStellarSecret = false;
   bool edit = false;
   late WalletsNotifier walletsRef;
+  String? _errorText;
 
   @override
   void initState() {
     super.initState();
     walletsRef = ref.read(walletsNotifier.notifier);
+    walletNameController.text = widget.wallet.name;
+    walletName = widget.wallet.name;
   }
 
   Future<bool> _deleteWallet() async {
@@ -59,6 +68,29 @@ class _WalletDetailsWidgetState extends ConsumerState<WalletDetailsWidget> {
       return false;
     } finally {
       if (context.mounted) Navigator.of(context).pop();
+    }
+  }
+
+  void _validateWalletName() {
+    final text = walletNameController.text.trim();
+    String? error;
+
+    if (text.isEmpty) {
+      error = 'Name can\'t be empty';
+    } else {
+      final wallets = ref.read(walletsNotifier);
+      final duplicateWallet = wallets.where(
+        (element) => element.name == text && element != widget.wallet,
+      );
+      if (duplicateWallet.isNotEmpty) {
+        error = 'Name exists';
+      }
+    }
+
+    if (_errorText != error) {
+      setState(() {
+        _errorText = error;
+      });
     }
   }
 
@@ -112,15 +144,52 @@ class _WalletDetailsWidgetState extends ConsumerState<WalletDetailsWidget> {
     stellarAddressController.text = widget.wallet.stellarAddress;
     tfchainSecretController.text = widget.wallet.tfchainSecret;
     tfchainAddressController.text = widget.wallet.tfchainAddress;
-    walletNameController.text = widget.wallet.name;
-    walletName = widget.wallet.name;
-
+    final wallet =
+        ref.watch(walletsNotifier).firstWhere((w) => w.name == walletName);
     return SingleChildScrollView(
       child: Padding(
         padding: const EdgeInsets.all(10),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            ListTile(
+              title: TextField(
+                  focusNode: nameFocus,
+                  autofocus: edit,
+                  readOnly: !edit,
+                  style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                        color: Theme.of(context).colorScheme.onSurface,
+                      ),
+                  controller: walletNameController,
+                  onChanged: (text) {
+                    _validateWalletName();
+                  },
+                  decoration: InputDecoration(
+                    labelText: 'Wallet Name',
+                    errorText: _errorText,
+                  )),
+              trailing: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  if (edit)
+                    IconButton(
+                      onPressed: _errorText == null ? _editWallet : null,
+                      icon: const Icon(Icons.save),
+                    ),
+                  if (edit)
+                    IconButton(
+                      onPressed: _cancelEdit,
+                      icon: const Icon(Icons.cancel),
+                    ),
+                  if (!edit)
+                    IconButton(
+                      onPressed: _editWallet,
+                      icon: const Icon(Icons.edit),
+                    ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 40),
             Text(
               'Addresses',
               style: Theme.of(context).textTheme.titleLarge!.copyWith(
@@ -235,21 +304,83 @@ class _WalletDetailsWidgetState extends ConsumerState<WalletDetailsWidget> {
                   icon: const Icon(Icons.copy)),
             ),
             const SizedBox(height: 40),
-            ListTile(
-              title: TextField(
-                  focusNode: nameFocus,
-                  autofocus: edit,
-                  readOnly: !edit,
-                  style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+            Row(
+              children: [
+                Text(
+                  'KYC',
+                  style: Theme.of(context).textTheme.titleLarge!.copyWith(
                         color: Theme.of(context).colorScheme.onSurface,
                       ),
-                  controller: walletNameController,
-                  decoration: const InputDecoration(
-                    labelText: 'Wallet Name',
-                  )),
-              trailing: IconButton(
-                  onPressed: _editWallet,
-                  icon: edit ? const Icon(Icons.save) : const Icon(Icons.edit)),
+                ),
+                const SizedBox(
+                  width: 8,
+                ),
+                Icon(
+                  wallet.verificationStatus == VerificationState.VERIFIED
+                      ? Icons.check_circle_outline_rounded
+                      : Icons.cancel_outlined,
+                  color: wallet.verificationStatus == VerificationState.VERIFIED
+                      ? Theme.of(context).colorScheme.primary
+                      : Theme.of(context).colorScheme.error,
+                  size: 16,
+                ),
+              ],
+            ),
+            const SizedBox(
+              height: 10,
+            ),
+            Center(
+              child: SizedBox(
+                width: MediaQuery.of(context).size.width - 40,
+                child: ElevatedButton(
+                  onPressed: () async {
+                    if (wallet.verificationStatus !=
+                        VerificationState.VERIFIED) {
+                      await termsAndConditionsDialog(
+                          context: context, wallet: wallet);
+
+                      final completer = Completer<void>();
+                      StreamSubscription? subscription;
+                      try {
+                        subscription =
+                            Events().onEvent(IdentityCallbackEvent, (event) {
+                          if (event is IdentityCallbackEvent &&
+                              event.type == 'success') {
+                            logger.i(
+                                '[Event Listener] IdentityCallbackEvent with success received.');
+                            completer.complete();
+                          }
+                        });
+
+                        await completer.future;
+                        await walletsRef.verifyWallet(wallet.name);
+                      } catch (e) {
+                        logger.e(
+                            '[Event Listener] Error while waiting for event: $e');
+                      } finally {
+                        if (subscription != null) {
+                          await subscription.cancel();
+                        }
+                      }
+                    } else {
+                      showIdentityDetails(context, wallet.tfchainSecret);
+                    }
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor:
+                        Theme.of(context).colorScheme.primaryContainer,
+                  ),
+                  child: Text(
+                    wallet.verificationStatus != VerificationState.VERIFIED
+                        ? 'Verify'
+                        : 'Show Data',
+                    style: Theme.of(context).textTheme.bodyLarge!.copyWith(
+                          color:
+                              Theme.of(context).colorScheme.onPrimaryContainer,
+                        ),
+                  ),
+                ),
+              ),
             ),
             const SizedBox(height: 40),
             if (widget.wallet.type == WalletType.IMPORTED)
@@ -270,7 +401,7 @@ class _WalletDetailsWidgetState extends ConsumerState<WalletDetailsWidget> {
                     ),
                   ),
                 ),
-              )
+              ),
           ],
         ),
       ),
@@ -287,5 +418,13 @@ class _WalletDetailsWidgetState extends ConsumerState<WalletDetailsWidget> {
         onAgree: _deleteWallet,
       ),
     );
+  }
+
+  void _cancelEdit() {
+    setState(() {
+      edit = false;
+      walletNameController.text = widget.wallet.name;
+      _errorText = null;
+    });
   }
 }
