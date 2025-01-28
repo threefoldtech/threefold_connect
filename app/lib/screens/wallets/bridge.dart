@@ -91,7 +91,7 @@ class _WalletBridgeScreenState extends ConsumerState<WalletBridgeScreen> {
     amountError = null;
     fee = isWithdraw
         ? Decimal.parse('1.01')
-        : (isSolana ? Decimal.parse('50') : Decimal.parse('1.1'));
+        : (isSolana ? Decimal.parse('100') : Decimal.parse('1.1'));
     setState(() {});
   }
 

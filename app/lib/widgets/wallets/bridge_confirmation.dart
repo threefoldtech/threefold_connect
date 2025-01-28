@@ -51,7 +51,7 @@ class _BridgeConfirmationWidgetState extends State<BridgeConfirmationWidget> {
     amountController.text = widget.amount;
     feeController.text = widget.bridgeOperation == BridgeOperation.Deposit
         ? widget.isSolana
-            ? '50'
+            ? '100'
             : '1.1'
         : '1.01';
     super.initState();
