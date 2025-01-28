@@ -11,6 +11,7 @@ import 'package:threebotlogin/providers/wallets_provider.dart';
 import 'package:threebotlogin/screens/scan_screen.dart';
 import 'package:threebotlogin/screens/wallets/contacts.dart';
 import 'package:threebotlogin/services/stellar_service.dart';
+import 'package:threebotlogin/widgets/custom_dialog.dart';
 import 'package:threebotlogin/widgets/wallets/select_chain_widget.dart';
 import 'package:threebotlogin/widgets/wallets/send_confirmation.dart';
 import 'package:validators/validators.dart';
@@ -399,21 +400,21 @@ class _WalletSendScreenState extends ConsumerState<WalletSendScreen> {
   void _showInvalidQRCodeDialog() {
     showDialog(
       context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Invalid QR Code'),
-          content: const Text(
-              'The QR code is missing required information or is invalid.'),
-          actions: <Widget>[
-            TextButton(
-              child: const Text('OK'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
-      },
+      builder: (BuildContext context) => CustomDialog(
+        type: DialogType.Warning,
+        image: Icons.warning,
+        title: 'Invalid QR Code',
+        description:
+            'The QR code is missing required information or is invalid.',
+        actions: [
+          TextButton(
+            child: const Text('Close'),
+            onPressed: () {
+              Navigator.pop(context);
+            },
+          ),
+        ],
+      ),
     );
   }
 
