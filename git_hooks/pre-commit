@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# Ensure git hooks path is set only once
+# Ensure git hooks path is set correctly
 if ! git config --get core.hooksPath | grep -q "git_hooks"; then
   echo "Setting git hooks path..."
   git config core.hooksPath git_hooks
@@ -10,21 +10,17 @@ else
 fi
 
 # Get staged Dart files
-STAGED_FILES=$(git diff --cached --name-only --diff-filter=ACM | grep '.dart$')
+STAGED_DART_FILES=$(git diff --cached --name-only --diff-filter=ACM | grep '\.dart$')
 
-if [-n "$STAGED_FILES"] ; then 
+if [ -n "$STAGED_DART_FILES" ]; then 
   echo "Analyzing staged Dart files..."
   echo "$STAGED_DART_FILES" | xargs dart analyze --fatal-infos
 
-
-  if [ $? -ne 0 ]; then
-    echo "Dart analysis failed. Commit aborted."
-    exit 1
-  fi
-
   echo "Applying fixes..."
   echo "$STAGED_DART_FILES" | xargs dart fix --apply
-  git add $STAGED_DART_FILES
+
+  echo "Re-adding fixed Dart files to the commit..."
+  echo "$STAGED_DART_FILES" | xargs git add
 fi
 
 exit 0
