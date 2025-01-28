@@ -383,11 +383,38 @@ class _WalletSendScreenState extends ConsumerState<WalletSendScreen> {
       if (chainType == ChainType.Stellar &&
           code.queryParameters.containsKey('message')) {
         memoController.text = code.queryParameters['message']!;
+      } else {
+        _showInvalidQRCodeDialog();
+        return;
       }
       setState(() {});
+    } else {
+      _showInvalidQRCodeDialog();
+      return;
     }
 
     return result.rawValue!;
+  }
+
+  void _showInvalidQRCodeDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Invalid QR Code'),
+          content: const Text(
+              'The QR code is missing required information or is invalid.'),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('OK'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 
   calculateAmount(int percentage) {
