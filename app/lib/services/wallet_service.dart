@@ -66,7 +66,7 @@ Future<(Stellar.Client, TFChain.Client)> loadWalletClients(String walletName,
     final entropy = bip39.mnemonicToEntropy(walletSeed);
     final seed = entropy.padRight(64, '0');
     stellarClient =
-        Stellar.Client.fromSecretSeedHex(Stellar.NetworkType.TESTNET, seed);
+        Stellar.Client.fromSecretSeedHex(Stellar.NetworkType.PUBLIC, seed);
   } else if (' '.allMatches(walletSeed).length == 23) {
     final entropy = bip39.mnemonicToEntropy(walletSeed);
     final seedList = hex.decode(entropy).toList();
@@ -74,10 +74,10 @@ Future<(Stellar.Client, TFChain.Client)> loadWalletClients(String walletName,
     final seed = Blake2b(32).hex(seedList);
 
     stellarClient =
-        Stellar.Client.fromSecretSeedHex(Stellar.NetworkType.TESTNET, seed);
+        Stellar.Client.fromSecretSeedHex(Stellar.NetworkType.PUBLIC, seed);
     tfchainClient = TFChain.Client(chainUrl, '0x$seed', 'sr25519');
   } else if (StellarService.isValidStellarSecret(walletSeed)) {
-    stellarClient = Stellar.Client(Stellar.NetworkType.TESTNET, walletSeed);
+    stellarClient = Stellar.Client(Stellar.NetworkType.PUBLIC, walletSeed);
     final hexSecret =
         hex.encode(stellarClient.privateKey!.toList().sublist(0, 32));
     tfchainClient = TFChain.Client(chainUrl, '0x$hexSecret', 'sr25519');
@@ -86,7 +86,7 @@ Future<(Stellar.Client, TFChain.Client)> loadWalletClients(String walletName,
       walletSeed = walletSeed.substring(2);
     }
     stellarClient = Stellar.Client.fromSecretSeedHex(
-        Stellar.NetworkType.TESTNET, walletSeed);
+        Stellar.NetworkType.PUBLIC, walletSeed);
     final hexSecret =
         hex.encode(stellarClient.privateKey!.toList().sublist(0, 32));
     tfchainClient = TFChain.Client(chainUrl, '0x$hexSecret', 'sr25519');
