@@ -234,7 +234,7 @@ class _WalletBridgeScreenState extends ConsumerState<WalletBridgeScreen> {
                       ),
                   controller: toController,
                   decoration: InputDecoration(
-                      labelText: 'To',
+                      labelText: isSolana ? 'Associated Token Address' : 'To',
                       errorText: toAddressError,
                       suffixIcon: !isSolana
                           ? IconButton(
