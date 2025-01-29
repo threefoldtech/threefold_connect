@@ -5,6 +5,7 @@ import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:threebotlogin/helpers/globals.dart';
+import 'package:threebotlogin/helpers/logger.dart';
 import 'package:threebotlogin/helpers/transaction_helpers.dart';
 import 'package:threebotlogin/models/wallet.dart';
 import 'package:threebotlogin/providers/wallets_provider.dart';
@@ -375,8 +376,15 @@ class _WalletSendScreenState extends ConsumerState<WalletSendScreen> {
             MaterialPageRoute(builder: (context) => const ScanScreen()));
       }
     }
-    if (result.rawValue != null) {
-      final code = Uri.parse(result.rawValue!);
+    if (result.rawValue != null && result.rawValue!.startsWith('TFT')) {
+      late final code;
+      try {
+        code = Uri.parse(result.rawValue!);
+      } catch (e) {
+        logger.e('Error parsing QR Code, Error: $e');
+        _showInvalidQRCodeDialog();
+        return;
+      }
       toController.text = code.path;
       if (code.queryParameters.containsKey('amount')) {
         amountController.text = code.queryParameters['amount']!;
