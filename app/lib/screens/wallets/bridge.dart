@@ -261,20 +261,22 @@ class _WalletBridgeScreenState extends ConsumerState<WalletBridgeScreen> {
             ),
             const SizedBox(height: 10),
             ListTile(
-              title: TextField(
-                  style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                        color: Theme.of(context).colorScheme.onSurface,
-                      ),
-                  keyboardType:
-                      const TextInputType.numberWithOptions(decimal: true),
-                  controller: amountController,
-                  decoration: InputDecoration(
-                      labelText: 'Amount (Balance: ${formatAmount(balance)})',
-                      hintText: '100',
-                      suffixText: 'TFT',
-                      errorText: amountError)),
-              subtitle: Text('Max Fee: $fee TFT'),
-            ),
+                title: TextField(
+                    style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                          color: Theme.of(context).colorScheme.onSurface,
+                        ),
+                    keyboardType:
+                        const TextInputType.numberWithOptions(decimal: true),
+                    controller: amountController,
+                    decoration: InputDecoration(
+                        labelText: 'Amount (Balance: ${formatAmount(balance)})',
+                        hintText: '100',
+                        suffixText: 'TFT',
+                        errorText: amountError)),
+                subtitle: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 8.0),
+                  child: Text('Max Fee: $fee TFT'),
+                )),
             const SizedBox(height: 10),
             if (isBiggerThanFee)
               Padding(
