@@ -385,6 +385,10 @@ class _WalletSendScreenState extends ConsumerState<WalletSendScreen> {
         _showInvalidQRCodeDialog();
         return;
       }
+      if (code.path == null) {
+        _showInvalidQRCodeDialog();
+        return;
+      }
       toController.text = code.path;
       if (code.queryParameters.containsKey('amount')) {
         amountController.text = code.queryParameters['amount']!;
