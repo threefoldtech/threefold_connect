@@ -14,13 +14,13 @@ STAGED_DART_FILES=$(git diff --cached --name-only --diff-filter=ACM | grep '\.da
 
 if [ -n "$STAGED_DART_FILES" ]; then 
   echo "Analyzing staged Dart files..."
-  echo "$STAGED_DART_FILES" | xargs dart analyze --fatal-infos
+  echo "$STAGED_DART_FILES" | xargs -n1 dart analyze --fatal-infos
 
   echo "Applying fixes..."
-  echo "$STAGED_DART_FILES" | xargs dart fix --apply
+  echo "$STAGED_DART_FILES" | xargs -n1 dart fix --apply
 
   echo "Re-adding fixed Dart files to the commit..."
-  echo "$STAGED_DART_FILES" | xargs git add
+  echo "$STAGED_DART_FILES" | xargs -n1 git add
 fi
 
 exit 0
