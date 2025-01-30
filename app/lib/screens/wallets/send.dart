@@ -396,10 +396,7 @@ class _WalletSendScreenState extends ConsumerState<WalletSendScreen> {
       if (chainType == ChainType.Stellar &&
           code.queryParameters.containsKey('message')) {
         memoController.text = code.queryParameters['message']!;
-      } else {
-        _showInvalidQRCodeDialog();
-        return;
-      }
+      } 
       setState(() {});
     } else {
       _showInvalidQRCodeDialog();
