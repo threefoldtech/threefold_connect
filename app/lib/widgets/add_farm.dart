@@ -75,10 +75,7 @@ class _NewFarmState extends State<NewFarm> {
   _add(String farmName) async {
     Farm? farm;
     try {
-      final idenfyServiceUrl = Globals().idenfyServiceUrl;
-      final kycVerified =
-          await getVerificationStatus(address: _selectedWallet!.tfchainAddress, idenfyServiceUrl: idenfyServiceUrl);
-      if (kycVerified.status == VerificationState.VERIFIED) {
+      //should be replace with email verification ??
         final f = await createFarm(farmName, _selectedWallet!.tfchainSecret,
             _selectedWallet!.stellarAddress);
         farm = Farm(
@@ -94,27 +91,6 @@ class _NewFarmState extends State<NewFarm> {
             'Farm $farmName has been added successfully',
             Icons.check,
             DialogType.Info);
-      } else {
-        saveLoading = false;
-        showDialog(
-            context: context,
-            builder: (BuildContext context) => CustomDialog(
-                  type: DialogType.Warning,
-                  image: Icons.warning,
-                  title: 'Unauthorized',
-                  description:
-                      'KYC verification is required for the selected wallet',
-                  actions: <Widget>[
-                    TextButton(
-                      child: const Text('Close'),
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
-                    ),
-                  ],
-                ));
-        return;
-      }
     } catch (e) {
       logger.e(e);
       _showDialog('Error', 'Failed to create farm. Please try again.',

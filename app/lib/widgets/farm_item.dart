@@ -34,17 +34,12 @@ class _FarmItemWidgetState extends State<FarmItemWidget> {
   ChainType chainType = ChainType.Stellar;
   String? addressError;
   String? currentAddress;
-  String? tfchainAddress;
 
   @override
   void initState() {
     super.initState();
     currentAddress = widget.farm.walletAddress;
     walletAddressController.text = currentAddress!;
-    tfchainAddress = widget.wallets
-        .where((w) => w.name == widget.farm.walletName)
-        .first
-        .tfchainAddress;
   }
 
   @override
@@ -238,31 +233,31 @@ class _FarmItemWidgetState extends State<FarmItemWidget> {
                         children: [
                           IconButton(
                               onPressed: () async {
-                                final idenfyServiceUrl = Globals().idenfyServiceUrl;
-                                final kycVerified = await getVerificationStatus(
-                                    address: tfchainAddress!, idenfyServiceUrl: idenfyServiceUrl);
-                                if (kycVerified.status !=
-                                    VerificationState.VERIFIED) {
-                                  showDialog(
-                                      context: context,
-                                      builder: (BuildContext context) =>
-                                          CustomDialog(
-                                            type: DialogType.Warning,
-                                            image: Icons.warning,
-                                            title: 'Unauthorized',
-                                            description:
-                                                'KYC verification is required for the selected wallet',
-                                            actions: <Widget>[
-                                              TextButton(
-                                                child: const Text('Close'),
-                                                onPressed: () {
-                                                  Navigator.pop(context);
-                                                },
-                                              ),
-                                            ],
-                                          ));
-                                  return;
-                                }
+                                // final idenfyServiceUrl = Globals().idenfyServiceUrl;
+                                // final kycVerified = await getVerificationStatus(
+                                //     address: tfchainAddress!, idenfyServiceUrl: idenfyServiceUrl);
+                                // if (kycVerified.status !=
+                                //     VerificationState.VERIFIED) {
+                                //   showDialog(
+                                //       context: context,
+                                //       builder: (BuildContext context) =>
+                                //           CustomDialog(
+                                //             type: DialogType.Warning,
+                                //             image: Icons.warning,
+                                //             title: 'Unauthorized',
+                                //             description:
+                                //                 'KYC verification is required for the selected wallet',
+                                //             actions: <Widget>[
+                                //               TextButton(
+                                //                 child: const Text('Close'),
+                                //                 onPressed: () {
+                                //                   Navigator.pop(context);
+                                //                 },
+                                //               ),
+                                //             ],
+                                //           ));
+                                //   return;
+                                // }
                                 setState(() {
                                   edit = !edit;
                                 });
