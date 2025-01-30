@@ -1480,13 +1480,13 @@ packages:
     source: hosted
     version: "2.3.5"
   shared_preferences_android:
-    dependency: transitive
+    dependency: "direct overridden"
     description:
       name: shared_preferences_android
-      sha256: "138b7bbbc7f59c56236e426c37afb8f78cbc57b094ac64c440e0bb90e380a4f5"
+      sha256: "853801ce6ba7429ec4e923e37317f32a57c903de50b8c33ffcfbdb7e6f0dd39c"
       url: "https://pub.dev"
     source: hosted
-    version: "2.4.2"
+    version: "2.0.12"
   shared_preferences_foundation:
     dependency: transitive
     description:
