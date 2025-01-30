@@ -1,12 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:threebotlogin/helpers/globals.dart';
 import 'package:threebotlogin/helpers/logger.dart';
 import 'package:threebotlogin/models/farm.dart';
-import 'package:threebotlogin/models/idenfy.dart';
 import 'package:threebotlogin/models/wallet.dart';
 import 'package:threebotlogin/services/gridproxy_service.dart';
-import 'package:threebotlogin/services/idenfy_service.dart';
 import 'package:threebotlogin/services/tfchain_service.dart';
 import 'package:threebotlogin/widgets/custom_dialog.dart';
 
