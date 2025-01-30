@@ -28,14 +28,12 @@ class _ContactsScreenState extends State<ContactsScreen> {
 
   _loadMyWalletContacts() {
     for (final w in widget.wallets) {
-      if (widget.chainType == ChainType.Stellar) {
+      if (double.parse(w.stellarBalance) >= 0) {
         myWalletContacts.add(PkidContact(
             name: w.name, address: w.stellarAddress, type: ChainType.Stellar));
       }
-      if (widget.chainType == ChainType.TFChain) {
-        myWalletContacts.add(PkidContact(
-            name: w.name, address: w.tfchainAddress, type: ChainType.TFChain));
-      }
+      myWalletContacts.add(PkidContact(
+          name: w.name, address: w.tfchainAddress, type: ChainType.TFChain));
     }
   }
 
@@ -144,7 +142,7 @@ class _ContactsScreenState extends State<ContactsScreen> {
                     ContactsWidget(
                         contacts: myWalletContacts
                             .where(
-                                (c) => c.address != widget.currentWalletAddress)
+                                (c) => c.address != widget.currentWalletAddress && c.type == widget.chainType)
                             .toList(),
                         onSelectToAddress: widget.onSelectToAddress),
                     ContactsWidget(

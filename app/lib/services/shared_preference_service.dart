@@ -230,48 +230,6 @@ Future<void> savePhone(String phone, String? signedPhoneIdentifier) async {
   client.setPKidDoc('phone', json.encode({'phone': phone}));
 }
 
-///
-///
-/// Identity methods in Shared Preferences
-///
-///
-
-Future<void> setIsIdentityVerified(bool isIdentityVerified) async {
-  final SharedPreferences prefs = await SharedPreferences.getInstance();
-  prefs.setBool('isIdentityVerified', isIdentityVerified);
-}
-
-Future<bool?> getIsIdentityVerified() async {
-  final SharedPreferences prefs = await SharedPreferences.getInstance();
-  return prefs.getBool('isIdentityVerified');
-}
-
-Future<Map<String, dynamic>> getIdentity() async {
-  final SharedPreferences prefs = await SharedPreferences.getInstance();
-  return {
-    'identityName': prefs.getString('identityName'),
-    'identityCountry': prefs.getString('identityCountry'),
-    'identityDOB': prefs.getString('identityDOB'),
-    'identityGender': prefs.getString('identityGender'),
-  };
-}
-
-Future<void> saveIdentity(String? identityName, String? identityCountry,
-    String? identityDOB, String? identityGender, String? referenceId) async {
-  final SharedPreferences prefs = await SharedPreferences.getInstance();
-  prefs.remove('identityName');
-  prefs.remove('identityCountry');
-  prefs.remove('identityDOB');
-  prefs.remove('identityGender');
-
-  prefs.setString('identityName', identityName!);
-  prefs.setString('identityCountry', identityCountry!);
-  prefs.setString('identityDOB', identityDOB!);
-  prefs.setString('identityGender', identityGender!);
-
-  updateUserData('identity_reference', referenceId!);
-  Globals().identityVerified.value = true;
-}
 
 ///
 ///

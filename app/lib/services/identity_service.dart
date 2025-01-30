@@ -8,7 +8,7 @@ String getFullNameOfObject(Map<String, dynamic> identityName) {
 }
 
 String getCorrectState(
-    int step, emailVerified, phoneVerified, identityVerified) {
+    int step, emailVerified, phoneVerified) {
   if (step == 1) {
     if (!emailVerified) {
       return 'CurrentPhase';
@@ -25,24 +25,6 @@ String getCorrectState(
     }
 
     return 'Verified';
-  }
-
-  if (step == 3) {
-    if (identityVerified) {
-      return 'Verified';
-    }
-
-    if (!emailVerified) {
-      return 'Unverified';
-    }
-
-    if (!phoneVerified) {
-      return 'Unverified';
-    }
-
-    if (emailVerified && phoneVerified && !identityVerified) {
-      return 'CurrentPhase';
-    }
   }
 
   return '';

@@ -5,12 +5,14 @@ import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:threebotlogin/helpers/globals.dart';
+import 'package:threebotlogin/helpers/logger.dart';
 import 'package:threebotlogin/helpers/transaction_helpers.dart';
 import 'package:threebotlogin/models/wallet.dart';
 import 'package:threebotlogin/providers/wallets_provider.dart';
 import 'package:threebotlogin/screens/scan_screen.dart';
 import 'package:threebotlogin/screens/wallets/contacts.dart';
 import 'package:threebotlogin/services/stellar_service.dart';
+import 'package:threebotlogin/widgets/custom_dialog.dart';
 import 'package:threebotlogin/widgets/wallets/select_chain_widget.dart';
 import 'package:threebotlogin/widgets/wallets/send_confirmation.dart';
 import 'package:validators/validators.dart';
@@ -268,14 +270,7 @@ class _WalletSendScreenState extends ConsumerState<WalletSendScreen> {
                                         chainType: chainType,
                                         currentWalletAddress:
                                             fromController.text,
-                                        wallets: chainType == ChainType.Stellar
-                                            ? wallets
-                                                .where((w) =>
-                                                    double.parse(
-                                                        w.stellarBalance) >=
-                                                    0)
-                                                .toList()
-                                            : wallets,
+                                        wallets: wallets,
                                         onSelectToAddress: _selectToAddress),
                                   ));
                                 },
@@ -382,7 +377,18 @@ class _WalletSendScreenState extends ConsumerState<WalletSendScreen> {
       }
     }
     if (result.rawValue != null) {
-      final code = Uri.parse(result.rawValue!);
+      late final Uri code;
+      try {
+        code = Uri.parse(result.rawValue!);
+      } catch (e) {
+        logger.e('Error parsing QR Code, Error: $e');
+        _showInvalidQRCodeDialog();
+        return;
+      }
+      if (code.scheme != 'tft' || code.path.isEmpty) {
+        _showInvalidQRCodeDialog();
+        return;
+      }
       toController.text = code.path;
       if (code.queryParameters.containsKey('amount')) {
         amountController.text = code.queryParameters['amount']!;
@@ -390,11 +396,36 @@ class _WalletSendScreenState extends ConsumerState<WalletSendScreen> {
       if (chainType == ChainType.Stellar &&
           code.queryParameters.containsKey('message')) {
         memoController.text = code.queryParameters['message']!;
-      }
+      } 
       setState(() {});
+    } else {
+      _showInvalidQRCodeDialog();
+      return;
     }
 
     return result.rawValue!;
+  }
+
+  void _showInvalidQRCodeDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) => CustomDialog(
+        type: DialogType.Warning,
+        image: Icons.warning,
+        title: 'Invalid QR Code',
+        description:
+            'The QR code is missing the required information or invalid.',
+
+        actions: [
+          TextButton(
+            child: const Text('Close'),
+            onPressed: () {
+              Navigator.pop(context);
+            },
+          ),
+        ],
+      ),
+    );
   }
 
   calculateAmount(int percentage) {
