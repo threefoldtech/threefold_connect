@@ -89,9 +89,13 @@ class _WalletBridgeScreenState extends ConsumerState<WalletBridgeScreen> {
     toController.text = '';
     toAddressError = null;
     amountError = null;
-    fee = isWithdraw
-        ? Decimal.parse('1.01')
-        : (isSolana ? Decimal.parse('100') : Decimal.parse('1.1'));
+    if (isWithdraw) {
+      fee = Decimal.parse('1.01');
+    } else if (isSolana) {
+      fee = Decimal.parse('100');
+    } else {
+      Decimal.parse('1.1');
+    }
     setState(() {});
   }
 
@@ -353,6 +357,7 @@ class _WalletBridgeScreenState extends ConsumerState<WalletBridgeScreen> {
               from: fromController.text.trim(),
               to: toController.text.trim(),
               amount: amountController.text.trim(),
+              fee: fee.toString(),
               isSolana: isSolana,
               memo: memoText,
               memoHash: memoHash,

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:threebotlogin/models/wallet.dart';
 
+enum Chains { TFChain, Stellar, Solana }
+
 class SwapTransactionWidget extends StatefulWidget {
   const SwapTransactionWidget({
     super.key,
@@ -33,11 +35,11 @@ class _SwapTransactionWidgetState extends State<SwapTransactionWidget> {
 
   void _initializeChains() {
     if (currentOperation == BridgeOperation.Withdraw) {
-      leftSelectedChain = 'TF Chain';
-      rightSelectedChain = 'Stellar';
+      leftSelectedChain = Chains.TFChain.name;
+      rightSelectedChain = Chains.Stellar.name;
     } else {
-      leftSelectedChain = 'Stellar';
-      rightSelectedChain = 'TF Chain';
+      leftSelectedChain = Chains.Stellar.name;
+      rightSelectedChain = Chains.TFChain.name;
     }
   }
 
@@ -57,16 +59,19 @@ class _SwapTransactionWidgetState extends State<SwapTransactionWidget> {
   void _handleLeftChainChange(String newChain) {
     setState(() {
       leftSelectedChain = newChain;
-      currentOperation = newChain == 'TF Chain'
-          ? BridgeOperation.Withdraw
-          : BridgeOperation.Deposit;
+      if (newChain == Chains.TFChain.name) {
+        currentOperation = BridgeOperation.Withdraw;  
+        _handleRightChainChange(Chains.Stellar.name);      
+      } else {
+        currentOperation = BridgeOperation.Deposit;
+      }
     });
     widget.onTransactionChange(currentOperation);
   }
 
   void _handleRightChainChange(String newChain) {
     setState(() => rightSelectedChain = newChain);
-    widget.updateIsSolana(newChain == 'Solana');
+    widget.updateIsSolana(newChain == Chains.Solana.name);
     widget.onTransactionChange(currentOperation);
   }
 
@@ -74,8 +79,8 @@ class _SwapTransactionWidgetState extends State<SwapTransactionWidget> {
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
     final colorScheme = Theme.of(context).colorScheme;
-    final disableSwap = rightSelectedChain == 'Solana' ||
-        widget.disableDeposit && rightSelectedChain == 'Stellar';
+    final disableSwap = rightSelectedChain == Chains.Solana.name ||
+        widget.disableDeposit && rightSelectedChain == Chains.Stellar.name;
 
     return Container(
       width: double.infinity,
@@ -92,14 +97,17 @@ class _SwapTransactionWidgetState extends State<SwapTransactionWidget> {
           _buildChainInfo(
             context,
             selectedChain: leftSelectedChain,
-            excludeChains: ['Solana', rightSelectedChain],
+            excludeChains: [Chains.Solana.name, rightSelectedChain],
             onChainChanged: _handleLeftChainChange,
           ),
           _buildSwapButton(context, disableSwap),
           _buildChainInfo(
             context,
             selectedChain: rightSelectedChain,
-            excludeChains: [leftSelectedChain],
+            excludeChains: [
+              leftSelectedChain,
+              if (leftSelectedChain == Chains.TFChain.name) Chains.Solana.name
+            ],
             onChainChanged: _handleRightChainChange,
             isLeft: false,
           ),
@@ -181,7 +189,8 @@ class ChainDropdown extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final chains = ['TF Chain', 'Stellar', 'Solana']
+    final chains = Chains.values
+        .map((c) => c.name)
         .where((c) => !excludeChains.contains(c))
         .toList();
 
@@ -254,14 +263,12 @@ class _ChainItem extends StatelessWidget {
   }
 
   String _getChainIcon(String chain) {
-    switch (chain) {
-      case 'Stellar':
-        return 'assets/stellar.png';
-      case 'Solana':
-        return 'assets/solana.png';
-      case 'TF Chain':
-      default:
-        return 'assets/tf_chain.png';
-    }
+    Map chainIcons = {
+      Chains.Stellar.name: 'assets/stellar.png',
+      Chains.Solana.name: 'assets/solana.png',
+      Chains.TFChain.name: 'assets/tf_chain.png',
+    };
+
+    return chainIcons[chain] ?? 'assets/tf_chain.png';
   }
 }

@@ -16,6 +16,7 @@ class BridgeConfirmationWidget extends StatefulWidget {
     required this.from,
     required this.to,
     required this.amount,
+    required this.fee,
     required this.memo,
     required this.memoHash,
     required this.isSolana,
@@ -27,6 +28,7 @@ class BridgeConfirmationWidget extends StatefulWidget {
   final String from;
   final String to;
   final String amount;
+  final String fee;
   final String? memo;
   final Uint8List? memoHash;
   final bool isSolana;
@@ -49,11 +51,7 @@ class _BridgeConfirmationWidgetState extends State<BridgeConfirmationWidget> {
     fromController.text = widget.from;
     toController.text = widget.to;
     amountController.text = widget.amount;
-    feeController.text = widget.bridgeOperation == BridgeOperation.Deposit
-        ? widget.isSolana
-            ? '100'
-            : '1.1'
-        : '1.01';
+    feeController.text = widget.fee;
     super.initState();
   }
 
