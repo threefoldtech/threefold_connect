@@ -376,8 +376,8 @@ class _WalletSendScreenState extends ConsumerState<WalletSendScreen> {
             MaterialPageRoute(builder: (context) => const ScanScreen()));
       }
     }
-    if (result.rawValue != null && result.rawValue!.startsWith('TFT')) {
-      late final code;
+    if (result.rawValue != null) {
+      late final Uri code;
       try {
         code = Uri.parse(result.rawValue!);
       } catch (e) {
@@ -385,7 +385,7 @@ class _WalletSendScreenState extends ConsumerState<WalletSendScreen> {
         _showInvalidQRCodeDialog();
         return;
       }
-      if (code.path == null) {
+      if (code.scheme != 'tft' || code.path.isEmpty) {
         _showInvalidQRCodeDialog();
         return;
       }
