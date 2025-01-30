@@ -232,32 +232,7 @@ class _FarmItemWidgetState extends State<FarmItemWidget> {
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
                           IconButton(
-                              onPressed: () async {
-                                // final idenfyServiceUrl = Globals().idenfyServiceUrl;
-                                // final kycVerified = await getVerificationStatus(
-                                //     address: tfchainAddress!, idenfyServiceUrl: idenfyServiceUrl);
-                                // if (kycVerified.status !=
-                                //     VerificationState.VERIFIED) {
-                                //   showDialog(
-                                //       context: context,
-                                //       builder: (BuildContext context) =>
-                                //           CustomDialog(
-                                //             type: DialogType.Warning,
-                                //             image: Icons.warning,
-                                //             title: 'Unauthorized',
-                                //             description:
-                                //                 'KYC verification is required for the selected wallet',
-                                //             actions: <Widget>[
-                                //               TextButton(
-                                //                 child: const Text('Close'),
-                                //                 onPressed: () {
-                                //                   Navigator.pop(context);
-                                //                 },
-                                //               ),
-                                //             ],
-                                //           ));
-                                //   return;
-                                // }
+                              onPressed: () async {                              
                                 setState(() {
                                   edit = !edit;
                                 });

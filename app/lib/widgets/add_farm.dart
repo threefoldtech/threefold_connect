@@ -75,7 +75,6 @@ class _NewFarmState extends State<NewFarm> {
   _add(String farmName) async {
     Farm? farm;
     try {
-      //should be replace with email verification ??
         final f = await createFarm(farmName, _selectedWallet!.tfchainSecret,
             _selectedWallet!.stellarAddress);
         farm = Farm(
