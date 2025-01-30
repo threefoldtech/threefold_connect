@@ -414,7 +414,8 @@ class _WalletSendScreenState extends ConsumerState<WalletSendScreen> {
         image: Icons.warning,
         title: 'Invalid QR Code',
         description:
-            'The QR code is missing required information or is invalid.',
+            'The QR code is missing the required information or invalid.',
+
         actions: [
           TextButton(
             child: const Text('Close'),
