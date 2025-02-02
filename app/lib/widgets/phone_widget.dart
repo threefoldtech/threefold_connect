@@ -215,20 +215,20 @@ class PhoneAlertDialogState extends State<PhoneAlertDialog> {
       Globals().sendSmsAttempts = 0;
       showDialog(
         context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: Text(
-                'Too many attempts please wait ${((Globals().lockedSmsUntil - currentTime) / 1000).round()} seconds.'),
-            actions: <Widget>[
-              TextButton(
-                child: const Text('OK'),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              ),
-            ],
-          );
-        },
+        builder: (BuildContext childContext) => CustomDialog(
+          image: Icons.info,
+          title: 'Too many attempts',
+          description:
+              'Please wait ${((Globals().lockedSmsUntil - currentTime) / 1000).round()} seconds.',
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Ok'),
+              onPressed: () {
+                Navigator.pop(childContext);
+              },
+            ),
+          ],
+        ),
       );
       return;
     }
@@ -242,19 +242,19 @@ class PhoneAlertDialogState extends State<PhoneAlertDialog> {
       if (!mounted) return;
       showDialog(
         context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: const Text('Too many attempts please wait one minute.'),
-            actions: <Widget>[
-              TextButton(
-                child: const Text('OK'),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              ),
-            ],
-          );
-        },
+        builder: (BuildContext childContext) => CustomDialog(
+          image: Icons.info,
+          title: 'Too many attempts',
+          description: 'Please wait one minute',
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Ok'),
+              onPressed: () {
+                Navigator.pop(childContext);
+              },
+            ),
+          ],
+        ),
       );
       return;
     }
