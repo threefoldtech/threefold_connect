@@ -18,8 +18,8 @@ Widget build(BuildContext context) {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   SizedBox(
-                    width: 50,
-                    height: 50,
+                    width: 45,
+                    height: 45,
                     child: Lottie.asset(
                       'assets/tfloading.json',
                       repeat: true,
@@ -29,7 +29,7 @@ Widget build(BuildContext context) {
                   const SizedBox(height: 10),
                   Text(
                     'THREEFOLD',
-                    style: Theme.of(context).textTheme.headlineSmall!.copyWith(
+                    style: Theme.of(context).textTheme.headlineLarge!.copyWith(
                           color: Theme.of(context).colorScheme.onSurface,
                           fontWeight: FontWeight.bold,
                         ),
@@ -37,7 +37,7 @@ Widget build(BuildContext context) {
                 ],
               )
             : SizedBox(
-                height: 50,
+                height: 90,
                 child: SvgPicture.asset(
                   'assets/TF_logo.svg',
                   alignment: Alignment.center,
