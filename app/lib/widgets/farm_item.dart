@@ -1,15 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:threebotlogin/helpers/globals.dart';
 import 'package:threebotlogin/helpers/logger.dart';
 import 'package:threebotlogin/models/farm.dart';
-import 'package:threebotlogin/models/idenfy.dart';
 import 'package:threebotlogin/models/wallet.dart';
 import 'package:threebotlogin/screens/wallets/contacts.dart';
-import 'package:threebotlogin/services/idenfy_service.dart';
 import 'package:threebotlogin/services/stellar_service.dart';
 import 'package:threebotlogin/services/tfchain_service.dart';
-import 'package:threebotlogin/widgets/custom_dialog.dart';
 import 'package:threebotlogin/widgets/farm_node_item.dart';
 
 class FarmItemWidget extends StatefulWidget {
@@ -34,17 +30,12 @@ class _FarmItemWidgetState extends State<FarmItemWidget> {
   ChainType chainType = ChainType.Stellar;
   String? addressError;
   String? currentAddress;
-  String? tfchainAddress;
 
   @override
   void initState() {
     super.initState();
     currentAddress = widget.farm.walletAddress;
     walletAddressController.text = currentAddress!;
-    tfchainAddress = widget.wallets
-        .where((w) => w.name == widget.farm.walletName)
-        .first
-        .tfchainAddress;
   }
 
   @override
@@ -237,32 +228,7 @@ class _FarmItemWidgetState extends State<FarmItemWidget> {
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
                           IconButton(
-                              onPressed: () async {
-                                final idenfyServiceUrl = Globals().idenfyServiceUrl;
-                                final kycVerified = await getVerificationStatus(
-                                    address: tfchainAddress!, idenfyServiceUrl: idenfyServiceUrl);
-                                if (kycVerified.status !=
-                                    VerificationState.VERIFIED) {
-                                  showDialog(
-                                      context: context,
-                                      builder: (BuildContext context) =>
-                                          CustomDialog(
-                                            type: DialogType.Warning,
-                                            image: Icons.warning,
-                                            title: 'Unauthorized',
-                                            description:
-                                                'KYC verification is required for the selected wallet',
-                                            actions: <Widget>[
-                                              TextButton(
-                                                child: const Text('Close'),
-                                                onPressed: () {
-                                                  Navigator.pop(context);
-                                                },
-                                              ),
-                                            ],
-                                          ));
-                                  return;
-                                }
+                              onPressed: () {                              
                                 setState(() {
                                   edit = !edit;
                                 });

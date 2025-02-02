@@ -27,7 +27,7 @@ class Farmers implements App {
 
   @override
   bool emailVerificationRequired() {
-    return false;
+    return true;
   }
 
   @override
