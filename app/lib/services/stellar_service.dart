@@ -88,3 +88,88 @@ Future<String> getBalanceByAccountId(String accountId) async {
   }
   return '-1';
 }
+
+Future<void> createOrder(
+  String secret,
+  String sellingAssetCode,
+  String buyingAssetCode,
+  String amount,
+  String price,
+) async {
+  final client = Client(NetworkType.PUBLIC, secret);
+  try {
+    await client.createOrder(
+        sellingAssetCode: sellingAssetCode,
+        buyingAssetCode: buyingAssetCode,
+        amount: amount,
+        price: price);
+  } catch (e) {
+    logger.e('Error creating order due to $e');
+  }
+}
+
+Future<void> cancelOrder(
+  String secret,
+  String sellingAssetCode,
+  String buyingAssetCode,
+  String offerId,
+) async {
+  final client = Client(NetworkType.PUBLIC, secret);
+  try {
+    await client.cancelOrder(
+      sellingAssetCode: sellingAssetCode,
+      buyingAssetCode: buyingAssetCode,
+      offerId: offerId,
+    );
+  } catch (e) {
+    logger.e('Error cancelling order due to $e');
+  }
+}
+
+Future<void> updateOrder(
+  String secret,
+  String sellingAssetCode,
+  String buyingAssetCode,
+  String amount,
+  String price,
+  String offerId,
+) async {
+  final client = Client(NetworkType.PUBLIC, secret);
+  try {
+    await client.updateOrder(
+      sellingAssetCode: sellingAssetCode,
+      buyingAssetCode: buyingAssetCode,
+      amount: amount,
+      price: price,
+      offerId: offerId,
+    );
+  } catch (e) {
+    logger.e('Error updating order due to $e');
+  }
+}
+
+Future<Stream<OrderBookResponse>> getOrderBook(
+  String secret,
+  String sellingAssetCode,
+  String buyingAssetCode,
+) async {
+  final client = Client(NetworkType.PUBLIC, secret);
+  try {
+    final orders = await client.getOrderBook(
+        sellingAssetCode: sellingAssetCode, buyingAssetCode: buyingAssetCode);
+    return orders;
+  } catch (e) {
+    logger.e('Error fetching order book due to $e');
+    throw Exception('Error fetching order book');
+  }
+}
+
+Future<List<OfferResponse>> listMyOffers(String secret) async {
+  final client = Client(NetworkType.PUBLIC, secret);
+  try {
+    return await client.listMyOffers();
+  } catch (e) {
+    logger.e('Error fetching offers due to $e');
+    throw Exception('Error fetching offers');
+  }
+}
