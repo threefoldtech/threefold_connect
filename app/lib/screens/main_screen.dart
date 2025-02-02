@@ -65,7 +65,8 @@ class _AppState extends State<MainScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            const Expanded(
+            const SizedBox(
+              height: 200,
               child: Hero(
                 tag: 'logo',
                 child: HomeLogoWidget(
@@ -75,34 +76,32 @@ class _AppState extends State<MainScreen> {
             ),
             const SizedBox(height: 50),
             Container(
-              padding: const EdgeInsets.only(left: 12, right: 12),
+              padding: const EdgeInsets.symmetric(horizontal: 12),
               child: Text(
                 updateMessage != null
                     ? updateMessage.toString()
                     : errorMessage.toString(),
                 style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: errorMessage != null
-                        ? Theme.of(context).colorScheme.error
-                        : Theme.of(context).colorScheme.onSurface),
+                      fontWeight: FontWeight.bold,
+                      color: errorMessage != null
+                          ? Theme.of(context).colorScheme.error
+                          : Theme.of(context).colorScheme.onSurface,
+                    ),
               ),
             ),
-            const SizedBox(
-              height: 40,
-            ),
+            const SizedBox(height: 40),
             Visibility(
-                maintainSize: true,
-                maintainAnimation: true,
-                maintainState: true,
-                visible: errorMessage != null,
-                child: ElevatedButton(
-                  child: const Text(
-                    'RETRY',
-                  ),
-                  onPressed: () async {
-                    await pushScreens();
-                  },
-                ))
+              maintainSize: true,
+              maintainAnimation: true,
+              maintainState: true,
+              visible: errorMessage != null,
+              child: ElevatedButton(
+                child: const Text('RETRY'),
+                onPressed: () async {
+                  await pushScreens();
+                },
+              ),
+            ),
           ],
         ),
       ),
