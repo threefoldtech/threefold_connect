@@ -228,7 +228,7 @@ class _FarmItemWidgetState extends State<FarmItemWidget> {
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
                           IconButton(
-                              onPressed: () async {                              
+                              onPressed: () {                              
                                 setState(() {
                                   edit = !edit;
                                 });
