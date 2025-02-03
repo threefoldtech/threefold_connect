@@ -148,6 +148,11 @@ class _NewWalletState extends ConsumerState<NewWallet> {
       return true;
     }
 
+    if (walletSecret.startsWith('S') && !isValidStellarSecret(walletSecret)){
+      secretError = 'Invalid Stellar secret';
+      return false;
+    }
+
     if (!isValidSeed(walletSecret)) {
       secretError = 'Invalid seed';
       return false;
