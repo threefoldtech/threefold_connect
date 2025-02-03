@@ -81,10 +81,12 @@ class _IdentityVerificationScreenState
         } else {
           phoneCountdownNotifier.value = -1;
           timer.cancel();
+          Globals().hidePhoneButton.value = false;
         }
       });
     } else {
       phoneCountdownNotifier.value = -1;
+      Globals().hidePhoneButton.value = false;
     }
   }
 
@@ -116,12 +118,10 @@ class _IdentityVerificationScreenState
         } else {
           countdownNotifier.value = -1;
           timer.cancel();
-          Globals().hidePhoneButton.value = false;
         }
       });
     } else {
       countdownNotifier.value = -1;
-      Globals().hidePhoneButton.value = false;
     }
   }
 
@@ -230,6 +230,7 @@ class _IdentityVerificationScreenState
 
   @override
   Widget build(BuildContext context) {
+    startOrResumePhoneCountdown();
     return LayoutDrawer(
       titleText: 'Identity',
       content: FutureBuilder(
@@ -1054,67 +1055,10 @@ class _IdentityVerificationScreenState
 
       return;
     } else {
-      PhoneAlertDialogState().sendPhoneVerification();
-      startPhoneNumberCounter();
+      await PhoneAlertDialogState().sendPhoneVerification();
+      setState(() {});
       return;
     }
-  }
-
-  void startPhoneNumberCounter() {
-    int currentTime = DateTime.now().millisecondsSinceEpoch;
-    if (globals.tooManySmsAttempts && globals.lockedSmsUntil > currentTime) {
-      globals.sendSmsAttempts = 0;
-      showDialog(
-        context: context,
-        builder: (BuildContext context) => CustomDialog(
-          image: Icons.info,
-          title: 'Too many attempts',
-          description:
-              'Please wait ${((globals.lockedSmsUntil - currentTime) / 1000).round()} seconds.',
-          actions: <Widget>[
-            TextButton(
-              child: const Text('Ok'),
-              onPressed: () {
-                Navigator.pop(context);
-              },
-            ),
-          ],
-        ),
-      );
-      return;
-    }
-
-    globals.tooManySmsAttempts = false;
-    if (globals.sendSmsAttempts >= 2) {
-      globals.tooManySmsAttempts = true;
-      globals.lockedSmsUntil = currentTime + 60000;
-      showDialog(
-        context: context,
-        builder: (BuildContext childContext) => CustomDialog(
-          image: Icons.info,
-          title: 'Too many attempts',
-          description: 'Please wait one minute',
-          actions: <Widget>[
-            TextButton(
-              child: const Text('Ok'),
-              onPressed: () {
-                Navigator.pop(childContext);
-              },
-            ),
-          ],
-        ),
-      );
-      return;
-    }
-
-    globals.sendSmsAttempts++;
-
-    sendVerificationSms();
-    Globals().hidePhoneButton.value = true;
-    Globals().smsSentOn = DateTime.now().millisecondsSinceEpoch;
-
-    startOrResumePhoneCountdown();
-    phoneSendDialog(context);
   }
 
   Future<void> getSpending() async {
