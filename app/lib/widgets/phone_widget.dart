@@ -54,11 +54,10 @@ class PhoneAlertDialog extends StatefulWidget {
   final String oldPhone;
 
   const PhoneAlertDialog(
-      {Key? key,
+      {super.key,
       required this.defaultCountryCode,
       required this.newPhone,
-      required this.oldPhone})
-      : super(key: key);
+      required this.oldPhone});
 
   @override
   State<StatefulWidget> createState() {
@@ -207,65 +206,14 @@ class PhoneAlertDialogState extends State<PhoneAlertDialog> {
   }
 
   sendPhoneVerification() async {
-    int currentTime = DateTime.now().millisecondsSinceEpoch;
-
-    if (Globals().tooManySmsAttempts &&
-        Globals().lockedSmsUntil > currentTime) {
-      Globals().sendSmsAttempts = 0;
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: Text(
-                'Too many attempts please wait ${((Globals().lockedSmsUntil - currentTime) / 1000).round()} seconds.'),
-            actions: <Widget>[
-              TextButton(
-                child: const Text('OK'),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              ),
-            ],
-          );
-        },
-      );
-      return;
-    }
-
-    Globals().tooManySmsAttempts = false;
-
-    if (Globals().sendSmsAttempts >= 3) {
-      Globals().tooManySmsAttempts = true;
-      Globals().lockedSmsUntil = currentTime + 60000;
-
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: const Text('Too many attempts please wait one minute.'),
-            actions: <Widget>[
-              TextButton(
-                child: const Text('OK'),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              ),
-            ],
-          );
-        },
-      );
-      return;
-    }
-
-    Globals().sendSmsAttempts++;
-
-    sendVerificationSms();
-
+    await sendVerificationSms();
     Globals().hidePhoneButton.value = true;
     Globals().smsSentOn = DateTime.now().millisecondsSinceEpoch;
-
-    phoneSendDialog(context);
-
-    Navigator.pop(context);
+    if (mounted) {
+      setState(() {
+        phoneSendDialog(context);
+        Navigator.pop(context);
+      });
+    }
   }
 }

@@ -57,6 +57,39 @@ class _IdentityVerificationScreenState
   Timer? emailTimer;
   ValueNotifier<int> countdownNotifier = ValueNotifier(-1);
 
+  int phoneCountdown = 120;
+  Timer? phoneTimer;
+  ValueNotifier<int> phoneCountdownNotifier = ValueNotifier(-1);
+
+  void startOrResumePhoneCountdown() {
+    int currentTime = DateTime.now().millisecondsSinceEpoch;
+    int lockedUntil =
+        Globals().smsSentOn + (Globals().smsMinutesCoolDown * 60 * 1000);
+    int timeLeft = ((lockedUntil - currentTime) / 1000).round();
+
+    if (timeLeft > 0) {
+      phoneCountdownNotifier.value = timeLeft;
+
+      phoneTimer?.cancel();
+      phoneTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+        int remainingTime =
+            ((lockedUntil - DateTime.now().millisecondsSinceEpoch) / 1000)
+                .round();
+
+        if (remainingTime > 0) {
+          phoneCountdownNotifier.value = remainingTime;
+        } else {
+          phoneCountdownNotifier.value = -1;
+          timer.cancel();
+          Globals().hidePhoneButton.value = false;
+        }
+      });
+    } else {
+      phoneCountdownNotifier.value = -1;
+      Globals().hidePhoneButton.value = false;
+    }
+  }
+
   void startOrResumeEmailCountdown({bool startNew = false}) {
     int currentTime = DateTime.now().millisecondsSinceEpoch;
     int lockedUntil =
@@ -108,6 +141,10 @@ class _IdentityVerificationScreenState
     if (mounted) {
       setState(() {
         phoneVerified = Globals().phoneVerified.value;
+        if (phoneVerified) {
+          phoneCountdownNotifier.value = -1;
+          phoneTimer?.cancel();
+        }
         Globals().smsSentOn = 0;
       });
     }
@@ -122,22 +159,28 @@ class _IdentityVerificationScreenState
     checkPhoneStatus();
     getUserValues();
     startOrResumeEmailCountdown();
+    startOrResumePhoneCountdown();
   }
 
   @override
   void dispose() {
     emailTimer?.cancel();
+    phoneTimer?.cancel();
+    phoneCountdownNotifier.dispose();
     countdownNotifier.dispose();
     super.dispose();
   }
 
   checkPhoneStatus() {
-    if (Globals().smsSentOn + (Globals().smsMinutesCoolDown * 60 * 1000) >
-        DateTime.now().millisecondsSinceEpoch) {
-      return Globals().hidePhoneButton.value = true;
-    }
+    int currentTime = DateTime.now().millisecondsSinceEpoch;
+    int lockedUntil =
+        Globals().smsSentOn + (Globals().smsMinutesCoolDown * 60 * 1000);
 
-    return Globals().hidePhoneButton.value = false;
+    if (lockedUntil > currentTime) {
+      return Globals().hidePhoneButton.value = true;
+    } else if (phoneCountdownNotifier.value <= 0) {
+      return Globals().hidePhoneButton.value = false;
+    }
   }
 
   void getUserValues() {
@@ -184,13 +227,13 @@ class _IdentityVerificationScreenState
       ),
     );
   }
-  
+
   @override
   Widget build(BuildContext context) {
+    startOrResumePhoneCountdown();
     return LayoutDrawer(
       titleText: 'Identity',
-      content: 
-      FutureBuilder(
+      content: FutureBuilder(
         future: getEmail(),
         builder: (ctx, snapshot) {
           if (snapshot.connectionState == ConnectionState.done) {
@@ -198,55 +241,57 @@ class _IdentityVerificationScreenState
               return pleaseWait(context);
             }
             return Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 4.0),
-              child: SingleChildScrollView(
-                child: Column(
-                  children: [
-                    const SizedBox(height: 20),
-                    AnimatedBuilder(
-                      animation: Listenable.merge([
-                        Globals().emailVerified,
-                        Globals().phoneVerified,
-                      ]),
-                      builder: (BuildContext context, _) {
-                        return Column(
-                          children: [
-                            ListTile(
-                              leading: const Icon(Icons.person),
-                              title: Text(
-                                doubleName.isNotEmpty
-                                    ? doubleName.substring(
-                                        0, doubleName.length - 5)
-                                    : 'Unknown',
-                              ),
-                            ),
-                            customDivider(context: context),
-                            FutureBuilder(
-                              future: getPhrase(),
-                              builder: (context, snapshot) {
-                                if (snapshot.hasData) {
-                                  return Padding(
-                                    padding: const EdgeInsets.only(right: 2.0),
-                                    child: ListTile(
-                                      trailing: const Icon(Icons.visibility),
-                                      leading: const Icon(Icons.vpn_key),
-                                      title: const Text('Show phrase'),
-                                      onTap: () async {
-                                        _showPhrase();
-                                      },
-                                    ),
-                                  );
-                                } else {
-                                  return Container();
-                                }
-                              },
-                            ),
-                            customDivider(context: context),
+                padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                child: SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      const SizedBox(height: 20),
+                      AnimatedBuilder(
+                          animation: Listenable.merge([
+                            Globals().emailVerified,
+                            Globals().phoneVerified,
+                          ]),
+                          builder: (BuildContext context, _) {
+                            return Column(
+                              children: [
+                                ListTile(
+                                  leading: const Icon(Icons.person),
+                                  title: Text(
+                                    doubleName.isNotEmpty
+                                        ? doubleName.substring(
+                                            0, doubleName.length - 5)
+                                        : 'Unknown',
+                                  ),
+                                ),
+                                customDivider(context: context),
+                                FutureBuilder(
+                                  future: getPhrase(),
+                                  builder: (context, snapshot) {
+                                    if (snapshot.hasData) {
+                                      return Padding(
+                                        padding:
+                                            const EdgeInsets.only(right: 2.0),
+                                        child: ListTile(
+                                          trailing:
+                                              const Icon(Icons.visibility),
+                                          leading: const Icon(Icons.vpn_key),
+                                          title: const Text('Show phrase'),
+                                          onTap: () async {
+                                            _showPhrase();
+                                          },
+                                        ),
+                                      );
+                                    } else {
+                                      return Container();
+                                    }
+                                  },
+                                ),
+                                customDivider(context: context),
 
                                 // Step one: verify email
                                 _fillCard(
-                                    getCorrectState(1, emailVerified,
-                                        phoneVerified),
+                                    getCorrectState(
+                                        1, emailVerified, phoneVerified),
                                     1,
                                     email,
                                     Icons.email),
@@ -257,8 +302,8 @@ class _IdentityVerificationScreenState
                                         (Globals().spendingLimit > 0 &&
                                             spending > Globals().spendingLimit))
                                     ? _fillCard(
-                                        getCorrectState(2, emailVerified,
-                                            phoneVerified),
+                                        getCorrectState(
+                                            2, emailVerified, phoneVerified),
                                         2,
                                         phone,
                                         Icons.phone)
@@ -267,25 +312,21 @@ class _IdentityVerificationScreenState
                                 const ListTile(
                                   leading: Icon(Icons.info),
                                   title: Text(
-                                    'KYC Verification has been moved to wallet page.'
-                                  ),
-                                ),                                
-
+                                      'KYC Verification has been moved to wallet page.'),
+                                ),
                               ],
                             );
                           })
                     ],
                   ),
-                )
-              
-            );
+                ));
           }
           return pleaseWait(context);
         },
       ),
     );
   }
-   
+
   Future copySeedPhrase() async {
     Clipboard.setData(ClipboardData(text: (await getPhrase()).toString()));
 
@@ -461,10 +502,7 @@ class _IdentityVerificationScreenState
             return _changeEmailDialog(false);
           }
 
-          if (step == 2) {
-            if (Globals().hidePhoneButton.value == true) {
-              return;
-            }
+          if (step == 2 && phoneCountdownNotifier.value == -1) {
             await addPhoneNumberDialog(context,
                 newPhone: false, oldPhone: phone);
 
@@ -522,9 +560,7 @@ class _IdentityVerificationScreenState
                                     children: <Widget>[
                                       Expanded(
                                         child: Text(
-                                              (text.isEmpty
-                                                  ? 'Unknown'
-                                                  : text),
+                                          (text.isEmpty ? 'Unknown' : text),
                                         ),
                                       )
                                     ],
@@ -560,87 +596,105 @@ class _IdentityVerificationScreenState
                                         }
                                       },
                                     ),
-                                  step == 2 &&
-                                          Globals().hidePhoneButton.value ==
-                                              true
-                                      ? const SizedBox(
-                                          height: 5,
-                                        )
-                                      : Container(),
-                                  step == 2 &&
-                                          Globals().hidePhoneButton.value ==
-                                              true
-                                      ? Row(
-                                          children: <Widget>[
-                                            Text(
-                                              'SMS sent, retry in ${calculateMinutes()} minute${calculateMinutes() == '1' ? '' : 's'}',
-                                              overflow: TextOverflow.clip,
-                                              style: Theme.of(context)
-                                                  .textTheme
-                                                  .bodySmall!
-                                                  .copyWith(
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                      color: Theme.of(context)
-                                                          .colorScheme
-                                                          .warning),
-                                            )
-                                          ],
-                                        )
-                                      : Container(),
+                                  if (step == 2)
+                                    ValueListenableBuilder<bool>(
+                                      valueListenable:
+                                          Globals().hidePhoneButton,
+                                      builder:
+                                          (context, hidePhoneButton, child) {
+                                        if (hidePhoneButton) {
+                                          return Column(
+                                            children: [
+                                              const SizedBox(height: 5),
+                                              Row(
+                                                children: <Widget>[
+                                                  ValueListenableBuilder<int>(
+                                                    valueListenable:
+                                                        phoneCountdownNotifier,
+                                                    builder: (context,
+                                                        remainingTime, child) {
+                                                      if (remainingTime > 0) {
+                                                        String formattedTime =
+                                                            _formatTime(
+                                                                remainingTime);
+                                                        return Text(
+                                                          'SMS sent, retry in $formattedTime',
+                                                          style:
+                                                              Theme.of(context)
+                                                                  .textTheme
+                                                                  .bodySmall!
+                                                                  .copyWith(
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .bold,
+                                                                    color: Theme.of(
+                                                                            context)
+                                                                        .colorScheme
+                                                                        .warning,
+                                                                  ),
+                                                        );
+                                                      }
+                                                      return Container();
+                                                    },
+                                                  ),
+                                                ],
+                                              ),
+                                            ],
+                                          );
+                                        }
+                                        return Container();
+                                      },
+                                    ),
                                 ]))),
-                    Globals().hidePhoneButton.value == true && step == 2
-                        ? Container()
-                        : ValueListenableBuilder(
-                            valueListenable: countdownNotifier,
-                            builder: (context, countdownValue, child) {
-                              return Padding(
-                                padding: const EdgeInsets.only(left: 12),
-                                child: ElevatedButton(
-                                    onPressed: countdownValue > 0
-                                        ? null
-                                        : () async {
-                                            switch (step) {
-                                              // Verify email
-                                              case 1:
-                                                {
-                                                  startOrResumeEmailCountdown(
-                                                      startNew: true);
-                                                  verifyEmail();
-                                                }
-                                                break;
-
-                                    // Verify phone
-                                    case 2:
-                                      {
-                                        await verifyPhone();
-                                      }
-                                      break;
-                                    default:
-                                      {}
-                                      break;
-                                  }
-                                },
-                                child: const Text('Verify')));
-                            }
-                        )
+                    ValueListenableBuilder<int>(
+                      valueListenable: step == 1
+                          ? countdownNotifier
+                          : phoneCountdownNotifier,
+                      builder: (context, countdownValue, child) {
+                        return Padding(
+                          padding: const EdgeInsets.only(left: 12),
+                          child: ElevatedButton(
+                            onPressed: countdownValue > 0
+                                ? null
+                                : () async {
+                                    if (step == 1) {
+                                      startOrResumeEmailCountdown(
+                                          startNew: true);
+                                      verifyEmail();
+                                    } else if (step == 2) {
+                                      await verifyPhone();
+                                    }
+                                  },
+                            child: const Text('Verify'),
+                          ),
+                        );
+                      },
+                    ),
                   ],
                 ),
               ))
         ]));
   }
 
+  String _formatTime(int remainingTime) {
+    if (remainingTime >= 60) {
+      int minutes = remainingTime ~/ 60;
+      int seconds = remainingTime % 60;
+      return '${minutes}m ${seconds}s';
+    } else {
+      return '${remainingTime}s';
+    }
+  }
+
   String calculateMinutes() {
     int currentTime = DateTime.now().millisecondsSinceEpoch;
     int lockedUntil =
         Globals().smsSentOn + (Globals().smsMinutesCoolDown * 60 * 1000);
-    String difference =
-        ((lockedUntil - currentTime) / 1000 / 60).round().toString();
+    int remainingTime = ((lockedUntil - currentTime) / 1000).round();
 
-    if (int.parse(difference) >= 0) {
-      return difference;
+    if (remainingTime > 0) {
+      return (remainingTime / 60).ceil().toString();
     }
-
     return '0';
   }
 
@@ -999,69 +1053,12 @@ class _IdentityVerificationScreenState
       FlutterPkid client = await getPkidClient();
       client.setPKidDoc('phone', json.encode({'phone': phone}));
 
-      startPhoneNumberCounter();
       return;
     } else {
-      PhoneAlertDialogState().sendPhoneVerification();
+      await PhoneAlertDialogState().sendPhoneVerification();
+      setState(() {});
       return;
     }
-  }
-
-  void startPhoneNumberCounter() {
-    int currentTime = DateTime.now().millisecondsSinceEpoch;
-    if (globals.tooManySmsAttempts && globals.lockedSmsUntil > currentTime) {
-      globals.sendSmsAttempts = 0;
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: Text(
-                'Too many attempts please wait ${((globals.lockedSmsUntil - currentTime) / 1000).round()} seconds.'),
-            actions: <Widget>[
-              TextButton(
-                child: const Text('OK'),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              ),
-            ],
-          );
-        },
-      );
-      return;
-    }
-
-    globals.tooManySmsAttempts = false;
-    if (globals.sendSmsAttempts >= 2) {
-      globals.tooManySmsAttempts = true;
-      globals.lockedSmsUntil = currentTime + 60000;
-
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: const Text('Too many attempts please wait one minute.'),
-            actions: <Widget>[
-              TextButton(
-                child: const Text('OK'),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              ),
-            ],
-          );
-        },
-      );
-      return;
-    }
-
-    globals.sendSmsAttempts++;
-
-    sendVerificationSms();
-    Globals().hidePhoneButton.value = true;
-    Globals().smsSentOn = DateTime.now().millisecondsSinceEpoch;
-
-    phoneSendDialog(context);
   }
 
   Future<void> getSpending() async {
