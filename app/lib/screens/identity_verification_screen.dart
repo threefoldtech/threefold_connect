@@ -81,10 +81,12 @@ class _IdentityVerificationScreenState
         } else {
           phoneCountdownNotifier.value = -1;
           timer.cancel();
+          Globals().hidePhoneButton.value = false;
         }
       });
     } else {
       phoneCountdownNotifier.value = -1;
+      Globals().hidePhoneButton.value = false;
     }
   }
 
@@ -116,12 +118,10 @@ class _IdentityVerificationScreenState
         } else {
           countdownNotifier.value = -1;
           timer.cancel();
-          Globals().hidePhoneButton.value = false;
         }
       });
     } else {
       countdownNotifier.value = -1;
-      Globals().hidePhoneButton.value = false;
     }
   }
 
@@ -230,6 +230,7 @@ class _IdentityVerificationScreenState
 
   @override
   Widget build(BuildContext context) {
+    startOrResumePhoneCountdown();
     return LayoutDrawer(
       titleText: 'Identity',
       content: FutureBuilder(
