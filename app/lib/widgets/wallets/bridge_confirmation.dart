@@ -14,6 +14,7 @@ class BridgeConfirmationWidget extends StatefulWidget {
     required this.from,
     required this.to,
     required this.amount,
+    required this.totalAmount,
     required this.memo,
     required this.reloadBalance,
   });
@@ -23,6 +24,7 @@ class BridgeConfirmationWidget extends StatefulWidget {
   final String from;
   final String to;
   final String amount;
+  final String totalAmount;
   final String? memo;
   final void Function() reloadBalance;
 
@@ -168,10 +170,10 @@ class _BridgeConfirmationWidgetState extends State<BridgeConfirmationWidget> {
     try {
       if (widget.bridgeOperation == BridgeOperation.Deposit) {
         await Stellar.transfer(widget.secret, Globals().bridgeTFTAddress,
-            widget.amount, widget.memo!);
+            widget.totalAmount, widget.memo!);
       } else {
         await TFChain.swapToStellar(
-            widget.secret, widget.to, BigInt.from(double.parse(widget.amount)));
+            widget.secret, widget.to, BigInt.from(double.parse(widget.totalAmount)));
       }
       await _showDialog('Success!', 'Tokens have been transferred successfully',
           Icons.check, DialogType.Info);
