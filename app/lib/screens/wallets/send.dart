@@ -295,7 +295,7 @@ class _WalletSendScreenState extends ConsumerState<WalletSendScreen> {
                             errorText: amountError)),
                     subtitle: Padding(
                         padding: const EdgeInsets.symmetric(vertical: 8.0),
-                        child: Text('Max Fee: $fee TFT')),
+                        child: Text('Transfer Fee: $fee TFT')),
                   ),
                   const SizedBox(height: 10),
                   if (isBiggerThanFee)
