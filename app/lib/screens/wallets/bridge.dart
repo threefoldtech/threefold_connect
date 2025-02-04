@@ -27,7 +27,10 @@ class _WalletBridgeScreenState extends ConsumerState<WalletBridgeScreen> {
   final amountController = TextEditingController();
   BridgeOperation transactionType = BridgeOperation.Withdraw;
   bool isWithdraw = true;
-  Decimal fee = Decimal.parse('1.01');
+  Decimal transferFee = Decimal.parse('0.01');
+  static Decimal BRIDGE_FEE = Decimal.parse('1.0');
+  late Decimal totalFee;
+  late Decimal totalAmount;
   String? toAddressError;
   String? amountError;
   bool reloadBalance = true;
@@ -36,6 +39,7 @@ class _WalletBridgeScreenState extends ConsumerState<WalletBridgeScreen> {
   @override
   void initState() {
     fromController.text = widget.wallet.tfchainAddress;
+    totalFee = transferFee + BRIDGE_FEE;
     _reloadBalances();
     super.initState();
   }
@@ -87,7 +91,8 @@ class _WalletBridgeScreenState extends ConsumerState<WalletBridgeScreen> {
     toController.text = '';
     toAddressError = null;
     amountError = null;
-    fee = isWithdraw ? Decimal.parse('1.01') : Decimal.parse('1.1');
+    transferFee = Decimal.parse(isWithdraw ? '.01' : '.1');
+    totalFee = transferFee + BRIDGE_FEE;
     setState(() {});
   }
 
@@ -148,7 +153,7 @@ class _WalletBridgeScreenState extends ConsumerState<WalletBridgeScreen> {
     final balance = roundAmount(isWithdraw
         ? widget.wallet.tfchainBalance
         : widget.wallet.stellarBalance);
-    if (balance - Decimal.parse(amount) - fee < Decimal.zero) {
+    if (balance - Decimal.parse(amount) - totalFee < Decimal.zero) {
       amountError = 'Balance is not enough';
       return false;
     }
@@ -178,7 +183,7 @@ class _WalletBridgeScreenState extends ConsumerState<WalletBridgeScreen> {
     String balance = isWithdraw
         ? widget.wallet.tfchainBalance
         : widget.wallet.stellarBalance;
-    final isBiggerThanFee = roundAmount(balance) > fee;
+    final isBiggerThanFee = roundAmount(balance) > totalFee;
 
     return Scaffold(
       appBar: AppBar(title: const Text('Bridge')),
@@ -303,7 +308,7 @@ class _WalletBridgeScreenState extends ConsumerState<WalletBridgeScreen> {
     final amount = (Decimal.parse(isWithdraw
                 ? widget.wallet.tfchainBalance
                 : widget.wallet.stellarBalance) -
-            fee) *
+            totalFee) *
         (Decimal.fromInt(percentage).shift(-2));
     amountController.text = roundAmount(amount.toString()).toString();
   }
@@ -311,6 +316,7 @@ class _WalletBridgeScreenState extends ConsumerState<WalletBridgeScreen> {
   _bridge_confirmation() async {
     final memoText =
         !isWithdraw ? await TFChain.getMemo(toController.text.trim()) : null;
+    totalAmount = Decimal.parse(amountController.text.trim()) + BRIDGE_FEE;
     showModalBottomSheet(
         isScrollControlled: true,
         useSafeArea: true,
@@ -325,6 +331,8 @@ class _WalletBridgeScreenState extends ConsumerState<WalletBridgeScreen> {
               from: fromController.text.trim(),
               to: toController.text.trim(),
               amount: amountController.text.trim(),
+              // amount + fee
+              totalAmount: totalAmount.toString(),
               memo: memoText,
               reloadBalance:
                   isWithdraw ? _loadTFChainBalance : _loadStellarBalance,
