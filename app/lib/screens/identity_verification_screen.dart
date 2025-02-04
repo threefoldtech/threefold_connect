@@ -861,7 +861,7 @@ class _IdentityVerificationScreenState
                                   color:
                                       Theme.of(context).colorScheme.onSurface))
                       : Text(
-                          'Changing your email will require re-verification.',
+                          'Changing your email will require re-\u200dverification.',
                           style: Theme.of(context)
                               .textTheme
                               .bodyLarge!
