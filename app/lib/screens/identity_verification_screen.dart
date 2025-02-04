@@ -503,8 +503,12 @@ class _IdentityVerificationScreenState
           }
 
           if (step == 2 && phoneCountdownNotifier.value == -1) {
-            await addPhoneNumberDialog(context,
-                newPhone: false, oldPhone: phone);
+            if (phone.isEmpty) {
+              await addPhoneNumberDialog(context, newPhone: true, oldPhone: '');
+            } else {
+              await addPhoneNumberDialog(context,
+                  newPhone: false, oldPhone: phone);
+            }
 
             var phoneMap = (await getPhone());
             if (phoneMap.isEmpty || !phoneMap.containsKey('phone')) {
