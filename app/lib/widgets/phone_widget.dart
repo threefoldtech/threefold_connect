@@ -161,7 +161,9 @@ class PhoneAlertDialogState extends State<PhoneAlertDialog> {
                 Navigator.pop(context);
               }),
           if (valid)
-            TextButton(onPressed: verifyButton, child: const Text('Add'))
+            TextButton(
+                onPressed: verifyButton,
+                child: Text(widget.newPhone ? 'Add' : 'Update'))
         ]);
   }
 
