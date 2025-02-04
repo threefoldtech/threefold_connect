@@ -669,7 +669,7 @@ class _IdentityVerificationScreenState
                                       await verifyPhone();
                                     }
                                   },
-                            child: const Text('Verify'),
+                            child: const Text('Resend'),
                           ),
                         );
                       },
