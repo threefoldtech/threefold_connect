@@ -396,7 +396,7 @@ class _WalletSendScreenState extends ConsumerState<WalletSendScreen> {
       if (chainType == ChainType.Stellar &&
           code.queryParameters.containsKey('message')) {
         memoController.text = code.queryParameters['message']!;
-      } 
+      }
       setState(() {});
     } else {
       _showInvalidQRCodeDialog();
@@ -410,12 +410,11 @@ class _WalletSendScreenState extends ConsumerState<WalletSendScreen> {
     showDialog(
       context: context,
       builder: (BuildContext context) => CustomDialog(
-        type: DialogType.Warning,
-        image: Icons.warning,
+        type: DialogType.Error,
+        image: Icons.error,
         title: 'Invalid QR Code',
         description:
             'The QR code is missing the required information or invalid.',
-
         actions: [
           TextButton(
             child: const Text('Close'),
