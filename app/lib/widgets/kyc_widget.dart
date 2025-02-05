@@ -12,7 +12,6 @@ import 'package:threebotlogin/screens/wizard/web_view.dart';
 import 'package:threebotlogin/services/idenfy_service.dart';
 import 'package:threebotlogin/helpers/globals.dart';
 import 'package:threebotlogin/helpers/logger.dart';
-import 'package:threebotlogin/services/wallet_service.dart';
 import 'package:threebotlogin/widgets/custom_dialog.dart';
 import 'package:idenfy_sdk_flutter/models/auto_identification_status.dart';
 
@@ -224,16 +223,12 @@ Future<void> verifyIdentityProcess({
     );
     return;
   } on NotEnoughBalance catch (_) {
-    final wallets = (await getPkidWallets())
-        .where((w) => w.seed == wallet.tfchainSecret)
-        .toList();
     final minimumBalance = Globals().minimumTFChainBalanceForKYC;
     showWarningDialog(
         context: context,
         title: 'Not enough balance',
-        description: wallets.isEmpty
-            ? 'Please initialize a wallet and fund it with at least $minimumBalance TFTs.'
-            : 'Please fund your ${wallets.first.name} TFChain wallet with at least $minimumBalance TFTs.');
+        description:
+            'Please fund your TFChain wallet with at least $minimumBalance TFTs.');
     return;
   } on NoTwinId catch (_) {
     showWarningDialog(
