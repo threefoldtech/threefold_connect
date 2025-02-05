@@ -819,10 +819,10 @@ packages:
     dependency: "direct main"
     description:
       name: idenfy_sdk_flutter
-      sha256: "89eebaca7b6fb0c955d51416546b81f3c76a944dfbfa4354c3a044d0cdd10010"
+      sha256: de34db373c3fdd5e93b5dc1f0cd70740a7a80bfbd2a390dedf7f0afe5738593e
       url: "https://pub.dev"
     source: hosted
-    version: "2.5.6"
+    version: "2.6.0"
   image:
     dependency: transitive
     description:
