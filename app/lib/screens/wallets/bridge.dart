@@ -249,7 +249,7 @@ class _WalletBridgeScreenState extends ConsumerState<WalletBridgeScreen> {
                         errorText: amountError)),
                 subtitle: Padding(
                   padding: const EdgeInsets.symmetric(vertical: 8.0),
-                  child: Text('Max Fee: ${!isWithdraw ? 1.1 : 1.01} TFT'),
+                  child: Text('Transfer Fee: ${!isWithdraw ? 1.1 : 1.01} TFT'),
                 )),
             const SizedBox(height: 10),
             if (isBiggerThanFee)
