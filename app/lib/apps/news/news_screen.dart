@@ -151,14 +151,18 @@ class _NewsScreenState extends State<NewsScreen> {
                 content = cleanHtmlContent(content);
 
                 return Padding(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 8, vertical: 4.0),
-                    child: GestureDetector(
-                      onTap: () async {
-                        _launchURL(link);
-                      },
-                      child: Card(
-                        elevation: 4.0,
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4.0),
+                  child: Card(
+                      elevation: 4.0,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: InkWell(
+                        borderRadius: BorderRadius.circular(12),
+                        onTap: () async {
+                          _launchURL(link);
+                        },
                         child: Padding(
                           padding: const EdgeInsets.all(16),
                           child: Column(
@@ -259,8 +263,8 @@ class _NewsScreenState extends State<NewsScreen> {
                             ],
                           ),
                         ),
-                      ),
-                    ));
+                      )),
+                );
               },
             ),
           )),
