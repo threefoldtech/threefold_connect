@@ -152,6 +152,10 @@ class _WalletSendScreenState extends ConsumerState<WalletSendScreen> {
     final amount = amountController.text.trim();
     amountError = null;
 
+    if (Decimal.parse(amount) <= fee) {
+      amountError = 'Amount should be greater than $fee';
+      return false;
+    }
     if (amount.isEmpty) {
       amountError = "Amount can't be empty";
       return false;
