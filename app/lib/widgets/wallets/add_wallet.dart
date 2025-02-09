@@ -139,8 +139,14 @@ class _NewWalletState extends ConsumerState<NewWallet> {
       return false;
     }
 
-    if (walletSecret.startsWith('S') && widget.wallets.any((wallet) => wallet.stellarSecret == walletSecret)){
+    if (walletSecret.startsWith('S') &&
+        widget.wallets.any((wallet) => wallet.stellarSecret == walletSecret)) {
       secretError = 'Secret already exists';
+      return false;
+    }
+
+    if (walletSecret.startsWith('S') && !isValidStellarSecret(walletSecret)) {
+      secretError = 'Invalid Stellar secret';
       return false;
     }
 
@@ -152,9 +158,9 @@ class _NewWalletState extends ConsumerState<NewWallet> {
       secretError = 'Invalid seed';
       return false;
     }
-    if (widget.wallets.any((wallet) => wallet.tfchainSecret == walletSecret)){
+    if (widget.wallets.any((wallet) => wallet.tfchainSecret == walletSecret)) {
       secretError = 'Secret already exists';
-      return false;      
+      return false;
     }
     if (!walletSecret.startsWith('0x') && walletSecret.length != 64) {
       secretError = 'Invalid seed length';
@@ -307,7 +313,8 @@ Future<Wallet> loadAddedWallet(String walletName, String walletSecret,
   final chainUrl = Globals().chainUrl;
   final idenfyServiceUrl = Globals().idenfyServiceUrl;
   final Wallet wallet = await compute((void _) async {
-    final wallet = await loadWallet(walletName, walletSecret, type, chainUrl, idenfyServiceUrl);
+    final wallet = await loadWallet(
+        walletName, walletSecret, type, chainUrl, idenfyServiceUrl);
     return wallet;
   }, null);
   return wallet;
