@@ -141,7 +141,8 @@ class _FarmScreenState extends ConsumerState<FarmScreen> {
           Padding(
             padding: const EdgeInsets.all(30),
             child: Text(
-                'No farm created yet? Get started by setting up your farms! Click the button below to create a new ',
+                'No farm created yet? Get started by setting up your farms! Click the button below to create a new farm.',
+
                 style: Theme.of(context)
                     .textTheme
                     .bodyLarge!
