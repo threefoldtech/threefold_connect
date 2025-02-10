@@ -129,14 +129,50 @@ class _FarmScreenState extends ConsumerState<FarmScreen> {
       ));
     } else if (farms.isEmpty) {
       mainWidget = Center(
-        child: Text(
-          'No farms yet.',
-          style: Theme.of(context)
-              .textTheme
-              .bodyLarge!
-              .copyWith(color: Theme.of(context).colorScheme.onSurface),
-        ),
-      );
+          child: Column(
+        children: [
+          SizedBox(height: MediaQuery.of(context).size.height * 0.1),
+          Image.asset(
+            'assets/farms.png',
+            fit: BoxFit.cover,
+            width: MediaQuery.of(context).size.width - 40,
+          ),
+          SizedBox(height: MediaQuery.of(context).size.height * 0.02),
+          Padding(
+            padding: const EdgeInsets.all(30),
+            child: Text(
+                'No farm created yet? Get started by setting up your farms! Click the button below to create a new ',
+                style: Theme.of(context)
+                    .textTheme
+                    .bodyLarge!
+                    .copyWith(color: Theme.of(context).colorScheme.onSurface)),
+          ),
+          SizedBox(
+            width: MediaQuery.of(context).size.width - 40,
+            child: ElevatedButton(
+              onPressed: _openAddFarmOverlay,
+              style: ElevatedButton.styleFrom(
+                  backgroundColor:
+                      Theme.of(context).colorScheme.primaryContainer),
+              child: Text(
+                'Create New Farm',
+                style: Theme.of(context).textTheme.bodyLarge!.copyWith(
+                      color: Theme.of(context).colorScheme.onPrimaryContainer,
+                    ),
+              ),
+            ),
+          ),
+        ],
+      ));
+      // mainWidget = Center(
+      //   child: Text(
+      //     'No farms yet.',
+      //     style: Theme.of(context)
+      //         .textTheme
+      //         .bodyLarge!
+      //         .copyWith(color: Theme.of(context).colorScheme.onSurface),
+      //   ),
+      // );
     } else {
       mainWidget = RefreshIndicator(
           onRefresh: listFarms,
