@@ -141,39 +141,29 @@ class _FarmScreenState extends ConsumerState<FarmScreen> {
           Padding(
             padding: const EdgeInsets.all(30),
             child: Text(
-                'No farm created yet? Get started by setting up your farms! Click the button below to create a new farm.',
-
-                style: Theme.of(context)
-                    .textTheme
-                    .bodyLarge!
-                    .copyWith(color: Theme.of(context).colorScheme.onSurface)),
+              'No farm created yet? Get started by setting up your farms! Click the button below to create a new farm.',
+              style: Theme.of(context)
+                  .textTheme
+                  .bodyLarge!
+                  .copyWith(color: Theme.of(context).colorScheme.onSurface),
+              textAlign: TextAlign.center,
+            ),
           ),
           SizedBox(
             width: MediaQuery.of(context).size.width - 40,
             child: ElevatedButton(
               onPressed: _openAddFarmOverlay,
-              style: ElevatedButton.styleFrom(
-                  backgroundColor:
-                      Theme.of(context).colorScheme.primaryContainer),
               child: Text(
                 'Create New Farm',
                 style: Theme.of(context).textTheme.bodyLarge!.copyWith(
                       color: Theme.of(context).colorScheme.onPrimaryContainer,
+                      fontWeight: FontWeight.bold,
                     ),
               ),
             ),
           ),
         ],
       ));
-      // mainWidget = Center(
-      //   child: Text(
-      //     'No farms yet.',
-      //     style: Theme.of(context)
-      //         .textTheme
-      //         .bodyLarge!
-      //         .copyWith(color: Theme.of(context).colorScheme.onSurface),
-      //   ),
-      // );
     } else {
       mainWidget = RefreshIndicator(
           onRefresh: listFarms,
