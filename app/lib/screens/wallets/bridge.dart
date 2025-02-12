@@ -147,14 +147,14 @@ class _WalletBridgeScreenState extends ConsumerState<WalletBridgeScreen> {
       return false;
     }
     if (Decimal.parse(amount) < Decimal.fromInt(2)) {
-      amountError = "Amount can't be less than 2";
+      amountError = "Amount can't be less than 2 excluding fees.";
       return false;
     }
     final balance = roundAmount(isWithdraw
         ? widget.wallet.tfchainBalance
         : widget.wallet.stellarBalance);
     if (balance - Decimal.parse(amount) - totalFee < Decimal.zero) {
-      amountError = 'Balance is not enough';
+      amountError = 'Insufficient balance (fees included).';
       return false;
     }
     return true;
