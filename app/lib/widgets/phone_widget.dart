@@ -2,7 +2,6 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_pkid/flutter_pkid.dart';
-import 'package:http/http.dart';
 import 'package:intl_mobile_field/countries.dart';
 import 'package:intl_mobile_field/intl_mobile_field.dart';
 import 'package:threebotlogin/helpers/globals.dart';
@@ -15,8 +14,7 @@ import 'custom_dialog.dart';
 
 Future<void> addPhoneNumberDialog(context,
     {required bool newPhone, required String oldPhone}) async {
-  Response res = await getCountry();
-  var countryCode = res.body.replaceAll('\n', '');
+  final countryCode = await getCountry();
 
   await showDialog(
     context: context,
@@ -167,7 +165,7 @@ class PhoneAlertDialogState extends State<PhoneAlertDialog> {
         ]);
   }
 
-  Future<dynamic> wantToVerifyNow() async {
+  Future<dynamic> verifyNow() async {
     return await showDialog(
       context: context,
       barrierDismissible: false,
@@ -204,7 +202,7 @@ class PhoneAlertDialogState extends State<PhoneAlertDialog> {
     FlutterPkid client = await getPkidClient();
     client.setPKidDoc('phone', json.encode({'phone': verificationPhoneNumber}));
 
-    wantToVerifyNow();
+    verifyNow();
   }
 
   sendPhoneVerification() async {
