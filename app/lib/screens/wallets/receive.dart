@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:threebotlogin/helpers/logger.dart';
 import 'package:threebotlogin/models/wallet.dart';
 import 'package:threebotlogin/screens/qr_code_screen.dart';
@@ -90,80 +91,94 @@ class _WalletReceiveScreenState extends State<WalletReceiveScreen> {
       onChangeChain(ChainType.TFChain);
     }
     return Scaffold(
-      appBar: AppBar(title: const Text('Receive')),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Column(children: [
-            SelectChainWidget(
-              chainType: chainType,
-              onChangeChain: onChangeChain,
-              hideStellar: hideStellar,
-            ),
-            const SizedBox(height: 40),
-            ListTile(
-              title: TextField(
-                  readOnly: true,
-                  style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                        color: Theme.of(context).colorScheme.onSurface,
-                      ),
-                  controller: toController,
-                  decoration: InputDecoration(
-                    labelText: 'To (name: ${widget.wallet.name})',
-                  )),
-            ),
-            const SizedBox(height: 10),
-            ListTile(
-              title: TextField(
-                  style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                        color: Theme.of(context).colorScheme.onSurface,
-                      ),
-                  keyboardType:
-                      const TextInputType.numberWithOptions(decimal: true),
-                  controller: amountController,
-                  decoration: InputDecoration(
-                      suffixText: 'TFT',
-                      labelText: 'Amount',
-                      hintText: '100',
-                      errorText: amountError)),
-            ),
-            const SizedBox(height: 10),
-            if (chainType == ChainType.Stellar)
-              ListTile(
-                title: TextField(
-                    style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                          color: Theme.of(context).colorScheme.onSurface,
-                        ),
-                    controller: memoController,
-                    decoration: const InputDecoration(
-                      labelText: 'Memo',
-                    )),
-              ),
-            const SizedBox(height: 40),
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 10),
-              child: ElevatedButton(
-                onPressed: () {
-                  final valid = _validate();
-                  logger.i(valid);
-                  if (valid) _showQRCode();
-                },
-                style: ElevatedButton.styleFrom(),
-                child: SizedBox(
-                  width: double.infinity,
-                  child: Text(
-                    'Generate QR Code',
-                    style: Theme.of(context).textTheme.titleLarge!.copyWith(
-                        color: Theme.of(context).colorScheme.primary,
-                        fontWeight: FontWeight.bold),
-                    textAlign: TextAlign.center,
+        appBar: AppBar(title: const Text('Receive')),
+        body: KeyboardVisibilityBuilder(builder: (context, isKeyboardVisible) {
+          return GestureDetector(
+            behavior: HitTestBehavior.opaque,
+            onTap: () {
+              FocusScope.of(context).unfocus();
+            },
+            child: SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Column(children: [
+                  SelectChainWidget(
+                    chainType: chainType,
+                    onChangeChain: onChangeChain,
+                    hideStellar: hideStellar,
                   ),
-                ),
+                  const SizedBox(height: 40),
+                  ListTile(
+                    title: TextField(
+                        readOnly: true,
+                        style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                              color: Theme.of(context).colorScheme.onSurface,
+                            ),
+                        controller: toController,
+                        decoration: InputDecoration(
+                          labelText: 'To (name: ${widget.wallet.name})',
+                        )),
+                  ),
+                  const SizedBox(height: 10),
+                  ListTile(
+                    title: TextField(
+                        style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                              color: Theme.of(context).colorScheme.onSurface,
+                            ),
+                        keyboardType: const TextInputType.numberWithOptions(
+                            decimal: true),
+                        controller: amountController,
+                        decoration: InputDecoration(
+                            suffixText: 'TFT',
+                            labelText: 'Amount',
+                            hintText: '100',
+                            errorText: amountError)),
+                  ),
+                  const SizedBox(height: 10),
+                  if (chainType == ChainType.Stellar)
+                    ListTile(
+                      title: TextField(
+                          style: Theme.of(context)
+                              .textTheme
+                              .bodyMedium!
+                              .copyWith(
+                                color: Theme.of(context).colorScheme.onSurface,
+                              ),
+                          controller: memoController,
+                          decoration: const InputDecoration(
+                            labelText: 'Memo',
+                          )),
+                    ),
+                  const SizedBox(height: 40),
+                  Padding(
+                    padding:
+                        const EdgeInsets.symmetric(vertical: 8, horizontal: 10),
+                    child: ElevatedButton(
+                      onPressed: () {
+                        final valid = _validate();
+                        logger.i(valid);
+                        if (valid) _showQRCode();
+                      },
+                      style: ElevatedButton.styleFrom(),
+                      child: SizedBox(
+                        width: double.infinity,
+                        child: Text(
+                          'Generate QR Code',
+                          style: Theme.of(context)
+                              .textTheme
+                              .titleLarge!
+                              .copyWith(
+                                  color: Theme.of(context).colorScheme.primary,
+                                  fontWeight: FontWeight.bold),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    ),
+                  ),
+                ]),
               ),
             ),
-          ]),
-        ),
-      ),
-    );
+          );
+        }));
   }
 }

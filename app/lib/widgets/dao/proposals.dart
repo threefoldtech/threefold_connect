@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:tfchain_client/models/dao.dart';
 
 import 'dao_card.dart';
@@ -93,22 +94,27 @@ class _ProposalsWidgetState extends State<ProposalsWidget> {
             ),
           ),
         ),
-        body: daoCards!.isNotEmpty
-            ? SingleChildScrollView(
-                child:
-                    Column(mainAxisSize: MainAxisSize.min, children: daoCards),
-              )
-            : Center(
-                child: Text(
-                  widget.proposals.isEmpty
-                      ? 'No active proposal at the moment'
-                      : 'No result was found',
-                  style: Theme.of(context)
-                      .textTheme
-                      .bodyLarge!
-                      .copyWith(color: Theme.of(context).colorScheme.onSurface),
-                ),
-              ));
+        body: KeyboardVisibilityBuilder(builder: (context, isKeyboardVisible) {
+          return GestureDetector(
+              behavior: HitTestBehavior.opaque,
+              onTap: () {
+                FocusScope.of(context).unfocus();
+              },
+              child: daoCards!.isNotEmpty
+                  ? SingleChildScrollView(
+                      child: Column(
+                          mainAxisSize: MainAxisSize.min, children: daoCards),
+                    )
+                  : Center(
+                      child: Text(
+                        widget.proposals.isEmpty
+                            ? 'No active proposal at the moment'
+                            : 'No result was found',
+                        style: Theme.of(context).textTheme.bodyLarge!.copyWith(
+                            color: Theme.of(context).colorScheme.onSurface),
+                      ),
+                    ));
+        }));
   }
 }
 
