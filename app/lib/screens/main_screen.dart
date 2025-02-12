@@ -9,6 +9,7 @@ import 'package:threebotlogin/helpers/flags.dart';
 import 'package:threebotlogin/helpers/globals.dart';
 import 'package:threebotlogin/helpers/kyc_helpers.dart';
 import 'package:threebotlogin/helpers/logger.dart';
+import 'package:threebotlogin/screens/change_pin_screen.dart';
 import 'package:threebotlogin/screens/home_screen.dart';
 import 'package:threebotlogin/screens/init_screen.dart';
 import 'package:threebotlogin/screens/unregistered_screen.dart';
@@ -200,7 +201,16 @@ class _AppState extends State<MainScreen> {
       ScaffoldMessenger.of(context).showSnackBar(loadingTwinFailure);
       logger.e('Failed to load twin information due to $e');
     }
-
+    String? pin = await getPin();
+    if (pin == null) {
+      await Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) => const ChangePinScreen(
+                    hideBackButton: true,
+                    currentPin: null,
+                  )));
+    }
     // await Navigator.push(context, MaterialPageRoute(builder: (context) => UnregisteredScreen()));
     await Navigator.of(context).pushReplacement(PageRouteBuilder(
         transitionDuration: const Duration(seconds: 1),
