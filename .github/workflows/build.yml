@@ -36,7 +36,7 @@ jobs:
         run: ./build.sh --build --production
 
       - name: Debug - List APK Files
-        run: ls -R build/app/outputs/
+        run: ls -R app/apks
 
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
