@@ -2,8 +2,8 @@
 
 set -e
 
-cd $CI_PRIMARY_REPOSITORY_PATH
-pwd 
+cd "$CI_PRIMARY_REPOSITORY_PATH" || { echo "Failed to change directory"; exit 1; }
+pwd
 
 # Install Flutter 3.27.2 using git.
 git clone https://github.com/flutter/flutter.git --depth 1 -b 3.27.2 $HOME/flutter
@@ -14,7 +14,12 @@ ls
 # Pre-cache Flutter artifacts for iOS.
 flutter precache --ios
 
-# Install dependencies.
+# Ensure we are in a Flutter project directory
+if [ ! -f "pubspec.yaml" ]; then
+  echo "Error: pubspec.yaml not found in $(pwd)"
+  exit 1
+fi
+
 flutter pub get
 
 # Run build_runner if needed.
@@ -27,7 +32,13 @@ fi
 HOMEBREW_NO_AUTO_UPDATE=1
 brew install cocoapods
 
-# Install CocoaPods dependencies
-cd ios && pod install
+# Ensure iOS directory exists
+if [ ! -d "ios" ]; then
+  echo "Error: ios directory not found"
+  exit 1
+fi
+
+cd ios
+pod install || { echo "Pod install failed"; exit 1; }
 
 exit 0
