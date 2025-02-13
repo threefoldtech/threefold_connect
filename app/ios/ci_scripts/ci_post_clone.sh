@@ -9,11 +9,11 @@ pwd
 git clone https://github.com/flutter/flutter.git --depth 1 -b 3.27.2 $HOME/flutter
 export PATH="$PATH:$HOME/flutter/bin"
 dart --version
-git branch -a
-ls
+
 # Pre-cache Flutter artifacts for iOS.
 flutter precache --ios
 
+cd ./app || { echo "Failed to change directory $(pwd)"; ls; exit 1; }
 # Ensure we are in a Flutter project directory
 if [ ! -f "pubspec.yaml" ]; then
   echo "Error: pubspec.yaml not found in $(pwd)"
