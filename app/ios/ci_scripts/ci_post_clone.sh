@@ -40,5 +40,5 @@ fi
 
 cd ios
 pod install || { echo "Pod install failed"; exit 1; }
-
+cd ..
 exit 0
