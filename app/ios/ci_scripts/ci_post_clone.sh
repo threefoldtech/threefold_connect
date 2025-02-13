@@ -1,11 +1,9 @@
 #!/bin/sh -x 
 
 set -e
-git clone https://github.com/flutter/flutter.git --depth 1 -b stable $HOME/flutter
-export PATH="$PATH:$HOME/flutter/bin"
-pwd
-cd $CI_PRIMARY_REPOSITORY_PATH
 
+cd $CI_PRIMARY_REPOSITORY_PATH
+pwd 
 # Install Flutter using git.
 git clone https://github.com/flutter/flutter.git --depth 1 -b stable $HOME/flutter
 export PATH="$PATH:$HOME/flutter/bin"
