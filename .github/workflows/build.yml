@@ -26,17 +26,16 @@ jobs:
       - name: Get dependencies
         run: flutter pub get
 
-      - name: Init build script
-        run: ./build.sh --init
-
       - name: Initialize Reflectable
         run: dart run build_runner build    
 
       - name: Build APK
-        run: flutter build apk --release
+        run: |
+          chmod +x build.sh
+          ./build.sh --build --production
 
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: app-release-apk
-          path: app/build/app/outputs/flutter-apk/app-release.apk        
+          name: app-apk
+          path: build/app/outputs/apk/release/*.apk       
