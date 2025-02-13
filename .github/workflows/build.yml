@@ -1,4 +1,4 @@
-name : Build
+name : Build APK
 
 on:
   pull_request:
@@ -25,17 +25,18 @@ jobs:
 
       - name: Get dependencies
         run: flutter pub get
+
       - name: Init build script
         run: ./build.sh --init
 
       - name: Initialize Reflectable
         run: dart run build_runner build    
-            
+
       - name: Build APK
         run: flutter build apk --release
 
       - name: Upload APK Artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: app-release-apk
           path: app/build/app/outputs/flutter-apk/app-release.apk        
