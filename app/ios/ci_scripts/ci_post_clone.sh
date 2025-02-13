@@ -7,7 +7,8 @@ pwd
 # Install Flutter using git.
 git clone https://github.com/flutter/flutter.git --depth 1 -b stable $HOME/flutter
 export PATH="$PATH:$HOME/flutter/bin"
-
+git branch -a
+ls
 # Pre-cache Flutter artifacts for iOS.
 flutter precache --ios
 
