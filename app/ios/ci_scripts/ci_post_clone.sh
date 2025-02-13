@@ -4,9 +4,11 @@ set -e
 
 cd $CI_PRIMARY_REPOSITORY_PATH
 pwd 
-# Install Flutter using git.
-git clone https://github.com/flutter/flutter.git --depth 1 -b stable $HOME/flutter
+
+# Install Flutter 3.27.2 using git.
+git clone https://github.com/flutter/flutter.git --depth 1 -b 3.27.2 $HOME/flutter
 export PATH="$PATH:$HOME/flutter/bin"
+dart --version
 git branch -a
 ls
 # Pre-cache Flutter artifacts for iOS.
