@@ -21,7 +21,7 @@ compileAndUpload() {
         else
             echo "[$5]: Building apk."
 
-            setConfigsAndBuild
+            setConfigsAndBuild "--$5"
             msgTelegramAndUploadToAppServer "$5" $4
         fi
 
