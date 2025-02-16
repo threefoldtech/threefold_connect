@@ -34,12 +34,9 @@ jobs:
 
       - name: Run Build Script
         run: ./build.sh --build --production || { echo "Build script failed!"; exit 1; }
-
-      - name: Debug - Check Build Output
-        run: ls -R
     
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
           name: app-apk
-          path: build/app/outputs/apk/release/*.apk
+          path: apks/*.apk
