@@ -52,8 +52,15 @@ setConfigsAndBuild() {
     sed -i -e "s/githashvalue/$githash/g" lib/helpers/env_config.dart
     sed -i -e "s/timevalue/$logcurrent_time/g" lib/helpers/env_config.dart
 
-    flutter build apk -t lib/main.dart -v --target-platform android-arm,android-arm64 --release
+    if [[ "$1" == "--local" ]]; then
+        echo "Running local debug build..."
+        flutter build apk -t lib/main.dart -v --target-platform android-arm,android-arm64 --debug
+    else
+        echo "Running release build..."
+        flutter build apk -t lib/main.dart -v --target-platform android-arm,android-arm64 --release
+    fi
 }
+
 
 msgTelegramAndUploadToAppServer () {
     mv build/app/outputs/apk/release/app-release.apk "build/app/outputs/apk/release/$current_time-TF-Connect-$1-$githash.apk"
