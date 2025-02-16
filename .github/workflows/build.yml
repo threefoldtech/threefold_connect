@@ -33,7 +33,7 @@ jobs:
         run: chmod +x build.sh
 
       - name: Run Build Script
-        run: ./build.sh --build --debug
+        run: ./build.sh --build --local
     
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
