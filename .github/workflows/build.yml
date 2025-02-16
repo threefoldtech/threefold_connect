@@ -33,7 +33,10 @@ jobs:
         run: chmod +x build.sh
 
       - name: Run Build Script
-        run: ./build.sh --build --local
+        run: | 
+            ./build.sh --build --local
+            echo "Build script exited with code $?"
+        
     
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
