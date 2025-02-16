@@ -27,7 +27,10 @@ jobs:
         run: flutter pub get
 
       - name: Initialize Reflectable
-        run: dart run build_runner build    
+        run: dart run build_runner build   
+
+      - name: Create app_config_local.dart from template
+        run: cp lib/app_config_local.template lib/app_config_local.dart
 
       - name: Ensure Build Script is Executable
         run: chmod +x build.sh
