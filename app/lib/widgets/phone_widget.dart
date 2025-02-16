@@ -165,33 +165,6 @@ class PhoneAlertDialogState extends State<PhoneAlertDialog> {
         ]);
   }
 
-  Future<dynamic> verifyNow() async {
-    return await showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (BuildContext dialogContext) => CustomDialog(
-        image: Icons.info,
-        title: 'Verify phone number',
-        description: 'Do you want to verify your phone number now?',
-        actions: [
-          TextButton(
-              onPressed: () {
-                Navigator.pop(dialogContext);
-                Navigator.pop(context);
-              },
-              child: const Text('No')),
-          TextButton(
-              onPressed: () async {
-                Navigator.pop(dialogContext);
-                Navigator.pop(context);
-                await sendPhoneVerification();
-              },
-              child: const Text('Yes'))
-        ],
-      ),
-    );
-  }
-
   void verifyButton() async {
     if (!valid) {
       return;
@@ -202,7 +175,7 @@ class PhoneAlertDialogState extends State<PhoneAlertDialog> {
     FlutterPkid client = await getPkidClient();
     client.setPKidDoc('phone', json.encode({'phone': verificationPhoneNumber}));
 
-    verifyNow();
+    await sendPhoneVerification();
   }
 
   sendPhoneVerification() async {
@@ -212,6 +185,7 @@ class PhoneAlertDialogState extends State<PhoneAlertDialog> {
     if (mounted) {
       setState(() {
         phoneSendDialog(context);
+        Navigator.pop(context);
         Navigator.pop(context);
       });
     }
