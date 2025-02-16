@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: app
+        working-directory: /app
     steps:
       - name: Set up Repository
         uses: actions/checkout@v4
@@ -36,8 +36,8 @@ jobs:
         run: ./build.sh --build --production || { echo "Build script failed!"; exit 1; }
 
       - name: Debug - Check Build Output
-        run: ls -R build/app/outputs/apk/release || echo "APK directory not found!"
-  
+        run: ls -R
+    
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
