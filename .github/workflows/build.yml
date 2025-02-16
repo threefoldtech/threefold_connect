@@ -33,7 +33,7 @@ jobs:
         run: chmod +x build.sh
 
       - name: Run Build Script
-        run: ./build.sh --build --production
+        run: ./build.sh --build --production || { echo "Build script failed!"; exit 1; }
 
       - name: Debug - List APK Files
         run: ls -R app/apks
@@ -42,4 +42,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: app-apk
-          path: app/apks/*.apk   
+          path: build/app/outputs/apk/release/*.apk
