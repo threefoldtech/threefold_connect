@@ -24,9 +24,6 @@ jobs:
           flutter-version: '3.27.2'
           channel: 'stable'
 
-      - name: Verify Flutter version
-        run: flutter --version
-        
       - name: Get dependencies
         run: flutter pub get
 
@@ -49,4 +46,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: app-apk
-          path: build/app/outputs/flutter-apk/*.apk
+          path: build/app/outputs/flutter-apk/app-debug.apk
