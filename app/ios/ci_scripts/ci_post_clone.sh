@@ -41,4 +41,6 @@ fi
 cd ios
 pod install || { echo "Pod install failed"; exit 1; }
 cd ..
+mv lib/app_config_local.template lib/app_config_local.dart
+mv lib/helpers/env_config_local.template lib/helpers/env_config.dart
 exit 0
