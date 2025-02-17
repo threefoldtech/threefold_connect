@@ -23,9 +23,6 @@ jobs:
         with:
           channel: 'stable'
           
-      - name: Set NDK Version
-        run: echo "ANDROID_NDK_VERSION=27.0.12077973" >> $GITHUB_ENV    
-
       - name: Get dependencies
         run: flutter pub get
 
