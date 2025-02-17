@@ -31,7 +31,6 @@ class _IdentityVerificationScreenState
   String phrase = '';
   String email = '';
   String phone = '';
-  String reference = '';
   bool emailVerified = false;
   bool phoneVerified = false;
   bool isLoading = false;
@@ -65,7 +64,6 @@ class _IdentityVerificationScreenState
   }
 
   void getPhoneCountdown() {
-    print('countdown entered');
     int currentTime = DateTime.now().millisecondsSinceEpoch;
     int lockedUntil =
         Globals().smsSentOn + (Globals().smsMinutesCoolDown * 60 * 1000);
@@ -163,7 +161,7 @@ class _IdentityVerificationScreenState
   }
 
   void getUserValues() async {
-    doubleName = (await getDoubleName())!.replaceAll('.3bot', '') ?? 'Unknown';
+    doubleName = (await getDoubleName())?.replaceAll('.3bot', '') ?? 'Unknown';
     phrase = (await getPhrase())!;
     final emailMap = await getEmail();
     if (emailMap['email'] != null) {
@@ -382,12 +380,12 @@ class _IdentityVerificationScreenState
     );
   }
 
-  void verifyEmail() {
+  Future<void> verifyEmail() async {
     if (emailVerified) {
       return;
     }
 
-    sendVerificationEmail();
+    await sendVerificationEmail();
     resendEmailDialog(context);
   }
 
@@ -395,8 +393,6 @@ class _IdentityVerificationScreenState
     if (phoneVerified) {
       return;
     }
-    getPhoneCountdown();
-
     await PhoneAlertDialogState().sendPhoneVerification();
     setState(() {});
   }
@@ -425,7 +421,8 @@ class _IdentityVerificationScreenState
 
   Widget _buildCountdown(BuildContext context, bool isEmail) {
     return ValueListenableBuilder<int>(
-      valueListenable: isEmail ? emailCountdownNotifier : phoneCountdownNotifier,
+      valueListenable:
+          isEmail ? emailCountdownNotifier : phoneCountdownNotifier,
       builder: (context, countdownValue, child) {
         if (countdownValue > 0) {
           return Row(
@@ -449,7 +446,8 @@ class _IdentityVerificationScreenState
 
   Widget _buildVerificationBtn(int step) {
     return ValueListenableBuilder<int>(
-      valueListenable: step == 1 ? emailCountdownNotifier : phoneCountdownNotifier,
+      valueListenable:
+          step == 1 ? emailCountdownNotifier : phoneCountdownNotifier,
       builder: (context, countdownValue, child) {
         return Padding(
           padding: const EdgeInsets.only(left: 20),
@@ -459,8 +457,10 @@ class _IdentityVerificationScreenState
                 : () async {
                     if (step == 1) {
                       getEmailCountdown(startNew: true);
-                      verifyEmail();
+                      await verifyEmail();
                     } else {
+                      Globals().smsSentOn =
+                          DateTime.now().millisecondsSinceEpoch;
                       getPhoneCountdown();
                       await verifyPhone();
                     }
@@ -497,9 +497,9 @@ class _IdentityVerificationScreenState
   _handleInfoWidget(step) async {
     if (step == 1 && emailCountdownNotifier.value == -1) {
       _changeEmailDialog();
-    } 
-    
-    if (step == 2 && phoneCountdownNotifier.value == -1){
+    }
+
+    if (step == 2 && phoneCountdownNotifier.value == -1) {
       await addPhoneNumberDialog(context, newPhone: false, oldPhone: phone);
       var phoneMap = await getPhone();
       String? phoneNumber = phoneMap['phone'];

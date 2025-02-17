@@ -181,7 +181,6 @@ class PhoneAlertDialogState extends State<PhoneAlertDialog> {
   sendPhoneVerification() async {
     await sendVerificationSms();
     Globals().hidePhoneButton.value = true;
-    Globals().smsSentOn = DateTime.now().millisecondsSinceEpoch;
     if (mounted) {
       setState(() {
         phoneSendDialog(context);
