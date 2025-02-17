@@ -61,7 +61,6 @@ setConfigsAndBuild() {
     fi
 }
 
-
 msgTelegramAndUploadToAppServer () {
     mv build/app/outputs/apk/release/app-release.apk "build/app/outputs/apk/release/$current_time-TF-Connect-$1-$githash.apk"
 
