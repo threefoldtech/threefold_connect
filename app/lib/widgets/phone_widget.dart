@@ -88,13 +88,13 @@ class PhoneAlertDialogState extends State<PhoneAlertDialog> {
             if (!widget.newPhone)
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: Text(
-                    'Changing your phone will require re-\u200dverification',
-                    style: Theme.of(context)
-                        .textTheme
-                        .bodyLarge!
-                        .copyWith(color: Theme.of(context).colorScheme.onSurface),
-                  ),
+                child: Text(
+                  'Changing your phone will require re-\u200dverification',
+                  style: Theme.of(context)
+                      .textTheme
+                      .bodyLarge!
+                      .copyWith(color: Theme.of(context).colorScheme.onSurface),
+                ),
               ),
             if (!widget.newPhone)
               const SizedBox(
@@ -181,6 +181,7 @@ class PhoneAlertDialogState extends State<PhoneAlertDialog> {
   sendPhoneVerification() async {
     await sendVerificationSms();
     Globals().hidePhoneButton.value = true;
+    Globals().smsSentOn = DateTime.now().millisecondsSinceEpoch;
     if (mounted) {
       setState(() {
         phoneSendDialog(context);

@@ -456,13 +456,13 @@ class _IdentityVerificationScreenState
                 ? null
                 : () async {
                     if (step == 1) {
-                      getEmailCountdown(startNew: true);
                       await verifyEmail();
+                      getEmailCountdown(startNew: true);
                     } else {
-                      Globals().smsSentOn =
-                          DateTime.now().millisecondsSinceEpoch;
-                      getPhoneCountdown();
+                      _loadingDialog();
                       await verifyPhone();
+                      Navigator.pop(context);
+                      getPhoneCountdown();
                     }
                   },
             child: Text(step == 1 ? 'Resend' : 'Verify'),
