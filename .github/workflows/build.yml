@@ -1,4 +1,4 @@
-name : Build APK
+name: Build APK
 
 on:
   pull_request:
@@ -21,14 +21,14 @@ jobs:
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.27.2'
-          channel: 'stable'
+          flutter-version: "3.27.2"
+          channel: "stable"
 
       - name: Get dependencies
         run: flutter pub get
 
       - name: Initialize Reflectable
-        run: dart run build_runner build   
+        run: dart run build_runner build
 
       - name: Create app_config_local.dart from template
         run: cp lib/app_config_local.template lib/app_config_local.dart
@@ -37,14 +37,14 @@ jobs:
         run: chmod +x build.sh
 
       - name: Run Build Script
-        run: | 
-            ./build.sh --build --local
-            echo "Build script exited with code $?"
+        run: |
+          ./build.sh --build --local
+          echo "Build script exited with code $?"
       - name: List build output files
         run: ls -R build/app/outputs/flutter-apk
-  
+
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
           name: app-apk
-          path: build/app/outputs/flutter-apk/app-debug.apk
+          path: build/app/outputs/flutter-apk/**/*.apk
