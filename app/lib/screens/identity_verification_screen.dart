@@ -1,14 +1,11 @@
 import 'dart:async';
-import 'dart:convert';
 import 'dart:core';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_pkid/flutter_pkid.dart';
 import 'package:threebotlogin/helpers/globals.dart';
 import 'package:threebotlogin/helpers/logger.dart';
 import 'package:threebotlogin/main.dart';
 import 'package:threebotlogin/screens/authentication_screen.dart';
-import 'package:threebotlogin/services/identity_service.dart';
 import 'package:threebotlogin/services/open_kyc_service.dart';
 import 'package:threebotlogin/services/pkid_service.dart';
 import 'package:threebotlogin/services/tools_service.dart';
@@ -44,7 +41,7 @@ class _IdentityVerificationScreenState
   int phoneCountdown = 120;
   Timer? emailTimer;
   Timer? phoneTimer;
-  ValueNotifier<int> countdownNotifier = ValueNotifier(-1);
+  ValueNotifier<int> emailCountdownNotifier = ValueNotifier(-1);
   ValueNotifier<int> phoneCountdownNotifier = ValueNotifier(-1);
 
   @override
@@ -63,7 +60,7 @@ class _IdentityVerificationScreenState
     emailTimer?.cancel();
     phoneTimer?.cancel();
     phoneCountdownNotifier.dispose();
-    countdownNotifier.dispose();
+    emailCountdownNotifier.dispose();
     super.dispose();
   }
 
@@ -110,7 +107,7 @@ class _IdentityVerificationScreenState
 
     if (timeLeft > 0) {
       emailCountdown = timeLeft;
-      countdownNotifier.value = emailCountdown;
+      emailCountdownNotifier.value = emailCountdown;
 
       emailTimer?.cancel();
 
@@ -121,14 +118,14 @@ class _IdentityVerificationScreenState
         int remainingTime = ((lockedUntil - currentTime) / 1000).round();
 
         if (remainingTime > 0) {
-          countdownNotifier.value = remainingTime;
+          emailCountdownNotifier.value = remainingTime;
         } else {
-          countdownNotifier.value = -1;
+          emailCountdownNotifier.value = -1;
           timer.cancel();
         }
       });
     } else {
-      countdownNotifier.value = -1;
+      emailCountdownNotifier.value = -1;
     }
   }
 
@@ -137,7 +134,7 @@ class _IdentityVerificationScreenState
       setState(() {
         emailVerified = Globals().emailVerified.value;
         if (emailVerified) {
-          countdownNotifier.value = -1;
+          emailCountdownNotifier.value = -1;
           emailTimer?.cancel();
         }
       });
@@ -390,10 +387,6 @@ class _IdentityVerificationScreenState
       return;
     }
 
-    if (countdownNotifier.value == -1) {
-      return _changeEmailDialog();
-    }
-
     sendVerificationEmail();
     resendEmailDialog(context);
   }
@@ -422,166 +415,6 @@ class _IdentityVerificationScreenState
     );
   }
 
-  Widget _fillCard(String phase, int step, String text, IconData icon) {
-    switch (phase) {
-      case 'Unverified':
-        return unVerifiedWidget(step, text, icon);
-      case 'Verified':
-        return verifiedWidget(step, text, icon);
-      case 'CurrentPhase':
-        return currentPhaseWidget(step, text, icon);
-      default:
-        return Container();
-    }
-  }
-
-  Widget unVerifiedWidget(int step, String text, IconData icon) {
-    return InkWell(
-      child: Opacity(
-        opacity: 0.5,
-        child: Padding(
-          padding: const EdgeInsets.only(bottom: 10.0),
-          child: ListTile(
-            leading: Icon(icon),
-            title: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Expanded(
-                      child: Text(
-                        text.isEmpty ? 'Unknown' : text,
-                        overflow: TextOverflow.clip,
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: Theme.of(context).colorScheme.onSurface,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 5),
-                Row(
-                  children: [
-                    Icon(
-                      Icons.close,
-                      color: Theme.of(context).colorScheme.error,
-                      size: 18.0,
-                    ),
-                    const SizedBox(width: 5),
-                    Text(
-                      'Not verified',
-                      style: TextStyle(
-                        color: Theme.of(context).colorScheme.error,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 12,
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget currentPhaseWidget(int step, String text, IconData icon) {
-    return InkWell(
-      onTap: () async {
-        if (step == 1 && countdownNotifier.value == -1) {
-          return _changeEmailDialog();
-        }
-
-        if (step == 2 && phoneCountdownNotifier.value == -1) {
-          if (phone.isEmpty) {
-            await addPhoneNumberDialog(context, newPhone: true, oldPhone: '');
-          } else {
-            await addPhoneNumberDialog(context,
-                newPhone: false, oldPhone: phone);
-          }
-
-          var phoneMap = await getPhone();
-          if (phoneMap.isEmpty || !phoneMap.containsKey('phone')) {
-            return;
-          }
-
-          String? phoneNumber = phoneMap['phone'];
-          if (phoneNumber == null || phoneNumber.isEmpty) {
-            return;
-          }
-
-          setState(() {
-            phone = phoneNumber;
-          });
-
-          FlutterPkid client = await getPkidClient();
-          client.setPKidDoc('phone', json.encode({'phone': phone}));
-
-          if (phone.isEmpty) {
-            return;
-          }
-        }
-      },
-      child: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.only(bottom: 10.0),
-            child: ListTile(
-              leading: Icon(icon),
-              title: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Flexible(
-                    child: Container(
-                      constraints: _getConstraints(context, step),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Row(
-                            children: [
-                              Expanded(
-                                child: Text(
-                                  text.isEmpty ? 'Unknown' : text,
-                                  overflow: TextOverflow.clip,
-                                ),
-                              ),
-                            ],
-                          ),
-                          if (step == 1) _buildCountdown(context, true),
-                          if (step == 2) _buildCountdown(context, false),
-                        ],
-                      ),
-                    ),
-                  ),
-                  _buildVerificationBtn(step),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  BoxConstraints _getConstraints(BuildContext context, int step) {
-    final hidePhoneButton = Globals().hidePhoneButton.value;
-    final screenWidth = MediaQuery.of(context).size.width;
-
-    if (hidePhoneButton == false || (step != 2 && hidePhoneButton == true)) {
-      return BoxConstraints(
-        minWidth: screenWidth * 0.5,
-        maxWidth: screenWidth * 0.5,
-      );
-    } else {
-      return BoxConstraints(
-        minWidth: screenWidth * 0.7,
-        maxWidth: screenWidth * 0.7,
-      );
-    }
-  }
-
   formatCountdownMsg(bool isEmail, int countdownValue) {
     if (isEmail) {
       return 'Verification email sent, retry in $countdownValue second${countdownValue == 1 ? '' : 's'}';
@@ -592,7 +425,7 @@ class _IdentityVerificationScreenState
 
   Widget _buildCountdown(BuildContext context, bool isEmail) {
     return ValueListenableBuilder<int>(
-      valueListenable: isEmail ? countdownNotifier : phoneCountdownNotifier,
+      valueListenable: isEmail ? emailCountdownNotifier : phoneCountdownNotifier,
       builder: (context, countdownValue, child) {
         if (countdownValue > 0) {
           return Row(
@@ -616,7 +449,7 @@ class _IdentityVerificationScreenState
 
   Widget _buildVerificationBtn(int step) {
     return ValueListenableBuilder<int>(
-      valueListenable: step == 1 ? countdownNotifier : phoneCountdownNotifier,
+      valueListenable: step == 1 ? emailCountdownNotifier : phoneCountdownNotifier,
       builder: (context, countdownValue, child) {
         return Padding(
           padding: const EdgeInsets.only(left: 20),
@@ -661,19 +494,25 @@ class _IdentityVerificationScreenState
     return '0';
   }
 
-  Widget verifiedWidget(int step, String text, IconData icon) {
+  _handleInfoWidget(step) async {
+    if (step == 1 && emailCountdownNotifier.value == -1) {
+      _changeEmailDialog();
+    } 
+    
+    if (step == 2 && phoneCountdownNotifier.value == -1){
+      await addPhoneNumberDialog(context, newPhone: false, oldPhone: phone);
+      var phoneMap = await getPhone();
+      String? phoneNumber = phoneMap['phone'];
+      setState(() {
+        phone = phoneNumber!;
+      });
+    }
+  }
+
+  Widget infoWidget(int step, String text, IconData icon, bool isVerified) {
     return InkWell(
       onTap: () async {
-        if (step == 1) {
-          _changeEmailDialog();
-        } else {
-          await addPhoneNumberDialog(context, newPhone: false, oldPhone: phone);
-          var phoneMap = await getPhone();
-          String? phoneNumber = phoneMap['phone'];
-          setState(() {
-            phone = phoneNumber!;
-          });
-        }
+        await _handleInfoWidget(step);
       },
       child: Padding(
         padding: const EdgeInsets.only(
@@ -684,30 +523,36 @@ class _IdentityVerificationScreenState
           title: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Container(
-                    constraints: BoxConstraints(
-                      minWidth: MediaQuery.of(context).size.width * 0.65,
-                      maxWidth: MediaQuery.of(context).size.width * 0.65,
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      constraints: BoxConstraints(
+                        minWidth: MediaQuery.of(context).size.width * 0.5,
+                      ),
+                      child: Text(
+                        text.isEmpty ? 'Unknown' : text,
+                        overflow: TextOverflow.ellipsis,
+                      ),
                     ),
-                    child: Text(
-                      text.isEmpty ? 'Unknown' : text,
-                      overflow: TextOverflow.clip,
-                    ),
-                  ),
-                  const SizedBox(height: 5),
-                  Text(
-                    'Verified',
-                    style: Theme.of(context).textTheme.bodySmall!.copyWith(
-                          color: Theme.of(context).colorScheme.primary,
-                          fontWeight: FontWeight.bold,
-                        ),
-                  ),
-                ],
+                    const SizedBox(height: 5),
+                    isVerified
+                        ? Text(
+                            'Verified',
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodySmall!
+                                .copyWith(
+                                  color: Theme.of(context).colorScheme.primary,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                          )
+                        : _buildCountdown(context, step == 1)
+                  ],
+                ),
               ),
-              const Icon(Icons.edit),
+              isVerified ? const Icon(Icons.edit) : _buildVerificationBtn(step),
             ],
           ),
         ),
@@ -723,6 +568,7 @@ class _IdentityVerificationScreenState
         padding: const EdgeInsets.symmetric(horizontal: 4.0),
         child: SingleChildScrollView(
           child: Column(
+            mainAxisSize: MainAxisSize.min,
             children: [
               const SizedBox(height: 20),
               AnimatedBuilder(
@@ -731,10 +577,6 @@ class _IdentityVerificationScreenState
                   Globals().phoneVerified,
                 ]),
                 builder: (BuildContext context, _) {
-                  final emailState =
-                      getCorrectState(1, emailVerified, phoneVerified);
-                  final phoneState =
-                      getCorrectState(2, emailVerified, phoneVerified);
                   return Column(
                     children: [
                       ListTile(
@@ -752,9 +594,9 @@ class _IdentityVerificationScreenState
                         ),
                       ),
                       customDivider(context: context),
-                      _fillCard(emailState, 1, email, Icons.email),
+                      infoWidget(1, email, Icons.email, emailVerified),
                       customDivider(context: context),
-                      _fillCard(phoneState, 2, phone, Icons.phone),
+                      infoWidget(2, phone, Icons.phone, phoneVerified),
                     ],
                   );
                 },
