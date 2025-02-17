@@ -40,8 +40,9 @@ jobs:
         run: | 
             ./build.sh --build --local
             echo "Build script exited with code $?"
-        
-    
+      - name: List build output files
+        run: ls -R build/app/outputs/flutter-apk
+  
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
