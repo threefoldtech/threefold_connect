@@ -54,7 +54,7 @@ setConfigsAndBuild() {
 
     if [[ "$1" == "--local" ]]; then
         echo "Running local debug build..."
-        flutter build apk -t lib/main.dart --target-platform android-arm,android-arm64 --debug
+        flutter build apk -t lib/main.dart -v --target-platform android-arm,android-arm64 --debug
     else
         echo "Running release build..."
         flutter build apk -t lib/main.dart -v --target-platform android-arm,android-arm64 --release
