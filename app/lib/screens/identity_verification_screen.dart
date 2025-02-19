@@ -167,23 +167,17 @@ class IdentityVerificationScreenState
   verifyButton(bool valid, verificationPhoneNumber) async {
     try {
       if (!valid) return;
-      print('hereeeeee');
-      await loadingDialog();
-      print('after loading........');
+      loadingDialog();
       await savePhone(verificationPhoneNumber, null);
       FlutterPkid client = await getPkidClient();
       client.setPKidDoc('phone', json.encode({'phone': verificationPhoneNumber}));
       await sendPhoneVerification();
-      print('after verification');
-      // Navigator.pop(context);
+      Navigator.pop(context);
       getPhoneCountdown();
-      print('countdownnnnnnn');
     } catch (e) {
       logger.e(e);
     }
   }
-
-
 
   sendPhoneVerification() async {
     await sendVerificationSms();
@@ -192,7 +186,6 @@ class IdentityVerificationScreenState
     if (mounted) {
       setState(() {
         phoneSendDialog(context);
-        Navigator.pop(context);
         Navigator.pop(context);
       });
     }
@@ -259,7 +252,6 @@ class IdentityVerificationScreenState
   }
 
   Future loadingDialog() {
-    print('loadingggggggggggggg');
     return showDialog(
       barrierDismissible: false,
       context: context,
@@ -338,7 +330,7 @@ class IdentityVerificationScreenState
                     child: const Text('Cancel')),
                 TextButton(
                     onPressed: () async {
-                      await loadingDialog();
+                      loadingDialog();
 
                       String emailValue = controller.text.toLowerCase().trim();
                       bool isValidEmail = validateEmail(emailValue);
@@ -432,7 +424,9 @@ class IdentityVerificationScreenState
     if (phoneVerified) {
       return;
     }
+    loadingDialog();
     await sendPhoneVerification();
+    Navigator.pop(context);
     setState(() {});
   }
 
@@ -498,9 +492,7 @@ class IdentityVerificationScreenState
                       await verifyEmail();
                       getEmailCountdown(startNew: true);
                     } else {
-                      await loadingDialog();
                       await verifyPhone();
-                      Navigator.pop(context);
                       getPhoneCountdown();
                     }
                   },

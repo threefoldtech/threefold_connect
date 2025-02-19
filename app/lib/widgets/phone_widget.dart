@@ -143,8 +143,9 @@ class PhoneAlertDialogState extends State<PhoneAlertDialog> {
         ),
         if (valid)
           TextButton(
-            onPressed: () {
-              widget.onVerify(context, valid, verificationPhoneNumber);
+            onPressed: () async{
+              await widget.onVerify(valid, verificationPhoneNumber);
+              Navigator.pop(context);
             },
             child: Text(widget.newPhone ? 'Add' : 'Update'),
           ),
