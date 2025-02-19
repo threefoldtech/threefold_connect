@@ -544,7 +544,7 @@ class IdentityVerificationScreenState
   Widget infoWidget(int step, String text, IconData icon, bool isVerified) {
     return InkWell(
       onTap: () async {
-        newPhone = text == 'Unknown';
+        newPhone = text == '';
         await _handleInfoWidget(step);
       },
       child: Padding(
@@ -585,7 +585,7 @@ class IdentityVerificationScreenState
                   ],
                 ),
               ),
-              isVerified || text == 'Unknown' ? const Icon(Icons.edit) : _buildVerificationBtn(step),
+              isVerified || text == 'Unknown' || text == '' ? const Icon(Icons.edit) : _buildVerificationBtn(step),
             ],
           ),
         ),
