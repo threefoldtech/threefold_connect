@@ -45,6 +45,7 @@ class IdentityVerificationScreenState
   int phoneCountdown = 120;
   Timer? emailTimer;
   Timer? phoneTimer;
+  bool newPhone = false;
   ValueNotifier<int> emailCountdownNotifier = ValueNotifier(-1);
   ValueNotifier<int> phoneCountdownNotifier = ValueNotifier(-1);
 
@@ -531,7 +532,7 @@ class IdentityVerificationScreenState
     }
 
     if (step == 2 && phoneCountdownNotifier.value == -1) {
-      await addPhoneNumberDialog(context, newPhone: false, oldPhone: phone, onVerify: verifyButton);
+      await addPhoneNumberDialog(context, newPhone: newPhone, oldPhone: phone, onVerify: verifyButton);
       var phoneMap = await getPhone();
       String? phoneNumber = phoneMap['phone'];
       setState(() {
@@ -543,6 +544,7 @@ class IdentityVerificationScreenState
   Widget infoWidget(int step, String text, IconData icon, bool isVerified) {
     return InkWell(
       onTap: () async {
+        newPhone = text == 'Unknown';
         await _handleInfoWidget(step);
       },
       child: Padding(
