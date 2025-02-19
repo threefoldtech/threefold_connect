@@ -106,9 +106,19 @@ class _RegisteredScreenState extends State<RegisteredScreen>
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     HomeCardWidget(
-                        name: 'Identity', icon: Icons.person, pageNumber: 5),
+                        name: 'Market',
+                        icon: Icons.show_chart_sharp,
+                        pageNumber: 6),
                     HomeCardWidget(
-                        name: 'Settings', icon: Icons.settings, pageNumber: 6),
+                        name: 'Identity', icon: Icons.person, pageNumber: 5),
+                  ],
+                ),
+                const Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    HomeCardWidget(
+                        name: 'Settings', icon: Icons.settings, pageNumber: 7),
                   ],
                 ),
                 const SizedBox(height: 40),
