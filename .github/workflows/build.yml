@@ -37,7 +37,16 @@ jobs:
         run: chmod +x build.sh
 
       - name: Run Build Script
-        run: ./build.sh --build --local
+        run: | 
+          set -e
+          ./build.sh --build --local
+
+      - name: Verify APK Exists
+        run: |
+          if [ ! -f "build/app/outputs/flutter-apk/app-debug.apk" ]; then
+            echo "APK not found! Build failed."
+            exit 1
+          fi
 
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
