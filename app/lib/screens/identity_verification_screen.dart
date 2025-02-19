@@ -1,7 +1,9 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:core';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_pkid/flutter_pkid.dart';
 import 'package:threebotlogin/helpers/globals.dart';
 import 'package:threebotlogin/helpers/logger.dart';
 import 'package:threebotlogin/main.dart';
@@ -19,11 +21,14 @@ class IdentityVerificationScreen extends StatefulWidget {
 
   @override
   State<IdentityVerificationScreen> createState() =>
-      _IdentityVerificationScreenState();
+      IdentityVerificationScreenState();
 }
 
-class _IdentityVerificationScreenState
+class IdentityVerificationScreenState
     extends State<IdentityVerificationScreen> {
+    static final GlobalKey<IdentityVerificationScreenState> globalKey =
+      GlobalKey<IdentityVerificationScreenState>();
+
   final emailController = TextEditingController();
   final changeEmailController = TextEditingController();
   Globals globals = Globals();
@@ -159,6 +164,39 @@ class _IdentityVerificationScreenState
       Globals().hidePhoneButton.value = true;
     }
   }
+  verifyButton(bool valid, verificationPhoneNumber) async {
+    try {
+      if (!valid) return;
+      print('hereeeeee');
+      await loadingDialog();
+      print('after loading........');
+      await savePhone(verificationPhoneNumber, null);
+      FlutterPkid client = await getPkidClient();
+      client.setPKidDoc('phone', json.encode({'phone': verificationPhoneNumber}));
+      await sendPhoneVerification();
+      print('after verification');
+      // Navigator.pop(context);
+      getPhoneCountdown();
+      print('countdownnnnnnn');
+    } catch (e) {
+      logger.e(e);
+    }
+  }
+
+
+
+  sendPhoneVerification() async {
+    await sendVerificationSms();
+    Globals().hidePhoneButton.value = true;
+    Globals().smsSentOn = DateTime.now().millisecondsSinceEpoch;
+    if (mounted) {
+      setState(() {
+        phoneSendDialog(context);
+        Navigator.pop(context);
+        Navigator.pop(context);
+      });
+    }
+  }
 
   void getUserValues() async {
     doubleName = (await getDoubleName())?.replaceAll('.3bot', '') ?? 'Unknown';
@@ -220,11 +258,12 @@ class _IdentityVerificationScreenState
     }
   }
 
-  Future _loadingDialog() {
+  Future loadingDialog() {
+    print('loadingggggggggggggg');
     return showDialog(
       barrierDismissible: false,
       context: context,
-      builder: (BuildContext context) {
+      builder: (BuildContext dialogueContext) {
         return WillPopScope(
           onWillPop: () => Future.value(false),
           child: Dialog(
@@ -299,7 +338,7 @@ class _IdentityVerificationScreenState
                     child: const Text('Cancel')),
                 TextButton(
                     onPressed: () async {
-                      _loadingDialog();
+                      await loadingDialog();
 
                       String emailValue = controller.text.toLowerCase().trim();
                       bool isValidEmail = validateEmail(emailValue);
@@ -393,7 +432,7 @@ class _IdentityVerificationScreenState
     if (phoneVerified) {
       return;
     }
-    await PhoneAlertDialogState().sendPhoneVerification();
+    await sendPhoneVerification();
     setState(() {});
   }
 
@@ -459,7 +498,7 @@ class _IdentityVerificationScreenState
                       await verifyEmail();
                       getEmailCountdown(startNew: true);
                     } else {
-                      _loadingDialog();
+                      await loadingDialog();
                       await verifyPhone();
                       Navigator.pop(context);
                       getPhoneCountdown();
@@ -500,7 +539,7 @@ class _IdentityVerificationScreenState
     }
 
     if (step == 2 && phoneCountdownNotifier.value == -1) {
-      await addPhoneNumberDialog(context, newPhone: false, oldPhone: phone);
+      await addPhoneNumberDialog(context, newPhone: false, oldPhone: phone, onVerify: verifyButton);
       var phoneMap = await getPhone();
       String? phoneNumber = phoneMap['phone'];
       setState(() {
@@ -552,7 +591,7 @@ class _IdentityVerificationScreenState
                   ],
                 ),
               ),
-              isVerified ? const Icon(Icons.edit) : _buildVerificationBtn(step),
+              isVerified || text == 'Unknown' ? const Icon(Icons.edit) : _buildVerificationBtn(step),
             ],
           ),
         ),
