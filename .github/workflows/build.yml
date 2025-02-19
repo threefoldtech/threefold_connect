@@ -39,7 +39,7 @@ jobs:
       - name: Run Build Script
         run: | 
           set -e
-          ./build.sh --build --production
+          ./build.sh --build --local
 
       - name: Verify APK Exists
         run: |
