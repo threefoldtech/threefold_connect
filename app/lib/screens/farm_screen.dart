@@ -17,23 +17,27 @@ class FarmScreen extends ConsumerStatefulWidget {
   ConsumerState<FarmScreen> createState() => _FarmScreenState();
 }
 
-class _FarmScreenState extends ConsumerState<FarmScreen> {
-  List<Farm> farms = [];
+class _FarmScreenState extends ConsumerState<FarmScreen>
+    with SingleTickerProviderStateMixin {
+  List<Farm> v3Farms = [];
+  List<Farm> v4Farms = [];
   List<Wallet> wallets = [];
   bool loading = true;
   late bool areWalletsListed;
-
+  late final TabController _tabController;
   @override
   void initState() {
     super.initState();
+    _tabController = TabController(length: 2, vsync: this);
     areWalletsListed =
         ref.read(walletsNotifier.notifier.select((n) => n.isListed));
-    _listFarms();
+    _listv3Farms();
+    _listv3Farms();
   }
 
-  Future<void> _listFarms() async {
+  Future<void> _listv3Farms() async {
     if (areWalletsListed) {
-      await listFarms();
+      await listv3Farms();
       return;
     }
     while (!areWalletsListed) {
@@ -41,18 +45,19 @@ class _FarmScreenState extends ConsumerState<FarmScreen> {
       areWalletsListed =
           ref.read(walletsNotifier.notifier.select((n) => n.isListed));
       if (areWalletsListed) {
-        await listFarms();
+        await listv3Farms();
         break;
       }
     }
   }
 
-  Future<void> listFarms() async {
+  Future<void> listv3Farms() async {
     setState(() {
       loading = true;
     });
     try {
-      farms.clear();
+      v3Farms.clear();
+
       wallets = ref.read(walletsNotifier);
       final Map<int, Wallet> twinIdWallets = {};
 
@@ -70,7 +75,7 @@ class _FarmScreenState extends ConsumerState<FarmScreen> {
         final seed = twinIdWallets[f.twinId]!.tfchainSecret;
         final walletName = twinIdWallets[f.twinId]!.name;
         final nodes = await getNodesByFarmId(f.farmID);
-        farms.add(Farm(
+        v3Farms.add(Farm(
             name: f.name,
             walletAddress: f.stellarAddress,
             tfchainWalletSecret: seed,
@@ -109,6 +114,21 @@ class _FarmScreenState extends ConsumerState<FarmScreen> {
     }
   }
 
+  Widget listv3FarmsWidget(List<Farm> farms) {
+    return ListView.builder(
+        itemCount: farms.length,
+        itemBuilder: (context, i) {
+          final farm = farms[i];
+          print('farms: ${farms.length}');
+          return farms.isEmpty
+              ? const Text('const SizedBox()')
+              : FarmItemWidget(
+                  farm: farm,
+                  wallets: wallets,
+                );
+        });
+  }
+
   @override
   Widget build(BuildContext context) {
     Widget mainWidget;
@@ -127,7 +147,7 @@ class _FarmScreenState extends ConsumerState<FarmScreen> {
           ),
         ],
       ));
-    } else if (farms.isEmpty) {
+    } else if (v3Farms.isEmpty && v4Farms.isEmpty) {
       mainWidget = Center(
           child: Column(
         children: [
@@ -165,17 +185,45 @@ class _FarmScreenState extends ConsumerState<FarmScreen> {
         ],
       ));
     } else {
-      mainWidget = RefreshIndicator(
-          onRefresh: listFarms,
-          child: ListView.builder(
-              itemCount: farms.length,
-              itemBuilder: (context, i) {
-                final farm = farms[i];
-                return FarmItemWidget(
-                  farm: farm,
-                  wallets: wallets,
-                );
-              }));
+      mainWidget = DefaultTabController(
+          length: 2,
+          child: Column(
+            children: [
+              PreferredSize(
+                preferredSize: const Size.fromHeight(50.0),
+                child: Container(
+                  color: Theme.of(context).scaffoldBackgroundColor,
+                  child: TabBar(
+                    controller: _tabController,
+                    labelColor: Theme.of(context).colorScheme.primary,
+                    indicatorColor: Theme.of(context).colorScheme.primary,
+                    unselectedLabelColor:
+                        Theme.of(context).colorScheme.onSurface,
+                    dividerColor: Theme.of(context).scaffoldBackgroundColor,
+                    labelStyle: Theme.of(context).textTheme.titleLarge,
+                    unselectedLabelStyle:
+                        Theme.of(context).textTheme.titleMedium,
+                    tabs: const [
+                      Tab(text: 'V3'),
+                      Tab(text: 'V4'),
+                    ],
+                  ),
+                ),
+              ),
+              Expanded(
+                child: TabBarView(controller: _tabController, children: [
+                  RefreshIndicator(
+                    onRefresh: listv3Farms,
+                    child: listv3FarmsWidget(v3Farms),
+                  ),
+                  RefreshIndicator(
+                    onRefresh: () => listv3Farms(),
+                    child: listv3FarmsWidget(v4Farms),
+                  ),
+                ]),
+              )
+            ],
+          ));
     }
     return LayoutDrawer(
       titleText: 'Farming',
@@ -206,7 +254,7 @@ class _FarmScreenState extends ConsumerState<FarmScreen> {
   }
 
   _addFarm(Farm farm) {
-    farms.add(farm);
+    v4Farms.add(farm);
     setState(() {});
   }
 }

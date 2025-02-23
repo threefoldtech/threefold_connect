@@ -1383,6 +1383,15 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "4.0.12"
+  registrar_client:
+    dependency: "direct main"
+    description:
+      path: "packages/registrar_client"
+      ref: development_registrar_client
+      resolved-ref: d0d7bf8a39659affb9bcf7d5e032c814efe9d25a
+      url: "https://github.com/threefoldtech/tfgridv4-sdk-dart"
+    source: git
+    version: "0.1.0"
   rfc_6901:
     dependency: transitive
     description:
