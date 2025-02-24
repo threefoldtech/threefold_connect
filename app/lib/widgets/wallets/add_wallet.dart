@@ -4,6 +4,7 @@ import 'package:bip39/bip39.dart';
 import 'package:convert/convert.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hashlib/hashlib.dart';
 import 'package:threebotlogin/helpers/globals.dart';
@@ -237,73 +238,82 @@ class _NewWalletState extends ConsumerState<NewWallet> {
   Widget build(BuildContext context) {
     final keyboardSpace = MediaQuery.of(context).viewInsets.bottom;
     return LayoutBuilder(builder: (ctx, constraints) {
-      return SizedBox(
-        child: SingleChildScrollView(
-          child: Padding(
-            padding: EdgeInsets.fromLTRB(16, 16, 16, keyboardSpace + 16),
-            child: Column(
-              children: [
-                Text(
-                  'Import Wallet',
-                  style: Theme.of(context).textTheme.headlineSmall!.copyWith(
-                        color: Theme.of(context).colorScheme.onSurface,
-                      ),
-                ),
-                TextField(
-                  style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                      color: Theme.of(context).colorScheme.onSurface,
-                      decorationColor: Theme.of(context).colorScheme.onSurface),
-                  maxLength: 50,
-                  decoration: InputDecoration(
-                      label: const Text('Name'), errorText: nameError),
-                  controller: _nameController,
-                ),
-                TextField(
-                  style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                      color: Theme.of(context).colorScheme.onSurface,
-                      decorationColor: Theme.of(context).colorScheme.onSurface),
-                  keyboardType: TextInputType.multiline,
-                  maxLines: null,
-                  decoration: InputDecoration(
-                    label: const Text('Secret'),
-                    errorText: secretError,
+      return SizedBox(child:
+          KeyboardVisibilityBuilder(builder: (context, isKeyboardVisible) {
+        return GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          onTap: () {
+            FocusScope.of(context).unfocus();
+          },
+          child: SingleChildScrollView(
+            child: Padding(
+              padding: EdgeInsets.fromLTRB(16, 16, 16, keyboardSpace + 16),
+              child: Column(
+                children: [
+                  Text(
+                    'Import Wallet',
+                    style: Theme.of(context).textTheme.headlineSmall!.copyWith(
+                          color: Theme.of(context).colorScheme.onSurface,
+                        ),
                   ),
-                  controller: _secretController,
-                ),
-                const SizedBox(
-                  height: 30,
-                ),
-                Row(
-                  children: [
-                    const Spacer(),
-                    ElevatedButton(
-                        onPressed: () {
-                          if (saveLoading) return;
-                          Navigator.pop(context);
-                        },
-                        child: const Text('Close')),
-                    const SizedBox(
-                      width: 5,
+                  TextField(
+                    style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                        color: Theme.of(context).colorScheme.onSurface,
+                        decorationColor:
+                            Theme.of(context).colorScheme.onSurface),
+                    maxLength: 50,
+                    decoration: InputDecoration(
+                        label: const Text('Name'), errorText: nameError),
+                    controller: _nameController,
+                  ),
+                  TextField(
+                    style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                        color: Theme.of(context).colorScheme.onSurface,
+                        decorationColor:
+                            Theme.of(context).colorScheme.onSurface),
+                    keyboardType: TextInputType.multiline,
+                    maxLines: null,
+                    decoration: InputDecoration(
+                      label: const Text('Secret'),
+                      errorText: secretError,
                     ),
-                    ElevatedButton(
-                        onPressed: () async {
-                          if (await _validate()) _addWallet();
-                        },
-                        child: saveLoading
-                            ? const SizedBox(
-                                width: 20,
-                                height: 20,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                ))
-                            : const Text('Save'))
-                  ],
-                ),
-              ],
+                    controller: _secretController,
+                  ),
+                  const SizedBox(
+                    height: 30,
+                  ),
+                  Row(
+                    children: [
+                      const Spacer(),
+                      ElevatedButton(
+                          onPressed: () {
+                            if (saveLoading) return;
+                            Navigator.pop(context);
+                          },
+                          child: const Text('Close')),
+                      const SizedBox(
+                        width: 5,
+                      ),
+                      ElevatedButton(
+                          onPressed: () async {
+                            if (await _validate()) _addWallet();
+                          },
+                          child: saveLoading
+                              ? const SizedBox(
+                                  width: 20,
+                                  height: 20,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                  ))
+                              : const Text('Save'))
+                    ],
+                  ),
+                ],
+              ),
             ),
           ),
-        ),
-      );
+        );
+      }));
     });
   }
 }
