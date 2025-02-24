@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:core';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:flutter_pkid/flutter_pkid.dart';
 import 'package:http/http.dart';
 import 'package:threebotlogin/helpers/globals.dart';
@@ -831,134 +832,154 @@ class _IdentityVerificationScreenState
     showDialog(
         context: context,
         builder: (BuildContext dialogContext) {
-          return StatefulBuilder(builder: (statefulContext, setCustomState) {
-            return AlertDialog(
-              title: emailWasEmpty == true
-                  ? Text(
-                      'Add email',
-                      style: Theme.of(context)
-                          .textTheme
-                          .headlineMedium!
-                          .copyWith(
-                              color: Theme.of(context).colorScheme.onSurface),
-                    )
-                  : Text('Change email',
-                      style: Theme.of(context)
-                          .textTheme
-                          .headlineMedium!
-                          .copyWith(
-                              color: Theme.of(context).colorScheme.onSurface)),
-              contentPadding: const EdgeInsets.all(24),
-              content: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  emailWasEmpty == true
-                      ? Text('Please pass us your email address',
+          return KeyboardVisibilityBuilder(
+              builder: (context, isKeyboardVisible) {
+            return GestureDetector(
+                behavior: HitTestBehavior.opaque,
+                onTap: () {
+                  FocusScope.of(context).unfocus();
+                },
+                child:
+                    StatefulBuilder(builder: (statefulContext, setCustomState) {
+                  return AlertDialog(
+                    title: emailWasEmpty == true
+                        ? Text(
+                            'Add email',
+                            style: Theme.of(context)
+                                .textTheme
+                                .headlineMedium!
+                                .copyWith(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onSurface),
+                          )
+                        : Text('Change email',
+                            style: Theme.of(context)
+                                .textTheme
+                                .headlineMedium!
+                                .copyWith(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onSurface)),
+                    contentPadding: const EdgeInsets.all(24),
+                    content: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        emailWasEmpty == true
+                            ? Text('Please pass us your email address',
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodyLarge!
+                                    .copyWith(
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .onSurface))
+                            : Text(
+                                'Changing your email will require re-\u200dverification.',
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodyLarge!
+                                    .copyWith(
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .onSurface)),
+                        TextField(
+                          controller: controller,
                           style: Theme.of(context)
                               .textTheme
-                              .bodyLarge!
+                              .bodyMedium!
                               .copyWith(
-                                  color:
-                                      Theme.of(context).colorScheme.onSurface))
-                      : Text(
-                          'Changing your email will require re-\u200dverification.',
-                          style: Theme.of(context)
-                              .textTheme
-                              .bodyLarge!
-                              .copyWith(
-                                  color:
-                                      Theme.of(context).colorScheme.onSurface)),
-                  TextField(
-                    controller: controller,
-                    style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                          color: Theme.of(context).colorScheme.onSurface,
+                                color: Theme.of(context).colorScheme.onSurface,
+                              ),
+                          decoration: InputDecoration(
+                              labelText: 'Email',
+                              errorText:
+                                  validEmail == true ? null : errorEmail),
                         ),
-                    decoration: InputDecoration(
-                        labelText: 'Email',
-                        errorText: validEmail == true ? null : errorEmail),
-                  ),
-                  const SizedBox(
-                    height: 20,
-                  ),
-                  statusMessage
-                ],
-              ),
-              actions: [
-                TextButton(
-                    onPressed: () {
-                      Navigator.pop(dialogContext);
-                    },
-                    child: const Text('Cancel')),
-                TextButton(
-                    onPressed: () async {
-                      _loadingDialog();
+                        const SizedBox(
+                          height: 20,
+                        ),
+                        statusMessage
+                      ],
+                    ),
+                    actions: [
+                      TextButton(
+                          onPressed: () {
+                            Navigator.pop(dialogContext);
+                          },
+                          child: const Text('Cancel')),
+                      TextButton(
+                          onPressed: () async {
+                            _loadingDialog();
 
-                      String emailValue = controller.text
-                          .toLowerCase()
-                          .trim()
-                          .replaceAll(RegExp(r'\s+'), ' ');
-                      bool isValidEmail = validateEmail(emailValue);
+                            String emailValue = controller.text
+                                .toLowerCase()
+                                .trim()
+                                .replaceAll(RegExp(r'\s+'), ' ');
+                            bool isValidEmail = validateEmail(emailValue);
 
-                      var oldEmail = await getEmail();
+                            var oldEmail = await getEmail();
 
-                      if (oldEmail['email'] == emailValue) {
-                        validEmail = false;
-                        errorEmail = 'Please enter a different email';
-                        setCustomState(() {});
-                        Navigator.pop(context);
-                        return;
-                      }
+                            if (oldEmail['email'] == emailValue) {
+                              validEmail = false;
+                              errorEmail = 'Please enter a different email';
+                              setCustomState(() {});
+                              Navigator.pop(context);
+                              return;
+                            }
 
-                      if (isValidEmail == false) {
-                        validEmail = false;
-                        errorEmail = 'Please enter a valid email';
-                        setCustomState(() {});
-                        Navigator.pop(context);
-                        return;
-                      }
+                            if (isValidEmail == false) {
+                              validEmail = false;
+                              errorEmail = 'Please enter a valid email';
+                              setCustomState(() {});
+                              Navigator.pop(context);
+                              return;
+                            }
 
-                      try {
-                        errorEmail = null;
-                        await saveEmail(emailValue, null);
+                            try {
+                              errorEmail = null;
+                              await saveEmail(emailValue, null);
 
-                        Response res = await updateEmailAddressOfUser();
+                              Response res = await updateEmailAddressOfUser();
 
-                        if (res.statusCode != 200) {
-                          throw Exception();
-                        }
+                              if (res.statusCode != 200) {
+                                throw Exception();
+                              }
 
-                        sendVerificationEmail();
+                              sendVerificationEmail();
 
-                        email = emailValue;
+                              email = emailValue;
 
-                        await setIsEmailVerified(false);
-                        await saveEmailToPKid();
+                              await setIsEmailVerified(false);
+                              await saveEmailToPKid();
 
-                        Navigator.pop(context);
-                        Navigator.pop(dialogContext);
-                        resendEmailDialog(context);
-                        startOrResumeEmailCountdown(startNew: true);
+                              Navigator.pop(context);
+                              Navigator.pop(dialogContext);
+                              resendEmailDialog(context);
+                              startOrResumeEmailCountdown(startNew: true);
 
-                        setState(() {});
-                      } catch (e) {
-                        logger.e(e);
-                        Navigator.pop(context);
+                              setState(() {});
+                            } catch (e) {
+                              logger.e(e);
+                              Navigator.pop(context);
 
-                        await saveEmail(oldEmail['email']!, oldEmail['sei']);
-                        await saveEmailToPKid();
+                              await saveEmail(
+                                  oldEmail['email']!, oldEmail['sei']);
+                              await saveEmailToPKid();
 
-                        statusMessage = const Text('Something went wrong',
-                            style: TextStyle(
-                                color: Colors.red,
-                                fontWeight: FontWeight.bold));
+                              statusMessage = const Text('Something went wrong',
+                                  style: TextStyle(
+                                      color: Colors.red,
+                                      fontWeight: FontWeight.bold));
 
-                        setState(() {});
-                        setCustomState(() {});
-                      }
-                    },
-                    child: const Text('Ok'))
-              ],
-            );
+                              setState(() {});
+                              setCustomState(() {});
+                            }
+                          },
+                          child: const Text('Ok'))
+                    ],
+                  );
+                }));
           });
         });
   }
@@ -971,51 +992,58 @@ class _IdentityVerificationScreenState
     return showDialog(
       context: context,
       builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Change your email'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Text('Please pass us your email address'),
-              const SizedBox(height: 16),
-              TextField(
-                controller: changeEmailController,
-                decoration: InputDecoration(
-                    labelText: 'Email',
-                    errorText: emailInputValidated
-                        ? null
-                        : 'Please enter a valid email'),
-              ),
-            ],
-          ),
-          actions: <Widget>[
-            TextButton(
-              child: const Text('OK'),
-              onPressed: () async {
-                bool isValid = checkEmail(changeEmailController.text);
-                if (!isValid) {
-                  setState(() {
-                    emailInputValidated = false;
-                  });
-                  return;
-                }
-
-                setState(() {
-                  emailInputValidated = true;
-                  email = changeEmailController.text;
-                });
-
-                await saveEmail(changeEmailController.text, null);
-
-                FlutterPkid client = await getPkidClient();
-
-                client.setPKidDoc('email', json.encode({'email': email}));
-
-                Navigator.of(context).pop();
+        return KeyboardVisibilityBuilder(builder: (context, isKeyboardVisible) {
+          return GestureDetector(
+              behavior: HitTestBehavior.opaque,
+              onTap: () {
+                FocusScope.of(context).unfocus();
               },
-            ),
-          ],
-        );
+              child: AlertDialog(
+                title: const Text('Change your email'),
+                content: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Text('Please pass us your email address'),
+                    const SizedBox(height: 16),
+                    TextField(
+                      controller: changeEmailController,
+                      decoration: InputDecoration(
+                          labelText: 'Email',
+                          errorText: emailInputValidated
+                              ? null
+                              : 'Please enter a valid email'),
+                    ),
+                  ],
+                ),
+                actions: <Widget>[
+                  TextButton(
+                    child: const Text('OK'),
+                    onPressed: () async {
+                      bool isValid = checkEmail(changeEmailController.text);
+                      if (!isValid) {
+                        setState(() {
+                          emailInputValidated = false;
+                        });
+                        return;
+                      }
+
+                      setState(() {
+                        emailInputValidated = true;
+                        email = changeEmailController.text;
+                      });
+
+                      await saveEmail(changeEmailController.text, null);
+
+                      FlutterPkid client = await getPkidClient();
+
+                      client.setPKidDoc('email', json.encode({'email': email}));
+
+                      Navigator.of(context).pop();
+                    },
+                  ),
+                ],
+              ));
+        });
       },
     );
   }
