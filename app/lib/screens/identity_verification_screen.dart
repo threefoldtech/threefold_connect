@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:core';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:flutter_pkid/flutter_pkid.dart';
 import 'package:threebotlogin/helpers/globals.dart';
 import 'package:threebotlogin/helpers/logger.dart';
@@ -26,7 +27,7 @@ class IdentityVerificationScreen extends StatefulWidget {
 
 class IdentityVerificationScreenState
     extends State<IdentityVerificationScreen> {
-    static final GlobalKey<IdentityVerificationScreenState> globalKey =
+  static final GlobalKey<IdentityVerificationScreenState> globalKey =
       GlobalKey<IdentityVerificationScreenState>();
 
   final emailController = TextEditingController();
@@ -165,13 +166,15 @@ class IdentityVerificationScreenState
       Globals().hidePhoneButton.value = true;
     }
   }
+
   verifyButton(bool valid, verificationPhoneNumber) async {
     try {
       if (!valid) return;
       loadingDialog();
       await savePhone(verificationPhoneNumber, null);
       FlutterPkid client = await getPkidClient();
-      client.setPKidDoc('phone', json.encode({'phone': verificationPhoneNumber}));
+      client.setPKidDoc(
+          'phone', json.encode({'phone': verificationPhoneNumber}));
       await sendPhoneVerification();
       Navigator.pop(context);
       getPhoneCountdown();
@@ -295,98 +298,116 @@ class IdentityVerificationScreenState
     showDialog(
         context: context,
         builder: (BuildContext dialogContext) {
-          return StatefulBuilder(builder: (statefulContext, setCustomState) {
-            return AlertDialog(
-              title: Text('Change email',
-                  style: Theme.of(context).textTheme.headlineMedium!.copyWith(
-                      color: Theme.of(context).colorScheme.onSurface)),
-              contentPadding: const EdgeInsets.all(24),
-              content: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                      'Changing your email will require re-\u200dverification.',
-                      style: Theme.of(context).textTheme.bodyLarge!.copyWith(
-                          color: Theme.of(context).colorScheme.onSurface)),
-                  TextField(
-                    controller: controller,
-                    style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                          color: Theme.of(context).colorScheme.onSurface,
-                        ),
-                    decoration: InputDecoration(
-                        labelText: 'Email',
-                        errorText: validEmail ? null : errorEmail),
+          return KeyboardVisibilityBuilder(
+              builder: (context, isKeyboardVisible) {
+            return GestureDetector(
+              behavior: HitTestBehavior.opaque,
+              onTap: () {
+                FocusScope.of(context).unfocus();
+              },
+              child:
+                  StatefulBuilder(builder: (statefulContext, setCustomState) {
+                return AlertDialog(
+                  title: Text('Change email',
+                      style: Theme.of(context)
+                          .textTheme
+                          .headlineMedium!
+                          .copyWith(
+                              color: Theme.of(context).colorScheme.onSurface)),
+                  contentPadding: const EdgeInsets.all(24),
+                  content: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                          'Changing your email will require re-\u200dverification.',
+                          style: Theme.of(context)
+                              .textTheme
+                              .bodyLarge!
+                              .copyWith(
+                                  color:
+                                      Theme.of(context).colorScheme.onSurface)),
+                      TextField(
+                        controller: controller,
+                        style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                              color: Theme.of(context).colorScheme.onSurface,
+                            ),
+                        decoration: InputDecoration(
+                            labelText: 'Email',
+                            errorText: validEmail ? null : errorEmail),
+                      ),
+                      const SizedBox(
+                        height: 20,
+                      ),
+                      statusMessage
+                    ],
                   ),
-                  const SizedBox(
-                    height: 20,
-                  ),
-                  statusMessage
-                ],
-              ),
-              actions: [
-                TextButton(
-                    onPressed: () {
-                      Navigator.pop(dialogContext);
-                    },
-                    child: const Text('Cancel')),
-                TextButton(
-                    onPressed: () async {
-                      loadingDialog();
+                  actions: [
+                    TextButton(
+                        onPressed: () {
+                          Navigator.pop(dialogContext);
+                        },
+                        child: const Text('Cancel')),
+                    TextButton(
+                        onPressed: () async {
+                          loadingDialog();
 
-                      String emailValue = controller.text.toLowerCase().trim();
-                      bool isValidEmail = validateEmail(emailValue);
+                          String emailValue =
+                              controller.text.toLowerCase().trim();
+                          bool isValidEmail = validateEmail(emailValue);
 
-                      var oldEmail = await getEmail();
+                          var oldEmail = await getEmail();
 
-                      if (oldEmail['email'] == emailValue) {
-                        validEmail = false;
-                        errorEmail = 'Please enter a different email';
-                        setCustomState(() {});
-                        Navigator.pop(context);
-                        return;
-                      }
+                          if (oldEmail['email'] == emailValue) {
+                            validEmail = false;
+                            errorEmail = 'Please enter a different email';
+                            setCustomState(() {});
+                            Navigator.pop(context);
+                            return;
+                          }
 
-                      if (isValidEmail == false) {
-                        validEmail = false;
-                        errorEmail = 'Please enter a valid email';
-                        setCustomState(() {});
-                        Navigator.pop(context);
-                        return;
-                      }
+                          if (isValidEmail == false) {
+                            validEmail = false;
+                            errorEmail = 'Please enter a valid email';
+                            setCustomState(() {});
+                            Navigator.pop(context);
+                            return;
+                          }
 
-                      try {
-                        errorEmail = null;
-                        await saveEmail(emailValue, null);
-                        await updateEmailAddressOfUser();
+                          try {
+                            errorEmail = null;
+                            await saveEmail(emailValue, null);
+                            await updateEmailAddressOfUser();
 
-                        sendVerificationEmail();
+                            sendVerificationEmail();
 
-                        email = emailValue;
+                            email = emailValue;
 
-                        await setIsEmailVerified(false);
-                        await saveEmailToPKid();
+                            await setIsEmailVerified(false);
+                            await saveEmailToPKid();
 
-                        Navigator.pop(context);
-                        Navigator.pop(dialogContext);
-                        resendEmailDialog(context);
-                        getEmailCountdown(startNew: true);
+                            Navigator.pop(context);
+                            Navigator.pop(dialogContext);
+                            resendEmailDialog(context);
+                            getEmailCountdown(startNew: true);
 
-                        setState(() {});
-                      } catch (e) {
-                        logger.e(e);
-                        Navigator.pop(context);
+                            setState(() {});
+                          } catch (e) {
+                            logger.e(e);
+                            Navigator.pop(context);
 
-                        statusMessage = const Text('Something went wrong',
-                            style: TextStyle(
-                                color: Colors.red,
-                                fontWeight: FontWeight.bold));
+                            statusMessage = const Text('Something went wrong',
+                                style: TextStyle(
+                                    color: Colors.red,
+                                    fontWeight: FontWeight.bold));
 
-                        setState(() {});
-                        setCustomState(() {});
-                      }
-                    },
-                    child: const Text('Ok'))
-              ],
+                            setState(() {});
+                            setCustomState(() {});
+                          }
+                        },
+                        child: const Text('Ok'))
+                  ],
+                );
+              }),
             );
           });
         });
@@ -532,7 +553,8 @@ class IdentityVerificationScreenState
     }
 
     if (step == 2 && phoneCountdownNotifier.value == -1) {
-      await addPhoneNumberDialog(context, newPhone: newPhone, oldPhone: phone, onVerify: verifyButton);
+      await addPhoneNumberDialog(context,
+          newPhone: newPhone, oldPhone: phone, onVerify: verifyButton);
       var phoneMap = await getPhone();
       String? phoneNumber = phoneMap['phone'];
       setState(() {
@@ -585,7 +607,9 @@ class IdentityVerificationScreenState
                   ],
                 ),
               ),
-              isVerified || text == 'Unknown' || text == '' ? const Icon(Icons.edit) : _buildVerificationBtn(step),
+              isVerified || text == 'Unknown' || text == ''
+                  ? const Icon(Icons.edit)
+                  : _buildVerificationBtn(step),
             ],
           ),
         ),
