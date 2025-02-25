@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:threebotlogin/helpers/transaction_helpers.dart';
 import 'package:threebotlogin/models/wallet.dart';
@@ -178,18 +180,20 @@ class _SendConfirmationWidgetState extends State<SendConfirmationWidget> {
       loading = true;
     });
     try {
-      if (widget.chainType == ChainType.Stellar) {
-        await Stellar.transfer(
-            widget.secret, widget.to, widget.amount, widget.memo);
-      } else {
-        await TFChain.transfer(widget.secret, widget.to, widget.amount);
-      }
+      await Future.any([
+        _performTransfer(),
+        Future.delayed(const Duration(minutes: 1), () {
+          throw TimeoutException('Transfer operation timed out.');
+        })
+      ]);
       await _showDialog('Success!', 'Tokens have been transferred successfully',
           Icons.check, DialogType.Info);
       Navigator.pop(context);
     } catch (e) {
-      _showDialog('Error', 'Failed to transfer. Please try again.', Icons.error,
-          DialogType.Error);
+      String errorMessage = e is TimeoutException
+          ? 'Transfer took too long. Please try again.'
+          : 'Failed to transfer. Please try again.';
+      _showDialog('Error', errorMessage, Icons.error, DialogType.Error);
       setState(() {
         loading = false;
       });
@@ -202,6 +206,15 @@ class _SendConfirmationWidgetState extends State<SendConfirmationWidget> {
     widget.reloadBalance();
     if (!context.mounted) return;
     Navigator.pop(context);
+  }
+
+  Future<void> _performTransfer() async {
+    if (widget.chainType == ChainType.Stellar) {
+      await Stellar.transfer(
+          widget.secret, widget.to, widget.amount, widget.memo);
+    } else {
+      await TFChain.transfer(widget.secret, widget.to, widget.amount);
+    }
   }
 
   Future<void> _showDialog(
