@@ -1697,8 +1697,8 @@ packages:
     dependency: "direct main"
     description:
       path: "packages/stellar_client"
-      ref: development
-      resolved-ref: "77f8f563f35d13016aada278feb6431fcfc6731d"
+      ref: development_order_book
+      resolved-ref: "6b2baa034f286eb839d60dd71df1761c1b14f2ca"
       url: "https://github.com/threefoldtech/tfgrid-sdk-dart"
     source: git
     version: "0.1.0"
@@ -1787,7 +1787,7 @@ packages:
     description:
       path: "packages/tfchain_client"
       ref: development
-      resolved-ref: "77f8f563f35d13016aada278feb6431fcfc6731d"
+      resolved-ref: bbbfa77feb87aba7784ca1c0c23be8c36c9d175f
       url: "https://github.com/threefoldtech/tfgrid-sdk-dart"
     source: git
     version: "0.1.0"
