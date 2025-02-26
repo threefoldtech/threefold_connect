@@ -34,7 +34,7 @@ dependencies:
   registrar_client:
     git:
       url: https://github.com/threefoldtech/tfgridv4-sdk-dart
-      ref: development_registrar_client
+      ref: development
       path: packages/registrar_client
   flutter_svg: ^2.0.17
   bip39: ^1.0.6
