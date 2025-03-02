@@ -127,7 +127,7 @@ class _FarmScreenState extends ConsumerState<FarmScreen>
     late registrar.Account account;
     final keypair = await generateKeypair(wallets.first.tfchainSecret);
     registrarClient = registrar.RegistrarClient(
-        baseUrl: 'http://localhost:8080/v1/', privateKey: keypair['privateKey']!);
+        baseUrl: 'http://localhost:8080/v1', privateKey: keypair['privateKey']!);
     for (var w in wallets) {
       final keypair = await generateKeypair(w.tfchainSecret);
       try {
@@ -135,6 +135,7 @@ class _FarmScreenState extends ConsumerState<FarmScreen>
             .getByPublicKey(keypair['publicKey']!);
         final farms = await registrarClient.farms
             .list(registrarFarm.FarmFilter(twinID: account.twinID));
+        print('farms: $farms');
         v4Farms.addAll(farms);
       } catch (e) {
         continue;
