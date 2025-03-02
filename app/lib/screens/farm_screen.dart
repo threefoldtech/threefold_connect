@@ -1,18 +1,12 @@
-import 'dart:convert';
-import 'dart:typed_data';
-
-import 'package:convert/convert.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:pinenacl/ed25519.dart';
 import 'package:registrar_client/models/farm.dart' as registrarFarm;
 import 'package:registrar_client/registrar_client.dart' as registrar;
-import 'package:sodium_libs/sodium_libs.dart';
+import 'package:threebotlogin/helpers/farm.dart';
 import 'package:threebotlogin/helpers/logger.dart';
 import 'package:threebotlogin/models/farm.dart';
 import 'package:threebotlogin/models/wallet.dart';
 import 'package:threebotlogin/providers/wallets_provider.dart';
-import 'package:threebotlogin/services/crypto_service.dart';
 import 'package:threebotlogin/services/gridproxy_service.dart';
 import 'package:threebotlogin/services/tfchain_service.dart';
 import 'package:threebotlogin/widgets/add_farm.dart';
@@ -42,20 +36,21 @@ class _FarmScreenState extends ConsumerState<FarmScreen>
     _tabController = TabController(length: 2, vsync: this);
     areWalletsListed =
         ref.read(walletsNotifier.notifier.select((n) => n.isListed));
-    _listFarms();
+    checkWalletsListed();
   }
 
-  Future<void> _listFarms() async {
+  Future<void> checkWalletsListed() async {
     if (areWalletsListed) {
       wallets = ref.read(walletsNotifier);
       await listFarms();
       return;
     }
     while (!areWalletsListed) {
-      await Future.delayed(const Duration(seconds: 5));
+      await Future.delayed(const Duration(seconds: 2));
       areWalletsListed =
           ref.read(walletsNotifier.notifier.select((n) => n.isListed));
       if (areWalletsListed) {
+        wallets = ref.read(walletsNotifier);
         await listFarms();
         break;
       }
@@ -63,14 +58,15 @@ class _FarmScreenState extends ConsumerState<FarmScreen>
   }
 
   Future<void> listFarms() async {
-    setState(() {
-      loading = true;
-      v3Farms.clear();
-      v4Farms.clear();
-    });
     try {
+      setState(() {
+        loading = true;
+        v3Farms.clear();
+        v4Farms.clear();
+      });
       await listV3FarmsAndNodes();
       await listV4FarmsAndNodes();
+      setState(() {});
     } catch (e) {
       logger.e('Failed to get farms due to $e');
       if (context.mounted) {
@@ -127,51 +123,28 @@ class _FarmScreenState extends ConsumerState<FarmScreen>
     await Future.wait(farmFutures);
   }
 
-  Future<Map<String, String>> generateKeypair(String seed) async {
-    late final KeyPair keypair;
-    final isHex = seed.startsWith('0x');
-    final hexString = seed.replaceAll('0x', '');
-    if (isHex) {
-      final hexBytes = Uint8List.fromList(hex.decode(hexString));
-      keypair = await generateKeyPairFromEntropy(hexBytes);
-    } else {
-      keypair = await generateKeyPairFromSeedPhrase(seed);
-    }
-    final privateKey = await extractPrivateKey(keypair.secretKey);
-    final publicKey = hex.encode(keypair.publicKey);
-    return {'privateKey': privateKey, 'publicKey': publicKey};
-  }
-
-  Future<String> extractPrivateKey(SecureKey secureKey) async {
-    return await secureKey.runUnlockedAsync((keyData) {
-      return base64.encode(keyData);
-    });
-  }
-
   listV4FarmsAndNodes() async {
-    try {
-      final keypair = await generateKeypair(wallets.first.tfchainSecret);
-      registrarClient = registrar.RegistrarClient(
-          baseUrl: 'http://localhost:8080', privateKey: keypair['privateKey']!);
-      wallets.map((w) async {
-        final keypair = await generateKeypair(w.tfchainSecret);
-        final account = await registrarClient.accounts
+    late registrar.Account account;
+    final keypair = await generateKeypair(wallets.first.tfchainSecret);
+    registrarClient = registrar.RegistrarClient(
+        baseUrl: 'http://localhost:8080/v1/', privateKey: keypair['privateKey']!);
+    for (var w in wallets) {
+      final keypair = await generateKeypair(w.tfchainSecret);
+      try {
+        account = await registrarClient.accounts
             .getByPublicKey(keypair['publicKey']!);
-        if (account.twinID != 0) {
-          final farms = await registrarClient.farms
-              .list(registrarFarm.FarmFilter(twinID: account.twinID));
-          v4Farms.addAll(farms);
-          setState(() {});
-        }
-      });
-    } catch (e) {
-      logger.e(e);
+        final farms = await registrarClient.farms
+            .list(registrarFarm.FarmFilter(twinID: account.twinID));
+        v4Farms.addAll(farms);
+      } catch (e) {
+        continue;
+      }
     }
   }
 
   Widget listFarmsWidget(List<dynamic> farms) {
     if (farms.isEmpty) {
-      return Center(
+      return SingleChildScrollView(
           child: Column(
         children: [
           SizedBox(height: MediaQuery.of(context).size.height * 0.1),
@@ -303,11 +276,16 @@ class _FarmScreenState extends ConsumerState<FarmScreen>
         builder: (ctx) => NewFarm(
               onAddFarm: _addFarm,
               wallets: wallets,
+              isV4: _tabController.index == 1,
             ));
   }
 
-  _addFarm(dynamic farm) {
-    _tabController.index == 0 ? v3Farms.add(farm) : v4Farms.add(farm);
+  _addFarm(dynamic farm) async {
+    if (_tabController.index == 0) {
+      v3Farms.add(farm);
+    } else {
+      v4Farms.add(farm);
+    }
     setState(() {});
   }
 }

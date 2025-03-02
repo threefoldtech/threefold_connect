@@ -1,7 +1,11 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
+
+import 'package:registrar_client/models/account.dart';
+import 'package:threebotlogin/helpers/farm.dart';
 import 'package:threebotlogin/helpers/logger.dart';
+import 'package:registrar_client/registrar_client.dart' as registrar;
 import 'package:threebotlogin/models/farm.dart';
 import 'package:threebotlogin/models/wallet.dart';
 import 'package:threebotlogin/services/gridproxy_service.dart';
@@ -9,9 +13,14 @@ import 'package:threebotlogin/services/tfchain_service.dart';
 import 'package:threebotlogin/widgets/custom_dialog.dart';
 
 class NewFarm extends StatefulWidget {
-  const NewFarm({super.key, required this.onAddFarm, required this.wallets});
-  final void Function(Farm addedFarm) onAddFarm;
+  const NewFarm(
+      {super.key,
+      required this.onAddFarm,
+      required this.wallets,
+      required this.isV4});
+  final void Function(dynamic addedFarm) onAddFarm;
   final List<Wallet> wallets;
+  final bool isV4;
 
   @override
   State<StatefulWidget> createState() {
@@ -71,17 +80,40 @@ class _NewFarmState extends State<NewFarm> {
   }
 
   _add(String farmName) async {
-    Farm? farm;
+    late dynamic farm;
+    late int v4Farm;
+    late final v3Farm;
+    late Account account;
     try {
-      final f = await createFarm(farmName, _selectedWallet!.tfchainSecret,
-          _selectedWallet!.stellarAddress);
+      if (widget.isV4) {
+        print('v4444444444 farmmmmmmmmmm');
+        final keypair = await generateKeypair(_selectedWallet!.tfchainSecret);
+        final registrarClient = registrar.RegistrarClient(baseUrl: 'http://localhost:8080/v1', privateKey: keypair['privateKey']!);
+        try {
+          account = await registrarClient.accounts
+              .getByPublicKey(keypair['publicKey']!);
+          v4Farm = await registrarClient.farms
+              .create(farmName, false, account.twinID);
+          print('account in try: $account');
+        } catch (e) {
+          print('eeeeeeeee: $e');
+          account = await registrarClient.accounts.create();
+          print('accounttttttt: $account');
+          v4Farm = await registrarClient.farms
+              .create(farmName, false, account.twinID);
+              print('v4Farmmmmmmmm: $v4Farm');
+        }
+      } else {
+        v3Farm = await createFarm(farmName, _selectedWallet!.tfchainSecret,
+            _selectedWallet!.stellarAddress);
+      }
       farm = Farm(
           name: farmName,
           walletAddress: _selectedWallet!.stellarAddress,
           tfchainWalletSecret: _selectedWallet!.tfchainSecret,
           walletName: _selectedWallet!.name,
-          twinId: f!.twinId,
-          farmId: f.id,
+          twinId: widget.isV4 ? v4Farm : v3Farm!.twinId,
+          farmId: widget.isV4 ? v4Farm : v3Farm.id,
           nodes: []);
       await _showDialog(
           'Farm Created!',
@@ -89,7 +121,7 @@ class _NewFarmState extends State<NewFarm> {
           Icons.check,
           DialogType.Info);
     } catch (e) {
-      logger.e(e);
+      logger.e('Failedddddddddddddd: $e');
       _showDialog('Error', 'Failed to create farm. Please try again.',
           Icons.error, DialogType.Error);
       return;
