@@ -88,6 +88,9 @@ class Flags {
 
     Globals().bridgeTFTAddress =
         (await Flags().getFlagValueByFeatureName('bridge-address'))!;
+    Globals().solanaBridgeAddress =
+        (await Flags().getFlagValueByFeatureName('solana-bridge-address'))
+            .toString();
     Globals().council =
         await Flags().hasFlagValueByFeatureName('council-member');
   }
