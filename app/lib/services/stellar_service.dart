@@ -168,3 +168,35 @@ Future<double> loadTFTPrice() async {
       throw Exception('Error gettung price');
     }
   }
+
+Future<void> fetchTftMarketData() async {
+  final now = DateTime.now().millisecondsSinceEpoch;
+  final startTime = now - (24 * 60 * 60 * 1000);
+
+  final url = Uri.parse(
+      'https://horizon.stellar.org/trade_aggregations?'
+      'base_asset_type=credit_alphanum4&base_asset_code=USDC&base_asset_issuer=GA5ZSEJYB37JRC5AVCIA5MOP4RHTM335X2KGX3IHOJAPP5RE34K4KZVN'
+      '&counter_asset_type=credit_alphanum4&counter_asset_code=TFT&counter_asset_issuer=GBOVQKJYHXRR3DX6NOX2RRYFRCUMSADGDESTDNBDS6CDVLGVESRTAC47'
+      '&resolution=86400000'
+      '&start_time=$startTime'
+      '&end_time=$now');
+
+  final response = await http.get(url);
+
+  if (response.statusCode == 200) {
+    final data = json.decode(response.body);
+    
+    if (data['_embedded'] != null && data['_embedded']['records'] != null && data['_embedded']['records'].isNotEmpty) {
+      final tradeData = data['_embedded']['records'][0]; // Latest record
+
+      print('Last Price: ${tradeData['close']} USDC');
+      print('24h High: ${tradeData['high']} USDC');
+      print('24h Low: ${tradeData['low']} USDC');
+      print('24h Volume: ${tradeData['base_volume']} TFT');
+    } else {
+      print('No trade data available.');
+    }
+  } else {
+    print('Error: ${response.statusCode}');
+  }
+}

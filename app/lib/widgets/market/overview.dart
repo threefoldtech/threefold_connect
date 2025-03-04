@@ -1,12 +1,15 @@
 import 'dart:async';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:threebotlogin/helpers/logger.dart';
+import 'package:threebotlogin/models/wallet.dart';
 import 'package:threebotlogin/services/stellar_service.dart';
 import 'package:threebotlogin/widgets/market/buy_tft.dart';
 
 class OverviewWidget extends StatefulWidget {
-  const OverviewWidget({super.key});
+  const OverviewWidget({super.key, required this.wallets});
+  final List<PkidWallet> wallets;
 
   @override
   State<OverviewWidget> createState() => _OverviewWidgetState();
@@ -16,12 +19,14 @@ class _OverviewWidgetState extends State<OverviewWidget> {
   double? tftPrice;
   late Timer _timer;
   String lastUpdated = '--';
+  PkidWallet? _selectedWallet;
 
   @override
   void initState() {
     super.initState();
     _fetchTFTPrice();
     _startPriceUpdater();
+    fetchTftMarketData();
   }
 
   void _fetchTFTPrice() async {
@@ -50,6 +55,19 @@ class _OverviewWidgetState extends State<OverviewWidget> {
 
   String _twoDigits(int n) => n.toString().padLeft(2, '0');
 
+  List<DropdownMenuEntry<PkidWallet>> _buildDropdownMenuEntries() {
+    return widget.wallets.map((wallet) {
+      return DropdownMenuEntry<PkidWallet>(
+        value: wallet,
+        label: wallet.name,
+        labelWidget: Text(wallet.name,
+            style: Theme.of(context).textTheme.bodyLarge!.copyWith(
+                  color: Theme.of(context).colorScheme.onSurface,
+                )),
+      );
+    }).toList();
+  }
+
   @override
   void dispose() {
     _timer.cancel();
@@ -59,8 +77,9 @@ class _OverviewWidgetState extends State<OverviewWidget> {
   @override
   Widget build(BuildContext context) {
     return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
+      mainAxisAlignment: MainAxisAlignment.start,
       children: [
+        const SizedBox(height: 8),
         if (tftPrice == null)
           const CircularProgressIndicator()
         else
@@ -77,6 +96,109 @@ class _OverviewWidgetState extends State<OverviewWidget> {
           style: Theme.of(context).textTheme.bodyMedium!.copyWith(
                 color: Theme.of(context).colorScheme.onSurfaceVariant,
               ),
+        ),
+        const SizedBox(height: 15),
+        Padding(
+          padding: const EdgeInsets.symmetric(
+              horizontal: 16.0),
+          child: Row(
+            children: [
+              Expanded(
+                child: Container(
+                  height: 50,
+                  child: DropdownMenu(
+                    menuHeight: MediaQuery.sizeOf(context).height * 0.3,
+                    enableFilter: true,
+                    width: double
+                        .infinity,
+                    textStyle: Theme.of(context).textTheme.bodyLarge!.copyWith(
+                          color: Theme.of(context).colorScheme.onSurface,
+                        ),
+                    trailingIcon: const Icon(
+                      CupertinoIcons.chevron_down,
+                      size: 16,
+                    ),
+                    selectedTrailingIcon: const Icon(
+                      CupertinoIcons.chevron_up,
+                      size: 16,
+                    ),
+                    inputDecorationTheme: InputDecorationTheme(
+                      border: InputBorder.none,
+                      isDense: true,
+                      filled: true,
+                      fillColor:
+                          Theme.of(context).colorScheme.secondaryContainer,
+                      enabledBorder: UnderlineInputBorder(
+                        borderRadius:
+                            const BorderRadius.all(Radius.circular(4)),
+                        borderSide: BorderSide(
+                          color:
+                              Theme.of(context).colorScheme.secondaryContainer,
+                          width: 6.0,
+                        ),
+                      ),
+                    ),
+                    menuStyle: MenuStyle(
+                      maximumSize: WidgetStateProperty.all<Size>(
+                const Size(300, double.infinity), // Restricts menu width
+              ),
+                      shape: WidgetStateProperty.all<RoundedRectangleBorder>(
+                        const RoundedRectangleBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(4)),
+                        ),
+                      ),
+                    ),
+                    label: Text(
+                      'Select Wallet',
+                      style: Theme.of(context).textTheme.bodyLarge!.copyWith(
+                            color: Theme.of(context)
+                                .colorScheme
+                                .onSecondaryContainer,
+                          ),
+                    ),
+                    dropdownMenuEntries: _buildDropdownMenuEntries(),
+                    onSelected: (PkidWallet? value) {
+                      if (value != null) {
+                        setState(() {
+                          _selectedWallet = value;
+                        });
+                      }
+                    },
+                  ),
+                ),
+              ),
+              const SizedBox(
+                  width:
+                      16),
+              Expanded(
+                child: SizedBox(
+                  height: 50,
+                  child: ElevatedButton(
+                    onPressed: _selectedWallet == null
+                        ? null
+                        : () async {
+                            Navigator.of(context).push(MaterialPageRoute(
+                                builder: (context) => const BuyTFTWidget()));
+                          },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor:
+                          Theme.of(context).colorScheme.primaryContainer,
+                      minimumSize:
+                          const Size.fromHeight(50),
+                    ),
+                    child: Text(
+                      'My Orders',
+                      style: Theme.of(context).textTheme.bodyLarge!.copyWith(
+                            color: Theme.of(context)
+                                .colorScheme
+                                .onPrimaryContainer,
+                          ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
         SizedBox(
           width: double.infinity,
@@ -134,42 +256,44 @@ class _OverviewWidgetState extends State<OverviewWidget> {
                 ),
               ),
               const SizedBox(height: 16),
-              Container(
-                width: double.infinity,
-                child: Card(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(5),
-                    side: BorderSide(
-                        color: Theme.of(context).colorScheme.primary),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Assets Balances',
-                          style: Theme.of(context)
-                              .textTheme
-                              .titleMedium!
-                              .copyWith(
-                                  fontWeight: FontWeight.bold,
-                                  color: Theme.of(context)
-                                      .colorScheme
-                                      .onSecondaryContainer),
-                        ),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            _buildMarketColumn('Total Balance (TFT)', 0.0126),
-                            _buildMarketColumn('Total Balance (USDC)', 0.5678),
-                          ],
-                        ),
-                      ],
+              if (_selectedWallet != null)
+                SizedBox(
+                  width: double.infinity,
+                  child: Card(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(5),
+                      side: BorderSide(
+                          color: Theme.of(context).colorScheme.primary),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Assets Balances',
+                            style: Theme.of(context)
+                                .textTheme
+                                .titleMedium!
+                                .copyWith(
+                                    fontWeight: FontWeight.bold,
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onSecondaryContainer),
+                          ),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              _buildMarketColumn('Total Balance (TFT)', 0.0126),
+                              _buildMarketColumn(
+                                  'Total Balance (USDC)', 0.5678),
+                            ],
+                          ),
+                        ],
+                      ),
                     ),
                   ),
-                ),
-              )
+                )
             ],
           ),
         ),
@@ -178,10 +302,12 @@ class _OverviewWidgetState extends State<OverviewWidget> {
           child: SizedBox(
             width: MediaQuery.of(context).size.width - 40,
             child: ElevatedButton(
-              onPressed: () async {
-                Navigator.of(context).push(MaterialPageRoute(
-                    builder: (context) => const BuyTFTWidget()));
-              },
+              onPressed: _selectedWallet == null
+                  ? null
+                  : () async {
+                      Navigator.of(context).push(MaterialPageRoute(
+                          builder: (context) => const BuyTFTWidget()));
+                    },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Theme.of(context).colorScheme.primaryContainer,
               ),
