@@ -22,9 +22,9 @@ class FarmScreen extends ConsumerStatefulWidget {
 
 class _FarmScreenState extends ConsumerState<FarmScreen>
     with SingleTickerProviderStateMixin {
-  late final registrar.RegistrarClient registrarClient;
+  registrar.RegistrarClient? registrarClient;
   List v3Farms = [];
-  List<registrar.Farm> v4Farms = [];
+  List<dynamic> v4Farms = [];
   List<Wallet> wallets = [];
   bool loading = true;
   late bool areWalletsListed;
@@ -61,6 +61,7 @@ class _FarmScreenState extends ConsumerState<FarmScreen>
     try {
       setState(() {
         loading = true;
+        registrarClient = null;
         v3Farms.clear();
         v4Farms.clear();
       });
@@ -127,15 +128,17 @@ class _FarmScreenState extends ConsumerState<FarmScreen>
     late registrar.Account account;
     final keypair = await generateKeypair(wallets.first.tfchainSecret);
     registrarClient = registrar.RegistrarClient(
-        baseUrl: 'http://localhost:8080/v1', privateKey: keypair['privateKey']!);
+        baseUrl: 'http://192.168.1.16:8080/v1', privateKey: keypair['privateKey']!);
     for (var w in wallets) {
       final keypair = await generateKeypair(w.tfchainSecret);
+      print('keypair, $keypair');
       try {
-        account = await registrarClient.accounts
+        account = await registrarClient!.accounts
             .getByPublicKey(keypair['publicKey']!);
-        final farms = await registrarClient.farms
+        print('account in list: $account');
+        final farms = await registrarClient!.farms
             .list(registrarFarm.FarmFilter(twinID: account.twinID));
-        print('farms: $farms');
+      print('farmssss: $farms');
         v4Farms.addAll(farms);
       } catch (e) {
         continue;
@@ -189,6 +192,7 @@ class _FarmScreenState extends ConsumerState<FarmScreen>
           return FarmItemWidget(
             farm: farm,
             wallets: wallets,
+            isV4: farms == v4Farms 
           );
         });
   }

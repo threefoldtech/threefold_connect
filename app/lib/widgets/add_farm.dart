@@ -81,27 +81,27 @@ class _NewFarmState extends State<NewFarm> {
 
   _add(String farmName) async {
     late dynamic farm;
-    late int v4Farm;
+    late int v4FarmId;
+    late dynamic v4Farm;
     late final v3Farm;
     late Account account;
     try {
       if (widget.isV4) {
-        print('v4444444444 farmmmmmmmmmm');
         final keypair = await generateKeypair(_selectedWallet!.tfchainSecret);
-        final registrarClient = registrar.RegistrarClient(baseUrl: 'http://localhost:8080/v1', privateKey: keypair['privateKey']!);
+        final registrarClient = registrar.RegistrarClient(
+            baseUrl: 'http://192.168.1.16:8080/v1',
+            privateKey: keypair['privateKey']!);
         try {
           account = await registrarClient.accounts
               .getByPublicKey(keypair['publicKey']!);
-          v4Farm = await registrarClient.farms
-              .create(farmName, false, account.twinID);
-          print('account in try: $account');
+              print('accountttttttt: $account');
         } catch (e) {
-          print('eeeeeeeee: $e');
           account = await registrarClient.accounts.create();
-          print('accounttttttt: $account');
-          v4Farm = await registrarClient.farms
+          print('account: $account');
+          v4FarmId = await registrarClient.farms
               .create(farmName, false, account.twinID);
-              print('v4Farmmmmmmmm: $v4Farm');
+          print('v4FarmId: $v4FarmId');
+          v4Farm = await registrarClient.farms.get(v4FarmId);
         }
       } else {
         v3Farm = await createFarm(farmName, _selectedWallet!.tfchainSecret,
@@ -112,8 +112,8 @@ class _NewFarmState extends State<NewFarm> {
           walletAddress: _selectedWallet!.stellarAddress,
           tfchainWalletSecret: _selectedWallet!.tfchainSecret,
           walletName: _selectedWallet!.name,
-          twinId: widget.isV4 ? v4Farm : v3Farm!.twinId,
-          farmId: widget.isV4 ? v4Farm : v3Farm.id,
+          twinId: widget.isV4 ? v4Farm.twinID : v3Farm.twinId,
+          farmId: widget.isV4 ? v4Farm.farmID : v3Farm.id,
           nodes: []);
       await _showDialog(
           'Farm Created!',
