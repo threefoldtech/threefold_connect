@@ -30,7 +30,7 @@ class _WalletBridgeScreenState extends ConsumerState<WalletBridgeScreen> {
   BridgeOperation transactionType = BridgeOperation.Withdraw;
   bool isWithdraw = true;
   Decimal transferFee = Decimal.parse('0.01');
-  static Decimal BRIDGE_FEE = Decimal.parse('1.0');
+  Decimal bridgeFee = Decimal.parse('1.0');
   late Decimal totalFee;
   late Decimal totalAmount;
   String? toAddressError;
@@ -42,7 +42,7 @@ class _WalletBridgeScreenState extends ConsumerState<WalletBridgeScreen> {
   @override
   void initState() {
     fromController.text = widget.wallet.tfchainAddress;
-    totalFee = transferFee + BRIDGE_FEE;
+    totalFee = transferFee + bridgeFee;
     _reloadBalances();
     super.initState();
   }
@@ -97,15 +97,15 @@ class _WalletBridgeScreenState extends ConsumerState<WalletBridgeScreen> {
     setState(() {
       if (isWithdraw) {
         transferFee = Decimal.parse('0.01');
-        BRIDGE_FEE = Decimal.parse('1.0');
+        bridgeFee = Decimal.parse('1.0');
       } else if (isSolana) {
-        transferFee = Decimal.parse('100.0');
-        BRIDGE_FEE = Decimal.parse('0.0');
+        transferFee = Decimal.parse('0.1');
+        bridgeFee = Decimal.parse('100.0');
       } else {
         transferFee = Decimal.parse('0.1');
-        BRIDGE_FEE = Decimal.parse('1.0');
+        bridgeFee = Decimal.parse('1.0');
       }
-      totalFee = transferFee + BRIDGE_FEE;
+      totalFee = transferFee + bridgeFee;
     });
   }
 
@@ -260,7 +260,8 @@ class _WalletBridgeScreenState extends ConsumerState<WalletBridgeScreen> {
                               ),
                           controller: toController,
                           decoration: InputDecoration(
-                              labelText: 'To',
+                              labelText:
+                                  isSolana ? 'Associated Token Address' : 'To',
                               errorText: toAddressError,
                               suffixIcon: !isSolana
                                   ? IconButton(
@@ -374,7 +375,7 @@ class _WalletBridgeScreenState extends ConsumerState<WalletBridgeScreen> {
   }
 
   _bridge_confirmation() async {
-    totalAmount = Decimal.parse(amountController.text.trim()) + BRIDGE_FEE;
+    totalAmount = Decimal.parse(amountController.text.trim()) + bridgeFee;
     final memoHash = isSolana ? base58.decode(toController.text.trim()) : null;
     final memoText = !isWithdraw && !isSolana
         ? await TFChain.getMemo(toController.text.trim())
