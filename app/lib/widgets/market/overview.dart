@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:threebotlogin/helpers/logger.dart';
+import 'package:threebotlogin/models/market_data.dart';
 import 'package:threebotlogin/models/wallet.dart';
 import 'package:threebotlogin/services/stellar_service.dart';
 import 'package:threebotlogin/widgets/market/buy_tft.dart';
@@ -26,7 +27,6 @@ class _OverviewWidgetState extends State<OverviewWidget> {
     super.initState();
     _fetchTFTPrice();
     _startPriceUpdater();
-    fetchTftMarketData();
   }
 
   void _fetchTFTPrice() async {
@@ -97,20 +97,17 @@ class _OverviewWidgetState extends State<OverviewWidget> {
                 color: Theme.of(context).colorScheme.onSurfaceVariant,
               ),
         ),
-        const SizedBox(height: 15),
         Padding(
-          padding: const EdgeInsets.symmetric(
-              horizontal: 16.0),
+          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 16),
           child: Row(
             children: [
               Expanded(
-                child: Container(
+                child: SizedBox(
                   height: 50,
                   child: DropdownMenu(
                     menuHeight: MediaQuery.sizeOf(context).height * 0.3,
                     enableFilter: true,
-                    width: double
-                        .infinity,
+                    width: 180,
                     textStyle: Theme.of(context).textTheme.bodyLarge!.copyWith(
                           color: Theme.of(context).colorScheme.onSurface,
                         ),
@@ -139,9 +136,6 @@ class _OverviewWidgetState extends State<OverviewWidget> {
                       ),
                     ),
                     menuStyle: MenuStyle(
-                      maximumSize: WidgetStateProperty.all<Size>(
-                const Size(300, double.infinity), // Restricts menu width
-              ),
                       shape: WidgetStateProperty.all<RoundedRectangleBorder>(
                         const RoundedRectangleBorder(
                           borderRadius: BorderRadius.all(Radius.circular(4)),
@@ -167,9 +161,7 @@ class _OverviewWidgetState extends State<OverviewWidget> {
                   ),
                 ),
               ),
-              const SizedBox(
-                  width:
-                      16),
+              const SizedBox(width: 16),
               Expanded(
                 child: SizedBox(
                   height: 50,
@@ -183,8 +175,7 @@ class _OverviewWidgetState extends State<OverviewWidget> {
                     style: ElevatedButton.styleFrom(
                       backgroundColor:
                           Theme.of(context).colorScheme.primaryContainer,
-                      minimumSize:
-                          const Size.fromHeight(50),
+                      minimumSize: const Size.fromHeight(50),
                     ),
                     child: Text(
                       'My Orders',
@@ -226,31 +217,52 @@ class _OverviewWidgetState extends State<OverviewWidget> {
                                     .colorScheme
                                     .onSecondaryContainer),
                       ),
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                _buildMarketColumn('Last Price', 0.0126),
-                                _buildMarketColumn('24H Volume', 0.5678),
-                                _buildMarketColumn('24H Low', 0.0105),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(width: 16),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                _buildMarketColumn('24H Change', 0.0023),
-                                _buildMarketColumn('24H High', 0.0130),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
+                      FutureBuilder<TftMarketData?>(
+                        future: fetchTftMarketData(),
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return const Center(
+                                child:
+                                    CircularProgressIndicator()); 
+                          } else if (snapshot.hasError || !snapshot.hasData) {
+                            return const Center(
+                                child: Text('No trade data available.'));
+                          }
+
+                          final marketData = snapshot.data!;
+
+                          return Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    _buildMarketColumn(
+                                        'Last Price', marketData.lastPrice),
+                                    _buildMarketColumn(
+                                        '24H Volume', marketData.volume24h),
+                                    _buildMarketColumn(
+                                        '24H Low', marketData.low24h),
+                                  ],
+                                ),
+                              ),
+                              const SizedBox(width: 16),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    
+                                    _buildMarketColumn(
+                                        '24H High', marketData.high24h),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          );
+                        },
+                      )
                     ],
                   ),
                 ),

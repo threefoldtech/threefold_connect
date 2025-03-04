@@ -3,6 +3,7 @@ import 'package:stellar_client/models/vesting_account.dart';
 import 'package:stellar_client/stellar_client.dart';
 import 'package:stellar_flutter_sdk/stellar_flutter_sdk.dart';
 import 'package:threebotlogin/helpers/logger.dart';
+import 'package:threebotlogin/models/market_data.dart';
 import 'package:threebotlogin/models/order_book.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
@@ -97,7 +98,7 @@ Future<Stream<OrderBook>> getOrderBook(
   final client = Client(NetworkType.PUBLIC, secret);
   final stream = await client.getOrderBook(
       sellingAssetCode: sellingAssetCode, buyingAssetCode: buyingAssetCode);
-      
+
   return stream.map((orderBookResponse) {
     return OrderBook(
       base: orderBookResponse.base.toString(),
@@ -127,54 +128,52 @@ Future<Stream<OrderBook>> getOrderBook(
 }
 
 Future<double> loadTFTPrice() async {
-    const String srcCode = 'USDC';
-    const String srcIssuer =
-        'GA5ZSEJYB37JRC5AVCIA5MOP4RHTM335X2KGX3IHOJAPP5RE34K4KZVN';
-    const String dstCode = 'TFT';
-    const String dstIssuer =
-        'GBOVQKJYHXRR3DX6NOX2RRYFRCUMSADGDESTDNBDS6CDVLGVESRTAC47';
-    const String dstAmount = '1';
+  const String srcCode = 'USDC';
+  const String srcIssuer =
+      'GA5ZSEJYB37JRC5AVCIA5MOP4RHTM335X2KGX3IHOJAPP5RE34K4KZVN';
+  const String dstCode = 'TFT';
+  const String dstIssuer =
+      'GBOVQKJYHXRR3DX6NOX2RRYFRCUMSADGDESTDNBDS6CDVLGVESRTAC47';
+  const String dstAmount = '1';
 
-    final String requestUrl = 'https://horizon.stellar.org/paths/strict-receive'
-        '?source_assets=$srcCode%3A$srcIssuer'
-        '&destination_asset_type=credit_alphanum4'
-        '&destination_asset_issuer=$dstIssuer'
-        '&destination_asset_code=$dstCode'
-        '&destination_amount=$dstAmount';
+  final String requestUrl = 'https://horizon.stellar.org/paths/strict-receive'
+      '?source_assets=$srcCode%3A$srcIssuer'
+      '&destination_asset_type=credit_alphanum4'
+      '&destination_asset_issuer=$dstIssuer'
+      '&destination_asset_code=$dstCode'
+      '&destination_amount=$dstAmount';
 
-    try {
-      final response = await http.get(Uri.parse(requestUrl));
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        final records = data['_embedded']?['records'];
+  try {
+    final response = await http.get(Uri.parse(requestUrl));
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      final records = data['_embedded']?['records'];
 
-        if (records != null && records.isNotEmpty) {
-          final price = records
-              .map((r) => double.parse(r['source_amount']))
-              .reduce((a, b) => a < b ? a : b);
-          print('TFT Price in USDC: $price');
-          return price;    
-        } else {
-          print('No price data available.');
-          return 0;
-        }
+      if (records != null && records.isNotEmpty) {
+        final price = records
+            .map((r) => double.parse(r['source_amount']))
+            .reduce((a, b) => a < b ? a : b);
+        print('TFT Price in USDC: $price');
+        return price;
       } else {
-        print('Error fetching price: ${response.statusCode}');
-              throw Exception('Error gettung price');
-
+        print('No price data available.');
+        return 0;
       }
-    } catch (e) {
-      print('Error: $e');
+    } else {
+      print('Error fetching price: ${response.statusCode}');
       throw Exception('Error gettung price');
     }
+  } catch (e) {
+    print('Error: $e');
+    throw Exception('Error gettung price');
   }
+}
 
-Future<void> fetchTftMarketData() async {
+Future<TftMarketData?> fetchTftMarketData() async {
   final now = DateTime.now().millisecondsSinceEpoch;
-  final startTime = now - (24 * 60 * 60 * 1000);
+  final startTime = now - (24 * 60 * 60 * 1000 * 7);
 
-  final url = Uri.parse(
-      'https://horizon.stellar.org/trade_aggregations?'
+  final url = Uri.parse('https://horizon.stellar.org/trade_aggregations?'
       'base_asset_type=credit_alphanum4&base_asset_code=USDC&base_asset_issuer=GA5ZSEJYB37JRC5AVCIA5MOP4RHTM335X2KGX3IHOJAPP5RE34K4KZVN'
       '&counter_asset_type=credit_alphanum4&counter_asset_code=TFT&counter_asset_issuer=GBOVQKJYHXRR3DX6NOX2RRYFRCUMSADGDESTDNBDS6CDVLGVESRTAC47'
       '&resolution=86400000'
@@ -182,21 +181,16 @@ Future<void> fetchTftMarketData() async {
       '&end_time=$now');
 
   final response = await http.get(url);
+  print(response.body);
 
   if (response.statusCode == 200) {
     final data = json.decode(response.body);
-    
-    if (data['_embedded'] != null && data['_embedded']['records'] != null && data['_embedded']['records'].isNotEmpty) {
-      final tradeData = data['_embedded']['records'][0]; // Latest record
 
-      print('Last Price: ${tradeData['close']} USDC');
-      print('24h High: ${tradeData['high']} USDC');
-      print('24h Low: ${tradeData['low']} USDC');
-      print('24h Volume: ${tradeData['base_volume']} TFT');
-    } else {
-      print('No trade data available.');
+    if (data['_embedded'] != null &&
+        data['_embedded']['records'] != null &&
+        data['_embedded']['records'].isNotEmpty) {
+      return TftMarketData.fromJson(data['_embedded']['records'][0]);
     }
-  } else {
-    print('Error: ${response.statusCode}');
   }
+  return null;
 }
