@@ -97,12 +97,15 @@ class _WalletBridgeScreenState extends ConsumerState<WalletBridgeScreen> {
     setState(() {
       if (isWithdraw) {
         transferFee = Decimal.parse('0.01');
+        BRIDGE_FEE = Decimal.parse('1.0');
       } else if (isSolana) {
         transferFee = Decimal.parse('100.0');
+        BRIDGE_FEE = Decimal.parse('0.0');
       } else {
         transferFee = Decimal.parse('0.1');
+        BRIDGE_FEE = Decimal.parse('1.0');
       }
-    totalFee = transferFee + BRIDGE_FEE;
+      totalFee = transferFee + BRIDGE_FEE;
     });
   }
 
@@ -306,8 +309,7 @@ class _WalletBridgeScreenState extends ConsumerState<WalletBridgeScreen> {
                                 errorText: amountError)),
                         subtitle: Padding(
                           padding: const EdgeInsets.symmetric(vertical: 8.0),
-                          child: Text(
-                              'Transfer Fee: $totalFee TFT'),
+                          child: Text('Transfer Fee: $totalFee TFT'),
                         )),
                     const SizedBox(height: 10),
                     if (isBiggerThanFee)
