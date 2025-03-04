@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:threebotlogin/helpers/logger.dart';
 import 'package:threebotlogin/models/farm.dart';
 import 'package:threebotlogin/models/wallet.dart';
@@ -149,184 +150,199 @@ class _FarmItemWidgetState extends State<FarmItemWidget> {
     farmIdController.text = widget.farm.farmId.toString();
     twinIdController.text = widget.farm.twinId.toString();
 
-    return ExpansionTile(
-      title: Text(
-        widget.farm.name,
-        style: Theme.of(context).textTheme.titleMedium!.copyWith(
-              color: Theme.of(context).colorScheme.onSurface,
-            ),
-      ),
-      childrenPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-      children: [
-        ListTile(
-          title: TextField(
-              focusNode: walletFocus,
-              autofocus: edit,
-              readOnly: !edit,
-              style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+    return KeyboardVisibilityBuilder(builder: (context, isKeyboardVisible) {
+      return GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          onTap: () {
+            FocusScope.of(context).unfocus();
+          },
+          child: ExpansionTile(
+            title: Text(
+              widget.farm.name,
+              style: Theme.of(context).textTheme.titleMedium!.copyWith(
                     color: Theme.of(context).colorScheme.onSurface,
                   ),
-              controller: walletAddressController,
-              onChanged: (value) {
-                validateStellarAddress(value.trim());
-              },
-              decoration: InputDecoration(
-                  errorText: addressError,
-                  labelText: 'Stellar Payout Address',
-                  suffixIcon: edit
-                      ? IconButton(
-                          onPressed: () {
-                            Navigator.of(context).push(MaterialPageRoute(
-                              builder: (context) => ContactsScreen(
-                                  chainType: chainType,
-                                  currentWalletAddress: currentAddress!,
-                                  wallets: widget.wallets
-                                      .where((w) =>
-                                          double.parse(w.stellarBalance) >= 0)
-                                      .toList(),
-                                  onSelectToAddress: _selectAddress),
-                            ));
-                          },
-                          icon: const Icon(Icons.person))
-                      : null)),
-          subtitle: const Text('This address will be used for payout.'),
-          trailing: isSaving
-              ? Transform.scale(
-                  scale: 0.5, child: const CircularProgressIndicator())
-              : edit
-                  ? SizedBox(
-                      width: 100,
-                      child: Row(
-                        children: [
-                          IconButton(
-                            onPressed: addressError == null
-                                ? () {
-                                    _editStellarPayoutAddress();
-                                  }
-                                : null,
-                            icon: Icon(
-                              Icons.save,
-                              color: addressError == null
-                                  ? Theme.of(context).colorScheme.onSurface
-                                  : Theme.of(context)
-                                      .colorScheme
-                                      .onSurfaceVariant,
-                            ),
-                          ),
-                          IconButton(
-                            onPressed: _cancelEdit,
-                            icon: const Icon(
-                              Icons.cancel_outlined,
+            ),
+            childrenPadding:
+                const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+            children: [
+              ListTile(
+                title: TextField(
+                    focusNode: walletFocus,
+                    autofocus: edit,
+                    readOnly: !edit,
+                    style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                          color: Theme.of(context).colorScheme.onSurface,
+                        ),
+                    controller: walletAddressController,
+                    onChanged: (value) {
+                      validateStellarAddress(value.trim());
+                    },
+                    decoration: InputDecoration(
+                        errorText: addressError,
+                        labelText: 'Stellar Payout Address',
+                        suffixIcon: edit
+                            ? IconButton(
+                                onPressed: () {
+                                  Navigator.of(context).push(MaterialPageRoute(
+                                    builder: (context) => ContactsScreen(
+                                        chainType: chainType,
+                                        currentWalletAddress: currentAddress!,
+                                        wallets: widget.wallets
+                                            .where((w) =>
+                                                double.parse(
+                                                    w.stellarBalance) >=
+                                                0)
+                                            .toList(),
+                                        onSelectToAddress: _selectAddress),
+                                  ));
+                                },
+                                icon: const Icon(Icons.person))
+                            : null)),
+                subtitle: const Text('This address will be used for payout.'),
+                trailing: isSaving
+                    ? Transform.scale(
+                        scale: 0.5, child: const CircularProgressIndicator())
+                    : edit
+                        ? SizedBox(
+                            width: 100,
+                            child: Row(
+                              children: [
+                                IconButton(
+                                  onPressed: addressError == null
+                                      ? () {
+                                          _editStellarPayoutAddress();
+                                        }
+                                      : null,
+                                  icon: Icon(
+                                    Icons.save,
+                                    color: addressError == null
+                                        ? Theme.of(context)
+                                            .colorScheme
+                                            .onSurface
+                                        : Theme.of(context)
+                                            .colorScheme
+                                            .onSurfaceVariant,
+                                  ),
+                                ),
+                                IconButton(
+                                  onPressed: _cancelEdit,
+                                  icon: const Icon(
+                                    Icons.cancel_outlined,
+                                  ),
+                                )
+                              ],
                             ),
                           )
-                        ],
-                      ),
-                    )
-                  : SizedBox(
-                      width: 100,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          IconButton(
-                              onPressed: () {                              
-                                setState(() {
-                                  edit = !edit;
-                                });
-                                if (edit) {
-                                  FocusScope.of(context)
-                                      .requestFocus(walletFocus);
-                                }
-                              },
-                              icon: edit
-                                  ? const Icon(Icons.save)
-                                  : const Icon(Icons.edit)),
-                          IconButton(
-                            onPressed: () {
-                              Clipboard.setData(ClipboardData(
-                                  text: walletAddressController.text));
-                              ScaffoldMessenger.of(context).clearSnackBars();
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(content: Text('Copied!')));
-                            },
-                            icon: const Icon(Icons.copy),
+                        : SizedBox(
+                            width: 100,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: [
+                                IconButton(
+                                    onPressed: () {
+                                      setState(() {
+                                        edit = !edit;
+                                      });
+                                      if (edit) {
+                                        FocusScope.of(context)
+                                            .requestFocus(walletFocus);
+                                      }
+                                    },
+                                    icon: edit
+                                        ? const Icon(Icons.save)
+                                        : const Icon(Icons.edit)),
+                                IconButton(
+                                  onPressed: () {
+                                    Clipboard.setData(ClipboardData(
+                                        text: walletAddressController.text));
+                                    ScaffoldMessenger.of(context)
+                                        .clearSnackBars();
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                        const SnackBar(
+                                            content: Text('Copied!')));
+                                  },
+                                  icon: const Icon(Icons.copy),
+                                ),
+                              ],
+                            ),
                           ),
-                        ],
-                      ),
-                    ),
-        ),
-        ListTile(
-          title: TextField(
-              readOnly: true,
-              obscureText: !showTfchainSecret,
-              style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                    color: Theme.of(context).colorScheme.onSurface,
-                  ),
-              controller: tfchainWalletSecretController,
-              decoration: InputDecoration(
-                labelText: 'TFChain Secret',
-                suffixIcon: IconButton(
+              ),
+              ListTile(
+                title: TextField(
+                    readOnly: true,
+                    obscureText: !showTfchainSecret,
+                    style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                          color: Theme.of(context).colorScheme.onSurface,
+                        ),
+                    controller: tfchainWalletSecretController,
+                    decoration: InputDecoration(
+                      labelText: 'TFChain Secret',
+                      suffixIcon: IconButton(
+                          onPressed: () {
+                            setState(() {
+                              showTfchainSecret = !showTfchainSecret;
+                            });
+                          },
+                          icon: Icon(showTfchainSecret
+                              ? Icons.visibility
+                              : Icons.visibility_off)),
+                    )),
+                subtitle: const Text(
+                    'Use this secret to log in to the ThreeFold Dashboard.'),
+                trailing: IconButton(
                     onPressed: () {
-                      setState(() {
-                        showTfchainSecret = !showTfchainSecret;
-                      });
+                      Clipboard.setData(ClipboardData(
+                          text: tfchainWalletSecretController.text));
+                      ScaffoldMessenger.of(context).clearSnackBars();
+                      ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Copied!')));
                     },
-                    icon: Icon(showTfchainSecret
-                        ? Icons.visibility
-                        : Icons.visibility_off)),
-              )),
-          subtitle: const Text(
-              'Use this secret to log in to the ThreeFold Dashboard.'),
-          trailing: IconButton(
-              onPressed: () {
-                Clipboard.setData(
-                    ClipboardData(text: tfchainWalletSecretController.text));
-                ScaffoldMessenger.of(context).clearSnackBars();
-                ScaffoldMessenger.of(context)
-                    .showSnackBar(const SnackBar(content: Text('Copied!')));
-              },
-              icon: const Icon(Icons.copy)),
-        ),
-        ListTile(
-          title: TextField(
-              readOnly: true,
-              style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                    color: Theme.of(context).colorScheme.onSurface,
-                  ),
-              controller: walletNameController,
-              decoration: const InputDecoration(
-                labelText: 'Wallet Name',
-              )),
-        ),
-        ListTile(
-          title: TextField(
-              readOnly: true,
-              style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                    color: Theme.of(context).colorScheme.onSurface,
-                  ),
-              controller: twinIdController,
-              decoration: const InputDecoration(
-                labelText: 'Twin ID',
-              )),
-        ),
-        ListTile(
-          title: TextField(
-              readOnly: true,
-              style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                    color: Theme.of(context).colorScheme.onSurface,
-                  ),
-              controller: farmIdController,
-              decoration: const InputDecoration(
-                labelText: 'Farm ID',
-              )),
-        ),
-        ExpansionTile(
-          title: const Text('Nodes'),
-          childrenPadding: const EdgeInsets.only(left: 20),
-          children: [
-            for (final node in widget.farm.nodes) FarmNodeItemWidget(node: node)
-          ],
-        )
-      ],
-    );
+                    icon: const Icon(Icons.copy)),
+              ),
+              ListTile(
+                title: TextField(
+                    readOnly: true,
+                    style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                          color: Theme.of(context).colorScheme.onSurface,
+                        ),
+                    controller: walletNameController,
+                    decoration: const InputDecoration(
+                      labelText: 'Wallet Name',
+                    )),
+              ),
+              ListTile(
+                title: TextField(
+                    readOnly: true,
+                    style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                          color: Theme.of(context).colorScheme.onSurface,
+                        ),
+                    controller: twinIdController,
+                    decoration: const InputDecoration(
+                      labelText: 'Twin ID',
+                    )),
+              ),
+              ListTile(
+                title: TextField(
+                    readOnly: true,
+                    style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                          color: Theme.of(context).colorScheme.onSurface,
+                        ),
+                    controller: farmIdController,
+                    decoration: const InputDecoration(
+                      labelText: 'Farm ID',
+                    )),
+              ),
+              ExpansionTile(
+                title: const Text('Nodes'),
+                childrenPadding: const EdgeInsets.only(left: 20),
+                children: [
+                  for (final node in widget.farm.nodes)
+                    FarmNodeItemWidget(node: node)
+                ],
+              )
+            ],
+          ));
+    });
   }
 }

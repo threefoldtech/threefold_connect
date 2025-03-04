@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:threebotlogin/helpers/logger.dart';
 import 'package:threebotlogin/models/contact.dart';
 import 'package:threebotlogin/models/wallet.dart';
@@ -205,111 +206,127 @@ class _AddEditContactState extends State<AddEditContact> {
   Widget build(BuildContext context) {
     final keyboardSpace = MediaQuery.of(context).viewInsets.bottom;
     return LayoutBuilder(builder: (ctx, constraints) {
-      return SizedBox(
-        child: SingleChildScrollView(
-          child: Padding(
-            padding: EdgeInsets.fromLTRB(16, 16, 16, keyboardSpace + 16),
-            child: Column(
-              children: [
-                Text(
-                  widget.operation == ContactOperation.Add
-                      ? 'Add Contact'
-                      : 'Edit Contact',
-                  style: Theme.of(context).textTheme.headlineSmall!.copyWith(
-                        color: Theme.of(context).colorScheme.onSurface,
-                      ),
-                ),
-                TextField(
-                  style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                      color: Theme.of(context).colorScheme.onSurface,
-                      decorationColor: Theme.of(context).colorScheme.onSurface),
-                  maxLength: 50,
-                  decoration: InputDecoration(
-                      label: const Text('Name'), errorText: nameError),
-                  controller: _nameController,
-                ),
-                TextField(
-                  style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                      color: Theme.of(context).colorScheme.onSurface,
-                      decorationColor: Theme.of(context).colorScheme.onSurface),
-                  keyboardType: TextInputType.multiline,
-                  maxLines: null,
-                  decoration: InputDecoration(
-                    label: const Text('Address'),
-                    errorText: addressError,
+      return SizedBox(child:
+          KeyboardVisibilityBuilder(builder: (context, isKeyboardVisible) {
+        return GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          onTap: () {
+            FocusScope.of(context).unfocus();
+          },
+          child: SingleChildScrollView(
+            child: Padding(
+              padding: EdgeInsets.fromLTRB(16, 16, 16, keyboardSpace + 16),
+              child: Column(
+                children: [
+                  Text(
+                    widget.operation == ContactOperation.Add
+                        ? 'Add Contact'
+                        : 'Edit Contact',
+                    style: Theme.of(context).textTheme.headlineSmall!.copyWith(
+                          color: Theme.of(context).colorScheme.onSurface,
+                        ),
                   ),
-                  controller: _addressController,
-                ),
-                const SizedBox(height: 20),
-                if (widget.operation == ContactOperation.Add)
+                  TextField(
+                    style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                        color: Theme.of(context).colorScheme.onSurface,
+                        decorationColor:
+                            Theme.of(context).colorScheme.onSurface),
+                    maxLength: 50,
+                    decoration: InputDecoration(
+                        label: const Text('Name'), errorText: nameError),
+                    controller: _nameController,
+                  ),
+                  TextField(
+                    style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                        color: Theme.of(context).colorScheme.onSurface,
+                        decorationColor:
+                            Theme.of(context).colorScheme.onSurface),
+                    keyboardType: TextInputType.multiline,
+                    maxLines: null,
+                    decoration: InputDecoration(
+                      label: const Text('Address'),
+                      errorText: addressError,
+                    ),
+                    controller: _addressController,
+                  ),
+                  const SizedBox(height: 20),
+                  if (widget.operation == ContactOperation.Add)
+                    Row(
+                      children: [
+                        Text(
+                          'Chain Type:',
+                          style: Theme.of(context)
+                              .textTheme
+                              .bodyMedium!
+                              .copyWith(
+                                  color:
+                                      Theme.of(context).colorScheme.onSurface,
+                                  decorationColor:
+                                      Theme.of(context).colorScheme.onSurface),
+                        ),
+                        const SizedBox(width: 10),
+                        DropdownButton<ChainType>(
+                          value: _selectedChainType,
+                          onChanged: (ChainType? newValue) {
+                            setState(() {
+                              _selectedChainType = newValue!;
+                            });
+                          },
+                          items: ChainType.values
+                              .map<DropdownMenuItem<ChainType>>(
+                                  (ChainType type) {
+                            return DropdownMenuItem<ChainType>(
+                              value: type,
+                              child: Text(
+                                type.name,
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodyMedium!
+                                    .copyWith(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onSurface,
+                                      decorationColor: Theme.of(context)
+                                          .colorScheme
+                                          .onSurface,
+                                    ),
+                              ),
+                            );
+                          }).toList(),
+                        ),
+                      ],
+                    ),
+                  const SizedBox(height: 30),
                   Row(
                     children: [
-                      Text(
-                        'Chain Type:',
-                        style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                            color: Theme.of(context).colorScheme.onSurface,
-                            decorationColor:
-                                Theme.of(context).colorScheme.onSurface),
-                      ),
-                      const SizedBox(width: 10),
-                      DropdownButton<ChainType>(
-                        value: _selectedChainType,
-                        onChanged: (ChainType? newValue) {
-                          setState(() {
-                            _selectedChainType = newValue!;
-                          });
-                        },
-                        items: ChainType.values
-                            .map<DropdownMenuItem<ChainType>>((ChainType type) {
-                          return DropdownMenuItem<ChainType>(
-                            value: type,
-                            child: Text(
-                              type.name,
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .bodyMedium!
-                                  .copyWith(
-                                    color:
-                                        Theme.of(context).colorScheme.onSurface,
-                                    decorationColor:
-                                        Theme.of(context).colorScheme.onSurface,
-                                  ),
-                            ),
-                          );
-                        }).toList(),
-                      ),
+                      const Spacer(),
+                      ElevatedButton(
+                          onPressed: () {
+                            if (saveLoading) return;
+                            Navigator.pop(context);
+                          },
+                          child: const Text('Close')),
+                      const SizedBox(width: 5),
+                      ElevatedButton(
+                          onPressed: widget.operation == ContactOperation.Add
+                              ? _validateAndAdd
+                              : _validateAndEdit,
+                          child: saveLoading
+                              ? const SizedBox(
+                                  width: 20,
+                                  height: 20,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                  ))
+                              : const Text('Save'))
                     ],
                   ),
-                const SizedBox(height: 30),
-                Row(
-                  children: [
-                    const Spacer(),
-                    ElevatedButton(
-                        onPressed: () {
-                          if (saveLoading) return;
-                          Navigator.pop(context);
-                        },
-                        child: const Text('Close')),
-                    const SizedBox(width: 5),
-                    ElevatedButton(
-                        onPressed: widget.operation == ContactOperation.Add
-                            ? _validateAndAdd
-                            : _validateAndEdit,
-                        child: saveLoading
-                            ? const SizedBox(
-                                width: 20,
-                                height: 20,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                ))
-                            : const Text('Save'))
-                  ],
-                ),
-              ],
+                ],
+              ),
             ),
           ),
-        ),
-      );
+        );
+      }));
     });
   }
 }
