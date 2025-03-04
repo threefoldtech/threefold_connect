@@ -94,15 +94,16 @@ class _WalletBridgeScreenState extends ConsumerState<WalletBridgeScreen> {
     toController.text = '';
     toAddressError = null;
     amountError = null;
+    setState(() {
+      if (isWithdraw) {
+        transferFee = Decimal.parse('0.01');
+      } else if (isSolana) {
+        transferFee = Decimal.parse('100.0');
+      } else {
+        transferFee = Decimal.parse('0.1');
+      }
     totalFee = transferFee + BRIDGE_FEE;
-    if (isWithdraw) {
-      transferFee = Decimal.parse('1.01');
-    } else if (isSolana) {
-      transferFee = Decimal.parse('100');
-    } else {
-      transferFee = Decimal.parse('1.1');
-    }
-    setState(() {});
+    });
   }
 
   Future<bool> _validateToAddress() async {
@@ -258,28 +259,31 @@ class _WalletBridgeScreenState extends ConsumerState<WalletBridgeScreen> {
                           decoration: InputDecoration(
                               labelText: 'To',
                               errorText: toAddressError,
-                              suffixIcon: IconButton(
-                                  onPressed: () {
-                                    Navigator.of(context)
-                                        .push(MaterialPageRoute(
-                                      builder: (context) => ContactsScreen(
-                                          chainType: isWithdraw
-                                              ? ChainType.Stellar
-                                              : ChainType.TFChain,
-                                          currentWalletAddress:
-                                              fromController.text,
-                                          wallets: isWithdraw
-                                              ? wallets
-                                                  .where((w) =>
-                                                      double.parse(
-                                                          w.stellarBalance) >=
-                                                      0)
-                                                  .toList()
-                                              : wallets,
-                                          onSelectToAddress: _selectToAddress),
-                                    ));
-                                  },
-                                  icon: const Icon(Icons.person)))),
+                              suffixIcon: !isSolana
+                                  ? IconButton(
+                                      onPressed: () {
+                                        Navigator.of(context)
+                                            .push(MaterialPageRoute(
+                                          builder: (context) => ContactsScreen(
+                                              chainType: isWithdraw
+                                                  ? ChainType.Stellar
+                                                  : ChainType.TFChain,
+                                              currentWalletAddress:
+                                                  fromController.text,
+                                              wallets: isWithdraw
+                                                  ? wallets
+                                                      .where((w) =>
+                                                          double.parse(w
+                                                              .stellarBalance) >=
+                                                          0)
+                                                      .toList()
+                                                  : wallets,
+                                              onSelectToAddress:
+                                                  _selectToAddress),
+                                        ));
+                                      },
+                                      icon: const Icon(Icons.person))
+                                  : null)),
                     ),
                     const SizedBox(height: 10),
                     ListTile(
@@ -303,7 +307,7 @@ class _WalletBridgeScreenState extends ConsumerState<WalletBridgeScreen> {
                         subtitle: Padding(
                           padding: const EdgeInsets.symmetric(vertical: 8.0),
                           child: Text(
-                              'Transfer Fee: ${!isWithdraw ? 1.1 : 1.01} TFT'),
+                              'Transfer Fee: $totalFee TFT'),
                         )),
                     const SizedBox(height: 10),
                     if (isBiggerThanFee)
