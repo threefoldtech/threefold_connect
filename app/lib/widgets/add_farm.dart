@@ -98,6 +98,7 @@ class _NewFarmState extends State<NewFarm> {
         } catch (e) {
           account = await registrarClient.accounts.create();
           print('account: $account');
+        } finally {
           v4FarmId = await registrarClient.farms
               .create(farmName, false, account.twinID);
           print('v4FarmId: $v4FarmId');

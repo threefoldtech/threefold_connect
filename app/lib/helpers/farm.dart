@@ -19,7 +19,7 @@ Future<Map<String, String>> generateKeypair(String seed) async {
   }
   keypair = await generateKeyPairFromEntropy(bytes);
   final privateKey = await extractPrivateKey(keypair.secretKey);
-  final publicKey = hex.encode(keypair.publicKey);
+  final publicKey = base64.encode(keypair.publicKey);
   return {'privateKey': privateKey, 'publicKey': publicKey};
 }
 
