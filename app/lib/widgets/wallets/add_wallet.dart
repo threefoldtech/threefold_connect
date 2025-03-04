@@ -4,6 +4,7 @@ import 'package:bip39/bip39.dart';
 import 'package:convert/convert.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hashlib/hashlib.dart';
 import 'package:threebotlogin/helpers/globals.dart';
@@ -139,8 +140,14 @@ class _NewWalletState extends ConsumerState<NewWallet> {
       return false;
     }
 
-    if (walletSecret.startsWith('S') && widget.wallets.any((wallet) => wallet.stellarSecret == walletSecret)){
+    if (walletSecret.startsWith('S') &&
+        widget.wallets.any((wallet) => wallet.stellarSecret == walletSecret)) {
       secretError = 'Secret already exists';
+      return false;
+    }
+
+    if (walletSecret.startsWith('S') && !isValidStellarSecret(walletSecret)) {
+      secretError = 'Invalid Stellar secret';
       return false;
     }
 
@@ -152,9 +159,9 @@ class _NewWalletState extends ConsumerState<NewWallet> {
       secretError = 'Invalid seed';
       return false;
     }
-    if (widget.wallets.any((wallet) => wallet.tfchainSecret == walletSecret)){
+    if (widget.wallets.any((wallet) => wallet.tfchainSecret == walletSecret)) {
       secretError = 'Secret already exists';
-      return false;      
+      return false;
     }
     if (!walletSecret.startsWith('0x') && walletSecret.length != 64) {
       secretError = 'Invalid seed length';
@@ -231,73 +238,82 @@ class _NewWalletState extends ConsumerState<NewWallet> {
   Widget build(BuildContext context) {
     final keyboardSpace = MediaQuery.of(context).viewInsets.bottom;
     return LayoutBuilder(builder: (ctx, constraints) {
-      return SizedBox(
-        child: SingleChildScrollView(
-          child: Padding(
-            padding: EdgeInsets.fromLTRB(16, 16, 16, keyboardSpace + 16),
-            child: Column(
-              children: [
-                Text(
-                  'Import Wallet',
-                  style: Theme.of(context).textTheme.headlineSmall!.copyWith(
-                        color: Theme.of(context).colorScheme.onSurface,
-                      ),
-                ),
-                TextField(
-                  style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                      color: Theme.of(context).colorScheme.onSurface,
-                      decorationColor: Theme.of(context).colorScheme.onSurface),
-                  maxLength: 50,
-                  decoration: InputDecoration(
-                      label: const Text('Name'), errorText: nameError),
-                  controller: _nameController,
-                ),
-                TextField(
-                  style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                      color: Theme.of(context).colorScheme.onSurface,
-                      decorationColor: Theme.of(context).colorScheme.onSurface),
-                  keyboardType: TextInputType.multiline,
-                  maxLines: null,
-                  decoration: InputDecoration(
-                    label: const Text('Secret'),
-                    errorText: secretError,
+      return SizedBox(child:
+          KeyboardVisibilityBuilder(builder: (context, isKeyboardVisible) {
+        return GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          onTap: () {
+            FocusScope.of(context).unfocus();
+          },
+          child: SingleChildScrollView(
+            child: Padding(
+              padding: EdgeInsets.fromLTRB(16, 16, 16, keyboardSpace + 16),
+              child: Column(
+                children: [
+                  Text(
+                    'Import Wallet',
+                    style: Theme.of(context).textTheme.headlineSmall!.copyWith(
+                          color: Theme.of(context).colorScheme.onSurface,
+                        ),
                   ),
-                  controller: _secretController,
-                ),
-                const SizedBox(
-                  height: 30,
-                ),
-                Row(
-                  children: [
-                    const Spacer(),
-                    ElevatedButton(
-                        onPressed: () {
-                          if (saveLoading) return;
-                          Navigator.pop(context);
-                        },
-                        child: const Text('Close')),
-                    const SizedBox(
-                      width: 5,
+                  TextField(
+                    style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                        color: Theme.of(context).colorScheme.onSurface,
+                        decorationColor:
+                            Theme.of(context).colorScheme.onSurface),
+                    maxLength: 50,
+                    decoration: InputDecoration(
+                        label: const Text('Name'), errorText: nameError),
+                    controller: _nameController,
+                  ),
+                  TextField(
+                    style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                        color: Theme.of(context).colorScheme.onSurface,
+                        decorationColor:
+                            Theme.of(context).colorScheme.onSurface),
+                    keyboardType: TextInputType.multiline,
+                    maxLines: null,
+                    decoration: InputDecoration(
+                      label: const Text('Secret'),
+                      errorText: secretError,
                     ),
-                    ElevatedButton(
-                        onPressed: () async {
-                          if (await _validate()) _addWallet();
-                        },
-                        child: saveLoading
-                            ? const SizedBox(
-                                width: 20,
-                                height: 20,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                ))
-                            : const Text('Save'))
-                  ],
-                ),
-              ],
+                    controller: _secretController,
+                  ),
+                  const SizedBox(
+                    height: 30,
+                  ),
+                  Row(
+                    children: [
+                      const Spacer(),
+                      ElevatedButton(
+                          onPressed: () {
+                            if (saveLoading) return;
+                            Navigator.pop(context);
+                          },
+                          child: const Text('Close')),
+                      const SizedBox(
+                        width: 5,
+                      ),
+                      ElevatedButton(
+                          onPressed: () async {
+                            if (await _validate()) _addWallet();
+                          },
+                          child: saveLoading
+                              ? const SizedBox(
+                                  width: 20,
+                                  height: 20,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                  ))
+                              : const Text('Save'))
+                    ],
+                  ),
+                ],
+              ),
             ),
           ),
-        ),
-      );
+        );
+      }));
     });
   }
 }
@@ -307,7 +323,8 @@ Future<Wallet> loadAddedWallet(String walletName, String walletSecret,
   final chainUrl = Globals().chainUrl;
   final idenfyServiceUrl = Globals().idenfyServiceUrl;
   final Wallet wallet = await compute((void _) async {
-    final wallet = await loadWallet(walletName, walletSecret, type, chainUrl, idenfyServiceUrl);
+    final wallet = await loadWallet(
+        walletName, walletSecret, type, chainUrl, idenfyServiceUrl);
     return wallet;
   }, null);
   return wallet;

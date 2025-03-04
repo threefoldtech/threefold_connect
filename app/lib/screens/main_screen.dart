@@ -9,6 +9,7 @@ import 'package:threebotlogin/helpers/flags.dart';
 import 'package:threebotlogin/helpers/globals.dart';
 import 'package:threebotlogin/helpers/kyc_helpers.dart';
 import 'package:threebotlogin/helpers/logger.dart';
+import 'package:threebotlogin/screens/change_pin_screen.dart';
 import 'package:threebotlogin/screens/home_screen.dart';
 import 'package:threebotlogin/screens/init_screen.dart';
 import 'package:threebotlogin/screens/unregistered_screen.dart';
@@ -65,7 +66,8 @@ class _AppState extends State<MainScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            const Expanded(
+            const SizedBox(
+              height: 200,
               child: Hero(
                 tag: 'logo',
                 child: HomeLogoWidget(
@@ -75,34 +77,32 @@ class _AppState extends State<MainScreen> {
             ),
             const SizedBox(height: 50),
             Container(
-              padding: const EdgeInsets.only(left: 12, right: 12),
+              padding: const EdgeInsets.symmetric(horizontal: 12),
               child: Text(
                 updateMessage != null
                     ? updateMessage.toString()
                     : errorMessage.toString(),
                 style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: errorMessage != null
-                        ? Theme.of(context).colorScheme.error
-                        : Theme.of(context).colorScheme.onSurface),
+                      fontWeight: FontWeight.bold,
+                      color: errorMessage != null
+                          ? Theme.of(context).colorScheme.error
+                          : Theme.of(context).colorScheme.onSurface,
+                    ),
               ),
             ),
-            const SizedBox(
-              height: 40,
-            ),
+            const SizedBox(height: 40),
             Visibility(
-                maintainSize: true,
-                maintainAnimation: true,
-                maintainState: true,
-                visible: errorMessage != null,
-                child: ElevatedButton(
-                  child: const Text(
-                    'RETRY',
-                  ),
-                  onPressed: () async {
-                    await pushScreens();
-                  },
-                ))
+              maintainSize: true,
+              maintainAnimation: true,
+              maintainState: true,
+              visible: errorMessage != null,
+              child: ElevatedButton(
+                child: const Text('RETRY'),
+                onPressed: () async {
+                  await pushScreens();
+                },
+              ),
+            ),
           ],
         ),
       ),
@@ -201,7 +201,16 @@ class _AppState extends State<MainScreen> {
       ScaffoldMessenger.of(context).showSnackBar(loadingTwinFailure);
       logger.e('Failed to load twin information due to $e');
     }
-
+    String? pin = await getPin();
+    if (pin == null) {
+      await Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) => const ChangePinScreen(
+                    hideBackButton: true,
+                    currentPin: null,
+                  )));
+    }
     // await Navigator.push(context, MaterialPageRoute(builder: (context) => UnregisteredScreen()));
     await Navigator.of(context).pushReplacement(PageRouteBuilder(
         transitionDuration: const Duration(seconds: 1),

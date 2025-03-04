@@ -154,105 +154,116 @@ class _NewsScreenState extends State<NewsScreen> {
                   padding:
                       const EdgeInsets.symmetric(horizontal: 8, vertical: 4.0),
                   child: Card(
-                    elevation: 4.0,
-                    child: Padding(
-                      padding: const EdgeInsets.all(16),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
+                      elevation: 4.0,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: InkWell(
+                        borderRadius: BorderRadius.circular(12),
+                        onTap: () async {
+                          _launchURL(link);
+                        },
+                        child: Padding(
+                          padding: const EdgeInsets.all(16),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Image.asset(
-                                'assets/tf_chain.png',
-                                color: Theme.of(context).colorScheme.onSurface,
-                                height: 20,
-                                width: 20,
+                              Row(
+                                children: [
+                                  Image.asset(
+                                    'assets/tf_chain.png',
+                                    color:
+                                        Theme.of(context).colorScheme.onSurface,
+                                    height: 20,
+                                    width: 20,
+                                  ),
+                                  const SizedBox(width: 2),
+                                  RichText(
+                                    text: TextSpan(
+                                      children: [
+                                        TextSpan(
+                                            text: 'THREEFOLD - ',
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .bodySmall!
+                                                .copyWith(
+                                                  color: Theme.of(context)
+                                                      .colorScheme
+                                                      .onSurface,
+                                                )),
+                                        TextSpan(
+                                            text: formattedDate,
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .bodySmall!
+                                                .copyWith(
+                                                  color: Theme.of(context)
+                                                      .colorScheme
+                                                      .onSurface,
+                                                )),
+                                      ],
+                                    ),
+                                  ),
+                                ],
                               ),
-                              const SizedBox(width: 2),
-                              RichText(
-                                text: TextSpan(
-                                  children: [
-                                    TextSpan(
-                                        text: 'THREEFOLD - ',
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .bodySmall!
-                                            .copyWith(
-                                              color: Theme.of(context)
-                                                  .colorScheme
-                                                  .onSurface,
-                                            )),
-                                    TextSpan(
-                                        text: formattedDate,
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .bodySmall!
-                                            .copyWith(
-                                              color: Theme.of(context)
-                                                  .colorScheme
-                                                  .onSurface,
-                                            )),
-                                  ],
-                                ),
+                              const SizedBox(
+                                height: 3,
                               ),
-                            ],
-                          ),
-                          const SizedBox(
-                            height: 3,
-                          ),
-                          Text(
-                            title,
-                            style: Theme.of(context)
-                                .textTheme
-                                .titleLarge!
-                                .copyWith(
-                                  fontWeight: FontWeight.bold,
+                              Text(
+                                title,
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .titleLarge!
+                                    .copyWith(
+                                      fontWeight: FontWeight.bold,
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onSurface,
+                                    ),
+                              ),
+                              const SizedBox(height: 5),
+                              HtmlWidget(
+                                content.length > 200
+                                    ? '${content.substring(0, 200)}...'
+                                    : content,
+                                textStyle: TextStyle(
                                   color:
                                       Theme.of(context).colorScheme.onSurface,
                                 ),
-                          ),
-                          const SizedBox(height: 5),
-                          HtmlWidget(
-                            content.length > 200
-                                ? '${content.substring(0, 200)}...'
-                                : content,
-                            textStyle: TextStyle(
-                              color: Theme.of(context).colorScheme.onSurface,
-                            ),
-                            onTapUrl: (url) {
-                              if (url.isNotEmpty) {
-                                _launchURL(url);
-                                return true;
-                              }
-                              return false;
-                            },
-                          ),
-                          const SizedBox(height: 4),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            children: [
-                              TextButton(
-                                onPressed: () async {
-                                  _launchURL(link);
+                                onTapUrl: (url) {
+                                  if (url.isNotEmpty) {
+                                    _launchURL(url);
+                                    return true;
+                                  }
+                                  return false;
                                 },
-                                child: Text(
-                                  'Read more',
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .bodyLarge!
-                                      .copyWith(
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .primary,
-                                      ),
-                                ),
+                              ),
+                              const SizedBox(height: 4),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: [
+                                  TextButton(
+                                    onPressed: () async {
+                                      _launchURL(link);
+                                    },
+                                    child: Text(
+                                      'Read more',
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .bodyLarge!
+                                          .copyWith(
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .primary,
+                                          ),
+                                    ),
+                                  ),
+                                ],
                               ),
                             ],
                           ),
-                        ],
-                      ),
-                    ),
-                  ),
+                        ),
+                      )),
                 );
               },
             ),

@@ -152,6 +152,10 @@ class _WalletSendScreenState extends ConsumerState<WalletSendScreen> {
     final amount = amountController.text.trim();
     amountError = null;
 
+    if (Decimal.parse(amount) <= fee) {
+      amountError = 'Amount should be greater than $fee';
+      return false;
+    }
     if (amount.isEmpty) {
       amountError = "Amount can't be empty";
       return false;
@@ -295,7 +299,7 @@ class _WalletSendScreenState extends ConsumerState<WalletSendScreen> {
                             errorText: amountError)),
                     subtitle: Padding(
                         padding: const EdgeInsets.symmetric(vertical: 8.0),
-                        child: Text('Max Fee: $fee TFT')),
+                        child: Text('Transfer Fee: $fee TFT')),
                   ),
                   const SizedBox(height: 10),
                   if (isBiggerThanFee)
@@ -396,7 +400,7 @@ class _WalletSendScreenState extends ConsumerState<WalletSendScreen> {
       if (chainType == ChainType.Stellar &&
           code.queryParameters.containsKey('message')) {
         memoController.text = code.queryParameters['message']!;
-      } 
+      }
       setState(() {});
     } else {
       _showInvalidQRCodeDialog();
@@ -410,12 +414,11 @@ class _WalletSendScreenState extends ConsumerState<WalletSendScreen> {
     showDialog(
       context: context,
       builder: (BuildContext context) => CustomDialog(
-        type: DialogType.Warning,
-        image: Icons.warning,
+        type: DialogType.Error,
+        image: Icons.error,
         title: 'Invalid QR Code',
         description:
             'The QR code is missing the required information or invalid.',
-
         actions: [
           TextButton(
             child: const Text('Close'),

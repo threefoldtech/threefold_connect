@@ -3,7 +3,7 @@ description: A decentralized login application
 
 publish_to: "none"
 
-version: 4.0.1+185
+version: 4.1.0+187
 
 environment:
   sdk: ">=3.4.0"
@@ -39,22 +39,17 @@ dependencies:
   shared_preferences: ^2.3.5
   http: ^1.3.0
   package_info_plus: ^8.1.3
-  cupertino_icons: ^1.0.8
   google_fonts: ^6.2.1
-  # intl_phone_field: ^3.2.0
   flagsmith: ^6.0.0
   flutter_inappwebview: ^6.1.5
   sodium_libs: ^3.4.3+1
-  uni_links: ^0.5.1
+  uni_links: ^0.5.1 # update it
   pbkdf2ns: ^0.0.2
-  # qr_code_scanner: ^1.0.1
   flutter_json_viewer: ^1.0.1
   device_info_plus: ^11.2.1
-  permission_handler: ^11.3.1
   path_provider: ^2.1.5
   dio: ^5.7.0
-  open_filex: ^4.6.0
-  country_picker: ^2.0.27
+  open_file: ^3.5.10
   pinenacl: ^0.6.0
   pinput: ^5.0.1
   build_runner: ^2.4.13
@@ -68,7 +63,7 @@ dependencies:
   xml2json: ^6.2.6
   timeago: ^3.7.0
   flutter_widget_from_html: ^0.15.3
-  idenfy_sdk_flutter: 2.5.6
+  idenfy_sdk_flutter: 2.6.0
   flutter_riverpod: ^2.6.1
   bs58: ^1.0.0
 
@@ -91,6 +86,7 @@ dev_dependencies:
 
 dependency_overrides:
   intl: ^0.19.0
+  shared_preferences_android: 2.0.12
 
 flutter:
   uses-material-design: true

@@ -16,7 +16,8 @@ class BridgeConfirmationWidget extends StatefulWidget {
     required this.from,
     required this.to,
     required this.amount,
-    required this.fee,
+    required this.totalFee,
+    required this.totalAmount,
     required this.memo,
     required this.memoHash,
     required this.isSolana,
@@ -28,10 +29,11 @@ class BridgeConfirmationWidget extends StatefulWidget {
   final String from;
   final String to;
   final String amount;
-  final String fee;
+  final String totalAmount;
   final String? memo;
   final Uint8List? memoHash;
   final bool isSolana;
+  final String totalFee;
   final void Function() reloadBalance;
 
   @override
@@ -51,7 +53,7 @@ class _BridgeConfirmationWidgetState extends State<BridgeConfirmationWidget> {
     fromController.text = widget.from;
     toController.text = widget.to;
     amountController.text = widget.amount;
-    feeController.text = widget.fee;
+    feeController.text = widget.totalFee;
     super.initState();
   }
 
@@ -178,16 +180,16 @@ class _BridgeConfirmationWidgetState extends State<BridgeConfirmationWidget> {
           await Stellar.transfer(
               widget.secret,
               'GDGIQWZDFVWJPAFG7PJ5AXMOK7NVFVFWELZILI5MLHGSZULBTBGIBYHW',
-              widget.amount,
+              widget.totalAmount,
               '',
               widget.memoHash);
         } else {
           await Stellar.transfer(widget.secret, Globals().bridgeTFTAddress,
-              widget.amount, widget.memo!);
+              widget.totalAmount, widget.memo!);
         }
       } else {
         await TFChain.swapToStellar(
-            widget.secret, widget.to, BigInt.from(double.parse(widget.amount)));
+            widget.secret, widget.to, BigInt.from(double.parse(widget.totalAmount)));
       }
       await _showDialog('Success!', 'Tokens have been transferred successfully',
           Icons.check, DialogType.Info);

@@ -1,6 +1,7 @@
 import 'package:bs58/bs58.dart';
 import 'package:decimal/decimal.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:threebotlogin/helpers/globals.dart';
 import 'package:threebotlogin/helpers/transaction_helpers.dart';
@@ -28,7 +29,10 @@ class _WalletBridgeScreenState extends ConsumerState<WalletBridgeScreen> {
   final amountController = TextEditingController();
   BridgeOperation transactionType = BridgeOperation.Withdraw;
   bool isWithdraw = true;
-  Decimal fee = Decimal.parse('1.01');
+  Decimal transferFee = Decimal.parse('0.01');
+  static Decimal BRIDGE_FEE = Decimal.parse('1.0');
+  late Decimal totalFee;
+  late Decimal totalAmount;
   String? toAddressError;
   String? amountError;
   bool reloadBalance = true;
@@ -38,6 +42,7 @@ class _WalletBridgeScreenState extends ConsumerState<WalletBridgeScreen> {
   @override
   void initState() {
     fromController.text = widget.wallet.tfchainAddress;
+    totalFee = transferFee + BRIDGE_FEE;
     _reloadBalances();
     super.initState();
   }
@@ -89,12 +94,13 @@ class _WalletBridgeScreenState extends ConsumerState<WalletBridgeScreen> {
     toController.text = '';
     toAddressError = null;
     amountError = null;
+    totalFee = transferFee + BRIDGE_FEE;
     if (isWithdraw) {
-      fee = Decimal.parse('1.01');
+      transferFee = Decimal.parse('1.01');
     } else if (isSolana) {
-      fee = Decimal.parse('100');
+      transferFee = Decimal.parse('100');
     } else {
-      Decimal.parse('1.1');
+      transferFee = Decimal.parse('1.1');
     }
     setState(() {});
   }
@@ -162,14 +168,14 @@ class _WalletBridgeScreenState extends ConsumerState<WalletBridgeScreen> {
       return false;
     }
     if (Decimal.parse(amount) < Decimal.fromInt(2)) {
-      amountError = "Amount can't be less than 2";
+      amountError = "Amount can't be less than 2 excluding fees.";
       return false;
     }
     final balance = roundAmount(isWithdraw
         ? widget.wallet.tfchainBalance
         : widget.wallet.stellarBalance);
-    if (balance - Decimal.parse(amount) - fee < Decimal.zero) {
-      amountError = 'Balance is not enough';
+    if (balance - Decimal.parse(amount) - totalFee < Decimal.zero) {
+      amountError = 'Insufficient balance (fees included).';
       return false;
     }
     return true;
@@ -204,141 +210,165 @@ class _WalletBridgeScreenState extends ConsumerState<WalletBridgeScreen> {
     String balance = isWithdraw
         ? widget.wallet.tfchainBalance
         : widget.wallet.stellarBalance;
-    final isBiggerThanFee = roundAmount(balance) > fee;
+    final isBiggerThanFee = roundAmount(balance) > totalFee;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Bridge')),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Column(children: [
-            const SizedBox(height: 10),
-            SwapTransactionWidget(
-                bridgeOperation: transactionType,
-                onTransactionChange: onTransactionChange,
-                disableDeposit: disableDeposit,
-                updateIsSolana: updateIsSolana),
-            const SizedBox(height: 20),
-            ListTile(
-              title: TextField(
-                  readOnly: true,
-                  style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                        color: Theme.of(context).colorScheme.onSurface,
-                      ),
-                  controller: fromController,
-                  decoration: InputDecoration(
-                    labelText: 'From (name: ${widget.wallet.name})',
-                  )),
-            ),
-            const SizedBox(height: 10),
-            ListTile(
-              title: TextField(
-                  style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                        color: Theme.of(context).colorScheme.onSurface,
-                      ),
-                  controller: toController,
-                  decoration: InputDecoration(
-                      labelText: isSolana ? 'Associated Token Address' : 'To',
-                      errorText: toAddressError,
-                      suffixIcon: !isSolana
-                          ? IconButton(
-                              onPressed: () {
-                                Navigator.of(context).push(MaterialPageRoute(
-                                  builder: (context) => ContactsScreen(
-                                      chainType: isWithdraw
-                                          ? ChainType.Stellar
-                                          : ChainType.TFChain,
-                                      currentWalletAddress: fromController.text,
-                                      wallets: isWithdraw
-                                          ? wallets
-                                              .where((w) =>
-                                                  double.parse(
-                                                      w.stellarBalance) >=
-                                                  0)
-                                              .toList()
-                                          : wallets,
-                                      onSelectToAddress: _selectToAddress),
-                                ));
-                              },
-                              icon: const Icon(Icons.person))
-                          : null)),
-            ),
-            const SizedBox(height: 10),
-            ListTile(
-                title: TextField(
-                    style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                          color: Theme.of(context).colorScheme.onSurface,
+        appBar: AppBar(title: const Text('Bridge')),
+        body: KeyboardVisibilityBuilder(builder: (context, isKeyboardVisible) {
+          return GestureDetector(
+              behavior: HitTestBehavior.opaque,
+              onTap: () {
+                FocusScope.of(context).unfocus();
+              },
+              child: SingleChildScrollView(
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Column(children: [
+                    const SizedBox(height: 10),
+                    SwapTransactionWidget(
+                        bridgeOperation: transactionType,
+                        onTransactionChange: onTransactionChange,
+                        disableDeposit: disableDeposit,
+                        updateIsSolana: updateIsSolana),
+                    const SizedBox(height: 20),
+                    ListTile(
+                      title: TextField(
+                          readOnly: true,
+                          style: Theme.of(context)
+                              .textTheme
+                              .bodyMedium!
+                              .copyWith(
+                                color: Theme.of(context).colorScheme.onSurface,
+                              ),
+                          controller: fromController,
+                          decoration: InputDecoration(
+                            labelText: 'From (name: ${widget.wallet.name})',
+                          )),
+                    ),
+                    const SizedBox(height: 10),
+                    ListTile(
+                      title: TextField(
+                          style: Theme.of(context)
+                              .textTheme
+                              .bodyMedium!
+                              .copyWith(
+                                color: Theme.of(context).colorScheme.onSurface,
+                              ),
+                          controller: toController,
+                          decoration: InputDecoration(
+                              labelText: 'To',
+                              errorText: toAddressError,
+                              suffixIcon: IconButton(
+                                  onPressed: () {
+                                    Navigator.of(context)
+                                        .push(MaterialPageRoute(
+                                      builder: (context) => ContactsScreen(
+                                          chainType: isWithdraw
+                                              ? ChainType.Stellar
+                                              : ChainType.TFChain,
+                                          currentWalletAddress:
+                                              fromController.text,
+                                          wallets: isWithdraw
+                                              ? wallets
+                                                  .where((w) =>
+                                                      double.parse(
+                                                          w.stellarBalance) >=
+                                                      0)
+                                                  .toList()
+                                              : wallets,
+                                          onSelectToAddress: _selectToAddress),
+                                    ));
+                                  },
+                                  icon: const Icon(Icons.person)))),
+                    ),
+                    const SizedBox(height: 10),
+                    ListTile(
+                        title: TextField(
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodyMedium!
+                                .copyWith(
+                                  color:
+                                      Theme.of(context).colorScheme.onSurface,
+                                ),
+                            keyboardType: const TextInputType.numberWithOptions(
+                                decimal: true),
+                            controller: amountController,
+                            decoration: InputDecoration(
+                                labelText:
+                                    'Amount (Balance: ${formatAmount(balance)})',
+                                hintText: '100',
+                                suffixText: 'TFT',
+                                errorText: amountError)),
+                        subtitle: Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 8.0),
+                          child: Text(
+                              'Transfer Fee: ${!isWithdraw ? 1.1 : 1.01} TFT'),
+                        )),
+                    const SizedBox(height: 10),
+                    if (isBiggerThanFee)
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 15.0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: percentages
+                              .map(
+                                (percentage) => OutlinedButton(
+                                  style: OutlinedButton.styleFrom(
+                                      shape: const RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.all(
+                                              Radius.circular(5)))),
+                                  onPressed: () => calculateAmount(percentage),
+                                  child: Text('$percentage%'),
+                                ),
+                              )
+                              .toList(),
                         ),
-                    keyboardType:
-                        const TextInputType.numberWithOptions(decimal: true),
-                    controller: amountController,
-                    decoration: InputDecoration(
-                        labelText: 'Amount (Balance: ${formatAmount(balance)})',
-                        hintText: '100',
-                        suffixText: 'TFT',
-                        errorText: amountError)),
-                subtitle: Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 8.0),
-                  child: Text('Max Fee: $fee TFT'),
-                )),
-            const SizedBox(height: 10),
-            if (isBiggerThanFee)
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 15.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: percentages
-                      .map(
-                        (percentage) => OutlinedButton(
-                          style: OutlinedButton.styleFrom(
-                              shape: const RoundedRectangleBorder(
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(5)))),
-                          onPressed: () => calculateAmount(percentage),
-                          child: Text('$percentage%'),
+                      ),
+                    const SizedBox(height: 30),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 8, horizontal: 10),
+                      child: ElevatedButton(
+                        onPressed: () async {
+                          if (await _validate()) {
+                            await _bridge_confirmation();
+                          }
+                        },
+                        style: ElevatedButton.styleFrom(),
+                        child: SizedBox(
+                          width: double.infinity,
+                          child: Text(
+                            'Submit',
+                            style: Theme.of(context)
+                                .textTheme
+                                .titleLarge!
+                                .copyWith(
+                                    color:
+                                        Theme.of(context).colorScheme.primary,
+                                    fontWeight: FontWeight.bold),
+                            textAlign: TextAlign.center,
+                          ),
                         ),
-                      )
-                      .toList(),
+                      ),
+                    ),
+                  ]),
                 ),
-              ),
-            const SizedBox(height: 30),
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 10),
-              child: ElevatedButton(
-                onPressed: () async {
-                  if (await _validate()) {
-                    await _bridge_confirmation();
-                  }
-                },
-                style: ElevatedButton.styleFrom(),
-                child: SizedBox(
-                  width: double.infinity,
-                  child: Text(
-                    'Submit',
-                    style: Theme.of(context).textTheme.titleLarge!.copyWith(
-                        color: Theme.of(context).colorScheme.primary,
-                        fontWeight: FontWeight.bold),
-                    textAlign: TextAlign.center,
-                  ),
-                ),
-              ),
-            ),
-          ]),
-        ),
-      ),
-    );
+              ));
+        }));
   }
 
   calculateAmount(int percentage) {
     final amount = (Decimal.parse(isWithdraw
                 ? widget.wallet.tfchainBalance
                 : widget.wallet.stellarBalance) -
-            fee) *
+            totalFee) *
         (Decimal.fromInt(percentage).shift(-2));
     amountController.text = roundAmount(amount.toString()).toString();
   }
 
   _bridge_confirmation() async {
+    totalAmount = Decimal.parse(amountController.text.trim()) + BRIDGE_FEE;
     final memoHash = isSolana ? base58.decode(toController.text.trim()) : null;
     final memoText = !isWithdraw && !isSolana
         ? await TFChain.getMemo(toController.text.trim())
@@ -357,8 +387,10 @@ class _WalletBridgeScreenState extends ConsumerState<WalletBridgeScreen> {
               from: fromController.text.trim(),
               to: toController.text.trim(),
               amount: amountController.text.trim(),
-              fee: fee.toString(),
               isSolana: isSolana,
+              // amount + fee
+              totalAmount: totalAmount.toString(),
+              totalFee: totalFee.toString(),
               memo: memoText,
               memoHash: memoHash,
               reloadBalance:

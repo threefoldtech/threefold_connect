@@ -129,7 +129,9 @@ class _ShowResultDialogState extends State<ShowResultDialog>
                   return LinearProgressIndicator(
                     minHeight: 40,
                     value: _animation.value,
-                    color: Theme.of(context).colorScheme.primary,
+                    color: Theme.of(context).colorScheme.primaryContainer,
+                    backgroundColor:
+                        Theme.of(context).colorScheme.surfaceContainerHigh,
                     borderRadius: const BorderRadius.all(Radius.circular(5)),
                   );
                 },
@@ -165,6 +167,8 @@ class _ShowResultDialogState extends State<ShowResultDialog>
               return LinearProgressIndicator(
                 value: _yesAnimation.value,
                 color: Theme.of(context).colorScheme.primary,
+                backgroundColor:
+                    Theme.of(context).colorScheme.surfaceContainerHigh,
               );
             },
           ),
@@ -189,6 +193,8 @@ class _ShowResultDialogState extends State<ShowResultDialog>
               return LinearProgressIndicator(
                 value: _noAnimation.value,
                 color: Theme.of(context).colorScheme.error,
+                backgroundColor:
+                    Theme.of(context).colorScheme.surfaceContainerHigh,
               );
             },
           ),

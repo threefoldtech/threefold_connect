@@ -7,37 +7,38 @@ class HomeLogoWidget extends StatelessWidget {
   const HomeLogoWidget({super.key, required this.animate});
 
   @override
-  Widget build(BuildContext context) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        Center(
-          child: animate
-              ? Column(
-                  children: [
-                    Lottie.asset(
+Widget build(BuildContext context) {
+  return Column(
+    mainAxisAlignment: MainAxisAlignment.center,
+    crossAxisAlignment: CrossAxisAlignment.center,
+    children: [
+      Center(
+        child: animate
+            ? Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  SizedBox(
+                    width: 45,
+                    height: 45,
+                    child: Lottie.asset(
                       'assets/tfloading.json',
                       repeat: true,
                       animate: true,
-                      width: 50,
-                      height: 50,
                     ),
-                    const SizedBox(
-                      height: 10,
-                    ),
-                    Text(
-                      'THREEFOLD',
-                      style: Theme.of(context)
-                          .textTheme
-                          .headlineSmall!
-                          .copyWith(
-                              color: Theme.of(context).colorScheme.onSurface,
-                              fontWeight: FontWeight.bold),
-                    ),
-                  ],
-                )
-              : SvgPicture.asset(
+                  ),
+                  const SizedBox(height: 10),
+                  Text(
+                    'THREEFOLD',
+                    style: Theme.of(context).textTheme.headlineLarge!.copyWith(
+                          color: Theme.of(context).colorScheme.onSurface,
+                          fontWeight: FontWeight.bold,
+                        ),
+                  ),
+                ],
+              )
+            : SizedBox(
+                height: 90,
+                child: SvgPicture.asset(
                   'assets/TF_logo.svg',
                   alignment: Alignment.center,
                   colorFilter: ColorFilter.mode(
@@ -45,23 +46,26 @@ class HomeLogoWidget extends StatelessWidget {
                     BlendMode.srcIn,
                   ),
                 ),
+              ),
+      ),
+      SizedBox(
+        height: MediaQuery.of(context).size.height * 0.04,
+        width: MediaQuery.of(context).size.width * 0.6,
+        child: Divider(
+          thickness: 2,
+          color: Theme.of(context).colorScheme.primary,
         ),
-        SizedBox(
-          height: MediaQuery.of(context).size.height * 0.04,
-          width: MediaQuery.of(context).size.width * 0.6,
-          child: Divider(
-            thickness: 2,
-            color: Theme.of(context).colorScheme.primary,
-          ),
-        ),
-        Text(
-          'CONNECT',
-          style: Theme.of(context).textTheme.titleLarge!.copyWith(
+      ),
+      Text(
+        'CONNECT',
+        style: Theme.of(context).textTheme.titleLarge!.copyWith(
               color: Theme.of(context).colorScheme.onSurface,
               letterSpacing: 10,
-              fontWeight: FontWeight.bold),
-        ),
-      ],
-    );
-  }
+              fontWeight: FontWeight.bold,
+            ),
+      ),
+    ],
+  );
+}
+
 }
