@@ -100,7 +100,7 @@ class _WalletBridgeScreenState extends ConsumerState<WalletBridgeScreen> {
         bridgeFee = Decimal.parse('1.0');
       } else if (isSolana) {
         transferFee = Decimal.parse('0.1');
-        bridgeFee = Decimal.parse('100.0');
+        bridgeFee = Decimal.parse('50.0');
       } else {
         transferFee = Decimal.parse('0.1');
         bridgeFee = Decimal.parse('1.0');
