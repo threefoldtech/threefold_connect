@@ -27,19 +27,13 @@ jobs:
       - name: Get dependencies
         run: flutter pub get
 
-      - name: Initialize Reflectable
-        run: dart run build_runner build
-
-      - name: Create app_config_local.dart from template
-        run: cp lib/app_config_local.template lib/app_config_local.dart
-
       - name: Ensure Build Script is Executable
         run: chmod +x build.sh
 
       - name: Run Build Script
         run: | 
-          set -e
-          ./build.sh --build --local
+          ./build.sh --init
+          ./build.sh --build --production --debug
 
       - name: Verify APK Exists
         run: |
