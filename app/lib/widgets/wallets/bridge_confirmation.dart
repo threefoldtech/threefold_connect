@@ -178,10 +178,10 @@ class _BridgeConfirmationWidgetState extends State<BridgeConfirmationWidget> {
       if (widget.bridgeOperation == BridgeOperation.Deposit) {
         if (widget.isSolana) {
           await Stellar.transfer(widget.secret, Globals().solanaBridgeAddress,
-              widget.totalAmount, '', widget.memoHash);
+              widget.totalAmount, memoHash: widget.memoHash);
         } else {
           await Stellar.transfer(widget.secret, Globals().bridgeTFTAddress,
-              widget.totalAmount, widget.memo!);
+              widget.totalAmount, memo: widget.memo!);
         }
       } else {
         await TFChain.swapToStellar(widget.secret, widget.to,
