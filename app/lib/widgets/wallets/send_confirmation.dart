@@ -211,7 +211,7 @@ class _SendConfirmationWidgetState extends State<SendConfirmationWidget> {
   Future<void> _performTransfer() async {
     if (widget.chainType == ChainType.Stellar) {
       await Stellar.transfer(
-          widget.secret, widget.to, widget.amount, widget.memo);
+          widget.secret, widget.to, widget.amount, memo: widget.memo);
     } else {
       await TFChain.transfer(widget.secret, widget.to, widget.amount);
     }

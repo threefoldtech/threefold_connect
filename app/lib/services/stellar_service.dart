@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:stellar_client/models/transaction.dart';
 import 'package:stellar_client/models/vesting_account.dart';
 import 'package:stellar_client/stellar_client.dart';
@@ -57,14 +59,15 @@ Future<List<VestingAccount>?> listVestedAccounts(String secret) async {
   return accounts;
 }
 
-Future<void> transfer(
-    String secret, String dest, String amount, String memo) async {
+Future<void> transfer(String secret, String dest, String amount,
+    {String? memo, Uint8List? memoHash}) async {
   final client = Client(NetworkType.PUBLIC, secret);
   await client.transferThroughThreefoldService(
     destinationAddress: dest,
     amount: amount,
     currency: 'TFT',
     memoText: memo,
+    memoHash: memoHash,
   );
 }
 
