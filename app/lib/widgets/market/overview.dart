@@ -1,12 +1,12 @@
 import 'dart:async';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:threebotlogin/helpers/logger.dart';
 import 'package:threebotlogin/models/market_data.dart';
 import 'package:threebotlogin/models/wallet.dart';
 import 'package:threebotlogin/services/stellar_service.dart';
 import 'package:threebotlogin/widgets/market/buy_tft.dart';
+import 'package:threebotlogin/widgets/market/wallet_selection.dart';
 
 class OverviewWidget extends StatefulWidget {
   const OverviewWidget({super.key, required this.wallets});
@@ -55,19 +55,6 @@ class _OverviewWidgetState extends State<OverviewWidget> {
 
   String _twoDigits(int n) => n.toString().padLeft(2, '0');
 
-  List<DropdownMenuEntry<PkidWallet>> _buildDropdownMenuEntries() {
-    return widget.wallets.map((wallet) {
-      return DropdownMenuEntry<PkidWallet>(
-        value: wallet,
-        label: wallet.name,
-        labelWidget: Text(wallet.name,
-            style: Theme.of(context).textTheme.bodyLarge!.copyWith(
-                  color: Theme.of(context).colorScheme.onSurface,
-                )),
-      );
-    }).toList();
-  }
-
   @override
   void dispose() {
     _timer.cancel();
@@ -98,99 +85,67 @@ class _OverviewWidgetState extends State<OverviewWidget> {
               ),
         ),
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 16),
-          child: Row(
-            children: [
-              Expanded(
-                child: SizedBox(
-                  height: 50,
-                  child: DropdownMenu(
-                    menuHeight: MediaQuery.sizeOf(context).height * 0.3,
-                    enableFilter: true,
-                    width: 180,
-                    textStyle: Theme.of(context).textTheme.bodyLarge!.copyWith(
-                          color: Theme.of(context).colorScheme.onSurface,
-                        ),
-                    trailingIcon: const Icon(
-                      CupertinoIcons.chevron_down,
-                      size: 16,
-                    ),
-                    selectedTrailingIcon: const Icon(
-                      CupertinoIcons.chevron_up,
-                      size: 16,
-                    ),
-                    inputDecorationTheme: InputDecorationTheme(
-                      border: InputBorder.none,
-                      isDense: true,
-                      filled: true,
-                      fillColor:
-                          Theme.of(context).colorScheme.secondaryContainer,
-                      enabledBorder: UnderlineInputBorder(
-                        borderRadius:
-                            const BorderRadius.all(Radius.circular(4)),
-                        borderSide: BorderSide(
-                          color:
-                              Theme.of(context).colorScheme.secondaryContainer,
-                          width: 6.0,
+            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 16),
+            child: Row(
+              children: [
+                Expanded(
+                  child: SizedBox(
+                    height: 50,
+                    child: ElevatedButton(
+                      onPressed: _openWalletSelectionOverlay,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor:
+                            Theme.of(context).colorScheme.primaryContainer,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
                         ),
                       ),
-                    ),
-                    menuStyle: MenuStyle(
-                      shape: WidgetStateProperty.all<RoundedRectangleBorder>(
-                        const RoundedRectangleBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(4)),
-                        ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            _selectedWallet?.name ?? 'Select Wallet',
+                            style: Theme.of(context).textTheme.bodyLarge!.copyWith(
+                              color: Theme.of(context).colorScheme.onPrimaryContainer
+                            ),
+                          ),
+                          Icon(Icons.arrow_drop_down, color: Theme.of(context).colorScheme.onPrimaryContainer),
+                        ],
                       ),
-                    ),
-                    label: Text(
-                      'Select Wallet',
-                      style: Theme.of(context).textTheme.bodyLarge!.copyWith(
-                            color: Theme.of(context)
-                                .colorScheme
-                                .onSecondaryContainer,
-                          ),
-                    ),
-                    dropdownMenuEntries: _buildDropdownMenuEntries(),
-                    onSelected: (PkidWallet? value) {
-                      if (value != null) {
-                        setState(() {
-                          _selectedWallet = value;
-                        });
-                      }
-                    },
-                  ),
-                ),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: SizedBox(
-                  height: 50,
-                  child: ElevatedButton(
-                    onPressed: _selectedWallet == null
-                        ? null
-                        : () async {
-                            Navigator.of(context).push(MaterialPageRoute(
-                                builder: (context) => const BuyTFTWidget()));
-                          },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor:
-                          Theme.of(context).colorScheme.primaryContainer,
-                      minimumSize: const Size.fromHeight(50),
-                    ),
-                    child: Text(
-                      'My Orders',
-                      style: Theme.of(context).textTheme.bodyLarge!.copyWith(
-                            color: Theme.of(context)
-                                .colorScheme
-                                .onPrimaryContainer,
-                          ),
                     ),
                   ),
                 ),
-              ),
-            ],
-          ),
-        ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: SizedBox(
+                    height: 50,
+                    child: ElevatedButton(
+                      onPressed: _selectedWallet == null
+                          ? null
+                          : () async {
+                              Navigator.of(context).push(MaterialPageRoute(
+                                  builder: (context) => const BuyTFTWidget()));
+                            },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor:
+                            Theme.of(context).colorScheme.primaryContainer,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                      child: Text(
+                        'My Orders',
+                        style: Theme.of(context).textTheme.bodyLarge!.copyWith(
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .onPrimaryContainer,
+                            ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            )),
         SizedBox(
           width: double.infinity,
           child: Column(
@@ -223,8 +178,7 @@ class _OverviewWidgetState extends State<OverviewWidget> {
                           if (snapshot.connectionState ==
                               ConnectionState.waiting) {
                             return const Center(
-                                child:
-                                    CircularProgressIndicator()); 
+                                child: CircularProgressIndicator());
                           } else if (snapshot.hasError || !snapshot.hasData) {
                             return const Center(
                                 child: Text('No trade data available.'));
@@ -253,7 +207,6 @@ class _OverviewWidgetState extends State<OverviewWidget> {
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    
                                     _buildMarketColumn(
                                         '24H High', marketData.high24h),
                                   ],
@@ -354,6 +307,28 @@ class _OverviewWidgetState extends State<OverviewWidget> {
                   color: Theme.of(context).colorScheme.onSecondaryContainer)),
         ],
       ),
+    );
+  }
+
+  void _openWalletSelectionOverlay() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      useSafeArea: true,
+      isDismissible: true,
+      constraints: const BoxConstraints(maxWidth: double.infinity),
+      builder: (context) {
+        return WalletSelectionSheet(
+          wallets: widget.wallets,
+          selectedWallet: _selectedWallet,
+          onWalletSelected: (PkidWallet wallet) {
+            setState(() {
+              _selectedWallet = wallet;
+            });
+            Navigator.pop(context);
+          },
+        );
+      },
     );
   }
 }
