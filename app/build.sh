@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 
 gituser=$(git config user.name)
 gitbranch=$(git rev-parse --abbrev-ref HEAD)
@@ -21,8 +22,8 @@ compileAndUpload() {
         else
             echo "[$5]: Building apk."
 
-            setConfigsAndBuild "--$5"
-            msgTelegramAndUploadToAppServer "$5" $4
+            setConfigsAndBuild "$3"
+            # msgTelegramAndUploadToAppServer "$5" $4
         fi
 
         exit 0
@@ -52,19 +53,19 @@ setConfigsAndBuild() {
     sed -i -e "s/githashvalue/$githash/g" lib/helpers/env_config.dart
     sed -i -e "s/timevalue/$logcurrent_time/g" lib/helpers/env_config.dart
 
-    if [[ "$1" == "--local" ]]; then
+    if [[ "$1" == "--debug" ]]; then
         echo "Running local debug build..."
-        flutter build apk -t lib/main.dart -v --target-platform android-arm,android-arm64 --debug
+        flutter build apk -t lib/main.dart --target-platform android-arm,android-arm64 --debug
     else
         echo "Running release build..."
-        flutter build apk -t lib/main.dart -v --target-platform android-arm,android-arm64 --release
+        flutter build apk -t lib/main.dart --target-platform android-arm,android-arm64 --release
     fi
 }
 
 msgTelegramAndUploadToAppServer () {
     mv build/app/outputs/apk/release/app-release.apk "build/app/outputs/apk/release/$current_time-TF-Connect-$1-$githash.apk"
 
-    scp "build/app/outputs/apk/release/$current_time-TF-Connect-$1-$githash.apk" jimber@192.168.3.10:/opt/apps/threefold/$1/
+    # scp "build/app/outputs/apk/release/$current_time-TF-Connect-$1-$githash.apk" jimber@192.168.3.10:/opt/apps/threefold/$1/
     
     # curl --http1.1 -s -X POST "https://api.telegram.org/bot868129294:AAEd-UDDSru9zGeGklzWL6mPO33NovuXYqo/sendMessage" -d parse_mode=markdown -d chat_id=-1001186043363 -d parse_mode=markdown -d text="Type: *$1* %0AGit user: *$gituser* %0AGit branch: *$gitbranch* %0AGit hash: *$githash* %0ATime: *$logcurrent_time* %0AMessage: *$2* %0AURL: *https://apps.staging.jimber.io/threefold/$1/*"
     # curl --http1.1 -s -X POST "https://api.telegram.org/bot868129294:AAEd-UDDSru9zGeGklzWL6mPO33NovuXYqo/sendDocument" -F chat_id=-1001186043363 -F document="@build/app/outputs/apk/release/$githash-TF-Connect-$1-$current_time.apk"
@@ -93,8 +94,10 @@ then
     AndroidManifestMainPath=android/app/src/main/AndroidManifest.xml
     AndroidManifestDebugPath=android/app/src/debug/AndroidManifest.xml
 
+
     env_configFilePath=lib/helpers/env_config.dart
     AppConfigLocalFilePath=lib/app_config_local.dart
+    ReflectablePath=lib/main.reflectable.dart
 
     BuildGradlePath=android/app/build.gradle
 
@@ -118,6 +121,13 @@ then
     mkdir android/app/src/debug
     generateFile $AndroidManifestMainPath android/app/src/main/AndroidManifest_local
     generateFile $AndroidManifestDebugPath android/app/src/main/AndroidManifest_local
+
+    if ! test -f $ReflectablePath; then
+        echo "$ReflectablePath doesn't exist, generating ..."
+        dart run build_runner build
+     else
+        echo "$1 already exists."
+    fi
 
     exit 0
 fi
