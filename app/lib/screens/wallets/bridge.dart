@@ -121,7 +121,7 @@ class _WalletBridgeScreenState extends ConsumerState<WalletBridgeScreen> {
       if (isSolana) {
         final isValidSolana = isValidSolanaAddress(toAddress);
         if (!isValidSolana) {
-          toAddressError = 'Invaild Solana address';
+          toAddressError = 'Invalid Solana address';
         }
         return isValidSolana;
       }
@@ -138,7 +138,7 @@ class _WalletBridgeScreenState extends ConsumerState<WalletBridgeScreen> {
 
     if (isWithdraw) {
       if (!isValidStellarAddress(toAddress)) {
-        toAddressError = 'Invaild Stellar address';
+        toAddressError = 'Invalid Stellar address';
         return false;
       }
       if (toAddress == Globals().bridgeTFTAddress) {
