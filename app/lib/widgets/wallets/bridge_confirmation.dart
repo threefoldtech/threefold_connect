@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:threebotlogin/helpers/globals.dart';
 import 'package:threebotlogin/helpers/transaction_helpers.dart';
@@ -14,8 +16,11 @@ class BridgeConfirmationWidget extends StatefulWidget {
     required this.from,
     required this.to,
     required this.amount,
+    required this.totalFee,
     required this.totalAmount,
     required this.memo,
+    required this.memoHash,
+    required this.isSolana,
     required this.reloadBalance,
   });
 
@@ -26,6 +31,9 @@ class BridgeConfirmationWidget extends StatefulWidget {
   final String amount;
   final String totalAmount;
   final String? memo;
+  final Uint8List? memoHash;
+  final bool isSolana;
+  final String totalFee;
   final void Function() reloadBalance;
 
   @override
@@ -45,8 +53,7 @@ class _BridgeConfirmationWidgetState extends State<BridgeConfirmationWidget> {
     fromController.text = widget.from;
     toController.text = widget.to;
     amountController.text = widget.amount;
-    feeController.text =
-        widget.bridgeOperation == BridgeOperation.Deposit ? '1.1' : '1.01';
+    feeController.text = widget.totalFee;
     super.initState();
   }
 
@@ -169,11 +176,16 @@ class _BridgeConfirmationWidgetState extends State<BridgeConfirmationWidget> {
     });
     try {
       if (widget.bridgeOperation == BridgeOperation.Deposit) {
-        await Stellar.transfer(widget.secret, Globals().bridgeTFTAddress,
-            widget.totalAmount, widget.memo!);
+        if (widget.isSolana) {
+          await Stellar.transfer(widget.secret, Globals().solanaBridgeAddress,
+              widget.totalAmount, memoHash: widget.memoHash);
+        } else {
+          await Stellar.transfer(widget.secret, Globals().bridgeTFTAddress,
+              widget.totalAmount, memo: widget.memo!);
+        }
       } else {
-        await TFChain.swapToStellar(
-            widget.secret, widget.to, BigInt.from(double.parse(widget.totalAmount)));
+        await TFChain.swapToStellar(widget.secret, widget.to,
+            BigInt.from(double.parse(widget.totalAmount)));
       }
       await _showDialog('Success!', 'Tokens have been transferred successfully',
           Icons.check, DialogType.Info);
