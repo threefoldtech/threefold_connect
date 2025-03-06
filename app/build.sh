@@ -1,5 +1,5 @@
 #!/bin/bash
-set -e
+# set -e
 
 gituser=$(git config user.name)
 gitbranch=$(git rev-parse --abbrev-ref HEAD)
