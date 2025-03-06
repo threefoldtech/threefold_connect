@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:registrar_client/models/farm.dart' as registrarFarm;
 import 'package:registrar_client/registrar_client.dart' as registrar;
 import 'package:threebotlogin/helpers/farm.dart';
+import 'package:threebotlogin/helpers/globals.dart';
 import 'package:threebotlogin/helpers/logger.dart';
 import 'package:threebotlogin/models/farm.dart';
 import 'package:threebotlogin/models/wallet.dart';
@@ -23,8 +24,8 @@ class FarmScreen extends ConsumerStatefulWidget {
 class _FarmScreenState extends ConsumerState<FarmScreen>
     with SingleTickerProviderStateMixin {
   registrar.RegistrarClient? registrarClient;
-  List v3Farms = [];
-  List<dynamic> v4Farms = [];
+  List<Farm> v3Farms = [];
+  List<Farm> v4Farms = [];
   List<Wallet> wallets = [];
   bool loading = true;
   late bool areWalletsListed;
@@ -125,21 +126,31 @@ class _FarmScreenState extends ConsumerState<FarmScreen>
   }
 
   listV4FarmsAndNodes() async {
+    List<registrar.Farm> farms;
     late registrar.Account account;
     final keypair = await generateKeypair(wallets.first.tfchainSecret);
     registrarClient = registrar.RegistrarClient(
-        baseUrl: 'http://192.168.1.16:8080/v1', privateKey: keypair['privateKey']!);
+        baseUrl: Globals().registrarURL,
+        privateKey: keypair['privateKey']!);
     for (var w in wallets) {
       final keypair = await generateKeypair(w.tfchainSecret);
-      print('keypair, $keypair');
       try {
         account = await registrarClient!.accounts
             .getByPublicKey(keypair['publicKey']!);
-        print('account in list: $account');
-        final farms = await registrarClient!.farms
+        farms = await registrarClient!.farms
             .list(registrarFarm.FarmFilter(twinID: account.twinID));
-      print('farmssss: $farms');
-        v4Farms.addAll(farms);
+        if (farms.isNotEmpty) {
+          v4Farms.addAll(farms.map((f) {
+            return Farm(
+                name: f.farmName,
+                walletAddress: '',
+                tfchainWalletSecret: '',
+                walletName: '',
+                twinId: f.twinID,
+                farmId: f.farmID!,
+                nodes: []);
+          }));
+        }
       } catch (e) {
         continue;
       }
@@ -189,11 +200,7 @@ class _FarmScreenState extends ConsumerState<FarmScreen>
         itemCount: farms.length,
         itemBuilder: (context, i) {
           final farm = farms[i];
-          return FarmItemWidget(
-            farm: farm,
-            wallets: wallets,
-            isV4: farms == v4Farms 
-          );
+          return FarmItemWidget(farm: farm, wallets: wallets);
         });
   }
 

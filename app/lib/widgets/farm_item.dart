@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:threebotlogin/helpers/logger.dart';
+import 'package:threebotlogin/models/farm.dart';
 import 'package:threebotlogin/models/wallet.dart';
 import 'package:threebotlogin/screens/wallets/contacts.dart';
 import 'package:threebotlogin/services/stellar_service.dart';
@@ -9,14 +10,9 @@ import 'package:threebotlogin/services/tfchain_service.dart';
 import 'package:threebotlogin/widgets/farm_node_item.dart';
 
 class FarmItemWidget extends StatefulWidget {
-  const FarmItemWidget(
-      {super.key,
-      required this.farm,
-      required this.wallets,
-      required this.isV4});
-  final dynamic farm;
+  const FarmItemWidget({super.key, required this.farm, required this.wallets});
+  final Farm farm;
   final List<Wallet> wallets;
-  final bool isV4;
 
   @override
   State<FarmItemWidget> createState() => _FarmItemWidgetState();
@@ -39,7 +35,7 @@ class _FarmItemWidgetState extends State<FarmItemWidget> {
   @override
   void initState() {
     super.initState();
-    currentAddress = widget.isV4 ? '' : widget.farm.walletAddress;
+    currentAddress = widget.farm.walletAddress;
     walletAddressController.text = currentAddress!;
   }
 
@@ -149,15 +145,10 @@ class _FarmItemWidgetState extends State<FarmItemWidget> {
 
   @override
   Widget build(BuildContext context) {
-    tfchainWalletSecretController.text =
-        widget.isV4 ? '' : widget.farm.tfchainWalletSecret;
-    walletNameController.text = widget.isV4 ? '' : widget.farm.walletName;
-    farmIdController.text = widget.isV4
-        ? widget.farm.farmID.toString()
-        : widget.farm.farmId.toString();
-    twinIdController.text = widget.isV4
-        ? widget.farm.twinID.toString()
-        : widget.farm.twinId.toString();
+    tfchainWalletSecretController.text = widget.farm.tfchainWalletSecret;
+    walletNameController.text = widget.farm.walletName;
+    farmIdController.text = widget.farm.farmId.toString();
+    twinIdController.text = widget.farm.twinId.toString();
 
     return KeyboardVisibilityBuilder(builder: (context, isKeyboardVisible) {
       return GestureDetector(
@@ -167,7 +158,7 @@ class _FarmItemWidgetState extends State<FarmItemWidget> {
           },
           child: ExpansionTile(
             title: Text(
-              widget.isV4 ? widget.farm.farmName : widget.farm.name,
+              widget.farm.name,
               style: Theme.of(context).textTheme.titleMedium!.copyWith(
                     color: Theme.of(context).colorScheme.onSurface,
                   ),
@@ -342,7 +333,7 @@ class _FarmItemWidgetState extends State<FarmItemWidget> {
                       labelText: 'Farm ID',
                     )),
               ),
-              if (widget.farm.nodes != null)
+              if (widget.farm.nodes.isNotEmpty)
                 ExpansionTile(
                   title: const Text('Nodes'),
                   childrenPadding: const EdgeInsets.only(left: 20),

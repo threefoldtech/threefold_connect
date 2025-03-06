@@ -4,6 +4,7 @@ import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 
 import 'package:registrar_client/models/account.dart';
 import 'package:threebotlogin/helpers/farm.dart';
+import 'package:threebotlogin/helpers/globals.dart';
 import 'package:threebotlogin/helpers/logger.dart';
 import 'package:registrar_client/registrar_client.dart' as registrar;
 import 'package:threebotlogin/models/farm.dart';
@@ -81,27 +82,24 @@ class _NewFarmState extends State<NewFarm> {
 
   _add(String farmName) async {
     late dynamic farm;
-    late int v4FarmId;
+    int v4FarmId;
     late dynamic v4Farm;
     late final v3Farm;
-    late Account account;
+    Account? account;
     try {
       if (widget.isV4) {
         final keypair = await generateKeypair(_selectedWallet!.tfchainSecret);
         final registrarClient = registrar.RegistrarClient(
-            baseUrl: 'http://192.168.1.16:8080/v1',
+            baseUrl: Globals().registrarURL,
             privateKey: keypair['privateKey']!);
         try {
           account = await registrarClient.accounts
               .getByPublicKey(keypair['publicKey']!);
-              print('accountttttttt: $account');
         } catch (e) {
-          account = await registrarClient.accounts.create();
-          print('account: $account');
+          account = (await registrarClient.accounts.create());
         } finally {
           v4FarmId = await registrarClient.farms
-              .create(farmName, false, account.twinID);
-          print('v4FarmId: $v4FarmId');
+              .create(farmName, false, (account?.twinID)!);
           v4Farm = await registrarClient.farms.get(v4FarmId);
         }
       } else {
@@ -110,9 +108,10 @@ class _NewFarmState extends State<NewFarm> {
       }
       farm = Farm(
           name: farmName,
-          walletAddress: _selectedWallet!.stellarAddress,
-          tfchainWalletSecret: _selectedWallet!.tfchainSecret,
-          walletName: _selectedWallet!.name,
+          walletAddress: widget.isV4 ? '' : _selectedWallet!.stellarAddress,
+          tfchainWalletSecret:
+              widget.isV4 ? '' : _selectedWallet!.tfchainSecret,
+          walletName: widget.isV4 ? '' : _selectedWallet!.name,
           twinId: widget.isV4 ? v4Farm.twinID : v3Farm.twinId,
           farmId: widget.isV4 ? v4Farm.farmID : v3Farm.id,
           nodes: []);
@@ -121,13 +120,13 @@ class _NewFarmState extends State<NewFarm> {
           'Farm $farmName has been added successfully',
           Icons.check,
           DialogType.Info);
+      widget.onAddFarm(farm);
     } catch (e) {
       logger.e('Failedddddddddddddd: $e');
       _showDialog('Error', 'Failed to create farm. Please try again.',
           Icons.error, DialogType.Error);
       return;
     }
-    widget.onAddFarm(farm);
     if (!context.mounted) return;
     Navigator.pop(context);
   }
