@@ -134,23 +134,24 @@ class _WalletBridgeScreenState extends ConsumerState<WalletBridgeScreen> {
         toAddressError = 'Address must have a twin ID';
         return false;
       }
+    }
 
-      if (isWithdraw) {
-        if (!isValidStellarAddress(toAddress)) {
-          toAddressError = 'Invaild Stellar address';
-          return false;
-        }
-        if (toAddress == Globals().bridgeTFTAddress) {
-          toAddressError = "Bridge address can't be the destination";
-          return false;
-        }
-        final toAddrBalance = await Stellar.getBalanceByAccountId(toAddress);
-        if (toAddrBalance == '-1') {
-          toAddressError = 'Address must be active and have TFT trustline';
-          return false;
-        }
+    if (isWithdraw) {
+      if (!isValidStellarAddress(toAddress)) {
+        toAddressError = 'Invaild Stellar address';
+        return false;
+      }
+      if (toAddress == Globals().bridgeTFTAddress) {
+        toAddressError = "Bridge address can't be the destination";
+        return false;
+      }
+      final toAddrBalance = await Stellar.getBalanceByAccountId(toAddress);
+      if (toAddrBalance == '-1') {
+        toAddressError = 'Address must be active and have TFT trustline';
+        return false;
       }
     }
+
     return true;
   }
 
