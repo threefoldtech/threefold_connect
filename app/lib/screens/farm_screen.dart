@@ -143,9 +143,9 @@ class _FarmScreenState extends ConsumerState<FarmScreen>
           v4Farms.addAll(farms.map((f) {
             return Farm(
                 name: f.farmName,
-                walletAddress: '',
-                tfchainWalletSecret: '',
-                walletName: '',
+                walletAddress: w.tfchainAddress,
+                tfchainWalletSecret: w.tfchainSecret,
+                walletName: w.name,
                 twinId: f.twinID,
                 farmId: f.farmID!,
                 nodes: []);

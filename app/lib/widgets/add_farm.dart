@@ -96,11 +96,13 @@ class _NewFarmState extends State<NewFarm> {
           account = await registrarClient.accounts
               .getByPublicKey(keypair['publicKey']!);
         } catch (e) {
-          account = (await registrarClient.accounts.create());
+          account = await registrarClient.accounts.create();
         } finally {
-          v4FarmId = await registrarClient.farms
-              .create(farmName, false, (account?.twinID)!);
-          v4Farm = await registrarClient.farms.get(v4FarmId);
+          if (account != null) {
+            v4FarmId = await registrarClient.farms
+                .create(farmName, false, account.twinID);
+            v4Farm = await registrarClient.farms.get(v4FarmId);
+          }
         }
       } else {
         v3Farm = await createFarm(farmName, _selectedWallet!.tfchainSecret,
@@ -108,10 +110,9 @@ class _NewFarmState extends State<NewFarm> {
       }
       farm = Farm(
           name: farmName,
-          walletAddress: widget.isV4 ? '' : _selectedWallet!.stellarAddress,
-          tfchainWalletSecret:
-              widget.isV4 ? '' : _selectedWallet!.tfchainSecret,
-          walletName: widget.isV4 ? '' : _selectedWallet!.name,
+          walletAddress: _selectedWallet!.stellarAddress,
+          tfchainWalletSecret: _selectedWallet!.tfchainSecret,
+          walletName: _selectedWallet!.name,
           twinId: widget.isV4 ? v4Farm.twinID : v3Farm.twinId,
           farmId: widget.isV4 ? v4Farm.farmID : v3Farm.id,
           nodes: []);
@@ -122,7 +123,7 @@ class _NewFarmState extends State<NewFarm> {
           DialogType.Info);
       widget.onAddFarm(farm);
     } catch (e) {
-      logger.e('Failedddddddddddddd: $e');
+      logger.e('Failed to add farm: $e');
       _showDialog('Error', 'Failed to create farm. Please try again.',
           Icons.error, DialogType.Error);
       return;
