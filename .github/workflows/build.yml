@@ -31,7 +31,8 @@ jobs:
         run: chmod +x build.sh
 
       - name: Run Build Script
-        run: | 
+        shell: bash  
+        run: |
           ./build.sh --init
           ./build.sh --build --production --debug
 
