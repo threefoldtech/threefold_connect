@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
+import 'package:threebotlogin/helpers/globals.dart';
 import 'package:threebotlogin/helpers/logger.dart';
 import 'package:threebotlogin/models/farm.dart';
 import 'package:threebotlogin/models/wallet.dart';
@@ -8,9 +9,14 @@ import 'package:threebotlogin/screens/wallets/contacts.dart';
 import 'package:threebotlogin/services/stellar_service.dart';
 import 'package:threebotlogin/services/tfchain_service.dart';
 import 'package:threebotlogin/widgets/farm_node_item.dart';
+import 'package:registrar_client/registrar_client.dart' as registrar;
 
 class FarmItemWidget extends StatefulWidget {
-  const FarmItemWidget({super.key, required this.farm, required this.wallets, required this.isV4});
+  const FarmItemWidget(
+      {super.key,
+      required this.farm,
+      required this.wallets,
+      required this.isV4});
   final Farm farm;
   final List<Wallet> wallets;
   final bool isV4;
@@ -66,11 +72,17 @@ class _FarmItemWidgetState extends State<FarmItemWidget> {
     }
 
     try {
-      await addStellarAddress(
-        widget.farm.tfchainWalletSecret,
-        widget.farm.farmId,
-        newAddress,
-      );
+      if (widget.isV4) {
+        final client = registrar.RegistrarClient(baseUrl: Globals().registrarURL, privateKey: widget.farm.privateKey!);
+        await client.farms.update(
+            widget.farm.twinId, widget.farm.farmId, stellarAddress: newAddress);
+      } else {
+        await addStellarAddress(
+          widget.farm.tfchainWalletSecret,
+          widget.farm.farmId,
+          newAddress,
+        );
+      }
       final savingAddressSuccess = SnackBar(
         content: Text(
           'Address is saved Successfully.',

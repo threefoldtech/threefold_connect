@@ -130,8 +130,9 @@ class _FarmScreenState extends ConsumerState<FarmScreen>
 
         v4Farms.addAll(farms.map((f) => Farm(
               name: f.farmName,
-              walletAddress: w.tfchainAddress,
+              walletAddress: f.stellarAddress!,
               tfchainWalletSecret: w.tfchainSecret,
+              privateKey: keypair['privateKey']!,
               walletName: w.name,
               twinId: f.twinID,
               farmId: f.farmID!,

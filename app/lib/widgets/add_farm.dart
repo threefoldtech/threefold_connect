@@ -37,6 +37,7 @@ class _NewFarmState extends State<NewFarm> {
   bool saveLoading = false;
   String? nameError;
   String? walletError;
+  String? privateKey;
   Future<void> _showDialog(
       String title, String message, IconData icon, DialogType type) async {
     showDialog(
@@ -85,8 +86,9 @@ class _NewFarmState extends State<NewFarm> {
   Future<registrar.Farm> addV4Farm(String farmName) async {
     Account? account;
     final keypair = await generateKeypair(_selectedWallet!.tfchainSecret);
+    privateKey = keypair['privateKey'];
     final registrarClient = registrar.RegistrarClient(
-        baseUrl: Globals().registrarURL, privateKey: keypair['privateKey']!);
+        baseUrl: Globals().registrarURL, privateKey: privateKey!);
     try {
       account =
           await registrarClient.accounts.getByPublicKey(keypair['publicKey']!);
@@ -112,6 +114,7 @@ class _NewFarmState extends State<NewFarm> {
       farm = Farm(
           name: farmName,
           walletAddress: _selectedWallet!.stellarAddress,
+          privateKey: privateKey,
           tfchainWalletSecret: _selectedWallet!.tfchainSecret,
           walletName: _selectedWallet!.name,
           twinId: widget.isV4 ? v4Farm.twinID : v3Farm.twinId,

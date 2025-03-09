@@ -1396,7 +1396,7 @@ packages:
     description:
       path: "packages/registrar_client"
       ref: development
-      resolved-ref: f75962bc62e2a0b0cab5bf047ecadc54bd695d84
+      resolved-ref: "8f730005fe0302636485a04ae783dff72f6808a4"
       url: "https://github.com/threefoldtech/tfgridv4-sdk-dart"
     source: git
     version: "0.1.0"
