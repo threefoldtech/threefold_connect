@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:threebotlogin/models/wallet.dart';
 
 class WalletSelectionSheet extends StatelessWidget {
-  final List<PkidWallet> wallets;
-  final PkidWallet? selectedWallet;
-  final void Function(PkidWallet) onWalletSelected;
+  final List<Wallet> wallets;
+  final Wallet? selectedWallet;
+  final void Function(Wallet) onWalletSelected;
 
   const WalletSelectionSheet({
     super.key,

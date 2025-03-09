@@ -1,33 +1,48 @@
 import 'package:flutter/material.dart';
 import 'package:threebotlogin/models/wallet.dart';
-import 'package:threebotlogin/services/stellar_service.dart';
-import 'package:threebotlogin/services/wallet_service.dart';
+import 'package:threebotlogin/providers/wallets_provider.dart';
 import 'package:threebotlogin/widgets/layout_drawer.dart';
 import 'package:threebotlogin/widgets/market/order_book.dart';
 import 'package:threebotlogin/widgets/market/overview.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class MarketPage extends StatefulWidget {
+class MarketPage extends ConsumerStatefulWidget {
   const MarketPage({super.key});
 
   @override
-  State<MarketPage> createState() => _MarketPageState();
+  ConsumerState<MarketPage> createState() => _MarketPageState();
 }
 
-class _MarketPageState extends State<MarketPage>
+class _MarketPageState extends ConsumerState<MarketPage>
     with SingleTickerProviderStateMixin {
   // TODO: handle loading
   bool loading = false;
   late final TabController _tabController;
-
+  List<Wallet> wallets = [];
+  
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
+    getWallets();
   }
 
-  Future<List<PkidWallet>> getWallets() async {
-    return await getPkidWallets();
+    void getWallets() async {
+    try {
+      setState(() {
+        loading = true;
+      });
+      await ref.read(walletsNotifier.notifier).list();
+      wallets = ref.read(walletsNotifier);
+    } catch (e) {
+      throw Exception('Failed to get wallets due to $e');
+    } finally {
+      setState(() {
+        loading = false;
+      });
+    }
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -75,16 +90,7 @@ class _MarketPageState extends State<MarketPage>
             Expanded(
               child: SingleChildScrollView(
                 padding: EdgeInsets.zero,
-                child: FutureBuilder<List<PkidWallet>>(
-                  future: getWallets(),
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return const Center(child: CircularProgressIndicator());
-                    } else if (snapshot.hasError) {
-                      return Center(child: Text('Error: ${snapshot.error}'));
-                    } else {
-                      final wallets = snapshot.data ?? [];
-                      return SizedBox(
+                child: SizedBox(
                         height: MediaQuery.of(context).size.height, 
                         child: TabBarView(
                           controller: _tabController,
@@ -96,10 +102,10 @@ class _MarketPageState extends State<MarketPage>
                             ),
                           ],
                         ),
-                      );
-                    }
-                  },
-                ),
+                      
+                    
+                  
+                )
               ),
             ),
           ],

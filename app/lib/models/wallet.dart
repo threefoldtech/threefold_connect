@@ -15,6 +15,7 @@ class Wallet {
     required this.tfchainSecret,
     required this.tfchainAddress,
     required this.tfchainBalance,
+    required this.usdcBalance,
     required this.type,
     required this.verificationStatus,
   });
@@ -25,6 +26,7 @@ class Wallet {
   final String tfchainAddress;
   String stellarBalance;
   String tfchainBalance;
+  String usdcBalance;
   final WalletType type;
   VerificationState verificationStatus; 
 }

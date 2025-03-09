@@ -127,70 +127,75 @@ Future<Stream<OrderBook>> getOrderBook(
   });
 }
 
-Future<double> loadTFTPrice() async {
-  const String srcCode = 'USDC';
-  const String srcIssuer =
+Future<double> getLastTradedTFTPrice() async {
+  const String baseUrl = 'https://horizon.stellar.org';
+  const String baseAssetCode = 'USDC';
+  const String baseAssetIssuer =
       'GA5ZSEJYB37JRC5AVCIA5MOP4RHTM335X2KGX3IHOJAPP5RE34K4KZVN';
-  const String dstCode = 'TFT';
-  const String dstIssuer =
+  const String counterAssetCode = 'TFT';
+  const String counterAssetIssuer =
       'GBOVQKJYHXRR3DX6NOX2RRYFRCUMSADGDESTDNBDS6CDVLGVESRTAC47';
-  const String dstAmount = '1';
 
-  final String requestUrl = 'https://horizon.stellar.org/paths/strict-receive'
-      '?source_assets=$srcCode%3A$srcIssuer'
-      '&destination_asset_type=credit_alphanum4'
-      '&destination_asset_issuer=$dstIssuer'
-      '&destination_asset_code=$dstCode'
-      '&destination_amount=$dstAmount';
+  final String requestUrl = '$baseUrl/trades?base_asset_type=credit_alphanum4'
+      '&base_asset_code=$baseAssetCode'
+      '&base_asset_issuer=$baseAssetIssuer'
+      '&counter_asset_type=credit_alphanum4'
+      '&counter_asset_code=$counterAssetCode'
+      '&counter_asset_issuer=$counterAssetIssuer'
+      '&order=desc&limit=1';
 
   try {
     final response = await http.get(Uri.parse(requestUrl));
+
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
-      final records = data['_embedded']?['records'];
+      final List<dynamic> trades = data['_embedded']?['records'] ?? [];
 
-      if (records != null && records.isNotEmpty) {
-        final price = records
-            .map((r) => double.parse(r['source_amount']))
-            .reduce((a, b) => a < b ? a : b);
-        print('TFT Price in USDC: $price');
-        return price;
+      if (trades.isNotEmpty) {
+        final trade = trades[0];
+        final double baseAmount = double.parse(trade['base_amount']);
+        final double counterAmount = double.parse(trade['counter_amount']);
+
+        final double pricePerUSDC = counterAmount / baseAmount;
+        print('Last traded price for 1 USDC in TFT: $pricePerUSDC');
+        return pricePerUSDC;
       } else {
-        print('No price data available.');
+        print('No recent trades found.');
         return 0;
       }
     } else {
-      print('Error fetching price: ${response.statusCode}');
-      throw Exception('Error gettung price');
+      print('Error fetching last traded price: ${response.statusCode}');
+      throw Exception('Error getting price');
     }
   } catch (e) {
     print('Error: $e');
-    throw Exception('Error gettung price');
+    throw Exception('Error getting price');
   }
 }
 
 Future<TftMarketData?> fetchTftMarketData() async {
-  final now = DateTime.now().millisecondsSinceEpoch;
-  final startTime = now - (24 * 60 * 60 * 1000 * 7);
+  final url = Uri.parse('https://horizon.stellar.org/trades?'
+      'base_asset_type=credit_alphanum4&base_asset_code=TFT&base_asset_issuer=GBOVQKJYHXRR3DX6NOX2RRYFRCUMSADGDESTDNBDS6CDVLGVESRTAC47'
+      '&counter_asset_type=credit_alphanum4&counter_asset_code=USDC&counter_asset_issuer=GA5ZSEJYB37JRC5AVCIA5MOP4RHTM335X2KGX3IHOJAPP5RE34K4KZVN'
+      '&order=desc'
+      '&limit=200');
 
-  final url = Uri.parse('https://horizon.stellar.org/trade_aggregations?'
-      'base_asset_type=credit_alphanum4&base_asset_code=USDC&base_asset_issuer=GA5ZSEJYB37JRC5AVCIA5MOP4RHTM335X2KGX3IHOJAPP5RE34K4KZVN'
-      '&counter_asset_type=credit_alphanum4&counter_asset_code=TFT&counter_asset_issuer=GBOVQKJYHXRR3DX6NOX2RRYFRCUMSADGDESTDNBDS6CDVLGVESRTAC47'
-      '&resolution=86400000'
-      '&start_time=$startTime'
-      '&end_time=$now');
+  try {
+    final response = await http.get(url);
 
-  final response = await http.get(url);
-  print(response.body);
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      final List<dynamic> trades = data['_embedded']?['records'] ?? [];
 
-  if (response.statusCode == 200) {
-    final data = json.decode(response.body);
-
-    if (data['_embedded'] != null &&
-        data['_embedded']['records'] != null &&
-        data['_embedded']['records'].isNotEmpty) {
-      return TftMarketData.fromJson(data['_embedded']['records'][0]);
+      if (trades.isNotEmpty) {
+        return TftMarketData.fromTrades(trades);
+      }
     }
+
+    print("Error: No trade data found.");
+  } catch (e) {
+    print("Error fetching market data: $e");
   }
+
   return null;
 }

@@ -6,11 +6,12 @@ import 'package:threebotlogin/models/market_data.dart';
 import 'package:threebotlogin/models/wallet.dart';
 import 'package:threebotlogin/services/stellar_service.dart';
 import 'package:threebotlogin/widgets/market/buy_tft.dart';
+import 'package:threebotlogin/widgets/market/order.dart';
 import 'package:threebotlogin/widgets/market/wallet_selection.dart';
 
 class OverviewWidget extends StatefulWidget {
   const OverviewWidget({super.key, required this.wallets});
-  final List<PkidWallet> wallets;
+  final List<Wallet> wallets;
 
   @override
   State<OverviewWidget> createState() => _OverviewWidgetState();
@@ -20,7 +21,7 @@ class _OverviewWidgetState extends State<OverviewWidget> {
   double? tftPrice;
   late Timer _timer;
   String lastUpdated = '--';
-  PkidWallet? _selectedWallet;
+  Wallet? _selectedWallet;
 
   @override
   void initState() {
@@ -31,7 +32,7 @@ class _OverviewWidgetState extends State<OverviewWidget> {
 
   void _fetchTFTPrice() async {
     try {
-      final price = await loadTFTPrice();
+      final price = await getLastTradedTFTPrice();
       setState(() {
         tftPrice = price;
         lastUpdated = _formattedDateTime();
@@ -71,7 +72,7 @@ class _OverviewWidgetState extends State<OverviewWidget> {
           const CircularProgressIndicator()
         else
           Text(
-            tftPrice.toString(),
+            tftPrice!.toStringAsFixed(7),
             style: Theme.of(context).textTheme.headlineLarge!.copyWith(
                   fontWeight: FontWeight.bold,
                   color: Theme.of(context).colorScheme.primary,
@@ -105,11 +106,18 @@ class _OverviewWidgetState extends State<OverviewWidget> {
                         children: [
                           Text(
                             _selectedWallet?.name ?? 'Select Wallet',
-                            style: Theme.of(context).textTheme.bodyLarge!.copyWith(
-                              color: Theme.of(context).colorScheme.onPrimaryContainer
-                            ),
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodyLarge!
+                                .copyWith(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onPrimaryContainer),
                           ),
-                          Icon(Icons.arrow_drop_down, color: Theme.of(context).colorScheme.onPrimaryContainer),
+                          Icon(Icons.arrow_drop_down,
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .onPrimaryContainer),
                         ],
                       ),
                     ),
@@ -124,7 +132,7 @@ class _OverviewWidgetState extends State<OverviewWidget> {
                           ? null
                           : () async {
                               Navigator.of(context).push(MaterialPageRoute(
-                                  builder: (context) => const BuyTFTWidget()));
+                                  builder: (context) => const OrderWidget()));
                             },
                       style: ElevatedButton.styleFrom(
                         backgroundColor:
@@ -134,7 +142,7 @@ class _OverviewWidgetState extends State<OverviewWidget> {
                         ),
                       ),
                       child: Text(
-                        'My Orders',
+                        'My Order',
                         style: Theme.of(context).textTheme.bodyLarge!.copyWith(
                               color: Theme.of(context)
                                   .colorScheme
@@ -193,12 +201,12 @@ class _OverviewWidgetState extends State<OverviewWidget> {
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    _buildMarketColumn(
-                                        'Last Price', marketData.lastPrice),
-                                    _buildMarketColumn(
-                                        '24H Volume', marketData.volume24h),
-                                    _buildMarketColumn(
-                                        '24H Low', marketData.low24h),
+                                    _buildMarketColumn('Last Price',
+                                        '${marketData.lastPrice} TFT'),
+                                    _buildMarketColumn('Last USD Price',
+                                        '\$${marketData.lastUsdPrice}'),
+                                    _buildMarketColumn('24H Change',
+                                        '${marketData.change24h}%'),
                                   ],
                                 ),
                               ),
@@ -207,15 +215,19 @@ class _OverviewWidgetState extends State<OverviewWidget> {
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
+                                    _buildMarketColumn('24H High',
+                                        '${marketData.high24h} TFT'),
                                     _buildMarketColumn(
-                                        '24H High', marketData.high24h),
+                                        '24H Low', '${marketData.low24h} TFT'),
+                                    _buildMarketColumn('24H Volume',
+                                        '${marketData.volume24h}K TFT'),
                                   ],
                                 ),
                               ),
                             ],
                           );
                         },
-                      )
+                      ),
                     ],
                   ),
                 ),
@@ -249,9 +261,10 @@ class _OverviewWidgetState extends State<OverviewWidget> {
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              _buildMarketColumn('Total Balance (TFT)', 0.0126),
                               _buildMarketColumn(
-                                  'Total Balance (USDC)', 0.5678),
+                                  'Total Balance (TFT)', "0.0126"),
+                              _buildMarketColumn(
+                                  'Total Balance (USDC)', "0.5678"),
                             ],
                           ),
                         ],
@@ -289,7 +302,7 @@ class _OverviewWidgetState extends State<OverviewWidget> {
     );
   }
 
-  Widget _buildMarketColumn(String title, double? value) {
+  Widget _buildMarketColumn(String title, String? value) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: Column(
@@ -302,7 +315,7 @@ class _OverviewWidgetState extends State<OverviewWidget> {
                 color: Theme.of(context).colorScheme.onSecondaryContainer),
           ),
           const SizedBox(height: 4),
-          Text(value != null ? value.toStringAsFixed(6) : 'Loading...',
+          Text(value ?? 'Loading...',
               style: Theme.of(context).textTheme.bodyMedium!.copyWith(
                   color: Theme.of(context).colorScheme.onSecondaryContainer)),
         ],
@@ -321,7 +334,7 @@ class _OverviewWidgetState extends State<OverviewWidget> {
         return WalletSelectionSheet(
           wallets: widget.wallets,
           selectedWallet: _selectedWallet,
-          onWalletSelected: (PkidWallet wallet) {
+          onWalletSelected: (Wallet wallet) {
             setState(() {
               _selectedWallet = wallet;
             });
