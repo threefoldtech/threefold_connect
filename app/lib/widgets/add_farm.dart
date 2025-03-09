@@ -12,6 +12,8 @@ import 'package:threebotlogin/models/wallet.dart';
 import 'package:threebotlogin/services/gridproxy_service.dart';
 import 'package:threebotlogin/services/tfchain_service.dart';
 import 'package:threebotlogin/widgets/custom_dialog.dart';
+import 'package:tfchain_client/generated/dev/types/tfchain_support/types/farm.dart'
+    as ChainFarm;
 
 class NewFarm extends StatefulWidget {
   const NewFarm(
@@ -19,7 +21,7 @@ class NewFarm extends StatefulWidget {
       required this.onAddFarm,
       required this.wallets,
       required this.isV4});
-  final void Function(dynamic addedFarm) onAddFarm;
+  final void Function(Farm addedFarm) onAddFarm;
   final List<Wallet> wallets;
   final bool isV4;
 
@@ -80,33 +82,32 @@ class _NewFarmState extends State<NewFarm> {
     return true;
   }
 
-  _add(String farmName) async {
-    late dynamic farm;
-    int v4FarmId;
-    late dynamic v4Farm;
-    late final v3Farm;
+  Future<registrar.Farm> addV4Farm(String farmName) async {
     Account? account;
+    final keypair = await generateKeypair(_selectedWallet!.tfchainSecret);
+    final registrarClient = registrar.RegistrarClient(
+        baseUrl: Globals().registrarURL, privateKey: keypair['privateKey']!);
+    try {
+      account =
+          await registrarClient.accounts.getByPublicKey(keypair['publicKey']!);
+    } catch (e) {
+      account = await registrarClient.accounts.create();
+    }
+    final v4FarmId =
+        await registrarClient.farms.create(farmName, false, account.twinID);
+    return await registrarClient.farms.get(v4FarmId);
+  }
+
+  _add(String farmName) async {
+    late Farm farm;
+    late ChainFarm.Farm v3Farm;
+    late registrar.Farm v4Farm;
     try {
       if (widget.isV4) {
-        final keypair = await generateKeypair(_selectedWallet!.tfchainSecret);
-        final registrarClient = registrar.RegistrarClient(
-            baseUrl: Globals().registrarURL,
-            privateKey: keypair['privateKey']!);
-        try {
-          account = await registrarClient.accounts
-              .getByPublicKey(keypair['publicKey']!);
-        } catch (e) {
-          account = await registrarClient.accounts.create();
-        } finally {
-          if (account != null) {
-            v4FarmId = await registrarClient.farms
-                .create(farmName, false, account.twinID);
-            v4Farm = await registrarClient.farms.get(v4FarmId);
-          }
-        }
+        v4Farm = await addV4Farm(farmName);
       } else {
-        v3Farm = await createFarm(farmName, _selectedWallet!.tfchainSecret,
-            _selectedWallet!.stellarAddress);
+        v3Farm = (await createFarm(farmName, _selectedWallet!.tfchainSecret,
+            _selectedWallet!.stellarAddress))!;
       }
       farm = Farm(
           name: farmName,
@@ -114,7 +115,7 @@ class _NewFarmState extends State<NewFarm> {
           tfchainWalletSecret: _selectedWallet!.tfchainSecret,
           walletName: _selectedWallet!.name,
           twinId: widget.isV4 ? v4Farm.twinID : v3Farm.twinId,
-          farmId: widget.isV4 ? v4Farm.farmID : v3Farm.id,
+          farmId: widget.isV4 ? v4Farm.farmID! : v3Farm.id,
           nodes: []);
       await _showDialog(
           'Farm Created!',

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:registrar_client/models/farm.dart' as registrarFarm;
+import 'package:registrar_client/models/node.dart' as registrarNode;
 import 'package:registrar_client/registrar_client.dart' as registrar;
 import 'package:threebotlogin/helpers/farm.dart';
 import 'package:threebotlogin/helpers/globals.dart';
@@ -41,20 +42,13 @@ class _FarmScreenState extends ConsumerState<FarmScreen>
   }
 
   Future<void> checkWalletsListed() async {
+    while (!areWalletsListed) {
+      areWalletsListed =
+          ref.read(walletsNotifier.notifier.select((n) => n.isListed));
+    }
     if (areWalletsListed) {
       wallets = ref.read(walletsNotifier);
       await listFarms();
-      return;
-    }
-    while (!areWalletsListed) {
-      await Future.delayed(const Duration(seconds: 2));
-      areWalletsListed =
-          ref.read(walletsNotifier.notifier.select((n) => n.isListed));
-      if (areWalletsListed) {
-        wallets = ref.read(walletsNotifier);
-        await listFarms();
-        break;
-      }
     }
   }
 
@@ -94,40 +88,40 @@ class _FarmScreenState extends ConsumerState<FarmScreen>
 
   listV3FarmsAndNodes() async {
     final Map<int, Wallet> twinIdWallets = {};
-    final twinIdFutures = wallets.map((w) async {
+    await Future.wait(wallets.map((w) async {
       final twinId = await getTwinId(w.tfchainSecret);
       if (twinId != 0) {
         twinIdWallets[twinId] = w;
       }
-    }).toList();
+    }));
 
-    await Future.wait(twinIdFutures);
     final farmsList = await getFarmsByTwinIds(twinIdWallets.keys.toList());
-    final farmFutures = farmsList.map((f) async {
-      final seed = twinIdWallets[f.twinId]!.tfchainSecret;
-      final walletName = twinIdWallets[f.twinId]!.name;
-      final nodes = await getNodesByFarmId(f.farmID);
+    await Future.wait(farmsList.map((farm) async {
+      final wallet = twinIdWallets[farm.twinId]!;
+      final nodes = await getNodesByFarmId(farm.farmID);
+
       v3Farms.add(Farm(
-          name: f.name,
-          walletAddress: f.stellarAddress,
-          tfchainWalletSecret: seed,
-          walletName: walletName,
-          twinId: f.twinId,
-          farmId: f.farmID,
-          nodes: nodes.map((n) {
-            return Node(
-              nodeId: n.nodeId,
-              status: NodeStatus.values.firstWhere((e) =>
-                  e.toString().toLowerCase() == 'nodestatus.${n.status}'),
-            );
-          }).toList()));
-    }).toList();
-    await Future.wait(farmFutures);
+        name: farm.name,
+        walletAddress: farm.stellarAddress,
+        tfchainWalletSecret: wallet.tfchainSecret,
+        walletName: wallet.name,
+        twinId: farm.twinId,
+        farmId: farm.farmID,
+        nodes: nodes
+            .map((node) => Node(
+                  nodeId: node.nodeId,
+                  status: NodeStatus.values.firstWhere(
+                    (status) =>
+                        status.toString().toLowerCase() ==
+                        'nodestatus.${node.status}',
+                  ),
+                ))
+            .toList(),
+      ));
+    }));
   }
 
   listV4FarmsAndNodes() async {
-    List<registrar.Farm> farms;
-    late registrar.Account account;
     final keypair = await generateKeypair(wallets.first.tfchainSecret);
     registrarClient = registrar.RegistrarClient(
         baseUrl: Globals().registrarURL,
@@ -135,10 +129,11 @@ class _FarmScreenState extends ConsumerState<FarmScreen>
     for (var w in wallets) {
       final keypair = await generateKeypair(w.tfchainSecret);
       try {
-        account = await registrarClient!.accounts
+        final account = await registrarClient!.accounts
             .getByPublicKey(keypair['publicKey']!);
-        farms = await registrarClient!.farms
-            .list(registrarFarm.FarmFilter(twinID: account.twinID));
+        final farms = await registrarClient!.farms.list(registrarFarm.FarmFilter(twinID: account.twinID));
+        final nodes =
+            await registrarClient!.nodes.list(registrarNode.NodeFilter(twinID: account.twinID));
         if (farms.isNotEmpty) {
           v4Farms.addAll(farms.map((f) {
             return Farm(
@@ -148,7 +143,13 @@ class _FarmScreenState extends ConsumerState<FarmScreen>
                 walletName: w.name,
                 twinId: f.twinID,
                 farmId: f.farmID!,
-                nodes: []);
+                nodes: (f.twinID ==
+                        account.twinID) // Add nodes only for matching twin ID
+                    ? nodes
+                        .map((n) =>
+                            Node(nodeId: n.nodeID, status: NodeStatus.Up))
+                        .toList()
+                    : []);
           }));
         }
       } catch (e) {
@@ -200,7 +201,11 @@ class _FarmScreenState extends ConsumerState<FarmScreen>
         itemCount: farms.length,
         itemBuilder: (context, i) {
           final farm = farms[i];
-          return FarmItemWidget(farm: farm, wallets: wallets);
+          return FarmItemWidget(
+            farm: farm,
+            wallets: wallets,
+            isV4: _tabController.index == 1,
+          );
         });
   }
 
@@ -293,11 +298,8 @@ class _FarmScreenState extends ConsumerState<FarmScreen>
   }
 
   _addFarm(dynamic farm) async {
-    if (_tabController.index == 0) {
-      v3Farms.add(farm);
-    } else {
-      v4Farms.add(farm);
-    }
-    setState(() {});
+    setState(() {
+      _tabController.index == 0 ? v3Farms.add(farm) : v4Farms.add(farm);
+    });
   }
 }

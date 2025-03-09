@@ -10,9 +10,10 @@ import 'package:threebotlogin/services/tfchain_service.dart';
 import 'package:threebotlogin/widgets/farm_node_item.dart';
 
 class FarmItemWidget extends StatefulWidget {
-  const FarmItemWidget({super.key, required this.farm, required this.wallets});
+  const FarmItemWidget({super.key, required this.farm, required this.wallets, required this.isV4});
   final Farm farm;
   final List<Wallet> wallets;
+  final bool isV4;
 
   @override
   State<FarmItemWidget> createState() => _FarmItemWidgetState();
@@ -339,7 +340,7 @@ class _FarmItemWidgetState extends State<FarmItemWidget> {
                   childrenPadding: const EdgeInsets.only(left: 20),
                   children: [
                     for (final node in widget.farm.nodes)
-                      FarmNodeItemWidget(node: node)
+                      FarmNodeItemWidget(node: node, isV4: widget.isV4)
                   ],
                 )
             ],
