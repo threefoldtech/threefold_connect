@@ -157,18 +157,18 @@ Future<double> getLastTradedTFTPrice() async {
         final double counterAmount = double.parse(trade['counter_amount']);
 
         final double pricePerUSDC = counterAmount / baseAmount;
-        print('Last traded price for 1 USDC in TFT: $pricePerUSDC');
+        logger.i('Last traded price for 1 USDC in TFT: $pricePerUSDC');
         return pricePerUSDC;
       } else {
-        print('No recent trades found.');
+        logger.i('No recent trades found.');
         return 0;
       }
     } else {
-      print('Error fetching last traded price: ${response.statusCode}');
+      logger.e('Error fetching last traded price: ${response.statusCode}');
       throw Exception('Error getting price');
     }
   } catch (e) {
-    print('Error: $e');
+    logger.e('Error: $e');
     throw Exception('Error getting price');
   }
 }
@@ -192,10 +192,16 @@ Future<TftMarketData?> fetchTftMarketData() async {
       }
     }
 
-    print("Error: No trade data found.");
+    logger.i('Error: No trade data found.');
   } catch (e) {
-    print("Error fetching market data: $e");
+    logger.e('Error fetching market data: $e');
   }
 
   return null;
+}
+
+Future<void> getActiveOrders(String secret) async {
+  final client = Client(NetworkType.PUBLIC, secret);
+  final orders = await client.listMyOffers();
+
 }
