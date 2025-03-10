@@ -108,7 +108,7 @@ class _FarmScreenState extends ConsumerState<FarmScreen>
         nodes: nodes
             .map((node) => Node(
                 nodeId: node.nodeId,
-                status: NodeStatus.values.byName(node.status)))
+                status: NodeStatus.Down))
             .toList(),
       );
     }).toList());
