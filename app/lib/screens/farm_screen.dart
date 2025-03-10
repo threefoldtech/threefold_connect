@@ -29,27 +29,30 @@ class _FarmScreenState extends ConsumerState<FarmScreen>
   List<Farm> v4Farms = [];
   List<Wallet> wallets = [];
   bool loading = true;
-  late bool areWalletsListed;
+  late WalletsNotifier walletRef;
   late final TabController _tabController;
 
   @override
-  initState() {
+  void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
-    areWalletsListed =
-        ref.read(walletsNotifier.notifier.select((n) => n.isListed));
-    checkWalletsListed();
-  }
 
-  Future<void> checkWalletsListed() async {
-    while (!areWalletsListed) {
-      areWalletsListed =
-          ref.read(walletsNotifier.notifier.select((n) => n.isListed));
-    }
-    if (areWalletsListed) {
-      wallets = ref.read(walletsNotifier);
-      await listFarms();
-    }
+    // Defer execution until after the first frame
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final walletNotifier = ref.read(walletsNotifier.notifier);
+      if (walletNotifier.isListed) {
+        wallets = ref.read(walletsNotifier);
+        listFarms();
+      } else {
+        // Listen for changes and trigger once wallets are listed
+        ref.read(walletsNotifier.notifier).addListener((state) {
+          if (state.isNotEmpty) {
+            wallets = state;
+            listFarms();
+          }
+        });
+      }
+    });
   }
 
   Future<void> listFarms() async {
@@ -108,8 +111,9 @@ class _FarmScreenState extends ConsumerState<FarmScreen>
         nodes: nodes
             .map((node) => Node(
                 nodeId: node.nodeId,
-                status: NodeStatus.values.firstWhere((e) =>
-                    e.toString().toLowerCase() == 'nodestatus.${node.status}',
+                status: NodeStatus.values.firstWhere(
+                  (e) =>
+                      e.toString().toLowerCase() == 'nodestatus.${node.status}',
                 )))
             .toList(),
       );

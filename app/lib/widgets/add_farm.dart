@@ -96,7 +96,7 @@ class _NewFarmState extends State<NewFarm> {
       account = await registrarClient.accounts.create();
     }
     final v4FarmId =
-        await registrarClient.farms.create(farmName, false, account.twinID);
+        await registrarClient.farms.create(farmName, false, _selectedWallet!.stellarAddress, account.twinID);
     return await registrarClient.farms.get(v4FarmId);
   }
 
