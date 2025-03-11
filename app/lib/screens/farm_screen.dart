@@ -3,12 +3,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:registrar_client/models/farm.dart' as registrarFarm;
 import 'package:registrar_client/models/node.dart' as registrarNode;
 import 'package:registrar_client/registrar_client.dart' as registrar;
-import 'package:threebotlogin/helpers/farm.dart';
 import 'package:threebotlogin/helpers/globals.dart';
 import 'package:threebotlogin/helpers/logger.dart';
 import 'package:threebotlogin/models/farm.dart';
 import 'package:threebotlogin/models/wallet.dart';
 import 'package:threebotlogin/providers/wallets_provider.dart';
+import 'package:threebotlogin/services/crypto_service.dart';
 import 'package:threebotlogin/services/gridproxy_service.dart';
 import 'package:threebotlogin/services/tfchain_service.dart';
 import 'package:threebotlogin/widgets/add_farm.dart';
@@ -132,14 +132,13 @@ class _FarmScreenState extends ConsumerState<FarmScreen>
   }
 
   Future<void> listV4FarmsAndNodes() async {
-    final keypair = await generateKeypair(wallets.first.tfchainSecret);
     registrarClient = registrar.RegistrarClient(
-        baseUrl: Globals().registrarURL, privateKey: keypair['privateKey']!);
+        baseUrl: Globals().registrarURL, mnemonicOrSeed: wallets.first.tfchainSecret);
     for (var w in wallets) {
       try {
-        final keypair = await generateKeypair(w.tfchainSecret);
+        final publicKey = await derivePublicKey(w.tfchainSecret);
         final account = await registrarClient!.accounts
-            .getByPublicKey(keypair['publicKey']!);
+            .getByPublicKey(publicKey);
         final farms = await registrarClient!.farms
             .list(registrarFarm.FarmFilter(twinID: account.twinID));
         final nodes = await registrarClient!.nodes
@@ -149,15 +148,11 @@ class _FarmScreenState extends ConsumerState<FarmScreen>
               name: f.farmName,
               walletAddress: f.stellarAddress!,
               tfchainWalletSecret: w.tfchainSecret,
-              privateKey: keypair['privateKey']!,
               walletName: w.name,
               twinId: f.twinID,
               farmId: f.farmID!,
-              nodes: (f.twinID == account.twinID)
-                  ? nodes
-                      .map((n) => Node(nodeId: n.nodeID, status: NodeStatus.Up))
-                      .toList()
-                  : [],
+              nodes: nodes.where((n) => n.farmID == f.farmID)
+                      .map((n) => Node(nodeId: n.nodeID, status: NodeStatus.Up)).toList(),
             )));
       } catch (e) {
         continue;

@@ -3,12 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 
 import 'package:registrar_client/models/account.dart';
-import 'package:threebotlogin/helpers/farm.dart';
 import 'package:threebotlogin/helpers/globals.dart';
 import 'package:threebotlogin/helpers/logger.dart';
 import 'package:registrar_client/registrar_client.dart' as registrar;
 import 'package:threebotlogin/models/farm.dart';
 import 'package:threebotlogin/models/wallet.dart';
+import 'package:threebotlogin/services/crypto_service.dart';
 import 'package:threebotlogin/services/gridproxy_service.dart';
 import 'package:threebotlogin/services/tfchain_service.dart';
 import 'package:threebotlogin/widgets/custom_dialog.dart';
@@ -37,15 +37,11 @@ class _NewFarmState extends State<NewFarm> {
   bool saveLoading = false;
   String? nameError;
   String? walletError;
-  String? privateKey;
   late registrar.RegistrarClient? registrarClient;
-  late Map<String, String> keypair;
 
-  Future<void> _initRegistrar() async {
-    keypair = await generateKeypair(_selectedWallet!.tfchainSecret);
-    privateKey = keypair['privateKey'];
+  Future<void> _initRegistrar(String mnemonicOrSeed) async {
     registrarClient = registrar.RegistrarClient(
-        baseUrl: Globals().registrarURL, privateKey: privateKey!);
+        baseUrl: Globals().registrarURL, mnemonicOrSeed: mnemonicOrSeed);
   }
 
   Future<void> _showDialog(
@@ -116,8 +112,9 @@ class _NewFarmState extends State<NewFarm> {
   Future<registrar.Farm> addV4Farm(String farmName) async {
     Account? account;
     try {
+      final publicKey = await derivePublicKey(_selectedWallet!.tfchainSecret);
       account =
-          await registrarClient!.accounts.getByPublicKey(keypair['publicKey']!);
+          await registrarClient!.accounts.getByPublicKey(publicKey);
     } catch (e) {
       account = await registrarClient!.accounts.create();
     }
@@ -140,7 +137,6 @@ class _NewFarmState extends State<NewFarm> {
       farm = Farm(
           name: farmName,
           walletAddress: _selectedWallet!.stellarAddress,
-          privateKey: privateKey,
           tfchainWalletSecret: _selectedWallet!.tfchainSecret,
           walletName: _selectedWallet!.name,
           twinId: widget.isV4 ? v4Farm.twinID : v3Farm.twinId,
@@ -288,7 +284,7 @@ class _NewFarmState extends State<NewFarm> {
                         onSelected: (Wallet? value) async {
                           if (value != null) {
                             _selectedWallet = value;
-                            await _initRegistrar();
+                            await _initRegistrar(_selectedWallet!.tfchainSecret);
                           }
                         },
                       ),

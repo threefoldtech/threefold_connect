@@ -18,7 +18,6 @@ class Farm {
     required this.twinId,
     required this.farmId,
     required this.nodes,
-    this.privateKey,
   });
 
   final String name;
@@ -28,5 +27,4 @@ class Farm {
   final int twinId;
   final int farmId;
   final List<Node> nodes;
-  final String? privateKey;
 }

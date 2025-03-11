@@ -75,7 +75,7 @@ class _FarmItemWidgetState extends State<FarmItemWidget> {
       if (widget.isV4) {
         final client = registrar.RegistrarClient(
             baseUrl: Globals().registrarURL,
-            privateKey: widget.farm.privateKey!);
+            mnemonicOrSeed: widget.farm.tfchainWalletSecret);
         await client.farms.update(widget.farm.twinId, widget.farm.farmId,
             stellarAddress: newAddress);
       } else {
