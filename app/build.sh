@@ -1,5 +1,4 @@
 #!/bin/bash
-# set -e
 
 gituser=$(git config user.name)
 gitbranch=$(git rev-parse --abbrev-ref HEAD)
@@ -23,7 +22,6 @@ compileAndUpload() {
             echo "[$5]: Building apk."
 
             setConfigsAndBuild "$3"
-            # msgTelegramAndUploadToAppServer "$5" $4
         fi
 
         exit 0
@@ -60,17 +58,6 @@ setConfigsAndBuild() {
         echo "Running release build..."
         flutter build apk -t lib/main.dart --target-platform android-arm,android-arm64 --release
     fi
-}
-
-msgTelegramAndUploadToAppServer () {
-    mv build/app/outputs/apk/release/app-release.apk "build/app/outputs/apk/release/$current_time-TF-Connect-$1-$githash.apk"
-
-    # scp "build/app/outputs/apk/release/$current_time-TF-Connect-$1-$githash.apk" jimber@192.168.3.10:/opt/apps/threefold/$1/
-    
-    # curl --http1.1 -s -X POST "https://api.telegram.org/bot868129294:AAEd-UDDSru9zGeGklzWL6mPO33NovuXYqo/sendMessage" -d parse_mode=markdown -d chat_id=-1001186043363 -d parse_mode=markdown -d text="Type: *$1* %0AGit user: *$gituser* %0AGit branch: *$gitbranch* %0AGit hash: *$githash* %0ATime: *$logcurrent_time* %0AMessage: *$2* %0AURL: *https://apps.staging.jimber.io/threefold/$1/*"
-    # curl --http1.1 -s -X POST "https://api.telegram.org/bot868129294:AAEd-UDDSru9zGeGklzWL6mPO33NovuXYqo/sendDocument" -F chat_id=-1001186043363 -F document="@build/app/outputs/apk/release/$githash-TF-Connect-$1-$current_time.apk"
-    
-    paplay /usr/share/sounds/gnome/default/alerts/glass.ogg
 }
 
 generateFile () {
@@ -132,10 +119,10 @@ then
     exit 0
 fi
 
-compileAndUpload "$1" "$2" "$3" "$4" "local"
-compileAndUpload "$1" "$2" "$3" "$4" "testing"
-compileAndUpload "$1" "$2" "$3" "$4" "staging"
-compileAndUpload "$1" "$2" "$3" "$4" "production"
+compileAndUpload "$1" "$2" "$3" "local"
+compileAndUpload "$1" "$2" "$3" "testing"
+compileAndUpload "$1" "$2" "$3" "staging"
+compileAndUpload "$1" "$2" "$3" "production"
 
 echo "Syntax error."
 echo "Usage: ./build.sh --[[run|build|switch]] --[[local|testing|staging|production]]"
