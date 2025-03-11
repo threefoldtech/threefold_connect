@@ -4,6 +4,7 @@ import 'package:stellar_client/stellar_client.dart';
 import 'package:stellar_flutter_sdk/stellar_flutter_sdk.dart';
 import 'package:threebotlogin/helpers/logger.dart';
 import 'package:threebotlogin/models/market_data.dart';
+import 'package:threebotlogin/models/offer.dart';
 import 'package:threebotlogin/models/order_book.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
@@ -28,24 +29,28 @@ bool isValidStellarAddress(String address) {
   return false;
 }
 
-Future<String> getBalanceByClient(Client client) async {
+Future<Map<String, String>> getBalanceByClient(Client client) async {
   try {
     final stellarBalances = await client.getBalance();
+    final balances = <String, String>{'TFT': '0', 'USDC': '0'};
+
     for (final balance in stellarBalances) {
-      if (balance.assetCode == 'TFT') {
-        if (double.parse(balance.balance) == 0) return '0';
-        return balance.balance;
+      if (balance.assetCode == 'TFT' || balance.assetCode == 'USDC') {
+        balances[balance.assetCode] =
+            double.parse(balance.balance) == 0 ? '0' : balance.balance;
       }
     }
+    return balances;
   } catch (e) {
     logger.i("Couldn't load the account balance due to $e");
+    return {'TFT': '-1', 'USDC': '-1'};
   }
-  return '-1';
 }
 
 Future<String> getBalance(String secret) async {
   final client = Client(NetworkType.PUBLIC, secret);
-  return getBalanceByClient(client);
+  final balances = await getBalanceByClient(client);
+  return balances['TFT'] ?? '-1';
 }
 
 Future<List<ITransaction>> listTransactions(
@@ -200,8 +205,14 @@ Future<TftMarketData?> fetchTftMarketData() async {
   return null;
 }
 
-Future<void> getActiveOrders(String secret) async {
+Future<List<Offer>> getActiveOrders(String secret) async {
   final client = Client(NetworkType.PUBLIC, secret);
   final orders = await client.listMyOffers();
+  return orders.map((order) => Offer.fromOfferResponse(order)).toList();
+}
 
+Future<List<Offer>> getOrdersHistory(String secret) async {
+  final client = Client(NetworkType.PUBLIC, secret);
+  final orders = await client.getTradingHistory(client.accountId);
+  return orders.map((order) => Offer.fromTradeResponse(order)).toList();
 }

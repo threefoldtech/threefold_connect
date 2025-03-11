@@ -175,7 +175,10 @@ class _OrderbookWidgetState extends State<OrderbookWidget> {
         child: SizedBox(
           width: MediaQuery.of(context).size.width - 40,
           child: ElevatedButton(
-            onPressed: () async {Navigator.of(context).push(MaterialPageRoute(builder: (context)=> BuyTFTWidget()));},
+            onPressed: () async {
+              null;
+              // Navigator.of(context).push(MaterialPageRoute(builder: (context)=> BuyTFTWidget()));
+              },
             style: ElevatedButton.styleFrom(
               backgroundColor: Theme.of(context).colorScheme.primaryContainer,
             ),

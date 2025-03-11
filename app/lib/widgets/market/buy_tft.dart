@@ -2,10 +2,12 @@ import 'package:decimal/decimal.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:threebotlogin/helpers/transaction_helpers.dart';
+import 'package:threebotlogin/models/wallet.dart';
 import 'package:validators/validators.dart';
 
 class BuyTFTWidget extends StatefulWidget {
-  const BuyTFTWidget({super.key});
+  final Wallet wallet;
+  const BuyTFTWidget({super.key, required this.wallet});
 
   @override
   State<BuyTFTWidget> createState() => _BuyTFTWidgetState();
@@ -138,7 +140,7 @@ class _BuyTFTWidgetState extends State<BuyTFTWidget> {
                       child: Align(
                         alignment: Alignment.centerRight,
                         child: Text(
-                          'Balance: 500 TFT',
+                          'Balance: ${widget.wallet.usdcBalance} USDC',
                           style:
                               Theme.of(context).textTheme.bodySmall!.copyWith(
                                     color: Theme.of(context)

@@ -32,7 +32,7 @@ Future<List<PkidWallet>> getPkidWallets() async {
   try {
     pKidResult = await client.getPKidDoc('purse');
     if (pKidResult.containsKey('error')) {
-      if (pKidResult.containsValue('Key is not found')){
+      if (pKidResult.containsValue('Key is not found')) {
         return [];
       }
       logger.e('Error in pKidResult : ${pKidResult['error']}');
@@ -64,7 +64,8 @@ Future<List<Wallet>> listWallets() async {
   final List<Wallet> wallets = await compute((void _) async {
     final List<Future<Wallet>> walletFutures = [];
     for (final w in pkidWallets) {
-      final walletFuture = loadWallet(w.name, w.seed, w.type, chainUrl, idenfyServiceUrl);
+      final walletFuture =
+          loadWallet(w.name, w.seed, w.type, chainUrl, idenfyServiceUrl);
       walletFutures.add(walletFuture);
     }
     return await Future.wait(walletFutures);
@@ -114,27 +115,33 @@ Future<Wallet> loadWallet(String walletName, String walletSeed,
     WalletType walletType, String chainUrl, String idenfyServiceUrl) async {
   final (stellarClient, tfchainClient) =
       await loadWalletClients(walletName, walletSeed, walletType, chainUrl);
+
   final balances = await Future.wait([
     StellarService.getBalanceByClient(stellarClient),
-    TFChainService.getBalanceByClient(tfchainClient)
+    TFChainService.getBalanceByClient(tfchainClient),
   ]);
-  final stellarBalance = balances.first.toString();
+
+  final stellarBalances = balances.first as Map<String, String>;
   final tfchainBalance =
       balances.last.toString() == '0.0' ? '0' : balances.last.toString();
-  final kycVerified =
-          await getVerificationStatus(address: tfchainClient.keypair!.address,idenfyServiceUrl: idenfyServiceUrl );
+
+  final kycVerified = await getVerificationStatus(
+      address: tfchainClient.keypair!.address,
+      idenfyServiceUrl: idenfyServiceUrl);
+
   final wallet = Wallet(
     name: walletName,
     stellarSecret: stellarClient.secretSeed,
     stellarAddress: stellarClient.accountId,
     tfchainSecret: tfchainClient.mnemonicOrSecretSeed,
     tfchainAddress: tfchainClient.address,
-    stellarBalance: stellarBalance,
+    stellarBalance: stellarBalances['TFT'] ?? '0',
     tfchainBalance: tfchainBalance,
-    usdcBalance: '-1',
+    usdcBalance: stellarBalances['USDC'] ?? '-1',
     type: walletType,
     verificationStatus: kycVerified.status,
   );
+
   return wallet;
 }
 

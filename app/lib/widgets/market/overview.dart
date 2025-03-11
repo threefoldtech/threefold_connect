@@ -132,7 +132,7 @@ class _OverviewWidgetState extends State<OverviewWidget> {
                           ? null
                           : () async {
                               Navigator.of(context).push(MaterialPageRoute(
-                                  builder: (context) => const OrderWidget()));
+                                  builder: (context) => OrderWidget(secret: _selectedWallet!.stellarSecret,)));
                             },
                       style: ElevatedButton.styleFrom(
                         backgroundColor:
@@ -262,9 +262,9 @@ class _OverviewWidgetState extends State<OverviewWidget> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               _buildMarketColumn(
-                                  'Total Balance (TFT)', "0.0126"),
+                                  'Total Balance (TFT)', _selectedWallet!.stellarBalance),
                               _buildMarketColumn(
-                                  'Total Balance (USDC)', "0.5678"),
+                                  'Total Balance (USDC)', _selectedWallet!.usdcBalance),
                             ],
                           ),
                         ],
@@ -284,7 +284,7 @@ class _OverviewWidgetState extends State<OverviewWidget> {
                   ? null
                   : () async {
                       Navigator.of(context).push(MaterialPageRoute(
-                          builder: (context) => const BuyTFTWidget()));
+                          builder: (context) => BuyTFTWidget(wallet: _selectedWallet!)));
                     },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Theme.of(context).colorScheme.primaryContainer,
@@ -331,8 +331,11 @@ class _OverviewWidgetState extends State<OverviewWidget> {
       isDismissible: true,
       constraints: const BoxConstraints(maxWidth: double.infinity),
       builder: (context) {
+        final filteredWallets = widget.wallets
+          .where((wallet) => wallet.stellarBalance != '-1')
+          .toList();
         return WalletSelectionSheet(
-          wallets: widget.wallets,
+          wallets: filteredWallets,
           selectedWallet: _selectedWallet,
           onWalletSelected: (Wallet wallet) {
             setState(() {
