@@ -42,9 +42,6 @@ switchConfigs() {
     cp android/app/src/main/res/mipmap-xxxhdpi/ic_launcher_$1.png android/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png
 
     cp ios/Runner/Info_$1 ios/Runner/Info.plist
-
-    # cp android/app/google-services_$1 android/app/google-services.json
-    # cp ios/Runner/GoogleService-Info_$1 ios/Runner/GoogleService-Info.plist
 }
 
 setConfigsAndBuild() {
