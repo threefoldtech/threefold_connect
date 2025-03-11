@@ -40,10 +40,6 @@ class _NewFarmState extends State<NewFarm> {
   String? privateKey;
   late registrar.RegistrarClient? registrarClient;
   late Map<String, String> keypair;
-  @override
-  initState() {
-    super.initState();
-  }
 
   Future<void> _initRegistrar() async {
     keypair = await generateKeypair(_selectedWallet!.tfchainSecret);
