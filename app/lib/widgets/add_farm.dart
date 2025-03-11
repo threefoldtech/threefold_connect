@@ -14,6 +14,7 @@ import 'package:threebotlogin/services/tfchain_service.dart';
 import 'package:threebotlogin/widgets/custom_dialog.dart';
 import 'package:tfchain_client/generated/dev/types/tfchain_support/types/farm.dart'
     as ChainFarm;
+import 'package:validators/validators.dart';
 
 class NewFarm extends StatefulWidget {
   const NewFarm(
@@ -24,7 +25,6 @@ class NewFarm extends StatefulWidget {
   final void Function(Farm addedFarm) onAddFarm;
   final List<Wallet> wallets;
   final bool isV4;
-
   @override
   State<StatefulWidget> createState() {
     return _NewFarmState();
@@ -38,6 +38,20 @@ class _NewFarmState extends State<NewFarm> {
   String? nameError;
   String? walletError;
   String? privateKey;
+  late registrar.RegistrarClient? registrarClient;
+  late Map<String, String> keypair;
+  @override
+  initState() {
+    super.initState();
+  }
+
+  Future<void> _initRegistrar() async {
+    keypair = await generateKeypair(_selectedWallet!.tfchainSecret);
+    privateKey = keypair['privateKey'];
+    registrarClient = registrar.RegistrarClient(
+        baseUrl: Globals().registrarURL, privateKey: privateKey!);
+  }
+
   Future<void> _showDialog(
       String title, String message, IconData icon, DialogType type) async {
     showDialog(
@@ -58,7 +72,18 @@ class _NewFarmState extends State<NewFarm> {
     );
   }
 
+  Future<bool> isV4FarmAvailable(String name) async {
+    try {
+      final farms = await registrarClient!.farms
+          .list(registrar.FarmFilter(farmName: name));
+      return farms.isEmpty;
+    } catch (e) {
+      throw Exception('Failed to list farm due to: $e');
+    }
+  }
+
   Future<bool> _validateName(String farmName) async {
+    late bool available;
     nameError = null;
     walletError = null;
 
@@ -66,7 +91,16 @@ class _NewFarmState extends State<NewFarm> {
       nameError = "Name can't be empty";
       return false;
     }
-    final available = await isFarmNameAvailable(farmName);
+
+    if (widget.isV4) {
+      if (!isAlphanumeric(farmName)) {
+        nameError = 'Name can only include letters and numbers';
+        return false;
+      }
+      available = await isV4FarmAvailable(farmName);
+    } else {
+      available = await isFarmNameAvailable(farmName);
+    }
 
     if (!available) {
       nameError = 'Farm name is already used';
@@ -85,19 +119,15 @@ class _NewFarmState extends State<NewFarm> {
 
   Future<registrar.Farm> addV4Farm(String farmName) async {
     Account? account;
-    final keypair = await generateKeypair(_selectedWallet!.tfchainSecret);
-    privateKey = keypair['privateKey'];
-    final registrarClient = registrar.RegistrarClient(
-        baseUrl: Globals().registrarURL, privateKey: privateKey!);
     try {
       account =
-          await registrarClient.accounts.getByPublicKey(keypair['publicKey']!);
+          await registrarClient!.accounts.getByPublicKey(keypair['publicKey']!);
     } catch (e) {
-      account = await registrarClient.accounts.create();
+      account = await registrarClient!.accounts.create();
     }
-    final v4FarmId =
-        await registrarClient.farms.create(farmName, false, _selectedWallet!.stellarAddress, account.twinID);
-    return await registrarClient.farms.get(v4FarmId);
+    final v4FarmId = await registrarClient!.farms.create(
+        farmName, false, _selectedWallet!.stellarAddress, account.twinID);
+    return await registrarClient!.farms.get(v4FarmId);
   }
 
   _add(String farmName) async {
@@ -165,6 +195,7 @@ class _NewFarmState extends State<NewFarm> {
   @override
   void dispose() {
     _nameController.dispose();
+    registrarClient = null;
     super.dispose();
   }
 
@@ -258,9 +289,10 @@ class _NewFarmState extends State<NewFarm> {
                                   ),
                         ),
                         dropdownMenuEntries: _buildDropdownMenuEntries(),
-                        onSelected: (Wallet? value) {
+                        onSelected: (Wallet? value) async {
                           if (value != null) {
                             _selectedWallet = value;
+                            await _initRegistrar();
                           }
                         },
                       ),

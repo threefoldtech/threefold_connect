@@ -31,7 +31,7 @@ class _FarmScreenState extends ConsumerState<FarmScreen>
   bool loading = true;
   late WalletsNotifier walletRef;
   late final TabController _tabController;
-
+  late void Function() _walletsListener;
   @override
   void initState() {
     super.initState();
@@ -41,18 +41,29 @@ class _FarmScreenState extends ConsumerState<FarmScreen>
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final walletNotifier = ref.read(walletsNotifier.notifier);
       if (walletNotifier.isListed) {
-        wallets = ref.read(walletsNotifier);
-        listFarms();
+        _assignWalletsAndListFarms();
       } else {
         // Listen for changes and trigger once wallets are listed
-        ref.read(walletsNotifier.notifier).addListener((state) {
+        _walletsListener =
+            ref.read(walletsNotifier.notifier).addListener((state) {
           if (state.isNotEmpty) {
-            wallets = state;
-            listFarms();
+            _assignWalletsAndListFarms();
+            _walletsListener();
           }
         });
       }
     });
+  }
+
+  _assignWalletsAndListFarms() {
+    wallets = ref.read(walletsNotifier);
+    listFarms();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _tabController.dispose();
   }
 
   Future<void> listFarms() async {
