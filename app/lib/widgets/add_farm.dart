@@ -103,7 +103,9 @@ class _NewFarmState extends State<NewFarm> {
 
   bool _validateWallet() {
     if (_selectedWallet == null) {
-      walletError = 'Please select a wallet';
+      setState(() {
+        walletError = 'Please select a wallet';
+      });
       return false;
     }
     return true;
@@ -113,8 +115,7 @@ class _NewFarmState extends State<NewFarm> {
     Account? account;
     try {
       final publicKey = await derivePublicKey(_selectedWallet!.tfchainSecret);
-      account =
-          await registrarClient!.accounts.getByPublicKey(publicKey);
+      account = await registrarClient!.accounts.getByPublicKey(publicKey);
     } catch (e) {
       account = await registrarClient!.accounts.create();
     }
@@ -159,16 +160,18 @@ class _NewFarmState extends State<NewFarm> {
   }
 
   Future<void> _validateAndAdd() async {
+    if(!_validateWallet()) return;
     final farmName = _nameController.text.trim();
-    saveLoading = true;
-    setState(() {});
+    setState(() {
+      saveLoading = true;
+    });
     final validName = await _validateName(farmName);
-    final validWallet = _validateWallet();
-    if (validName && validWallet) {
+    if (validName) {
       await _add(farmName);
     }
-    saveLoading = false;
-    setState(() {});
+    setState(() {
+      saveLoading = false;
+    });
   }
 
   List<DropdownMenuEntry<Wallet>> _buildDropdownMenuEntries() {
@@ -284,7 +287,8 @@ class _NewFarmState extends State<NewFarm> {
                         onSelected: (Wallet? value) async {
                           if (value != null) {
                             _selectedWallet = value;
-                            await _initRegistrar(_selectedWallet!.tfchainSecret);
+                            await _initRegistrar(
+                                _selectedWallet!.tfchainSecret);
                           }
                         },
                       ),

@@ -29,30 +29,12 @@ class _FarmScreenState extends ConsumerState<FarmScreen>
   List<Farm> v4Farms = [];
   List<Wallet> wallets = [];
   bool loading = true;
-  late WalletsNotifier walletRef;
   late final TabController _tabController;
-  late void Function() _walletsListener;
+
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
-
-    // Defer execution until after the first frame
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      final walletNotifier = ref.read(walletsNotifier.notifier);
-      if (walletNotifier.isListed) {
-        _assignWalletsAndListFarms();
-      } else {
-        // Listen for changes and trigger once wallets are listed
-        _walletsListener =
-            ref.read(walletsNotifier.notifier).addListener((state) {
-          if (state.isNotEmpty) {
-            _assignWalletsAndListFarms();
-            _walletsListener();
-          }
-        });
-      }
-    });
   }
 
   _assignWalletsAndListFarms() {
@@ -133,12 +115,13 @@ class _FarmScreenState extends ConsumerState<FarmScreen>
 
   Future<void> listV4FarmsAndNodes() async {
     registrarClient = registrar.RegistrarClient(
-        baseUrl: Globals().registrarURL, mnemonicOrSeed: wallets.first.tfchainSecret);
+        baseUrl: Globals().registrarURL,
+        mnemonicOrSeed: wallets.first.tfchainSecret);
     for (var w in wallets) {
       try {
         final publicKey = await derivePublicKey(w.tfchainSecret);
-        final account = await registrarClient!.accounts
-            .getByPublicKey(publicKey);
+        final account =
+            await registrarClient!.accounts.getByPublicKey(publicKey);
         final farms = await registrarClient!.farms
             .list(registrarFarm.FarmFilter(twinID: account.twinID));
         final nodes = await registrarClient!.nodes
@@ -151,8 +134,10 @@ class _FarmScreenState extends ConsumerState<FarmScreen>
               walletName: w.name,
               twinId: f.twinID,
               farmId: f.farmID!,
-              nodes: nodes.where((n) => n.farmID == f.farmID)
-                      .map((n) => Node(nodeId: n.nodeID, status: NodeStatus.Up)).toList(),
+              nodes: nodes
+                  .where((n) => n.farmID == f.farmID)
+                  .map((n) => Node(nodeId: n.nodeID, status: NodeStatus.Up))
+                  .toList(),
             )));
       } catch (e) {
         continue;
@@ -160,7 +145,7 @@ class _FarmScreenState extends ConsumerState<FarmScreen>
     }
   }
 
-  Widget listFarmsWidget(List<dynamic> farms) {
+  Widget listFarmsWidget(List<Farm> farms, bool isV4) {
     if (farms.isEmpty) {
       return SingleChildScrollView(
           child: Column(
@@ -206,7 +191,7 @@ class _FarmScreenState extends ConsumerState<FarmScreen>
           return FarmItemWidget(
             farm: farm,
             wallets: wallets,
-            isV4: _tabController.index == 1,
+            isV4: isV4,
           );
         });
   }
@@ -214,6 +199,11 @@ class _FarmScreenState extends ConsumerState<FarmScreen>
   @override
   Widget build(BuildContext context) {
     Widget mainWidget;
+    ref.listen<List<Wallet>>(walletsNotifier, (previous, current) {
+      if (current.isNotEmpty) {
+        _assignWalletsAndListFarms();
+      }
+    });
     if (loading) {
       mainWidget = Center(
           child: Column(
@@ -259,11 +249,11 @@ class _FarmScreenState extends ConsumerState<FarmScreen>
                 child: TabBarView(controller: _tabController, children: [
                   RefreshIndicator(
                     onRefresh: listFarms,
-                    child: listFarmsWidget(v3Farms),
+                    child: listFarmsWidget(v3Farms, false),
                   ),
                   RefreshIndicator(
                     onRefresh: listFarms,
-                    child: listFarmsWidget(v4Farms),
+                    child: listFarmsWidget(v4Farms, true),
                   ),
                 ]),
               )
