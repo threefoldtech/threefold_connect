@@ -1,0 +1,50 @@
+name: Build APK
+
+on:
+  pull_request:
+    branches:
+      - development
+  push:
+    branches:
+      - development
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: app
+    steps:
+      - name: Set up Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: "3.27.2"
+          channel: "stable"
+
+      - name: Get dependencies
+        run: flutter pub get
+
+      - name: Ensure Build Script is Executable
+        run: chmod +x build.sh
+
+      - name: Run Build Script
+        # shell: bash  
+        run: |
+          ./build.sh --init
+          ./build.sh --build --production --debug
+
+      - name: Verify APK Exists
+        run: |
+          if [ ! -f "build/app/outputs/flutter-apk/app-debug.apk" ]; then
+            echo "APK not found! Build failed."
+            exit 1
+          fi
+
+      - name: Upload APK Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-apk
+          path: app/build/app/outputs/flutter-apk/app-debug.apk
