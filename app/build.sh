@@ -7,19 +7,19 @@ logcurrent_time=$(date "+%H:%M:%S %d.%m.%Y")
 current_time=$(date "+%Y.%m.%d-%H.%M.%S")
 
 compileAndUpload() {
-    if [[ $2 == "--$5" ]]
+    if [[ $2 == "--$4" ]]
     then
-        switchConfigs "$5"
+        switchConfigs "$4"
 
         if [[ $1 == "--run" ]]
         then
-            echo "[$5]: Running."
+            echo "[$4]: Running."
             flutter run -t lib/main.dart
         elif [[ $1 == "--switch" ]]
         then
-            echo "[$5]: Switched configs."
+            echo "[$4]: Switched configs."
         else
-            echo "[$5]: Building apk."
+            echo "[$4]: Building apk."
 
             setConfigsAndBuild "$3"
         fi
