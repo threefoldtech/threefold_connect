@@ -73,9 +73,11 @@ class _FarmItemWidgetState extends State<FarmItemWidget> {
 
     try {
       if (widget.isV4) {
-        final client = registrar.RegistrarClient(baseUrl: Globals().registrarURL, privateKey: widget.farm.privateKey!);
-        await client.farms.update(
-            widget.farm.twinId, widget.farm.farmId, stellarAddress: newAddress);
+        final client = registrar.RegistrarClient(
+            baseUrl: Globals().registrarURL,
+            privateKey: widget.farm.privateKey!);
+        await client.farms.update(widget.farm.twinId, widget.farm.farmId,
+            stellarAddress: newAddress);
       } else {
         await addStellarAddress(
           widget.farm.tfchainWalletSecret,
@@ -281,38 +283,39 @@ class _FarmItemWidgetState extends State<FarmItemWidget> {
                             ),
                           ),
               ),
-              ListTile(
-                title: TextField(
-                    readOnly: true,
-                    obscureText: !showTfchainSecret,
-                    style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                          color: Theme.of(context).colorScheme.onSurface,
-                        ),
-                    controller: tfchainWalletSecretController,
-                    decoration: InputDecoration(
-                      labelText: 'TFChain Secret',
-                      suffixIcon: IconButton(
-                          onPressed: () {
-                            setState(() {
-                              showTfchainSecret = !showTfchainSecret;
-                            });
-                          },
-                          icon: Icon(showTfchainSecret
-                              ? Icons.visibility
-                              : Icons.visibility_off)),
-                    )),
-                subtitle: const Text(
-                    'Use this secret to log in to the ThreeFold Dashboard.'),
-                trailing: IconButton(
-                    onPressed: () {
-                      Clipboard.setData(ClipboardData(
-                          text: tfchainWalletSecretController.text));
-                      ScaffoldMessenger.of(context).clearSnackBars();
-                      ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Copied!')));
-                    },
-                    icon: const Icon(Icons.copy)),
-              ),
+              if (!widget.isV4)
+                ListTile(
+                  title: TextField(
+                      readOnly: true,
+                      obscureText: !showTfchainSecret,
+                      style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                            color: Theme.of(context).colorScheme.onSurface,
+                          ),
+                      controller: tfchainWalletSecretController,
+                      decoration: InputDecoration(
+                        labelText: 'TFChain Secret',
+                        suffixIcon: IconButton(
+                            onPressed: () {
+                              setState(() {
+                                showTfchainSecret = !showTfchainSecret;
+                              });
+                            },
+                            icon: Icon(showTfchainSecret
+                                ? Icons.visibility
+                                : Icons.visibility_off)),
+                      )),
+                  subtitle: const Text(
+                      'Use this secret to log in to the ThreeFold Dashboard.'),
+                  trailing: IconButton(
+                      onPressed: () {
+                        Clipboard.setData(ClipboardData(
+                            text: tfchainWalletSecretController.text));
+                        ScaffoldMessenger.of(context).clearSnackBars();
+                        ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('Copied!')));
+                      },
+                      icon: const Icon(Icons.copy)),
+                ),
               ListTile(
                 title: TextField(
                     readOnly: true,
