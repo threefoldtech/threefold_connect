@@ -23,9 +23,20 @@ class WalletsNotifier extends StateNotifier<List<Wallet>> {
   Future<void> list() async {
     if (_isListed) return;
     _loading = true;
-    state = await listWallets();
+    await _mutex.protect(() async {
+      state = await listWallets();
+    });
     _loading = false;
     _isListed = true;
+  }
+
+  Future<void> waitUntilListed() async {
+    if (_isListed) return;
+
+    await for (final _
+        in stream.where((wallets) => wallets.isNotEmpty && _isListed == true)) {
+      break;
+    }
   }
 
   Future<void> removeWallet(String name) async {
@@ -50,24 +61,24 @@ class WalletsNotifier extends StateNotifier<List<Wallet>> {
     });
   }
 
-Future<void> verifyWallet(String walletName) async {
-  final idenfyServiceUrl = Globals().idenfyServiceUrl;
-  await _mutex.protect(() async {
-    final wallet = state.where((w) => w.name == walletName).firstOrNull;
-    if (wallet != null) {
-      try {
-        final updatedVerificationStatus = await getVerificationStatus(
-          address: wallet.tfchainAddress,
-          idenfyServiceUrl: idenfyServiceUrl,
-        );
-        wallet.verificationStatus = updatedVerificationStatus.status;
-        state = [...state];
-      } catch (e) {
-        logger.e('[verifyWallet] Error during verification: $e');
+  Future<void> verifyWallet(String walletName) async {
+    final idenfyServiceUrl = Globals().idenfyServiceUrl;
+    await _mutex.protect(() async {
+      final wallet = state.where((w) => w.name == walletName).firstOrNull;
+      if (wallet != null) {
+        try {
+          final updatedVerificationStatus = await getVerificationStatus(
+            address: wallet.tfchainAddress,
+            idenfyServiceUrl: idenfyServiceUrl,
+          );
+          wallet.verificationStatus = updatedVerificationStatus.status;
+          state = [...state];
+        } catch (e) {
+          logger.e('[verifyWallet] Error during verification: $e');
+        }
       }
-    }
-  });
-}
+    });
+  }
 
   void reloadBalances() async {
     if (!_reload) return await TFChainService.disconnect();
