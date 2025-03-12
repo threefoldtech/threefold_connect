@@ -31,6 +31,11 @@ dependencies:
       url: https://github.com/threefoldtech/tfgrid-sdk-dart
       ref: development
       path: packages/gridproxy_client
+  registrar_client:
+    git:
+      url: https://github.com/threefoldtech/tfgridv4-sdk-dart
+      ref: development
+      path: packages/registrar_client
   flutter_svg: ^2.0.17
   bip39: ^1.0.6
   socket_io_client: 1.0.2
@@ -87,6 +92,11 @@ dev_dependencies:
 dependency_overrides:
   intl: ^0.19.0
   shared_preferences_android: 2.0.12
+  signer:
+    git:
+      url: https://github.com/threefoldtech/tfgrid-sdk-dart.git
+      path: packages/signer
+      ref: development
 
 flutter:
   uses-material-design: true

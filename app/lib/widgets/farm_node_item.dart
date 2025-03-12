@@ -3,8 +3,9 @@ import 'package:threebotlogin/main.dart';
 import 'package:threebotlogin/models/farm.dart';
 
 class FarmNodeItemWidget extends StatefulWidget {
-  const FarmNodeItemWidget({super.key, required this.node});
+  const FarmNodeItemWidget({super.key, required this.node, required this.isV4});
   final Node node;
+  final bool isV4;
 
   @override
   State<FarmNodeItemWidget> createState() => _FarmNodeItemWidgetState();
@@ -51,20 +52,22 @@ class _FarmNodeItemWidgetState extends State<FarmNodeItemWidget> {
           decoration: const InputDecoration(
             labelText: 'Node ID',
           )),
-      trailing: ElevatedButton(
-        onPressed: null,
-        style: ElevatedButton.styleFrom(
-            disabledBackgroundColor: statusColor,
-            shape: const RoundedRectangleBorder(
-                borderRadius: BorderRadius.all(Radius.circular(20)))),
-        child: Text(
-          widget.node.status.name,
-          style: Theme.of(context)
-              .textTheme
-              .bodySmall!
-              .copyWith(color: statusTextColor),
-        ),
-      ),
+      trailing: (widget.isV4)
+          ? null
+          : ElevatedButton(
+              onPressed: null,
+              style: ElevatedButton.styleFrom(
+                  disabledBackgroundColor: statusColor,
+                  shape: const RoundedRectangleBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(20)))),
+              child: Text(
+                widget.node.status.name,
+                style: Theme.of(context)
+                    .textTheme
+                    .bodySmall!
+                    .copyWith(color: statusTextColor),
+              ),
+            ),
     );
   }
 }

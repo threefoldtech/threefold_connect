@@ -93,6 +93,8 @@ class Flags {
             .toString();
     Globals().council =
         await Flags().hasFlagValueByFeatureName('council-member');
+    Globals().registrarURL =
+        (await Flags().getFlagValueByFeatureName('registrar-url')).toString();
   }
 
   Future<bool> hasFlagValueByFeatureName(String name) async {

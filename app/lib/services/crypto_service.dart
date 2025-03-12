@@ -1,7 +1,8 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:typed_data';
-
+// ignore: depend_on_referenced_packages
+import 'package:signer/signer.dart';
 import 'package:crypto/crypto.dart' show sha256;
 import 'package:bip39/bip39.dart' as bip39;
 import 'package:sodium_libs/sodium_libs.dart';
@@ -135,4 +136,17 @@ Future<Uint8List> generateDerivedSeed(String appId) async {
   List<int> hashKey = generator.generateKey(encodedPrivateKey, appId, 1000, 32);
 
   return Uint8List.fromList(hashKey);
+}
+
+Future<Signer> createSigner(String mnemonicOrSeed, KPType keypairType) async {
+  final Signer signer = Signer();
+  await signer.fromUri(mnemonicOrSeed, keypairType);
+  return signer;
+}
+
+Future<String> derivePublicKey(
+    String mnemonicOrSeed) async {
+  final signer = await createSigner(mnemonicOrSeed, KPType.sr25519);
+  final publicKey = signer.keypair!.publicKey.bytes;
+  return base64Encode(publicKey);
 }
