@@ -755,7 +755,7 @@ packages:
     description:
       path: "packages/gridproxy_client"
       ref: development
-      resolved-ref: "77f8f563f35d13016aada278feb6431fcfc6731d"
+      resolved-ref: "29666eae72ffd8946b06d5393fef6457c2789c7d"
       url: "https://github.com/threefoldtech/tfgrid-sdk-dart"
     source: git
     version: "1.0.0"
@@ -1715,7 +1715,7 @@ packages:
     description:
       path: "packages/stellar_client"
       ref: development
-      resolved-ref: f1513e6b8558f121a19275b5922ba8f432c81e60
+      resolved-ref: "29666eae72ffd8946b06d5393fef6457c2789c7d"
       url: "https://github.com/threefoldtech/tfgrid-sdk-dart"
     source: git
     version: "0.1.0"
