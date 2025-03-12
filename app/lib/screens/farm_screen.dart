@@ -30,15 +30,14 @@ class _FarmScreenState extends ConsumerState<FarmScreen>
   List<Wallet> wallets = [];
   bool loading = true;
   late final TabController _tabController;
+  late bool areWalletsListed;
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
-  }
-
-  _assignWalletsAndListFarms() {
-    wallets = ref.read(walletsNotifier);
+    areWalletsListed =
+        ref.read(walletsNotifier.notifier.select((n) => n.isListed));
     listFarms();
   }
 
@@ -56,6 +55,19 @@ class _FarmScreenState extends ConsumerState<FarmScreen>
         v3Farms.clear();
         v4Farms.clear();
       });
+      if (areWalletsListed) {
+        wallets = ref.read(walletsNotifier);
+      }
+      while (!areWalletsListed) {
+        await Future.delayed(const Duration(seconds: 1));
+        areWalletsListed =
+            ref.read(walletsNotifier.notifier.select((n) => n.isListed));
+        if (areWalletsListed) {
+          wallets = ref.read(walletsNotifier);
+          break;
+        }
+      }
+      if (areWalletsListed && wallets.isEmpty) return;
       await listV3FarmsAndNodes();
       await listV4FarmsAndNodes();
       setState(() {});
@@ -199,11 +211,6 @@ class _FarmScreenState extends ConsumerState<FarmScreen>
   @override
   Widget build(BuildContext context) {
     Widget mainWidget;
-    ref.listen<List<Wallet>>(walletsNotifier, (previous, current) {
-      if (current.isNotEmpty) {
-        _assignWalletsAndListFarms();
-      }
-    });
     if (loading) {
       mainWidget = Center(
           child: Column(
