@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:threebotlogin/models/offer.dart';
+import 'package:intl/intl.dart';
+import 'package:threebotlogin/widgets/market/order_details.dart';
 
 class OrderCardWidget extends ConsumerStatefulWidget {
   final Offer offer;
@@ -13,20 +15,28 @@ class OrderCardWidget extends ConsumerStatefulWidget {
 class _WalletCardWidgetState extends ConsumerState<OrderCardWidget> {
   List<Widget> cardContent = [];
 
+  String formatDateTime(String isoString) {
+    DateTime dateTime = DateTime.parse(isoString).toLocal();
+    return DateFormat('yyyy-MM-dd HH:mm:ss').format(dateTime);
+  }
+
   @override
   Widget build(BuildContext context) {
+    final double amount = double.parse(widget.offer.amount);
+    final double pricePerTFT = double.parse(widget.offer.price);
+    final double totalCost = amount * pricePerTFT;
     cardContent = [
       Row(
         children: [
           Text(
-            'Price per TFT: ${double.parse(widget.offer.price).toStringAsFixed(2)}',
+            'Price per TFT:',
             style: Theme.of(context).textTheme.bodyMedium!.copyWith(
                   color: Theme.of(context).colorScheme.onSurfaceVariant,
                 ),
           ),
           const Spacer(),
           Text(
-            '+ ${widget.offer.amount} TFT',
+            '${pricePerTFT.toStringAsFixed(2)} USDC',
             style: Theme.of(context).textTheme.bodyLarge!.copyWith(
                   color: Theme.of(context).colorScheme.onSecondaryContainer,
                 ),
@@ -35,29 +45,38 @@ class _WalletCardWidgetState extends ConsumerState<OrderCardWidget> {
       ),
       Row(
         children: [
-          SizedBox(
-              width: 35,
-              child: Image.asset(
-                'assets/tf_chain.png',
-                color: Theme.of(context).colorScheme.onSurface,
-                width: 20,
-                height: 20,
-              )),
           Text(
-            'TFChain',
-            style: Theme.of(context).textTheme.bodyLarge!.copyWith(
-                  color: Theme.of(context).colorScheme.onSecondaryContainer,
+            'Total Amount:',
+            style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
                 ),
           ),
           const Spacer(),
-          // Text(
-          //   '${formatAmount(widget.wallet.tfchainBalance)} TFT',
-          //   style: Theme.of(context).textTheme.bodyLarge!.copyWith(
-          //         color: Theme.of(context).colorScheme.onSecondaryContainer,
-          //       ),
-          // ),
+          Text(
+            '${amount.toStringAsFixed(2)} TFT',
+            style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
+          ),
         ],
-      )
+      ),
+      Row(
+        children: [
+          Text(
+            'Total Cost:',
+            style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
+          ),
+          const Spacer(),
+          Text(
+            '- ${totalCost.toStringAsFixed(2)} USDC',
+            style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
+          ),
+        ],
+      ),
     ];
 
     return Card(
@@ -66,15 +85,11 @@ class _WalletCardWidgetState extends ConsumerState<OrderCardWidget> {
           side: BorderSide(color: Theme.of(context).colorScheme.primary)),
       child: InkWell(
         onTap: () {
-          // if (widget.wallet.type == WalletType.NATIVE &&
-          //     widget.wallet.stellarBalance == '-1') {
-          //   return;
-          // }
-          // Navigator.of(context).push(MaterialPageRoute(
-          //   builder: (context) => WalletDetailsScreen(
-          //     wallet: widget.wallet,
-          //   ),
-          // ));
+          Navigator.of(context).push(MaterialPageRoute(
+            builder: (context) => OrderDetailsWidget(
+              offer: widget.offer,
+            ),
+          ));
         },
         child: Padding(
           padding: const EdgeInsets.all(16),
@@ -112,7 +127,7 @@ class _WalletCardWidgetState extends ConsumerState<OrderCardWidget> {
                   ),
                   const Spacer(),
                   Text(
-                    widget.offer.lastModifiedTime,
+                    formatDateTime(widget.offer.lastModifiedTime),
                     style: Theme.of(context).textTheme.bodyMedium!.copyWith(
                           color: Theme.of(context).colorScheme.onSurfaceVariant,
                         ),

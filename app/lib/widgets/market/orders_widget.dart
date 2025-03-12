@@ -23,11 +23,20 @@ class _OrdersWidgetState extends State<OrdersWidget> {
 
   @override
   Widget build(BuildContext context) {
-  final List<OrderCardWidget>? cards = _buildOffersCardsList(orders);
-    return SingleChildScrollView(
-      child: Column(
-                          mainAxisSize: MainAxisSize.min, children: cards!),
-    );
+    final List<OrderCardWidget>? cards = _buildOffersCardsList(orders);
+    return cards!.isNotEmpty
+        ? SingleChildScrollView(
+            child: Column(mainAxisSize: MainAxisSize.min, children: cards!),
+          )
+        : Center(
+            child: Text(
+              'No Orders was found',
+              style: Theme.of(context)
+                  .textTheme
+                  .bodyLarge!
+                  .copyWith(color: Theme.of(context).colorScheme.onSurface),
+            ),
+          );
   }
 }
 
