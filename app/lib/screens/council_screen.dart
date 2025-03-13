@@ -14,10 +14,49 @@ class CouncilScreen extends StatefulWidget {
 class _CouncilScreenState extends State<CouncilScreen> {
   final urlController = TextEditingController();
   String? errorMessage;
+  String? selectedNetwork = '';
+
+  Widget networkButton(String label, String url) {
+    final bool isActive = selectedNetwork == url;
+    final colorScheme = Theme.of(context).colorScheme;
+
+    return SizedBox(
+      width: MediaQuery.of(context).size.width / 3,
+      child: ElevatedButton(
+        style: ElevatedButton.styleFrom(
+          backgroundColor:
+              isActive ? colorScheme.primaryContainer : colorScheme.surface,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(6),
+            side: BorderSide(
+              color:
+                  isActive ? colorScheme.primaryContainer : colorScheme.outline,
+            ),
+          ),
+        ),
+        onPressed: () => _onNetworkSelected(url),
+        child: Text(
+          label,
+          style: TextStyle(
+            color: isActive
+                ? colorScheme.onPrimaryContainer
+                : colorScheme.onSurfaceVariant,
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _onNetworkSelected(String url) {
+    setState(() {
+      selectedNetwork = url;
+      urlController.text = url;
+      errorMessage = null;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-    const size = 100.0;
     final content = Padding(
         padding: const EdgeInsets.all(16.0),
         child: KeyboardVisibilityBuilder(builder: (context, isKeyboardVisible) {
@@ -60,55 +99,31 @@ class _CouncilScreenState extends State<CouncilScreen> {
                         labelText: 'TFChain URL',
                         errorText: errorMessage,
                       )),
-                  const SizedBox(height: 50),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  const SizedBox(height: 30),
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                              fixedSize: const Size.fromWidth(size)),
-                          onPressed: () {
-                            urlController.text = 'wss://tfchain.dev.grid.tf';
-                            errorMessage = null;
-                            setState(() {});
-                          },
-                          child: const Text('Devnet')),
-                      ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                              fixedSize: const Size.fromWidth(size)),
-                          onPressed: () {
-                            urlController.text = 'wss://tfchain.qa.grid.tf';
-                            errorMessage = null;
-                            setState(() {});
-                          },
-                          child: const Text('QAnet')),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          networkButton('Devnet', 'wss://tfchain.dev.grid.tf'),
+                          const SizedBox(width: 30),
+                          networkButton('QAnet', 'wss://tfchain.qa.grid.tf'),
+                        ],
+                      ),
+                      const SizedBox(height: 20),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          networkButton(
+                              'Testnet', 'wss://tfchain.test.grid.tf'),
+                          const SizedBox(width: 30),
+                          networkButton('Mainnet', 'wss://tfchain.grid.tf'),
+                        ],
+                      ),
                     ],
                   ),
                   const SizedBox(height: 20),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                              fixedSize: const Size.fromWidth(size)),
-                          onPressed: () {
-                            urlController.text = 'wss://tfchain.test.grid.tf';
-                            errorMessage = null;
-                            setState(() {});
-                          },
-                          child: const Text('Testnet')),
-                      ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                              fixedSize: const Size.fromWidth(size)),
-                          onPressed: () {
-                            urlController.text = 'wss://tfchain.grid.tf';
-                            errorMessage = null;
-                            setState(() {});
-                          },
-                          child: const Text('Mainnet')),
-                    ],
-                  ),
-                  const SizedBox(height: 50),
                   ElevatedButton(
                       onPressed: () {
                         if (errorMessage == null) {

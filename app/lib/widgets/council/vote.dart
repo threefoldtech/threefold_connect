@@ -93,7 +93,7 @@ class _CouncilVoteDialogState extends ConsumerState<CouncilVoteDialog> {
     } else {
       if (wallets.isEmpty) {
         content = Text(
-          'No wallets available to vote.',
+          'No wallets available to vote. Please import your council wallet.',
           style: Theme.of(context).textTheme.bodyLarge!.copyWith(
                 color: Theme.of(context).colorScheme.onSurface,
               ),
@@ -175,20 +175,6 @@ class _CouncilVoteDialogState extends ConsumerState<CouncilVoteDialog> {
               ? null
               : <Widget>[
                   TextButton(
-                    child: noLoading
-                        ? const SizedBox(
-                            width: 20,
-                            height: 20,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                            ),
-                          )
-                        : const Text('No'),
-                    onPressed: () {
-                      _vote(false);
-                    },
-                  ),
-                  TextButton(
                     child: yesLoading
                         ? const SizedBox(
                             width: 20,
@@ -203,7 +189,21 @@ class _CouncilVoteDialogState extends ConsumerState<CouncilVoteDialog> {
                     onPressed: () async {
                       _vote(true);
                     },
-                  )
+                  ),
+                  TextButton(
+                    child: noLoading
+                        ? const SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                            ),
+                          )
+                        : const Text('No'),
+                    onPressed: () {
+                      _vote(false);
+                    },
+                  ),
                 ],
     );
   }
