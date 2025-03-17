@@ -61,12 +61,23 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
       ));
     } else if (failed) {
       mainWidget = Center(
-        child: Text(
-          'Something went wrong.',
-          style: Theme.of(context)
-              .textTheme
-              .bodyLarge!
-              .copyWith(color: Theme.of(context).colorScheme.onSurface),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const SizedBox(height: 15),
+            ElevatedButton.icon(
+              icon: const Icon(Icons.refresh),
+              label: const Text('Try Again'),
+              onPressed: () {
+                setState(() {
+                  walletRef.clear();
+                  failed = false;
+                  loading = true;
+                });
+                listMyWallets();
+              },
+            ),
+          ],
         ),
       );
     } else {
@@ -103,8 +114,8 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
     });
     try {
       await walletRef.list();
-      await Future.delayed(const Duration(seconds: 1));
-      if (walletRef.isListed && wallets.isEmpty) {
+      await walletRef.waitUntilListed();
+      if (wallets.isEmpty) {
         await _addInitialWallet();
       }
     } catch (e) {
@@ -161,7 +172,9 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
       await ref.refresh(walletsNotifier.notifier).list();
       return;
     } catch (e) {
-      throw Exception('Something happend while reloading wallets!');
+      setState(() {
+        failed = true;
+      });
     } finally {
       loading = false;
     }
