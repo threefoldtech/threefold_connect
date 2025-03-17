@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import 'package:http/http.dart' as http;
+import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:threebotlogin/helpers/globals.dart';
 import 'package:threebotlogin/widgets/layout_drawer.dart';
 import 'package:xml2json/xml2json.dart';
@@ -17,278 +18,172 @@ class NewsScreen extends StatefulWidget {
 
 class _NewsScreenState extends State<NewsScreen> {
   final Xml2Json xml2json = Xml2Json();
-  List allArticles = [];
-  List visibleArticles = [];
-  bool isLoading = false;
-  bool isInitialLoading = true;
-  int articlesPerPage = 5;
-  int currentPage = 0;
-  final ScrollController _scrollController = ScrollController();
-  final newsUrl = Globals().newsUrl;
-
-  Future<void> getArticles() async {
-    if (mounted) {
-      setState(() {
-        isLoading = true;
-        if (currentPage == 0) {
-          isInitialLoading = true;
-        }
-      });
-    }
-
-    final url = Uri.parse(newsUrl);
-    final response = await http.get(url);
-
-    xml2json.parse(response.body);
-
-    var jsondata = xml2json.toGData();
-    var data = json.decode(jsondata);
-
-    var allEntries = data['feed']['entry'] ?? [];
-
-    setState(() {
-      allArticles = allEntries;
-      loadMoreArticles();
-
-      isLoading = false;
-      if (currentPage > 0) {
-        isInitialLoading = false;
-      }
-    });
-  }
-
-  void loadMoreArticles() {
-    final startIndex = currentPage * articlesPerPage;
-    final endIndex = startIndex + articlesPerPage;
-
-    if (startIndex < allArticles.length) {
-      setState(() {
-        isLoading = true;
-        visibleArticles.addAll(
-          allArticles.sublist(
-              startIndex, endIndex.clamp(0, allArticles.length)),
-        );
-        currentPage++;
-      });
-    }
-  }
+  static const int articlesPerPage = 20;
+  final PagingController<int, Map<String, dynamic>> _pagingController =
+      PagingController(firstPageKey: 0);
+  final String newsUrl = Globals().newsUrl;
 
   @override
   void initState() {
     super.initState();
-    getArticles();
-    _scrollController.addListener(() {
-      if (_scrollController.position.pixels ==
-          _scrollController.position.maxScrollExtent) {
-        loadMoreArticles();
-      } else {
-        setState(() {
-          isLoading = false;
-        });
-      }
-    });
+    _pagingController.addPageRequestListener(getArticles);
+  }
+
+  Future<void> getArticles(int pageKey) async {
+    try {
+      final response = await http.get(Uri.parse(newsUrl));
+      xml2json.parse(response.body);
+
+      var data = json.decode(xml2json.toGData());
+      var allEntries =
+          List<Map<String, dynamic>>.from(data['feed']['entry'] ?? []);
+
+      final startIndex = pageKey * articlesPerPage;
+      final endIndex =
+          (startIndex + articlesPerPage).clamp(0, allEntries.length);
+      final newArticles = allEntries.sublist(startIndex, endIndex);
+
+      final isLastPage = newArticles.length < articlesPerPage;
+      isLastPage
+          ? _pagingController.appendLastPage(newArticles)
+          : _pagingController.appendPage(newArticles, pageKey + 1);
+    } catch (e) {
+      _pagingController.error = e;
+    }
   }
 
   @override
   void dispose() {
-    _scrollController.dispose();
+    _pagingController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    if (isInitialLoading) {
-      return LayoutDrawer(
-          titleText: 'News',
-          content: Center(
-              child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const CircularProgressIndicator(),
-              const SizedBox(height: 15),
-              Text(
-                'Loading Articles...',
-                style: Theme.of(context).textTheme.bodyLarge!.copyWith(
-                    color: Theme.of(context).colorScheme.onSurface,
-                    fontWeight: FontWeight.bold),
-              ),
-            ],
-          )));
-    }
-
     return LayoutDrawer(
       titleText: 'News',
-      content: Column(
-        children: [
-          Expanded(
-              child: RefreshIndicator(
-            onRefresh: () {
-              isInitialLoading = true;
-              return getArticles();
-            },
-            child: ListView.builder(
-              controller: _scrollController,
-              itemCount: visibleArticles.length + (isLoading ? 1 : 0),
-              itemBuilder: (context, index) {
-                var entry = visibleArticles[index];
-
-                var title = entry['title']?['\$t'] ?? 'No Title';
-                var content = entry['content']?['\$t'] ?? 'No Content';
-                var link = entry['link'] is List
-                    ? entry['link'].first['href']
-                    : entry['link']['href'];
-
-                var publishedDateStr = entry['published']?['\$t'] ?? '';
-                DateTime publishedDate;
-                try {
-                  publishedDate = DateTime.parse(publishedDateStr).toLocal();
-                } catch (e) {
-                  publishedDate = DateTime.now();
-                }
-
-                String formattedDate = timeago.format(publishedDate);
-
-                content = cleanHtmlContent(content);
-
-                return Padding(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4.0),
-                  child: Card(
-                      elevation: 4.0,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: InkWell(
-                        borderRadius: BorderRadius.circular(12),
-                        onTap: () async {
-                          _launchURL(link);
-                        },
-                        child: Padding(
-                          padding: const EdgeInsets.all(16),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                children: [
-                                  Image.asset(
-                                    'assets/tf_chain.png',
-                                    color:
-                                        Theme.of(context).colorScheme.onSurface,
-                                    height: 20,
-                                    width: 20,
-                                  ),
-                                  const SizedBox(width: 2),
-                                  RichText(
-                                    text: TextSpan(
-                                      children: [
-                                        TextSpan(
-                                            text: 'THREEFOLD - ',
-                                            style: Theme.of(context)
-                                                .textTheme
-                                                .bodySmall!
-                                                .copyWith(
-                                                  color: Theme.of(context)
-                                                      .colorScheme
-                                                      .onSurface,
-                                                )),
-                                        TextSpan(
-                                            text: formattedDate,
-                                            style: Theme.of(context)
-                                                .textTheme
-                                                .bodySmall!
-                                                .copyWith(
-                                                  color: Theme.of(context)
-                                                      .colorScheme
-                                                      .onSurface,
-                                                )),
-                                      ],
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(
-                                height: 3,
-                              ),
-                              Text(
-                                title,
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .titleLarge!
-                                    .copyWith(
-                                      fontWeight: FontWeight.bold,
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .onSurface,
-                                    ),
-                              ),
-                              const SizedBox(height: 5),
-                              HtmlWidget(
-                                content.length > 200
-                                    ? '${content.substring(0, 200)}...'
-                                    : content,
-                                textStyle: TextStyle(
-                                  color:
-                                      Theme.of(context).colorScheme.onSurface,
-                                ),
-                                onTapUrl: (url) {
-                                  if (url.isNotEmpty) {
-                                    _launchURL(url);
-                                    return true;
-                                  }
-                                  return false;
-                                },
-                              ),
-                              const SizedBox(height: 4),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.end,
-                                children: [
-                                  TextButton(
-                                    onPressed: () async {
-                                      _launchURL(link);
-                                    },
-                                    child: Text(
-                                      'Read more',
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .bodyLarge!
-                                          .copyWith(
-                                            color: Theme.of(context)
-                                                .colorScheme
-                                                .primary,
-                                          ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
-                      )),
-                );
-              },
-            ),
-          )),
-          if (isLoading && !isInitialLoading)
-            const Center(
-              child: Padding(
-                padding: EdgeInsets.all(8.0),
-                child: CircularProgressIndicator(),
+      content: RefreshIndicator(
+        onRefresh: () async => _pagingController.refresh(),
+        child: PagedListView<int, Map<String, dynamic>>(
+          pagingController: _pagingController,
+          builderDelegate: PagedChildBuilderDelegate<Map<String, dynamic>>(
+            itemBuilder: (context, entry, index) =>
+                buildArticleCard(entry, context),
+            firstPageProgressIndicatorBuilder: (context) => Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const CircularProgressIndicator(),
+                  const SizedBox(height: 8),
+                  Text('Loading Articles...',
+                      style: Theme.of(context).textTheme.bodyLarge!.copyWith(
+                          color: Theme.of(context).colorScheme.onSurface,
+                          fontWeight: FontWeight.bold)),
+                ],
               ),
             ),
-        ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget buildArticleCard(Map<String, dynamic> entry, BuildContext context) {
+    final theme = Theme.of(context);
+    final onSurfaceColor = theme.colorScheme.onSurface;
+
+    final title = entry['title']?['\$t'] ?? 'No Title';
+    final content =
+        (entry['content']?['\$t'] ?? 'No Content').replaceAll(r'\\n', '');
+    final link = entry['link'] is List
+        ? entry['link'].first['href']
+        : entry['link']['href'];
+
+    final publishedDate =
+        DateTime.tryParse(entry['published']?['\$t'] ?? '')?.toLocal() ??
+            DateTime.now();
+    final formattedDate = timeago.format(publishedDate);
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4.0),
+      child: Card(
+        elevation: 4.0,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        child: InkWell(
+          borderRadius: BorderRadius.circular(12),
+          onTap: () => _launchURL(link),
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Image.asset('assets/tf_chain.png',
+                        color: onSurfaceColor, height: 20, width: 20),
+                    const SizedBox(width: 2),
+                    RichText(
+                      text: TextSpan(
+                        children: [
+                          TextSpan(
+                            text: 'THREEFOLD - ',
+                            style: theme.textTheme.bodySmall!
+                                .copyWith(color: onSurfaceColor),
+                          ),
+                          TextSpan(
+                            text: formattedDate,
+                            style: theme.textTheme.bodySmall!
+                                .copyWith(color: onSurfaceColor),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 3),
+                Text(
+                  title,
+                  style: theme.textTheme.titleLarge!.copyWith(
+                      fontWeight: FontWeight.bold, color: onSurfaceColor),
+                ),
+                const SizedBox(height: 5),
+                HtmlWidget(
+                  content.length > 200
+                      ? '${content.substring(0, 200)}...'
+                      : content,
+                  textStyle: TextStyle(color: onSurfaceColor),
+                  onTapUrl: (url) {
+                    if (url.isNotEmpty) {
+                      _launchURL(url);
+                      return true;
+                    }
+                    return false;
+                  },
+                ),
+                const SizedBox(height: 4),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    TextButton(
+                      onPressed: () => _launchURL(link),
+                      child: Text('Read more',
+                          style: theme.textTheme.bodyLarge!
+                              .copyWith(color: theme.colorScheme.primary)),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }
 
   void _launchURL(String url) async {
-    if (await canLaunchUrl(Uri.parse(url))) {
-      await launchUrl(Uri.parse(url));
-    } else {
-      throw 'Could not launch $url';
+    final uri = Uri.parse(url);
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri);
     }
-  }
-
-  String cleanHtmlContent(String content) {
-    return content.replaceAll(r'\\n', '');
   }
 }
