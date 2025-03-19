@@ -111,15 +111,18 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
   listMyWallets() async {
     setState(() {
       loading = true;
+      failed = false;
     });
     try {
-      await walletRef.list();
-      await walletRef.waitUntilListed();
+      await ref.read(walletsNotifier.notifier).list();
+      wallets = ref.read(walletsNotifier);
       if (wallets.isEmpty) {
         await _addInitialWallet();
       }
     } catch (e) {
-      failed = true;
+      setState(() {
+        failed = true;
+      });
       logger.e('Failed to get wallets due to $e');
       if (context.mounted) {
         final loadingFarmsFailure = SnackBar(
@@ -172,11 +175,25 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
       await ref.refresh(walletsNotifier.notifier).list();
       return;
     } catch (e) {
-      setState(() {
-        failed = true;
-      });
+      failed = true;
+      logger.e('Failed to get wallets due to $e');
+      if (context.mounted) {
+        final loadingFarmsFailure = SnackBar(
+          content: Text(
+            'Failed to load wallets',
+            style: Theme.of(context)
+                .textTheme
+                .bodyMedium!
+                .copyWith(color: Theme.of(context).colorScheme.errorContainer),
+          ),
+          duration: const Duration(seconds: 3),
+        );
+        ScaffoldMessenger.of(context).clearSnackBars();
+        ScaffoldMessenger.of(context).showSnackBar(loadingFarmsFailure);
+      }
     } finally {
       loading = false;
+      setState(() {});
     }
   }
 }

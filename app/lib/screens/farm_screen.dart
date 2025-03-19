@@ -28,6 +28,7 @@ class _FarmScreenState extends ConsumerState<FarmScreen>
   List<Farm> v3Farms = [];
   List<Farm> v4Farms = [];
   List<Wallet> wallets = [];
+  bool failed = false;
   bool loading = true;
   late final TabController _tabController;
 
@@ -53,6 +54,7 @@ class _FarmScreenState extends ConsumerState<FarmScreen>
     try {
       setState(() {
         loading = true;
+        failed = false;
         registrarClient = null;
         v3Farms.clear();
         v4Farms.clear();
@@ -62,7 +64,9 @@ class _FarmScreenState extends ConsumerState<FarmScreen>
       if (wallets.isEmpty) return;
       await listV3FarmsAndNodes();
       await listV4FarmsAndNodes();
-      setState(() {});
+      setState(() {
+        loading = false;
+      });
     } catch (e) {
       logger.e('Failed to get farms due to $e');
       if (context.mounted) {
@@ -79,8 +83,8 @@ class _FarmScreenState extends ConsumerState<FarmScreen>
         ScaffoldMessenger.of(context).clearSnackBars();
         ScaffoldMessenger.of(context).showSnackBar(loadingFarmsFailure);
       }
-    } finally {
       setState(() {
+        failed = true;
         loading = false;
       });
     }
@@ -218,6 +222,26 @@ class _FarmScreenState extends ConsumerState<FarmScreen>
           ),
         ],
       ));
+    } else if (failed) {
+      mainWidget = Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const SizedBox(height: 15),
+            ElevatedButton.icon(
+              icon: const Icon(Icons.refresh),
+              label: const Text('Try Again'),
+              onPressed: () async {
+                setState(() {
+                  failed = false;
+                  loading = true;
+                });
+                await listFarms();
+              },
+            ),
+          ],
+        ),
+      );
     } else {
       mainWidget = DefaultTabController(
           length: 2,
