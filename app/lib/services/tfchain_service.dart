@@ -1,5 +1,6 @@
 // ignore_for_file: depend_on_referenced_packages
 
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:bip39/bip39.dart';
@@ -99,14 +100,17 @@ Future<int> getTwinIdByQueryClient(String address) async {
 Future<Map<String, List<Proposal>>> getProposals() async {
   final chainUrl = Globals().chainUrl;
   final client = TFChain.QueryClient(chainUrl);
+  Map<String, List<Proposal>>? proposals;
   try {
     await client.connect();
-    final proposals = await client.dao.get();
+    proposals = await client.dao.get();
     return proposals;
   } catch (e) {
-    throw Exception('Failed to get dao proposals due to $e');
-  } finally {
-    await client.disconnect();
+    throw Exception('Failed to get DAO proposals due to $e');
+  } finally{
+    if (proposals != null) {
+      await client.disconnect();
+    }
   }
 }
 
