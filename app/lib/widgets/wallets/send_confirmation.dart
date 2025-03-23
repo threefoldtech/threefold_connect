@@ -1,5 +1,8 @@
 import 'dart:async';
+import 'dart:typed_data';
 
+import 'package:bs58/bs58.dart';
+import 'package:convert/convert.dart';
 import 'package:flutter/material.dart';
 import 'package:threebotlogin/helpers/transaction_helpers.dart';
 import 'package:threebotlogin/models/wallet.dart';
@@ -16,6 +19,7 @@ class SendConfirmationWidget extends StatefulWidget {
     required this.to,
     required this.amount,
     required this.memo,
+    required this.memoHash,
     required this.reloadBalance,
   });
 
@@ -24,7 +28,8 @@ class SendConfirmationWidget extends StatefulWidget {
   final String from;
   final String to;
   final String amount;
-  final String memo;
+  final String? memo;
+  final String? memoHash;
   final void Function() reloadBalance;
 
   @override
@@ -45,7 +50,11 @@ class _SendConfirmationWidgetState extends State<SendConfirmationWidget> {
     toController.text = widget.to;
     amountController.text = widget.amount;
     feeController.text = widget.chainType == ChainType.Stellar ? '0.1' : '0.01';
-    memoController.text = widget.memo;
+    if (widget.memo != null) {
+    memoController.text = widget.memo!;
+  } else if (widget.memoHash != null) {
+    memoController.text = widget.memoHash!;
+  } 
     super.initState();
   }
 
@@ -190,6 +199,8 @@ class _SendConfirmationWidgetState extends State<SendConfirmationWidget> {
           Icons.check, DialogType.Info);
       Navigator.pop(context);
     } catch (e) {
+      print('Hello ya error');
+      print(e);
       String errorMessage = e is TimeoutException
           ? 'Transfer took too long. Please try again.'
           : 'Failed to transfer. Please try again.';
@@ -210,8 +221,9 @@ class _SendConfirmationWidgetState extends State<SendConfirmationWidget> {
 
   Future<void> _performTransfer() async {
     if (widget.chainType == ChainType.Stellar) {
+      final memoHash = widget.memoHash != null ? hex.decode(memoController.text.trim()) : null;
       await Stellar.transfer(
-          widget.secret, widget.to, widget.amount, memo: widget.memo);
+          widget.secret, widget.to, widget.amount, memo: widget.memo, memoHash: Uint8List.fromList(memoHash!));
     } else {
       await TFChain.transfer(widget.secret, widget.to, widget.amount);
     }

@@ -40,6 +40,8 @@ class _WalletSendScreenState extends ConsumerState<WalletSendScreen> {
   final FocusNode textFieldFocusNode = FocusNode();
   List percentages = [25, 50, 75, 100];
   List<Wallet> wallets = [];
+  MemoType selectedMemoType = MemoType.text;
+  String? memoError;
 
   @override
   void initState() {
@@ -182,9 +184,28 @@ class _WalletSendScreenState extends ConsumerState<WalletSendScreen> {
     return validAddress && validAmount;
   }
 
+  String? _validateMemo(String memo, MemoType type) {
+    if (type == MemoType.hash) {
+      final isValidHex = RegExp(r'^[0-9a-fA-F]{1,64}$').hasMatch(memo);
+      if (!isValidHex) return 'Invalid Hash (Hex, max 64 chars)';
+    } else {
+      if (memo.length > 28) return 'Invalid Text length, max length is 28';
+    }
+    return null;
+  }
+
   void _selectToAddress(String address) {
     toController.text = address;
     setState(() {});
+  }
+
+  String _memoTypeToString(MemoType type) {
+    switch (type) {
+      case MemoType.hash:
+        return 'Memo Hash';
+      case MemoType.text:
+        return 'Memo Text';
+    }
   }
 
   @override
@@ -322,18 +343,72 @@ class _WalletSendScreenState extends ConsumerState<WalletSendScreen> {
                       ),
                     ),
                   if (chainType == ChainType.Stellar)
-                    ListTile(
-                      title: TextField(
-                          style: Theme.of(context)
-                              .textTheme
-                              .bodyMedium!
-                              .copyWith(
-                                color: Theme.of(context).colorScheme.onSurface,
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 8, horizontal: 10),
+                      child: SizedBox(
+                        width: double.infinity,
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: TextField(
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodyMedium!
+                                    .copyWith(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onSurface,
+                                    ),
+                                controller: memoController,
+                                decoration: InputDecoration(
+                                  errorText: memoError,
+                                  labelText:
+                                      _memoTypeToString(selectedMemoType),
+                                ),                              
+                                onChanged: (value) {
+                                  setState(() {
+                                    memoError =
+                                        _validateMemo(value, selectedMemoType);
+                                  });
+                                },
                               ),
-                          controller: memoController,
-                          decoration: const InputDecoration(
-                            labelText: 'Memo',
-                          )),
+                            ),
+                            const SizedBox(width: 10),
+                            SizedBox(
+                              width: 150,
+                              child: DropdownButtonFormField<MemoType>(
+                                value: selectedMemoType,
+                                onChanged: (MemoType? newValue) {
+                                  setState(() {
+                                    selectedMemoType = newValue!;
+                                  });
+                                },
+                                items: MemoType.values.map((MemoType type) {
+                                  return DropdownMenuItem<MemoType>(
+                                    value: type,
+                                    child: Text(
+                                      _memoTypeToString(type),
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .bodyMedium!
+                                          .copyWith(
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .onSurface,
+                                          ),
+                                    ),
+                                  );
+                                }).toList(),
+                                decoration: const InputDecoration(
+                                  contentPadding: EdgeInsets.symmetric(
+                                      vertical: 12, horizontal: 10),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
                     ),
                   const SizedBox(height: 40),
                   Padding(
@@ -341,7 +416,7 @@ class _WalletSendScreenState extends ConsumerState<WalletSendScreen> {
                         const EdgeInsets.symmetric(vertical: 8, horizontal: 10),
                     child: ElevatedButton(
                       onPressed: () async {
-                        if (await _validate()) {
+                        if (await _validate() && memoError == null) {
                           await _send_confirmation();
                         }
                       },
@@ -397,9 +472,14 @@ class _WalletSendScreenState extends ConsumerState<WalletSendScreen> {
       if (code.queryParameters.containsKey('amount')) {
         amountController.text = code.queryParameters['amount']!;
       }
-      if (chainType == ChainType.Stellar &&
-          code.queryParameters.containsKey('message')) {
-        memoController.text = code.queryParameters['message']!;
+      if (chainType == ChainType.Stellar) {
+        if (code.queryParameters.containsKey('memo_hash')) {
+          selectedMemoType = MemoType.hash;
+          memoController.text = code.queryParameters['memo_hash']!;
+        } else if (code.queryParameters.containsKey('message')) {
+          selectedMemoType = MemoType.text;
+          memoController.text = code.queryParameters['message']!;
+        }
       }
       setState(() {});
     } else {
@@ -441,6 +521,10 @@ class _WalletSendScreenState extends ConsumerState<WalletSendScreen> {
   }
 
   _send_confirmation() async {
+    final memoHash = selectedMemoType == MemoType.hash ? memoController.text.trim() : null;
+    final memoText = selectedMemoType == MemoType.text
+        ? memoController.text.trim()
+        : null;
     showModalBottomSheet(
         isScrollControlled: true,
         useSafeArea: true,
@@ -455,10 +539,13 @@ class _WalletSendScreenState extends ConsumerState<WalletSendScreen> {
               from: fromController.text.trim(),
               to: toController.text.trim(),
               amount: amountController.text.trim(),
-              memo: memoController.text.trim(),
+              memo: memoText,
+              memoHash: memoHash,
               reloadBalance: chainType == ChainType.Stellar
                   ? _loadStellarBalance
                   : _loadTFChainBalance,
             ));
   }
 }
+
+enum MemoType { text, hash }
