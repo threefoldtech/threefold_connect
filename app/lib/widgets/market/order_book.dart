@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:threebotlogin/models/order_book.dart';
 import 'package:threebotlogin/services/stellar_service.dart';
-import 'package:threebotlogin/widgets/market/buy_tft.dart';
 
 class OrderbookWidget extends StatefulWidget {
   const OrderbookWidget({super.key, required this.secret});
@@ -47,152 +46,159 @@ class _OrderbookWidgetState extends State<OrderbookWidget> {
   }
 
   Widget _buildOrderBookTable(OrderBook orderBook) {
-  final int maxRows = orderBook.bids.length > orderBook.asks.length
-      ? orderBook.bids.length
-      : orderBook.asks.length;
+    final int maxRows = orderBook.bids.length > orderBook.asks.length
+        ? orderBook.bids.length
+        : orderBook.asks.length;
 
-  return Column(
-    children: [
-      Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: [
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.all(10),
-              child: Text(
-                'Buy Offers',
-                style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: Theme.of(context).colorScheme.primary),
+    return Column(
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.all(10),
+                child: Text(
+                  'Buy Offers',
+                  style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: Theme.of(context).colorScheme.primary),
+                ),
               ),
             ),
-          ),
-          Container(
-            width: 1,
-            height: 30,
-            color: Theme.of(context).colorScheme.onSurfaceVariant,
-          ),
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.all(10),
-              child: Text(
-                'Sell Offers',
-                style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: Theme.of(context).colorScheme.error),
+            Container(
+              width: 1,
+              height: 30,
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
+            ),
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.all(10),
+                child: Text(
+                  'Sell Offers',
+                  style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: Theme.of(context).colorScheme.error),
+                ),
               ),
             ),
-          ),
-        ],
-      ),
-      Divider(thickness: 1, color: Theme.of(context).colorScheme.onSurfaceVariant),
-
-      Row(
-        children: [
-          Expanded(
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                Text('Amount (USDC)',
-                    style: Theme.of(context).textTheme.bodySmall!.copyWith(
-                        fontWeight: FontWeight.bold,
-                        color: Theme.of(context).colorScheme.onSurface)),
-                Text('Price (TFT)',
-                    style: Theme.of(context).textTheme.bodySmall!.copyWith(
-                        fontWeight: FontWeight.bold,
-                        color: Theme.of(context).colorScheme.onSurface)),
-              ],
+          ],
+        ),
+        Divider(
+            thickness: 1,
+            color: Theme.of(context).colorScheme.onSurfaceVariant),
+        Row(
+          children: [
+            Expanded(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  Text('Amount (USDC)',
+                      style: Theme.of(context).textTheme.bodySmall!.copyWith(
+                          fontWeight: FontWeight.bold,
+                          color: Theme.of(context).colorScheme.onSurface)),
+                  Text('Price (TFT)',
+                      style: Theme.of(context).textTheme.bodySmall!.copyWith(
+                          fontWeight: FontWeight.bold,
+                          color: Theme.of(context).colorScheme.onSurface)),
+                ],
+              ),
             ),
-          ),
-          Container(width: 1, height: 30, color: Theme.of(context).colorScheme.onSurfaceVariant),
-          Expanded(
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                Text('Amount (USDC)',
-                    style: Theme.of(context).textTheme.bodySmall!.copyWith(
-                        fontWeight: FontWeight.bold,
-                        color: Theme.of(context).colorScheme.onSurface)),
-                Text('Price (TFT)',
-                    style: Theme.of(context).textTheme.bodySmall!.copyWith(
-                        fontWeight: FontWeight.bold,
-                        color: Theme.of(context).colorScheme.onSurface)),
-              ],
+            Container(
+                width: 1,
+                height: 30,
+                color: Theme.of(context).colorScheme.onSurfaceVariant),
+            Expanded(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  Text('Amount (USDC)',
+                      style: Theme.of(context).textTheme.bodySmall!.copyWith(
+                          fontWeight: FontWeight.bold,
+                          color: Theme.of(context).colorScheme.onSurface)),
+                  Text('Price (TFT)',
+                      style: Theme.of(context).textTheme.bodySmall!.copyWith(
+                          fontWeight: FontWeight.bold,
+                          color: Theme.of(context).colorScheme.onSurface)),
+                ],
+              ),
             ),
-          ),
-        ],
-      ),
-      const SizedBox(height: 5),
+          ],
+        ),
+        const SizedBox(height: 5),
+        Expanded(
+          child: ListView.builder(
+            itemCount: maxRows,
+            itemBuilder: (context, index) {
+              final bid =
+                  index < orderBook.bids.length ? orderBook.bids[index] : null;
+              final ask =
+                  index < orderBook.asks.length ? orderBook.asks[index] : null;
 
-      Expanded(
-        child: ListView.builder(
-          itemCount: maxRows,
-          itemBuilder: (context, index) {
-            final bid = index < orderBook.bids.length ? orderBook.bids[index] : null;
-            final ask = index < orderBook.asks.length ? orderBook.asks[index] : null;
-
-            return Row(
-              children: [
-                Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 5),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: [
-                        Text(bid != null ? bid.amount.toString() : '',
-                            style: Theme.of(context).textTheme.bodySmall!.copyWith(
-                                color: Theme.of(context).colorScheme.onPrimaryContainer)),
-                        Text(bid != null ? bid.price.toString() : '',
-                            style: Theme.of(context).textTheme.bodySmall!.copyWith(
-                                color: Theme.of(context).colorScheme.onPrimaryContainer)),
-                      ],
+              return Row(
+                children: [
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 5),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: [
+                          Text(bid != null ? bid.amount.toString() : '',
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodySmall!
+                                  .copyWith(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onPrimaryContainer)),
+                          Text(bid != null ? bid.price.toString() : '',
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodySmall!
+                                  .copyWith(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onPrimaryContainer)),
+                        ],
+                      ),
                     ),
                   ),
-                ),
-                Container(width: 1, height: 30, color: Theme.of(context).colorScheme.onSurfaceVariant),
-                Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 5),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: [
-                        Text(ask != null ? ask.amount.toString() : '',
-                            style: Theme.of(context).textTheme.bodySmall!.copyWith(
-                                color: Theme.of(context).colorScheme.onPrimaryContainer)),
-                        Text(ask != null ? ask.price.toString() : '',
-                            style: Theme.of(context).textTheme.bodySmall!.copyWith(
-                                color: Theme.of(context).colorScheme.onPrimaryContainer)),
-                      ],
+                  Container(
+                      width: 1,
+                      height: 30,
+                      color: Theme.of(context).colorScheme.onSurfaceVariant),
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 5),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: [
+                          Text(ask != null ? ask.amount.toString() : '',
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodySmall!
+                                  .copyWith(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onPrimaryContainer)),
+                          Text(ask != null ? ask.price.toString() : '',
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodySmall!
+                                  .copyWith(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onPrimaryContainer)),
+                        ],
+                      ),
                     ),
                   ),
-                ),
-              ],
-            );
-          },
-        ),
-      ),
-      Center(
-        child: SizedBox(
-          width: MediaQuery.of(context).size.width - 40,
-          child: ElevatedButton(
-            onPressed: () async {
-              null;
-              // Navigator.of(context).push(MaterialPageRoute(builder: (context)=> BuyTFTWidget()));
-              },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Theme.of(context).colorScheme.primaryContainer,
-            ),
-            child: Text(
-              'Buy TFT',
-              style: Theme.of(context).textTheme.bodyLarge!.copyWith(
-                    color: Theme.of(context).colorScheme.onPrimaryContainer,
-                  ),
-            ),
+                ],
+              );
+            },
           ),
         ),
-      ),
-    ],
-  );
-}
-
+      ],
+    );
+  }
 }

@@ -71,12 +71,28 @@ class _OverviewWidgetState extends State<OverviewWidget> {
         if (tftPrice == null)
           const CircularProgressIndicator()
         else
-          Text(
-            tftPrice!.toStringAsFixed(7),
-            style: Theme.of(context).textTheme.headlineLarge!.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: Theme.of(context).colorScheme.primary,
-                ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Text(
+                tftPrice!.toStringAsFixed(7),
+                style: Theme.of(context).textTheme.headlineLarge!.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: Theme.of(context).colorScheme.primary,
+                    ),
+              ),
+              const SizedBox(
+                width: 5,
+              ),
+              Text(
+                'TFT',
+                style: Theme.of(context).textTheme.headlineLarge!.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: Theme.of(context).colorScheme.primary,
+                    ),
+              ),
+            ],
           ),
         const SizedBox(height: 8),
         Text(
@@ -132,7 +148,9 @@ class _OverviewWidgetState extends State<OverviewWidget> {
                           ? null
                           : () async {
                               Navigator.of(context).push(MaterialPageRoute(
-                                  builder: (context) => OrderWidget(secret: _selectedWallet!.stellarSecret,)));
+                                  builder: (context) => OrderWidget(
+                                        selectedWallet: _selectedWallet!,
+                                      )));
                             },
                       style: ElevatedButton.styleFrom(
                         backgroundColor:
@@ -261,10 +279,10 @@ class _OverviewWidgetState extends State<OverviewWidget> {
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              _buildMarketColumn(
-                                  'Total Balance (TFT)', _selectedWallet!.stellarBalance),
-                              _buildMarketColumn(
-                                  'Total Balance (USDC)', _selectedWallet!.usdcBalance),
+                              _buildMarketColumn('Total Balance (TFT)',
+                                  _selectedWallet!.stellarBalance),
+                              _buildMarketColumn('Total Balance (USDC)',
+                                  _selectedWallet!.usdcBalance),
                             ],
                           ),
                         ],
@@ -284,7 +302,10 @@ class _OverviewWidgetState extends State<OverviewWidget> {
                   ? null
                   : () async {
                       Navigator.of(context).push(MaterialPageRoute(
-                          builder: (context) => BuyTFTWidget(wallet: _selectedWallet!)));
+                          builder: (context) => BuyTFTWidget(
+                                wallet: _selectedWallet!,
+                                edit: false,
+                              )));
                     },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Theme.of(context).colorScheme.primaryContainer,
@@ -332,8 +353,8 @@ class _OverviewWidgetState extends State<OverviewWidget> {
       constraints: const BoxConstraints(maxWidth: double.infinity),
       builder: (context) {
         final filteredWallets = widget.wallets
-          .where((wallet) => wallet.stellarBalance != '-1')
-          .toList();
+            .where((wallet) => wallet.stellarBalance != '-1')
+            .toList();
         return WalletSelectionSheet(
           wallets: filteredWallets,
           selectedWallet: _selectedWallet,

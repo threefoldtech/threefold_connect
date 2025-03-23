@@ -216,3 +216,33 @@ Future<List<Offer>> getOrdersHistory(String secret) async {
   final orders = await client.getTradingHistory(client.accountId);
   return orders.map((order) => Offer.fromTradeResponse(order)).toList();
 }
+
+Future<bool> createOrder(String secret, String sellingAssetCode,
+    String buyingAssetCode, String amount, String price) async {
+  final client = Client(NetworkType.PUBLIC, secret);
+  return await client.createOrder(
+      sellingAssetCode: sellingAssetCode,
+      buyingAssetCode: buyingAssetCode,
+      amount: amount,
+      price: price);
+}
+
+Future<bool> cancelOrder(String secret, String sellingAssetCode,
+    String buyingAssetCode, String offerID) async {
+  final client = Client(NetworkType.PUBLIC, secret);
+  return await client.cancelOrder(
+      sellingAssetCode: sellingAssetCode,
+      buyingAssetCode: buyingAssetCode,
+      offerId: offerID);
+}
+
+Future<bool> updateOrder(String secret, String sellingAssetCode,
+    String buyingAssetCode, String amount, String price, String offerID) async {
+  final client = Client(NetworkType.PUBLIC, secret);
+  return await client.updateOrder(
+      sellingAssetCode: sellingAssetCode,
+      buyingAssetCode: buyingAssetCode,
+      amount: amount,
+      price: price,
+      offerId:offerID );
+}

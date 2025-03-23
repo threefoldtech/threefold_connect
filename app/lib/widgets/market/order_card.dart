@@ -2,11 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:threebotlogin/models/offer.dart';
 import 'package:intl/intl.dart';
+import 'package:threebotlogin/models/wallet.dart';
 import 'package:threebotlogin/widgets/market/order_details.dart';
 
 class OrderCardWidget extends ConsumerStatefulWidget {
   final Offer offer;
-  const OrderCardWidget({super.key, required this.offer});
+  final Wallet selectedWallet;
+  const OrderCardWidget(
+      {super.key, required this.offer, required this.selectedWallet});
 
   @override
   ConsumerState<OrderCardWidget> createState() => _WalletCardWidgetState();
@@ -25,7 +28,25 @@ class _WalletCardWidgetState extends ConsumerState<OrderCardWidget> {
     final double amount = double.parse(widget.offer.amount);
     final double pricePerTFT = double.parse(widget.offer.price);
     final double totalCost = amount * pricePerTFT;
+
     cardContent = [
+      Row(
+        children: [
+          Text(
+            'Price per USDC:',
+            style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
+          ),
+          const Spacer(),
+          Text(
+            '- ${amount.toStringAsFixed(2)} USDC',
+            style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
+          ),
+        ],
+      ),
       Row(
         children: [
           Text(
@@ -36,7 +57,7 @@ class _WalletCardWidgetState extends ConsumerState<OrderCardWidget> {
           ),
           const Spacer(),
           Text(
-            '${pricePerTFT.toStringAsFixed(2)} USDC',
+            '+ ${pricePerTFT.toStringAsFixed(2)} USDC',
             style: Theme.of(context).textTheme.bodyLarge!.copyWith(
                   color: Theme.of(context).colorScheme.onSecondaryContainer,
                 ),
@@ -53,24 +74,7 @@ class _WalletCardWidgetState extends ConsumerState<OrderCardWidget> {
           ),
           const Spacer(),
           Text(
-            '${amount.toStringAsFixed(2)} TFT',
-            style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                  color: Theme.of(context).colorScheme.onSurfaceVariant,
-                ),
-          ),
-        ],
-      ),
-      Row(
-        children: [
-          Text(
-            'Total Cost:',
-            style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                  color: Theme.of(context).colorScheme.onSurfaceVariant,
-                ),
-          ),
-          const Spacer(),
-          Text(
-            '- ${totalCost.toStringAsFixed(2)} USDC',
+            '${totalCost.toStringAsFixed(2)} TFT',
             style: Theme.of(context).textTheme.bodyMedium!.copyWith(
                   color: Theme.of(context).colorScheme.onSurfaceVariant,
                 ),
@@ -88,6 +92,7 @@ class _WalletCardWidgetState extends ConsumerState<OrderCardWidget> {
           Navigator.of(context).push(MaterialPageRoute(
             builder: (context) => OrderDetailsWidget(
               offer: widget.offer,
+              selectedWallet: widget.selectedWallet,
             ),
           ));
         },

@@ -46,7 +46,7 @@ class Offer {
         response.counterAssetIssuer,
       ),
       amount: response.baseAmount,
-      price: response.price.toString(),
+      price: response.price.numerator.toString() + '/' + response.price.denominator.toString(),
       lastModifiedTime: response.ledgerCloseTime,
     );
   }

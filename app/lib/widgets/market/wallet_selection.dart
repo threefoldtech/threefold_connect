@@ -27,8 +27,7 @@ class WalletSelectionSheet extends StatelessWidget {
           Text(
             'Select Wallet',
             style: Theme.of(context).textTheme.titleLarge!.copyWith(
-              color: Theme.of(context).colorScheme.onPrimaryContainer
-            ),
+                color: Theme.of(context).colorScheme.onPrimaryContainer),
           ),
           const SizedBox(height: 12),
           ...wallets.map((wallet) => ListTile(

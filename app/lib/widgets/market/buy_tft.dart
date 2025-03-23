@@ -2,31 +2,55 @@ import 'package:decimal/decimal.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:threebotlogin/helpers/transaction_helpers.dart';
+import 'package:threebotlogin/models/offer.dart';
 import 'package:threebotlogin/models/wallet.dart';
-import 'package:validators/validators.dart';
+import 'package:threebotlogin/services/stellar_service.dart' as Stellar;
+import 'package:threebotlogin/widgets/custom_dialog.dart';
 
 class BuyTFTWidget extends StatefulWidget {
   final Wallet wallet;
-  const BuyTFTWidget({super.key, required this.wallet});
+  final Offer? offer;
+  final bool edit;
+  const BuyTFTWidget(
+      {super.key, required this.wallet, this.offer, required this.edit});
 
   @override
   State<BuyTFTWidget> createState() => _BuyTFTWidgetState();
 }
 
 class _BuyTFTWidgetState extends State<BuyTFTWidget> {
-  final amountController = TextEditingController();
-
+  late TextEditingController amountController;
+  late TextEditingController priceController;
+  final totalAmountController = TextEditingController();
   final FocusNode textFieldFocusNode = FocusNode();
   String? amountError;
-  // should be changed
-  Decimal fee = Decimal.one.shift(-1);
+  String? priceError;
+  bool loading = false;
+  bool _isButtonEnabled = false;
   List percentages = [25, 50, 75, 100];
+
+  @override
+  void initState() {
+    super.initState();
+    amountController = TextEditingController(
+        text: widget.edit ? widget.offer?.amount.toString() ?? '' : '');
+    priceController = TextEditingController(
+        text: widget.edit ? widget.offer?.price.toString() ?? '' : '');
+    amountController.addListener(_calculateTotal);
+    priceController.addListener(_calculateTotal);
+    if (widget.edit) _calculateTotal();
+  }
 
   @override
   void dispose() {
     textFieldFocusNode.dispose();
     amountController.dispose();
-
+    priceController.dispose();
+    totalAmountController.dispose();
+    amountError = null;
+    priceError = null;
+    amountController.removeListener(_calculateTotal);
+    priceController.removeListener(_calculateTotal);
     super.dispose();
   }
 
@@ -34,40 +58,214 @@ class _BuyTFTWidgetState extends State<BuyTFTWidget> {
     final amount = amountController.text.trim();
     amountError = null;
 
-    if (Decimal.parse(amount) <= fee) {
-      amountError = 'Amount should be greater than $fee';
-      return false;
-    }
     if (amount.isEmpty) {
-      amountError = "Amount can't be empty";
+      setState(() {
+        amountError = "Amount can't be empty";
+      });
       return false;
     }
-    if (!isFloat(amount)) {
-      amountError = 'Amount should have numeric values only';
-      return false;
-    }
-    final balance = roundAmount('500');
 
-    if (balance - Decimal.parse(amount) - fee < Decimal.zero) {
-      amountError = 'Balance is not enough';
+    final balance = roundAmount(widget.wallet.usdcBalance);
+
+    if (balance - Decimal.parse(amount) < Decimal.zero) {
+      setState(() {
+        amountError = 'Balance is not enough';
+      });
       return false;
     }
     return true;
   }
 
+  bool _validatePrice() {
+    final price = priceController.text.trim();
+    priceError = null;
+
+    if (price.isEmpty) {
+      setState(() {
+        priceError = "Price can't be empty";
+      });
+      return false;
+    }
+
+    return true;
+  }
+
   calculateAmount(int percentage) {
-    // final amount = (Decimal.parse(chainType == ChainType.TFChain
-    //             ? widget.wallet.tfchainBalance
-    //             : widget.wallet.stellarBalance) -
-    //         fee) *
-    //     (Decimal.fromInt(percentage).shift(-2));
-    // amountController.text = roundAmount(amount.toString()).toString();
+    final amount = Decimal.parse(widget.wallet.usdcBalance) *
+        (Decimal.fromInt(percentage).shift(-2));
+    amountController.text = roundAmount(amount.toString()).toString();
+    _calculateTotal();
+  }
+
+  void _calculateTotal() {
+    final amountText = amountController.text.trim();
+    final priceText = priceController.text.trim();
+
+    if (amountText.isNotEmpty && priceText.isNotEmpty) {
+      try {
+        final amount = Decimal.parse(amountText);
+        final price = Decimal.parse(priceText);
+        final total = amount * price;
+        totalAmountController.text = roundAmount(total.toString()).toString();
+      } catch (e) {
+        totalAmountController.text = '';
+      }
+    } else {
+      totalAmountController.text = '';
+    }
+  }
+
+  void _checkForChanges() {
+    setState(() {
+      _isButtonEnabled = (amountController.text != widget.offer!.amount) ||
+          (priceController.text != widget.offer!.price);
+    });
+  }
+
+  _createOrder() async {
+    setState(() {
+      loading = true;
+    });
+    try {
+      final success = await Stellar.createOrder(widget.wallet.stellarSecret,
+          'USDC', 'TFT', amountController.text, priceController.text);
+      if (success) {
+        showDialog(
+          barrierDismissible: false,
+          context: context,
+          builder: (BuildContext context) => CustomDialog(
+              image: Icons.check,
+              title: 'Success!',
+              description: 'Your order was created successfully.',
+              actions: <Widget>[
+                TextButton(
+                  child: const Text('Close'),
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                )
+              ]),
+        );
+      } else {
+        showDialog(
+          barrierDismissible: false,
+          context: context,
+          builder: (BuildContext context) => CustomDialog(
+              image: Icons.error,
+              title: 'Failed!',
+              description: 'Failed to create your order.',
+              actions: <Widget>[
+                TextButton(
+                  child: const Text('Close'),
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                )
+              ]),
+        );
+      }
+    } catch (e) {
+      showDialog(
+        barrierDismissible: false,
+        context: context,
+        builder: (BuildContext context) => CustomDialog(
+            image: Icons.error,
+            title: 'Error',
+            description: 'Error creating your order',
+            actions: <Widget>[
+              TextButton(
+                child: const Text('Close'),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              )
+            ]),
+      );
+      return;
+    } finally {
+      setState(() {
+        loading = false;
+      });
+    }
+  }
+
+  _updateOrder() async {
+    setState(() {
+      loading = true;
+    });
+    try {
+      final success = await Stellar.updateOrder(
+          widget.wallet.stellarSecret,
+          'USDC',
+          'TFT',
+          amountController.text,
+          priceController.text,
+          widget.offer!.id);
+      if (success) {
+        showDialog(
+          barrierDismissible: false,
+          context: context,
+          builder: (BuildContext context) => CustomDialog(
+              image: Icons.check,
+              title: 'Success!',
+              description: 'Your order was updated successfully.',
+              actions: <Widget>[
+                TextButton(
+                  child: const Text('Close'),
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                )
+              ]),
+        );
+      } else {
+        showDialog(
+          barrierDismissible: false,
+          context: context,
+          builder: (BuildContext context) => CustomDialog(
+              image: Icons.error,
+              title: 'Failed!',
+              description: 'Failed to update your order.',
+              actions: <Widget>[
+                TextButton(
+                  child: const Text('Close'),
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                )
+              ]),
+        );
+      }
+    } catch (e) {
+      showDialog(
+        barrierDismissible: false,
+        context: context,
+        builder: (BuildContext context) => CustomDialog(
+            image: Icons.error,
+            title: 'Error',
+            description: 'Error updating your order',
+            actions: <Widget>[
+              TextButton(
+                child: const Text('Close'),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              )
+            ]),
+      );
+      return;
+    } finally {
+      setState(() {
+        loading = false;
+      });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(title: const Text('Buy')),
+        appBar: AppBar(
+            title: widget.edit ? const Text('Edit Order') : const Text('Buy')),
         body: KeyboardVisibilityBuilder(builder: (context, isKeyboardVisible) {
           return GestureDetector(
               behavior: HitTestBehavior.opaque,
@@ -84,7 +282,10 @@ class _BuyTFTWidgetState extends State<BuyTFTWidget> {
                       child: Text(
                         'Amount',
                         style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                              fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onSecondaryContainer,
+                              fontWeight: FontWeight.bold,
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .onSecondaryContainer,
                             ),
                       ),
                     ),
@@ -117,7 +318,7 @@ class _BuyTFTWidgetState extends State<BuyTFTWidget> {
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               Image.asset(
-                                'assets/tf_chain.png',
+                                'assets/usdc-icon.png',
                                 color: Theme.of(context).colorScheme.onSurface,
                                 width: 20,
                                 height: 20,
@@ -126,10 +327,16 @@ class _BuyTFTWidgetState extends State<BuyTFTWidget> {
                                 width: 5,
                               ),
                               Text(
-                                'TFT',
-                                style: Theme.of(context).textTheme.bodyMedium!.copyWith(color: Theme.of(context).colorScheme.onSecondaryContainer),
+                                'USDC',
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodyMedium!
+                                    .copyWith(
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .onSecondaryContainer),
                               ),
-                              const SizedBox(width: 5),
+                              const SizedBox(width: 10),
                             ],
                           ),
                         ),
@@ -140,7 +347,7 @@ class _BuyTFTWidgetState extends State<BuyTFTWidget> {
                       child: Align(
                         alignment: Alignment.centerRight,
                         child: Text(
-                          'Balance: ${widget.wallet.usdcBalance} USDC',
+                          'Available: ${widget.wallet.usdcBalance} USDC',
                           style:
                               Theme.of(context).textTheme.bodySmall!.copyWith(
                                     color: Theme.of(context)
@@ -175,8 +382,10 @@ class _BuyTFTWidgetState extends State<BuyTFTWidget> {
                       child: Text(
                         'Price',
                         style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                              fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onSecondaryContainer
-                            ),
+                            fontWeight: FontWeight.bold,
+                            color: Theme.of(context)
+                                .colorScheme
+                                .onSecondaryContainer),
                       ),
                     ),
                     ListTile(
@@ -184,14 +393,13 @@ class _BuyTFTWidgetState extends State<BuyTFTWidget> {
                         style: Theme.of(context).textTheme.bodyMedium!.copyWith(
                               color: Theme.of(context).colorScheme.onSurface,
                             ),
-                        focusNode: textFieldFocusNode,
                         keyboardType: const TextInputType.numberWithOptions(
                             decimal: true),
-                        controller: amountController,
+                        controller: priceController,
                         textInputAction: TextInputAction.done,
                         decoration: InputDecoration(
-                          hintText: 'Enter amount',
-                          errorText: amountError,
+                          hintText: 'Enter price',
+                          errorText: priceError,
                           border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(8),
                               borderSide: BorderSide(
@@ -208,7 +416,7 @@ class _BuyTFTWidgetState extends State<BuyTFTWidget> {
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               Image.asset(
-                                'assets/usdc-icon.png',
+                                'assets/tf_chain.png',
                                 color: Theme.of(context).colorScheme.onSurface,
                                 width: 20,
                                 height: 20,
@@ -216,11 +424,15 @@ class _BuyTFTWidgetState extends State<BuyTFTWidget> {
                               const SizedBox(
                                 width: 5,
                               ),
-                              Text(
-                                'USDC',
-                                style: Theme.of(context).textTheme.bodyMedium!.copyWith(color: Theme.of(context).colorScheme.onSecondaryContainer)
-                              ),
-                              const SizedBox(width: 5),
+                              Text('TFT',
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .bodyMedium!
+                                      .copyWith(
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .onSecondaryContainer)),
+                              const SizedBox(width: 10),
                             ],
                           ),
                         ),
@@ -232,8 +444,10 @@ class _BuyTFTWidgetState extends State<BuyTFTWidget> {
                       child: Text(
                         'Total',
                         style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                              fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onSecondaryContainer
-                            ),
+                            fontWeight: FontWeight.bold,
+                            color: Theme.of(context)
+                                .colorScheme
+                                .onSecondaryContainer),
                       ),
                     ),
                     ListTile(
@@ -241,14 +455,13 @@ class _BuyTFTWidgetState extends State<BuyTFTWidget> {
                         style: Theme.of(context).textTheme.bodyMedium!.copyWith(
                               color: Theme.of(context).colorScheme.onSurface,
                             ),
-                        focusNode: textFieldFocusNode,
                         keyboardType: const TextInputType.numberWithOptions(
                             decimal: true),
-                        controller: amountController,
+                        controller: totalAmountController,
+                        readOnly: true,
                         textInputAction: TextInputAction.done,
                         decoration: InputDecoration(
-                          hintText: 'Enter amount',
-                          errorText: amountError,
+                          hintText: 'Total amount',
                           border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(8),
                               borderSide: BorderSide(
@@ -265,24 +478,115 @@ class _BuyTFTWidgetState extends State<BuyTFTWidget> {
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               Image.asset(
-                                'assets/usdc-icon.png',
+                                'assets/tf_chain.png',
                                 color: Theme.of(context).colorScheme.onSurface,
                                 width: 20,
                                 height: 20,
                               ),
                               const SizedBox(width: 5),
                               Text(
-                                'USDC',
-                                style: Theme.of(context).textTheme.bodyMedium!.copyWith(color: Theme.of(context).colorScheme.onSecondaryContainer),
+                                'TFT',
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodyMedium!
+                                    .copyWith(
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .onSecondaryContainer),
                               ),
                               const SizedBox(
-                                width: 5,
+                                width: 10,
                               ),
                             ],
                           ),
                         ),
                       ),
                     ),
+                    if (amountError != null && priceError != null)
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 15.0, vertical: 5.0),
+                        child: Text(
+                          'You are selling ${amountController.text} USDC for ${totalAmountController.text} TFT. ',
+                          style:
+                              Theme.of(context).textTheme.bodySmall!.copyWith(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onSurfaceVariant,
+                                  ),
+                        ),
+                      ),
+                    const SizedBox(height: 40),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 8, horizontal: 10),
+                      child: SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          onPressed: () async {
+                            if (_validateAmount() && _validatePrice()) {
+                              if (widget.edit && _isButtonEnabled) {
+                                _updateOrder();
+                              } else {
+                                _createOrder();
+                              }
+                            } else {
+                              setState(() {});
+                            }
+                          },
+                          style: ElevatedButton.styleFrom(),
+                          child: loading
+                              ? const Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    SizedBox(
+                                      width: 20,
+                                      height: 20,
+                                      child: CircularProgressIndicator(
+                                          strokeWidth: 3),
+                                    ),
+                                  ],
+                                )
+                              : Text(
+                                  widget.edit ? 'Edit order' : 'Buy TFT',
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .titleLarge!
+                                      .copyWith(
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .primary,
+                                      ),
+                                  textAlign: TextAlign.center,
+                                ),
+                        ),
+                      ),
+                    ),
+                    if (widget.edit)
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 8, horizontal: 10),
+                        child: SizedBox(
+                          width: double.infinity,
+                          child: ElevatedButton(
+                            onPressed: () async {
+                              Navigator.pop(context);
+                            },
+                            style: ElevatedButton.styleFrom(),
+                            child: Text(
+                              'Cancel',
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .titleLarge!
+                                  .copyWith(
+                                    color:
+                                        Theme.of(context).colorScheme.primary,
+                                  ),
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                        ),
+                      ),
                   ],
                 ),
               ));

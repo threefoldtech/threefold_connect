@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:threebotlogin/helpers/logger.dart';
 import 'package:threebotlogin/models/offer.dart';
+import 'package:threebotlogin/models/wallet.dart';
 import 'package:threebotlogin/services/stellar_service.dart';
 import 'package:threebotlogin/widgets/market/orders_widget.dart';
 
 class OrderWidget extends StatefulWidget {
-  final String secret;
-  const OrderWidget({super.key, required this.secret});
+  final Wallet selectedWallet;
+  const OrderWidget({super.key, required this.selectedWallet});
 
   @override
   State<OrderWidget> createState() => _OrderWidgetState();
@@ -20,18 +21,28 @@ class _OrderWidgetState extends State<OrderWidget>
   late final TabController _tabController;
 
   Future<void> loadOrders() async {
-    setState((){
+    setState(() {
       loading = true;
     });
 
-    try{
-      final currentOrders = await getActiveOrders(widget.secret);
-      final ordersHistory = await getOrdersHistory(widget.secret);
+    try {
+      final currentOrders =
+          await getActiveOrders(widget.selectedWallet.stellarSecret);
+      final ordersHistory =
+          await getOrdersHistory(widget.selectedWallet.stellarSecret);
       if (activeOrders.isNotEmpty) activeOrders.clear();
       if (previousOrders.isNotEmpty) previousOrders.clear();
-      activeOrders.addAll(currentOrders);
-      previousOrders.addAll(ordersHistory);
-    }catch(e){
+      final filteredActiveOrders = currentOrders.where(
+        (order) => order.sellingAsset == 'USDC' && order.buyingAsset == 'TFT',
+      );
+
+      final filteredOrderHistory = ordersHistory.where(
+        (order) => order.sellingAsset == 'USDC' && order.buyingAsset == 'TFT',
+      );
+
+      activeOrders.addAll(filteredActiveOrders);
+      previousOrders.addAll(filteredOrderHistory);
+    } catch (e) {
       logger.e('Failed to load orders due to $e');
       if (context.mounted) {
         final loadingOrdersFailure = SnackBar(
@@ -47,8 +58,7 @@ class _OrderWidgetState extends State<OrderWidget>
         ScaffoldMessenger.of(context).clearSnackBars();
         ScaffoldMessenger.of(context).showSnackBar(loadingOrdersFailure);
       }
-
-    }finally {
+    } finally {
       setState(() {
         loading = false;
       });
@@ -80,64 +90,59 @@ class _OrderWidgetState extends State<OrderWidget>
           ),
         ],
       ));
-    }
-    else{
-    content = DefaultTabController(
-          length: 2,
-          child: Column(
-            children: [
-              PreferredSize(
-                preferredSize: const Size.fromHeight(10.0),
-                child: Container(
-                  color: Theme.of(context).scaffoldBackgroundColor,
-                  child: TabBar(
-                    controller: _tabController,
-                    labelColor: Theme.of(context).colorScheme.primary,
-                    indicatorColor: Theme.of(context).colorScheme.primary,
-                    unselectedLabelColor:
-                        Theme.of(context).colorScheme.onSurface,
-                    dividerColor: Theme.of(context).scaffoldBackgroundColor,
-                    labelStyle: Theme.of(context).textTheme.titleLarge,
-                    unselectedLabelStyle:
-                        Theme.of(context).textTheme.titleMedium,
-                    tabs: const [
-                      Tab(text: 'Active Order'),
-                      Tab(text: 'Trade History'),
-                    ],
-                  ),
+    } else {
+      content = DefaultTabController(
+        length: 2,
+        child: Column(
+          children: [
+            PreferredSize(
+              preferredSize: const Size.fromHeight(10.0),
+              child: Container(
+                color: Theme.of(context).scaffoldBackgroundColor,
+                child: TabBar(
+                  controller: _tabController,
+                  labelColor: Theme.of(context).colorScheme.primary,
+                  indicatorColor: Theme.of(context).colorScheme.primary,
+                  unselectedLabelColor: Theme.of(context).colorScheme.onSurface,
+                  dividerColor: Theme.of(context).scaffoldBackgroundColor,
+                  labelStyle: Theme.of(context).textTheme.titleLarge,
+                  unselectedLabelStyle: Theme.of(context).textTheme.titleMedium,
+                  tabs: const [
+                    Tab(text: 'Active Order'),
+                    Tab(text: 'Trade History'),
+                  ],
                 ),
               ),
-              Expanded(
-                child: SingleChildScrollView(
-                    padding: EdgeInsets.zero,
-                    child: SizedBox(
-                      height: MediaQuery.of(context).size.height,
-                      child: TabBarView(
-                        controller: _tabController,
-                        children: [
-                                            RefreshIndicator(
-                      onRefresh: loadOrders,
-                      child: OrdersWidget(
-                        offers: activeOrders,
-                        active: true,
-                      )),
-                  RefreshIndicator(
-                      onRefresh: loadOrders,
-                      child: OrdersWidget(
-                        offers: previousOrders,
-                      )),
-
-                        ],
-                      ),
-                    )),
-              ),
-            ],
-          ),
-        );
-    } 
-    return Scaffold(
-        appBar: AppBar(title: const Text('Order')),
-        body: content);
-      
+            ),
+            Expanded(
+              child: SingleChildScrollView(
+                  padding: EdgeInsets.zero,
+                  child: SizedBox(
+                    height: MediaQuery.of(context).size.height,
+                    child: TabBarView(
+                      controller: _tabController,
+                      children: [
+                        RefreshIndicator(
+                            onRefresh: loadOrders,
+                            child: OrdersWidget(
+                              offers: activeOrders,
+                              active: true,
+                              selectedWallet: widget.selectedWallet,
+                            )),
+                        RefreshIndicator(
+                            onRefresh: loadOrders,
+                            child: OrdersWidget(
+                              offers: previousOrders,
+                              selectedWallet: widget.selectedWallet,
+                            )),
+                      ],
+                    ),
+                  )),
+            ),
+          ],
+        ),
+      );
+    }
+    return Scaffold(appBar: AppBar(title: const Text('Order')), body: content);
   }
 }
