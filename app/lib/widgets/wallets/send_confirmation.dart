@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:typed_data';
 
-import 'package:bs58/bs58.dart';
 import 'package:convert/convert.dart';
 import 'package:flutter/material.dart';
 import 'package:threebotlogin/helpers/transaction_helpers.dart';
