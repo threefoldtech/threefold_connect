@@ -335,71 +335,80 @@ class _WalletSendScreenState extends ConsumerState<WalletSendScreen> {
                     ),
                   if (chainType == ChainType.Stellar)
                     Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 10),
-                      child: SizedBox(
-                        width: double.infinity,
-                        child: Row(
-                          children: [
-                            Expanded(
-                              child: TextField(
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .bodyMedium!
-                                    .copyWith(
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .onSurface,
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 8, horizontal: 10),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                SizedBox(
+                                  child: TextField(
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .bodyMedium!
+                                        .copyWith(
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .onSurface,
+                                        ),
+                                    controller: memoController,
+                                    decoration: InputDecoration(
+                                      labelText: 'Memo',
+                                      errorText: memoError,
                                     ),
-                                controller: memoController,
-                                decoration: InputDecoration(
-                                  errorText: memoError,
-                                  labelText: 'Memo',
+                                    onChanged: (value) {
+                                      setState(() {
+                                        memoError = _validateMemo(
+                                            value, selectedMemoType);
+                                      });
+                                    },
+                                  ),
                                 ),
-                                onChanged: (value) {
-                                  setState(() {
-                                    memoError =
-                                        _validateMemo(value, selectedMemoType);
-                                  });
-                                },
-                              ),
+                              ],
                             ),
-                            const SizedBox(width: 10),
-                            SizedBox(
-                              width: 120,
-                              child: DropdownButtonFormField<MemoType>(
-                                value: selectedMemoType,
-                                onChanged: (MemoType? newValue) {
-                                  setState(() {
-                                    selectedMemoType = newValue!;
-                                    if (memoController.text.isNotEmpty) {
-                                      memoError = _validateMemo(
-                                          memoController.text,
-                                          selectedMemoType);
-                                    } else {
-                                      memoError = null;
-                                    }
-                                  });
-                                },
-                                items: MemoType.values.map((MemoType type) {
-                                  return DropdownMenuItem<MemoType>(
-                                    value: type,
-                                    child: Text(
-                                      type.name,
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .bodyLarge!
-                                          .copyWith(
-                                            color: Theme.of(context)
-                                                .colorScheme
-                                                .onSurface,
-                                          ),
-                                    ),
-                                  );
-                                }).toList(),
+                          ),
+                          const SizedBox(width: 10),
+                          SizedBox(
+                            width: 120,
+                            child: DropdownButtonFormField<MemoType>(
+                              value: selectedMemoType,
+                              decoration: const InputDecoration(
+                                contentPadding: EdgeInsets.symmetric(
+                                    vertical: 14, horizontal: 12),
                               ),
+                              onChanged: (MemoType? newValue) {
+                                setState(() {
+                                  selectedMemoType = newValue!;
+                                  if (memoController.text.isNotEmpty) {
+                                    memoError = _validateMemo(
+                                        memoController.text, selectedMemoType);
+                                  } else {
+                                    memoError = null;
+                                  }
+                                });
+                              },
+                              items: MemoType.values.map((MemoType type) {
+                                return DropdownMenuItem<MemoType>(
+                                  value: type,
+                                  child: Text(
+                                    type.name,
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .bodyLarge!
+                                        .copyWith(
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .onSurface,
+                                        ),
+                                  ),
+                                );
+                              }).toList(),
                             ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
                     ),
                   const SizedBox(height: 40),
