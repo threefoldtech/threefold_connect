@@ -5,6 +5,7 @@ import 'package:threebotlogin/models/wallet.dart';
 import 'package:threebotlogin/services/stellar_service.dart' as Stellar;
 import 'package:threebotlogin/widgets/custom_dialog.dart';
 import 'package:threebotlogin/widgets/market/buy_tft.dart';
+import 'package:threebotlogin/widgets/market/orders_notifier.dart';
 
 class OrderDetailsWidget extends StatefulWidget {
   final Wallet selectedWallet;
@@ -32,6 +33,7 @@ class _OrderDetailsWidgetState extends State<OrderDetailsWidget> {
     try {
       final success = await Stellar.cancelOrder(
           widget.selectedWallet.stellarSecret, 'USDC', 'TFT', widget.offer.id);
+      OrderNotifier.emitUpdate();    
       if (success) {
         showDialog(
           barrierDismissible: false,
@@ -44,6 +46,7 @@ class _OrderDetailsWidgetState extends State<OrderDetailsWidget> {
                 TextButton(
                   child: const Text('Close'),
                   onPressed: () {
+                    Navigator.pop(context);
                     Navigator.pop(context);
                   },
                 )

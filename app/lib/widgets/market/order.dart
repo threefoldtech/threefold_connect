@@ -3,6 +3,7 @@ import 'package:threebotlogin/helpers/logger.dart';
 import 'package:threebotlogin/models/offer.dart';
 import 'package:threebotlogin/models/wallet.dart';
 import 'package:threebotlogin/services/stellar_service.dart';
+import 'package:threebotlogin/widgets/market/orders_notifier.dart';
 import 'package:threebotlogin/widgets/market/orders_widget.dart';
 
 class OrderWidget extends StatefulWidget {
@@ -70,6 +71,9 @@ class _OrderWidgetState extends State<OrderWidget>
     super.initState();
     loadOrders();
     _tabController = TabController(length: 2, vsync: this);
+    OrderNotifier.orderUpdated.addListener(() {
+    loadOrders();
+  });
   }
 
   @override
