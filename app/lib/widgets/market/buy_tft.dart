@@ -26,7 +26,6 @@ class _BuyTFTWidgetState extends State<BuyTFTWidget> {
   String? amountError;
   String? priceError;
   bool loading = false;
-  bool _isButtonEnabled = false;
   List percentages = [25, 50, 75, 100];
 
   @override
@@ -115,11 +114,10 @@ class _BuyTFTWidgetState extends State<BuyTFTWidget> {
     }
   }
 
-  void _checkForChanges() {
-    setState(() {
-      _isButtonEnabled = (amountController.text != widget.offer!.amount) ||
+  bool _checkForChanges() {
+     final boolean = (amountController.text != widget.offer!.amount) ||
           (priceController.text != widget.offer!.price);
-    });
+          return boolean;
   }
 
   _createOrder() async {
@@ -525,7 +523,7 @@ class _BuyTFTWidgetState extends State<BuyTFTWidget> {
                         child: ElevatedButton(
                           onPressed: () async {
                             if (_validateAmount() && _validatePrice()) {
-                              if (widget.edit && _isButtonEnabled) {
+                              if (widget.edit && _checkForChanges()) {
                                 _updateOrder();
                               } else {
                                 _createOrder();
@@ -551,11 +549,11 @@ class _BuyTFTWidgetState extends State<BuyTFTWidget> {
                                   widget.edit ? 'Edit order' : 'Buy TFT',
                                   style: Theme.of(context)
                                       .textTheme
-                                      .titleLarge!
+                                      .bodyLarge!
                                       .copyWith(
                                         color: Theme.of(context)
                                             .colorScheme
-                                            .primary,
+                                            .onPrimaryContainer,
                                       ),
                                   textAlign: TextAlign.center,
                                 ),
@@ -572,15 +570,18 @@ class _BuyTFTWidgetState extends State<BuyTFTWidget> {
                             onPressed: () async {
                               Navigator.pop(context);
                             },
-                            style: ElevatedButton.styleFrom(),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor:
+                                  Theme.of(context).colorScheme.surface,
+                            ),
                             child: Text(
                               'Cancel',
                               style: Theme.of(context)
                                   .textTheme
-                                  .titleLarge!
+                                  .bodyLarge!
                                   .copyWith(
                                     color:
-                                        Theme.of(context).colorScheme.primary,
+                                        Theme.of(context).colorScheme.onSurface,
                                   ),
                               textAlign: TextAlign.center,
                             ),

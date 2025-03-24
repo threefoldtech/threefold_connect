@@ -33,7 +33,7 @@ class _OrderDetailsWidgetState extends State<OrderDetailsWidget> {
     try {
       final success = await Stellar.cancelOrder(
           widget.selectedWallet.stellarSecret, 'USDC', 'TFT', widget.offer.id);
-      OrderNotifier.emitUpdate();    
+      OrderNotifier.emitUpdate();
       if (success) {
         showDialog(
           barrierDismissible: false,
@@ -66,7 +66,6 @@ class _OrderDetailsWidgetState extends State<OrderDetailsWidget> {
                   onPressed: () {
                     Navigator.pop(context);
                     Navigator.pop(context);
-
                   },
                 )
               ]),

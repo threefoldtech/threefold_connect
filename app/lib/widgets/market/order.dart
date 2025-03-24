@@ -72,8 +72,8 @@ class _OrderWidgetState extends State<OrderWidget>
     loadOrders();
     _tabController = TabController(length: 2, vsync: this);
     OrderNotifier.orderUpdated.addListener(() {
-    loadOrders();
-  });
+      loadOrders();
+    });
   }
 
   @override
