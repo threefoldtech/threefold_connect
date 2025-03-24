@@ -157,6 +157,17 @@ class _LayoutDrawerState extends State<LayoutDrawer> {
                 minLeadingWidth: 10,
                 leading: const Padding(
                     padding: EdgeInsets.only(left: 10),
+                    child: Icon(Icons.show_chart_sharp, size: 18)),
+                title: const Text('Market'),
+                onTap: () {
+                  Navigator.pop(context);
+                  globals.tabController.animateTo(6);
+                },
+              ),
+              ListTile(
+                minLeadingWidth: 10,
+                leading: const Padding(
+                    padding: EdgeInsets.only(left: 10),
                     child: Icon(Icons.person, size: 18)),
                 title: const Text('Identity'),
                 onTap: () {
@@ -172,7 +183,7 @@ class _LayoutDrawerState extends State<LayoutDrawer> {
                 title: const Text('Settings'),
                 onTap: () {
                   Navigator.pop(context);
-                  globals.tabController.animateTo(6);
+                  globals.tabController.animateTo(7);
                 },
               ),
               if (Globals().council)
@@ -184,7 +195,7 @@ class _LayoutDrawerState extends State<LayoutDrawer> {
                   title: const Text('Council'),
                   onTap: () {
                     Navigator.pop(context);
-                    globals.tabController.animateTo(7);
+                    globals.tabController.animateTo(8);
                   },
                 ),
             ],
