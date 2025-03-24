@@ -199,15 +199,6 @@ class _WalletSendScreenState extends ConsumerState<WalletSendScreen> {
     setState(() {});
   }
 
-  String _memoTypeToString(MemoType type) {
-    switch (type) {
-      case MemoType.hash:
-        return 'Memo Hash';
-      case MemoType.text:
-        return 'Memo Text';
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     final bool hideStellar = widget.wallet.stellarBalance == '-1';
@@ -363,9 +354,8 @@ class _WalletSendScreenState extends ConsumerState<WalletSendScreen> {
                                 controller: memoController,
                                 decoration: InputDecoration(
                                   errorText: memoError,
-                                  labelText:
-                                      _memoTypeToString(selectedMemoType),
-                                ),                              
+                                  labelText: 'Memo ${selectedMemoType.name}',
+                                ),
                                 onChanged: (value) {
                                   setState(() {
                                     memoError =
@@ -388,7 +378,7 @@ class _WalletSendScreenState extends ConsumerState<WalletSendScreen> {
                                   return DropdownMenuItem<MemoType>(
                                     value: type,
                                     child: Text(
-                                      _memoTypeToString(type),
+                                      'Memo ${type.name}',
                                       style: Theme.of(context)
                                           .textTheme
                                           .bodyMedium!
@@ -521,10 +511,9 @@ class _WalletSendScreenState extends ConsumerState<WalletSendScreen> {
   }
 
   _send_confirmation() async {
-    final memoHash = selectedMemoType == MemoType.hash ? memoController.text.trim() : null;
-    final memoText = selectedMemoType == MemoType.text
-        ? memoController.text.trim()
-        : null;
+    final trimmedMemo = memoController.text.trim();
+    final memoHash = selectedMemoType == MemoType.hash ? trimmedMemo : null;
+    final memoText = selectedMemoType == MemoType.text ? trimmedMemo : null;
     showModalBottomSheet(
         isScrollControlled: true,
         useSafeArea: true,

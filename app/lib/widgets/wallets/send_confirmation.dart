@@ -198,8 +198,6 @@ class _SendConfirmationWidgetState extends State<SendConfirmationWidget> {
           Icons.check, DialogType.Info);
       Navigator.pop(context);
     } catch (e) {
-      print('Hello ya error');
-      print(e);
       String errorMessage = e is TimeoutException
           ? 'Transfer took too long. Please try again.'
           : 'Failed to transfer. Please try again.';
@@ -220,9 +218,9 @@ class _SendConfirmationWidgetState extends State<SendConfirmationWidget> {
 
   Future<void> _performTransfer() async {
     if (widget.chainType == ChainType.Stellar) {
-      final memoHash = widget.memoHash != null ? hex.decode(memoController.text.trim()) : null;
+      final memoHash = widget.memoHash != null ? Uint8List.fromList(hex.decode(memoController.text.trim())) : null;
       await Stellar.transfer(
-          widget.secret, widget.to, widget.amount, memo: widget.memo, memoHash: Uint8List.fromList(memoHash!));
+          widget.secret, widget.to, widget.amount, memo: widget.memo, memoHash: memoHash);
     } else {
       await TFChain.transfer(widget.secret, widget.to, widget.amount);
     }
