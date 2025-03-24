@@ -335,8 +335,7 @@ class _WalletSendScreenState extends ConsumerState<WalletSendScreen> {
                     ),
                   if (chainType == ChainType.Stellar)
                     Padding(
-                      padding: const EdgeInsets.symmetric(
-                          vertical: 8, horizontal: 10),
+                      padding: const EdgeInsets.symmetric(horizontal: 10),
                       child: SizedBox(
                         width: double.infinity,
                         child: Row(
@@ -372,6 +371,13 @@ class _WalletSendScreenState extends ConsumerState<WalletSendScreen> {
                                 onChanged: (MemoType? newValue) {
                                   setState(() {
                                     selectedMemoType = newValue!;
+                                    if (memoController.text.isNotEmpty) {
+                                      memoError = _validateMemo(
+                                          memoController.text,
+                                          selectedMemoType);
+                                    } else {
+                                      memoError = null;
+                                    }
                                   });
                                 },
                                 items: MemoType.values.map((MemoType type) {
@@ -390,10 +396,6 @@ class _WalletSendScreenState extends ConsumerState<WalletSendScreen> {
                                     ),
                                   );
                                 }).toList(),
-                                decoration: const InputDecoration(
-                                  contentPadding: EdgeInsets.symmetric(
-                                      vertical: 14, horizontal: 10),
-                                ),
                               ),
                             ),
                           ],
