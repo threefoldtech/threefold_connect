@@ -40,7 +40,7 @@ class _WalletSendScreenState extends ConsumerState<WalletSendScreen> {
   final FocusNode textFieldFocusNode = FocusNode();
   List percentages = [25, 50, 75, 100];
   List<Wallet> wallets = [];
-  MemoType selectedMemoType = MemoType.text;
+  MemoType selectedMemoType = MemoType.Text;
   String? memoError;
 
   @override
@@ -185,7 +185,7 @@ class _WalletSendScreenState extends ConsumerState<WalletSendScreen> {
   }
 
   String? _validateMemo(String memo, MemoType type) {
-    if (type == MemoType.hash) {
+    if (type == MemoType.Hash) {
       final isValidHex = RegExp(r'^[0-9a-fA-F]{1,64}$').hasMatch(memo);
       if (!isValidHex) return 'Invalid Hash (Hex, max 64 chars)';
     } else {
@@ -354,7 +354,7 @@ class _WalletSendScreenState extends ConsumerState<WalletSendScreen> {
                                 controller: memoController,
                                 decoration: InputDecoration(
                                   errorText: memoError,
-                                  labelText: 'Memo ${selectedMemoType.name}',
+                                  labelText: 'Memo',
                                 ),
                                 onChanged: (value) {
                                   setState(() {
@@ -366,7 +366,7 @@ class _WalletSendScreenState extends ConsumerState<WalletSendScreen> {
                             ),
                             const SizedBox(width: 10),
                             SizedBox(
-                              width: 150,
+                              width: 120,
                               child: DropdownButtonFormField<MemoType>(
                                 value: selectedMemoType,
                                 onChanged: (MemoType? newValue) {
@@ -381,7 +381,7 @@ class _WalletSendScreenState extends ConsumerState<WalletSendScreen> {
                                       type.name,
                                       style: Theme.of(context)
                                           .textTheme
-                                          .bodyMedium!
+                                          .bodyLarge!
                                           .copyWith(
                                             color: Theme.of(context)
                                                 .colorScheme
@@ -392,7 +392,7 @@ class _WalletSendScreenState extends ConsumerState<WalletSendScreen> {
                                 }).toList(),
                                 decoration: const InputDecoration(
                                   contentPadding: EdgeInsets.symmetric(
-                                      vertical: 12, horizontal: 10),
+                                      vertical: 14, horizontal: 10),
                                 ),
                               ),
                             ),
@@ -464,10 +464,10 @@ class _WalletSendScreenState extends ConsumerState<WalletSendScreen> {
       }
       if (chainType == ChainType.Stellar) {
         if (code.queryParameters.containsKey('memo_hash')) {
-          selectedMemoType = MemoType.hash;
+          selectedMemoType = MemoType.Hash;
           memoController.text = code.queryParameters['memo_hash']!;
         } else if (code.queryParameters.containsKey('message')) {
-          selectedMemoType = MemoType.text;
+          selectedMemoType = MemoType.Text;
           memoController.text = code.queryParameters['message']!;
         }
       }
@@ -512,8 +512,8 @@ class _WalletSendScreenState extends ConsumerState<WalletSendScreen> {
 
   _send_confirmation() async {
     final trimmedMemo = memoController.text.trim();
-    final memoHash = selectedMemoType == MemoType.hash ? trimmedMemo : null;
-    final memoText = selectedMemoType == MemoType.text ? trimmedMemo : null;
+    final memoHash = selectedMemoType == MemoType.Hash ? trimmedMemo : null;
+    final memoText = selectedMemoType == MemoType.Text ? trimmedMemo : null;
     showModalBottomSheet(
         isScrollControlled: true,
         useSafeArea: true,
@@ -537,4 +537,4 @@ class _WalletSendScreenState extends ConsumerState<WalletSendScreen> {
   }
 }
 
-enum MemoType { text, hash }
+enum MemoType { Text, Hash }
