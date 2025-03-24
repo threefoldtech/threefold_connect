@@ -378,7 +378,7 @@ class _WalletSendScreenState extends ConsumerState<WalletSendScreen> {
                                   return DropdownMenuItem<MemoType>(
                                     value: type,
                                     child: Text(
-                                      'Memo ${type.name}',
+                                      type.name,
                                       style: Theme.of(context)
                                           .textTheme
                                           .bodyMedium!
