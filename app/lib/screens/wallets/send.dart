@@ -336,38 +336,30 @@ class _WalletSendScreenState extends ConsumerState<WalletSendScreen> {
                   if (chainType == ChainType.Stellar)
                     Padding(
                       padding: const EdgeInsets.symmetric(
-                          vertical: 8, horizontal: 10),
+                          vertical: 10, horizontal: 10),
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                SizedBox(
-                                  child: TextField(
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .bodyMedium!
-                                        .copyWith(
-                                          color: Theme.of(context)
-                                              .colorScheme
-                                              .onSurface,
-                                        ),
-                                    controller: memoController,
-                                    decoration: InputDecoration(
-                                      labelText: 'Memo',
-                                      errorText: memoError,
-                                    ),
-                                    onChanged: (value) {
-                                      setState(() {
-                                        memoError = _validateMemo(
-                                            value, selectedMemoType);
-                                      });
-                                    },
+                            child: TextField(
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodyMedium!
+                                  .copyWith(
+                                    color:
+                                        Theme.of(context).colorScheme.onSurface,
                                   ),
-                                ),
-                              ],
+                              controller: memoController,
+                              decoration: InputDecoration(
+                                labelText: 'Memo',
+                                errorText: memoError,
+                              ),
+                              onChanged: (value) {
+                                setState(() {
+                                  memoError =
+                                      _validateMemo(value, selectedMemoType);
+                                });
+                              },
                             ),
                           ),
                           const SizedBox(width: 10),
@@ -375,10 +367,6 @@ class _WalletSendScreenState extends ConsumerState<WalletSendScreen> {
                             width: 120,
                             child: DropdownButtonFormField<MemoType>(
                               value: selectedMemoType,
-                              decoration: const InputDecoration(
-                                contentPadding: EdgeInsets.symmetric(
-                                    vertical: 14, horizontal: 12),
-                              ),
                               onChanged: (MemoType? newValue) {
                                 setState(() {
                                   selectedMemoType = newValue!;
