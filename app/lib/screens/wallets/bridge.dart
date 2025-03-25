@@ -5,6 +5,7 @@ import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:threebotlogin/helpers/globals.dart';
 import 'package:threebotlogin/helpers/transaction_helpers.dart';
+import 'package:threebotlogin/main.dart';
 import 'package:threebotlogin/models/wallet.dart';
 import 'package:threebotlogin/providers/wallets_provider.dart';
 import 'package:threebotlogin/screens/wallets/contacts.dart';
@@ -235,6 +236,37 @@ class _WalletBridgeScreenState extends ConsumerState<WalletBridgeScreen> {
                         onTransactionChange: onTransactionChange,
                         disableDeposit: disableDeposit,
                         updateIsSolana: updateIsSolana),
+                    if (isSolana)
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 15.0),
+                        child: Row(
+                          crossAxisAlignment:
+                              CrossAxisAlignment.start,
+                          children: <Widget>[
+                            Icon(
+                              Icons.info,
+                              color: Theme.of(context).colorScheme.primary,
+                              size: 16,
+                            ),
+                            const SizedBox(
+                                width: 8),
+                            Expanded(
+                              child: Text(
+                                'This is only a one-way bridge (Stellar to Solana) and the other way will be supported soon.',
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodySmall!
+                                    .copyWith(
+                                      color:
+                                          Theme.of(context).colorScheme.primary,
+                                    ),
+                                softWrap:
+                                    true,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
                     const SizedBox(height: 20),
                     ListTile(
                       title: TextField(
