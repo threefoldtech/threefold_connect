@@ -251,7 +251,7 @@ class _WalletBridgeScreenState extends ConsumerState<WalletBridgeScreen> {
                                 width: 8),
                             Expanded(
                               child: Text(
-                                'This is only a one-way bridge (Stellar to Solana) and the other way will be supported soon.',
+                                'This bridge currently supports only Stellar to Solana transfers.',
                                 style: Theme.of(context)
                                     .textTheme
                                     .bodySmall!
