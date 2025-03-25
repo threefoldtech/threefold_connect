@@ -40,7 +40,7 @@ class _WalletSendScreenState extends ConsumerState<WalletSendScreen> {
   final FocusNode textFieldFocusNode = FocusNode();
   List percentages = [25, 50, 75, 100];
   List<Wallet> wallets = [];
-  MemoType selectedMemoType = MemoType.Text;
+  MemoType selectedMemoType = MemoType.TEXT;
   String? memoError;
 
   @override
@@ -185,7 +185,7 @@ class _WalletSendScreenState extends ConsumerState<WalletSendScreen> {
   }
 
   String? _validateMemo(String memo, MemoType type) {
-    if (type == MemoType.Hash) {
+    if (type == MemoType.HASH) {
       final isValidHex = RegExp(r'^[0-9a-fA-F]{1,64}$').hasMatch(memo);
       if (!isValidHex) return 'Invalid Hash (Hex, max 64 chars)';
     } else {
@@ -338,7 +338,7 @@ class _WalletSendScreenState extends ConsumerState<WalletSendScreen> {
                       title: TextField(
                         style: Theme.of(context).textTheme.bodyMedium!.copyWith(
                               color: Theme.of(context).colorScheme.onSurface,
-                            ),
+                            ),                           
                         controller: memoController,
                         decoration: InputDecoration(
                           labelText: 'Memo',
@@ -350,6 +350,7 @@ class _WalletSendScreenState extends ConsumerState<WalletSendScreen> {
                           });
                         },
                       ),
+                      titleAlignment: ListTileTitleAlignment.top,
                       trailing: SizedBox(
                         width: 120,
                         child: DropdownButtonFormField<MemoType>(
@@ -452,10 +453,10 @@ class _WalletSendScreenState extends ConsumerState<WalletSendScreen> {
       }
       if (chainType == ChainType.Stellar) {
         if (code.queryParameters.containsKey('memo_hash')) {
-          selectedMemoType = MemoType.Hash;
+          selectedMemoType = MemoType.HASH;
           memoController.text = code.queryParameters['memo_hash']!;
         } else if (code.queryParameters.containsKey('message')) {
-          selectedMemoType = MemoType.Text;
+          selectedMemoType = MemoType.TEXT;
           memoController.text = code.queryParameters['message']!;
         }
       }
@@ -500,8 +501,8 @@ class _WalletSendScreenState extends ConsumerState<WalletSendScreen> {
 
   _send_confirmation() async {
     final trimmedMemo = memoController.text.trim();
-    final memoHash = selectedMemoType == MemoType.Hash ? trimmedMemo : null;
-    final memoText = selectedMemoType == MemoType.Text ? trimmedMemo : null;
+    final memoHash = selectedMemoType == MemoType.HASH ? trimmedMemo : null;
+    final memoText = selectedMemoType == MemoType.TEXT ? trimmedMemo : null;
     showModalBottomSheet(
         isScrollControlled: true,
         useSafeArea: true,
@@ -525,4 +526,4 @@ class _WalletSendScreenState extends ConsumerState<WalletSendScreen> {
   }
 }
 
-enum MemoType { Text, Hash }
+enum MemoType { TEXT, HASH }
