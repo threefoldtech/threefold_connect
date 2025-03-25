@@ -5,7 +5,6 @@ import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:threebotlogin/helpers/globals.dart';
 import 'package:threebotlogin/helpers/transaction_helpers.dart';
-import 'package:threebotlogin/main.dart';
 import 'package:threebotlogin/models/wallet.dart';
 import 'package:threebotlogin/providers/wallets_provider.dart';
 import 'package:threebotlogin/screens/wallets/contacts.dart';
