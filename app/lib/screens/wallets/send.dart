@@ -40,7 +40,7 @@ class _WalletSendScreenState extends ConsumerState<WalletSendScreen> {
   final FocusNode textFieldFocusNode = FocusNode();
   List percentages = [25, 50, 75, 100];
   List<Wallet> wallets = [];
-  MemoType selectedMemoType = MemoType.Text;
+  MemoType selectedMemoType = MemoType.TEXT;
   String? memoError;
 
   @override
@@ -185,7 +185,7 @@ class _WalletSendScreenState extends ConsumerState<WalletSendScreen> {
   }
 
   String? _validateMemo(String memo, MemoType type) {
-    if (type == MemoType.Hash) {
+    if (type == MemoType.HASH) {
       final isValidHex = RegExp(r'^[0-9a-fA-F]{1,64}$').hasMatch(memo);
       if (!isValidHex) return 'Invalid Hash (Hex, max 64 chars)';
     } else {
@@ -334,39 +334,24 @@ class _WalletSendScreenState extends ConsumerState<WalletSendScreen> {
                       ),
                     ),
                   if (chainType == ChainType.Stellar)
-                    Padding(
-                      padding: const EdgeInsets.symmetric(
-                          vertical: 10, horizontal: 10),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Expanded(
-                            child: TextField(
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .bodyMedium!
-                                  .copyWith(
-                                    color:
-                                        Theme.of(context).colorScheme.onSurface,
-                                  ),
-                              controller: memoController,
-                              decoration: InputDecoration(
-                                labelText: 'Memo',
-                                errorText: memoError,
-                              ),
-                              onChanged: (value) {
-                                setState(() {
-                                  memoError =
-                                      _validateMemo(value, selectedMemoType);
-                                });
-                              },
+                    ListTile(
+                      title: TextField(
+                        style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                              color: Theme.of(context).colorScheme.onSurface,
                             ),
-                          ),
-                          const SizedBox(width: 10),
-                          SizedBox(
-                            width: 120,
+                        controller: memoController,
+                        decoration: InputDecoration(
+                          labelText: 'Memo',
+                          errorText: memoError,
+                          suffixIcon: SizedBox(
+                            width: 100,
                             child: DropdownButtonFormField<MemoType>(
                               value: selectedMemoType,
+                              alignment: Alignment.centerRight,
+                              decoration: const InputDecoration(
+                                contentPadding: EdgeInsets.only(left: 25),
+                                border: InputBorder.none,
+                              ),
                               onChanged: (MemoType? newValue) {
                                 setState(() {
                                   selectedMemoType = newValue!;
@@ -396,8 +381,14 @@ class _WalletSendScreenState extends ConsumerState<WalletSendScreen> {
                               }).toList(),
                             ),
                           ),
-                        ],
+                        ),
+                        onChanged: (value) {
+                          setState(() {
+                            memoError = _validateMemo(value, selectedMemoType);
+                          });
+                        },
                       ),
+                      titleAlignment: ListTileTitleAlignment.top,
                     ),
                   const SizedBox(height: 40),
                   Padding(
@@ -463,10 +454,10 @@ class _WalletSendScreenState extends ConsumerState<WalletSendScreen> {
       }
       if (chainType == ChainType.Stellar) {
         if (code.queryParameters.containsKey('memo_hash')) {
-          selectedMemoType = MemoType.Hash;
+          selectedMemoType = MemoType.HASH;
           memoController.text = code.queryParameters['memo_hash']!;
         } else if (code.queryParameters.containsKey('message')) {
-          selectedMemoType = MemoType.Text;
+          selectedMemoType = MemoType.TEXT;
           memoController.text = code.queryParameters['message']!;
         }
       }
@@ -511,8 +502,8 @@ class _WalletSendScreenState extends ConsumerState<WalletSendScreen> {
 
   _send_confirmation() async {
     final trimmedMemo = memoController.text.trim();
-    final memoHash = selectedMemoType == MemoType.Hash ? trimmedMemo : null;
-    final memoText = selectedMemoType == MemoType.Text ? trimmedMemo : null;
+    final memoHash = selectedMemoType == MemoType.HASH ? trimmedMemo : null;
+    final memoText = selectedMemoType == MemoType.TEXT ? trimmedMemo : null;
     showModalBottomSheet(
         isScrollControlled: true,
         useSafeArea: true,
@@ -536,4 +527,4 @@ class _WalletSendScreenState extends ConsumerState<WalletSendScreen> {
   }
 }
 
-enum MemoType { Text, Hash }
+enum MemoType { TEXT, HASH }
