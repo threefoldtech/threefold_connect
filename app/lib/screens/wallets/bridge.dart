@@ -251,7 +251,7 @@ class _WalletBridgeScreenState extends ConsumerState<WalletBridgeScreen> {
                                 width: 8),
                             Expanded(
                               child: Text(
-                                'This bridge currently supports only Stellar to Solana transfers.',
+                                'This bridge currently only supports Stellar to Solana transfers.',
                                 style: Theme.of(context)
                                     .textTheme
                                     .bodySmall!
