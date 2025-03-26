@@ -338,11 +338,49 @@ class _WalletSendScreenState extends ConsumerState<WalletSendScreen> {
                       title: TextField(
                         style: Theme.of(context).textTheme.bodyMedium!.copyWith(
                               color: Theme.of(context).colorScheme.onSurface,
-                            ),                           
+                            ),
                         controller: memoController,
                         decoration: InputDecoration(
                           labelText: 'Memo',
                           errorText: memoError,
+                          suffixIcon: SizedBox(
+                            width: 100,
+                            child: DropdownButtonFormField<MemoType>(
+                              value: selectedMemoType,
+                              alignment: Alignment.centerRight,
+                              decoration: const InputDecoration(
+                                contentPadding: EdgeInsets.only(left: 25),
+                                border: InputBorder.none,
+                              ),
+                              onChanged: (MemoType? newValue) {
+                                setState(() {
+                                  selectedMemoType = newValue!;
+                                  if (memoController.text.isNotEmpty) {
+                                    memoError = _validateMemo(
+                                        memoController.text, selectedMemoType);
+                                  } else {
+                                    memoError = null;
+                                  }
+                                });
+                              },
+                              items: MemoType.values.map((MemoType type) {
+                                return DropdownMenuItem<MemoType>(
+                                  value: type,
+                                  child: Text(
+                                    type.name,
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .bodyLarge!
+                                        .copyWith(
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .onSurface,
+                                        ),
+                                  ),
+                                );
+                              }).toList(),
+                            ),
+                          ),
                         ),
                         onChanged: (value) {
                           setState(() {
@@ -351,43 +389,6 @@ class _WalletSendScreenState extends ConsumerState<WalletSendScreen> {
                         },
                       ),
                       titleAlignment: ListTileTitleAlignment.top,
-                      trailing: SizedBox(
-                        width: 120,
-                        child: DropdownButtonFormField<MemoType>(
-                          value: selectedMemoType,
-                          decoration: const InputDecoration(
-                            contentPadding: EdgeInsets.symmetric(
-                                vertical: 14, horizontal: 12),
-                          ),
-                          onChanged: (MemoType? newValue) {
-                            setState(() {
-                              selectedMemoType = newValue!;
-                              if (memoController.text.isNotEmpty) {
-                                memoError = _validateMemo(
-                                    memoController.text, selectedMemoType);
-                              } else {
-                                memoError = null;
-                              }
-                            });
-                          },
-                          items: MemoType.values.map((MemoType type) {
-                            return DropdownMenuItem<MemoType>(
-                              value: type,
-                              child: Text(
-                                type.name,
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .bodyLarge!
-                                    .copyWith(
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .onSurface,
-                                    ),
-                              ),
-                            );
-                          }).toList(),
-                        ),
-                      ),
                     ),
                   const SizedBox(height: 40),
                   Padding(
