@@ -102,6 +102,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.1.1"
+  bs58:
+    dependency: "direct main"
+    description:
+      name: bs58
+      sha256: "3ed24dadf386ca749ff50af678be1131ef569a3583a6f37b87b90c032270c767"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.2"
   build:
     dependency: transitive
     description:
@@ -747,7 +755,7 @@ packages:
     description:
       path: "packages/gridproxy_client"
       ref: development
-      resolved-ref: "77f8f563f35d13016aada278feb6431fcfc6731d"
+      resolved-ref: "29666eae72ffd8946b06d5393fef6457c2789c7d"
       url: "https://github.com/threefoldtech/tfgrid-sdk-dart"
     source: git
     version: "1.0.0"
@@ -875,10 +883,10 @@ packages:
     dependency: transitive
     description:
       name: json_schema
-      sha256: b183ba828374365a89b81246c06a9a636935897d509cd846998bbc0d9bd0a2cf
+      sha256: fc8c3e280c7647ed8e94f2565ba107ef4aff94b096764b8460a7e1ae39f20382
       url: "https://pub.dev"
     source: hosted
-    version: "5.2.0"
+    version: "5.2.1"
   just_audio:
     dependency: transitive
     description:
@@ -1027,10 +1035,10 @@ packages:
     dependency: transitive
     description:
       name: moment_dart
-      sha256: "35b99c62689613e84880dac9d0e81d1a624e4edbdf79897cdb3d444e964bf25b"
+      sha256: c6893749e6c96192c76513d67a21ce550ddd9f39f667d08bc4201e036446aebd
       url: "https://pub.dev"
     source: hosted
-    version: "3.2.1"
+    version: "3.3.2"
   mutex:
     dependency: "direct main"
     description:
@@ -1383,6 +1391,15 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "4.0.12"
+  registrar_client:
+    dependency: "direct main"
+    description:
+      path: "packages/registrar_client"
+      ref: development
+      resolved-ref: "075a179b1fcdd997bc4aa4b7c900036f44d14f7f"
+      url: "https://github.com/threefoldtech/tfgridv4-sdk-dart"
+    source: git
+    version: "0.1.0"
   rfc_6901:
     dependency: transitive
     description:
@@ -1544,11 +1561,11 @@ packages:
     source: hosted
     version: "2.0.0"
   signer:
-    dependency: transitive
+    dependency: "direct overridden"
     description:
       path: "packages/signer"
       ref: development
-      resolved-ref: "77f8f563f35d13016aada278feb6431fcfc6731d"
+      resolved-ref: "29666eae72ffd8946b06d5393fef6457c2789c7d"
       url: "https://github.com/threefoldtech/tfgrid-sdk-dart.git"
     source: git
     version: "0.1.0"
@@ -1787,7 +1804,7 @@ packages:
     description:
       path: "packages/tfchain_client"
       ref: development
-      resolved-ref: bbbfa77feb87aba7784ca1c0c23be8c36c9d175f
+      resolved-ref: "29666eae72ffd8946b06d5393fef6457c2789c7d"
       url: "https://github.com/threefoldtech/tfgrid-sdk-dart"
     source: git
     version: "0.1.0"

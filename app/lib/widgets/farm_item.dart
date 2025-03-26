@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
+import 'package:threebotlogin/helpers/globals.dart';
 import 'package:threebotlogin/helpers/logger.dart';
 import 'package:threebotlogin/models/farm.dart';
 import 'package:threebotlogin/models/wallet.dart';
@@ -8,11 +9,17 @@ import 'package:threebotlogin/screens/wallets/contacts.dart';
 import 'package:threebotlogin/services/stellar_service.dart';
 import 'package:threebotlogin/services/tfchain_service.dart';
 import 'package:threebotlogin/widgets/farm_node_item.dart';
+import 'package:registrar_client/registrar_client.dart' as registrar;
 
 class FarmItemWidget extends StatefulWidget {
-  const FarmItemWidget({super.key, required this.farm, required this.wallets});
+  const FarmItemWidget(
+      {super.key,
+      required this.farm,
+      required this.wallets,
+      required this.isV4});
   final Farm farm;
   final List<Wallet> wallets;
+  final bool isV4;
 
   @override
   State<FarmItemWidget> createState() => _FarmItemWidgetState();
@@ -65,11 +72,19 @@ class _FarmItemWidgetState extends State<FarmItemWidget> {
     }
 
     try {
-      await addStellarAddress(
-        widget.farm.tfchainWalletSecret,
-        widget.farm.farmId,
-        newAddress,
-      );
+      if (widget.isV4) {
+        final client = registrar.RegistrarClient(
+            baseUrl: Globals().registrarURL,
+            mnemonicOrSeed: widget.farm.tfchainWalletSecret);
+        await client.farms.update(widget.farm.twinId, widget.farm.farmId,
+            stellarAddress: newAddress);
+      } else {
+        await addStellarAddress(
+          widget.farm.tfchainWalletSecret,
+          widget.farm.farmId,
+          newAddress,
+        );
+      }
       final savingAddressSuccess = SnackBar(
         content: Text(
           'Address is saved Successfully.',
@@ -268,38 +283,39 @@ class _FarmItemWidgetState extends State<FarmItemWidget> {
                             ),
                           ),
               ),
-              ListTile(
-                title: TextField(
-                    readOnly: true,
-                    obscureText: !showTfchainSecret,
-                    style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                          color: Theme.of(context).colorScheme.onSurface,
-                        ),
-                    controller: tfchainWalletSecretController,
-                    decoration: InputDecoration(
-                      labelText: 'TFChain Secret',
-                      suffixIcon: IconButton(
-                          onPressed: () {
-                            setState(() {
-                              showTfchainSecret = !showTfchainSecret;
-                            });
-                          },
-                          icon: Icon(showTfchainSecret
-                              ? Icons.visibility
-                              : Icons.visibility_off)),
-                    )),
-                subtitle: const Text(
-                    'Use this secret to log in to the ThreeFold Dashboard.'),
-                trailing: IconButton(
-                    onPressed: () {
-                      Clipboard.setData(ClipboardData(
-                          text: tfchainWalletSecretController.text));
-                      ScaffoldMessenger.of(context).clearSnackBars();
-                      ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Copied!')));
-                    },
-                    icon: const Icon(Icons.copy)),
-              ),
+              if (!widget.isV4)
+                ListTile(
+                  title: TextField(
+                      readOnly: true,
+                      obscureText: !showTfchainSecret,
+                      style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                            color: Theme.of(context).colorScheme.onSurface,
+                          ),
+                      controller: tfchainWalletSecretController,
+                      decoration: InputDecoration(
+                        labelText: 'TFChain Secret',
+                        suffixIcon: IconButton(
+                            onPressed: () {
+                              setState(() {
+                                showTfchainSecret = !showTfchainSecret;
+                              });
+                            },
+                            icon: Icon(showTfchainSecret
+                                ? Icons.visibility
+                                : Icons.visibility_off)),
+                      )),
+                  subtitle: const Text(
+                      'Use this secret to log in to the ThreeFold Dashboard.'),
+                  trailing: IconButton(
+                      onPressed: () {
+                        Clipboard.setData(ClipboardData(
+                            text: tfchainWalletSecretController.text));
+                        ScaffoldMessenger.of(context).clearSnackBars();
+                        ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('Copied!')));
+                      },
+                      icon: const Icon(Icons.copy)),
+                ),
               ListTile(
                 title: TextField(
                     readOnly: true,
@@ -333,14 +349,15 @@ class _FarmItemWidgetState extends State<FarmItemWidget> {
                       labelText: 'Farm ID',
                     )),
               ),
-              ExpansionTile(
-                title: const Text('Nodes'),
-                childrenPadding: const EdgeInsets.only(left: 20),
-                children: [
-                  for (final node in widget.farm.nodes)
-                    FarmNodeItemWidget(node: node)
-                ],
-              )
+              if (widget.farm.nodes.isNotEmpty)
+                ExpansionTile(
+                  title: const Text('Nodes'),
+                  childrenPadding: const EdgeInsets.only(left: 20),
+                  children: [
+                    for (final node in widget.farm.nodes)
+                      FarmNodeItemWidget(node: node, isV4: widget.isV4)
+                  ],
+                )
             ],
           ));
     });

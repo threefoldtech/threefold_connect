@@ -5,10 +5,9 @@ import 'package:threebotlogin/models/payment_request.dart';
 
 class NoAnimationTabController extends TabController {
   NoAnimationTabController(
-      {int initialIndex = 0,
-      required int length,
-      required TickerProvider vsync})
-      : super(initialIndex: initialIndex, length: length, vsync: vsync);
+      {super.initialIndex,
+      required super.length,
+      required super.vsync});
 
   @override
   void animateTo(int value,
@@ -60,12 +59,13 @@ class Globals {
   String gridproxyUrl = '';
   String activationUrl = '';
   String bridgeTFTAddress = '';
+  String solanaBridgeAddress = '';
   String relayUrl = '';
   String termsAndConditionsUrl = '';
   String newsUrl = '';
   String idenfyServiceUrl = '';
   bool council = false;
-
+  String registrarURL = '';
   bool isCacheClearedWallet = false;
   bool isCacheClearedFarmer = false;
 

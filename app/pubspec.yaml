@@ -3,7 +3,7 @@ description: A decentralized login application
 
 publish_to: "none"
 
-version: 4.1.0+187
+version: 4.2.1+189
 
 environment:
   sdk: ">=3.4.0"
@@ -31,6 +31,11 @@ dependencies:
       url: https://github.com/threefoldtech/tfgrid-sdk-dart
       ref: development
       path: packages/gridproxy_client
+  registrar_client:
+    git:
+      url: https://github.com/threefoldtech/tfgridv4-sdk-dart
+      ref: development
+      path: packages/registrar_client
   flutter_svg: ^2.0.17
   bip39: ^1.0.6
   socket_io_client: 1.0.2
@@ -65,6 +70,7 @@ dependencies:
   flutter_widget_from_html: ^0.15.3
   idenfy_sdk_flutter: 2.6.0
   flutter_riverpod: ^2.6.1
+  bs58: ^1.0.0
 
   convert: ^3.1.2
   crypto: ^3.0.6
@@ -86,6 +92,11 @@ dev_dependencies:
 dependency_overrides:
   intl: ^0.19.0
   shared_preferences_android: 2.0.12
+  signer:
+    git:
+      url: https://github.com/threefoldtech/tfgrid-sdk-dart.git
+      path: packages/signer
+      ref: development
 
 flutter:
   uses-material-design: true

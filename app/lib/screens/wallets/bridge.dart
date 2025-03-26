@@ -1,3 +1,4 @@
+import 'package:bs58/bs58.dart';
 import 'package:decimal/decimal.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
@@ -29,18 +30,19 @@ class _WalletBridgeScreenState extends ConsumerState<WalletBridgeScreen> {
   BridgeOperation transactionType = BridgeOperation.Withdraw;
   bool isWithdraw = true;
   Decimal transferFee = Decimal.parse('0.01');
-  static Decimal BRIDGE_FEE = Decimal.parse('1.0');
+  Decimal bridgeFee = Decimal.parse('1.0');
   late Decimal totalFee;
   late Decimal totalAmount;
   String? toAddressError;
   String? amountError;
   bool reloadBalance = true;
   List percentages = [25, 50, 75, 100];
+  bool isSolana = false;
 
   @override
   void initState() {
     fromController.text = widget.wallet.tfchainAddress;
-    totalFee = transferFee + BRIDGE_FEE;
+    totalFee = transferFee + bridgeFee;
     _reloadBalances();
     super.initState();
   }
@@ -92,9 +94,19 @@ class _WalletBridgeScreenState extends ConsumerState<WalletBridgeScreen> {
     toController.text = '';
     toAddressError = null;
     amountError = null;
-    transferFee = Decimal.parse(isWithdraw ? '.01' : '.1');
-    totalFee = transferFee + BRIDGE_FEE;
-    setState(() {});
+    setState(() {
+      if (isWithdraw) {
+        transferFee = Decimal.parse('0.01');
+        bridgeFee = Decimal.parse('1.0');
+      } else if (isSolana) {
+        transferFee = Decimal.parse('0.1');
+        bridgeFee = Decimal.parse('50.0');
+      } else {
+        transferFee = Decimal.parse('0.1');
+        bridgeFee = Decimal.parse('1.0');
+      }
+      totalFee = transferFee + bridgeFee;
+    });
   }
 
   Future<bool> _validateToAddress() async {
@@ -106,6 +118,13 @@ class _WalletBridgeScreenState extends ConsumerState<WalletBridgeScreen> {
     }
 
     if (!isWithdraw) {
+      if (isSolana) {
+        final isValidSolana = isValidSolanaAddress(toAddress);
+        if (!isValidSolana) {
+          toAddressError = 'Invalid Solana address';
+        }
+        return isValidSolana;
+      }
       if (toAddress.length != 48) {
         toAddressError = 'Address length should be 48 characters';
         return false;
@@ -119,7 +138,7 @@ class _WalletBridgeScreenState extends ConsumerState<WalletBridgeScreen> {
 
     if (isWithdraw) {
       if (!isValidStellarAddress(toAddress)) {
-        toAddressError = 'Invaild Stellar address';
+        toAddressError = 'Invalid Stellar address';
         return false;
       }
       if (toAddress == Globals().bridgeTFTAddress) {
@@ -132,7 +151,13 @@ class _WalletBridgeScreenState extends ConsumerState<WalletBridgeScreen> {
         return false;
       }
     }
+
     return true;
+  }
+
+  bool isValidSolanaAddress(String address) {
+    final decodeBytes = base58.decode(address);
+    return decodeBytes.length == 32;
   }
 
   bool _validateAmount() {
@@ -173,6 +198,12 @@ class _WalletBridgeScreenState extends ConsumerState<WalletBridgeScreen> {
     setState(() {});
   }
 
+  updateIsSolana(bool value) {
+    setState(() {
+      isSolana = value;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     List<Wallet> wallets = ref.read(walletsNotifier);
@@ -202,7 +233,39 @@ class _WalletBridgeScreenState extends ConsumerState<WalletBridgeScreen> {
                     SwapTransactionWidget(
                         bridgeOperation: transactionType,
                         onTransactionChange: onTransactionChange,
-                        disableDeposit: disableDeposit),
+                        disableDeposit: disableDeposit,
+                        updateIsSolana: updateIsSolana),
+                    if (isSolana)
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 15.0),
+                        child: Row(
+                          crossAxisAlignment:
+                              CrossAxisAlignment.start,
+                          children: <Widget>[
+                            Icon(
+                              Icons.info,
+                              color: Theme.of(context).colorScheme.primary,
+                              size: 16,
+                            ),
+                            const SizedBox(
+                                width: 8),
+                            Expanded(
+                              child: Text(
+                                'This bridge currently only supports Stellar to Solana transfers.',
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodySmall!
+                                    .copyWith(
+                                      color:
+                                          Theme.of(context).colorScheme.primary,
+                                    ),
+                                softWrap:
+                                    true,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
                     const SizedBox(height: 20),
                     ListTile(
                       title: TextField(
@@ -229,30 +292,34 @@ class _WalletBridgeScreenState extends ConsumerState<WalletBridgeScreen> {
                               ),
                           controller: toController,
                           decoration: InputDecoration(
-                              labelText: 'To',
+                              labelText:
+                                  isSolana ? 'Associated Token Address' : 'To',
                               errorText: toAddressError,
-                              suffixIcon: IconButton(
-                                  onPressed: () {
-                                    Navigator.of(context)
-                                        .push(MaterialPageRoute(
-                                      builder: (context) => ContactsScreen(
-                                          chainType: isWithdraw
-                                              ? ChainType.Stellar
-                                              : ChainType.TFChain,
-                                          currentWalletAddress:
-                                              fromController.text,
-                                          wallets: isWithdraw
-                                              ? wallets
-                                                  .where((w) =>
-                                                      double.parse(
-                                                          w.stellarBalance) >=
-                                                      0)
-                                                  .toList()
-                                              : wallets,
-                                          onSelectToAddress: _selectToAddress),
-                                    ));
-                                  },
-                                  icon: const Icon(Icons.person)))),
+                              suffixIcon: !isSolana
+                                  ? IconButton(
+                                      onPressed: () {
+                                        Navigator.of(context)
+                                            .push(MaterialPageRoute(
+                                          builder: (context) => ContactsScreen(
+                                              chainType: isWithdraw
+                                                  ? ChainType.Stellar
+                                                  : ChainType.TFChain,
+                                              currentWalletAddress:
+                                                  fromController.text,
+                                              wallets: isWithdraw
+                                                  ? wallets
+                                                      .where((w) =>
+                                                          double.parse(w
+                                                              .stellarBalance) >=
+                                                          0)
+                                                      .toList()
+                                                  : wallets,
+                                              onSelectToAddress:
+                                                  _selectToAddress),
+                                        ));
+                                      },
+                                      icon: const Icon(Icons.person))
+                                  : null)),
                     ),
                     const SizedBox(height: 10),
                     ListTile(
@@ -275,8 +342,7 @@ class _WalletBridgeScreenState extends ConsumerState<WalletBridgeScreen> {
                                 errorText: amountError)),
                         subtitle: Padding(
                           padding: const EdgeInsets.symmetric(vertical: 8.0),
-                          child: Text(
-                              'Transfer Fee: ${!isWithdraw ? 1.1 : 1.01} TFT'),
+                          child: Text('Transfer Fee: $totalFee TFT'),
                         )),
                     const SizedBox(height: 10),
                     if (isBiggerThanFee)
@@ -341,9 +407,11 @@ class _WalletBridgeScreenState extends ConsumerState<WalletBridgeScreen> {
   }
 
   _bridge_confirmation() async {
-    final memoText =
-        !isWithdraw ? await TFChain.getMemo(toController.text.trim()) : null;
-    totalAmount = Decimal.parse(amountController.text.trim()) + BRIDGE_FEE;
+    totalAmount = Decimal.parse(amountController.text.trim()) + bridgeFee;
+    final memoHash = isSolana ? base58.decode(toController.text.trim()) : null;
+    final memoText = !isWithdraw && !isSolana
+        ? await TFChain.getMemo(toController.text.trim())
+        : null;
     showModalBottomSheet(
         isScrollControlled: true,
         useSafeArea: true,
@@ -358,9 +426,12 @@ class _WalletBridgeScreenState extends ConsumerState<WalletBridgeScreen> {
               from: fromController.text.trim(),
               to: toController.text.trim(),
               amount: amountController.text.trim(),
+              isSolana: isSolana,
               // amount + fee
               totalAmount: totalAmount.toString(),
+              totalFee: totalFee.toString(),
               memo: memoText,
+              memoHash: memoHash,
               reloadBalance:
                   isWithdraw ? _loadTFChainBalance : _loadStellarBalance,
             ));

@@ -2,10 +2,12 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gridproxy_client/models/farms.dart';
+import 'package:threebotlogin/models/wallet.dart';
 import 'package:threebotlogin/providers/wallets_provider.dart';
+import 'package:threebotlogin/services/gridproxy_service.dart';
 import 'package:threebotlogin/services/tfchain_service.dart';
-import 'package:threebotlogin/services/wallet_service.dart';
 import 'package:threebotlogin/widgets/custom_dialog.dart';
+import 'package:threebotlogin/services/tfchain_service.dart' as TFChainService;
 
 class VoteDialog extends ConsumerStatefulWidget {
   final String proposalHash;
@@ -21,7 +23,7 @@ class VoteDialog extends ConsumerStatefulWidget {
 class _VoteDialogState extends ConsumerState<VoteDialog> {
   int? farmId;
   List<Farm> farms = [];
-  Map<int, Map<String, String>> twinIdWallets = {};
+  Map<int, Wallet> twinIdWallets = {};
   bool loading = true;
   bool yesLoading = false;
   bool noLoading = false;
@@ -33,7 +35,17 @@ class _VoteDialogState extends ConsumerState<VoteDialog> {
       });
       await ref.read(walletsNotifier.notifier).list();
       final wallets = ref.read(walletsNotifier);
-      farms = await getDaoFarms(wallets);
+      final twinIdFutures = wallets.map((w) async {
+        final twinId = await TFChainService.getTwinId(w.tfchainSecret);
+        if (twinId != 0) {
+          twinIdWallets[twinId] = w;
+        }
+      }).toList();
+
+      await Future.wait(twinIdFutures);
+
+      farms =
+          await getFarmsByTwinIds(twinIdWallets.keys.toList(), hasUpNode: true);
     } catch (e) {
       throw Exception('Failed to get farms due to $e');
     } finally {
@@ -209,7 +221,7 @@ class _VoteDialogState extends ConsumerState<VoteDialog> {
     });
     final farm = farms.firstWhere((farm) => farm.farmID == farmId);
     final twinId = farm.twinId;
-    final seed = twinIdWallets[twinId]!['tfchainSeed'];
+    final seed = twinIdWallets[twinId]!.tfchainSecret;
     final votes = await getProposalVotes(widget.proposalHash);
 
     final hasVotedYes = votes.ayes.any((vote) => vote.farmId == farmId);
@@ -226,7 +238,7 @@ class _VoteDialogState extends ConsumerState<VoteDialog> {
       return;
     }
     try {
-      await vote(approve, widget.proposalHash, farmId!, seed!);
+      await vote(approve, widget.proposalHash, farmId!, seed);
       await _showDialog('Voted!', 'You have voted successfully.', Icons.check,
           DialogType.Info);
       Navigator.of(context).pop();
