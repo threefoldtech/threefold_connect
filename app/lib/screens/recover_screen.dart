@@ -69,6 +69,7 @@ class _RecoverScreenState extends State<RecoverScreen> {
       if (e.toString().contains('Invalid mnemonic')) {
         throw ('Invalid mnemonic');
       }
+      rethrow;
     }
   }
 
