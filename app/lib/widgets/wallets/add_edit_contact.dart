@@ -127,8 +127,16 @@ class _AddEditContactState extends State<AddEditContact> {
       return;
     }
     if (chainType == widget.chainType) {
-      widget.onAddContact!(PkidContact(
-          name: contactName, address: contactAddress, type: chainType));
+      final alreadyExists = widget.contacts
+          .any((c) => c.address == contactAddress && c.type == chainType);
+
+      if (!alreadyExists) {
+        widget.onAddContact!(PkidContact(
+          name: contactName,
+          address: contactAddress,
+          type: chainType,
+        ));
+      }
     }
     if (!context.mounted) return;
     Navigator.pop(context);
