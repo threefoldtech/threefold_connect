@@ -175,6 +175,20 @@ class _CouncilVoteDialogState extends ConsumerState<CouncilVoteDialog> {
               ? null
               : <Widget>[
                   TextButton(
+                    child: noLoading
+                        ? const SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                            ),
+                          )
+                        : const Text('No'),
+                    onPressed: () {
+                      _vote(false);
+                    },
+                  ),
+                  TextButton(
                     child: yesLoading
                         ? const SizedBox(
                             width: 20,
@@ -189,21 +203,7 @@ class _CouncilVoteDialogState extends ConsumerState<CouncilVoteDialog> {
                     onPressed: () async {
                       _vote(true);
                     },
-                  ),
-                  TextButton(
-                    child: noLoading
-                        ? const SizedBox(
-                            width: 20,
-                            height: 20,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                            ),
-                          )
-                        : const Text('No'),
-                    onPressed: () {
-                      _vote(false);
-                    },
-                  ),
+                  )
                 ],
     );
   }

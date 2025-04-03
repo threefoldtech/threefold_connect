@@ -92,6 +92,7 @@ class _CouncilScreenState extends State<CouncilScreen> {
                           return;
                         }
                         errorMessage = null;
+                        selectedNetwork = value;
                         setState(() {});
                         return;
                       },
