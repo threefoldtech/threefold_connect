@@ -61,12 +61,23 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
       ));
     } else if (failed) {
       mainWidget = Center(
-        child: Text(
-          'Something went wrong.',
-          style: Theme.of(context)
-              .textTheme
-              .bodyLarge!
-              .copyWith(color: Theme.of(context).colorScheme.onSurface),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const SizedBox(height: 15),
+            ElevatedButton.icon(
+              icon: const Icon(Icons.refresh),
+              label: const Text('Try Again'),
+              onPressed: () {
+                setState(() {
+                  walletRef.clear();
+                  failed = false;
+                  loading = true;
+                });
+                listMyWallets();
+              },
+            ),
+          ],
         ),
       );
     } else {
@@ -100,15 +111,18 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
   listMyWallets() async {
     setState(() {
       loading = true;
+      failed = false;
     });
     try {
-      await walletRef.list();
-      await Future.delayed(const Duration(seconds: 1));
-      if (walletRef.isListed && wallets.isEmpty) {
+      await ref.read(walletsNotifier.notifier).list();
+      wallets = ref.read(walletsNotifier);
+      if (wallets.isEmpty) {
         await _addInitialWallet();
       }
     } catch (e) {
-      failed = true;
+      setState(() {
+        failed = true;
+      });
       logger.e('Failed to get wallets due to $e');
       if (context.mounted) {
         final loadingFarmsFailure = SnackBar(
@@ -161,9 +175,25 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
       await ref.refresh(walletsNotifier.notifier).list();
       return;
     } catch (e) {
-      throw Exception('Something happend while reloading wallets!');
+      failed = true;
+      logger.e('Failed to get wallets due to $e');
+      if (context.mounted) {
+        final loadingFarmsFailure = SnackBar(
+          content: Text(
+            'Failed to load wallets',
+            style: Theme.of(context)
+                .textTheme
+                .bodyMedium!
+                .copyWith(color: Theme.of(context).colorScheme.errorContainer),
+          ),
+          duration: const Duration(seconds: 3),
+        );
+        ScaffoldMessenger.of(context).clearSnackBars();
+        ScaffoldMessenger.of(context).showSnackBar(loadingFarmsFailure);
+      }
     } finally {
       loading = false;
+      setState(() {});
     }
   }
 }

@@ -16,11 +16,13 @@ class _DaoPageState extends State<DaoPage> with SingleTickerProviderStateMixin {
   final List<Proposal> activeList = [];
   final List<Proposal> inactiveList = [];
   bool loading = true;
+  bool failed = false;
   late final TabController _tabController;
 
   Future<void> loadProposals() async {
     setState(() {
       loading = true;
+      failed = false;
     });
     try {
       final proposals = await getProposals();
@@ -28,6 +30,10 @@ class _DaoPageState extends State<DaoPage> with SingleTickerProviderStateMixin {
       if (inactiveList.isNotEmpty) inactiveList.clear();
       activeList.addAll(proposals['activeProposals']!);
       inactiveList.addAll(proposals['inactiveProposals']!);
+      setState(() {
+        loading = false;
+        failed = false;
+      });
     } catch (e) {
       logger.e('Failed to load proposals due to $e');
       if (context.mounted) {
@@ -44,10 +50,11 @@ class _DaoPageState extends State<DaoPage> with SingleTickerProviderStateMixin {
         ScaffoldMessenger.of(context).clearSnackBars();
         ScaffoldMessenger.of(context).showSnackBar(loadingProposalFailure);
       }
-    } finally {
       setState(() {
         loading = false;
+        failed = true;
       });
+      throw Exception('Failed to load proposals due to $e');
     }
   }
 
@@ -76,6 +83,26 @@ class _DaoPageState extends State<DaoPage> with SingleTickerProviderStateMixin {
           ),
         ],
       ));
+    } else if (failed) {
+      content = Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const SizedBox(height: 15),
+            ElevatedButton.icon(
+              icon: const Icon(Icons.refresh),
+              label: const Text('Try Again'),
+              onPressed: () async {
+                setState(() {
+                  failed = false;
+                  loading = true;
+                });
+                await loadProposals();
+              },
+            ),
+          ],
+        ),
+      );
     } else {
       content = DefaultTabController(
         length: 2,
