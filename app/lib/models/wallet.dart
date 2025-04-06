@@ -26,7 +26,18 @@ class Wallet {
   String stellarBalance;
   String tfchainBalance;
   final WalletType type;
-  VerificationState verificationStatus; 
+  VerificationState verificationStatus;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is Wallet &&
+          runtimeType == other.runtimeType &&
+          stellarAddress == other.stellarAddress &&
+          tfchainAddress == other.tfchainAddress;
+
+  @override
+  int get hashCode => stellarAddress.hashCode ^ tfchainAddress.hashCode;
 }
 
 class PkidWallet {

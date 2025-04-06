@@ -70,7 +70,8 @@ Future<List<Wallet>> listWallets() async {
     return await Future.wait(walletFutures);
   }, null);
 
-  return wallets;
+  final uniqueWallets = wallets.toSet().toList();
+  return uniqueWallets;
 }
 
 Future<(Stellar.Client, TFChain.Client)> loadWalletClients(String walletName,
