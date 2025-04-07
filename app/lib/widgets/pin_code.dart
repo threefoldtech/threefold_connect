@@ -9,12 +9,13 @@ class PincodeWidget extends StatefulWidget {
     required this.title,
     required this.handler,
     this.hideBackButton = false,
+    this.enabled = true,
   });
   final String title;
   final String userMessage;
   final bool hideBackButton;
   final Function(String) handler;
-
+  final bool enabled;
   @override
   State<PincodeWidget> createState() => _PincodeWidgetState();
 }
@@ -73,8 +74,10 @@ class _PincodeWidgetState extends State<PincodeWidget> {
                 ),
               ),
               const SizedBox(height: 100),
-              Pinput(
-                autofocus: true,
+              IgnorePointer(
+                  ignoring: !widget.enabled,
+                child: Pinput(
+                autofocus: widget.enabled,
                 obscureText: true,
                 controller: pinController,
                 focusNode: focusNode,
@@ -114,6 +117,7 @@ class _PincodeWidgetState extends State<PincodeWidget> {
                       Border.all(color: Theme.of(context).colorScheme.error),
                 ),
               ),
+              )
             ],
           ),
         ),
