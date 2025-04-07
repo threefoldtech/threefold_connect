@@ -27,17 +27,6 @@ class Wallet {
   String tfchainBalance;
   final WalletType type;
   VerificationState verificationStatus;
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is Wallet &&
-          runtimeType == other.runtimeType &&
-          stellarAddress == other.stellarAddress &&
-          tfchainAddress == other.tfchainAddress;
-
-  @override
-  int get hashCode => stellarAddress.hashCode ^ tfchainAddress.hashCode;
 }
 
 class PkidWallet {
@@ -63,4 +52,18 @@ class PkidWallet {
   toMap() {
     return {'name': name, 'index': index, 'seed': seed, 'type': type.name};
   }
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is PkidWallet &&
+          runtimeType == other.runtimeType &&
+          name == other.name &&
+          index == other.index &&
+          seed == other.seed &&
+          type == other.type;
+
+  @override
+  int get hashCode =>
+      name.hashCode ^ index.hashCode ^ seed.hashCode ^ type.hashCode;
 }

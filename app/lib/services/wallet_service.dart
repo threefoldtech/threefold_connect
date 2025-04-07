@@ -32,7 +32,7 @@ Future<List<PkidWallet>> getPkidWallets() async {
   try {
     pKidResult = await client.getPKidDoc('purse');
     if (pKidResult.containsKey('error')) {
-      if (pKidResult.containsValue('Key is not found')){
+      if (pKidResult.containsValue('Key is not found')) {
         return [];
       }
       logger.e('Error in pKidResult : ${pKidResult['error']}');
@@ -64,14 +64,14 @@ Future<List<Wallet>> listWallets() async {
   final List<Wallet> wallets = await compute((void _) async {
     final List<Future<Wallet>> walletFutures = [];
     for (final w in pkidWallets) {
-      final walletFuture = loadWallet(w.name, w.seed, w.type, chainUrl, idenfyServiceUrl);
+      final walletFuture =
+          loadWallet(w.name, w.seed, w.type, chainUrl, idenfyServiceUrl);
       walletFutures.add(walletFuture);
     }
     return await Future.wait(walletFutures);
   }, null);
 
-  final uniqueWallets = wallets.toSet().toList();
-  return uniqueWallets;
+  return wallets;
 }
 
 Future<(Stellar.Client, TFChain.Client)> loadWalletClients(String walletName,
@@ -122,8 +122,9 @@ Future<Wallet> loadWallet(String walletName, String walletSeed,
   final stellarBalance = balances.first.toString();
   final tfchainBalance =
       balances.last.toString() == '0.0' ? '0' : balances.last.toString();
-  final kycVerified =
-          await getVerificationStatus(address: tfchainClient.keypair!.address,idenfyServiceUrl: idenfyServiceUrl );
+  final kycVerified = await getVerificationStatus(
+      address: tfchainClient.keypair!.address,
+      idenfyServiceUrl: idenfyServiceUrl);
   final wallet = Wallet(
     name: walletName,
     stellarSecret: stellarClient.secretSeed,
