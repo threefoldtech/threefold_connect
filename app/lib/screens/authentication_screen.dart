@@ -141,17 +141,11 @@ class AuthenticationScreenState extends State<AuthenticationScreen> {
       title: 'Authentication',
       userMessage: widget.userMessage,
       handler: validate,
-      enabled: !isLocked,
     );
   }
 
   Future<void> validate(String pin) async {
     int currentTime = DateTime.now().millisecondsSinceEpoch;
-
-    if (_initializing || isLocked || (globals.lockedUntill > currentTime)) {
-      print('PIN entry blocked due to lockout.');
-      return;
-    }
 
     if (globals.tooManyAuthenticationAttempts &&
         globals.lockedUntill < currentTime) {
@@ -163,6 +157,10 @@ class AuthenticationScreenState extends State<AuthenticationScreen> {
       setState(() {
         isLocked = false;
       });
+    }
+
+    if (_initializing || isLocked || (globals.lockedUntill > currentTime)) {
+      return;
     }
 
     if (pin == widget.correctPin && !globals.tooManyAuthenticationAttempts) {

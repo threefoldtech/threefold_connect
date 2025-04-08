@@ -1,5 +1,8 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:pinput/pinput.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:threebotlogin/helpers/globals.dart';
 
 class PincodeWidget extends StatefulWidget {
@@ -9,13 +12,11 @@ class PincodeWidget extends StatefulWidget {
     required this.title,
     required this.handler,
     this.hideBackButton = false,
-    this.enabled = true,
   });
   final String title;
   final String userMessage;
   final bool hideBackButton;
   final Function(String) handler;
-  final bool enabled;
   @override
   State<PincodeWidget> createState() => _PincodeWidgetState();
 }
@@ -25,12 +26,67 @@ class _PincodeWidgetState extends State<PincodeWidget> {
   final pinController = TextEditingController();
   final focusNode = FocusNode();
   final formKey = GlobalKey<FormState>();
+  Timer? _countdownTimer;
+  int _remainingSeconds = -1;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkLockRemainingTime();
+  }
 
   @override
   void dispose() {
     pinController.dispose();
     focusNode.dispose();
+    _countdownTimer?.cancel();
     super.dispose();
+  }
+
+  Future<void> _checkLockRemainingTime() async {
+    final prefs = await SharedPreferences.getInstance();
+    final lockedUntil = prefs.getInt('locked_until');
+    final currentTime = DateTime.now().millisecondsSinceEpoch;
+
+    if (lockedUntil != null && lockedUntil > currentTime) {
+      final remainingMs = lockedUntil - currentTime;
+      _startCountdown((remainingMs / 1000).ceil());
+    } else {
+      setState(() {
+        _remainingSeconds = 0;
+      });
+    }
+  }
+
+  void _startCountdown(int seconds) {
+    setState(() {
+      _remainingSeconds = seconds;
+    });
+
+    _countdownTimer?.cancel();
+    _countdownTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (_remainingSeconds > 1) {
+        setState(() {
+          _remainingSeconds--;
+        });
+      } else {
+        timer.cancel();
+        setState(() {
+          _remainingSeconds = 0;
+        });
+      }
+    });
+  }
+
+  Future<void> checkAndStartCountdown() async {
+    final prefs = await SharedPreferences.getInstance();
+    final lockedUntil = prefs.getInt('locked_until');
+    final currentTime = DateTime.now().millisecondsSinceEpoch;
+
+    if (lockedUntil != null && lockedUntil > currentTime) {
+      final remainingMs = lockedUntil - currentTime;
+      _startCountdown((remainingMs / 1000).ceil());
+    }
   }
 
   @override
@@ -50,8 +106,6 @@ class _PincodeWidgetState extends State<PincodeWidget> {
         border: Border.all(color: borderColor),
       ),
     );
-
-    /// Optionally you can use form to validate the Pinput
     return Scaffold(
       appBar: AppBar(
           elevation: 0,
@@ -63,6 +117,17 @@ class _PincodeWidgetState extends State<PincodeWidget> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
+              if (_remainingSeconds > 0)
+                Padding(
+                  padding: const EdgeInsets.only(top: 16),
+                  child: Text(
+                    'Try again in $_remainingSeconds seconds',
+                    style: Theme.of(context)
+                        .textTheme
+                        .bodyMedium!
+                        .copyWith(color: Theme.of(context).colorScheme.error),
+                  ),
+                ),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 24),
                 child: Text(
@@ -75,48 +140,49 @@ class _PincodeWidgetState extends State<PincodeWidget> {
               ),
               const SizedBox(height: 100),
               IgnorePointer(
-                  ignoring: !widget.enabled,
+                ignoring: _remainingSeconds != 0,
                 child: Pinput(
-                autofocus: widget.enabled,
-                obscureText: true,
-                controller: pinController,
-                focusNode: focusNode,
-                defaultPinTheme: defaultPinTheme,
-                separatorBuilder: (index) => const SizedBox(width: 8),
-                onCompleted: (value) {
-                  widget.handler(value);
-                  pinController.clear();
-                },
-                hapticFeedbackType: HapticFeedbackType.lightImpact,
-                cursor: Column(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    Container(
-                      margin: const EdgeInsets.only(bottom: 9),
-                      width: 22,
-                      height: 1,
-                      color: focusedBorderColor,
+                  autofocus: _remainingSeconds == 0,
+                  obscureText: true,
+                  controller: pinController,
+                  focusNode: focusNode,
+                  defaultPinTheme: defaultPinTheme,
+                  separatorBuilder: (index) => const SizedBox(width: 8),
+                  onCompleted: (value) {
+                    widget.handler(value);
+                    pinController.clear();
+                    checkAndStartCountdown();
+                  },
+                  hapticFeedbackType: HapticFeedbackType.lightImpact,
+                  cursor: Column(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      Container(
+                        margin: const EdgeInsets.only(bottom: 9),
+                        width: 22,
+                        height: 1,
+                        color: focusedBorderColor,
+                      ),
+                    ],
+                  ),
+                  focusedPinTheme: defaultPinTheme.copyWith(
+                    decoration: defaultPinTheme.decoration!.copyWith(
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: focusedBorderColor),
                     ),
-                  ],
-                ),
-                focusedPinTheme: defaultPinTheme.copyWith(
-                  decoration: defaultPinTheme.decoration!.copyWith(
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: focusedBorderColor),
+                  ),
+                  submittedPinTheme: defaultPinTheme.copyWith(
+                    decoration: defaultPinTheme.decoration!.copyWith(
+                      color: fillColor,
+                      borderRadius: BorderRadius.circular(19),
+                      border: Border.all(color: focusedBorderColor),
+                    ),
+                  ),
+                  errorPinTheme: defaultPinTheme.copyBorderWith(
+                    border:
+                        Border.all(color: Theme.of(context).colorScheme.error),
                   ),
                 ),
-                submittedPinTheme: defaultPinTheme.copyWith(
-                  decoration: defaultPinTheme.decoration!.copyWith(
-                    color: fillColor,
-                    borderRadius: BorderRadius.circular(19),
-                    border: Border.all(color: focusedBorderColor),
-                  ),
-                ),
-                errorPinTheme: defaultPinTheme.copyBorderWith(
-                  border:
-                      Border.all(color: Theme.of(context).colorScheme.error),
-                ),
-              ),
               )
             ],
           ),
