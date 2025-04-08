@@ -50,7 +50,7 @@ class _WalletDetailsWidgetState extends ConsumerState<WalletDetailsWidget> {
       await Future.any([
         deleteWallet(walletNameController.text),
         Future.delayed(const Duration(minutes: 1), () {
-          throw TimeoutException('Transfer operation timed out.');
+          throw TimeoutException('Transfer timed out. Please try again.');
         })
       ]);
       await walletsRef.removeWallet(walletNameController.text);
@@ -59,7 +59,7 @@ class _WalletDetailsWidgetState extends ConsumerState<WalletDetailsWidget> {
       logger.e('Failed to delete wallet due to $e');
       if (context.mounted) {
         String errorMessage = e is TimeoutException
-            ? 'Transfer took too long. Please try again.'
+            ? 'Transfer timed out. Please try again.'
             : 'Failed to delete.';
         final loadingFarmsFailure = SnackBar(
           content: Text(
