@@ -18,36 +18,44 @@ class WalletTransactionsWidget extends StatefulWidget {
 
 class _WalletTransactionsWidgetState extends State<WalletTransactionsWidget> {
   final _pageSize = 10;
-  final PagingController<int, ITransaction> _pagingController =
-      PagingController(firstPageKey: 1); // Start from page 1
+  final PagingController<String?, ITransaction> _pagingController =
+      PagingController(firstPageKey: null);
 
-  Future<void> _listTransactions(int pageKey) async {
-    try {
-      final offset = (pageKey - 1) * _pageSize;
-      final txs = await listTransactions(
-          widget.wallet.stellarSecret, offset, _pageSize);
-      final isLastPage = txs.length < _pageSize;
-      if (isLastPage) {
+  void _listTransactions(String? pagingToken) {
+    listTransactions(widget.wallet.stellarSecret, pagingToken, _pageSize)
+        .then((txs) {
+      if (txs.isEmpty) {
+        _pagingController.appendLastPage([]);
+        return;
+      }
+
+      // Use the paging token of the last raw transaction.
+      // Make sure to adjust the token (subtract one) to avoid the duplicate record.
+      final lastTx = (txs.last as PaymentTransaction);
+      final adjustedPagingToken =
+          (BigInt.parse(lastTx.pagingToken) - BigInt.one).toString();
+
+      if (txs.length < _pageSize) {
         _pagingController.appendLastPage(txs);
       } else {
-        _pagingController.appendPage(txs, pageKey + 1);
+        _pagingController.appendPage(txs, adjustedPagingToken);
       }
-    } catch (e) {
-      logger.e('Failed to load transactions due to $e');
-      _pagingController.error(e);
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text(
-            'Failed to load transaction',
-            style: Theme.of(context)
-                .textTheme
-                .bodyMedium!
-                .copyWith(color: Theme.of(context).colorScheme.errorContainer),
+    }).catchError((e) {
+      logger.e('Failed to load transactions: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              'Failed to load transaction',
+              style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                  color: Theme.of(context).colorScheme.errorContainer),
+            ),
+            duration: const Duration(seconds: 3),
           ),
-          duration: const Duration(seconds: 3),
-        ));
+        );
       }
-    }
+      _pagingController.error = e;
+    });
   }
 
   @override
@@ -78,7 +86,7 @@ class _WalletTransactionsWidgetState extends State<WalletTransactionsWidget> {
       );
     }
 
-    return PagedListView<int, ITransaction>(
+    return PagedListView<String?, ITransaction>(
       pagingController: _pagingController,
       builderDelegate: PagedChildBuilderDelegate<ITransaction>(
         itemBuilder: (context, item, index) => Column(
