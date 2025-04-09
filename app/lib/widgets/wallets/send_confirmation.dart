@@ -50,10 +50,10 @@ class _SendConfirmationWidgetState extends State<SendConfirmationWidget> {
     amountController.text = widget.amount;
     feeController.text = widget.chainType == ChainType.Stellar ? '0.1' : '0.01';
     if (widget.memo != null) {
-    memoController.text = widget.memo!;
-  } else if (widget.memoHash != null) {
-    memoController.text = widget.memoHash!;
-  } 
+      memoController.text = widget.memo!;
+    } else if (widget.memoHash != null) {
+      memoController.text = widget.memoHash!;
+    }
     super.initState();
   }
 
@@ -178,6 +178,27 @@ class _SendConfirmationWidgetState extends State<SendConfirmationWidget> {
               ),
             ),
           ),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 10),
+            child: SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Theme.of(context).colorScheme.secondaryContainer,
+                ),
+                child: Text(
+                  'Cancel',
+                  style: Theme.of(context).textTheme.titleLarge!.copyWith(
+                      color: Theme.of(context).colorScheme.onSurface,
+                      fontWeight: FontWeight.bold),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            ),
+          ),
         ]),
       ),
     );
@@ -218,9 +239,11 @@ class _SendConfirmationWidgetState extends State<SendConfirmationWidget> {
 
   Future<void> _performTransfer() async {
     if (widget.chainType == ChainType.Stellar) {
-      final memoHash = widget.memoHash != null ? Uint8List.fromList(hex.decode(memoController.text.trim())) : null;
-      await Stellar.transfer(
-          widget.secret, widget.to, widget.amount, memo: widget.memo, memoHash: memoHash);
+      final memoHash = widget.memoHash != null
+          ? Uint8List.fromList(hex.decode(memoController.text.trim()))
+          : null;
+      await Stellar.transfer(widget.secret, widget.to, widget.amount,
+          memo: widget.memo, memoHash: memoHash);
     } else {
       await TFChain.transfer(widget.secret, widget.to, widget.amount);
     }
