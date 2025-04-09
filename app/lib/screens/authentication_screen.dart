@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:threebotlogin/events/close_auth_event.dart';
 import 'package:threebotlogin/events/events.dart';
 import 'package:threebotlogin/helpers/globals.dart';
@@ -27,11 +28,17 @@ class AuthenticationScreenState extends State<AuthenticationScreen> {
   int timeout = 30000;
   Globals globals = Globals();
   late Timer timer;
+  bool isLocked = false;
+  bool _initializing = true;
 
   @override
   initState() {
     super.initState();
+    _init();
+  }
 
+  Future<void> _init() async {
+    await _checkPersistentLock();
     Events().onEvent(CloseAuthEvent().runtimeType, (CloseAuthEvent event) {
       if (mounted) {
         close();
@@ -61,6 +68,9 @@ class AuthenticationScreenState extends State<AuthenticationScreen> {
     if (created != null &&
         ((currentTimestamp - created) / 1000) > Globals().loginTimeout) {
       timer.cancel();
+      setState(() {
+        isLocked = true;
+      });
 
       await showDialog(
         context: context,
@@ -82,6 +92,22 @@ class AuthenticationScreenState extends State<AuthenticationScreen> {
 
       Navigator.pop(context, false);
     }
+  }
+
+  Future<void> _checkPersistentLock() async {
+    final prefs = await SharedPreferences.getInstance();
+    final lockedUntil = prefs.getInt('locked_until');
+    final currentTime = DateTime.now().millisecondsSinceEpoch;
+
+    bool shouldBeLocked = lockedUntil != null && lockedUntil > currentTime;
+
+    globals.tooManyAuthenticationAttempts = shouldBeLocked;
+    globals.lockedUntill = shouldBeLocked ? lockedUntil : 0;
+
+    setState(() {
+      isLocked = shouldBeLocked;
+      _initializing = false;
+    });
   }
 
   close() {
@@ -106,6 +132,11 @@ class AuthenticationScreenState extends State<AuthenticationScreen> {
 
   @override
   Widget build(BuildContext context) {
+    if (_initializing) {
+      return const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
     return PincodeWidget(
       title: 'Authentication',
       userMessage: widget.userMessage,
@@ -113,20 +144,32 @@ class AuthenticationScreenState extends State<AuthenticationScreen> {
     );
   }
 
-  validate(String pin) {
+  Future<void> validate(String pin) async {
     int currentTime = DateTime.now().millisecondsSinceEpoch;
 
-    if (globals.incorrectPincodeAttempts >= 3 &&
-        (globals.tooManyAuthenticationAttempts &&
-            globals.lockedUntill < currentTime)) {
+    if (globals.tooManyAuthenticationAttempts &&
+        globals.lockedUntill < currentTime) {
       globals.tooManyAuthenticationAttempts = false;
       globals.lockedUntill = 0;
       globals.incorrectPincodeAttempts = 0;
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.remove('locked_until');
+      setState(() {
+        isLocked = false;
+      });
+    }
+
+    if (_initializing || isLocked || (globals.lockedUntill > currentTime)) {
+      return;
     }
 
     if (pin == widget.correctPin && !globals.tooManyAuthenticationAttempts) {
       globals.incorrectPincodeAttempts = 0;
-      Navigator.pop(context, pin == widget.correctPin);
+      globals.tooManyAuthenticationAttempts = false;
+      globals.lockedUntill = 0;
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.remove('locked_until');
+      Navigator.pop(context, true);
       return;
     }
 
@@ -142,6 +185,11 @@ class AuthenticationScreenState extends State<AuthenticationScreen> {
       if (!globals.tooManyAuthenticationAttempts) {
         globals.tooManyAuthenticationAttempts = true;
         globals.lockedUntill = currentTime + timeout;
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setInt('locked_until', globals.lockedUntill);
+        setState(() {
+          isLocked = true;
+        });
       }
 
       dialog = CustomDialog(
