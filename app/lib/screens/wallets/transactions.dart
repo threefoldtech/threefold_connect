@@ -21,17 +21,22 @@ class _WalletTransactionsWidgetState extends State<WalletTransactionsWidget> {
   final PagingController<String?, ITransaction> _pagingController =
       PagingController(firstPageKey: null);
 
-  void _listTransactions(String? pagingToken) {
-    listTransactions(widget.wallet.stellarSecret, pagingToken, _pageSize)
-        .then((txs) {
+  void _listTransactions(String? pagingToken) async {
+    try {
+      final txStream = listTransactions(
+        widget.wallet.stellarSecret,
+        pagingToken,
+        _pageSize,
+      );
+
+      final txs = await txStream.take(_pageSize).toList();
+
       if (txs.isEmpty) {
         _pagingController.appendLastPage([]);
         return;
       }
 
-      // Use the paging token of the last raw transaction.
-      // Make sure to adjust the token (subtract one) to avoid the duplicate record.
-      final lastTx = (txs.last as PaymentTransaction);
+      final lastTx = txs.last as PaymentTransaction;
       final adjustedPagingToken =
           (BigInt.parse(lastTx.pagingToken) - BigInt.one).toString();
 
@@ -40,22 +45,23 @@ class _WalletTransactionsWidgetState extends State<WalletTransactionsWidget> {
       } else {
         _pagingController.appendPage(txs, adjustedPagingToken);
       }
-    }).catchError((e) {
+    } catch (e) {
       logger.e('Failed to load transactions: $e');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              'Failed to load transaction',
+              'Failed to load transactions',
               style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                  color: Theme.of(context).colorScheme.errorContainer),
+                    color: Theme.of(context).colorScheme.errorContainer,
+                  ),
             ),
             duration: const Duration(seconds: 3),
           ),
         );
       }
       _pagingController.error = e;
-    });
+    }
   }
 
   @override
