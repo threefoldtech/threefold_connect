@@ -1715,7 +1715,7 @@ packages:
     description:
       path: "packages/stellar_client"
       ref: development
-      resolved-ref: f3afde66922dfbe836d0915fac8e152c5817626b
+      resolved-ref: "0ce3b575e2f3dcd371be2152042978113b4eadb1"
       url: "https://github.com/threefoldtech/tfgrid-sdk-dart"
     source: git
     version: "0.1.0"
