@@ -197,7 +197,7 @@ class IdentityVerificationScreenState
 
   void getUserValues() async {
     doubleName = (await getDoubleName())?.replaceAll('.3bot', '') ?? 'Unknown';
-    phrase = (await getPhrase())!;
+    phrase = (await getPhrase()) ?? '';
     final emailMap = await getEmail();
     if (emailMap['email'] != null) {
       email = emailMap['email']!;
@@ -641,16 +641,22 @@ class IdentityVerificationScreenState
                         title: Text(doubleName),
                       ),
                       customDivider(context: context),
-                      Padding(
-                        padding: const EdgeInsets.only(right: 2.0),
-                        child: ListTile(
-                          trailing: const Icon(Icons.visibility),
-                          leading: const Icon(Icons.vpn_key),
-                          title: const Text('Show phrase'),
-                          onTap: _showPhrase,
-                        ),
-                      ),
-                      customDivider(context: context),
+                      !phrase.isNotEmpty
+                          ? Column(
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.only(right: 2.0),
+                                  child: ListTile(
+                                    trailing: const Icon(Icons.visibility),
+                                    leading: const Icon(Icons.vpn_key),
+                                    title: const Text('Show phrase'),
+                                    onTap: _showPhrase,
+                                  ),
+                                ),
+                                customDivider(context: context),
+                              ],
+                            )
+                          : const SizedBox.shrink(),
                       infoWidget(1, email, Icons.email, emailVerified),
                       customDivider(context: context),
                       infoWidget(2, phone, Icons.phone, phoneVerified),
