@@ -64,6 +64,5 @@ class PkidWallet {
           type == other.type;
 
   @override
-  int get hashCode =>
-      name.hashCode ^ index.hashCode ^ seed.hashCode ^ type.hashCode;
+  int get hashCode => Object.hash(name, index, seed, type);
 }
