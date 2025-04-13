@@ -88,8 +88,17 @@
 	<true/>
 	<key>UIBackgroundModes</key>
 	<array>
-  	<string>fetch</string>
-  	<string>remote-notification</string>
+  		<string>fetch</string>
+  		<string>remote-notification</string>
 	</array>
+
+	<key>NSUserNotificationAlertStyle</key>
+	<string>alert</string>
+
+	<key>NSLocalNetworkUsageDescription</key>
+	<string>This app uses the network to monitor your node status.</string>
+
+	<key>NSUserNotificationUsageDescription</key>
+	<string>This app needs permission to send you notifications when your node is offline.</string>
 </dict>
 </plist>

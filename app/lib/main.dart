@@ -1,8 +1,12 @@
+import 'package:background_fetch/background_fetch.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:threebotlogin/helpers/globals.dart';
+import 'package:threebotlogin/helpers/logger.dart';
 import 'package:threebotlogin/screens/splash_screen.dart';
+import 'package:threebotlogin/services/background_service.dart';
+import 'package:threebotlogin/services/notification_service.dart';
 import 'package:threebotlogin/services/shared_preference_service.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:threebotlogin/providers/theme_provider.dart';
@@ -33,6 +37,10 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
 
+  await NotificationService().initNotification();
+
+  BackgroundFetch.registerHeadlessTask(backgroundFetchHeadlessTask);
+
   bool initDone = await getInitDone();
   String? doubleName = await getDoubleName();
 
@@ -44,6 +52,27 @@ Future<void> main() async {
       child: MyApp(initDone: initDone, registered: registered),
     ),
   );
+
+  BackgroundFetch.configure(
+    BackgroundFetchConfig(
+      minimumFetchInterval: 15,
+      stopOnTerminate: false,
+      enableHeadless: true,
+      requiresBatteryNotLow: false,
+      requiresCharging: false,
+      requiresStorageNotLow: false,
+      requiredNetworkType: NetworkType.ANY,
+    ),
+    (String taskId) async {
+      logger.i('[BackgroundFetch] Task: $taskId');
+      await checkNodeStatus();
+      BackgroundFetch.finish(taskId);
+    },
+    (String taskId) async {
+      logger.i('[BackgroundFetch] Timeout: $taskId');
+      BackgroundFetch.finish(taskId);
+    },
+  );
 }
 
 Future<void> setGlobalValues() async {
@@ -52,7 +81,6 @@ Future<void> setGlobalValues() async {
 
   Globals().emailVerified.value = (email['sei'] != null);
   Globals().phoneVerified.value = (phone['spi'] != null);
-
 }
 
 class MyApp extends ConsumerWidget {
