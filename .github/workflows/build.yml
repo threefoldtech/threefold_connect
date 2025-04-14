@@ -24,12 +24,12 @@ jobs:
           flutter-version: "3.27.2"
           channel: "stable"
 
-      - name: Clear Gradle and background_fetch cache
+      - name: Clean Gradle & Flutter build cache
         run: |
           rm -rf ~/.gradle
           rm -rf ~/.pub-cache/hosted/pub.dev/background_fetch*
-          ./gradlew clean
-    
+          flutter clean
+
       - name: Get dependencies
         run: flutter pub get
 
