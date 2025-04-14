@@ -24,10 +24,6 @@ jobs:
           flutter-version: "3.27.2"
           channel: "stable"
 
-      - name: Patch NDK version
-        run: |
-          sed -i '/android {/a \ \ \ \ ndkVersion "27.0.12077973"' android/app/build.gradle
-
       - name: Clear cached background_fetch package
         run: rm -rf ~/.pub-cache/hosted/pub.dev/background_fetch*
     
