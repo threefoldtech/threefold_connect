@@ -30,8 +30,14 @@ jobs:
       - name: Get dependencies
         run: flutter pub get
 
-      - name: Debug background_fetch version
-        run: grep "background_fetch" pubspec.lock || echo "background_fetch not found"
+      - name: Verify background_fetch version
+        run: |
+          echo "Checking version of background_fetch..."
+          grep -A 2 "background_fetch:" pubspec.lock || echo "background_fetch not found"
+          if ! grep -q 'version: "1.1.3"' pubspec.lock; then
+            echo "❌ background_fetch is NOT version 1.1.3. Failing build."
+            exit 1
+          fi
 
       - name: Ensure Build Script is Executable
         run: chmod +x build.sh
