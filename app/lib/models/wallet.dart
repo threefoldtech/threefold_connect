@@ -26,7 +26,7 @@ class Wallet {
   String stellarBalance;
   String tfchainBalance;
   final WalletType type;
-  VerificationState verificationStatus; 
+  VerificationState verificationStatus;
 }
 
 class PkidWallet {
@@ -52,4 +52,17 @@ class PkidWallet {
   toMap() {
     return {'name': name, 'index': index, 'seed': seed, 'type': type.name};
   }
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is PkidWallet &&
+          runtimeType == other.runtimeType &&
+          name == other.name &&
+          index == other.index &&
+          seed == other.seed &&
+          type == other.type;
+
+  @override
+  int get hashCode => Object.hash(name, index, seed, type);
 }
