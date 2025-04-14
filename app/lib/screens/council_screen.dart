@@ -17,7 +17,7 @@ class _CouncilScreenState extends State<CouncilScreen> {
   String? selectedNetwork = '';
 
   Widget networkButton(String label, String url) {
-    final bool isActive = selectedNetwork == url;
+    final bool isActive = selectedNetwork == url && errorMessage == null;
     final colorScheme = Theme.of(context).colorScheme;
 
     return SizedBox(
@@ -77,17 +77,20 @@ class _CouncilScreenState extends State<CouncilScreen> {
                         final v = value.trim();
                         if (v.isEmpty) {
                           errorMessage = 'URL is required';
+                          selectedNetwork = '';
                           setState(() {});
                           return;
                         }
                         if (!v.startsWith('wss://') && !v.startsWith('ws://')) {
                           errorMessage = 'Not a valid websocket URL';
+                          selectedNetwork = '';
                           setState(() {});
                           return;
                         }
                         if (!isFQDN(v.replaceFirst('wss://', '')) &&
                             !isFQDN(v.replaceFirst('ws://', ''))) {
                           errorMessage = 'Not a valid websocket URL';
+                          selectedNetwork = '';
                           setState(() {});
                           return;
                         }
