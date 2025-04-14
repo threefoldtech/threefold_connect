@@ -30,6 +30,9 @@ jobs:
       - name: Get dependencies
         run: flutter pub get
 
+      - name: Debug background_fetch version
+        run: grep "background_fetch" pubspec.lock || echo "background_fetch not found"
+
       - name: Ensure Build Script is Executable
         run: chmod +x build.sh
 
