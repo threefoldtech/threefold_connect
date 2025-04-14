@@ -23,7 +23,10 @@ jobs:
         with:
           flutter-version: "3.27.2"
           channel: "stable"
-
+          
+      - name: Clear cached background_fetch package
+        run: rm -rf ~/.pub-cache/hosted/pub.dev/background_fetch*
+    
       - name: Get dependencies
         run: flutter pub get
 
