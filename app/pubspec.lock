@@ -69,7 +69,7 @@ packages:
       sha256: "2b7fff16a552486d078bfc09a8cde19f426dc6d6329262b684182597bec5b1ac"
       url: "https://pub.dev"
     source: hosted
-    version: "0.1.21"
+    version: "0.1.25"
   background_fetch:
     dependency: "direct main"
     description:
