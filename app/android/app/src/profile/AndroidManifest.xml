@@ -4,11 +4,4 @@
          to allow setting breakpoints, to provide hot reload, etc.
     -->
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
-    <receiver android:name="com.transistorsoft.flutter.backgroundfetch.HeadlessBroadcastReceiver" android:enabled="true" android:exported="true">
-        <intent-filter>
-            <action android:name="com.transistorsoft.flutter.backgroundfetch.ACTION_RECEIVE"/>
-        </intent-filter>
-    </receiver>
-
 </manifest>
