@@ -99,7 +99,9 @@ class _SwapTransactionWidgetState extends State<SwapTransactionWidget> {
             selectedChain: leftSelectedChain,
             excludeChains: [rightSelectedChain],
             onChainChanged: _handleLeftChainChange,
-            disabledChains: [Chains.Solana.name],
+            disabledChains: rightSelectedChain == Chains.Solana.name
+                ? [Chains.TFChain.name, Chains.Solana.name]
+                : [Chains.Solana.name],
           ),
           _buildSwapButton(context, disableSwap),
           _buildChainInfo(
