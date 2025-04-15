@@ -196,20 +196,27 @@ class IdentityVerificationScreenState
   }
 
   void getUserValues() async {
-    doubleName = (await getDoubleName())?.replaceAll('.3bot', '') ?? 'Unknown';
-    phrase = (await getPhrase()) ?? '';
-    final emailMap = await getEmail();
-    if (emailMap['email'] != null) {
-      email = emailMap['email']!;
-      changeEmailController.text = email;
-      emailVerified = (emailMap['sei'] != null);
+    setState(() => isLoading = true);
+    try {
+      doubleName =
+          (await getDoubleName())?.replaceAll('.3bot', '') ?? 'Unknown';
+      phrase = (await getPhrase()) ?? '';
+      final emailMap = await getEmail();
+      if (emailMap['email'] != null) {
+        email = emailMap['email']!;
+        changeEmailController.text = email;
+        emailVerified = (emailMap['sei'] != null);
+      }
+      final phoneMap = await getPhone();
+      if (phoneMap['phone'] != null) {
+        phone = phoneMap['phone']!;
+        phoneVerified = (phoneMap['spi'] != null);
+      }
+    } catch (e) {
+      logger.e('failed getting user values: $e');
+    } finally {
+      if (mounted) setState(() => isLoading = false);
     }
-    final phoneMap = await getPhone();
-    if (phoneMap['phone'] != null) {
-      phone = phoneMap['phone']!;
-      phoneVerified = (phoneMap['spi'] != null);
-    }
-    setState(() {});
   }
 
   Future copySeedPhrase() async {
@@ -619,6 +626,26 @@ class IdentityVerificationScreenState
 
   @override
   Widget build(BuildContext context) {
+    if (isLoading) {
+      return Scaffold(
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              CircularProgressIndicator(
+                color: Theme.of(context).colorScheme.primary,
+              ),
+              const SizedBox(height: 20),
+              Text(
+                'Loading identity information...',
+                style: Theme.of(context).textTheme.bodyMedium,
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
     return LayoutDrawer(
       titleText: 'Identity',
       content: Padding(
@@ -641,22 +668,18 @@ class IdentityVerificationScreenState
                         title: Text(doubleName),
                       ),
                       customDivider(context: context),
-                      !phrase.isNotEmpty
-                          ? Column(
-                              children: [
-                                Padding(
-                                  padding: const EdgeInsets.only(right: 2.0),
-                                  child: ListTile(
-                                    trailing: const Icon(Icons.visibility),
-                                    leading: const Icon(Icons.vpn_key),
-                                    title: const Text('Show phrase'),
-                                    onTap: _showPhrase,
-                                  ),
-                                ),
-                                customDivider(context: context),
-                              ],
-                            )
-                          : const SizedBox.shrink(),
+                      if (phrase.isNotEmpty) ...[
+                        Padding(
+                          padding: const EdgeInsets.only(right: 2.0),
+                          child: ListTile(
+                            trailing: const Icon(Icons.visibility),
+                            leading: const Icon(Icons.vpn_key),
+                            title: const Text('Show phrase'),
+                            onTap: _showPhrase,
+                          ),
+                        ),
+                        customDivider(context: context),
+                      ],
                       infoWidget(1, email, Icons.email, emailVerified),
                       customDivider(context: context),
                       infoWidget(2, phone, Icons.phone, phoneVerified),
