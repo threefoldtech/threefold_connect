@@ -6,7 +6,6 @@ import 'package:threebotlogin/screens/splash_screen.dart';
 import 'package:threebotlogin/services/shared_preference_service.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:threebotlogin/providers/theme_provider.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
 
 extension ColorSchemeExtension on ColorScheme {
   Color get warning => brightness == Brightness.light
@@ -85,16 +84,6 @@ class MyApp extends ConsumerWidget {
     );
 
     return MaterialApp(
-      // Force US locale settings
-      locale: const Locale('en', 'US'),
-      localizationsDelegates: const [
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      supportedLocales: const [
-        Locale('en', 'US'), // English, United States
-      ],
       theme: ThemeData().copyWith(
         colorScheme: kColorScheme,
         brightness: Brightness.light,
