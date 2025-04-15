@@ -38,27 +38,18 @@ class _ContactsScreenState extends State<ContactsScreen> {
   }
 
   _loadFavouriteContacts() async {
-    final allContacts = await getPkidContacts();
-
-    final seen = <String>{};
-    final filtered = <PkidContact>[];
-
-    for (final c in allContacts) {
-      if (c.type != widget.chainType) continue;
-
-      final key = '${c.address}_${c.type}';
-      if (seen.add(key)) {
-        filtered.add(c);
-      }
-    }
-
-    myPkidContacts = filtered;
+    myPkidContacts = await getPkidContacts();
+    myPkidContacts =
+        myPkidContacts.where((c) => c.type == widget.chainType).toList();
     setState(() {});
   }
 
   _onAddContact(PkidContact contact) async {
-    myPkidContacts.add(contact);
-    setState(() {});
+    final exists = myPkidContacts.any((c) => c.name == contact.name && c.address == contact.address);
+    if (!exists) {
+      myPkidContacts.add(contact);
+      setState(() {});
+    }
   }
 
   _openAddContactOverlay() {
