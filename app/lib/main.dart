@@ -52,7 +52,6 @@ Future<void> setGlobalValues() async {
 
   Globals().emailVerified.value = (email['sei'] != null);
   Globals().phoneVerified.value = (phone['spi'] != null);
-
 }
 
 class MyApp extends ConsumerWidget {
