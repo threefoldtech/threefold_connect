@@ -86,14 +86,10 @@ class _AddEditContactState extends State<AddEditContact> {
       addressError = "Address can't be empty";
       return false;
     }
+    // Check for duplicates across all chain types
     final contacts = widget.contacts.where((c) => c.address == contactAddress);
-    if (edit && contactAddress != widget.address && contacts.isNotEmpty) {
+    if (contacts.isNotEmpty) {
       addressError = 'Address is used in another contact';
-      return false;
-    } else if (!edit && contacts.isNotEmpty) {
-      addressError =
-          'Address exists in another ${contacts.first.type.name} contact';
-
       return false;
     }
     if (_selectedChainType == ChainType.TFChain &&

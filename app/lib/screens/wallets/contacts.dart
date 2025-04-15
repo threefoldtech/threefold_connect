@@ -39,13 +39,11 @@ class _ContactsScreenState extends State<ContactsScreen> {
 
   _loadFavouriteContacts() async {
     myPkidContacts = await getPkidContacts();
-    myPkidContacts =
-        myPkidContacts.where((c) => c.type == widget.chainType).toList();
     setState(() {});
   }
 
   _onAddContact(PkidContact contact) async {
-    final exists = myPkidContacts.any((c) => c.name == contact.name && c.address == contact.address);
+    final exists = myPkidContacts.any((c) => c.address == contact.address);
     if (!exists) {
       myPkidContacts.add(contact);
       setState(() {});
@@ -150,7 +148,9 @@ class _ContactsScreenState extends State<ContactsScreen> {
                             .toList(),
                         onSelectToAddress: widget.onSelectToAddress),
                     ContactsWidget(
-                      contacts: myPkidContacts,
+                      contacts: myPkidContacts
+                          .where((c) => c.type == widget.chainType)
+                          .toList(),
                       onSelectToAddress: widget.onSelectToAddress,
                       onDeleteContact: _onDeleteContact,
                       onEditContact: _openEditContactOverlay,
