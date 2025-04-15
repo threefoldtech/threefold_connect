@@ -60,8 +60,8 @@ class _SwapTransactionWidgetState extends State<SwapTransactionWidget> {
     setState(() {
       leftSelectedChain = newChain;
       if (newChain == Chains.TFChain.name) {
-        currentOperation = BridgeOperation.Withdraw;  
-        _handleRightChainChange(Chains.Stellar.name);      
+        currentOperation = BridgeOperation.Withdraw;
+        _handleRightChainChange(Chains.Stellar.name);
       } else {
         currentOperation = BridgeOperation.Deposit;
       }
@@ -97,17 +97,18 @@ class _SwapTransactionWidgetState extends State<SwapTransactionWidget> {
           _buildChainInfo(
             context,
             selectedChain: leftSelectedChain,
-            excludeChains: [Chains.Solana.name, rightSelectedChain],
+            excludeChains: [rightSelectedChain],
             onChainChanged: _handleLeftChainChange,
+            disabledChains: [Chains.Solana.name],
           ),
           _buildSwapButton(context, disableSwap),
           _buildChainInfo(
             context,
             selectedChain: rightSelectedChain,
-            excludeChains: [
-              leftSelectedChain,
-              if (leftSelectedChain == Chains.TFChain.name) Chains.Solana.name
-            ],
+            excludeChains: [leftSelectedChain],
+            disabledChains: leftSelectedChain == Chains.TFChain.name
+                ? [Chains.Solana.name]
+                : [],
             onChainChanged: _handleRightChainChange,
             isLeft: false,
           ),
@@ -122,6 +123,7 @@ class _SwapTransactionWidgetState extends State<SwapTransactionWidget> {
     required List<String> excludeChains,
     required ValueChanged<String> onChainChanged,
     bool isLeft = true,
+    List<String> disabledChains = const [],
   }) {
     return Flexible(
       flex: 1,
@@ -137,6 +139,7 @@ class _SwapTransactionWidgetState extends State<SwapTransactionWidget> {
               onChanged: onChainChanged,
               colorScheme: Theme.of(context).colorScheme,
               textTheme: Theme.of(context).textTheme,
+              disabledChains: disabledChains,
             ),
           ),
         ],
@@ -174,6 +177,7 @@ class _SwapTransactionWidgetState extends State<SwapTransactionWidget> {
 class ChainDropdown extends StatelessWidget {
   final String selectedChain;
   final List<String> excludeChains;
+  final List<String> disabledChains;
   final ValueChanged<String> onChanged;
   final ColorScheme colorScheme;
   final TextTheme textTheme;
@@ -185,6 +189,7 @@ class ChainDropdown extends StatelessWidget {
     required this.onChanged,
     required this.colorScheme,
     required this.textTheme,
+    this.disabledChains = const [],
   });
 
   @override
@@ -198,16 +203,24 @@ class ChainDropdown extends StatelessWidget {
       child: DropdownButton<String>(
         value: selectedChain,
         items: chains.map((c) {
+          final isDisabled = disabledChains.contains(c);
           return DropdownMenuItem<String>(
-            value: c,
-            child: _ChainItem(chain: c, colorScheme: colorScheme),
+            value: isDisabled ? null : c,
+            enabled: !isDisabled,
+            child: _ChainItem(
+              chain: c,
+              colorScheme: colorScheme,
+              isDisabled: isDisabled,
+            ),
           );
         }).toList(),
         selectedItemBuilder: (context) => chains.map((c) {
+          final isDisabled = disabledChains.contains(c);
           return _ChainItem(
             chain: c,
             colorScheme: colorScheme,
             isSelected: true,
+            isDisabled: isDisabled,
           );
         }).toList(),
         onChanged: (v) => v != null ? onChanged(v) : null,
@@ -220,22 +233,28 @@ class _ChainItem extends StatelessWidget {
   final String chain;
   final ColorScheme colorScheme;
   final bool isSelected;
+  final bool isDisabled;
 
   const _ChainItem({
     required this.chain,
     required this.colorScheme,
     this.isSelected = false,
+    this.isDisabled = false,
   });
 
   @override
   Widget build(BuildContext context) {
+    final color = isDisabled
+        ? colorScheme.onSurface.withOpacity(0.4)
+        : colorScheme.onSurface;
+
     return Row(
       children: [
         Image.asset(
           _getChainIcon(chain),
           width: isSelected ? 30 : 20,
           height: isSelected ? 30 : 20,
-          color: colorScheme.onSurface,
+          color: color,
         ),
         const SizedBox(width: 8),
         Column(
@@ -246,14 +265,14 @@ class _ChainItem extends StatelessWidget {
               style: TextStyle(
                 fontWeight: FontWeight.bold,
                 fontSize: isSelected ? 14 : 12,
-                color: colorScheme.onSurface,
+                color: color,
               ),
             ),
             Text(
               chain,
               style: TextStyle(
                 fontSize: isSelected ? 12 : 10,
-                color: colorScheme.onSurface,
+                color: color,
               ),
             ),
           ],
@@ -263,12 +282,11 @@ class _ChainItem extends StatelessWidget {
   }
 
   String _getChainIcon(String chain) {
-    Map chainIcons = {
-      Chains.Stellar.name: 'assets/stellar.png',
-      Chains.Solana.name: 'assets/solana.png',
-      Chains.TFChain.name: 'assets/tf_chain.png',
-    };
-
-    return chainIcons[chain] ?? 'assets/tf_chain.png';
+    return {
+          Chains.Stellar.name: 'assets/stellar.png',
+          Chains.Solana.name: 'assets/solana.png',
+          Chains.TFChain.name: 'assets/tf_chain.png',
+        }[chain] ??
+        'assets/tf_chain.png';
   }
 }
