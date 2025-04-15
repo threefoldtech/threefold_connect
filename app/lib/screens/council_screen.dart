@@ -75,27 +75,24 @@ class _CouncilScreenState extends State<CouncilScreen> {
                       controller: urlController,
                       onChanged: (value) {
                         final v = value.trim();
+                        selectedNetwork = v;
                         if (v.isEmpty) {
                           errorMessage = 'URL is required';
-                          selectedNetwork = '';
                           setState(() {});
                           return;
                         }
                         if (!v.startsWith('wss://') && !v.startsWith('ws://')) {
                           errorMessage = 'Not a valid websocket URL';
-                          selectedNetwork = '';
                           setState(() {});
                           return;
                         }
                         if (!isFQDN(v.replaceFirst('wss://', '')) &&
                             !isFQDN(v.replaceFirst('ws://', ''))) {
                           errorMessage = 'Not a valid websocket URL';
-                          selectedNetwork = '';
                           setState(() {});
                           return;
                         }
                         errorMessage = null;
-                        selectedNetwork = value;
                         setState(() {});
                         return;
                       },
