@@ -17,6 +17,7 @@ class AddEditContact extends StatefulWidget {
     this.name = '',
     this.address = '',
     this.onEditContact,
+    this.getAllContacts,
   });
 
   final void Function(PkidContact addedContact)? onAddContact;
@@ -27,6 +28,7 @@ class AddEditContact extends StatefulWidget {
   final String address;
   final void Function(String oldName, String newName, String newAddress)?
       onEditContact;
+  final List<PkidContact> Function()? getAllContacts;
 
   @override
   State<StatefulWidget> createState() {
@@ -81,27 +83,34 @@ class _AddEditContactState extends State<AddEditContact> {
 
   bool _validateAddress(String contactAddress, {bool edit = false}) {
     addressError = null;
+    final allContacts = widget.getAllContacts != null
+        ? widget.getAllContacts!()
+        : widget.contacts;
 
     if (contactAddress.isEmpty) {
       addressError = "Address can't be empty";
       return false;
     }
-    // Check for duplicates across all chain types
-    final contacts = widget.contacts.where((c) => c.address == contactAddress);
-    if (contacts.isNotEmpty) {
+
+    final isDuplicate = allContacts.any((c) => c.address == contactAddress);
+
+    if (isDuplicate) {
       addressError = 'Address is used in another contact';
       return false;
     }
+
     if (_selectedChainType == ChainType.TFChain &&
         contactAddress.length != 48) {
       addressError = 'Address length should be 48 characters';
       return false;
     }
+
     if (_selectedChainType == ChainType.Stellar &&
         !isValidStellarAddress(contactAddress)) {
       addressError = 'Invaild Stellar address';
       return false;
     }
+
     return true;
   }
 
@@ -122,10 +131,12 @@ class _AddEditContactState extends State<AddEditContact> {
           Icons.error, DialogType.Error);
       return;
     }
-    if (chainType == widget.chainType) {
-      widget.onAddContact!(PkidContact(
-          name: contactName, address: contactAddress, type: chainType));
-    }
+    widget.onAddContact?.call(PkidContact(
+      name: contactName,
+      address: contactAddress,
+      type: chainType,
+    ));
+
     if (!context.mounted) return;
     Navigator.pop(context);
   }
