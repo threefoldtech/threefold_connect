@@ -254,12 +254,12 @@ class _MobileRegistrationScreenState extends State<MobileRegistrationScreen> {
   }
 
   void saveRegistration() async {
-    savePrivateKey(_registrationData.keyPair.secretKey.extractBytes());
-    savePublicKey(_registrationData.keyPair.publicKey);
-    saveFingerprint(false);
-    saveEmail(_registrationData.email, null);
-    saveDoubleName(_registrationData.doubleName);
-    savePhrase(_registrationData.phrase);
+    await savePrivateKey(_registrationData.keyPair.secretKey.extractBytes());
+    await savePublicKey(_registrationData.keyPair.publicKey);
+    await saveFingerprint(false);
+    await saveEmail(_registrationData.email, null);
+    await saveDoubleName(_registrationData.doubleName);
+    await savePhrase(_registrationData.phrase);
 
     FlutterPkid client = await getPkidClient();
     client.setPKidDoc('email', json.encode({'email': _registrationData.email}));
