@@ -40,6 +40,7 @@ class IdentityVerificationScreenState
   bool emailVerified = false;
   bool phoneVerified = false;
   bool isLoading = false;
+  bool failed = false;
   bool hidePhoneVerifyButton = false;
   bool emailInputValidated = false;
   int emailCountdown = 60;
@@ -213,7 +214,24 @@ class IdentityVerificationScreenState
         phoneVerified = (phoneMap['spi'] != null);
       }
     } catch (e) {
-      logger.e('failed getting user values: $e');
+      setState(() {
+        failed = true;
+      });
+      logger.e('Failed to get user values due to $e');
+      if (context.mounted) {
+        final loadingFarmsFailure = SnackBar(
+          content: Text(
+            'Failed to get user values',
+            style: Theme.of(context)
+                .textTheme
+                .bodyMedium!
+                .copyWith(color: Theme.of(context).colorScheme.errorContainer),
+          ),
+          duration: const Duration(seconds: 3),
+        );
+        ScaffoldMessenger.of(context).clearSnackBars();
+        ScaffoldMessenger.of(context).showSnackBar(loadingFarmsFailure);
+      }
     } finally {
       if (mounted) setState(() => isLoading = false);
     }
@@ -626,29 +644,44 @@ class IdentityVerificationScreenState
 
   @override
   Widget build(BuildContext context) {
+    final Widget content;
     if (isLoading) {
-      return Scaffold(
-        body: Center(
+      content = Center(
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              CircularProgressIndicator(
-                color: Theme.of(context).colorScheme.primary,
-              ),
-              const SizedBox(height: 20),
-              Text(
-                'Loading identity information...',
-                style: Theme.of(context).textTheme.bodyMedium,
-              ),
-            ],
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const CircularProgressIndicator(),
+          const SizedBox(height: 15),
+          Text(
+            'Loading identity information...',
+            style: Theme.of(context).textTheme.bodyLarge!.copyWith(
+                color: Theme.of(context).colorScheme.onSurface,
+                fontWeight: FontWeight.bold),
           ),
+        ],
+      ));
+    } else if (failed) {
+      content = Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const SizedBox(height: 15),
+            ElevatedButton.icon(
+              icon: const Icon(Icons.refresh),
+              label: const Text('Try Again'),
+              onPressed: () {
+                setState(() {
+                  failed = false;
+                  isLoading = true;
+                });
+                getUserValues();
+              },
+            ),
+          ],
         ),
       );
-    }
-
-    return LayoutDrawer(
-      titleText: 'Identity',
-      content: Padding(
+    } else {
+      content = Padding(
         padding: const EdgeInsets.symmetric(horizontal: 4.0),
         child: SingleChildScrollView(
           child: Column(
@@ -690,7 +723,12 @@ class IdentityVerificationScreenState
             ],
           ),
         ),
-      ),
+      );
+    }
+
+    return LayoutDrawer(
+      titleText: 'Identity',
+      content: content,
     );
   }
 }
