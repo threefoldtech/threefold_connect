@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
+import 'package:threebotlogin/helpers/form.dart';
 import 'package:threebotlogin/helpers/globals.dart';
 import 'package:threebotlogin/helpers/logger.dart';
 import 'package:threebotlogin/helpers/transaction_helpers.dart';
@@ -320,6 +321,10 @@ class _WalletSendScreenState extends ConsumerState<WalletSendScreen> {
                         focusNode: textFieldFocusNode,
                         keyboardType: const TextInputType.numberWithOptions(
                             decimal: true),
+                        inputFormatters: [
+                          FilteringTextInputFormatter.allow(RegExp(r'[0-9.,]')),
+                          CommaToDotTextFormatter(),
+                        ],
                         controller: amountController,
                         textInputAction: TextInputAction.done,
                         decoration: InputDecoration(
