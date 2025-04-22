@@ -92,7 +92,7 @@ class _AddEditContactState extends State<AddEditContact> {
       return false;
     }
 
-    final isDuplicate = allContacts.any((c) => c.address == contactAddress);
+    final isDuplicate = allContacts.any((c) => c.address == contactAddress && (!edit || (edit && widget.address != contactAddress)));
 
     if (isDuplicate) {
       addressError = 'Address is used in another contact';
