@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:background_fetch/background_fetch.dart';
 import 'package:threebotlogin/services/nodes_check_service.dart';
 import 'notification_service.dart';
