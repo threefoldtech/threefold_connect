@@ -20,7 +20,7 @@ Future<void> checkNodeStatus() async {
 
   if (offlineNodes.isNotEmpty) {
     final twoDaysAgoTimestamp =
-        DateTime.now().subtract(const Duration(days: 2)).millisecondsSinceEpoch;
+        DateTime.now().subtract(const Duration(days: 7)).millisecondsSinceEpoch;
 
     final recentOfflineNodes = offlineNodes
         .where((node) => node.updatedAt! > twoDaysAgoTimestamp)
