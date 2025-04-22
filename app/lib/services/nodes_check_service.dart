@@ -31,6 +31,7 @@ class NodeCheckService {
         final nodes = nodesData
             .map((node) => Node(
                   nodeId: node.nodeId,
+                  updatedAt: node.updatedAt,
                   status: NodeStatus.values.firstWhere(
                     (e) =>
                         e.toString().toLowerCase() ==

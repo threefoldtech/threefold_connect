@@ -33,28 +33,43 @@ class NotificationService {
     _isInitialized = true;
   }
 
-  NotificationDetails _notificationDetails() {
-    return const NotificationDetails(
-      android: AndroidNotificationDetails(
-        'node_status_channel',
-        'Node Status',
-        channelDescription: 'Notify user when node goes offline',
-        importance: Importance.max,
-        priority: Priority.high,
-      ),
-      iOS: DarwinNotificationDetails(
-        presentAlert: true,
-        presentSound: true,
-        presentBadge: true,
-      ),
-    );
-  }
-
   Future<void> showNotification({
     int id = 0,
     required String title,
     required String body,
+    String? groupKey,
+    bool isGroupSummary = false,
   }) async {
-    await notificationsPlugin.show(id, title, body, _notificationDetails());
+    final androidDetails = groupKey != null
+        ? AndroidNotificationDetails(
+            'node_status_channel',
+            'Node Status',
+            channelDescription: 'Notify user when node goes offline',
+            importance: Importance.max,
+            priority: Priority.high,
+            groupKey: groupKey,
+            setAsGroupSummary: isGroupSummary,
+          )
+        : const AndroidNotificationDetails(
+            'node_status_channel',
+            'Node Status',
+            channelDescription: 'Notify user when node goes offline',
+            importance: Importance.max,
+            priority: Priority.high,
+          );
+
+    final iosDetails = DarwinNotificationDetails(
+      presentAlert: true,
+      presentBadge: true,
+      presentSound: true,
+      threadIdentifier: groupKey,
+    );
+
+    final notificationDetails = NotificationDetails(
+      android: androidDetails,
+      iOS: iosDetails,
+    );
+
+    await notificationsPlugin.show(id, title, body, notificationDetails);
   }
 }

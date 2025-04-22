@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:background_fetch/background_fetch.dart';
 import 'package:threebotlogin/services/nodes_check_service.dart';
 import 'notification_service.dart';
@@ -19,11 +21,33 @@ Future<void> checkNodeStatus() async {
   final offlineNodes = await NodeCheckService.pingNodesInBackground();
 
   if (offlineNodes.isNotEmpty) {
-    final nodeIds = offlineNodes.map((n) => n.nodeId).join(', ');
-    await NotificationService().showNotification(
-      title: 'Node Alert 🚨',
-      body: 'Offline node(s): $nodeIds',
-    );
+    final twoDaysAgoTimestamp =
+        DateTime.now().subtract(const Duration(days: 2)).millisecondsSinceEpoch;
+
+    final recentOfflineNodes = offlineNodes
+        .where((node) => node.updatedAt! > twoDaysAgoTimestamp)
+        .toList();
+
+    if (offlineNodes.isEmpty) return;
+
+    const groupKey = 'offline_nodes';
+    for (var node in recentOfflineNodes) {
+      await NotificationService().showNotification(
+        id: node.hashCode,
+        title: 'Node Alert 🚨',
+        body: 'Node ${node.nodeId} is offline',
+        groupKey: groupKey,
+      );
+    }
+
+    if (recentOfflineNodes.length > 1) {
+      await NotificationService().showNotification(
+        id: 0,
+        title: 'Multiple Nodes Offline',
+        body: '${offlineNodes.length} nodes are currently offline',
+        groupKey: groupKey,
+        isGroupSummary: true,
+      );
+    }
   }
 }
-
