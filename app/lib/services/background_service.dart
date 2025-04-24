@@ -19,7 +19,7 @@ Future<void> checkNodeStatus() async {
   final offlineNodes = await NodeCheckService.pingNodesInBackground();
 
   if (offlineNodes.isNotEmpty) {
-    final twoDaysAgoTimestamp =
+    final sevenDaysAgoTimestamp =
         DateTime.now().subtract(const Duration(days: 7)).millisecondsSinceEpoch;
 
     final recentOfflineNodes = offlineNodes
