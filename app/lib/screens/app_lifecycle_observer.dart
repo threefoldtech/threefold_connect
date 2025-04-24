@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:threebotlogin/helpers/globals.dart';
 import 'package:threebotlogin/helpers/logger.dart';
 import 'package:threebotlogin/main.dart';
 import 'package:threebotlogin/screens/home_screen.dart';
@@ -55,10 +54,6 @@ class _AppLifecycleObserverState extends ConsumerState<AppLifecycleObserver>
           navigatorKey.currentState?.push(
             MaterialPageRoute(builder: (context) => const HomeScreen()),
           );
-          if (Globals().tabController.index != 0) {
-            Globals().tabController.animateTo(0, duration: Duration.zero);
-            logger.i('Tab index reset to 0.');
-          }
         });
         ref.read(lastPausedProvider.notifier).state = now;
       }
