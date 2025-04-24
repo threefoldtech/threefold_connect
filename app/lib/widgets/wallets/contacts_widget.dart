@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:threebotlogin/models/contact.dart';
+import 'package:threebotlogin/models/wallet.dart';
 import 'package:threebotlogin/widgets/wallets/contact_card.dart';
 
 class ContactsWidget extends StatelessWidget {
@@ -9,19 +10,21 @@ class ContactsWidget extends StatelessWidget {
     required this.onSelectToAddress,
     this.onDeleteContact,
     this.onEditContact,
+    required this.chainType,
     this.canEditAndDelete = false,
   });
-
   final List<PkidContact> contacts;
   final void Function(String address) onSelectToAddress;
   final bool canEditAndDelete;
   final void Function(String name)? onDeleteContact;
   final void Function(String oldName, String oldAddress)? onEditContact;
+  final ChainType chainType;
 
   @override
   Widget build(BuildContext context) {
+     final filteredContacts = contacts.where((c) => c.type == chainType).toList();
     Widget content;
-    if (contacts.isEmpty) {
+    if (filteredContacts.isEmpty) {
       content = Center(
         child: Text(
           'No contacts yet.',
@@ -33,7 +36,7 @@ class ContactsWidget extends StatelessWidget {
       );
     } else {
       content = ListView(children: [
-        for (final contact in contacts)
+        for (final contact in filteredContacts)
           InkWell(
               onTap: () {
                 onSelectToAddress(contact.address);
