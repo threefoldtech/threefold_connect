@@ -39,8 +39,6 @@ class _ContactsScreenState extends State<ContactsScreen> {
 
   _loadFavouriteContacts() async {
     myPkidContacts = await getPkidContacts();
-    myPkidContacts =
-        myPkidContacts.where((c) => c.type == widget.chainType).toList();
     setState(() {});
   }
 
@@ -60,6 +58,7 @@ class _ContactsScreenState extends State<ContactsScreen> {
               onAddContact: _onAddContact,
               chainType: widget.chainType,
               contacts: [...myPkidContacts, ...myWalletContacts],
+              getAllContacts: () => [...myPkidContacts, ...myWalletContacts],
             ));
   }
 
@@ -141,15 +140,18 @@ class _ContactsScreenState extends State<ContactsScreen> {
                   children: [
                     ContactsWidget(
                         contacts: myWalletContacts
-                            .where(
-                                (c) => c.address != widget.currentWalletAddress && c.type == widget.chainType)
+                            .where((c) =>
+                                c.address != widget.currentWalletAddress &&
+                                c.type == widget.chainType)
                             .toList(),
+                        chainType: widget.chainType,
                         onSelectToAddress: widget.onSelectToAddress),
                     ContactsWidget(
                       contacts: myPkidContacts,
                       onSelectToAddress: widget.onSelectToAddress,
                       onDeleteContact: _onDeleteContact,
                       onEditContact: _openEditContactOverlay,
+                      chainType: widget.chainType,
                       canEditAndDelete: true,
                     ),
                   ],
