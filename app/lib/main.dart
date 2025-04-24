@@ -32,7 +32,7 @@ extension ColorSchemeExtension on ColorScheme {
       ? const Color.fromARGB(255, 240, 240, 240)
       : const Color.fromARGB(255, 10, 10, 10);
 }
-
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
@@ -113,6 +113,7 @@ class MyApp extends ConsumerWidget {
     );
 
     return MaterialApp(
+      navigatorKey: navigatorKey,
       theme: ThemeData().copyWith(
         colorScheme: kColorScheme,
         brightness: Brightness.light,
