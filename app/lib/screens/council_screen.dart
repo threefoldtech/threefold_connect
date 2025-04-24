@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
+import 'package:threebotlogin/main.dart';
 import 'package:threebotlogin/widgets/council/councils.dart';
 import 'package:threebotlogin/widgets/layout_drawer.dart';
 import 'package:validators/validators.dart';
@@ -128,7 +129,7 @@ class _CouncilScreenState extends State<CouncilScreen> {
                   ElevatedButton(
                       onPressed: () {
                         if (errorMessage == null) {
-                          Navigator.of(context).push(MaterialPageRoute(
+                          navigatorKey.currentState?.push(MaterialPageRoute(
                             builder: (context) =>
                                 CouncilsWidget(chainUrl: urlController.text),
                           ));
