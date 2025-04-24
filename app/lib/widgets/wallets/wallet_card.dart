@@ -4,7 +4,6 @@ import 'package:threebotlogin/helpers/globals.dart';
 import 'package:threebotlogin/helpers/kyc_helpers.dart';
 import 'package:threebotlogin/helpers/logger.dart';
 import 'package:threebotlogin/helpers/transaction_helpers.dart';
-import 'package:threebotlogin/main.dart';
 import 'package:threebotlogin/models/idenfy.dart';
 import 'package:threebotlogin/models/wallet.dart';
 import 'package:threebotlogin/providers/wallets_provider.dart';
@@ -156,11 +155,11 @@ class _WalletCardWidgetState extends ConsumerState<WalletCardWidget> {
               widget.wallet.stellarBalance == '-1') {
             return;
           }
-          navigatorKey.currentState?.push(
-            MaterialPageRoute(
-              builder: (context) => WalletDetailsScreen(wallet: widget.wallet),
+          Navigator.of(context).push(MaterialPageRoute(
+            builder: (context) => WalletDetailsScreen(
+              wallet: widget.wallet,
             ),
-          );
+          ));
         },
         child: Padding(
           padding: const EdgeInsets.all(16),
@@ -190,7 +189,7 @@ class _WalletCardWidgetState extends ConsumerState<WalletCardWidget> {
                       ),
                       borderRadius: BorderRadius.circular(20),
                     ),
-                    child: Text(capitalize(wallet.verificationStatus.name),
+                    child: Text(capitalize(wallet.verificationStatus.name),                   
                         style: Theme.of(context).textTheme.bodySmall!.copyWith(
                               color: wallet.verificationStatus ==
                                       VerificationState.VERIFIED

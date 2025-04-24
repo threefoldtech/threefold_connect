@@ -3,7 +3,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:threebotlogin/helpers/globals.dart';
 import 'package:threebotlogin/helpers/logger.dart';
-import 'package:threebotlogin/main.dart';
 import 'package:threebotlogin/models/farm.dart';
 import 'package:threebotlogin/models/wallet.dart';
 import 'package:threebotlogin/screens/wallets/contacts.dart';
@@ -200,7 +199,7 @@ class _FarmItemWidgetState extends State<FarmItemWidget> {
                         suffixIcon: edit
                             ? IconButton(
                                 onPressed: () {
-                                  navigatorKey.currentState?.push(MaterialPageRoute(
+                                  Navigator.of(context).push(MaterialPageRoute(
                                     builder: (context) => ContactsScreen(
                                         chainType: chainType,
                                         currentWalletAddress: currentAddress!,

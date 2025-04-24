@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:threebotlogin/main.dart';
 import 'package:threebotlogin/screens/main_screen.dart';
 import 'package:threebotlogin/widgets/home_logo.dart';
 
@@ -24,7 +23,7 @@ class _SplashScreenState extends State<SplashScreen>
     Future.delayed(
       const Duration(seconds: 2),
       () {
-        navigatorKey.currentState?.pushReplacement(MaterialPageRoute(
+        Navigator.of(context).pushReplacement(MaterialPageRoute(
             builder: (_) => MainScreen(
                 initDone: widget.initDone, registered: widget.registered)));
       },

@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:stellar_client/models/vesting_account.dart';
 import 'package:threebotlogin/helpers/globals.dart';
 import 'package:threebotlogin/helpers/transaction_helpers.dart';
-import 'package:threebotlogin/main.dart';
 import 'package:threebotlogin/models/wallet.dart';
 import 'package:threebotlogin/providers/wallets_provider.dart';
 import 'package:threebotlogin/screens/wallets/bridge.dart';
@@ -99,7 +98,7 @@ class _WalletAssetsWidgetState extends State<WalletAssetsWidget> {
                   children: [
                     InkWell(
                       onTap: () {
-                        navigatorKey.currentState?.push(MaterialPageRoute(
+                        Navigator.of(context).push(MaterialPageRoute(
                           builder: (context) => WalletSendScreen(
                             wallet: widget.wallet,
                           ),
@@ -129,7 +128,7 @@ class _WalletAssetsWidgetState extends State<WalletAssetsWidget> {
                   children: [
                     InkWell(
                       onTap: () {
-                        navigatorKey.currentState?.push(MaterialPageRoute(
+                        Navigator.of(context).push(MaterialPageRoute(
                           builder: (context) => WalletReceiveScreen(
                             wallet: widget.wallet,
                           ),
@@ -158,7 +157,7 @@ class _WalletAssetsWidgetState extends State<WalletAssetsWidget> {
                   children: [
                     InkWell(
                       onTap: () {
-                        navigatorKey.currentState?.push(MaterialPageRoute(
+                        Navigator.of(context).push(MaterialPageRoute(
                           builder: (context) => WalletBridgeScreen(
                             wallet: widget.wallet,
                           ),

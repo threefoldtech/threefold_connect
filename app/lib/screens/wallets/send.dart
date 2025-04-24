@@ -8,7 +8,6 @@ import 'package:threebotlogin/helpers/form.dart';
 import 'package:threebotlogin/helpers/globals.dart';
 import 'package:threebotlogin/helpers/logger.dart';
 import 'package:threebotlogin/helpers/transaction_helpers.dart';
-import 'package:threebotlogin/main.dart';
 import 'package:threebotlogin/models/wallet.dart';
 import 'package:threebotlogin/providers/wallets_provider.dart';
 import 'package:threebotlogin/screens/scan_screen.dart';
@@ -302,7 +301,7 @@ class _WalletSendScreenState extends ConsumerState<WalletSendScreen> {
                             errorText: toAddressError,
                             suffixIcon: IconButton(
                                 onPressed: () {
-                                  navigatorKey.currentState?.push(MaterialPageRoute(
+                                  Navigator.of(context).push(MaterialPageRoute(
                                     builder: (context) => ContactsScreen(
                                         chainType: chainType,
                                         currentWalletAddress:
