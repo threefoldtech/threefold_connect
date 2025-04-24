@@ -9,7 +9,6 @@ import 'package:threebotlogin/helpers/flags.dart';
 import 'package:threebotlogin/helpers/globals.dart';
 import 'package:threebotlogin/helpers/kyc_helpers.dart';
 import 'package:threebotlogin/helpers/logger.dart';
-import 'package:threebotlogin/main.dart';
 import 'package:threebotlogin/screens/change_pin_screen.dart';
 import 'package:threebotlogin/screens/home_screen.dart';
 import 'package:threebotlogin/screens/init_screen.dart';
@@ -213,7 +212,7 @@ class _AppState extends State<MainScreen> {
                   )));
     }
     // await Navigator.push(context, MaterialPageRoute(builder: (context) => UnregisteredScreen()));
-    await navigatorKey.currentState?.pushReplacement(PageRouteBuilder(
+    await Navigator.of(context).pushReplacement(PageRouteBuilder(
         transitionDuration: const Duration(seconds: 1),
         pageBuilder: (_, __, ___) => HomeScreen(
             initialLink: initialLink, backendConnection: _backendConnection)));
