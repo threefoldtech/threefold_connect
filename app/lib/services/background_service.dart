@@ -35,25 +35,23 @@ Future<void> checkNodeStatus() async {
   if (nodesToNotify.isEmpty) return;
 
   const groupKey = 'offline_nodes';
-  if (nodesToNotify.length == 1) {
-    final node = nodesToNotify.first;
+  final StringBuffer bodyBuffer = StringBuffer();
+
+  for (final node in nodesToNotify) {
     final downtime =
         _formatDowntime(Duration(milliseconds: now - node.updatedAt!));
 
-    await NotificationService().showNotification(
-      id: node.hashCode,
-      title: 'Node Alert 🚨',
-      body: 'Node ${node.nodeId} has been offline for $downtime',
-      groupKey: groupKey,
-    );
-  } else {
-    await NotificationService().showNotification(
-      id: nodesToNotify.hashCode,
-      title: 'Multiple Nodes Offline',
-      body: '${nodesToNotify.length} nodes are currently offline',
-      groupKey: groupKey,
-    );
+    bodyBuffer.writeln('Node ${node.nodeId}: offline for $downtime');
   }
+
+  await NotificationService().showNotification(
+    id: nodesToNotify.hashCode,
+    title: nodesToNotify.length == 1
+        ? 'Node Alert 🚨'
+        : '${nodesToNotify.length} Nodes Offline 🚨',
+    body: bodyBuffer.toString().trim(),
+    groupKey: groupKey,
+  );
 }
 
 Duration _getCheckInterval(Duration downtime) {

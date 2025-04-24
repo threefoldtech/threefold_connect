@@ -40,29 +40,21 @@ class NotificationService {
     String? groupKey,
     bool isGroupSummary = false,
   }) async {
-    final androidDetails = groupKey != null
-        ? AndroidNotificationDetails(
-            'node_status_channel',
-            'Node Status',
-            channelDescription: 'Notify user when node goes offline',
-            importance: Importance.max,
-            priority: Priority.high,
-            groupKey: groupKey,
-            setAsGroupSummary: isGroupSummary,
-          )
-        : const AndroidNotificationDetails(
-            'node_status_channel',
-            'Node Status',
-            channelDescription: 'Notify user when node goes offline',
-            importance: Importance.max,
-            priority: Priority.high,
-          );
+    final androidDetails = AndroidNotificationDetails(
+      'node_status_channel',
+      'Node Status',
+      channelDescription: 'Notify user when node goes offline',
+      importance: Importance.max,
+      priority: Priority.high,
+      groupKey: groupKey,
+    );
 
     final iosDetails = DarwinNotificationDetails(
       presentAlert: true,
       presentBadge: true,
       presentSound: true,
       threadIdentifier: groupKey,
+      interruptionLevel: InterruptionLevel.timeSensitive
     );
 
     final notificationDetails = NotificationDetails(
