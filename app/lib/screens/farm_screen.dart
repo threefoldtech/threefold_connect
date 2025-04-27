@@ -7,13 +7,13 @@ import 'package:threebotlogin/helpers/globals.dart';
 import 'package:threebotlogin/helpers/logger.dart';
 import 'package:threebotlogin/models/farm.dart';
 import 'package:threebotlogin/models/wallet.dart';
+import 'package:threebotlogin/providers/app_bar_provider.dart';
 import 'package:threebotlogin/providers/wallets_provider.dart';
 import 'package:threebotlogin/services/crypto_service.dart';
 import 'package:threebotlogin/services/gridproxy_service.dart';
 import 'package:threebotlogin/services/tfchain_service.dart';
 import 'package:threebotlogin/widgets/add_farm.dart';
 import 'package:threebotlogin/widgets/farm_item.dart';
-import 'package:threebotlogin/widgets/layout_drawer.dart';
 
 class FarmScreen extends ConsumerStatefulWidget {
   const FarmScreen({super.key});
@@ -23,7 +23,7 @@ class FarmScreen extends ConsumerStatefulWidget {
 }
 
 class _FarmScreenState extends ConsumerState<FarmScreen>
-    with SingleTickerProviderStateMixin {
+    with SingleTickerProviderStateMixin, AutomaticKeepAliveClientMixin {
   registrar.RegistrarClient? registrarClient;
   List<Farm> v3Farms = [];
   List<Farm> v4Farms = [];
@@ -33,16 +33,32 @@ class _FarmScreenState extends ConsumerState<FarmScreen>
   late final TabController _tabController;
 
   @override
+  bool get wantKeepAlive => true;
+
+  @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
     listFarms();
+
+    Future.microtask(() {
+      ref.read(appBarActionsBuilderProvider.notifier).state =
+          (BuildContext context) {
+        return [
+          IconButton(
+            icon: const Icon(Icons.add),
+            onPressed: () => _openAddFarmOverlay(),
+          ),
+        ];
+      };
+    });
   }
 
   @override
   void dispose() {
-    super.dispose();
+    ref.read(appBarActionsBuilderProvider.notifier).state = null;
     _tabController.dispose();
+    super.dispose();
   }
 
   listWallets() async {
@@ -206,9 +222,10 @@ class _FarmScreenState extends ConsumerState<FarmScreen>
 
   @override
   Widget build(BuildContext context) {
-    Widget mainWidget;
+    super.build(context);
+    Widget mainContent;
     if (loading) {
-      mainWidget = Center(
+      mainContent = Center(
           child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
@@ -223,7 +240,7 @@ class _FarmScreenState extends ConsumerState<FarmScreen>
         ],
       ));
     } else if (failed) {
-      mainWidget = Center(
+      mainContent = Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -243,59 +260,43 @@ class _FarmScreenState extends ConsumerState<FarmScreen>
         ),
       );
     } else {
-      mainWidget = DefaultTabController(
-          length: 2,
-          child: Column(
-            children: [
-              PreferredSize(
-                preferredSize: const Size.fromHeight(50.0),
-                child: Container(
-                  color: Theme.of(context).scaffoldBackgroundColor,
-                  child: TabBar(
-                    controller: _tabController,
-                    labelColor: Theme.of(context).colorScheme.primary,
-                    indicatorColor: Theme.of(context).colorScheme.primary,
-                    unselectedLabelColor:
-                        Theme.of(context).colorScheme.onSurface,
-                    dividerColor: Theme.of(context).scaffoldBackgroundColor,
-                    labelStyle: Theme.of(context).textTheme.titleLarge,
-                    unselectedLabelStyle:
-                        Theme.of(context).textTheme.titleMedium,
-                    tabs: const [
-                      Tab(text: 'V3'),
-                      Tab(text: 'V4'),
-                    ],
-                  ),
-                ),
+      mainContent = Column(
+        children: [
+          PreferredSize(
+            preferredSize: const Size.fromHeight(50.0),
+            child: Container(
+              color: Theme.of(context).scaffoldBackgroundColor,
+              child: TabBar(
+                controller: _tabController,
+                labelColor: Theme.of(context).colorScheme.primary,
+                indicatorColor: Theme.of(context).colorScheme.primary,
+                unselectedLabelColor: Theme.of(context).colorScheme.onSurface,
+                dividerColor: Theme.of(context).scaffoldBackgroundColor,
+                labelStyle: Theme.of(context).textTheme.titleLarge,
+                unselectedLabelStyle: Theme.of(context).textTheme.titleMedium,
+                tabs: const [
+                  Tab(text: 'V3'),
+                  Tab(text: 'V4'),
+                ],
               ),
-              Expanded(
-                child: TabBarView(controller: _tabController, children: [
-                  RefreshIndicator(
-                    onRefresh: listFarms,
-                    child: listFarmsWidget(v3Farms, false),
-                  ),
-                  RefreshIndicator(
-                    onRefresh: listFarms,
-                    child: listFarmsWidget(v4Farms, true),
-                  ),
-                ]),
-              )
-            ],
-          ));
+            ),
+          ),
+          Expanded(
+            child: TabBarView(controller: _tabController, children: [
+              RefreshIndicator(
+                onRefresh: listFarms,
+                child: listFarmsWidget(v3Farms, false),
+              ),
+              RefreshIndicator(
+                onRefresh: listFarms,
+                child: listFarmsWidget(v4Farms, true),
+              ),
+            ]),
+          )
+        ],
+      );
     }
-    return LayoutDrawer(
-      titleText: 'Farming',
-      content: mainWidget,
-      appBarActions: loading
-          ? []
-          : [
-              IconButton(
-                  onPressed: _openAddFarmOverlay,
-                  icon: const Icon(
-                    Icons.add,
-                  ))
-            ],
-    );
+    return mainContent;
   }
 
   _openAddFarmOverlay() {

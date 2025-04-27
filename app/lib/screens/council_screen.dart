@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:threebotlogin/widgets/council/councils.dart';
-import 'package:threebotlogin/widgets/layout_drawer.dart';
 import 'package:validators/validators.dart';
 
 class CouncilScreen extends StatefulWidget {
@@ -11,7 +10,7 @@ class CouncilScreen extends StatefulWidget {
   State<CouncilScreen> createState() => _CouncilScreenState();
 }
 
-class _CouncilScreenState extends State<CouncilScreen> {
+class _CouncilScreenState extends State<CouncilScreen> with AutomaticKeepAliveClientMixin {
   final urlController = TextEditingController();
   String? errorMessage;
   String? selectedNetwork = '';
@@ -57,6 +56,7 @@ class _CouncilScreenState extends State<CouncilScreen> {
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     final content = Padding(
         padding: const EdgeInsets.all(16.0),
         child: KeyboardVisibilityBuilder(builder: (context, isKeyboardVisible) {
@@ -157,6 +157,9 @@ class _CouncilScreenState extends State<CouncilScreen> {
                 ],
               ));
         }));
-    return LayoutDrawer(titleText: 'Council', content: content);
+    return content;
   }
+  
+  @override
+  bool get wantKeepAlive => true;
 }

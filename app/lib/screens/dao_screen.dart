@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:tfchain_client/models/dao.dart';
 import 'package:threebotlogin/helpers/logger.dart';
-import 'package:threebotlogin/widgets/layout_drawer.dart';
 import 'package:threebotlogin/widgets/dao/proposals.dart';
 import 'package:threebotlogin/services/tfchain_service.dart';
 
@@ -12,7 +11,7 @@ class DaoPage extends StatefulWidget {
   State<DaoPage> createState() => _DaoPageState();
 }
 
-class _DaoPageState extends State<DaoPage> with SingleTickerProviderStateMixin {
+class _DaoPageState extends State<DaoPage> with SingleTickerProviderStateMixin, AutomaticKeepAliveClientMixin {
   final List<Proposal> activeList = [];
   final List<Proposal> inactiveList = [];
   bool loading = true;
@@ -67,6 +66,7 @@ class _DaoPageState extends State<DaoPage> with SingleTickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     Widget content;
     if (loading) {
       content = Center(
@@ -149,6 +149,9 @@ class _DaoPageState extends State<DaoPage> with SingleTickerProviderStateMixin {
         ),
       );
     }
-    return LayoutDrawer(titleText: 'Dao', content: content);
+    return content;
   }
+  
+  @override
+  bool get wantKeepAlive => true;
 }
