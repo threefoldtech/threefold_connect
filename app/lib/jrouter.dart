@@ -9,6 +9,7 @@ import 'package:threebotlogin/screens/registered_screen.dart';
 
 import 'apps/farmers/farmers.dart';
 import 'apps/news/news.dart';
+import 'apps/sign/sign.dart';
 
 class AppInfo {
   Route route;
@@ -84,6 +85,14 @@ class JRouter {
             name: 'Council',
             icon: Icons.how_to_vote_outlined,
             view: await Council().widget(),
+          ),
+          app: Dao()),
+      AppInfo(
+          route: Route(
+            path: '/sign',
+            name: 'Sign',
+            icon: Icons.handshake,
+            view: await Sign().widget(),
           ),
           app: Dao()),
     ];
