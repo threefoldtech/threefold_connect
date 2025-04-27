@@ -25,6 +25,8 @@ class _DaoPageState extends State<DaoPage> with SingleTickerProviderStateMixin {
       failed = false;
     });
     try {
+      await checkInternetConnection();
+
       final proposals = await getProposals();
       if (activeList.isNotEmpty) activeList.clear();
       if (inactiveList.isNotEmpty) inactiveList.clear();
@@ -92,12 +94,12 @@ class _DaoPageState extends State<DaoPage> with SingleTickerProviderStateMixin {
             ElevatedButton.icon(
               icon: const Icon(Icons.refresh),
               label: const Text('Try Again'),
-              onPressed: () async {
+              onPressed: () {
                 setState(() {
                   failed = false;
                   loading = true;
                 });
-                await loadProposals();
+                loadProposals();
               },
             ),
           ],

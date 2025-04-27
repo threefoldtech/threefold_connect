@@ -2,6 +2,7 @@
 
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:bip39/bip39.dart';
 import 'package:convert/convert.dart';
@@ -322,5 +323,19 @@ Future<Votes> getCouncilProposalVotes(String chainUrl, String hash) async {
     throw Exception('Failed to get council proposals votes due to $e');
   } finally {
     await client.disconnect();
+  }
+}
+
+Future<void> checkInternetConnection() async {
+  try {
+    final result = await InternetAddress.lookup('google.com')
+        .timeout(const Duration(seconds: 5));
+    if (result.isEmpty || result[0].rawAddress.isEmpty) {
+      throw Exception('No internet connection');
+    }
+  } on SocketException catch (_) {
+    throw Exception('No internet connection');
+  } on TimeoutException catch (_) {
+    throw Exception('Connection timeout');
   }
 }
