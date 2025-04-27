@@ -16,6 +16,7 @@ import 'package:threebotlogin/events/go_wallet_event.dart';
 import 'package:threebotlogin/events/new_login_event.dart';
 import 'package:threebotlogin/events/uni_link_event.dart';
 import 'package:threebotlogin/helpers/globals.dart';
+import 'package:threebotlogin/main.dart';
 import 'package:threebotlogin/providers/wallets_provider.dart';
 import 'package:threebotlogin/screens/authentication_screen.dart';
 import 'package:threebotlogin/services/socket_service.dart';
@@ -25,26 +26,30 @@ import 'package:threebotlogin/widgets/email_verification_needed.dart';
 import 'package:uni_links/uni_links.dart';
 
 /* Screen shows tab bar and all pages defined in router.dart */
-class HomeScreen extends StatefulWidget {
+class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key, this.initialLink, this.backendConnection});
   final String? initialLink;
   final BackendConnection? backendConnection;
 
   @override
-  State<HomeScreen> createState() => _HomeScreenState();
+  ConsumerState<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen>
-    with WidgetsBindingObserver, SingleTickerProviderStateMixin {
+class _HomeScreenState extends ConsumerState<HomeScreen>
+    with SingleTickerProviderStateMixin {
   Globals globals = Globals();
   StreamSubscription? _sub;
   String? initialLink;
   bool timeoutExpiredInBackground = true;
   bool pinCheckOpen = false;
-  int lastCheck = 0;
-  final int pinCheckTimeout = 60000 * 5;
 
-  _HomeScreenState();
+  @override
+  void dispose() {
+    _sub?.cancel();
+    globals.tabController.removeListener(_handleTabSelection);
+    globals.tabController.dispose();
+    super.dispose();
+  }
 
   void checkPinAndNavigateIfSuccess(int indexIfAuthIsSuccess) async {
     String? pin = await getPin();
@@ -63,7 +68,8 @@ class _HomeScreenState extends State<HomeScreen>
     pinCheckOpen = false;
 
     if (authenticated != null && authenticated) {
-      lastCheck = DateTime.now().millisecondsSinceEpoch;
+      ref.read(lastPausedProvider.notifier).state =
+          DateTime.now().millisecondsSinceEpoch;
       timeoutExpiredInBackground = false;
       globals.tabController.animateTo(indexIfAuthIsSuccess);
     }
@@ -175,40 +181,6 @@ class _HomeScreenState extends State<HomeScreen>
     Events().onEvent(PhoneEvent().runtimeType, (PhoneEvent event) {
       phoneVerification(context);
     });
-
-    WidgetsBinding.instance.addObserver(this);
-  }
-
-  @override
-  void dispose() {
-    _sub?.cancel();
-    WidgetsBinding.instance.removeObserver(this);
-    super.dispose();
-  }
-
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (state == AppLifecycleState.resumed) {
-      if (pinCheckOpen) {
-        return;
-      }
-
-      int timeSpendWithPausedApp =
-          DateTime.now().millisecondsSinceEpoch - lastCheck;
-
-      if (timeSpendWithPausedApp >= pinCheckTimeout) {
-        timeoutExpiredInBackground = true;
-      }
-
-      if (Globals().router.pinRequired(globals.tabController.index) &&
-          timeoutExpiredInBackground) {
-        int homeTab = 0;
-        globals.tabController.animateTo(homeTab);
-      }
-    } else if (state == AppLifecycleState.inactive) {
-    } else if (state == AppLifecycleState.paused) {
-      lastCheck = DateTime.now().millisecondsSinceEpoch;
-    }
   }
 
   Future<void> initUniLinks() async {
