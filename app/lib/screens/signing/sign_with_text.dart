@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -5,6 +7,7 @@ import 'package:threebotlogin/helpers/logger.dart';
 import 'package:threebotlogin/models/wallet.dart';
 import 'package:threebotlogin/providers/wallets_provider.dart';
 import 'package:threebotlogin/services/signing_service.dart';
+import 'package:http/http.dart' as http;
 
 class SignWithTextScreen extends ConsumerStatefulWidget {
   const SignWithTextScreen({super.key});
@@ -20,6 +23,8 @@ class _SignWithTextScreenState extends ConsumerState<SignWithTextScreen> {
   bool isLoading = false;
   String? textError;
   String? walletError;
+  final TextEditingController _destUrlController = TextEditingController();
+  String? destUrlError;
 
   @override
   void initState() {
@@ -29,6 +34,7 @@ class _SignWithTextScreenState extends ConsumerState<SignWithTextScreen> {
   @override
   void dispose() {
     _textController.dispose();
+    _destUrlController.dispose();
     super.dispose();
   }
 
@@ -48,9 +54,46 @@ class _SignWithTextScreenState extends ConsumerState<SignWithTextScreen> {
     });
   }
 
+  bool _validateDestUrl() {
+    if (_destUrlController.text.isEmpty) {
+      return true;
+    }
+
+    String url = _destUrlController.text.trim();
+    try {
+      final uri = Uri.parse(url);
+      if (!uri.isScheme('http') && !uri.isScheme('https')) {
+        setState(() {
+          destUrlError = 'URL must start with http:// or https://';
+        });
+        return false;
+      }
+
+      if (!uri.hasAuthority) {
+        setState(() {
+          destUrlError = 'Invalid URL format';
+        });
+        return false;
+      }
+
+      setState(() {
+        destUrlError = null;
+      });
+      return true;
+    } catch (e) {
+      setState(() {
+        destUrlError = 'Invalid URL format';
+      });
+      return false;
+    }
+  }
+
   Future<void> _signText() async {
     _validateInputs();
     if (textError != null || walletError != null) {
+      return;
+    }
+    if (!_validateDestUrl()) {
       return;
     }
 
@@ -64,6 +107,9 @@ class _SignWithTextScreenState extends ConsumerState<SignWithTextScreen> {
         data: _textController.text,
         walletSecretSeed: selectedWallet!.tfchainSecret,
       );
+      if (_destUrlController.text.isNotEmpty) {
+        await sendSignedData(_destUrlController.text.trim(), signedData!);
+      }
     } catch (e) {
       if (mounted) {
         setState(() {
@@ -76,6 +122,39 @@ class _SignWithTextScreenState extends ConsumerState<SignWithTextScreen> {
         setState(() {
           isLoading = false;
         });
+      }
+    }
+  }
+
+  Future<void> sendSignedData(String destUrl, String signature) async {
+    try {
+      final response = await http.post(
+        Uri.parse(destUrl),
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode({'signature': signature}),
+      );
+
+      if (response.statusCode != 200) {
+        throw Exception('Failed to send signature to destination');
+      }
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Signature sent successfully'),
+            backgroundColor: Colors.green,
+          ),
+        );
+      }
+    } catch (e) {
+      logger.e('Error sending signature to destination: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Failed to send signature to destination'),
+            backgroundColor: Colors.red,
+          ),
+        );
       }
     }
   }
@@ -154,6 +233,32 @@ class _SignWithTextScreenState extends ConsumerState<SignWithTextScreen> {
                     _validateInputs();
                   }
                 });
+              },
+            ),
+            const SizedBox(
+              height: 24,
+            ),
+            TextField(
+              controller: _destUrlController,
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: Theme.of(context).colorScheme.onSurface,
+                  ),
+              decoration: InputDecoration(
+                labelText: 'Destination URL (Optional)',
+                errorText: destUrlError,
+                hintText: 'https://example.com/api/signatures',
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+              onChanged: (value) {
+                if (value.isNotEmpty) {
+                  _validateDestUrl();
+                } else {
+                  setState(() {
+                    destUrlError = null;
+                  });
+                }
               },
             ),
             const SizedBox(height: 32),

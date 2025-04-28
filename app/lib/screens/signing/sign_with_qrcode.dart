@@ -28,6 +28,8 @@ class _SignWithTextScreenState extends ConsumerState<SignWithQRCodeScreen> {
   String? scannedDataError;
   String? walletError;
   String? _destUrl;
+  final TextEditingController _destUrlController = TextEditingController();
+  String? destUrlError;
 
   @override
   void initState() {
@@ -37,6 +39,7 @@ class _SignWithTextScreenState extends ConsumerState<SignWithQRCodeScreen> {
   @override
   void dispose() {
     _textController.dispose();
+    _destUrlController.dispose();
     super.dispose();
   }
 
@@ -54,6 +57,40 @@ class _SignWithTextScreenState extends ConsumerState<SignWithQRCodeScreen> {
         walletError = null;
       }
     });
+  }
+
+  bool _validateDestUrl() {
+    if (_destUrlController.text.isEmpty) {
+      return true;
+    }
+
+    String url = _destUrlController.text.trim();
+    try {
+      final uri = Uri.parse(url);
+      if (!uri.isScheme('http') && !uri.isScheme('https')) {
+        setState(() {
+          destUrlError = 'URL must start with http:// or https://';
+        });
+        return false;
+      }
+
+      if (!uri.hasAuthority) {
+        setState(() {
+          destUrlError = 'Invalid URL format';
+        });
+        return false;
+      }
+
+      setState(() {
+        destUrlError = null;
+      });
+      return true;
+    } catch (e) {
+      setState(() {
+        destUrlError = 'Invalid URL format';
+      });
+      return false;
+    }
   }
 
   void _showInvalidQRCodeDialog() {
@@ -144,6 +181,9 @@ class _SignWithTextScreenState extends ConsumerState<SignWithQRCodeScreen> {
     if (scannedDataError != null || walletError != null) {
       return;
     }
+    if (!_validateDestUrl()) {
+      return;
+    }
 
     setState(() {
       isLoading = true;
@@ -155,6 +195,9 @@ class _SignWithTextScreenState extends ConsumerState<SignWithQRCodeScreen> {
         data: _textController.text,
         walletSecretSeed: selectedWallet!.tfchainSecret,
       );
+      if (_destUrlController.text.isNotEmpty) {
+        await sendSignedData(_destUrlController.text.trim(), signedData!);
+      }
       if (_destUrl != null) {
         await sendSignedData(_destUrl!, signedData!);
       }
@@ -204,7 +247,6 @@ class _SignWithTextScreenState extends ConsumerState<SignWithQRCodeScreen> {
           ),
         );
       }
-      throw Exception('Failed to send signature');
     }
   }
 
@@ -317,6 +359,32 @@ class _SignWithTextScreenState extends ConsumerState<SignWithQRCodeScreen> {
                     _validateInputs();
                   }
                 });
+              },
+            ),
+            const SizedBox(
+              height: 24,
+            ),
+            TextField(
+              controller: _destUrlController,
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: Theme.of(context).colorScheme.onSurface,
+                  ),
+              decoration: InputDecoration(
+                labelText: 'Destination URL (Optional)',
+                errorText: destUrlError,
+                hintText: 'https://example.com/api/signatures',
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+              onChanged: (value) {
+                if (value.isNotEmpty) {
+                  _validateDestUrl();
+                } else {
+                  setState(() {
+                    destUrlError = null;
+                  });
+                }
               },
             ),
             const SizedBox(height: 32),
