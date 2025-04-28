@@ -18,16 +18,12 @@ class WalletScreen extends ConsumerStatefulWidget {
   ConsumerState<WalletScreen> createState() => _WalletScreenState();
 }
 
-class _WalletScreenState extends ConsumerState<WalletScreen>
-    with AutomaticKeepAliveClientMixin {
+class _WalletScreenState extends ConsumerState<WalletScreen> {
   bool loading = true;
   bool failed = false;
   bool reloadBalance = true;
   List<Wallet> wallets = [];
   late WalletsNotifier walletRef;
-
-  @override
-  bool get wantKeepAlive => true;
 
   @override
   void initState() {
@@ -76,7 +72,6 @@ class _WalletScreenState extends ConsumerState<WalletScreen>
 
   @override
   Widget build(BuildContext context) {
-    super.build(context);
     wallets = ref.watch(walletsNotifier);
     Widget mainWidget;
     if (loading) {

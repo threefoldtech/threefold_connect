@@ -10,7 +10,7 @@ class CouncilScreen extends StatefulWidget {
   State<CouncilScreen> createState() => _CouncilScreenState();
 }
 
-class _CouncilScreenState extends State<CouncilScreen> with AutomaticKeepAliveClientMixin {
+class _CouncilScreenState extends State<CouncilScreen> {
   final urlController = TextEditingController();
   String? errorMessage;
   String? selectedNetwork = '';
@@ -56,7 +56,6 @@ class _CouncilScreenState extends State<CouncilScreen> with AutomaticKeepAliveCl
 
   @override
   Widget build(BuildContext context) {
-    super.build(context);
     final content = Padding(
         padding: const EdgeInsets.all(16.0),
         child: KeyboardVisibilityBuilder(builder: (context, isKeyboardVisible) {
@@ -159,7 +158,4 @@ class _CouncilScreenState extends State<CouncilScreen> with AutomaticKeepAliveCl
         }));
     return content;
   }
-  
-  @override
-  bool get wantKeepAlive => true;
 }

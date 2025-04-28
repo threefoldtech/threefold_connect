@@ -35,7 +35,7 @@ class PreferenceScreen extends ConsumerStatefulWidget {
   ConsumerState<PreferenceScreen> createState() => _PreferenceScreenState();
 }
 
-class _PreferenceScreenState extends ConsumerState<PreferenceScreen> with AutomaticKeepAliveClientMixin {
+class _PreferenceScreenState extends ConsumerState<PreferenceScreen> {
   // FirebaseNotificationListener _listener;
   Map email = {};
   bool showAdvancedOptions = false;
@@ -53,10 +53,6 @@ class _PreferenceScreenState extends ConsumerState<PreferenceScreen> with Automa
 
   MaterialColor thiscolor = Colors.green;
   bool deleteLoading = false;
-
-  
-  @override
-  bool get wantKeepAlive => true;
 
   @override
   void initState() {
@@ -88,7 +84,6 @@ class _PreferenceScreenState extends ConsumerState<PreferenceScreen> with Automa
 
   @override
   Widget build(BuildContext context) {
-    super.build(context);
     final themeMode = ref.watch(themeModeNotifier);
     bool isDarkMode;
     if (themeMode == ThemeMode.system) {

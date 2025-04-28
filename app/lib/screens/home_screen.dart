@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:threebotlogin/events/email_event.dart';
 import 'package:threebotlogin/events/go_news_event.dart';
 import 'package:threebotlogin/events/go_reservations_event.dart';
@@ -25,9 +24,11 @@ import 'package:threebotlogin/services/socket_service.dart';
 import 'package:threebotlogin/services/uni_link_service.dart';
 import 'package:threebotlogin/services/shared_preference_service.dart';
 import 'package:threebotlogin/widgets/email_verification_needed.dart';
+import 'package:threebotlogin/widgets/app_bottom_nav.dart';
+import 'package:threebotlogin/widgets/app_drawer.dart';
+import 'package:threebotlogin/widgets/keep_alive.dart';
 import 'package:uni_links/uni_links.dart';
 
-/* Screen shows tab bar and all pages defined in router.dart */
 class HomeScreen extends ConsumerStatefulWidget {
   final String? initialLink;
   final BackendConnection? backendConnection;
@@ -49,9 +50,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
   late TabController _tabController;
   Globals globals = Globals();
   StreamSubscription? _sub;
-  bool timeoutExpiredInBackground = true;
-  bool pinCheckOpen = false;
-
+  bool _timeoutExpiredInBackground = true;
+  bool _isPinCheckOpen = false;
   final List<Widget> _screens = Globals().router.getContent();
   final List<String> _screenTitles = [
     'Home',
@@ -63,64 +63,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     'Settings',
     'Council',
   ];
-
-  Widget buildDrawerItem(
-      {required IconData icon, required String label, required int tabIndex}) {
-    return ListTile(
-      minLeadingWidth: 10,
-      leading: Padding(
-          padding: const EdgeInsets.only(left: 10),
-          child: Icon(icon, size: 18)),
-      title: Text(label),
-      onTap: () {
-        Navigator.pop(context);
-        _selectScreen(tabIndex);
-      },
-    );
-  }
-
-  void _selectScreen(int index) {
-    if (index >= 0 && index < _tabController.length) {
-      _tabController.animateTo(index);
-    }
-  }
-
-  void _selectBottomNavItem(int bottomNavIndex) {
-    int screenIndexToNavigateTo;
-    switch (bottomNavIndex) {
-      case 0: // Tap the 1st item (Home)
-        screenIndexToNavigateTo = 0;
-        break;
-      case 1: // Tap the 2nd item (Wallet)
-        screenIndexToNavigateTo = 2;
-        break;
-      case 2: // Tap the 3rd item (Farming)
-        screenIndexToNavigateTo = 3;
-        break;
-      case 3: // Tap the 4th item (Settings)
-        screenIndexToNavigateTo =
-            6;
-        break;
-      default:
-        screenIndexToNavigateTo = 0; // Default to Home
-    }
-    _selectScreen(screenIndexToNavigateTo);
-  }
-
-  int _mapTabControllerIndexToBottomNavIndex(int tabIndex) {
-    switch (tabIndex) {
-      case 0: // HomeScreen
-        return 0;
-      case 2: // WalletScreen
-        return 1;
-      case 3: // FarmScreen
-        return 2;
-      case 6: // PreferenceScreen (Settings)
-        return 3;
-      default:
-        return 0; // Default to Home
-    }
-  }
 
   @override
   void initState() {
@@ -141,51 +83,59 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
       }
     });
 
-    initUniLinks();
-    Events().onEvent(GoHomeEvent().runtimeType, (GoHomeEvent event) {
-      _selectScreen(0);
+    _setupEventHandlers();
+    _initUniLinks();
+    Future.microtask(() {
+      ref.read(walletsNotifier.notifier);
     });
+  }
 
-    Events().onEvent(GoNewsEvent().runtimeType, (GoNewsEvent event) {
-      _selectScreen(1);
-    });
+  void _setupEventHandlers() {
+    final navigationEvents = {
+      GoHomeEvent().runtimeType: 0,
+      GoNewsEvent().runtimeType: 1,
+      GoSupportEvent().runtimeType: 3,
+      GoSettingsEvent().runtimeType: 6,
+      GoReservationsEvent().runtimeType: 5,
+    };
 
-    Events().onEvent(GoWalletEvent().runtimeType, (GoWalletEvent event) {
-      if (pinCheckOpen) return;
-      int tabIndex = 2;
-      if (Globals().router.pinRequired(tabIndex)) {
-        checkPinAndNavigateIfSuccess(tabIndex);
-      } else {
+    navigationEvents.forEach((eventType, tabIndex) {
+      Events().onEvent(eventType, (_) {
         _selectScreen(tabIndex);
+      });
+    });
+
+    Events().onEvent(GoWalletEvent().runtimeType, (_) {
+      if (_isPinCheckOpen) return;
+      const walletTabIndex = 2;
+      if (Globals().router.pinRequired(walletTabIndex)) {
+        _performPinCheck(successTabIndex: walletTabIndex);
+      } else {
+        _selectScreen(walletTabIndex);
       }
     });
 
-    Events().onEvent(GoSupportEvent().runtimeType, (GoSupportEvent event) {
-      _selectScreen(3);
-    });
-    Events().onEvent(GoSettingsEvent().runtimeType, (GoSettingsEvent event) {
-      _selectScreen(6);
-    });
-    Events().onEvent(GoReservationsEvent().runtimeType,
-        (GoReservationsEvent event) {
-      _selectScreen(5);
-    });
-
     Events().onEvent(NewLoginEvent().runtimeType, (NewLoginEvent event) {
-      openLogin(context, event.loginData!, widget.backendConnection!);
+      if (widget.backendConnection != null) {
+        openLogin(context, event.loginData!, widget.backendConnection!);
+      }
     });
     Events().onEvent(NewSignEvent().runtimeType, (NewSignEvent event) {
-      openSign(context, event.signData!, widget.backendConnection!);
+      if (widget.backendConnection != null) {
+        openSign(context, event.signData!, widget.backendConnection!);
+      }
     });
     Events().onEvent(EmailEvent().runtimeType, (EmailEvent event) {
-      emailVerification(context);
+      if (mounted && context.mounted) {
+        emailVerificationDialog(context);
+      }
     });
     Events().onEvent(IdentityCallbackEvent().runtimeType,
         (IdentityCallbackEvent event) async {
       if (mounted) {
-        Future(() {
+        Future.delayed(Duration.zero, () {
           _selectScreen(0);
-          if (context.mounted) {
+          if (context.mounted && event.type != null) {
             showIdentityMessage(context, event.type!);
           }
         });
@@ -198,12 +148,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     });
   }
 
-  void checkPinAndNavigateIfSuccess(int indexIfAuthIsSuccess) async {
+  Future<void> _performPinCheck({int? successTabIndex}) async {
+    _isPinCheckOpen = true;
     String? pin = await getPin();
-    pinCheckOpen = true;
 
     bool? authenticated = false;
-    if (mounted && pin != null) {
+    if (mounted && pin != null && context.mounted) {
       authenticated = await Navigator.push(
         context,
         MaterialPageRoute(
@@ -213,22 +163,53 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
           ),
         ),
       );
-    } else if (mounted && pin == null) {
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('PIN is not set. Please set up a PIN.')),
-        );
-      }
+    } else if (mounted && pin == null && context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('PIN is not set. Please set up a PIN.')),
+      );
     }
 
-    pinCheckOpen = false;
+    _isPinCheckOpen = false;
 
-    if (mounted && authenticated != null && authenticated) {
+    if (mounted && authenticated == true) {
       ref.read(lastPausedProvider.notifier).state =
           DateTime.now().millisecondsSinceEpoch;
-      timeoutExpiredInBackground = false;
-      _tabController.animateTo(indexIfAuthIsSuccess);
+      _timeoutExpiredInBackground = false;
+      if (successTabIndex != null) {
+        _selectScreen(successTabIndex);
+      }
     }
+  }
+
+  void _selectScreen(int index) {
+    if (index >= 0 && index < _tabController.length) {
+      _tabController.animateTo(
+        index,
+        duration: const Duration(milliseconds: 100),
+        curve: Curves.easeOut,
+      );
+    }
+  }
+
+  void _handleBottomNavItemTap(int bottomNavIndex) {
+    int screenIndexToNavigateTo;
+    switch (bottomNavIndex) {
+      case 0: // Tap the 1st item (Home) -> Tab Index 0
+        screenIndexToNavigateTo = 0;
+        break;
+      case 1: // Tap the 2nd item (Wallet) -> Tab Index 2
+        screenIndexToNavigateTo = 2;
+        break;
+      case 2: // Tap the 3rd item (Farming) -> Tab Index 3
+        screenIndexToNavigateTo = 3;
+        break;
+      case 3: // Tap the 4th item (Settings) -> Tab Index 6
+        screenIndexToNavigateTo = 6;
+        break;
+      default:
+        screenIndexToNavigateTo = 0; // Default to Home
+    }
+    _selectScreen(screenIndexToNavigateTo);
   }
 
   _handleTabSelection() async {
@@ -237,44 +218,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
 
     if (!mounted) return;
 
+    // Handle PIN requirement
     if (Globals().router.pinRequired(currentIndex) &&
-        timeoutExpiredInBackground &&
-        !pinCheckOpen) {
-      final authenticatedAppIndex = currentIndex;
+        _timeoutExpiredInBackground &&
+        !_isPinCheckOpen) {
       _tabController.animateTo(previousIndex,
           duration: const Duration(seconds: 0));
-
-      String? pin = await getPin();
-      pinCheckOpen = true;
-
-      bool? authenticated = false;
-      if (mounted && pin != null) {
-        authenticated = await Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => AuthenticationScreen(
-              correctPin: pin,
-              userMessage: 'Please enter your PIN code',
-            ),
-          ),
-        );
-      } else if (mounted && pin == null) {
-        if (context.mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-                content: Text('PIN is not set. Please set up a PIN.')),
-          );
-        }
-      }
-
-      pinCheckOpen = false;
-
-      if (mounted && authenticated != null && authenticated) {
-        ref.read(lastPausedProvider.notifier).state =
-            DateTime.now().millisecondsSinceEpoch;
-        timeoutExpiredInBackground = false;
-        _tabController.animateTo(authenticatedAppIndex);
-      }
+      await _performPinCheck(successTabIndex: currentIndex);
       return;
     }
 
@@ -285,21 +235,20 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
       if (mounted && context.mounted) {
         await emailVerificationDialog(context);
       }
+      return;
     }
 
     if (currentIndex != 2 && Globals().paymentRequest != null) {
       Globals().paymentRequest = null;
       Globals().paymentRequestIsUsed = false;
-    }
-
-    if (previousIndex == 2 &&
+    } else if (previousIndex == 2 &&
         Globals().paymentRequest != null &&
         Globals().paymentRequestIsUsed == true) {
       Globals().paymentRequest = null;
     }
   }
 
-  Future<void> initUniLinks() async {
+  Future<void> _initUniLinks() async {
     Events().onEvent(
         UniLinkEvent(null, null).runtimeType, UniLinkService.handleUniLink);
     if (widget.initialLink != null) {
@@ -324,22 +273,19 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
   }
 
   @override
+  @override
   Widget build(BuildContext context) {
     super.build(context);
-    final selectedIconTheme =
-        BottomNavigationBarTheme.of(context).selectedIconTheme;
-    final selectedItemColor =
-        BottomNavigationBarTheme.of(context).selectedItemColor;
 
     final currentIndex = _tabController.index;
     final actionsBuilder = ref.watch(appBarActionsBuilderProvider);
     List<Widget> appBarActions =
         actionsBuilder != null ? actionsBuilder(context) : [];
-    ProviderScope.containerOf(context, listen: false)
-        .read(walletsNotifier.notifier);
+    final bool showAppBarAndNav = currentIndex != 0;
+
     return Scaffold(
       resizeToAvoidBottomInset: false,
-      appBar: currentIndex != 0
+      appBar: showAppBarAndNav
           ? AppBar(
               title: Text(_screenTitles[currentIndex]),
               actions: appBarActions,
@@ -348,106 +294,47 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
             )
           : null,
       body: WillPopScope(
-        onWillPop: onWillPop,
+        onWillPop: _onWillPop,
         child: SafeArea(
           child: TabBarView(
-            controller: _tabController,
-            physics: const NeverScrollableScrollPhysics(),
-            children: _screens,
-          ),
+                  controller: _tabController,
+                  physics: const NeverScrollableScrollPhysics(),
+                  children: List.generate(
+                    _screens.length,
+                    (index) => KeepAlivePage(child: _screens[index]),
+                  ),
+                )
         ),
       ),
-      drawer: currentIndex != 0
-          ? Drawer(
-              elevation: 5,
-              width: MediaQuery.of(context).size.width * 2 / 3,
-              child: Column(
-                children: [
-                  SizedBox(
-                    height: 70,
-                    child: DrawerHeader(
-                      decoration: BoxDecoration(
-                        border: Border(
-                          bottom: BorderSide(
-                              color: Theme.of(context).colorScheme.primary),
-                        ),
-                      ),
-                      child: SvgPicture.asset(
-                        'assets/TF_log_horizontal.svg',
-                        colorFilter: ColorFilter.mode(
-                            Theme.of(context).colorScheme.onSurface,
-                            BlendMode.srcIn),
-                      ),
-                    ),
-                  ),
-                  buildDrawerItem(icon: Icons.home, label: 'Home', tabIndex: 0),
-                  buildDrawerItem(
-                      icon: Icons.article, label: 'News', tabIndex: 1),
-                  buildDrawerItem(
-                      icon: Icons.account_balance_wallet,
-                      label: 'Wallet',
-                      tabIndex: 2),
-                  if (globals.canSeeFarmers)
-                    buildDrawerItem(
-                        icon: Icons.account_balance_wallet,
-                        label: 'Farming',
-                        tabIndex: 3),
-                  buildDrawerItem(
-                      icon: Icons.how_to_vote_outlined,
-                      label: 'Dao',
-                      tabIndex: 4),
-                  buildDrawerItem(
-                      icon: Icons.person, label: 'Identity', tabIndex: 5),
-                  buildDrawerItem(
-                      icon: Icons.settings, label: 'Settings', tabIndex: 6),
-                  if (globals.council)
-                    buildDrawerItem(
-                        icon: Icons.how_to_vote_outlined,
-                        label: 'Council',
-                        tabIndex: 7),
-                ],
-              ),
+      drawer: showAppBarAndNav
+          ? AppDrawer(
+              onItemSelected: _selectScreen,
             )
           : null,
-      bottomNavigationBar: currentIndex != 0
-          ? BottomNavigationBar(
-              onTap: _selectBottomNavItem,
-              currentIndex:
-                  _mapTabControllerIndexToBottomNavIndex(currentIndex),
-              selectedIconTheme: selectedIconTheme,
-              selectedItemColor: selectedItemColor,
-              showUnselectedLabels: true,
-              selectedFontSize: 14,
-              unselectedFontSize: 12,
-              type: BottomNavigationBarType.fixed,
-              items: const [
-                BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-                BottomNavigationBarItem(
-                    icon: Icon(Icons.account_balance_wallet), label: 'Wallet'),
-                BottomNavigationBarItem(
-                    icon: Icon(Icons.storage), label: 'Farming'),
-                BottomNavigationBarItem(
-                    icon: Icon(Icons.settings), label: 'Settings'),
-              ],
+      bottomNavigationBar: showAppBarAndNav
+          ? AppBottomNavigationBar(
+              currentTabIndex: currentIndex,
+              onItemSelected: _handleBottomNavItemTap,
             )
           : null,
     );
   }
 
-  Future<bool> onWillPop() {
-    if (globals.tabController.index == 0) {
-      return Future(() => true); // if home screen exit
+  Future<bool> _onWillPop() async {
+    if (_tabController.index == 0) {
+      return true;
     }
-    if (Globals().router.routes[globals.tabController.index].app == null) {
-      Events().emit(GoHomeEvent()); // if not an app, eg settings, go home
-    }
-    Globals()
-        .router
-        .routes[globals.tabController.index]
-        .app!
-        .back(); // if app ask app to handle back event
 
-    return Future(() => false);
+    final currentRoute = Globals().router.routes[_tabController.index];
+    if (currentRoute.app == null) {
+      Events().emit(GoHomeEvent());
+    } else {
+      if (mounted && currentRoute.app != null) {
+        currentRoute.app!.back();
+      }
+    }
+
+    return false;
   }
 
   @override

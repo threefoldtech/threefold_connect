@@ -23,7 +23,7 @@ class FarmScreen extends ConsumerStatefulWidget {
 }
 
 class _FarmScreenState extends ConsumerState<FarmScreen>
-    with SingleTickerProviderStateMixin, AutomaticKeepAliveClientMixin {
+    with SingleTickerProviderStateMixin {
   registrar.RegistrarClient? registrarClient;
   List<Farm> v3Farms = [];
   List<Farm> v4Farms = [];
@@ -31,9 +31,6 @@ class _FarmScreenState extends ConsumerState<FarmScreen>
   bool failed = false;
   bool loading = true;
   late final TabController _tabController;
-
-  @override
-  bool get wantKeepAlive => true;
 
   @override
   void initState() {
@@ -222,7 +219,6 @@ class _FarmScreenState extends ConsumerState<FarmScreen>
 
   @override
   Widget build(BuildContext context) {
-    super.build(context);
     Widget mainContent;
     if (loading) {
       mainContent = Center(

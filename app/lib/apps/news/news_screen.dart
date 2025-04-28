@@ -15,8 +15,7 @@ class NewsScreen extends StatefulWidget {
   State<NewsScreen> createState() => _NewsScreenState();
 }
 
-class _NewsScreenState extends State<NewsScreen>
-    with AutomaticKeepAliveClientMixin {
+class _NewsScreenState extends State<NewsScreen> {
   final Xml2Json xml2json = Xml2Json();
   static const int articlesPerPage = 20;
   final PagingController<int, Map<String, dynamic>> _pagingController =
@@ -60,7 +59,6 @@ class _NewsScreenState extends State<NewsScreen>
 
   @override
   Widget build(BuildContext context) {
-    super.build(context);
     return RefreshIndicator(
       onRefresh: () async => _pagingController.refresh(),
       child: PagedListView<int, Map<String, dynamic>>(
@@ -184,7 +182,4 @@ class _NewsScreenState extends State<NewsScreen>
       await launchUrl(uri);
     }
   }
-
-  @override
-  bool get wantKeepAlive => true;
 }

@@ -11,7 +11,7 @@ class DaoPage extends StatefulWidget {
   State<DaoPage> createState() => _DaoPageState();
 }
 
-class _DaoPageState extends State<DaoPage> with SingleTickerProviderStateMixin, AutomaticKeepAliveClientMixin {
+class _DaoPageState extends State<DaoPage> with SingleTickerProviderStateMixin {
   final List<Proposal> activeList = [];
   final List<Proposal> inactiveList = [];
   bool loading = true;
@@ -66,7 +66,6 @@ class _DaoPageState extends State<DaoPage> with SingleTickerProviderStateMixin, 
 
   @override
   Widget build(BuildContext context) {
-    super.build(context);
     Widget content;
     if (loading) {
       content = Center(
@@ -151,7 +150,4 @@ class _DaoPageState extends State<DaoPage> with SingleTickerProviderStateMixin, 
     }
     return content;
   }
-  
-  @override
-  bool get wantKeepAlive => true;
 }

@@ -25,7 +25,7 @@ class IdentityVerificationScreen extends StatefulWidget {
 }
 
 class IdentityVerificationScreenState
-    extends State<IdentityVerificationScreen> with AutomaticKeepAliveClientMixin {
+    extends State<IdentityVerificationScreen> {
   static final GlobalKey<IdentityVerificationScreenState> globalKey =
       GlobalKey<IdentityVerificationScreenState>();
 
@@ -643,7 +643,6 @@ class IdentityVerificationScreenState
 
   @override
   Widget build(BuildContext context) {
-    super.build(context);
     final Widget content;
     if (isLoading) {
       content = Center(
@@ -728,7 +727,4 @@ class IdentityVerificationScreenState
 
     return content;
   }
-  
-  @override
-  bool get wantKeepAlive => true;
 }
