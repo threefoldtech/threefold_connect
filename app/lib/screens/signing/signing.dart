@@ -67,7 +67,7 @@ class _SigningState extends State<Signing> {
           const SizedBox(height: 24),
           _buildSignButton(
             icon: Icons.text_fields,
-            label: 'Sign with Text',
+            label: 'Sign Text',
             onPressed: () {
               Navigator.push(
                 context,
