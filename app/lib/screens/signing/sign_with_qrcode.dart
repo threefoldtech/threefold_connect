@@ -214,7 +214,7 @@ class _SignWithTextScreenState extends ConsumerState<SignWithQRCodeScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Sign with QR Code'),
+        title: const Text('Sign QR Code Content'),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
@@ -334,7 +334,7 @@ class _SignWithTextScreenState extends ConsumerState<SignWithQRCodeScreen> {
                       width: 20,
                       child: CircularProgressIndicator(strokeWidth: 2),
                     )
-                  : Text('Sign Text',
+                  : Text('Sign',
                       style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                             color: Theme.of(context).colorScheme.onSurface,
                             fontWeight: FontWeight.bold,

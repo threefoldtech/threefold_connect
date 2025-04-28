@@ -6,6 +6,7 @@ import 'package:threebotlogin/models/wallet.dart';
 import 'package:threebotlogin/providers/wallets_provider.dart';
 import 'package:threebotlogin/services/signing_service.dart';
 import 'package:threebotlogin/widgets/custom_dialog.dart';
+import 'package:http/http.dart' as http;
 
 class SignWithLinkScreen extends ConsumerStatefulWidget {
   const SignWithLinkScreen({super.key});
@@ -83,7 +84,7 @@ class _SignWithTextScreenState extends ConsumerState<SignWithLinkScreen> {
     );
   }
 
-  void _processLink() {
+  Future<void> _processLink() async {
     if (_linkController.text.isEmpty) {
       setState(() {
         linkError = 'Please enter a link';
@@ -91,51 +92,84 @@ class _SignWithTextScreenState extends ConsumerState<SignWithLinkScreen> {
       return;
     }
 
+    setState(() {
+      isLoading = true;
+    });
+
     try {
-      final Uri link = Uri.parse(_linkController.text);
-      Map<String, String> queryParams = link.queryParameters;
+      String linkText = _linkController.text;
 
-      List<String> requiredParams = [
-        'dataHash',
-        'state',
-        'appId',
-        'dataUrl',
-        'isJson',
-        'friendlyName'
-      ];
+      try {
+        final response = await http.get(Uri.parse(linkText));
+        if (response.statusCode == 200) {
+          _dataController.text = response.body;
+          _textController.text = response.body;
+          setState(() {
+            linkError = null;
+            dataError = null;
+            isLoading = false;
+          });
 
-      bool isValidSignAttempt = true;
-      for (var param in requiredParams) {
-        if (queryParams[param] == null || queryParams[param] == 'undefined') {
-          isValidSignAttempt = false;
-          break;
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Content fetched successfully'),
+              backgroundColor: Colors.green,
+            ),
+          );
+          return;
+        } else {
+          throw Exception('Failed to fetch content: ${response.statusCode}');
         }
-      }
+      } catch (e) {
+        final Uri link = Uri.parse(linkText);
+        Map<String, String> queryParams = link.queryParameters;
 
-      if (!isValidSignAttempt) {
+        List<String> requiredParams = [
+          'dataHash',
+          'state',
+          'appId',
+          'dataUrl',
+          'isJson',
+          'friendlyName'
+        ];
+
+        bool isValidSignAttempt = true;
+        for (var param in requiredParams) {
+          if (queryParams[param] == null || queryParams[param] == 'undefined') {
+            isValidSignAttempt = false;
+            break;
+          }
+        }
+
+        if (!isValidSignAttempt) {
+          setState(() {
+            linkError = 'Missing required parameters';
+            isLoading = false;
+          });
+          _showInvalidLinkDialog();
+          return;
+        }
+
+        _dataController.text = queryParams['dataHash'] ?? '';
+        _textController.text = queryParams['dataHash'] ?? '';
         setState(() {
-          linkError = 'Missing required parameters';
+          linkError = null;
+          dataError = null;
+          isLoading = false;
         });
-        _showInvalidLinkDialog();
-        return;
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Link processed successfully'),
+            backgroundColor: Colors.green,
+          ),
+        );
       }
-
-      _dataController.text = queryParams['dataHash'] ?? '';
-      setState(() {
-        linkError = null;
-        dataError = null;
-      });
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Link processed successfully'),
-          backgroundColor: Colors.green,
-        ),
-      );
     } catch (e) {
-      logger.e('Error parsing link: $e');
+      logger.e('Error processing link: $e');
       setState(() {
         linkError = 'Invalid link format';
+        isLoading = false;
       });
       _showInvalidLinkDialog();
     }
