@@ -89,7 +89,7 @@ class _SigningState extends State<Signing> {
           ),
           _buildSignButton(
             icon: Icons.link,
-            label: 'Sign with URL',
+            label: 'Sign URL Content',
             onPressed: () {
               Navigator.push(
                 context,
