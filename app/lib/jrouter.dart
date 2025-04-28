@@ -94,7 +94,7 @@ class JRouter {
             icon: Icons.handshake,
             view: await Sign().widget(),
           ),
-          app: Dao()),
+          app: Sign()),
     ];
   }
 
