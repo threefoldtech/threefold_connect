@@ -171,7 +171,7 @@ class _SignWithTextScreenState extends ConsumerState<SignWithTextScreen> {
                       width: 20,
                       child: CircularProgressIndicator(strokeWidth: 2),
                     )
-                  : const Text('Sign Text'),
+                  : const Text('Sign'),
             ),
             if (signedData != null) ...[
               const SizedBox(height: 24),
