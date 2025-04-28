@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -8,6 +10,7 @@ import 'package:threebotlogin/providers/wallets_provider.dart';
 import 'package:threebotlogin/screens/scan_screen.dart';
 import 'package:threebotlogin/services/signing_service.dart';
 import 'package:threebotlogin/widgets/custom_dialog.dart';
+import 'package:http/http.dart' as http;
 
 class SignWithQRCodeScreen extends ConsumerStatefulWidget {
   const SignWithQRCodeScreen({super.key});
@@ -24,6 +27,7 @@ class _SignWithTextScreenState extends ConsumerState<SignWithQRCodeScreen> {
   bool isLoading = false;
   String? scannedDataError;
   String? walletError;
+  String? _destUrl;
 
   @override
   void initState() {
@@ -86,31 +90,47 @@ class _SignWithTextScreenState extends ConsumerState<SignWithQRCodeScreen> {
       }
     }
     if (result.rawValue != null) {
-      late final Uri code;
-      try {
-        code = Uri.parse(result.rawValue!);
-      } catch (e) {
-        logger.e('Error parsing QR Code, Error: $e');
+      final Map<String, dynamic> jsonData = json.decode(result.rawValue!);
+      _destUrl = jsonData['dest'];
+      if (jsonData.containsKey('content')) {
+        _textController.text = jsonData['content'];
+      } else if (jsonData.containsKey('src')) {
         setState(() {
-          scannedDataError = 'Invalid QR code format';
+          isLoading = true;
+        });
+
+        try {
+          final response = await http.get(Uri.parse(jsonData['src']));
+          if (response.statusCode == 200) {
+            _textController.text = response.body;
+          } else {
+            throw Exception('Failed to load content from source');
+          }
+        } catch (e) {
+          logger.e('Error fetching content from src: $e');
+          setState(() {
+            scannedDataError = 'Failed to fetch content from source';
+          });
+          _showInvalidQRCodeDialog();
+          return;
+        } finally {
+          setState(() {
+            isLoading = false;
+          });
+        }
+      } else {
+        setState(() {
+          scannedDataError = 'No content found in QR code';
         });
         _showInvalidQRCodeDialog();
         return;
       }
-      if (code.path.isEmpty) {
-        _showInvalidQRCodeDialog();
-        setState(() {
-          scannedDataError = 'Invalid QR code format';
-        });
-        return;
-      }
-      _textController.text = code.path;
       setState(() {
         scannedDataError = null;
       });
     } else {
       setState(() {
-        scannedDataError = 'No QR code data detected';
+        scannedDataError = 'No QR code data detected nor src provided';
       });
       _showInvalidQRCodeDialog();
       return;
@@ -135,6 +155,9 @@ class _SignWithTextScreenState extends ConsumerState<SignWithQRCodeScreen> {
         data: _textController.text,
         walletSecretSeed: selectedWallet!.tfchainSecret,
       );
+      if (_destUrl != null) {
+        await sendSignedData(_destUrl!, signedData!);
+      }
     } catch (e) {
       logger.e('Failed to sign data: $e');
       if (mounted) {
@@ -148,6 +171,40 @@ class _SignWithTextScreenState extends ConsumerState<SignWithQRCodeScreen> {
           isLoading = false;
         });
       }
+    }
+  }
+
+  Future<void> sendSignedData(String destUrl, String signature) async {
+    try {
+      final response = await http.post(
+        Uri.parse(destUrl),
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode({'signature': signature}),
+      );
+
+      if (response.statusCode != 200) {
+        throw Exception('Failed to send signature to destination');
+      }
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Signature sent successfully'),
+            backgroundColor: Colors.green,
+          ),
+        );
+      }
+    } catch (e) {
+      logger.e('Error sending signature to destination: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Failed to send signature to destination'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+      throw Exception('Failed to send signature');
     }
   }
 
@@ -277,16 +334,34 @@ class _SignWithTextScreenState extends ConsumerState<SignWithQRCodeScreen> {
                       width: 20,
                       child: CircularProgressIndicator(strokeWidth: 2),
                     )
-                  : const Text('Sign Text'),
+                  : Text('Sign Text',
+                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                            color: Theme.of(context).colorScheme.onSurface,
+                            fontWeight: FontWeight.bold,
+                          )),
             ),
             if (signedData != null) ...[
               const SizedBox(height: 24),
-              Text(
-                'Signed Data',
-                style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                      fontWeight: FontWeight.bold,
-                      color: Theme.of(context).colorScheme.onSurface,
-                    ),
+              Row(
+                children: [
+                  Text(
+                    'Signed Data',
+                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                          fontWeight: FontWeight.bold,
+                          color: Theme.of(context).colorScheme.onSurface,
+                        ),
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    '(hex encoded)',
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: Theme.of(context)
+                              .colorScheme
+                              .onSurface
+                              .withOpacity(0.6),
+                        ),
+                  ),
+                ],
               ),
               const SizedBox(height: 16),
               Container(

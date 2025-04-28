@@ -171,16 +171,34 @@ class _SignWithTextScreenState extends ConsumerState<SignWithTextScreen> {
                       width: 20,
                       child: CircularProgressIndicator(strokeWidth: 2),
                     )
-                  : const Text('Sign'),
+                  : Text('Sign Text',
+                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                            color: Theme.of(context).colorScheme.onSurface,
+                            fontWeight: FontWeight.bold,
+                          )),
             ),
             if (signedData != null) ...[
               const SizedBox(height: 24),
-              Text(
-                'Signed Data',
-                style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                      fontWeight: FontWeight.bold,
-                      color: Theme.of(context).colorScheme.onSurface,
-                    ),
+              Row(
+                children: [
+                  Text(
+                    'Signed Data',
+                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                          fontWeight: FontWeight.bold,
+                          color: Theme.of(context).colorScheme.onSurface,
+                        ),
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    '(hex encoded)',
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: Theme.of(context)
+                              .colorScheme
+                              .onSurface
+                              .withOpacity(0.6),
+                        ),
+                  ),
+                ],
               ),
               const SizedBox(height: 16),
               Container(
