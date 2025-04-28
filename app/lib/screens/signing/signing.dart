@@ -78,7 +78,7 @@ class _SigningState extends State<Signing> {
           ),
           _buildSignButton(
             icon: Icons.qr_code_scanner,
-            label: 'Sign with QR Code',
+            label: 'Sign QR Code Content',
             onPressed: () {
               Navigator.push(
                 context,
