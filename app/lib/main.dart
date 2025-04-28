@@ -5,8 +5,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:threebotlogin/helpers/globals.dart';
 import 'package:threebotlogin/helpers/logger.dart';
 import 'package:threebotlogin/screens/app_lifecycle_observer.dart';
-import 'package:threebotlogin/helpers/logger.dart';
-import 'package:threebotlogin/screens/app_lifecycle_observer.dart';
 import 'package:threebotlogin/screens/splash_screen.dart';
 import 'package:threebotlogin/services/background_service.dart';
 import 'package:threebotlogin/services/notification_service.dart';
