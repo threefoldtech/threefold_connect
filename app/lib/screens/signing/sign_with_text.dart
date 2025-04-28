@@ -86,7 +86,7 @@ class _SignWithTextScreenState extends ConsumerState<SignWithTextScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Sign with Text'),
+        title: const Text('Sign Text'),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
