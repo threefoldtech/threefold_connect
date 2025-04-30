@@ -29,7 +29,7 @@ Future<void> checkNodeStatus() async {
     final downtime = Duration(milliseconds: now - node.updatedAt!);
     final checkInterval = _getCheckInterval(downtime);
 
-    return downtime.inMinutes % checkInterval.inMinutes == 0;
+    return downtime.inMinutes % checkInterval.inMinutes < 15;
   }).toList();
 
   if (nodesToNotify.isEmpty) return;
