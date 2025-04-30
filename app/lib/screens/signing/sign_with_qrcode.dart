@@ -231,9 +231,11 @@ class _SignWithTextScreenState extends ConsumerState<SignWithQRCodeScreen> {
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Signature sent successfully'),
-            backgroundColor: Colors.green,
+          SnackBar(
+            content: Text('Signature sent successfully',
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: Theme.of(context).colorScheme.onPrimaryContainer)),
+            backgroundColor: Theme.of(context).colorScheme.primary,
           ),
         );
       }
@@ -241,9 +243,11 @@ class _SignWithTextScreenState extends ConsumerState<SignWithQRCodeScreen> {
       logger.e('Error sending signature to destination: $e');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Failed to send signature to destination'),
-            backgroundColor: Colors.red,
+          SnackBar(
+            content: Text('Failed to send signature to destination',
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: Theme.of(context).colorScheme.onErrorContainer)),
+            backgroundColor: Theme.of(context).colorScheme.error,
           ),
         );
       }
@@ -403,8 +407,10 @@ class _SignWithTextScreenState extends ConsumerState<SignWithQRCodeScreen> {
                       child: CircularProgressIndicator(strokeWidth: 2),
                     )
                   : Text('Sign',
-                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                            color: Theme.of(context).colorScheme.onSurface,
+                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                            color: Theme.of(context)
+                                .colorScheme
+                                .onPrimaryContainer,
                             fontWeight: FontWeight.bold,
                           )),
             ),
