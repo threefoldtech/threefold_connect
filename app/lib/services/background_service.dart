@@ -24,9 +24,10 @@ Future<void> checkNodeStatus() async {
       DateTime.now().subtract(const Duration(days: 7)).millisecondsSinceEpoch;
 
   final nodesToNotify = offlineNodes.where((node) {
-    if (node.updatedAt! <= sevenDaysAgoTimestamp) return false;
+    final nodeUpdatedAtMs = node.updatedAt! * 1000;
+    if (nodeUpdatedAtMs <= sevenDaysAgoTimestamp) return false;
 
-    final downtime = Duration(milliseconds: now - node.updatedAt!);
+    final downtime = Duration(milliseconds: now - nodeUpdatedAtMs);
     final checkInterval = _getCheckInterval(downtime);
 
     return downtime.inMinutes % checkInterval.inMinutes < 15;
@@ -38,8 +39,9 @@ Future<void> checkNodeStatus() async {
   final StringBuffer bodyBuffer = StringBuffer();
 
   for (final node in nodesToNotify) {
+    final nodeUpdatedAtMs = node.updatedAt! * 1000;
     final downtime =
-        _formatDowntime(Duration(milliseconds: now - node.updatedAt!));
+        _formatDowntime(Duration(milliseconds: now - nodeUpdatedAtMs));
 
     bodyBuffer.writeln('Node ${node.nodeId}: offline for $downtime');
   }
