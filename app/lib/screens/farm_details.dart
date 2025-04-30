@@ -504,12 +504,12 @@ class _FarmDetailsState extends State<FarmDetails> {
                                 Theme.of(context).colorScheme.onSurfaceVariant,
                           ),
                     ),
-                    const Divider(height: 20, thickness: 1),
                   ],
                   if (widget.farm.nodes.isNotEmpty)
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
+                        const Divider(height: 20, thickness: 1),
                         Padding(
                           padding: const EdgeInsets.symmetric(vertical: 8.0),
                           child: Text(
