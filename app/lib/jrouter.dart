@@ -91,7 +91,7 @@ class JRouter {
           route: Route(
             path: '/sign',
             name: 'Sign',
-            icon: Icons.handshake,
+            icon: Icons.draw_sharp,
             view: await Sign().widget(),
           ),
           app: Sign()),

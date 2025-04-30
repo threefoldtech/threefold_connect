@@ -157,7 +157,7 @@ class _LayoutDrawerState extends State<LayoutDrawer> {
                 minLeadingWidth: 10,
                 leading: const Padding(
                     padding: EdgeInsets.only(left: 10),
-                    child: Icon(Icons.handshake, size: 18)),
+                    child: Icon(Icons.draw_sharp, size: 18)),
                 title: const Text('Sign'),
                 onTap: () {
                   Navigator.pop(context);

@@ -98,7 +98,7 @@ class _RegisteredScreenState extends State<RegisteredScreen>
                         icon: Icons.how_to_vote_outlined,
                         pageNumber: 4),
                     HomeCardWidget(
-                        name: 'Sign', icon: Icons.handshake, pageNumber: 8),
+                        name: 'Sign', icon: Icons.draw_sharp, pageNumber: 8),
                   ],
                 ),
                 const Row(

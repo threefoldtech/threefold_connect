@@ -4,7 +4,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:threebotlogin/helpers/logger.dart';
 import 'package:threebotlogin/providers/wallets_provider.dart';
 import 'package:threebotlogin/screens/signing/signing_mixin.dart';
-import 'package:threebotlogin/services/signing_service.dart';
 import 'package:threebotlogin/widgets/custom_dialog.dart';
 import 'package:http/http.dart' as http;
 
