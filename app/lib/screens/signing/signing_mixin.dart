@@ -1,7 +1,5 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:http/http.dart' as http;
 import 'package:threebotlogin/models/wallet.dart';
 import 'package:threebotlogin/helpers/logger.dart';
 import 'package:threebotlogin/services/signing_service.dart';
@@ -41,7 +39,26 @@ mixin SigningMixin<T extends StatefulWidget> on State<T> {
       );
       final destinationUrl = destUrlController.text.trim();
       if (destinationUrl.isNotEmpty) {
-        await sendSignedData(destinationUrl, signedData!);
+        final success = await sendSignedData(destinationUrl, signedData!);
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                success
+                    ? 'Signature sent successfully'
+                    : 'Failed to send signature to destination',
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: success
+                          ? Theme.of(context).colorScheme.onPrimaryContainer
+                          : Theme.of(context).colorScheme.onErrorContainer,
+                    ),
+              ),
+              backgroundColor: success
+                  ? Theme.of(context).colorScheme.primary
+                  : Theme.of(context).colorScheme.error,
+            ),
+          );
+        }
       }
     } catch (e) {
       logger.e('Failed to sign data: $e');
@@ -110,43 +127,6 @@ mixin SigningMixin<T extends StatefulWidget> on State<T> {
         destUrlError = 'Invalid URL format';
       });
       return false;
-    }
-  }
-
-  Future<void> sendSignedData(String destUrl, String signature) async {
-    try {
-      final response = await http.post(
-        Uri.parse(destUrl),
-        headers: {'Content-Type': 'application/json'},
-        body: json.encode({'signature': signature}),
-      );
-
-      if (response.statusCode != 200) {
-        throw Exception('Failed to send signature to destination');
-      }
-
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Signature sent successfully',
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: Theme.of(context).colorScheme.onPrimaryContainer)),
-            backgroundColor: Theme.of(context).colorScheme.primary,
-          ),
-        );
-      }
-    } catch (e) {
-      logger.e('Error sending signature to destination: $e');
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Failed to send signature to destination',
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: Theme.of(context).colorScheme.onErrorContainer)),
-            backgroundColor: Theme.of(context).colorScheme.error,
-          ),
-        );
-      }
     }
   }
 
