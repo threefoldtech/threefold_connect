@@ -1,11 +1,9 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:threebotlogin/helpers/logger.dart';
-import 'package:threebotlogin/models/wallet.dart';
 import 'package:threebotlogin/providers/wallets_provider.dart';
+import 'package:threebotlogin/screens/signing/signing_mixin.dart';
 import 'package:threebotlogin/services/signing_service.dart';
 import 'package:threebotlogin/widgets/custom_dialog.dart';
 import 'package:http/http.dart' as http;
@@ -14,21 +12,15 @@ class SignWithLinkScreen extends ConsumerStatefulWidget {
   const SignWithLinkScreen({super.key});
 
   @override
-  ConsumerState<SignWithLinkScreen> createState() => _SignWithTextScreenState();
+  _SignWithLinkScreenState createState() => _SignWithLinkScreenState();
 }
 
-class _SignWithTextScreenState extends ConsumerState<SignWithLinkScreen> {
-  final TextEditingController _textController = TextEditingController();
-  Wallet? selectedWallet;
-  String? signedData;
-  bool isLoading = false;
+class _SignWithLinkScreenState extends ConsumerState<SignWithLinkScreen>
+    with SigningMixin {
   final TextEditingController _dataController = TextEditingController();
   final TextEditingController _linkController = TextEditingController();
   String? linkError;
   String? dataError;
-  String? walletError;
-  final TextEditingController _destUrlController = TextEditingController();
-  String? destUrlError;
 
   @override
   void initState() {
@@ -37,12 +29,13 @@ class _SignWithTextScreenState extends ConsumerState<SignWithLinkScreen> {
 
   @override
   void dispose() {
-    _textController.dispose();
     _dataController.dispose();
+    _linkController.dispose();
     super.dispose();
   }
 
-  void _validateInputs() {
+  @override
+  void validateInputs() {
     setState(() {
       if (_linkController.text.isEmpty) {
         linkError = 'Please enter a link';
@@ -60,47 +53,15 @@ class _SignWithTextScreenState extends ConsumerState<SignWithLinkScreen> {
       } else {
         dataError = null;
       }
-
-      if (selectedWallet == null) {
-        walletError = 'Please select a wallet';
-      } else {
-        walletError = null;
-      }
+      validateWallet();
     });
   }
 
-  bool _validateDestUrl() {
-    if (_destUrlController.text.isEmpty) {
-      return true;
-    }
-
-    String url = _destUrlController.text.trim();
-    try {
-      final uri = Uri.parse(url);
-      if (!uri.isScheme('http') && !uri.isScheme('https')) {
-        setState(() {
-          destUrlError = 'URL must start with http:// or https://';
-        });
-        return false;
-      }
-
-      if (!uri.hasAuthority) {
-        setState(() {
-          destUrlError = 'Invalid URL format';
-        });
-        return false;
-      }
-
-      setState(() {
-        destUrlError = null;
-      });
-      return true;
-    } catch (e) {
-      setState(() {
-        destUrlError = 'Invalid URL format';
-      });
-      return false;
-    }
+  @override
+  void setSigningError(String message) {
+    setState(() {
+      linkError = message;
+    });
   }
 
   void _showInvalidLinkDialog() {
@@ -142,7 +103,7 @@ class _SignWithTextScreenState extends ConsumerState<SignWithLinkScreen> {
         final response = await http.get(Uri.parse(linkText));
         if (response.statusCode == 200) {
           _dataController.text = response.body;
-          _textController.text = response.body;
+          textController.text = response.body;
           setState(() {
             linkError = null;
             dataError = null;
@@ -150,9 +111,11 @@ class _SignWithTextScreenState extends ConsumerState<SignWithLinkScreen> {
           });
 
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Content fetched successfully'),
-              backgroundColor: Colors.green,
+            SnackBar(
+              content: Text('Content fetched successfully',
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: Theme.of(context).colorScheme.onPrimaryContainer)),
+              backgroundColor: Theme.of(context).colorScheme.primary,
             ),
           );
           return;
@@ -190,7 +153,7 @@ class _SignWithTextScreenState extends ConsumerState<SignWithLinkScreen> {
         }
 
         _dataController.text = queryParams['dataHash'] ?? '';
-        _textController.text = queryParams['dataHash'] ?? '';
+        textController.text = queryParams['dataHash'] ?? '';
         setState(() {
           linkError = null;
           dataError = null;
@@ -198,9 +161,11 @@ class _SignWithTextScreenState extends ConsumerState<SignWithLinkScreen> {
         });
 
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Link processed successfully'),
-            backgroundColor: Colors.green,
+          SnackBar(
+            content: Text('Link processed successfully',
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: Theme.of(context).colorScheme.onPrimaryContainer)),
+            backgroundColor: Theme.of(context).colorScheme.primary,
           ),
         );
       }
@@ -214,313 +179,129 @@ class _SignWithTextScreenState extends ConsumerState<SignWithLinkScreen> {
     }
   }
 
-  Future<void> _signText() async {
-    _validateInputs();
-    if (linkError != null || dataError != null || walletError != null) {
-      return;
-    }
-    if (!_validateDestUrl()) {
-      return;
-    }
-
-    setState(() {
-      isLoading = true;
-      signedData = null;
-    });
-
-    try {
-      signedData = await md5Sign(
-        data: _textController.text,
-        walletSecretSeed: selectedWallet!.tfchainSecret,
-      );
-      if (_destUrlController.text.isNotEmpty) {
-        await sendSignedData(_destUrlController.text.trim(), signedData!);
-      }
-    } catch (e) {
-      if (mounted) {
-        setState(() {
-          logger.e('Failed to sign data: $e');
-          dataError = 'Failed to sign data';
-        });
-      }
-    } finally {
-      if (mounted) {
-        setState(() {
-          isLoading = false;
-        });
-      }
-    }
-  }
-
-  Future<void> sendSignedData(String destUrl, String signature) async {
-    try {
-      final response = await http.post(
-        Uri.parse(destUrl),
-        headers: {'Content-Type': 'application/json'},
-        body: json.encode({'signature': signature}),
-      );
-
-      if (response.statusCode != 200) {
-        throw Exception('Failed to send signature to destination');
-      }
-
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Signature sent successfully',
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: Theme.of(context).colorScheme.onPrimaryContainer)),
-            backgroundColor: Theme.of(context).colorScheme.primary,
-          ),
-        );
-      }
-    } catch (e) {
-      logger.e('Error sending signature to destination: $e');
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Failed to send signature to destination',
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: Theme.of(context).colorScheme.onErrorContainer)),
-            backgroundColor: Theme.of(context).colorScheme.error,
-          ),
-        );
-      }
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     final wallets = ref.watch(walletsNotifier);
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Sign Link Content'),
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Text(
-              'Enter Link',
-              style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: Theme.of(context).colorScheme.onSurface,
-                  ),
-            ),
-            const SizedBox(height: 16),
-            TextField(
-              controller: _linkController,
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: Theme.of(context).colorScheme.onSurface,
-                  ),
-              decoration: InputDecoration(
-                hintText: 'Paste your link here...',
-                errorText: linkError,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                suffixIcon: IconButton(
-                  icon: const Icon(Icons.paste),
-                  onPressed: () async {
-                    final clipboardData = await Clipboard.getData('text/plain');
-                    if (clipboardData?.text != null) {
-                      _linkController.text = clipboardData!.text!;
-                      _processLink();
-                    }
-                  },
-                ),
-              ),
-              onSubmitted: (_) => _processLink(),
-            ),
-            const SizedBox(height: 8),
-            Align(
-              alignment: Alignment.centerRight,
-              child: TextButton.icon(
-                icon: const Icon(Icons.link),
-                label: const Text('Process Link'),
-                onPressed: _processLink,
-              ),
-            ),
-            const SizedBox(height: 24),
-            Text(
-              'Extracted Data',
-              style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: Theme.of(context).colorScheme.onSurface,
-                  ),
-            ),
-            const SizedBox(height: 16),
-            TextField(
-              controller: _dataController,
-              readOnly: true,
-              maxLines: 3,
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: Theme.of(context).colorScheme.onSurface,
-                  ),
-              decoration: InputDecoration(
-                hintText: 'Processed data will appear here...',
-                errorText: dataError,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                suffixIcon: _dataController.text.isNotEmpty
-                    ? IconButton(
-                        icon: const Icon(Icons.copy),
-                        onPressed: () {
-                          Clipboard.setData(
-                              ClipboardData(text: _dataController.text));
-                          ScaffoldMessenger.of(context).clearSnackBars();
-                          ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text('Copied!')));
-                        },
-                      )
-                    : null,
-              ),
-            ),
-            const SizedBox(height: 24),
-            Text(
-              'Select Wallet',
-              style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: Theme.of(context).colorScheme.onSurface,
-                  ),
-            ),
-            const SizedBox(height: 16),
-            DropdownButtonFormField<Wallet>(
-              value: selectedWallet,
-              decoration: InputDecoration(
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                hintText: 'Select a wallet',
-                errorText: walletError,
-              ),
-              items: wallets.map((wallet) {
-                return DropdownMenuItem(
-                  value: wallet,
-                  child: Text(wallet.name,
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            color: Theme.of(context).colorScheme.onSurface,
-                          )),
-                );
-              }).toList(),
-              onChanged: (Wallet? value) {
-                setState(() {
-                  selectedWallet = value;
-                  if (walletError != null) {
-                    _validateInputs();
-                  }
-                });
-              },
-            ),
-            const SizedBox(
-              height: 24,
-            ),
-            TextField(
-              controller: _destUrlController,
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: Theme.of(context).colorScheme.onSurface,
-                  ),
-              decoration: InputDecoration(
-                labelText: 'Destination URL (Optional)',
-                errorText: destUrlError,
-                hintText: 'https://example.com/api/signatures',
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-              ),
-              onChanged: (value) {
-                if (value.isNotEmpty) {
-                  _validateDestUrl();
-                } else {
-                  setState(() {
-                    destUrlError = null;
-                  });
-                }
-              },
-            ),
-            const SizedBox(height: 32),
-            ElevatedButton(
-              onPressed: isLoading ? null : _signText,
-              style: ElevatedButton.styleFrom(
-                padding: const EdgeInsets.all(16),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-              ),
-              child: isLoading
-                  ? const SizedBox(
-                      height: 20,
-                      width: 20,
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    )
-                  : Text('Sign',
-                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                            color: Theme.of(context)
-                                .colorScheme
-                                .onPrimaryContainer,
-                            fontWeight: FontWeight.bold,
-                          )),
-            ),
-            if (signedData != null) ...[
-              const SizedBox(height: 24),
-              Row(
+        appBar: AppBar(
+          title: const Text('Sign Link Content'),
+        ),
+        body: SingleChildScrollView(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   Text(
-                    'Signed Data',
+                    'Enter Link',
                     style: Theme.of(context).textTheme.titleLarge?.copyWith(
                           fontWeight: FontWeight.bold,
                           color: Theme.of(context).colorScheme.onSurface,
                         ),
                   ),
-                  const SizedBox(width: 8),
+                  const SizedBox(height: 16),
+                  TextField(
+                    controller: _linkController,
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          color: Theme.of(context).colorScheme.onSurface,
+                        ),
+                    decoration: InputDecoration(
+                      hintText: 'Paste your link here...',
+                      errorText: linkError,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      suffixIcon: IconButton(
+                        icon: const Icon(Icons.paste),
+                        onPressed: () async {
+                          final clipboardData =
+                              await Clipboard.getData('text/plain');
+                          if (clipboardData?.text != null) {
+                            _linkController.text = clipboardData!.text!;
+                            _processLink();
+                          }
+                        },
+                      ),
+                    ),
+                    onSubmitted: (_) => _processLink(),
+                  ),
+                  const SizedBox(height: 8),
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: TextButton.icon(
+                      icon: const Icon(Icons.link),
+                      label: const Text('Process Link'),
+                      onPressed: _processLink,
+                    ),
+                  ),
+                  const SizedBox(height: 24),
                   Text(
-                    '(hex encoded)',
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: Theme.of(context)
-                              .colorScheme
-                              .onSurface
-                              .withOpacity(0.6),
+                    'Extracted Data',
+                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                          fontWeight: FontWeight.bold,
+                          color: Theme.of(context).colorScheme.onSurface,
                         ),
                   ),
-                ],
-              ),
-              const SizedBox(height: 16),
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  border: Border.all(
-                    color: Theme.of(context).colorScheme.outline,
-                  ),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(signedData!,
-                        style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                              color: Theme.of(context).colorScheme.onSurface,
-                            )),
-                    const SizedBox(height: 8),
-                    TextButton.icon(
-                      icon: const Icon(Icons.copy),
-                      label: const Text('Copy'),
-                      onPressed: () {
-                        Clipboard.setData(ClipboardData(text: signedData!));
-                        ScaffoldMessenger.of(context).clearSnackBars();
-                        ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('Copied!')));
-                      },
+                  const SizedBox(height: 16),
+                  TextField(
+                    controller: _dataController,
+                    readOnly: true,
+                    maxLines: 3,
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          color: Theme.of(context).colorScheme.onSurface,
+                        ),
+                    decoration: InputDecoration(
+                      hintText: 'Processed data will appear here...',
+                      errorText: dataError,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      suffixIcon: _dataController.text.isNotEmpty
+                          ? IconButton(
+                              icon: const Icon(Icons.copy),
+                              onPressed: () {
+                                Clipboard.setData(
+                                    ClipboardData(text: _dataController.text));
+                                ScaffoldMessenger.of(context).clearSnackBars();
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(content: Text('Copied!')));
+                              },
+                            )
+                          : null,
                     ),
-                  ],
-                ),
-              ),
-            ],
-          ],
-        ),
-      ),
-    );
+                  ),
+                  const SizedBox(height: 24),
+                  buildWalletSelector(wallets),
+                  const SizedBox(height: 24),
+                  buildDestinationUrlField(),
+                  const SizedBox(height: 32),
+                  ElevatedButton(
+                    onPressed: isLoading ? null : signText,
+                    style: ElevatedButton.styleFrom(
+                      padding: const EdgeInsets.all(16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                    child: isLoading
+                        ? const SizedBox(
+                            height: 20,
+                            width: 20,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          )
+                        : Text('Sign',
+                            style: Theme.of(context)
+                                .textTheme
+                                .titleLarge
+                                ?.copyWith(
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .onPrimaryContainer,
+                                  fontWeight: FontWeight.bold,
+                                )),
+                  ),
+                  const SizedBox(height: 24),
+                  buildSignedDataDisplay(),
+                ])));
   }
 }
