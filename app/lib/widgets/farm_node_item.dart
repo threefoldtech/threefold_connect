@@ -73,16 +73,42 @@ class _FarmNodeItemWidgetState extends State<FarmNodeItemWidget> {
     return parts.join(' ');
   }
 
+  Widget _buildChip({
+    required String label,
+    required Color borderColor,
+    required Color textColor,
+  }) {
+    return Container(
+      padding: const EdgeInsets.only(left: 8, right: 8, top: 4, bottom: 4),
+      decoration: BoxDecoration(
+        border: Border.all(
+          color: borderColor,
+        ),
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Text(
+        label,
+        style: Theme.of(context).textTheme.bodySmall!.copyWith(
+              color: textColor,
+            ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     String? countryCode = countryNameToCode[widget.node.country];
+    final statusColor = widget.node.status == NodeStatus.Up
+        ? Theme.of(context).colorScheme.primary
+        : Theme.of(context).colorScheme.error;
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 10.0),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
-            padding: const EdgeInsets.only(top: 8.0),
+            padding: const EdgeInsets.only(top: 6.0),
             child: countryCode != null
                 ? ClipOval(
                     child: SizedBox(
@@ -122,44 +148,18 @@ class _FarmNodeItemWidgetState extends State<FarmNodeItemWidget> {
                     const SizedBox(width: 8.0),
 
                     // Country Chip
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 12, vertical: 6),
-                      decoration: BoxDecoration(
-                        border: Border.all(
-                          color: Theme.of(context).colorScheme.primary,
-                        ),
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: Text(widget.node.country!,
-                          style: Theme.of(context)
-                              .textTheme
-                              .bodySmall!
-                              .copyWith(
-                                color: Theme.of(context).colorScheme.primary,
-                              )),
+                    _buildChip(
+                      label: widget.node.country!,
+                      borderColor: Theme.of(context).colorScheme.primary,
+                      textColor: Theme.of(context).colorScheme.primary,
                     ),
                     const SizedBox(width: 8.0),
 
                     // Status Chip
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 12, vertical: 6),
-                      decoration: BoxDecoration(
-                        border: Border.all(
-                          color: widget.node.status == NodeStatus.Up
-                              ? Theme.of(context).colorScheme.primary
-                              : Theme.of(context).colorScheme.error,
-                        ),
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: Text(widget.node.status.name,
-                          style:
-                              Theme.of(context).textTheme.bodySmall!.copyWith(
-                                    color: widget.node.status == NodeStatus.Up
-                                        ? Theme.of(context).colorScheme.primary
-                                        : Theme.of(context).colorScheme.error,
-                                  )),
+                    _buildChip(
+                      label: widget.node.status.name,
+                      borderColor: statusColor,
+                      textColor: statusColor,
                     ),
                   ],
                 ),

@@ -541,13 +541,10 @@ class _FarmDetailsState extends State<FarmDetails> {
                                 ),
                               ),
                               clipBehavior: Clip.antiAlias,
-                              child: Padding(
-                                padding: const EdgeInsets.only(top: 6.0, bottom: 6.0), // Increased top padding
-                                child: FarmNodeItemWidget(
-                                  node: node,
-                                  isV4: widget.isV4,
-                                  farmName: widget.farm.name,
-                                ),
+                              child: FarmNodeItemWidget(
+                                node: node,
+                                isV4: widget.isV4,
+                                farmName: widget.farm.name,
                               ),
                             );
                           },

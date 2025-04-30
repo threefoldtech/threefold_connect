@@ -20,47 +20,15 @@ class FarmItemWidget extends StatefulWidget {
 }
 
 class _FarmItemWidgetState extends State<FarmItemWidget> {
-  final walletAddressController = TextEditingController();
-  final tfchainWalletSecretController = TextEditingController();
-  final walletNameController = TextEditingController();
-  final twinIdController = TextEditingController();
-  final farmIdController = TextEditingController();
-
-  bool showTfchainSecret = false;
-  bool edit = false;
-  bool isSaving = false;
-
-  final walletFocus = FocusNode();
-  ChainType chainType = ChainType.Stellar;
-
-  String? addressError;
-  String? currentAddress;
-
-  @override
-  void initState() {
-    super.initState();
-    currentAddress = widget.farm.walletAddress;
-    walletAddressController.text = currentAddress!;
-
-    tfchainWalletSecretController.text = widget.farm.tfchainWalletSecret;
-    walletNameController.text = widget.farm.walletName;
-    farmIdController.text = widget.farm.farmId.toString();
-    twinIdController.text = widget.farm.twinId.toString();
-  }
-
   @override
   void dispose() {
-    walletAddressController.dispose();
-    tfchainWalletSecretController.dispose();
-    walletNameController.dispose();
-    twinIdController.dispose();
-    farmIdController.dispose();
-    walletFocus.dispose();
     super.dispose();
   }
-  
+
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return GestureDetector(
       onTap: () {
         Navigator.push(
@@ -81,17 +49,17 @@ class _FarmItemWidgetState extends State<FarmItemWidget> {
           borderRadius: BorderRadius.circular(8.0),
         ),
         clipBehavior: Clip.antiAlias,
-        color: Colors.grey[850],
+        color: colorScheme.surfaceVariant,
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              const Padding(
-                padding: EdgeInsets.only(right: 16.0),
+              Padding(
+                padding: const EdgeInsets.only(right: 16.0),
                 child: Icon(
                   Icons.menu,
-                  color: Colors.white70,
+                  color: colorScheme.onSurfaceVariant.withOpacity(0.7),
                 ),
               ),
               Expanded(
@@ -101,29 +69,24 @@ class _FarmItemWidgetState extends State<FarmItemWidget> {
                   children: [
                     Text(
                       widget.farm.name,
-                      style: Theme.of(context)
-                          .textTheme
-                          .titleMedium
-                          ?.copyWith(
-                            color: Colors.white,
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                            color: colorScheme.onSurfaceVariant,
                           ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
-                    if (widget.farm.nodes.isNotEmpty)
+                    ...[
                       const SizedBox(height: 4.0),
-                    if (widget.farm.nodes.isNotEmpty)
                       Text(
                         '${widget.farm.nodes.length} Node${widget.farm.nodes.length == 1 ? '' : 's'}',
-                        style: Theme.of(context)
-                            .textTheme
-                            .bodyMedium
-                            ?.copyWith(
-                              color: Colors.white70,
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                              color:
+                                  colorScheme.onSurfaceVariant.withOpacity(0.7),
                             ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
+                    ],
                   ],
                 ),
               ),
