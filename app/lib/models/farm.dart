@@ -4,9 +4,11 @@ class Node {
   Node({
     required this.nodeId,
     required this.status,
+    this.updatedAt,
   });
   final int nodeId;
   final NodeStatus status;
+  final int? updatedAt;
 }
 
 class Farm {
