@@ -4,9 +4,13 @@ class Node {
   Node({
     required this.nodeId,
     required this.status,
+    required this.country,
+    this.uptime,
   });
   final int nodeId;
   final NodeStatus status;
+  final int? uptime;
+  final String? country;
 }
 
 class Farm {
