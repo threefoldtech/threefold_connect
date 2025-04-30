@@ -56,7 +56,6 @@ class _DaoPageState extends State<DaoPage> with SingleTickerProviderStateMixin {
         loading = false;
         failed = true;
       });
-      throw Exception('Failed to load proposals due to $e');
     }
   }
 

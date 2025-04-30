@@ -108,10 +108,8 @@ Future<Map<String, List<Proposal>>> getProposals() async {
     return proposals;
   } catch (e) {
     throw Exception('Failed to get DAO proposals due to $e');
-  } finally{
-    if (proposals != null) {
-      await client.disconnect();
-    }
+  } finally {
+    await client.disconnect();
   }
 }
 
