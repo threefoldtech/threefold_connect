@@ -8,28 +8,54 @@ It contains an ultra secure 2FA authenticator for authenticating through third p
 
 Inside the app, you can manage your Threefold Tokens(TFT).
 
-## Features
-
-### Threefold news
-
-Inside the app, there is a "News" section where you can find all the latest Threefold news!
+## Features ✨
 
 ### Wallet
 
-In the Threefold Connect app, it is possible to manage your TFT and view your transaction history on the TF chain.
+In the ThreeFold Connect app, you can:
 
-### Farmers
+- Manage your ThreeFold Tokens (TFT) across multiple wallets
+- Import existing wallets using seed phrases or secret keys
+- Send and receive tokens on both TFChain and the Stellar network
+- Bridge tokens between TFChain, Stellar and Solana networks
+- Verify your identity for KYC requirements
+- Monitor your balance in real-time
+- Manage contacts for easy transfers
 
-If you own a Threefold node, you can manage your farm here.
+### Farm
 
-### Support
+In the ThreeFold Connect app, you can:
 
-If you have Threefold related questions, we provide a support chat where we will answer your questions as soon as possible!
+- Create and manage both v3 and v4 farms
+- View farm details and configurations
+- Track node status (online/offline) in real-time
 
+### Node Monitoring
+
+- Receive proactive notifications when nodes go offline
+- Smart notification system that categorizes offline nodes:
+  - Recent outages (0-1 hour): Notifications every 15 minutes
+  - Short outages (1-4 hours): Notifications every hour
+  - Medium outages (4-24 hours): Notifications every 4 hours
+  - Extended outages (1-3 days): Notifications every 12 hours
+  - Long outages (3-7 days): Notifications once daily
+  - Very long outages (beyond 7 days): Notifications suppressed
+
+### DAO
+
+Inside the app, you can vote on proposals and view the results of your votes.
+
+### Threefold News
+
+Inside the app, there is a "News" section where you can find all the latest Threefold news!
 
 ### Identity
 
 When you are using the secure 2FA authentication, some third party apps require certain information (eg. phone number). In this tab you can verify your email, phone number and identity to provide this data to the third party application. This allows you total granular control over which data you choose to share or not share.
+
+### Support
+
+If you have Threefold related questions, we provide a support chat where we will answer your questions as soon as possible!
 
 ## New codebase
 
@@ -68,12 +94,38 @@ uwsgi --http :5000 --gevent 1000 --http-websockets --master --wsgi-file __main__
 
 ## App
 
-Make sure you have at least Flutter 2.8.1 installed. If everything is installed properly, execute the following commands:
+### Setup and Run the Mobile App
 
-Copy the file in /lib/app_config_local.template into /lib/app_config_local.dart and change the configuration to your local IP's
+1. **Prerequisites**
+   - Install Flutter 3.27.2
 
-After that, use the build.sh script to set up the right environment
+2. **Configure the App**
+   - Navigate to the app directory: `cd app`
+   - Copy configuration templates:
 
-`./build.sh --init && ./build.sh --switch --local`
+     ```bash
+     dart run build_runner build
+     ```
 
-Connect your phone / start an emulator and everything should work properly.
+3. **Initialize the Environment**
+   - Run the initialization script:
+
+     ```bash
+     ./build.sh --init
+     ```
+
+   - Switch to local development environment:
+
+     ```bash
+     ./build.sh --switch --local
+     ```
+
+4. **Run the App**
+   - Connect your Android/iOS device or start an emulator
+   - Launch the app:
+
+     ```bash
+     flutter run
+     ```
+
+After completing these steps, the app should be running on your device or emulator with your local backend configuration.
