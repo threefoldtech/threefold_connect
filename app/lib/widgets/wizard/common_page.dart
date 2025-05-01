@@ -15,7 +15,7 @@ class CommonPage extends StatefulWidget {
   final bool? showTermsAndConditions;
 
   const CommonPage({
-    Key? key,
+    super.key,
     required this.title,
     required this.subtitle,
     required this.imagePath,
@@ -23,7 +23,7 @@ class CommonPage extends StatefulWidget {
     this.heightPercentage = 100,
     this.widthPercentage = 300,
     this.showTermsAndConditions = false,
-  }) : super(key: key);
+  });
 
   @override
   State<CommonPage> createState() => _CommonPageState();
