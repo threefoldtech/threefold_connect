@@ -4,7 +4,7 @@ class Node {
   Node({
     required this.nodeId,
     required this.status,
-    required this.country,
+    this.country,
     this.uptime,
     this.updatedAt,
   });
