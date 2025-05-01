@@ -6,11 +6,13 @@ class Node {
     required this.status,
     required this.country,
     this.uptime,
+    this.updatedAt,
   });
   final int nodeId;
   final NodeStatus status;
   final int? uptime;
   final String? country;
+  final int? updatedAt;
 }
 
 class Farm {
