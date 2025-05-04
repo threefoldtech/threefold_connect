@@ -83,6 +83,10 @@ class _NewFarmState extends State<NewFarm> {
       nameError = "Name can't be empty";
       return false;
     }
+    if (farmName.contains(' ')) {
+      nameError = "Name can't contain spaces";
+      return false;
+    }
 
     if (widget.isV4) {
       if (!isAlphanumeric(farmName)) {
@@ -105,6 +109,12 @@ class _NewFarmState extends State<NewFarm> {
     if (_selectedWallet == null) {
       setState(() {
         walletError = 'Please select a wallet';
+      });
+      return false;
+    }
+    if (_selectedWallet!.stellarBalance == '-1') {
+      setState(() {
+        walletError = 'Wallet not activated on stellar';
       });
       return false;
     }
@@ -160,7 +170,7 @@ class _NewFarmState extends State<NewFarm> {
   }
 
   Future<void> _validateAndAdd() async {
-    if(!_validateWallet()) return;
+    if (!_validateWallet()) return;
     final farmName = _nameController.text.trim();
     setState(() {
       saveLoading = true;
