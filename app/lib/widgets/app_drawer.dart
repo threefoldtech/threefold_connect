@@ -29,7 +29,7 @@ class AppDrawer extends StatelessWidget {
     DrawerItemData(
         icon: Icons.account_balance_wallet, label: 'Wallet', tabIndex: 2),
     DrawerItemData(
-        icon: Icons.account_balance_wallet, label: 'Farming', tabIndex: 3),
+        icon: Icons.storage, label: 'Farming', tabIndex: 3),
     DrawerItemData(icon: Icons.how_to_vote_outlined, label: 'Dao', tabIndex: 4),
     DrawerItemData(icon: Icons.person, label: 'Identity', tabIndex: 5),
     DrawerItemData(icon: Icons.settings, label: 'Settings', tabIndex: 6),
