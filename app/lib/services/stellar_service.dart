@@ -97,3 +97,13 @@ Future<String> getBalanceByAccountId(String accountId) async {
   }
   return '-1';
 }
+
+Future<bool> activateThroughtThreefoldService(String secret) async {
+  final client = Client(NetworkType.PUBLIC, secret);
+  try {
+    return await client.activateThroughThreefoldService();
+  } catch (e) {
+    logger.e(e);
+    return false;
+  }
+}

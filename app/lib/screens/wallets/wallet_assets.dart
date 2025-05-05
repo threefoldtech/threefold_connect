@@ -9,6 +9,7 @@ import 'package:threebotlogin/screens/wallets/bridge.dart';
 import 'package:threebotlogin/screens/wallets/receive.dart';
 import 'package:threebotlogin/screens/wallets/send.dart';
 import 'package:threebotlogin/services/stellar_service.dart' as Stellar;
+import 'package:threebotlogin/widgets/wallets/activate_wallet.dart';
 import 'package:threebotlogin/widgets/wallets/arrow_inward.dart';
 import 'package:threebotlogin/widgets/wallets/balance_tile.dart';
 
@@ -57,6 +58,18 @@ class _WalletAssetsWidgetState extends State<WalletAssetsWidget> {
   void dispose() {
     reloadBalance = false;
     super.dispose();
+  }
+
+  _openActivateStellarOverlay() {
+    showModalBottomSheet(
+        isScrollControlled: true,
+        useSafeArea: true,
+        isDismissible: false,
+        constraints: const BoxConstraints(maxWidth: double.infinity),
+        context: context,
+        builder: (ctx) => ActivateWalletWidget(
+              wallet: widget.wallet,
+            ));
   }
 
   @override
@@ -211,8 +224,27 @@ class _WalletAssetsWidgetState extends State<WalletAssetsWidget> {
               loading: tfchainBalaceLoading,
             ),
           const SizedBox(
-            height: 20,
+            height: 80,
           ),
+          if (widget.wallet.stellarBalance == '-1')
+            Center(
+              child: SizedBox(
+                  width: MediaQuery.of(context).size.width - 40,
+                  child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor:
+                            Theme.of(context).colorScheme.primaryContainer,
+                      ),
+                      onPressed: _openActivateStellarOverlay,
+                      child: Text(
+                        'Activate Stellar',
+                        style: Theme.of(context).textTheme.bodyLarge!.copyWith(
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .onPrimaryContainer,
+                            ),
+                      ))),
+            ),
           ...vestWidgets
         ],
       ),
