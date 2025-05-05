@@ -134,14 +134,6 @@ mixin SigningMixin<T extends StatefulWidget> on State<T> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Text(
-          'Select Wallet',
-          style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                fontWeight: FontWeight.bold,
-                color: Theme.of(context).colorScheme.onSurface,
-              ),
-        ),
-        const SizedBox(height: 16),
         DropdownButtonFormField<Wallet>(
           value: selectedWallet,
           decoration: InputDecoration(
