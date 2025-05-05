@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:threebotlogin/app.dart';
 import 'package:threebotlogin/apps/council/council.dart';
 import 'package:threebotlogin/apps/dao/dao.dart';
+import 'package:threebotlogin/apps/notifications/notifications.dart';
 import 'package:threebotlogin/apps/wallet/wallet.dart';
 import 'package:threebotlogin/screens/identity_verification_screen.dart';
 import 'package:threebotlogin/screens/preference_screen.dart';
@@ -86,6 +87,14 @@ class JRouter {
             view: await Council().widget(),
           ),
           app: Dao()),
+                AppInfo(
+          route: Route(
+            path: '/notifications',
+            name: 'Notifications',
+            icon: Icons.how_to_vote_outlined,
+            view: await Notifications().widget(),
+          ),
+          app: null),
     ];
   }
 

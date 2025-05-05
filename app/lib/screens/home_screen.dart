@@ -62,6 +62,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     'Identity',
     'Settings',
     'Council',
+    'Notification Settings',
   ];
 
   @override

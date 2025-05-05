@@ -28,13 +28,14 @@ class AppDrawer extends StatelessWidget {
     DrawerItemData(icon: Icons.article, label: 'News', tabIndex: 1),
     DrawerItemData(
         icon: Icons.account_balance_wallet, label: 'Wallet', tabIndex: 2),
-    DrawerItemData(
-        icon: Icons.storage, label: 'Farming', tabIndex: 3),
+    DrawerItemData(icon: Icons.storage, label: 'Farming', tabIndex: 3),
     DrawerItemData(icon: Icons.how_to_vote_outlined, label: 'Dao', tabIndex: 4),
     DrawerItemData(icon: Icons.person, label: 'Identity', tabIndex: 5),
     DrawerItemData(icon: Icons.settings, label: 'Settings', tabIndex: 6),
     DrawerItemData(
         icon: Icons.how_to_vote_outlined, label: 'Council', tabIndex: 7),
+    DrawerItemData(
+        icon: Icons.notifications, label: 'Notifications', tabIndex: 8),
   ];
 
   @override
@@ -48,6 +49,7 @@ class AppDrawer extends StatelessWidget {
       _allDrawerItems[5],
       _allDrawerItems[6],
       if (globals.council) _allDrawerItems[7],
+      _allDrawerItems[8],
     ];
 
     return Drawer(
