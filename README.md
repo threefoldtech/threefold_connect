@@ -57,10 +57,6 @@ When you are using the secure 2FA authentication, some third party apps require 
 
 If you have Threefold related questions, we provide a support chat where we will answer your questions as soon as possible!
 
-## New codebase
-
-In June 2022, a new codebase has been written for this project. It is built on turborepository. This codebase is still in development and not ready yet, you can find this under v2 branch.
-
 ## Local development
 
 ### External repositories
