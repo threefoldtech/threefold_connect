@@ -218,6 +218,7 @@ class _NewWalletState extends ConsumerState<NewWallet> {
           Icons.check,
           DialogType.Info);
 
+      if (!mounted) return;
       Navigator.pop(context);
 
       if (wallet.stellarBalance == '-1') {
@@ -225,15 +226,15 @@ class _NewWalletState extends ConsumerState<NewWallet> {
       }
     } catch (e) {
       logger.e(e);
+      if (!mounted) return;
       _showDialog('Error', 'Failed to save wallet. Please try again.',
           Icons.error, DialogType.Error);
       saveLoading = false;
-      if (!context.mounted) return;
       setState(() {});
       return;
     }
     saveLoading = false;
-    if (!context.mounted) return;
+    if (!mounted) return;
     setState(() {});
     Navigator.pop(context);
   }
@@ -329,10 +330,10 @@ class _NewWalletState extends ConsumerState<NewWallet> {
   }
 
   Future<void> activateStellarConfirmation(Wallet wallet) async {
-    final BuildContext currentContext = context;
+    if (!mounted) return;
 
     return showDialog(
-      context: currentContext,
+      context: context,
       barrierDismissible: false,
       builder: (BuildContext dialogContext) => CustomDialog(
         type: DialogType.Warning,
@@ -351,21 +352,23 @@ class _NewWalletState extends ConsumerState<NewWallet> {
             child: const Text('Activate'),
             onPressed: () {
               Navigator.pop(dialogContext);
-              WidgetsBinding.instance.addPostFrameCallback((_) {
-                if (currentContext.mounted) {
-                  showModalBottomSheet(
-                    isScrollControlled: true,
-                    useSafeArea: true,
-                    isDismissible: false,
-                    constraints:
-                        const BoxConstraints(maxWidth: double.infinity),
-                    context: currentContext,
-                    builder: (ctx) => ActivateWalletWidget(
-                      wallet: wallet,
-                    ),
-                  );
-                }
-              });
+              if (mounted) {
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  if (mounted) {
+                    showModalBottomSheet(
+                      isScrollControlled: true,
+                      useSafeArea: true,
+                      isDismissible: false,
+                      constraints:
+                          const BoxConstraints(maxWidth: double.infinity),
+                      context: context,
+                      builder: (ctx) => ActivateWalletWidget(
+                        wallet: wallet,
+                      ),
+                    );
+                  }
+                });
+              }
             },
           ),
         ],
