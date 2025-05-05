@@ -43,7 +43,7 @@ In the ThreeFold Connect app, you can:
 
 ### DAO
 
-Inside the app, you can vote on proposals and view the results of your votes.
+Inside the app, you can vote on TFChain proposals and view the results of your votes.
 
 ### Threefold News
 
