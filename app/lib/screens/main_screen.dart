@@ -211,7 +211,6 @@ class _AppState extends State<MainScreen> {
                     currentPin: null,
                   )));
     }
-    // await Navigator.push(context, MaterialPageRoute(builder: (context) => UnregisteredScreen()));
     await Navigator.of(context).pushReplacement(PageRouteBuilder(
         transitionDuration: const Duration(seconds: 1),
         pageBuilder: (_, __, ___) => HomeScreen(

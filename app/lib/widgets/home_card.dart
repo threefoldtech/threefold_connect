@@ -35,7 +35,7 @@ class HomeCardWidget extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(10),
               height: size / 7,
-              width: fullWidth ? size * 2 / 2.5 + 2 * margin : size / 2.5,
+              width: fullWidth ? size * 0.8 : size / 2.5,
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -45,11 +45,16 @@ class HomeCardWidget extends StatelessWidget {
                     color: Theme.of(context).colorScheme.onPrimaryContainer,
                   ),
                   const SizedBox(width: 7),
-                  Text(
-                    name,
-                    style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                        color: Theme.of(context).colorScheme.onPrimaryContainer,
-                        fontWeight: FontWeight.bold),
+                  Flexible(
+                    child: Text(
+                      name,
+                      style: Theme.of(context).textTheme.titleMedium!.copyWith(
+                          color:
+                              Theme.of(context).colorScheme.onPrimaryContainer,
+                          fontWeight: FontWeight.bold),
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 1,
+                    ),
                   )
                 ],
               ),

@@ -88,7 +88,7 @@ class JRouter {
             view: await Council().widget(),
           ),
           app: Dao()),
-                AppInfo(
+      AppInfo(
           route: Route(
             path: '/notifications',
             name: 'Notifications',
