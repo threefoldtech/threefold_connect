@@ -1,6 +1,11 @@
 import 'package:background_fetch/background_fetch.dart';
 import 'package:threebotlogin/services/nodes_check_service.dart';
 import 'notification_service.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:threebotlogin/helpers/logger.dart';
+
+const String _nodeStatusNotificationEnabledKey =
+    'nodeStatusNotificationEnabled';
 
 void backgroundFetchHeadlessTask(HeadlessTask task) async {
   final String taskId = task.taskId;
@@ -10,14 +15,28 @@ void backgroundFetchHeadlessTask(HeadlessTask task) async {
     BackgroundFetch.finish(taskId);
     return;
   }
-  await checkNodeStatus();
+  final prefs = await SharedPreferences.getInstance();
+  final bool notificationsEnabled =
+      prefs.getBool(_nodeStatusNotificationEnabledKey) ?? true;
 
-  BackgroundFetch.finish(taskId);
+  logger.i(
+      'Background Fetch Headless Task: $taskId, Notifications Enabled: $notificationsEnabled');
+
+  if (!notificationsEnabled) {
+    logger.i(
+        '[BackgroundFetch] Node status notifications are disabled. Finishing task: $taskId');
+    BackgroundFetch.finish(taskId);
+    return;
+  }
+  await checkNodeStatus(taskId);
 }
 
-Future<void> checkNodeStatus() async {
+Future<void> checkNodeStatus(String taskId) async {
   final offlineNodes = await NodeCheckService.pingNodesInBackground();
-  if (offlineNodes.isEmpty) return;
+  if (offlineNodes.isEmpty) {
+    BackgroundFetch.finish(taskId);
+    return;
+  }
 
   final now = DateTime.now().millisecondsSinceEpoch;
   final sevenDaysAgoTimestamp =
@@ -33,7 +52,10 @@ Future<void> checkNodeStatus() async {
     return downtime.inMinutes % checkInterval.inMinutes < 15;
   }).toList();
 
-  if (nodesToNotify.isEmpty) return;
+  if (nodesToNotify.isEmpty) {
+    BackgroundFetch.finish(taskId);
+    return;
+  }
 
   const groupKey = 'offline_nodes';
   final StringBuffer bodyBuffer = StringBuffer();
@@ -54,6 +76,7 @@ Future<void> checkNodeStatus() async {
     body: bodyBuffer.toString().trim(),
     groupKey: groupKey,
   );
+  BackgroundFetch.finish(taskId);
 }
 
 Duration _getCheckInterval(Duration downtime) {

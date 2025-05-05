@@ -9,9 +9,10 @@ class NotificationsScreen extends StatefulWidget {
 }
 
 class _NotificationsScreenState extends State<NotificationsScreen> {
-  bool _notificationsEnabled = true;
+  bool _nodeStatusNotificationEnabled = true;
 
-  static const String _notificationsEnabledKey = 'notificationsEnabled';
+  static const String _nodeStatusNotificationEnabledKey =
+      'nodeStatusNotificationEnabled';
 
   @override
   void initState() {
@@ -22,13 +23,14 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
   void _loadNotificationPreference() async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
-      _notificationsEnabled = prefs.getBool(_notificationsEnabledKey) ?? true;
+      _nodeStatusNotificationEnabled =
+          prefs.getBool(_nodeStatusNotificationEnabledKey) ?? true;
     });
   }
 
-  void _saveNotificationPreference(bool newValue) async {
+  void _setNodeStatusNotification(bool newValue) async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool(_notificationsEnabledKey, newValue);
+    await prefs.setBool(_nodeStatusNotificationEnabledKey, newValue);
   }
 
   @override
@@ -37,23 +39,16 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
       padding: const EdgeInsets.symmetric(vertical: 16.0),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment:
-            CrossAxisAlignment.stretch,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
           SwitchListTile(
-            title: const Text('Enable Push Notifications'),
-            value: _notificationsEnabled,
+            title: const Text('Enable node status notifications'),
+            value: _nodeStatusNotificationEnabled,
             onChanged: (bool newValue) {
               setState(() {
-                _notificationsEnabled = newValue;
+                _nodeStatusNotificationEnabled = newValue;
               });
-              _saveNotificationPreference(newValue);
-
-              if (newValue) {
-                print('Notifications enabled. Implement subscription logic.');
-              } else {
-                 print('Notifications disabled. Implement unsubscription logic.');
-              }
+              _setNodeStatusNotification(newValue);
             },
             secondary: const Icon(Icons.notifications),
           ),

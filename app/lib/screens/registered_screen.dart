@@ -4,15 +4,13 @@ import 'package:threebotlogin/widgets/home_card.dart';
 import 'package:threebotlogin/widgets/home_logo.dart';
 
 class RegisteredScreen extends StatefulWidget {
-  static final RegisteredScreen _singleton = RegisteredScreen._internal();
+  static final RegisteredScreen _singleton = const RegisteredScreen._internal();
 
   factory RegisteredScreen() {
     return _singleton;
   }
 
-  RegisteredScreen._internal() {
-    //init
-  }
+  const RegisteredScreen._internal();
 
   @override
   State<RegisteredScreen> createState() => _RegisteredScreenState();
@@ -20,8 +18,6 @@ class RegisteredScreen extends StatefulWidget {
 
 class _RegisteredScreenState extends State<RegisteredScreen>
     with WidgetsBindingObserver {
-  // We will treat this error as a singleton
-
   bool showSettings = false;
   bool showPreference = false;
 
@@ -31,6 +27,7 @@ class _RegisteredScreenState extends State<RegisteredScreen>
         body: SingleChildScrollView(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
           SizedBox(
             height: MediaQuery.of(context).size.height * 0.3,
@@ -51,12 +48,12 @@ class _RegisteredScreenState extends State<RegisteredScreen>
               ],
             ),
           ),
-          Container(
-            padding: const EdgeInsets.only(left: 10, right: 10, top: 50),
-            height: MediaQuery.of(context).size.height * 0.6,
-            width: MediaQuery.of(context).size.width,
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 10),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min,
               children: [
                 SizedBox(
                   width: MediaQuery.of(context).size.width / 1.2,
@@ -76,7 +73,7 @@ class _RegisteredScreenState extends State<RegisteredScreen>
                         ]),
                   ),
                 ),
-                const Spacer(),
+                const SizedBox(height: 45),
                 const Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -111,10 +108,26 @@ class _RegisteredScreenState extends State<RegisteredScreen>
                         name: 'Settings', icon: Icons.settings, pageNumber: 6),
                   ],
                 ),
-                const SizedBox(height: 40),
                 const Row(
-                  children: [Spacer(), CrispChatbot(), SizedBox(width: 20)],
-                )
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    HomeCardWidget(
+                      name: 'Notification Settings',
+                      icon: Icons.notifications,
+                      pageNumber: 8,
+                      fullWidth: true,
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 70),
+                const Align(
+                  alignment: Alignment.bottomRight,
+                  child: Padding(
+                    padding: EdgeInsets.only(right: 20.0),
+                    child: CrispChatbot(),
+                  ),
+                ),
               ],
             ),
           )
