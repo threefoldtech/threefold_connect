@@ -1714,8 +1714,8 @@ packages:
     dependency: "direct main"
     description:
       path: "packages/stellar_client"
-      ref: development_order_book
-      resolved-ref: "6b2baa034f286eb839d60dd71df1761c1b14f2ca"
+      ref: development
+      resolved-ref: faf00a8ff66d41fc7f9c529f24b4d1e16ac0c459
       url: "https://github.com/threefoldtech/tfgrid-sdk-dart"
     source: git
     version: "0.1.0"

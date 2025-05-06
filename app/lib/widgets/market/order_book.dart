@@ -21,7 +21,7 @@ class _OrderbookWidgetState extends State<OrderbookWidget> {
   }
 
   void _loadOrderBook() async {
-    _orderBookStream = await getOrderBook(widget.secret, 'USDC', 'TFT');
+    _orderBookStream = await listOrderBook(widget.secret, 'USDC', 'TFT');
     setState(() {});
   }
 

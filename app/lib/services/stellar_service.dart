@@ -55,11 +55,9 @@ Future<String> getBalance(String secret) async {
   return balances['TFT'] ?? '-1';
 }
 
-Future<List<ITransaction>> listTransactions(
-    String secret, int offset, int limit) async {
+Future<Stream<ITransaction>> listTransactions(String secret, int limit) async {
   final client = Client(NetworkType.PUBLIC, secret);
-  return await client.getTransactions(
-      assetCodeFilter: 'TFT', limit: limit, offset: offset);
+  return client.getTransactions(assetCodeFilter: 'TFT', limit: limit);
 }
 
 Future<List<VestingAccount>?> listVestedAccounts(String secret) async {
@@ -101,11 +99,9 @@ Future<String> getBalanceByAccountId(String accountId) async {
   return '-1';
 }
 
-Future<Stream<OrderBook>> getOrderBook(
+Future<Stream<OrderBook>> listOrderBook(
     String secret, String sellingAssetCode, String buyingAssetCode) async {
-  final client = Client(NetworkType.PUBLIC, secret);
-  final stream = await client.getOrderBook(
-      sellingAssetCode: sellingAssetCode, buyingAssetCode: buyingAssetCode);
+  final stream = await getOrderBook();
 
   return stream.map((orderBookResponse) {
     return OrderBook(
@@ -247,5 +243,5 @@ Future<bool> updateOrder(String secret, String sellingAssetCode,
       buyingAssetCode: buyingAssetCode,
       amount: amount,
       price: price,
-      offerId:offerID );
+      offerId: offerID);
 }
