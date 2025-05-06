@@ -51,15 +51,12 @@ mixin SigningMixin<T extends ConsumerStatefulWidget> on ConsumerState<T> {
                 success
                     ? 'Signature sent successfully'
                     : 'Failed to send signature to destination',
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                style: Theme.of(context).textTheme.bodyMedium!.copyWith(
                       color: success
                           ? Theme.of(context).colorScheme.onPrimaryContainer
-                          : Theme.of(context).colorScheme.onErrorContainer,
+                          : Theme.of(context).colorScheme.errorContainer,
                     ),
               ),
-              backgroundColor: success
-                  ? Theme.of(context).colorScheme.primary
-                  : Theme.of(context).colorScheme.error,
             ),
           );
         }
@@ -177,10 +174,9 @@ mixin SigningMixin<T extends ConsumerStatefulWidget> on ConsumerState<T> {
           SnackBar(
             content: Text(
               'Wallets loaded successfully',
-              style: TextStyle(
+              style: Theme.of(context).textTheme.bodyMedium!.copyWith(
                   color: Theme.of(context).colorScheme.onPrimaryContainer),
             ),
-            backgroundColor: Theme.of(context).colorScheme.primary,
             duration: const Duration(seconds: 2),
           ),
         );
@@ -194,14 +190,14 @@ mixin SigningMixin<T extends ConsumerStatefulWidget> on ConsumerState<T> {
           SnackBar(
             content: Text(
               'Failed to load wallets. Please check your connection.',
-              style: TextStyle(
-                  color: Theme.of(context).colorScheme.onErrorContainer),
+              style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                  color: Theme.of(context).colorScheme.errorContainer),
             ),
             duration: const Duration(seconds: 3),
             backgroundColor: Theme.of(context).colorScheme.error,
             action: SnackBarAction(
               label: 'Retry',
-              textColor: Theme.of(context).colorScheme.onErrorContainer,
+              textColor: Theme.of(context).colorScheme.errorContainer,
               onPressed: () {
                 retryLoadingWallets();
               },
@@ -238,7 +234,7 @@ mixin SigningMixin<T extends ConsumerStatefulWidget> on ConsumerState<T> {
                       const SizedBox(width: 12),
                       Text(
                         'Loading wallets...',
-                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        style: Theme.of(context).textTheme.bodyMedium!.copyWith(
                               color: Theme.of(context).colorScheme.onSurface,
                             ),
                       ),
@@ -264,7 +260,7 @@ mixin SigningMixin<T extends ConsumerStatefulWidget> on ConsumerState<T> {
                               style: Theme.of(context)
                                   .textTheme
                                   .bodyMedium
-                                  ?.copyWith(
+                                  !.copyWith(
                                     color:
                                         Theme.of(context).colorScheme.onSurface,
                                   )),
@@ -350,7 +346,7 @@ mixin SigningMixin<T extends ConsumerStatefulWidget> on ConsumerState<T> {
           children: [
             Text(
               'Signed Data',
-              style: Theme.of(context).textTheme.titleLarge?.copyWith(
+              style: Theme.of(context).textTheme.titleLarge!.copyWith(
                     fontWeight: FontWeight.bold,
                     color: Theme.of(context).colorScheme.onSurface,
                   ),
@@ -358,7 +354,7 @@ mixin SigningMixin<T extends ConsumerStatefulWidget> on ConsumerState<T> {
             const SizedBox(width: 8),
             Text(
               '(hex encoded)',
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+              style: Theme.of(context).textTheme.bodySmall!.copyWith(
                     color: Theme.of(context)
                         .colorScheme
                         .onSurface

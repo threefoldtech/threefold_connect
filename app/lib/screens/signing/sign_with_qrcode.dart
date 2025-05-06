@@ -180,7 +180,7 @@ class _SignWithQRCodeScreenState extends ConsumerState<SignWithQRCodeScreen>
                   const SizedBox(height: 24),
                   Text(
                     'Scanned Data',
-                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                    style: Theme.of(context).textTheme.titleLarge!.copyWith(
                           fontWeight: FontWeight.bold,
                           color: Theme.of(context).colorScheme.onSurface,
                         ),
@@ -190,7 +190,7 @@ class _SignWithQRCodeScreenState extends ConsumerState<SignWithQRCodeScreen>
                     controller: textController,
                     readOnly: true,
                     maxLines: 3,
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    style: Theme.of(context).textTheme.bodyMedium!.copyWith(
                           color: Theme.of(context).colorScheme.onSurface,
                         ),
                     decoration: InputDecoration(
@@ -214,7 +214,7 @@ class _SignWithQRCodeScreenState extends ConsumerState<SignWithQRCodeScreen>
                     ),
                   ),
                   const SizedBox(height: 24),
-                  buildWalletSelector(), 
+                  buildWalletSelector(),
                   const SizedBox(height: 24),
                   buildDestinationUrlField(),
                   const SizedBox(height: 32),
@@ -240,8 +240,8 @@ class _SignWithQRCodeScreenState extends ConsumerState<SignWithQRCodeScreen>
                         : Text('Sign',
                             style: Theme.of(context)
                                 .textTheme
-                                .titleLarge
-                                ?.copyWith(
+                                .titleLarge!
+                                .copyWith(
                                   color: Theme.of(context)
                                       .colorScheme
                                       .onPrimaryContainer,

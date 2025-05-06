@@ -113,9 +113,8 @@ class _SignWithLinkScreenState extends ConsumerState<SignWithLinkScreen>
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text('Content fetched successfully',
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  style: Theme.of(context).textTheme.bodyMedium!.copyWith(
                       color: Theme.of(context).colorScheme.onPrimaryContainer)),
-              backgroundColor: Theme.of(context).colorScheme.primary,
             ),
           );
           return;
@@ -163,9 +162,8 @@ class _SignWithLinkScreenState extends ConsumerState<SignWithLinkScreen>
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Link processed successfully',
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                style: Theme.of(context).textTheme.bodyMedium!.copyWith(
                     color: Theme.of(context).colorScheme.onPrimaryContainer)),
-            backgroundColor: Theme.of(context).colorScheme.primary,
           ),
         );
       }
@@ -194,7 +192,7 @@ class _SignWithLinkScreenState extends ConsumerState<SignWithLinkScreen>
                 children: [
                   Text(
                     'Enter Link',
-                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                    style: Theme.of(context).textTheme.titleLarge!.copyWith(
                           fontWeight: FontWeight.bold,
                           color: Theme.of(context).colorScheme.onSurface,
                         ),
@@ -202,7 +200,7 @@ class _SignWithLinkScreenState extends ConsumerState<SignWithLinkScreen>
                   const SizedBox(height: 16),
                   TextField(
                     controller: _linkController,
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    style: Theme.of(context).textTheme.bodyMedium!.copyWith(
                           color: Theme.of(context).colorScheme.onSurface,
                         ),
                     enabled: !isLoadingWallets,
@@ -238,7 +236,7 @@ class _SignWithLinkScreenState extends ConsumerState<SignWithLinkScreen>
                   const SizedBox(height: 24),
                   Text(
                     'Extracted Data',
-                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                    style: Theme.of(context).textTheme.titleLarge!.copyWith(
                           fontWeight: FontWeight.bold,
                           color: Theme.of(context).colorScheme.onSurface,
                         ),
@@ -248,7 +246,7 @@ class _SignWithLinkScreenState extends ConsumerState<SignWithLinkScreen>
                     controller: _dataController,
                     readOnly: true,
                     maxLines: 3,
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    style: Theme.of(context).textTheme.bodyMedium!.copyWith(
                           color: Theme.of(context).colorScheme.onSurface,
                         ),
                     decoration: InputDecoration(
@@ -298,8 +296,8 @@ class _SignWithLinkScreenState extends ConsumerState<SignWithLinkScreen>
                         : Text('Sign',
                             style: Theme.of(context)
                                 .textTheme
-                                .titleLarge
-                                ?.copyWith(
+                                .titleLarge!
+                                .copyWith(
                                   color: Theme.of(context)
                                       .colorScheme
                                       .onPrimaryContainer,

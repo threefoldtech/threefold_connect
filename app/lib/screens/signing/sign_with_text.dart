@@ -52,14 +52,14 @@ class _SignWithTextScreenState extends ConsumerState<SignWithTextScreen>
                 children: [
                   Text(
                     'Enter Text to Sign',
-                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                    style: Theme.of(context).textTheme.titleLarge!.copyWith(
                           fontWeight: FontWeight.bold,
                           color: Theme.of(context).colorScheme.onSurface,
                         ),
                   ),
                   const SizedBox(height: 16),
                   TextField(
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    style: Theme.of(context).textTheme.bodyMedium!.copyWith(
                           color: Theme.of(context).colorScheme.onSurface,
                         ),
                     controller: textController,
@@ -103,7 +103,7 @@ class _SignWithTextScreenState extends ConsumerState<SignWithTextScreen>
                             style: Theme.of(context)
                                 .textTheme
                                 .titleLarge
-                                ?.copyWith(
+                                !.copyWith(
                                   color: Theme.of(context)
                                       .colorScheme
                                       .onPrimaryContainer,
