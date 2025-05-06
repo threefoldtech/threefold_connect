@@ -55,9 +55,18 @@ Future<String> getBalance(String secret) async {
   return balances['TFT'] ?? '-1';
 }
 
-Future<Stream<ITransaction>> listTransactions(String secret, int limit) async {
+
+Stream<ITransaction> listTransactions(
+    String secret, String? pagingToken, int limit) async* {
   final client = Client(NetworkType.PUBLIC, secret);
-  return client.getTransactions(assetCodeFilter: 'TFT', limit: limit);
+
+  await for (var response in client.getTransactions(
+    assetCodeFilter: 'TFT',
+    limit: limit,
+    pagingToken: pagingToken,
+  )) {
+    yield response;
+  }
 }
 
 Future<List<VestingAccount>?> listVestedAccounts(String secret) async {

@@ -14,11 +14,13 @@ class CouncilsWidget extends StatefulWidget {
 
 class _CouncilsWidgetState extends State<CouncilsWidget> {
   bool loading = false;
+  bool failed = false;
   List<CouncilProposal> proposals = [];
 
   Future<void> listProposals() async {
     setState(() {
       loading = true;
+      failed = false;
       proposals.clear();
     });
     try {
@@ -39,6 +41,9 @@ class _CouncilsWidgetState extends State<CouncilsWidget> {
         ScaffoldMessenger.of(context).clearSnackBars();
         ScaffoldMessenger.of(context).showSnackBar(loadingFarmsFailure);
       }
+      setState(() {
+        failed = true;
+      });
     } finally {
       setState(() {
         loading = false;
@@ -57,19 +62,40 @@ class _CouncilsWidgetState extends State<CouncilsWidget> {
     Widget mainWidget;
     if (loading) {
       mainWidget = Center(
-          child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          const CircularProgressIndicator(),
-          const SizedBox(height: 15),
-          Text(
-            'Loading Proposals...',
-            style: Theme.of(context).textTheme.bodyLarge!.copyWith(
-                color: Theme.of(context).colorScheme.onSurface,
-                fontWeight: FontWeight.bold),
-          ),
-        ],
-      ));
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const CircularProgressIndicator(),
+            const SizedBox(height: 15),
+            Text(
+              'Loading Proposals...',
+              style: Theme.of(context).textTheme.bodyLarge!.copyWith(
+                  color: Theme.of(context).colorScheme.onSurface,
+                  fontWeight: FontWeight.bold),
+            ),
+          ],
+        ),
+      );
+    } else if (failed) {
+      mainWidget = Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const SizedBox(height: 15),
+            ElevatedButton.icon(
+              icon: const Icon(Icons.refresh),
+              label: const Text('Try Again'),
+              onPressed: () {
+                setState(() {
+                  failed = false;
+                  loading = true;
+                });
+                listProposals();
+              },
+            ),
+          ],
+        ),
+      );
     } else if (proposals.isEmpty) {
       mainWidget = Center(
         child: Text(
@@ -82,16 +108,18 @@ class _CouncilsWidgetState extends State<CouncilsWidget> {
       );
     } else {
       mainWidget = RefreshIndicator(
-          onRefresh: listProposals,
-          child: ListView.builder(
-              itemCount: proposals.length,
-              itemBuilder: (context, i) {
-                final proposal = proposals[i];
-                return CouncilCard(
-                  proposal: proposal,
-                  chainUrl: widget.chainUrl,
-                );
-              }));
+        onRefresh: listProposals,
+        child: ListView.builder(
+          itemCount: proposals.length,
+          itemBuilder: (context, i) {
+            final proposal = proposals[i];
+            return CouncilCard(
+              proposal: proposal,
+              chainUrl: widget.chainUrl,
+            );
+          },
+        ),
+      );
     }
     return Scaffold(
       appBar: AppBar(title: const Text('Council')),

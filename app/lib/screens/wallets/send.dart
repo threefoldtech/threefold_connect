@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
+import 'package:threebotlogin/helpers/form.dart';
 import 'package:threebotlogin/helpers/globals.dart';
 import 'package:threebotlogin/helpers/logger.dart';
 import 'package:threebotlogin/helpers/transaction_helpers.dart';
@@ -110,25 +111,33 @@ class _WalletSendScreenState extends ConsumerState<WalletSendScreen> {
     final fromAddress = fromController.text.trim();
     toAddressError = null;
     if (toAddress.isEmpty) {
-      toAddressError = "Address can't be empty";
+      setState(() {
+        toAddressError = "Address can't be empty";
+      });
       return false;
     }
 
     if (toAddress == fromAddress) {
-      toAddressError = '"To" and "From" addresses must be different';
+      setState(() {
+        toAddressError = '"To" and "From" addresses must be different';
+      });
       return false;
     }
 
     if (chainType == ChainType.TFChain) {
       if (toAddress.length != 48) {
-        toAddressError = 'Address length should be 48 characters';
+        setState(() {
+          toAddressError = 'Address length should be 48 characters';
+        });
         return false;
       }
     }
 
     if (chainType == ChainType.Stellar) {
       if (!isValidStellarAddress(toAddress)) {
-        toAddressError = 'Invaild Stellar address';
+        setState(() {
+          toAddressError = 'Invaild Stellar address';
+        });
         return false;
       }
 
@@ -137,16 +146,23 @@ class _WalletSendScreenState extends ConsumerState<WalletSendScreen> {
       final Wallet? wallet =
           matchingWallets.isNotEmpty ? matchingWallets.first : null;
       if (wallet != null && wallet.stellarBalance == '-1') {
-        toAddressError = 'Wallet not activated on stellar';
+        setState(() {
+          toAddressError = 'Wallet not activated on stellar';
+        });
         return false;
       } else {
         final balance = await Stellar.getBalanceByAccountId(toAddress);
         if (balance == '-1') {
-          toAddressError = 'Wallet not activated on stellar';
+          setState(() {
+            toAddressError = 'Wallet not activated on stellar';
+          });
           return false;
         }
       }
     }
+    setState(() {
+      toAddressError = null;
+    });
     return true;
   }
 
@@ -196,6 +212,7 @@ class _WalletSendScreenState extends ConsumerState<WalletSendScreen> {
 
   void _selectToAddress(String address) {
     toController.text = address;
+    _validateToAddress();
     setState(() {});
   }
 
@@ -276,6 +293,9 @@ class _WalletSendScreenState extends ConsumerState<WalletSendScreen> {
                               color: Theme.of(context).colorScheme.onSurface,
                             ),
                         controller: toController,
+                        onChanged: (text) async {
+                          _validateToAddress();
+                        },
                         decoration: InputDecoration(
                             labelText: 'To',
                             errorText: toAddressError,
@@ -301,6 +321,10 @@ class _WalletSendScreenState extends ConsumerState<WalletSendScreen> {
                         focusNode: textFieldFocusNode,
                         keyboardType: const TextInputType.numberWithOptions(
                             decimal: true),
+                        inputFormatters: [
+                          FilteringTextInputFormatter.allow(RegExp(r'[0-9.,]')),
+                          CommaToDotTextFormatter(),
+                        ],
                         controller: amountController,
                         textInputAction: TextInputAction.done,
                         decoration: InputDecoration(

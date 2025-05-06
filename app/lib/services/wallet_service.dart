@@ -124,11 +124,9 @@ Future<Wallet> loadWallet(String walletName, String walletSeed,
   final stellarBalances = balances.first as Map<String, String>;
   final tfchainBalance =
       balances.last.toString() == '0.0' ? '0' : balances.last.toString();
-
   final kycVerified = await getVerificationStatus(
       address: tfchainClient.keypair!.address,
       idenfyServiceUrl: idenfyServiceUrl);
-
   final wallet = Wallet(
     name: walletName,
     stellarSecret: stellarClient.secretSeed,

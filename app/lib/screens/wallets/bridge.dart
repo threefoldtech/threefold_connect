@@ -1,8 +1,10 @@
 import 'package:bs58/bs58.dart';
 import 'package:decimal/decimal.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:threebotlogin/helpers/form.dart';
 import 'package:threebotlogin/helpers/globals.dart';
 import 'package:threebotlogin/helpers/transaction_helpers.dart';
 import 'package:threebotlogin/models/wallet.dart';
@@ -239,16 +241,14 @@ class _WalletBridgeScreenState extends ConsumerState<WalletBridgeScreen> {
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 15.0),
                         child: Row(
-                          crossAxisAlignment:
-                              CrossAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: <Widget>[
                             Icon(
                               Icons.info,
                               color: Theme.of(context).colorScheme.primary,
                               size: 16,
                             ),
-                            const SizedBox(
-                                width: 8),
+                            const SizedBox(width: 8),
                             Expanded(
                               child: Text(
                                 'This bridge currently only supports Stellar to Solana transfers.',
@@ -259,8 +259,7 @@ class _WalletBridgeScreenState extends ConsumerState<WalletBridgeScreen> {
                                       color:
                                           Theme.of(context).colorScheme.primary,
                                     ),
-                                softWrap:
-                                    true,
+                                softWrap: true,
                               ),
                             ),
                           ],
@@ -333,6 +332,11 @@ class _WalletBridgeScreenState extends ConsumerState<WalletBridgeScreen> {
                                 ),
                             keyboardType: const TextInputType.numberWithOptions(
                                 decimal: true),
+                            inputFormatters: [
+                              FilteringTextInputFormatter.allow(
+                                  RegExp(r'[0-9.,]')),
+                              CommaToDotTextFormatter(),
+                            ],
                             controller: amountController,
                             decoration: InputDecoration(
                                 labelText:

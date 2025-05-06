@@ -111,8 +111,6 @@ Future<Map<String, String>> getEdCurveKeys() async {
 
 Future<void> savePhrase(String phrase) async {
   final SharedPreferences prefs = await SharedPreferences.getInstance();
-  prefs.remove('phrase');
-
   prefs.setString('phrase', phrase);
 }
 

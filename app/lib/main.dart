@@ -1,8 +1,13 @@
+import 'package:background_fetch/background_fetch.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:threebotlogin/helpers/globals.dart';
+import 'package:threebotlogin/helpers/logger.dart';
+import 'package:threebotlogin/screens/app_lifecycle_observer.dart';
 import 'package:threebotlogin/screens/splash_screen.dart';
+import 'package:threebotlogin/services/background_service.dart';
+import 'package:threebotlogin/services/notification_service.dart';
 import 'package:threebotlogin/services/shared_preference_service.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:threebotlogin/providers/theme_provider.dart';
@@ -29,9 +34,18 @@ extension ColorSchemeExtension on ColorScheme {
       : const Color.fromARGB(255, 10, 10, 10);
 }
 
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+
+final lastPausedProvider =
+    StateProvider<int>((ref) => DateTime.now().millisecondsSinceEpoch);
+
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
+
+  await NotificationService().initNotification();
+
+  BackgroundFetch.registerHeadlessTask(backgroundFetchHeadlessTask);
 
   bool initDone = await getInitDone();
   String? doubleName = await getDoubleName();
@@ -44,6 +58,27 @@ Future<void> main() async {
       child: MyApp(initDone: initDone, registered: registered),
     ),
   );
+
+  BackgroundFetch.configure(
+    BackgroundFetchConfig(
+      minimumFetchInterval: 15,
+      stopOnTerminate: false,
+      enableHeadless: true,
+      requiresBatteryNotLow: false,
+      requiresCharging: false,
+      requiresStorageNotLow: false,
+      requiredNetworkType: NetworkType.ANY,
+    ),
+    (String taskId) async {
+      logger.i('[BackgroundFetch] Task: $taskId');
+      await checkNodeStatus();
+      BackgroundFetch.finish(taskId);
+    },
+    (String taskId) async {
+      logger.i('[BackgroundFetch] Timeout: $taskId');
+      BackgroundFetch.finish(taskId);
+    },
+  );
 }
 
 Future<void> setGlobalValues() async {
@@ -52,7 +87,6 @@ Future<void> setGlobalValues() async {
 
   Globals().emailVerified.value = (email['sei'] != null);
   Globals().phoneVerified.value = (phone['spi'] != null);
-
 }
 
 class MyApp extends ConsumerWidget {
@@ -84,60 +118,65 @@ class MyApp extends ConsumerWidget {
       Theme.of(context).textTheme,
     );
 
-    return MaterialApp(
-      theme: ThemeData().copyWith(
-        colorScheme: kColorScheme,
-        brightness: Brightness.light,
-        textTheme: textTheme,
-        appBarTheme: const AppBarTheme().copyWith(
-          backgroundColor: kColorScheme.primary,
-          foregroundColor: kColorScheme.onPrimary,
+    return AppLifecycleObserver(
+      child: MaterialApp(
+        navigatorKey: navigatorKey,
+        theme: ThemeData().copyWith(
+          colorScheme: kColorScheme,
+          brightness: Brightness.light,
+          textTheme: textTheme,
+          appBarTheme: const AppBarTheme().copyWith(
+            backgroundColor: kColorScheme.primary,
+            foregroundColor: kColorScheme.onPrimary,
+          ),
+          cardTheme: const CardTheme().copyWith(
+              color: kColorScheme.surfaceContainer,
+              margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8)),
+          elevatedButtonTheme: ElevatedButtonThemeData(
+            style: ElevatedButton.styleFrom(
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(5)),
+                backgroundColor: kColorScheme.primaryContainer),
+          ),
+          expansionTileTheme: const ExpansionTileThemeData().copyWith(
+              backgroundColor: kColorScheme.backgroundDarker,
+              collapsedBackgroundColor: ThemeData().colorScheme.surface),
+          bottomNavigationBarTheme:
+              const BottomNavigationBarThemeData().copyWith(
+            selectedItemColor: kColorScheme.primary,
+            unselectedItemColor: kColorScheme.secondary,
+          ),
         ),
-        cardTheme: const CardTheme().copyWith(
-            color: kColorScheme.surfaceContainer,
-            margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8)),
-        elevatedButtonTheme: ElevatedButtonThemeData(
-          style: ElevatedButton.styleFrom(
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(5)),
-              backgroundColor: kColorScheme.primaryContainer),
+        darkTheme: ThemeData(
+          useMaterial3: true,
+          colorScheme: kDarkColorScheme,
+          brightness: Brightness.dark,
+          textTheme: textTheme,
+          appBarTheme: const AppBarTheme().copyWith(
+            backgroundColor: kDarkColorScheme.primaryContainer,
+            foregroundColor: kDarkColorScheme.onPrimaryContainer,
+          ),
+          cardTheme: const CardTheme().copyWith(
+              color: kDarkColorScheme.surfaceContainer,
+              margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8)),
+          elevatedButtonTheme: ElevatedButtonThemeData(
+            style: ElevatedButton.styleFrom(
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(5)),
+                backgroundColor: kDarkColorScheme.primaryContainer),
+          ),
+          expansionTileTheme: const ExpansionTileThemeData().copyWith(
+              backgroundColor: kDarkColorScheme.backgroundDarker,
+              collapsedBackgroundColor: kDarkColorScheme.surface),
+          bottomNavigationBarTheme:
+              const BottomNavigationBarThemeData().copyWith(
+            selectedItemColor: kDarkColorScheme.primary,
+            unselectedItemColor: kDarkColorScheme.secondary,
+          ),
         ),
-        expansionTileTheme: const ExpansionTileThemeData().copyWith(
-            backgroundColor: kColorScheme.backgroundDarker,
-            collapsedBackgroundColor: ThemeData().colorScheme.surface),
-        bottomNavigationBarTheme: const BottomNavigationBarThemeData().copyWith(
-          selectedItemColor: kColorScheme.primary,
-          unselectedItemColor: kColorScheme.secondary,
-        ),
+        themeMode: themeMode,
+        home: SplashScreen(initDone: initDone, registered: registered),
       ),
-      darkTheme: ThemeData(
-        useMaterial3: true,
-        colorScheme: kDarkColorScheme,
-        brightness: Brightness.dark,
-        textTheme: textTheme,
-        appBarTheme: const AppBarTheme().copyWith(
-          backgroundColor: kDarkColorScheme.primaryContainer,
-          foregroundColor: kDarkColorScheme.onPrimaryContainer,
-        ),
-        cardTheme: const CardTheme().copyWith(
-            color: kDarkColorScheme.surfaceContainer,
-            margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8)),
-        elevatedButtonTheme: ElevatedButtonThemeData(
-          style: ElevatedButton.styleFrom(
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(5)),
-              backgroundColor: kDarkColorScheme.primaryContainer),
-        ),
-        expansionTileTheme: const ExpansionTileThemeData().copyWith(
-            backgroundColor: kDarkColorScheme.backgroundDarker,
-            collapsedBackgroundColor: kDarkColorScheme.surface),
-        bottomNavigationBarTheme: const BottomNavigationBarThemeData().copyWith(
-          selectedItemColor: kDarkColorScheme.primary,
-          unselectedItemColor: kDarkColorScheme.secondary,
-        ),
-      ),
-      themeMode: themeMode,
-      home: SplashScreen(initDone: initDone, registered: registered),
     );
   }
 }

@@ -10,6 +10,7 @@ import 'package:threebotlogin/screens/registered_screen.dart';
 
 import 'apps/farmers/farmers.dart';
 import 'apps/news/news.dart';
+import 'apps/sign/sign.dart';
 
 class AppInfo {
   Route route;
@@ -96,6 +97,14 @@ class JRouter {
             view: await Council().widget(),
           ),
           app: Dao()),
+      AppInfo(
+          route: Route(
+            path: '/sign',
+            name: 'Sign',
+            icon: Icons.draw_sharp,
+            view: await Sign().widget(),
+          ),
+          app: Sign()),
     ];
   }
 
