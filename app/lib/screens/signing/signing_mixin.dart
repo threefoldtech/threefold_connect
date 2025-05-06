@@ -53,7 +53,7 @@ mixin SigningMixin<T extends ConsumerStatefulWidget> on ConsumerState<T> {
                     : 'Failed to send signature to destination',
                 style: Theme.of(context).textTheme.bodyMedium!.copyWith(
                       color: success
-                          ? Theme.of(context).colorScheme.onPrimaryContainer
+                          ? Theme.of(context).colorScheme.primaryContainer
                           : Theme.of(context).colorScheme.errorContainer,
                     ),
               ),
@@ -175,7 +175,7 @@ mixin SigningMixin<T extends ConsumerStatefulWidget> on ConsumerState<T> {
             content: Text(
               'Wallets loaded successfully',
               style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                  color: Theme.of(context).colorScheme.onPrimaryContainer),
+                  color: Theme.of(context).colorScheme.primaryContainer),
             ),
             duration: const Duration(seconds: 2),
           ),
@@ -194,7 +194,6 @@ mixin SigningMixin<T extends ConsumerStatefulWidget> on ConsumerState<T> {
                   color: Theme.of(context).colorScheme.errorContainer),
             ),
             duration: const Duration(seconds: 3),
-            backgroundColor: Theme.of(context).colorScheme.error,
             action: SnackBarAction(
               label: 'Retry',
               textColor: Theme.of(context).colorScheme.errorContainer,
@@ -287,8 +286,8 @@ mixin SigningMixin<T extends ConsumerStatefulWidget> on ConsumerState<T> {
               onPressed: isLoadingWallets ? null : retryLoadingWallets,
               icon: isLoadingWallets
                   ? SizedBox(
-                      width: 10,
-                      height: 10,
+                      width: 20,
+                      height: 20,
                       child: CircularProgressIndicator(
                         strokeWidth: 2,
                         color: Theme.of(context).colorScheme.primary,

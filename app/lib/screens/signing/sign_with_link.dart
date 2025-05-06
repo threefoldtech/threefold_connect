@@ -114,7 +114,7 @@ class _SignWithLinkScreenState extends ConsumerState<SignWithLinkScreen>
             SnackBar(
               content: Text('Content fetched successfully',
                   style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                      color: Theme.of(context).colorScheme.onPrimaryContainer)),
+                      color: Theme.of(context).colorScheme.primaryContainer)),
             ),
           );
           return;
@@ -163,7 +163,7 @@ class _SignWithLinkScreenState extends ConsumerState<SignWithLinkScreen>
           SnackBar(
             content: Text('Link processed successfully',
                 style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                    color: Theme.of(context).colorScheme.onPrimaryContainer)),
+                    color: Theme.of(context).colorScheme.primaryContainer)),
           ),
         );
       }
