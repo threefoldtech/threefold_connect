@@ -49,7 +49,7 @@ class _ActivateWalletWidgetState extends ConsumerState<ActivateWalletWidget> {
       logger.e('Failed to load TFT price: $e');
       if (mounted) {
         setState(() {
-          tftPrice = 3;
+          tftPrice = 0;
           isLoadingPrice = false;
         });
       }
@@ -118,11 +118,16 @@ class _ActivateWalletWidgetState extends ConsumerState<ActivateWalletWidget> {
             ],
           ),
         );
-        await StellarService.transfer(
-          _selectedWallet!.stellarSecret,
-          Globals().activationServiceAddress,
-          '3',
-        );
+        try {
+          await StellarService.transfer(
+            _selectedWallet!.stellarSecret,
+            Globals().activationServiceAddress,
+            (3 * tftPrice).toString(),
+          );
+        } catch (transferError) {
+          logger.e('Transfer error : $transferError');
+        }
+
         walletRef.reloadBalances();
         widget.wallet.stellarBalance = '0';
         Navigator.pop(context);
@@ -147,7 +152,7 @@ class _ActivateWalletWidgetState extends ConsumerState<ActivateWalletWidget> {
         );
       }
     } catch (e) {
-      logger.e(e);
+      logger.e('Activation error: $e');
       await showDialog(
         context: context,
         builder: (BuildContext context) => CustomDialog(
@@ -186,13 +191,18 @@ class _ActivateWalletWidgetState extends ConsumerState<ActivateWalletWidget> {
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
                 child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      'Activate Stellar',
-                      style:
-                          Theme.of(context).textTheme.headlineSmall!.copyWith(
-                                color: Theme.of(context).colorScheme.onSurface,
-                              ),
+                    Center(
+                      child: Text(
+                        'Activate Stellar',
+                        style: Theme.of(context)
+                            .textTheme
+                            .headlineSmall!
+                            .copyWith(
+                              color: Theme.of(context).colorScheme.onSurface,
+                            ),
+                      ),
                     ),
                     const SizedBox(height: 20),
                     Text(
