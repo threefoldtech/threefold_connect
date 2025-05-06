@@ -349,28 +349,21 @@ class _NewWalletState extends ConsumerState<NewWallet> {
             },
           ),
           TextButton(
-            child: const Text('Activate'),
-            onPressed: () {
-              Navigator.pop(dialogContext);
-              if (mounted) {
-                WidgetsBinding.instance.addPostFrameCallback((_) {
-                  if (mounted) {
-                    showModalBottomSheet(
-                      isScrollControlled: true,
-                      useSafeArea: true,
-                      isDismissible: false,
-                      constraints:
-                          const BoxConstraints(maxWidth: double.infinity),
-                      context: context,
-                      builder: (ctx) => ActivateWalletWidget(
-                        wallet: wallet,
-                      ),
-                    );
-                  }
-                });
-              }
-            },
-          ),
+              child: const Text('Activate'),
+              onPressed: () {
+                Navigator.pop(dialogContext);
+
+                showModalBottomSheet(
+                  isScrollControlled: true,
+                  useSafeArea: true,
+                  isDismissible: false,
+                  constraints: const BoxConstraints(maxWidth: double.infinity),
+                  context: context,
+                  builder: (ctx) => ActivateWalletWidget(
+                    wallet: wallet,
+                  ),
+                );
+              }),
         ],
       ),
     );
