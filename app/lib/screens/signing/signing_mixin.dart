@@ -285,12 +285,11 @@ mixin SigningMixin<T extends ConsumerStatefulWidget> on ConsumerState<T> {
             child: IconButton(
               onPressed: isLoadingWallets ? null : retryLoadingWallets,
               icon: isLoadingWallets
-                  ? SizedBox(
+                  ? const SizedBox(
                       width: 20,
                       height: 20,
                       child: CircularProgressIndicator(
                         strokeWidth: 2,
-                        color: Theme.of(context).colorScheme.primary,
                       ),
                     )
                   : Icon(
