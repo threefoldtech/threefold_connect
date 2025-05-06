@@ -100,8 +100,11 @@ Future<String> getBalanceByAccountId(String accountId) async {
 }
 
 Future<Stream<OrderBook>> listOrderBook(
-    String secret, String sellingAssetCode, String buyingAssetCode) async {
-  final stream = await getOrderBook();
+    String secret, Asset sellingAsset, Asset buyingAsset) async {
+  final stream = await getOrderBook(
+      horizonUrl: 'https://horizon.stellar.org/',
+      sellingAsset: sellingAsset,
+      buyingAsset: buyingAsset);
 
   return stream.map((orderBookResponse) {
     return OrderBook(
@@ -212,7 +215,8 @@ Future<List<Offer>> getActiveOrders(String secret) async {
 
 Future<List<Offer>> getOrdersHistory(String secret) async {
   final client = Client(NetworkType.PUBLIC, secret);
-  final orders = await client.getTradingHistory(client.accountId);
+  final orders = await getTradingHistory(
+      network: NetworkType.PUBLIC, accountId: client.accountId);
   return orders.map((order) => Offer.fromTradeResponse(order)).toList();
 }
 
@@ -226,22 +230,14 @@ Future<bool> createOrder(String secret, String sellingAssetCode,
       price: price);
 }
 
-Future<bool> cancelOrder(String secret, String sellingAssetCode,
-    String buyingAssetCode, String offerID) async {
+Future<bool> cancelOrder(String secret, String offerID) async {
   final client = Client(NetworkType.PUBLIC, secret);
-  return await client.cancelOrder(
-      sellingAssetCode: sellingAssetCode,
-      buyingAssetCode: buyingAssetCode,
-      offerId: offerID);
+  return await client.cancelOrder(offerId: offerID);
 }
 
-Future<bool> updateOrder(String secret, String sellingAssetCode,
-    String buyingAssetCode, String amount, String price, String offerID) async {
+Future<bool> updateOrder(
+    String secret, String amount, String price, String offerID) async {
   final client = Client(NetworkType.PUBLIC, secret);
   return await client.updateOrder(
-      sellingAssetCode: sellingAssetCode,
-      buyingAssetCode: buyingAssetCode,
-      amount: amount,
-      price: price,
-      offerId: offerID);
+      amount: amount, price: price, offerId: offerID);
 }

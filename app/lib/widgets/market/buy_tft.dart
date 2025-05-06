@@ -115,9 +115,9 @@ class _BuyTFTWidgetState extends State<BuyTFTWidget> {
   }
 
   bool _checkForChanges() {
-     final boolean = (amountController.text != widget.offer!.amount) ||
-          (priceController.text != widget.offer!.price);
-          return boolean;
+    final boolean = (amountController.text != widget.offer!.amount) ||
+        (priceController.text != widget.offer!.price);
+    return boolean;
   }
 
   _createOrder() async {
@@ -192,13 +192,8 @@ class _BuyTFTWidgetState extends State<BuyTFTWidget> {
       loading = true;
     });
     try {
-      final success = await Stellar.updateOrder(
-          widget.wallet.stellarSecret,
-          'USDC',
-          'TFT',
-          amountController.text,
-          priceController.text,
-          widget.offer!.id);
+      final success = await Stellar.updateOrder(widget.wallet.stellarSecret,
+          amountController.text, priceController.text, widget.offer!.id);
       if (success) {
         showDialog(
           barrierDismissible: false,

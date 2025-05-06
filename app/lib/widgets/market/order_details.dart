@@ -32,7 +32,7 @@ class _OrderDetailsWidgetState extends State<OrderDetailsWidget> {
     });
     try {
       final success = await Stellar.cancelOrder(
-          widget.selectedWallet.stellarSecret, 'USDC', 'TFT', widget.offer.id);
+          widget.selectedWallet.stellarSecret, widget.offer.id);
       OrderNotifier.emitUpdate();
       if (success) {
         showDialog(
