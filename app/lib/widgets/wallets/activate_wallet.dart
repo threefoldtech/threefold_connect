@@ -22,11 +22,38 @@ class _ActivateWalletWidgetState extends ConsumerState<ActivateWalletWidget> {
   String? walletError;
   bool saveLoading = false;
   late WalletsNotifier walletRef;
+  int tftPrice = 0;
+  bool isLoadingPrice = true;
 
   @override
   void initState() {
     super.initState();
     walletRef = ref.read(walletsNotifier.notifier);
+    _loadTFTPrice();
+  }
+
+  Future<void> _loadTFTPrice() async {
+    setState(() {
+      isLoadingPrice = true;
+    });
+
+    try {
+      final price = await StellarService.getTFTPriceFromXLM();
+      if (mounted) {
+        setState(() {
+          tftPrice = price;
+          isLoadingPrice = false;
+        });
+      }
+    } catch (e) {
+      logger.e('Failed to load TFT price: $e');
+      if (mounted) {
+        setState(() {
+          tftPrice = 3;
+          isLoadingPrice = false;
+        });
+      }
+    }
   }
 
   List<DropdownMenuEntry<Wallet>> _buildDropdownMenuEntries(
@@ -53,7 +80,7 @@ class _ActivateWalletWidgetState extends ConsumerState<ActivateWalletWidget> {
       });
       return false;
     }
-    if (double.parse(_selectedWallet!.stellarBalance) < 3) {
+    if (double.parse(_selectedWallet!.stellarBalance) < (tftPrice * 3)) {
       setState(() {
         walletError = 'Selected wallet does not have enough TFTs';
       });
@@ -187,16 +214,45 @@ class _ActivateWalletWidgetState extends ConsumerState<ActivateWalletWidget> {
                         ),
                         const SizedBox(width: 8),
                         Expanded(
-                          child: Text(
-                            'This will consume 3 TFTs from the selected wallet.',
-                            style: Theme.of(context)
-                                .textTheme
-                                .bodySmall!
-                                .copyWith(
-                                  color: Theme.of(context).colorScheme.primary,
+                          child: isLoadingPrice
+                              ? Row(
+                                  children: [
+                                    Text(
+                                      'Loading activation cost...',
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .bodySmall!
+                                          .copyWith(
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .primary,
+                                          ),
+                                    ),
+                                    const SizedBox(width: 8),
+                                    SizedBox(
+                                      width: 12,
+                                      height: 12,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2,
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .primary,
+                                      ),
+                                    ),
+                                  ],
+                                )
+                              : Text(
+                                  'This will consume ${tftPrice * 3} TFTs from the selected wallet.',
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .bodySmall!
+                                      .copyWith(
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .primary,
+                                      ),
+                                  softWrap: true,
                                 ),
-                            softWrap: true,
-                          ),
                         ),
                       ],
                     ),
@@ -275,9 +331,10 @@ class _ActivateWalletWidgetState extends ConsumerState<ActivateWalletWidget> {
                           width: 5,
                         ),
                         ElevatedButton(
-                            onPressed: saveLoading
-                                ? null
-                                : () async => await activateWallet(),
+                            onPressed:
+                                saveLoading || isLoadingPrice || tftPrice == 0
+                                    ? null
+                                    : () async => await activateWallet(),
                             child: saveLoading
                                 ? const SizedBox(
                                     width: 20,
