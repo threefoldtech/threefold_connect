@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:threebotlogin/helpers/globals.dart';
 import 'package:threebotlogin/helpers/logger.dart';
 import 'package:threebotlogin/models/wallet.dart';
 import 'package:threebotlogin/providers/wallets_provider.dart';
@@ -63,18 +64,11 @@ class _ActivateWalletWidgetState extends ConsumerState<ActivateWalletWidget> {
 
   Future<void> activateWallet() async {
     if (!_validateWallet()) return;
-
     try {
       setState(() {
         saveLoading = true;
         walletError = null;
       });
-
-      await StellarService.transfer(
-        _selectedWallet!.stellarSecret,
-        'GAAN2EVASE724NRZWDKPW57NVSGIJZHVEDSSAJ7PKYIS2D26OEUYXGX3',
-        '3',
-      );
 
       final activated = await StellarService.activateThroughtThreefoldService(
           widget.wallet.stellarSecret);
@@ -96,6 +90,11 @@ class _ActivateWalletWidgetState extends ConsumerState<ActivateWalletWidget> {
               ),
             ],
           ),
+        );
+        await StellarService.transfer(
+          _selectedWallet!.stellarSecret,
+          Globals().activationServiceAddress,
+          '3',
         );
         walletRef.reloadBalances();
         widget.wallet.stellarBalance = '0';

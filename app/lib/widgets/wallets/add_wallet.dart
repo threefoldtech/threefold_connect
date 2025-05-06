@@ -20,7 +20,6 @@ import 'package:threebotlogin/services/stellar_service.dart' as StellarService;
 import 'package:stellar_client/stellar_client.dart' as Stellar;
 import 'package:bip39/bip39.dart';
 import 'package:substrate_bip39/substrate_bip39.dart';
-import 'package:threebotlogin/widgets/wallets/activate_wallet.dart';
 
 class NewWallet extends ConsumerStatefulWidget {
   const NewWallet({super.key, required this.wallets});
@@ -209,24 +208,13 @@ class _NewWalletState extends ConsumerState<NewWallet> {
     try {
       await addWallet(walletName, walletSecret);
       walletRef.addWallet(wallet);
-      setState(() {
-        saveLoading = false;
-      });
       await _showDialog(
           'Wallet Added!',
           'Wallet $walletName has been added successfully',
           Icons.check,
           DialogType.Info);
-
-      if (!mounted) return;
-      Navigator.pop(context);
-
-      if (wallet.stellarBalance == '-1') {
-        await activateStellarConfirmation(wallet);
-      }
     } catch (e) {
       logger.e(e);
-      if (!mounted) return;
       _showDialog('Error', 'Failed to save wallet. Please try again.',
           Icons.error, DialogType.Error);
       saveLoading = false;
@@ -234,8 +222,8 @@ class _NewWalletState extends ConsumerState<NewWallet> {
       return;
     }
     saveLoading = false;
-    if (!mounted) return;
     setState(() {});
+    if (!context.mounted) return;
     Navigator.pop(context);
   }
 
@@ -327,46 +315,6 @@ class _NewWalletState extends ConsumerState<NewWallet> {
         );
       }));
     });
-  }
-
-  Future<void> activateStellarConfirmation(Wallet wallet) async {
-    if (!mounted) return;
-
-    return showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (BuildContext dialogContext) => CustomDialog(
-        type: DialogType.Warning,
-        image: Icons.warning,
-        title: 'Activate Stellar Wallet',
-        description:
-            'This wallet needs to be activated on the Stellar network to receive and send TFT. Would you like to activate it now?',
-        actions: <Widget>[
-          TextButton(
-            child: const Text('Later'),
-            onPressed: () {
-              Navigator.pop(dialogContext);
-            },
-          ),
-          TextButton(
-              child: const Text('Activate'),
-              onPressed: () {
-                Navigator.pop(dialogContext);
-
-                showModalBottomSheet(
-                  isScrollControlled: true,
-                  useSafeArea: true,
-                  isDismissible: false,
-                  constraints: const BoxConstraints(maxWidth: double.infinity),
-                  context: context,
-                  builder: (ctx) => ActivateWalletWidget(
-                    wallet: wallet,
-                  ),
-                );
-              }),
-        ],
-      ),
-    );
   }
 }
 

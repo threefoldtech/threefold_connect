@@ -121,7 +121,7 @@ class _WalletCardWidgetState extends ConsumerState<WalletCardWidget> {
                 child: Text(
                   'Not Activated',
                   style: Theme.of(context).textTheme.bodySmall!.copyWith(
-                        color: Theme.of(context).colorScheme.onSurface,
+                        color: Theme.of(context).colorScheme.onPrimaryContainer,
                         fontWeight: FontWeight.w500,
                       ),
                 ),
