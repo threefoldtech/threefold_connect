@@ -98,7 +98,7 @@ class _RegisteredScreenState extends State<RegisteredScreen>
                         icon: Icons.how_to_vote_outlined,
                         pageNumber: 4),
                     HomeCardWidget(
-                        name: 'Sign', icon: Icons.draw_sharp, pageNumber: 8),
+                        name: 'Sign', icon: Icons.draw_sharp, pageNumber: 9),
                   ],
                 ),
                 const Row(
@@ -111,14 +111,13 @@ class _RegisteredScreenState extends State<RegisteredScreen>
                         pageNumber: 6),
                     HomeCardWidget(
                         name: 'News', icon: Icons.article, pageNumber: 1),
-
                   ],
                 ),
                 const Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                                        HomeCardWidget(
+                    HomeCardWidget(
                         name: 'Identity', icon: Icons.person, pageNumber: 5),
                     HomeCardWidget(
                         name: 'Settings', icon: Icons.settings, pageNumber: 7),
