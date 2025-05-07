@@ -79,9 +79,9 @@ Future<void> transfer(String secret, String dest, String amount,
   );
 }
 
-Future<void> initialize(String secret) async {
+Future<bool> initialize(String secret) async {
   final client = Client(NetworkType.PUBLIC, secret);
-  await client.activateThroughThreefoldService();
+  return await client.activateThroughThreefoldService();
 }
 
 Future<String> getBalanceByAccountId(String accountId) async {
@@ -98,16 +98,6 @@ Future<String> getBalanceByAccountId(String accountId) async {
     logger.i("Couldn't load the account balance due to $e");
   }
   return '-1';
-}
-
-Future<bool> activateThroughtThreefoldService(String secret) async {
-  final client = Client(NetworkType.PUBLIC, secret);
-  try {
-    return await client.activateThroughThreefoldService();
-  } catch (e) {
-    logger.e(e);
-    return false;
-  }
 }
 
 Future<int> getTFTPriceFromXLM() async {

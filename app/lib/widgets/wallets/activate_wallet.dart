@@ -28,7 +28,6 @@ class _ActivateWalletWidgetState extends ConsumerState<ActivateWalletWidget> {
   // Activation Fees in XLM
   static const int activationFee = 3;
 
-
   @override
   void initState() {
     super.initState();
@@ -84,7 +83,8 @@ class _ActivateWalletWidgetState extends ConsumerState<ActivateWalletWidget> {
       });
       return false;
     }
-    if (double.parse(_selectedWallet!.stellarBalance) < (tftPrice * activationFee)) {
+    if (double.parse(_selectedWallet!.stellarBalance) <
+        (tftPrice * activationFee)) {
       setState(() {
         walletError = 'Selected wallet does not have enough TFTs';
       });
@@ -101,10 +101,20 @@ class _ActivateWalletWidgetState extends ConsumerState<ActivateWalletWidget> {
         walletError = null;
       });
 
-      final activated = await StellarService.activateThroughtThreefoldService(
-          widget.wallet.stellarSecret);
+      final activated =
+          await StellarService.initialize(widget.wallet.stellarSecret);
       if (activated) {
         logger.d('Wallet activated successfully');
+        try {
+          logger.d('Transferring activation fee');
+          await StellarService.transfer(
+            _selectedWallet!.stellarSecret,
+            Globals().activationServiceAddress,
+            (activationFee * tftPrice).toString(),
+          );
+        } catch (transferError) {
+          logger.e('Transfer error : $transferError');
+        }
         await showDialog(
           context: context,
           builder: (BuildContext context) => CustomDialog(
@@ -122,16 +132,6 @@ class _ActivateWalletWidgetState extends ConsumerState<ActivateWalletWidget> {
             ],
           ),
         );
-        try {
-          await StellarService.transfer(
-            _selectedWallet!.stellarSecret,
-            Globals().activationServiceAddress,
-            (activationFee * tftPrice).toString(),
-          );
-        } catch (transferError) {
-          logger.e('Transfer error : $transferError');
-        }
-
         walletRef.reloadBalances();
         widget.wallet.stellarBalance = '0';
         Navigator.pop(context);
