@@ -25,6 +25,10 @@ class _ActivateWalletWidgetState extends ConsumerState<ActivateWalletWidget> {
   int tftPrice = 0;
   bool isLoadingPrice = true;
 
+  // Activation Fees in XLM
+  static const int activationFee = 3;
+
+
   @override
   void initState() {
     super.initState();
@@ -80,7 +84,7 @@ class _ActivateWalletWidgetState extends ConsumerState<ActivateWalletWidget> {
       });
       return false;
     }
-    if (double.parse(_selectedWallet!.stellarBalance) < (tftPrice * 3)) {
+    if (double.parse(_selectedWallet!.stellarBalance) < (tftPrice * activationFee)) {
       setState(() {
         walletError = 'Selected wallet does not have enough TFTs';
       });
@@ -122,7 +126,7 @@ class _ActivateWalletWidgetState extends ConsumerState<ActivateWalletWidget> {
           await StellarService.transfer(
             _selectedWallet!.stellarSecret,
             Globals().activationServiceAddress,
-            (3 * tftPrice).toString(),
+            (activationFee * tftPrice).toString(),
           );
         } catch (transferError) {
           logger.e('Transfer error : $transferError');
@@ -252,7 +256,7 @@ class _ActivateWalletWidgetState extends ConsumerState<ActivateWalletWidget> {
                                   ],
                                 )
                               : Text(
-                                  'This will consume ${tftPrice * 3} TFTs from the selected wallet.',
+                                  'This will consume ${tftPrice * activationFee} TFTs from the selected wallet.',
                                   style: Theme.of(context)
                                       .textTheme
                                       .bodySmall!
