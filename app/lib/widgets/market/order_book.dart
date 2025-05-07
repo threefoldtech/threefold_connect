@@ -4,9 +4,7 @@ import 'package:threebotlogin/models/order_book.dart';
 import 'package:threebotlogin/services/stellar_service.dart';
 
 class OrderbookWidget extends StatefulWidget {
-  const OrderbookWidget({super.key, required this.secret});
-
-  final String secret;
+  const OrderbookWidget({super.key});
 
   @override
   State<OrderbookWidget> createState() => _OrderbookWidgetState();
@@ -23,7 +21,6 @@ class _OrderbookWidgetState extends State<OrderbookWidget> {
 
   void _loadOrderBook() async {
     _orderBookStream = await listOrderBook(
-        widget.secret,
         AssetTypeCreditAlphaNum4(
             'USDC', 'GA5ZSEJYB37JRC5AVCIA5MOP4RHTM335X2KGX3IHOJAPP5RE34K4KZVN'),
         AssetTypeCreditAlphaNum4(

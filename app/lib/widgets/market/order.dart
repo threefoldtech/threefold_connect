@@ -16,10 +16,35 @@ class OrderWidget extends StatefulWidget {
 
 class _OrderWidgetState extends State<OrderWidget>
     with SingleTickerProviderStateMixin {
-  final List<Offer> activeOrders = [];
-  final List<Offer> previousOrders = [];
   bool loading = true;
   late final TabController _tabController;
+  final List<Offer> activeOrders = [];
+  final List<Offer> previousOrders = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(length: 2, vsync: this);
+    _tabController.addListener(_handleTabChange);
+
+    loadOrders();
+    OrderNotifier.orderUpdated.addListener(() {
+      loadOrders();
+    });
+  }
+
+  void _handleTabChange() {
+    if (_tabController.indexIsChanging) {
+      logger.i('Tab changed to index: ${_tabController.index}');
+      setState(() {});
+    }
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
+  }
 
   Future<void> loadOrders() async {
     setState(() {
@@ -31,16 +56,20 @@ class _OrderWidgetState extends State<OrderWidget>
           await getActiveOrders(widget.selectedWallet.stellarSecret);
       final ordersHistory =
           await getOrdersHistory(widget.selectedWallet.stellarSecret);
+
       if (activeOrders.isNotEmpty) activeOrders.clear();
       if (previousOrders.isNotEmpty) previousOrders.clear();
       final filteredActiveOrders = currentOrders.where(
-        (order) => order.sellingAsset == 'USDC' && order.buyingAsset == 'TFT',
+        (order) =>
+            (order.sellingAsset == 'USDC' && order.buyingAsset == 'TFT') ||
+            (order.sellingAsset == 'TFT' && order.buyingAsset == 'USDC'),
       );
 
       final filteredOrderHistory = ordersHistory.where(
-        (order) => order.sellingAsset == 'USDC' && order.buyingAsset == 'TFT',
+        (order) =>
+            (order.sellingAsset == 'USDC' && order.buyingAsset == 'TFT') ||
+            (order.sellingAsset == 'TFT' && order.buyingAsset == 'USDC'),
       );
-
       activeOrders.addAll(filteredActiveOrders);
       previousOrders.addAll(filteredOrderHistory);
     } catch (e) {
@@ -64,16 +93,6 @@ class _OrderWidgetState extends State<OrderWidget>
         loading = false;
       });
     }
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    loadOrders();
-    _tabController = TabController(length: 2, vsync: this);
-    OrderNotifier.orderUpdated.addListener(() {
-      loadOrders();
-    });
   }
 
   @override
@@ -119,34 +138,29 @@ class _OrderWidgetState extends State<OrderWidget>
               ),
             ),
             Expanded(
-              child: SingleChildScrollView(
-                  padding: EdgeInsets.zero,
-                  child: SizedBox(
-                    height: MediaQuery.of(context).size.height,
-                    child: TabBarView(
-                      controller: _tabController,
-                      children: [
-                        RefreshIndicator(
-                            onRefresh: loadOrders,
-                            child: OrdersWidget(
-                              offers: activeOrders,
-                              active: true,
-                              selectedWallet: widget.selectedWallet,
-                            )),
-                        RefreshIndicator(
-                            onRefresh: loadOrders,
-                            child: OrdersWidget(
-                              offers: previousOrders,
-                              selectedWallet: widget.selectedWallet,
-                            )),
-                      ],
-                    ),
-                  )),
+              child: TabBarView(
+                controller: _tabController,
+                children: [
+                  RefreshIndicator(
+                      onRefresh: loadOrders,
+                      child: OrdersWidget(
+                        offers: activeOrders,
+                        active: true,
+                        selectedWallet: widget.selectedWallet,
+                      )),
+                  RefreshIndicator(
+                      onRefresh: loadOrders,
+                      child: OrdersWidget(
+                        offers: previousOrders,
+                        selectedWallet: widget.selectedWallet,
+                      )),
+                ],
+              ),
             ),
           ],
         ),
       );
     }
-    return Scaffold(appBar: AppBar(title: const Text('Order')), body: content);
+    return Scaffold(appBar: AppBar(title: const Text('Orders')), body: content);
   }
 }

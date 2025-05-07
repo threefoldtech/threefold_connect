@@ -55,7 +55,6 @@ Future<String> getBalance(String secret) async {
   return balances['TFT'] ?? '-1';
 }
 
-
 Stream<ITransaction> listTransactions(
     String secret, String? pagingToken, int limit) async* {
   final client = Client(NetworkType.PUBLIC, secret);
@@ -109,7 +108,7 @@ Future<String> getBalanceByAccountId(String accountId) async {
 }
 
 Future<Stream<OrderBook>> listOrderBook(
-    String secret, Asset sellingAsset, Asset buyingAsset) async {
+    Asset sellingAsset, Asset buyingAsset) async {
   final stream = await getOrderBook(
       horizonUrl: 'https://horizon.stellar.org/',
       sellingAsset: sellingAsset,

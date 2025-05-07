@@ -15,11 +15,10 @@ class MarketPage extends ConsumerStatefulWidget {
 
 class _MarketPageState extends ConsumerState<MarketPage>
     with SingleTickerProviderStateMixin {
-  // TODO: handle loading
   bool loading = false;
   late final TabController _tabController;
   List<Wallet> wallets = [];
-  
+
   @override
   void initState() {
     super.initState();
@@ -27,7 +26,7 @@ class _MarketPageState extends ConsumerState<MarketPage>
     getWallets();
   }
 
-    void getWallets() async {
+  void getWallets() async {
     try {
       setState(() {
         loading = true;
@@ -42,7 +41,6 @@ class _MarketPageState extends ConsumerState<MarketPage>
       });
     }
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -89,24 +87,17 @@ class _MarketPageState extends ConsumerState<MarketPage>
             ),
             Expanded(
               child: SingleChildScrollView(
-                padding: EdgeInsets.zero,
-                child: SizedBox(
-                        height: MediaQuery.of(context).size.height, 
-                        child: TabBarView(
-                          controller: _tabController,
-                          children: [
-                            OverviewWidget(wallets: wallets),
-                            const OrderbookWidget(
-                              secret:
-                                  'SDVA4BNOZBEPUOUTEW72EAFAZGUCWXLHRKNQWHMPD3CUJGUAWZGJYJW3',
-                            ),
-                          ],
-                        ),
-                      
-                    
-                  
-                )
-              ),
+                  padding: EdgeInsets.zero,
+                  child: SizedBox(
+                    height: MediaQuery.of(context).size.height,
+                    child: TabBarView(
+                      controller: _tabController,
+                      children: const [
+                        OverviewWidget(),
+                        OrderbookWidget(),
+                      ],
+                    ),
+                  )),
             ),
           ],
         ),

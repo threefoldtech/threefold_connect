@@ -32,21 +32,37 @@ class Offer {
   }
 
   factory Offer.fromTradeResponse(TradeResponse response) {
+    final bool userIsSeller =
+        response.baseAccount == response.links.base.href.split('/').last;
+    final String sellingAsset = userIsSeller
+        ? _getAssetNameFromTrade(response.baseAssetType, response.baseAssetCode,
+            response.baseAssetIssuer)
+        : _getAssetNameFromTrade(response.counterAssetType,
+            response.counterAssetCode, response.counterAssetIssuer);
+
+    final String buyingAsset = userIsSeller
+        ? _getAssetNameFromTrade(response.counterAssetType,
+            response.counterAssetCode, response.counterAssetIssuer)
+        : _getAssetNameFromTrade(response.baseAssetType, response.baseAssetCode,
+            response.baseAssetIssuer);
+    final String amount =
+        userIsSeller ? response.baseAmount : response.counterAmount;
+
+    String priceStr;
+    try {
+      Price priceObj = response.price;
+      priceStr = (priceObj.numerator! / priceObj.denominator!).toString();
+    } catch (e) {
+      priceStr = '0';
+    }
+
     return Offer(
       id: response.id,
-      seller: response.baseAccount ?? 'Unknown',
-      sellingAsset: _getAssetNameFromTrade(
-        response.baseAssetType,
-        response.baseAssetCode,
-        response.baseAssetIssuer,
-      ),
-      buyingAsset: _getAssetNameFromTrade(
-        response.counterAssetType,
-        response.counterAssetCode,
-        response.counterAssetIssuer,
-      ),
-      amount: response.baseAmount,
-      price: response.price.numerator.toString() + '/' + response.price.denominator.toString(),
+      seller: userIsSeller ? response.baseAccount! : response.counterAccount!,
+      sellingAsset: sellingAsset,
+      buyingAsset: buyingAsset,
+      amount: amount,
+      price: priceStr,
       lastModifiedTime: response.ledgerCloseTime,
     );
   }

@@ -1,23 +1,24 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:threebotlogin/helpers/logger.dart';
 import 'package:threebotlogin/models/market_data.dart';
 import 'package:threebotlogin/models/wallet.dart';
+import 'package:threebotlogin/providers/wallets_provider.dart';
 import 'package:threebotlogin/services/stellar_service.dart';
 import 'package:threebotlogin/widgets/market/buy_tft.dart';
 import 'package:threebotlogin/widgets/market/order.dart';
 import 'package:threebotlogin/widgets/market/wallet_selection.dart';
 
-class OverviewWidget extends StatefulWidget {
-  const OverviewWidget({super.key, required this.wallets});
-  final List<Wallet> wallets;
+class OverviewWidget extends ConsumerStatefulWidget {
+  const OverviewWidget({super.key});
 
   @override
-  State<OverviewWidget> createState() => _OverviewWidgetState();
+  ConsumerState<OverviewWidget> createState() => _OverviewWidgetState();
 }
 
-class _OverviewWidgetState extends State<OverviewWidget> {
+class _OverviewWidgetState extends ConsumerState<OverviewWidget> {
   double? tftPrice;
   late Timer _timer;
   String lastUpdated = '--';
@@ -64,6 +65,7 @@ class _OverviewWidgetState extends State<OverviewWidget> {
 
   @override
   Widget build(BuildContext context) {
+    final wallets = ref.watch(walletsNotifier);
     return Column(
       mainAxisAlignment: MainAxisAlignment.start,
       children: [
@@ -109,7 +111,7 @@ class _OverviewWidgetState extends State<OverviewWidget> {
                   child: SizedBox(
                     height: 50,
                     child: ElevatedButton(
-                      onPressed: _openWalletSelectionOverlay,
+                      onPressed: () => _openWalletSelectionOverlay(wallets),
                       style: ElevatedButton.styleFrom(
                         backgroundColor:
                             Theme.of(context).colorScheme.primaryContainer,
@@ -160,7 +162,7 @@ class _OverviewWidgetState extends State<OverviewWidget> {
                         ),
                       ),
                       child: Text(
-                        'My Order',
+                        'My Orders',
                         style: Theme.of(context).textTheme.bodyLarge!.copyWith(
                               color: Theme.of(context)
                                   .colorScheme
@@ -220,11 +222,11 @@ class _OverviewWidgetState extends State<OverviewWidget> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     _buildMarketColumn('Last Price',
-                                        '${marketData.lastPrice} TFT'),
+                                        '${marketData.lastPrice.toStringAsFixed(7)} TFT'),
                                     _buildMarketColumn('Last USD Price',
-                                        '\$${marketData.lastUsdPrice}'),
+                                        '\$${marketData.lastUsdPrice.toStringAsFixed(7)}'),
                                     _buildMarketColumn('24H Change',
-                                        '${marketData.change24h}%'),
+                                        '${marketData.change24h.toStringAsFixed(7)}%'),
                                   ],
                                 ),
                               ),
@@ -234,11 +236,11 @@ class _OverviewWidgetState extends State<OverviewWidget> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     _buildMarketColumn('24H High',
-                                        '${marketData.high24h} TFT'),
-                                    _buildMarketColumn(
-                                        '24H Low', '${marketData.low24h} TFT'),
+                                        '${marketData.high24h.toStringAsFixed(7)} TFT'),
+                                    _buildMarketColumn('24H Low',
+                                        '${marketData.low24h.toStringAsFixed(7)} TFT'),
                                     _buildMarketColumn('24H Volume',
-                                        '${marketData.volume24h}K TFT'),
+                                        '${marketData.volume24h.toStringAsFixed(7)}K TFT'),
                                   ],
                                 ),
                               ),
@@ -344,7 +346,7 @@ class _OverviewWidgetState extends State<OverviewWidget> {
     );
   }
 
-  void _openWalletSelectionOverlay() {
+  _openWalletSelectionOverlay(List<Wallet> wallets) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -352,9 +354,8 @@ class _OverviewWidgetState extends State<OverviewWidget> {
       isDismissible: true,
       constraints: const BoxConstraints(maxWidth: double.infinity),
       builder: (context) {
-        final filteredWallets = widget.wallets
-            .where((wallet) => wallet.stellarBalance != '-1')
-            .toList();
+        final filteredWallets =
+            wallets.where((wallet) => wallet.stellarBalance != '-1').toList();
         return WalletSelectionSheet(
           wallets: filteredWallets,
           selectedWallet: _selectedWallet,

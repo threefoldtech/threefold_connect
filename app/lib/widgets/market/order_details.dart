@@ -10,9 +10,13 @@ import 'package:threebotlogin/widgets/market/orders_notifier.dart';
 class OrderDetailsWidget extends StatefulWidget {
   final Wallet selectedWallet;
   final Offer offer;
+  final bool active;
 
   const OrderDetailsWidget(
-      {super.key, required this.selectedWallet, required this.offer});
+      {super.key,
+      required this.selectedWallet,
+      required this.offer,
+      required this.active});
 
   @override
   _OrderDetailsWidgetState createState() => _OrderDetailsWidgetState();
@@ -274,59 +278,67 @@ class _OrderDetailsWidgetState extends State<OrderDetailsWidget> {
       ),
       bottomNavigationBar: Padding(
         padding: const EdgeInsets.all(20),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            SizedBox(
-              width: MediaQuery.of(context).size.width - 40,
-              child: ElevatedButton(
-                onPressed: () async {
-                  Navigator.of(context).push(MaterialPageRoute(
-                      builder: (context) => BuyTFTWidget(
-                            wallet: widget.selectedWallet,
-                            offer: widget.offer,
-                            edit: true,
-                          )));
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor:
-                      Theme.of(context).colorScheme.primaryContainer,
-                ),
-                child: Text(
-                  'Edit Order',
-                  style: Theme.of(context).textTheme.bodyLarge!.copyWith(
-                        color: Theme.of(context).colorScheme.onPrimaryContainer,
+        child: widget.active
+            ? Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  SizedBox(
+                    width: MediaQuery.of(context).size.width - 40,
+                    child: ElevatedButton(
+                      onPressed: () async {
+                        Navigator.of(context).push(MaterialPageRoute(
+                            builder: (context) => BuyTFTWidget(
+                                  wallet: widget.selectedWallet,
+                                  offer: widget.offer,
+                                  edit: true,
+                                )));
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor:
+                            Theme.of(context).colorScheme.primaryContainer,
                       ),
-                ),
-              ),
-            ),
-            const SizedBox(height: 10),
-            SizedBox(
-              width: MediaQuery.of(context).size.width - 40,
-              child: ElevatedButton(
-                onPressed: () async {
-                  _cancelOrder();
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Theme.of(context).colorScheme.surface,
-                ),
-                child: loading
-                    ? const SizedBox(
-                        width: 20,
-                        height: 20,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 3,
-                        ))
-                    : Text(
-                        'Cancel Order',
+                      child: Text(
+                        'Edit Order',
                         style: Theme.of(context).textTheme.bodyLarge!.copyWith(
-                              color: Theme.of(context).colorScheme.onSurface,
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .onPrimaryContainer,
                             ),
                       ),
-              ),
-            ),
-          ],
-        ),
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  SizedBox(
+                    width: MediaQuery.of(context).size.width - 40,
+                    child: ElevatedButton(
+                      onPressed: () async {
+                        _cancelOrder();
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Theme.of(context).colorScheme.surface,
+                      ),
+                      child: loading
+                          ? const SizedBox(
+                              width: 20,
+                              height: 20,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 3,
+                              ))
+                          : Text(
+                              'Cancel Order',
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodyLarge!
+                                  .copyWith(
+                                    color:
+                                        Theme.of(context).colorScheme.onSurface,
+                                  ),
+                            ),
+                    ),
+                  ),
+                ],
+              )
+            : null,
       ),
     );
   }

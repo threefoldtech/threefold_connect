@@ -19,49 +19,71 @@ class OrdersWidget extends StatefulWidget {
 }
 
 class _OrdersWidgetState extends State<OrdersWidget> {
-  List<Offer> orders = [];
-
   @override
   void initState() {
-    orders = widget.offers;
     super.initState();
   }
 
   @override
-  void didUpdateWidget(covariant OrdersWidget oldWidget) {
+  void didUpdateWidget(OrdersWidget oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (widget.offers != oldWidget.offers) {
-      setState(() {
-        orders = widget.offers;
-      });
-    }
   }
 
   @override
   Widget build(BuildContext context) {
-    final List<OrderCardWidget>? cards =
-        _buildOffersCardsList(orders, widget.selectedWallet);
-    return cards!.isNotEmpty
-        ? SingleChildScrollView(
-            child: Column(mainAxisSize: MainAxisSize.min, children: cards),
-          )
-        : Center(
-            child: Text(
-              'No Orders were found',
-              style: Theme.of(context)
-                  .textTheme
-                  .bodyLarge!
-                  .copyWith(color: Theme.of(context).colorScheme.onSurface),
+    if (widget.offers.isEmpty) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.history,
+              size: 48,
+              color: Theme.of(context)
+                  .colorScheme
+                  .onSurfaceVariant
+                  .withOpacity(0.5),
             ),
-          );
-  }
-}
+            const SizedBox(height: 16),
+            Text(
+              widget.active ? 'No active orders' : 'No trade history',
+              style: Theme.of(context).textTheme.titleMedium!.copyWith(
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
+            ),
+            if (!widget.active) const SizedBox(height: 8),
+            if (!widget.active)
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 32),
+                child: Text(
+                  'Your completed trades will appear here',
+                  textAlign: TextAlign.center,
+                  style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                        color: Theme.of(context)
+                            .colorScheme
+                            .onSurfaceVariant
+                            .withOpacity(0.7),
+                      ),
+                ),
+              ),
+          ],
+        ),
+      );
+    }
 
-List<OrderCardWidget> _buildOffersCardsList(List<Offer> orders, Wallet wallet) {
-  return orders.map((item) {
-    return OrderCardWidget(
-      offer: item,
-      selectedWallet: wallet,
+    return ListView(
+      padding: const EdgeInsets.only(top: 8, bottom: 80),
+      children: widget.offers.map((offer) {
+        return Padding(
+          padding: const EdgeInsets.only(bottom: 8),
+          child: OrderCardWidget(
+            key: ValueKey(offer.id),
+            offer: offer,
+            selectedWallet: widget.selectedWallet,
+            active: widget.active,
+          ),
+        );
+      }).toList(),
     );
-  }).toList();
+  }
 }
