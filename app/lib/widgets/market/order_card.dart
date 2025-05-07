@@ -33,8 +33,6 @@ class _OrderCardWidgetState extends ConsumerState<OrderCardWidget> {
 
   @override
   Widget build(BuildContext context) {
-    logger.i('Building OrderCardWidget for offer: ${widget.offer.id}');
-
     try {
       final double amount = double.parse(widget.offer.amount);
       double pricePerTFT;
@@ -63,7 +61,7 @@ class _OrderCardWidgetState extends ConsumerState<OrderCardWidget> {
               '${pricePerTFT.toStringAsFixed(4)} USDC',
               isHighlighted: true),
           _buildInfoRow(context, 'Total Received:',
-              '+ ${(amount / pricePerTFT).toStringAsFixed(2)} TFT'),
+              '+ ${(amount / pricePerTFT).toStringAsFixed(4)} TFT'),
         ];
       } else if (isSellOrder) {
         cardContent = [
@@ -73,7 +71,7 @@ class _OrderCardWidgetState extends ConsumerState<OrderCardWidget> {
               '${pricePerTFT.toStringAsFixed(4)} USDC',
               isHighlighted: true),
           _buildInfoRow(context, 'Total Received:',
-              '+ ${totalCost.toStringAsFixed(2)} USDC'),
+              '+ ${totalCost.toStringAsFixed(4)} USDC'),
         ];
       } else {
         cardContent = [

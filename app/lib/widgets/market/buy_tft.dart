@@ -66,7 +66,7 @@ class _BuyTFTWidgetState extends State<BuyTFTWidget> {
 
     final balance = roundAmount(widget.wallet.usdcBalance);
 
-    if (balance - Decimal.parse(amount) < Decimal.zero) {
+    if (balance - Decimal.parse(amount) <= Decimal.zero) {
       setState(() {
         amountError = 'Balance is not enough';
       });
@@ -82,6 +82,12 @@ class _BuyTFTWidgetState extends State<BuyTFTWidget> {
     if (price.isEmpty) {
       setState(() {
         priceError = "Price can't be empty";
+      });
+      return false;
+    }
+    if (Decimal.parse(price) <= Decimal.zero) {
+      setState(() {
+        priceError = 'Price should be positive';
       });
       return false;
     }
