@@ -58,7 +58,7 @@ class _FarmItemWidgetState extends State<FarmItemWidget> {
               Padding(
                 padding: const EdgeInsets.only(right: 16.0),
                 child: Icon(
-                  Icons.menu,
+                  Icons.storage,
                   color: colorScheme.onSurfaceVariant.withOpacity(0.7),
                 ),
               ),

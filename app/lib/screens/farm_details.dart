@@ -202,7 +202,6 @@ class _FarmDetailsState extends State<FarmDetails> {
       walletAddressController.text = address;
       _validateStellarAddress(address.trim());
     });
-    Navigator.pop(context);
   }
 
   Widget _buildDisplayField({
