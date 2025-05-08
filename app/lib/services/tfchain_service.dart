@@ -107,7 +107,7 @@ Future<Map<String, List<Proposal>>> getProposals() async {
     return proposals;
   } catch (e) {
     throw Exception('Failed to get DAO proposals due to $e');
-  } finally{
+  } finally {
     if (proposals != null) {
       await client.disconnect();
     }
@@ -320,6 +320,19 @@ Future<Votes> getCouncilProposalVotes(String chainUrl, String hash) async {
     return votes;
   } catch (e) {
     throw Exception('Failed to get council proposals votes due to $e');
+  } finally {
+    await client.disconnect();
+  }
+}
+
+Future<int> getTFTPrice(String chainUrl) async {
+  final client = TFChain.QueryClient(chainUrl);
+  try {
+    await client.connect();
+    final price = await client.price.get();
+    return price;
+  } catch (e) {
+    throw Exception('Failed to get TFT price due to $e');
   } finally {
     await client.disconnect();
   }

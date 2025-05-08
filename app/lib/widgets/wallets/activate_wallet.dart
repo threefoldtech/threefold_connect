@@ -7,6 +7,7 @@ import 'package:threebotlogin/models/wallet.dart';
 import 'package:threebotlogin/providers/wallets_provider.dart';
 import 'package:threebotlogin/services/stellar_service.dart' as StellarService;
 import 'package:threebotlogin/widgets/custom_dialog.dart';
+import 'package:threebotlogin/services/tfchain_service.dart' as TFChainService;
 
 class ActivateWalletWidget extends ConsumerStatefulWidget {
   const ActivateWalletWidget({super.key, required this.wallet});
@@ -50,9 +51,10 @@ class _ActivateWalletWidgetState extends ConsumerState<ActivateWalletWidget> {
       }
     } catch (e) {
       logger.e('Failed to load TFT price: $e');
+      final price = await TFChainService.getTFTPrice(Globals().chainUrl) * 0.5;
       if (mounted) {
         setState(() {
-          tftPrice = 0;
+          tftPrice = price.ceil();
           isLoadingPrice = false;
         });
       }
@@ -67,11 +69,24 @@ class _ActivateWalletWidgetState extends ConsumerState<ActivateWalletWidget> {
         .map((wallet) {
       return DropdownMenuEntry<Wallet>(
         value: wallet,
-        label: wallet.name,
-        labelWidget: Text(wallet.name,
-            style: Theme.of(context).textTheme.bodyLarge!.copyWith(
-                  color: Theme.of(context).colorScheme.onSurface,
-                )),
+        label: "${wallet.name} (${wallet.stellarBalance} TFT)",
+        labelWidget: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              wallet.name,
+              style: Theme.of(context).textTheme.bodyLarge!.copyWith(
+                    color: Theme.of(context).colorScheme.onSurface,
+                  ),
+            ),
+            Text(
+              "${wallet.stellarBalance} TFT",
+              style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
+            ),
+          ],
+        ),
       );
     }).toList();
   }
@@ -133,7 +148,6 @@ class _ActivateWalletWidgetState extends ConsumerState<ActivateWalletWidget> {
           ),
         );
         walletRef.reloadBalances();
-        widget.wallet.stellarBalance = '0';
         Navigator.pop(context);
       } else {
         logger.e('Failed to activate wallet');
