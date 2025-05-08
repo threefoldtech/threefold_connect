@@ -43,6 +43,17 @@ class _ActivateWalletWidgetState extends ConsumerState<ActivateWalletWidget> {
 
     try {
       final price = await StellarService.getTFTPriceFromXLM();
+      if (price == 0) {
+        final price =
+            await TFChainService.getTFTPrice(Globals().chainUrl) * 0.5;
+        if (mounted) {
+          setState(() {
+            tftPrice = price.ceil();
+            isLoadingPrice = false;
+          });
+        }
+        return;
+      }
       if (mounted) {
         setState(() {
           tftPrice = price;
@@ -51,12 +62,24 @@ class _ActivateWalletWidgetState extends ConsumerState<ActivateWalletWidget> {
       }
     } catch (e) {
       logger.e('Failed to load TFT price: $e');
-      final price = await TFChainService.getTFTPrice(Globals().chainUrl) * 0.5;
-      if (mounted) {
-        setState(() {
-          tftPrice = price.ceil();
-          isLoadingPrice = false;
-        });
+      try {
+        final price =
+            await TFChainService.getTFTPrice(Globals().chainUrl) * 0.5;
+        if (mounted) {
+          setState(() {
+            tftPrice = price.ceil();
+            isLoadingPrice = false;
+          });
+        }
+      } catch (tfchainError) {
+        logger
+            .e('Failed to load TFT price from TFChain fallback: $tfchainError');
+        if (mounted) {
+          setState(() {
+            tftPrice = 0;
+            isLoadingPrice = false;
+          });
+        }
       }
     }
   }
