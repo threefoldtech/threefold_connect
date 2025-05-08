@@ -101,7 +101,7 @@ class _ActivateWalletWidgetState extends ConsumerState<ActivateWalletWidget> {
     if (double.parse(_selectedWallet!.stellarBalance) <
         (tftPrice * activationFee)) {
       setState(() {
-        walletError = 'Selected wallet does not have enough TFTs';
+        walletError = 'Selected wallet does not have enough TFTs on Stellar';
       });
       return false;
     }
