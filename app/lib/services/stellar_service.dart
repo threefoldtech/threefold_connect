@@ -141,3 +141,12 @@ Future<int> getTFTPriceFromXLM() async {
     throw Exception('Error getting price');
   }
 }
+
+Future<AccountResponse> getStellarAccount(String accountId) async {
+  return await getAccount(network: NetworkType.PUBLIC, accountId: accountId);
+}
+
+Future<bool> addTrustline(String secret) async {
+  final client = Client(NetworkType.PUBLIC, secret);
+  return await client.addConfiguredTrustlines();
+}

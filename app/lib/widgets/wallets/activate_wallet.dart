@@ -139,58 +139,122 @@ class _ActivateWalletWidgetState extends ConsumerState<ActivateWalletWidget> {
         walletError = null;
       });
 
-      final activated =
-          await StellarService.initialize(widget.wallet.stellarSecret);
-      if (activated) {
-        logger.d('Wallet activated successfully');
+      bool accountExists = false;
+      try {
+        await StellarService.getStellarAccount(widget.wallet.stellarAddress);
+        accountExists = true;
+        logger.d('Account already exists on Stellar network');
+
         try {
-          logger.d('Transferring activation fee');
-          await StellarService.transfer(
-            _selectedWallet!.stellarSecret,
-            Globals().activationServiceAddress,
-            (activationFee * tftPrice).toString(),
+          final trustlineAdded =
+              await StellarService.addTrustline(widget.wallet.stellarSecret);
+          if (trustlineAdded) {
+            logger.d('TFT trustline added successfully');
+            await showDialog(
+              context: context,
+              builder: (BuildContext context) => CustomDialog(
+                type: DialogType.Info,
+                image: Icons.check,
+                title: 'Trustline Added',
+                description:
+                    'Your wallet already existed on Stellar. TFT trustline has been added successfully.',
+                actions: <Widget>[
+                  TextButton(
+                    child: const Text('Close'),
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                  ),
+                ],
+              ),
+            );
+            walletRef.reloadBalances();
+            Navigator.pop(context);
+            return;
+          } else {
+            throw Exception('Failed to add trustline');
+          }
+        } catch (trustlineError) {
+          logger.e('Failed to add trustline: $trustlineError');
+          await showDialog(
+            context: context,
+            builder: (BuildContext context) => CustomDialog(
+              type: DialogType.Error,
+              image: Icons.error,
+              title: 'Trustline Error',
+              description:
+                  'Your wallet exists but failed to add the TFT trustline. Please try again.',
+              actions: <Widget>[
+                TextButton(
+                  child: const Text('Close'),
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                ),
+              ],
+            ),
           );
-        } catch (transferError) {
-          logger.e('Transfer error : $transferError');
+          return;
         }
-        await showDialog(
-          context: context,
-          builder: (BuildContext context) => CustomDialog(
-            type: DialogType.Info,
-            image: Icons.check,
-            title: 'Wallet Activated',
-            description: 'Your wallet has been activated successfully',
-            actions: <Widget>[
-              TextButton(
-                child: const Text('Close'),
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-              ),
-            ],
-          ),
-        );
-        walletRef.reloadBalances();
-        Navigator.pop(context);
-      } else {
-        logger.e('Failed to activate wallet');
-        await showDialog(
-          context: context,
-          builder: (BuildContext context) => CustomDialog(
-            type: DialogType.Error,
-            image: Icons.error,
-            title: 'Error',
-            description: 'Failed to activate wallet. Please try again.',
-            actions: <Widget>[
-              TextButton(
-                child: const Text('Close'),
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-              ),
-            ],
-          ),
-        );
+      } catch (accountError) {
+        accountExists = false;
+        logger.d('Account does not exist, will proceed with activation');
+      }
+
+      if (!accountExists) {
+        final activated =
+            await StellarService.initialize(widget.wallet.stellarSecret);
+        if (activated) {
+          logger.d('Wallet activated successfully');
+          try {
+            logger.d('Transferring activation fee');
+            await StellarService.transfer(
+              _selectedWallet!.stellarSecret,
+              Globals().activationServiceAddress,
+              (activationFee * tftPrice).toString(),
+            );
+          } catch (transferError) {
+            logger.e('Transfer error: $transferError');
+          }
+          await showDialog(
+            context: context,
+            builder: (BuildContext context) => CustomDialog(
+              type: DialogType.Info,
+              image: Icons.check,
+              title: 'Wallet Activated',
+              description: 'Your wallet has been activated successfully',
+              actions: <Widget>[
+                TextButton(
+                  child: const Text('Close'),
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                ),
+              ],
+            ),
+          );
+          walletRef.reloadBalances();
+          Navigator.pop(context);
+        } else {
+          logger.e('Failed to activate wallet');
+          await showDialog(
+            context: context,
+            builder: (BuildContext context) => CustomDialog(
+              type: DialogType.Error,
+              image: Icons.error,
+              title: 'Error',
+              description: 'Failed to activate wallet. Please try again.',
+              actions: <Widget>[
+                TextButton(
+                  child: const Text('Close'),
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                ),
+              ],
+            ),
+          );
+        }
       }
     } catch (e) {
       logger.e('Activation error: $e');
