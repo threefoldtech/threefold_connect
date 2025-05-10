@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:tfchain_client/models/dao.dart';
 import 'package:threebotlogin/helpers/logger.dart';
@@ -24,8 +26,17 @@ class _DaoPageState extends State<DaoPage> with SingleTickerProviderStateMixin {
       loading = true;
       failed = false;
     });
+
     try {
-      final proposals = await getProposals();
+      final proposals = await getProposals().timeout(
+        const Duration(minutes: 1),
+        onTimeout: () {
+          throw TimeoutException('Loading DAO proposals timed out');
+        },
+      );
+
+      logger.i('Proposals loaded successfully');
+
       if (activeList.isNotEmpty) activeList.clear();
       if (inactiveList.isNotEmpty) inactiveList.clear();
       activeList.addAll(proposals['activeProposals']!);
@@ -33,6 +44,26 @@ class _DaoPageState extends State<DaoPage> with SingleTickerProviderStateMixin {
       setState(() {
         loading = false;
         failed = false;
+      });
+    } on TimeoutException catch (e) {
+      logger.e('Loading proposals timed out: $e');
+      if (context.mounted) {
+        final timeoutFailure = SnackBar(
+          content: Text(
+            'Loading proposals timed out. Please try again.',
+            style: Theme.of(context)
+                .textTheme
+                .bodyMedium!
+                .copyWith(color: Theme.of(context).colorScheme.errorContainer),
+          ),
+          duration: const Duration(seconds: 3),
+        );
+        ScaffoldMessenger.of(context).clearSnackBars();
+        ScaffoldMessenger.of(context).showSnackBar(timeoutFailure);
+      }
+      setState(() {
+        loading = false;
+        failed = true;
       });
     } catch (e) {
       logger.e('Failed to load proposals due to $e');
@@ -54,7 +85,6 @@ class _DaoPageState extends State<DaoPage> with SingleTickerProviderStateMixin {
         loading = false;
         failed = true;
       });
-      throw Exception('Failed to load proposals due to $e');
     }
   }
 
