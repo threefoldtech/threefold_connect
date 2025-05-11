@@ -7,6 +7,7 @@ import 'package:threebotlogin/models/wallet.dart';
 import 'package:threebotlogin/providers/wallets_provider.dart';
 import 'package:threebotlogin/services/stellar_service.dart' as StellarService;
 import 'package:threebotlogin/widgets/custom_dialog.dart';
+import 'package:threebotlogin/services/tfchain_service.dart' as TFChainService;
 
 class ActivateWalletWidget extends ConsumerStatefulWidget {
   const ActivateWalletWidget(
@@ -24,8 +25,10 @@ class _ActivateWalletWidgetState extends ConsumerState<ActivateWalletWidget> {
   String? walletError;
   bool saveLoading = false;
   late WalletsNotifier walletRef;
+  int tftPrice = 0;
+  bool isLoadingPrice = true;
 
-  // Fees in TFT
+  // Fees in XLM
   static const int activationFee = 2;
   static const int trustlineFee = 1;
 
@@ -33,6 +36,55 @@ class _ActivateWalletWidgetState extends ConsumerState<ActivateWalletWidget> {
   void initState() {
     super.initState();
     walletRef = ref.read(walletsNotifier.notifier);
+    _loadTFTPrice();
+  }
+
+  Future<void> _loadTFTPrice() async {
+    setState(() {
+      isLoadingPrice = true;
+    });
+
+    try {
+      final price = await StellarService.getTFTPriceFromXLM();
+      if (price == 0) {
+        final price =
+            await TFChainService.getTFTPrice(Globals().chainUrl) * 0.5;
+        if (mounted) {
+          setState(() {
+            tftPrice = price.ceil();
+            isLoadingPrice = false;
+          });
+        }
+        return;
+      }
+      if (mounted) {
+        setState(() {
+          tftPrice = price;
+          isLoadingPrice = false;
+        });
+      }
+    } catch (e) {
+      logger.e('Failed to load TFT price: $e');
+      try {
+        final price =
+            await TFChainService.getTFTPrice(Globals().chainUrl) * 0.5;
+        if (mounted) {
+          setState(() {
+            tftPrice = price.ceil();
+            isLoadingPrice = false;
+          });
+        }
+      } catch (tfchainError) {
+        logger
+            .e('Failed to load TFT price from TFChain fallback: $tfchainError');
+        if (mounted) {
+          setState(() {
+            tftPrice = 0;
+            isLoadingPrice = false;
+          });
+        }
+      }
+    }
   }
 
   List<DropdownMenuEntry<Wallet>> _buildDropdownMenuEntries(
@@ -73,7 +125,9 @@ class _ActivateWalletWidgetState extends ConsumerState<ActivateWalletWidget> {
       return false;
     }
     if (double.parse(_selectedWallet!.stellarBalance) <
-        (widget.walletExists ? trustlineFee : activationFee)) {
+        (widget.walletExists
+            ? (tftPrice * trustlineFee)
+            : (tftPrice * activationFee))) {
       setState(() {
         walletError = 'Selected wallet does not have enough TFTs on Stellar';
       });
@@ -97,7 +151,7 @@ class _ActivateWalletWidgetState extends ConsumerState<ActivateWalletWidget> {
           await StellarService.transfer(
             _selectedWallet!.stellarSecret,
             Globals().activationServiceAddress,
-            trustlineFee.toString(),
+            (tftPrice * trustlineFee).toString(),
           );
         } catch (transferError) {
           logger.e('Transfer error: $transferError');
@@ -169,7 +223,7 @@ class _ActivateWalletWidgetState extends ConsumerState<ActivateWalletWidget> {
           await StellarService.transfer(
             _selectedWallet!.stellarSecret,
             Globals().activationServiceAddress,
-            activationFee.toString(),
+            (tftPrice * activationFee).toString(),
           );
         } catch (transferError) {
           logger.e('Transfer error: $transferError');
@@ -292,8 +346,8 @@ class _ActivateWalletWidgetState extends ConsumerState<ActivateWalletWidget> {
                         Expanded(
                           child: Text(
                             widget.walletExists
-                                ? 'This will consume $trustlineFee TFTs from the selected wallet.'
-                                : 'This will consume $activationFee TFTs from the selected wallet.',
+                                ? 'This will consume ${tftPrice * trustlineFee} TFTs from the selected wallet.'
+                                : 'This will consume ${tftPrice * activationFee} TFTs from the selected wallet.',
                             style: Theme.of(context)
                                 .textTheme
                                 .bodySmall!
