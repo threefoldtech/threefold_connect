@@ -4,7 +4,6 @@ import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import 'package:http/http.dart' as http;
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:threebotlogin/helpers/globals.dart';
-import 'package:threebotlogin/widgets/layout_drawer.dart';
 import 'package:xml2json/xml2json.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:timeago/timeago.dart' as timeago;
@@ -60,27 +59,24 @@ class _NewsScreenState extends State<NewsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return LayoutDrawer(
-      titleText: 'News',
-      content: RefreshIndicator(
-        onRefresh: () async => _pagingController.refresh(),
-        child: PagedListView<int, Map<String, dynamic>>(
-          pagingController: _pagingController,
-          builderDelegate: PagedChildBuilderDelegate<Map<String, dynamic>>(
-            itemBuilder: (context, entry, index) =>
-                buildArticleCard(entry, context),
-            firstPageProgressIndicatorBuilder: (context) => Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const CircularProgressIndicator(),
-                  const SizedBox(height: 8),
-                  Text('Loading Articles...',
-                      style: Theme.of(context).textTheme.bodyLarge!.copyWith(
-                          color: Theme.of(context).colorScheme.onSurface,
-                          fontWeight: FontWeight.bold)),
-                ],
-              ),
+    return RefreshIndicator(
+      onRefresh: () async => _pagingController.refresh(),
+      child: PagedListView<int, Map<String, dynamic>>(
+        pagingController: _pagingController,
+        builderDelegate: PagedChildBuilderDelegate<Map<String, dynamic>>(
+          itemBuilder: (context, entry, index) =>
+              buildArticleCard(entry, context),
+          firstPageProgressIndicatorBuilder: (context) => Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const CircularProgressIndicator(),
+                const SizedBox(height: 8),
+                Text('Loading Articles...',
+                    style: Theme.of(context).textTheme.bodyLarge!.copyWith(
+                        color: Theme.of(context).colorScheme.onSurface,
+                        fontWeight: FontWeight.bold)),
+              ],
             ),
           ),
         ),

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:threebotlogin/widgets/council/councils.dart';
-import 'package:threebotlogin/widgets/layout_drawer.dart';
 import 'package:validators/validators.dart';
 
 class CouncilScreen extends StatefulWidget {
@@ -157,6 +156,6 @@ class _CouncilScreenState extends State<CouncilScreen> {
                 ],
               ));
         }));
-    return LayoutDrawer(titleText: 'Council', content: content);
+    return content;
   }
 }

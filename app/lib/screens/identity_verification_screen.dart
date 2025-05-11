@@ -14,7 +14,6 @@ import 'package:threebotlogin/services/pkid_service.dart';
 import 'package:threebotlogin/services/tools_service.dart';
 import 'package:threebotlogin/services/shared_preference_service.dart';
 import 'package:threebotlogin/widgets/custom_dialog.dart';
-import 'package:threebotlogin/widgets/layout_drawer.dart';
 import 'package:threebotlogin/widgets/phone_widget.dart';
 
 class IdentityVerificationScreen extends StatefulWidget {
@@ -726,9 +725,6 @@ class IdentityVerificationScreenState
       );
     }
 
-    return LayoutDrawer(
-      titleText: 'Identity',
-      content: content,
-    );
+    return content;
   }
 }

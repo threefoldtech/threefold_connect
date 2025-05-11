@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:threebotlogin/screens/signing/signing_mixin.dart';
 
@@ -102,8 +101,8 @@ class _SignWithTextScreenState extends ConsumerState<SignWithTextScreen>
                         : Text('Sign',
                             style: Theme.of(context)
                                 .textTheme
-                                .titleLarge
-                                !.copyWith(
+                                .titleLarge!
+                                .copyWith(
                                   color: Theme.of(context)
                                       .colorScheme
                                       .onPrimaryContainer,

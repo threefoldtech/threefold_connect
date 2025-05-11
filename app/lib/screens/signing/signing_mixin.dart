@@ -258,8 +258,8 @@ mixin SigningMixin<T extends ConsumerStatefulWidget> on ConsumerState<T> {
                           child: Text(wallet.name,
                               style: Theme.of(context)
                                   .textTheme
-                                  .bodyMedium
-                                  !.copyWith(
+                                  .bodyMedium!
+                                  .copyWith(
                                     color:
                                         Theme.of(context).colorScheme.onSurface,
                                   )),

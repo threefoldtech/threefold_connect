@@ -24,7 +24,6 @@ import 'package:threebotlogin/services/pkid_service.dart';
 import 'package:threebotlogin/services/shared_preference_service.dart';
 import 'package:threebotlogin/services/wallet_service.dart';
 import 'package:threebotlogin/widgets/custom_dialog.dart';
-import 'package:threebotlogin/widgets/layout_drawer.dart';
 import 'package:threebotlogin/providers/theme_provider.dart';
 import 'package:threebotlogin/widgets/wallets/warning_dialog.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -94,172 +93,165 @@ class _PreferenceScreenState extends ConsumerState<PreferenceScreen> {
     } else {
       isDarkMode = themeMode == ThemeMode.dark;
     }
-    return LayoutDrawer(
-      titleText: 'Settings',
-      content: ListView(
-        children: <Widget>[
-          const ListTile(
-            title: Text('Global settings'),
-          ),
-          FutureBuilder(
-              future: checkBiometrics(),
-              builder: (context, snapshot) {
-                if (snapshot.hasData) {
-                  if (snapshot.data == true) {
-                    return FutureBuilder(
-                        future: getBiometricDeviceName(),
-                        builder: (context, snapshot) {
-                          if (snapshot.hasData) {
-                            if (snapshot.data == 'Not found') {
-                              return Container();
-                            }
-                            biometricDeviceName = snapshot.data;
-                            return CheckboxListTile(
-                              secondary: biometricDeviceName == 'Face ID' ||
-                                      biometricDeviceName == 'Face unlock'
-                                  ? Image.asset(
-                                      'assets/face-id.png',
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .onSurface,
-                                      height: 24.0,
-                                      width: 24.0,
-                                    )
-                                  : const Icon(Icons.fingerprint),
-                              value: finger,
-                              title: Text(snapshot.data.toString()),
-                              activeColor:
-                                  Theme.of(context).colorScheme.primary,
-                              onChanged: (bool? newValue) async {
-                                _toggleFingerprint(newValue!);
-                              },
-                            );
-                          } else {
+    return ListView(
+      children: <Widget>[
+        const ListTile(
+          title: Text('Global settings'),
+        ),
+        FutureBuilder(
+            future: checkBiometrics(),
+            builder: (context, snapshot) {
+              if (snapshot.hasData) {
+                if (snapshot.data == true) {
+                  return FutureBuilder(
+                      future: getBiometricDeviceName(),
+                      builder: (context, snapshot) {
+                        if (snapshot.hasData) {
+                          if (snapshot.data == 'Not found') {
                             return Container();
                           }
-                        });
-                  } else {
-                    return Container();
-                  }
+                          biometricDeviceName = snapshot.data;
+                          return CheckboxListTile(
+                            secondary: biometricDeviceName == 'Face ID' ||
+                                    biometricDeviceName == 'Face unlock'
+                                ? Image.asset(
+                                    'assets/face-id.png',
+                                    color:
+                                        Theme.of(context).colorScheme.onSurface,
+                                    height: 24.0,
+                                    width: 24.0,
+                                  )
+                                : const Icon(Icons.fingerprint),
+                            value: finger,
+                            title: Text(snapshot.data.toString()),
+                            activeColor: Theme.of(context).colorScheme.primary,
+                            onChanged: (bool? newValue) async {
+                              _toggleFingerprint(newValue!);
+                            },
+                          );
+                        } else {
+                          return Container();
+                        }
+                      });
                 } else {
                   return Container();
                 }
-              }),
-          ListTile(
-            leading: const Icon(Icons.lock),
-            title: const Text('Change PIN'),
-            onTap: () async {
-              _changePincode();
+              } else {
+                return Container();
+              }
+            }),
+        ListTile(
+          leading: const Icon(Icons.lock),
+          title: const Text('Change PIN'),
+          onTap: () async {
+            _changePincode();
+          },
+        ),
+        ListTile(
+          leading: const Icon(Icons.brightness_6_outlined),
+          title: const Text('Appearance'),
+          trailing: GestureDetector(
+            onTap: () {
+              ref.read(themeModeNotifier.notifier).toggleTheme();
             },
-          ),
-          ListTile(
-            leading: const Icon(Icons.brightness_6_outlined),
-            title: const Text('Appearance'),
-            trailing: GestureDetector(
-              onTap: () {
-                ref.read(themeModeNotifier.notifier).toggleTheme();
-              },
-              child: Container(
-                width: 40,
-                height: 20,
-                decoration: BoxDecoration(
-                  color: isDarkMode
-                      ? Colors.black
-                      : Theme.of(context).colorScheme.primary,
-                  borderRadius: BorderRadius.circular(10),
-                  boxShadow: const [
-                    BoxShadow(
-                      color: Colors.black26,
-                      blurRadius: 4,
-                      offset: Offset(2, 2),
-                    ),
-                  ],
-                ),
-                child: Stack(
-                  children: [
-                    AnimatedPositioned(
-                      duration: const Duration(milliseconds: 300),
-                      left: isDarkMode ? 20 : 0,
-                      child: Container(
-                        width: 20,
-                        height: 20,
-                        decoration: const BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: Colors.white,
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black26,
-                              blurRadius: 4,
-                              offset: Offset(2, 2),
-                            ),
-                          ],
-                        ),
-                        child: Center(
-                          child: Icon(
-                            isDarkMode
-                                ? Icons.nightlight_round
-                                : Icons.wb_sunny,
-                            color: isDarkMode
-                                ? Colors.black
-                                : Theme.of(context).colorScheme.primary,
-                            size: 14,
+            child: Container(
+              width: 40,
+              height: 20,
+              decoration: BoxDecoration(
+                color: isDarkMode
+                    ? Colors.black
+                    : Theme.of(context).colorScheme.primary,
+                borderRadius: BorderRadius.circular(10),
+                boxShadow: const [
+                  BoxShadow(
+                    color: Colors.black26,
+                    blurRadius: 4,
+                    offset: Offset(2, 2),
+                  ),
+                ],
+              ),
+              child: Stack(
+                children: [
+                  AnimatedPositioned(
+                    duration: const Duration(milliseconds: 300),
+                    left: isDarkMode ? 20 : 0,
+                    child: Container(
+                      width: 20,
+                      height: 20,
+                      decoration: const BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Colors.white,
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black26,
+                            blurRadius: 4,
+                            offset: Offset(2, 2),
                           ),
+                        ],
+                      ),
+                      child: Center(
+                        child: Icon(
+                          isDarkMode ? Icons.nightlight_round : Icons.wb_sunny,
+                          color: isDarkMode
+                              ? Colors.black
+                              : Theme.of(context).colorScheme.primary,
+                          size: 14,
                         ),
                       ),
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
           ),
-          ListTile(
-            leading: const Icon(Icons.perm_device_information),
-            title: Text('Version: $version - $buildNumber'),
-            onTap: () {
-              _showVersionInfo();
-            },
+        ),
+        ListTile(
+          leading: const Icon(Icons.perm_device_information),
+          title: Text('Version: $version - $buildNumber'),
+          onTap: () {
+            _showVersionInfo();
+          },
+        ),
+        ListTile(
+          leading: const Icon(Icons.info_outline),
+          title: const Text('Terms and conditions'),
+          onTap: () async => {await _showTermsAndConds()},
+        ),
+        ListTile(
+          leading: const Icon(Icons.logout_outlined),
+          title: Text(
+            'Log Out',
+            style: Theme.of(context)
+                .textTheme
+                .bodyLarge!
+                .copyWith(color: Theme.of(context).colorScheme.onSurface),
           ),
-          ListTile(
-            leading: const Icon(Icons.info_outline),
-            title: const Text('Terms and conditions'),
-            onTap: () async => {await _showTermsAndConds()},
+          onTap: _showDialog,
+        ),
+        ExpansionTile(
+          title: const Text(
+            'Advanced settings',
           ),
-          ListTile(
-            leading: const Icon(Icons.logout_outlined),
-            title: Text(
-              'Log Out',
-              style: Theme.of(context)
-                  .textTheme
-                  .bodyLarge!
-                  .copyWith(color: Theme.of(context).colorScheme.onSurface),
-            ),
-            onTap: _showDialog,
-          ),
-          ExpansionTile(
-            title: const Text(
-              'Advanced settings',
-            ),
-            children: <Widget>[
-              ListTile(
-                leading: Icon(
-                  Icons.remove_circle,
-                  color: Theme.of(context).colorScheme.error,
-                ),
-                title: Text(
-                  'Delete Account',
-                  style: Theme.of(context)
-                      .textTheme
-                      .bodyLarge!
-                      .copyWith(color: Theme.of(context).colorScheme.error),
-                ),
-                onTap: () {
-                  _showDialog(delete: true);
-                },
+          children: <Widget>[
+            ListTile(
+              leading: Icon(
+                Icons.remove_circle,
+                color: Theme.of(context).colorScheme.error,
               ),
-            ],
-          ),
-        ],
-      ),
+              title: Text(
+                'Delete Account',
+                style: Theme.of(context)
+                    .textTheme
+                    .bodyLarge!
+                    .copyWith(color: Theme.of(context).colorScheme.error),
+              ),
+              onTap: () {
+                _showDialog(delete: true);
+              },
+            ),
+          ],
+        ),
+      ],
     );
   }
 

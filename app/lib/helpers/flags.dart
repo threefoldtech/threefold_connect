@@ -96,10 +96,9 @@ class Flags {
     Globals().registrarURL =
         (await Flags().getFlagValueByFeatureName('registrar-url')).toString();
 
-    Globals().activationServiceAddress = (await Flags()
-        .getFlagValueByFeatureName('activation-service-address'))
-        .toString();    
-
+    Globals().activationServiceAddress =
+        (await Flags().getFlagValueByFeatureName('activation-service-address'))
+            .toString();
   }
 
   Future<bool> hasFlagValueByFeatureName(String name) async {
