@@ -324,7 +324,7 @@ class _ActivateWalletWidgetState extends ConsumerState<ActivateWalletWidget> {
                     const SizedBox(height: 20),
                     Text(
                       widget.wallet.stellarBalance == '-1'
-                          ? 'Please select a wallet to add TFT asset.'
+                          ? 'Please select a wallet to fund adding the TFT asset.'
                           : 'Please select a wallet to activate Stellar.',
                       style: Theme.of(context).textTheme.bodyLarge!.copyWith(
                             color: Theme.of(context).colorScheme.onSurface,
