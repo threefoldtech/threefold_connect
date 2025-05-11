@@ -10,10 +10,8 @@ import 'package:threebotlogin/widgets/custom_dialog.dart';
 import 'package:threebotlogin/services/tfchain_service.dart' as TFChainService;
 
 class ActivateWalletWidget extends ConsumerStatefulWidget {
-  const ActivateWalletWidget(
-      {super.key, required this.wallet, required this.walletExists});
+  const ActivateWalletWidget({super.key, required this.wallet});
   final Wallet wallet;
-  final bool walletExists;
 
   @override
   ConsumerState<ActivateWalletWidget> createState() =>
@@ -125,7 +123,7 @@ class _ActivateWalletWidgetState extends ConsumerState<ActivateWalletWidget> {
       return false;
     }
     if (double.parse(_selectedWallet!.stellarBalance) <
-        (widget.walletExists
+        (widget.wallet.stellarBalance == '-1'
             ? (tftPrice * trustlineFee)
             : (tftPrice * activationFee))) {
       setState(() {
@@ -208,6 +206,7 @@ class _ActivateWalletWidgetState extends ConsumerState<ActivateWalletWidget> {
   }
 
   Future<void> activateWallet() async {
+    if (!_validateWallet()) return;
     try {
       setState(() {
         saveLoading = true;
@@ -311,7 +310,7 @@ class _ActivateWalletWidgetState extends ConsumerState<ActivateWalletWidget> {
                   children: [
                     Center(
                       child: Text(
-                        widget.walletExists
+                        widget.wallet.stellarBalance == '-1'
                             ? 'Add TFT Asset'
                             : 'Activate Stellar',
                         style: Theme.of(context)
@@ -324,7 +323,7 @@ class _ActivateWalletWidgetState extends ConsumerState<ActivateWalletWidget> {
                     ),
                     const SizedBox(height: 20),
                     Text(
-                      widget.walletExists
+                      widget.wallet.stellarBalance == '-1'
                           ? 'Please select a wallet to add TFT asset.'
                           : 'Please select a wallet to activate Stellar.',
                       style: Theme.of(context).textTheme.bodyLarge!.copyWith(
@@ -345,7 +344,7 @@ class _ActivateWalletWidgetState extends ConsumerState<ActivateWalletWidget> {
                         const SizedBox(width: 8),
                         Expanded(
                           child: Text(
-                            widget.walletExists
+                            widget.wallet.stellarBalance == '-1'
                                 ? 'This will consume ${tftPrice * trustlineFee} TFTs from the selected wallet.'
                                 : 'This will consume ${tftPrice * activationFee} TFTs from the selected wallet.',
                             style: Theme.of(context)
@@ -436,7 +435,7 @@ class _ActivateWalletWidgetState extends ConsumerState<ActivateWalletWidget> {
                         ElevatedButton(
                             onPressed: saveLoading
                                 ? null
-                                : widget.walletExists
+                                : widget.wallet.stellarBalance == '-1'
                                     ? () async => await addTFTAsset()
                                     : () async => await activateWallet(),
                             child: saveLoading
@@ -446,7 +445,7 @@ class _ActivateWalletWidgetState extends ConsumerState<ActivateWalletWidget> {
                                     child: CircularProgressIndicator(
                                       strokeWidth: 2,
                                     ))
-                                : widget.walletExists
+                                : widget.wallet.stellarBalance == '-1'
                                     ? const Text('Add TFT Asset')
                                     : const Text('Activate'))
                       ],

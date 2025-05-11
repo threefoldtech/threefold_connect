@@ -23,32 +23,6 @@ class WalletCardWidget extends ConsumerStatefulWidget {
 class _WalletCardWidgetState extends ConsumerState<WalletCardWidget> {
   bool initialWalletLoading = false;
   List<Wallet> wallets = [];
-  bool walletExists = false;
-
-  checkWalletExists() async {
-    try {
-      await StellarService.getStellarAccount(widget.wallet.stellarAddress);
-      setState(() {
-        walletExists = true;
-      });
-    } catch (e) {
-      logger.e('Wallet does not exist on Stellar network.');
-    }
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    checkWalletExists();
-  }
-
-  @override
-  void didUpdateWidget(covariant WalletCardWidget oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (oldWidget.wallet != widget.wallet) {
-      checkWalletExists();
-    }
-  }
 
   _initializeWallet() async {
     setState(() {
@@ -135,7 +109,8 @@ class _WalletCardWidgetState extends ConsumerState<WalletCardWidget> {
                   ),
             ),
             const Spacer(),
-            if (widget.wallet.stellarBalance == '-1')
+            if (widget.wallet.stellarBalance == '-1' ||
+                widget.wallet.stellarBalance == '-2')
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                 decoration: BoxDecoration(
@@ -143,14 +118,17 @@ class _WalletCardWidgetState extends ConsumerState<WalletCardWidget> {
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Text(
-                  walletExists ? 'Asset not found' : 'Not Activated',
+                  widget.wallet.stellarBalance == '-1'
+                      ? 'Asset not found'
+                      : 'Not Activated',
                   style: Theme.of(context).textTheme.bodySmall!.copyWith(
                         color: Theme.of(context).colorScheme.onPrimaryContainer,
                         fontWeight: FontWeight.w500,
                       ),
                 ),
               ),
-            if (widget.wallet.stellarBalance != '-1')
+            if (widget.wallet.stellarBalance != '-1' &&
+                widget.wallet.stellarBalance != '-2')
               Text(
                 '${formatAmount(widget.wallet.stellarBalance)} TFT',
                 style: Theme.of(context).textTheme.bodyLarge!.copyWith(
@@ -200,7 +178,6 @@ class _WalletCardWidgetState extends ConsumerState<WalletCardWidget> {
           Navigator.of(context).push(MaterialPageRoute(
             builder: (context) => WalletDetailsScreen(
               wallet: widget.wallet,
-              walletExists: walletExists,
             ),
           ));
         },

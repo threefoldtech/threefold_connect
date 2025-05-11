@@ -39,7 +39,10 @@ Future<String> getBalanceByClient(Client client) async {
     }
   } catch (e) {
     logger.i("Couldn't load the account balance due to $e");
+    // -2 means that the account not activated on stellar
+    return '-2';
   }
+  // -1 means that account activated but no TFT trustline
   return '-1';
 }
 
@@ -140,10 +143,6 @@ Future<int> getTFTPriceFromXLM() async {
     logger.e('Error: $e');
     throw Exception('Error getting price');
   }
-}
-
-Future<AccountResponse> getStellarAccount(String accountId) async {
-  return await getAccount(network: NetworkType.PUBLIC, accountId: accountId);
 }
 
 Future<bool> addTFTTrustline(String secret, String assetCode) async {

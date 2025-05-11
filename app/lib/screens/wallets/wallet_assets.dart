@@ -14,10 +14,8 @@ import 'package:threebotlogin/widgets/wallets/arrow_inward.dart';
 import 'package:threebotlogin/widgets/wallets/balance_tile.dart';
 
 class WalletAssetsWidget extends StatefulWidget {
-  const WalletAssetsWidget(
-      {super.key, required this.wallet, required this.walletExists});
+  const WalletAssetsWidget({super.key, required this.wallet});
   final Wallet wallet;
-  final bool walletExists;
 
   @override
   State<WalletAssetsWidget> createState() => _WalletAssetsWidgetState();
@@ -71,7 +69,6 @@ class _WalletAssetsWidgetState extends State<WalletAssetsWidget> {
         context: context,
         builder: (ctx) => ActivateWalletWidget(
               wallet: widget.wallet,
-              walletExists: widget.walletExists,
             ));
   }
 
@@ -227,12 +224,12 @@ class _WalletAssetsWidgetState extends State<WalletAssetsWidget> {
               loading: tfchainBalaceLoading,
             ),
           const SizedBox(height: 10),
-          if (widget.wallet.stellarBalance == '-1')
+          if (widget.wallet.stellarBalance == '-1' ||
+              widget.wallet.stellarBalance == '-2')
             WalletBalanceTileWidget(
               name: ChainType.Stellar,
-              balance: '',
+              balance: widget.wallet.stellarBalance,
               loading: false,
-              walletExists: widget.walletExists,
               onActivate: _openActivateStellarOverlay,
             ),
           ...vestWidgets
