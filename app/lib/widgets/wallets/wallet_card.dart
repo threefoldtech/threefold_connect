@@ -109,8 +109,7 @@ class _WalletCardWidgetState extends ConsumerState<WalletCardWidget> {
                   ),
             ),
             const Spacer(),
-            if (widget.wallet.stellarBalance == '-1' ||
-                widget.wallet.stellarBalance == '-2')
+            if (double.parse(widget.wallet.stellarBalance) <= -1)
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                 decoration: BoxDecoration(
@@ -120,7 +119,6 @@ class _WalletCardWidgetState extends ConsumerState<WalletCardWidget> {
                 child: Text(
                   widget.wallet.stellarBalance == '-1'
                       ? 'Asset Not Found'
-
                       : 'Not Activated',
                   style: Theme.of(context).textTheme.bodySmall!.copyWith(
                         color: Theme.of(context).colorScheme.onPrimaryContainer,
@@ -173,7 +171,7 @@ class _WalletCardWidgetState extends ConsumerState<WalletCardWidget> {
       child: InkWell(
         onTap: () {
           if (widget.wallet.type == WalletType.NATIVE &&
-              widget.wallet.stellarBalance == '-1') {
+              double.parse(widget.wallet.stellarBalance) <= -1) {
             return;
           }
           Navigator.of(context).push(MaterialPageRoute(
