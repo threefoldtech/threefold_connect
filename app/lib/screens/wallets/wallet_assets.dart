@@ -226,27 +226,14 @@ class _WalletAssetsWidgetState extends State<WalletAssetsWidget> {
               balance: formatAmount(widget.wallet.tfchainBalance),
               loading: tfchainBalaceLoading,
             ),
-          const SizedBox(
-            height: 80,
-          ),
+          const SizedBox(height: 10),
           if (widget.wallet.stellarBalance == '-1')
-            Center(
-              child: SizedBox(
-                  width: MediaQuery.of(context).size.width - 40,
-                  child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor:
-                            Theme.of(context).colorScheme.primaryContainer,
-                      ),
-                      onPressed: _openActivateStellarOverlay,
-                      child: Text( widget.walletExists ? 'Add TFT Asset' :
-                        'Activate Stellar',
-                        style: Theme.of(context).textTheme.bodyLarge!.copyWith(
-                              color: Theme.of(context)
-                                  .colorScheme
-                                  .onPrimaryContainer,
-                            ),
-                      ))),
+            WalletBalanceTileWidget(
+              name: ChainType.Stellar,
+              balance: '',
+              loading: false,
+              walletExists: widget.walletExists,
+              onActivate: _openActivateStellarOverlay,
             ),
           ...vestWidgets
         ],

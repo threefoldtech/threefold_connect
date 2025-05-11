@@ -7,10 +7,14 @@ class WalletBalanceTileWidget extends StatelessWidget {
     required this.balance,
     required this.name,
     required this.loading,
+    this.onActivate,
+    this.walletExists = false,
   });
   final String balance;
   final ChainType name;
   final bool loading;
+  final VoidCallback? onActivate;
+  final bool walletExists;
 
   @override
   Widget build(BuildContext context) {
@@ -43,12 +47,31 @@ class WalletBalanceTileWidget extends StatelessWidget {
               child: CircularProgressIndicator(
                 strokeWidth: 2,
               ))
-          : Text(
-              '$balance TFT',
-              style: Theme.of(context).textTheme.bodyLarge!.copyWith(
-                    color: Theme.of(context).colorScheme.onSecondaryContainer,
+          : walletExists && onActivate != null
+              ? ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor:
+                        Theme.of(context).colorScheme.primaryContainer,
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 12, vertical: 0),
+                    minimumSize: const Size(80, 36),
                   ),
-            ),
+                  onPressed: onActivate,
+                  child: Text(
+                    walletExists ? 'Add TFT Asset' : 'Activate Stellar',
+                    style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                          color:
+                              Theme.of(context).colorScheme.onPrimaryContainer,
+                        ),
+                  ),
+                )
+              : Text(
+                  '$balance TFT',
+                  style: Theme.of(context).textTheme.bodyLarge!.copyWith(
+                        color:
+                            Theme.of(context).colorScheme.onSecondaryContainer,
+                      ),
+                ),
     );
   }
 }
