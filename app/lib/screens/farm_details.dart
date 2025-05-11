@@ -74,7 +74,7 @@ class _FarmDetailsState extends State<FarmDetails> {
 
     try {
       final balance = await getBalanceByAccountId(address);
-      if (balance == '-1') {
+      if (double.parse(balance) <= -1) {
         setState(() {
           stellarAddressError = 'Wallet not activated on stellar';
         });
@@ -120,7 +120,7 @@ class _FarmDetailsState extends State<FarmDetails> {
 
     try {
       final balance = await getBalanceByAccountId(newAddress);
-      if (balance == '-1') {
+      if (double.parse(balance) <= -1) {
         if (context.mounted) {
           ScaffoldMessenger.of(context).clearSnackBars();
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
