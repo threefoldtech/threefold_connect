@@ -145,7 +145,7 @@ class _WalletSendScreenState extends ConsumerState<WalletSendScreen> {
           wallets.where((wallet) => wallet.stellarAddress == toAddress);
       final Wallet? wallet =
           matchingWallets.isNotEmpty ? matchingWallets.first : null;
-      if (wallet != null && wallet.stellarBalance == '-1') {
+      if (wallet != null && double.parse(wallet.stellarBalance) <= -1) {
         setState(() {
           toAddressError = 'Wallet not activated on stellar';
         });
@@ -218,7 +218,7 @@ class _WalletSendScreenState extends ConsumerState<WalletSendScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final bool hideStellar = widget.wallet.stellarBalance == '-1';
+    final bool hideStellar = double.parse(widget.wallet.stellarBalance) <= -1;
     if (hideStellar && chainType == ChainType.Stellar) {
       onChangeChain(ChainType.TFChain);
     }

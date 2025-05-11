@@ -89,7 +89,7 @@ class _ActivateWalletWidgetState extends ConsumerState<ActivateWalletWidget> {
       List<Wallet> wallets) {
     return wallets
         .where((wallet) =>
-            wallet != widget.wallet && wallet.stellarBalance != '-1')
+            wallet != widget.wallet && double.parse(wallet.stellarBalance) > -1)
         .map((wallet) {
       return DropdownMenuEntry<Wallet>(
         value: wallet,

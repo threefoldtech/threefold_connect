@@ -209,7 +209,8 @@ class _WalletBridgeScreenState extends ConsumerState<WalletBridgeScreen> {
   @override
   Widget build(BuildContext context) {
     List<Wallet> wallets = ref.read(walletsNotifier);
-    final bool disableDeposit = widget.wallet.stellarBalance == '-1';
+    final bool disableDeposit =
+        double.parse(widget.wallet.stellarBalance) <= -1;
     if (disableDeposit && !isWithdraw) {
       onTransactionChange(BridgeOperation.Withdraw);
     }
