@@ -56,7 +56,7 @@ class WalletBalanceTileWidget extends StatelessWidget {
                   ),
                   onPressed: onActivate,
                   child: Text(
-                    balance == '-1' ? 'Add TFT Asset' : 'Activate Stellar',
+                    balance == '-1' ? 'Add TFT Asset' : 'Activate',
                     style: Theme.of(context).textTheme.bodyMedium!.copyWith(
                           color:
                               Theme.of(context).colorScheme.onPrimaryContainer,
