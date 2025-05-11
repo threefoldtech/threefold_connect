@@ -148,7 +148,7 @@ class _WalletBridgeScreenState extends ConsumerState<WalletBridgeScreen> {
         return false;
       }
       final toAddrBalance = await Stellar.getBalanceByAccountId(toAddress);
-      if (toAddrBalance == '-1') {
+      if (double.parse(toAddrBalance) <= -1) {
         toAddressError = 'Address must be active and have TFT trustline';
         return false;
       }
@@ -209,7 +209,8 @@ class _WalletBridgeScreenState extends ConsumerState<WalletBridgeScreen> {
   @override
   Widget build(BuildContext context) {
     List<Wallet> wallets = ref.read(walletsNotifier);
-    final bool disableDeposit = widget.wallet.stellarBalance == '-1';
+    final bool disableDeposit =
+        double.parse(widget.wallet.stellarBalance) <= -1;
     if (disableDeposit && !isWithdraw) {
       onTransactionChange(BridgeOperation.Withdraw);
     }

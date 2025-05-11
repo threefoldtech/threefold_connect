@@ -5,9 +5,7 @@ import 'package:threebotlogin/models/payment_request.dart';
 
 class NoAnimationTabController extends TabController {
   NoAnimationTabController(
-      {super.initialIndex,
-      required super.length,
-      required super.vsync});
+      {super.initialIndex, required super.length, required super.vsync});
 
   @override
   void animateTo(int value,
@@ -75,6 +73,8 @@ class Globals {
 
   int emailSentOn = 0;
   int emailMinutesCoolDown = 1;
+
+  String activationServiceAddress = '';
 
   ValueNotifier<bool> hidePhoneButton = ValueNotifier(false);
 
