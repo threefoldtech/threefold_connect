@@ -146,7 +146,7 @@ Future<AccountResponse> getStellarAccount(String accountId) async {
   return await getAccount(network: NetworkType.PUBLIC, accountId: accountId);
 }
 
-Future<bool> addTrustline(String secret) async {
+Future<bool> addTFTTrustline(String secret, String assetCode) async {
   final client = Client(NetworkType.PUBLIC, secret);
-  return await client.addConfiguredTrustlines();
+  return await client.addTrustLineThroughThreefoldService(assetCode);
 }

@@ -23,6 +23,33 @@ class WalletCardWidget extends ConsumerStatefulWidget {
 class _WalletCardWidgetState extends ConsumerState<WalletCardWidget> {
   bool initialWalletLoading = false;
   List<Wallet> wallets = [];
+  bool walletExists = false;
+
+  checkWalletExists() async {
+    try {
+      await StellarService.getStellarAccount(widget.wallet.stellarAddress);
+      setState(() {
+        walletExists = true;
+      });
+    } catch (e) {
+      logger.e('Wallet does not exist on Stellar network.');
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    checkWalletExists();
+  }
+
+  @override
+  void didUpdateWidget(covariant WalletCardWidget oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.wallet != widget.wallet) {
+      checkWalletExists();
+    }
+  }
+
   _initializeWallet() async {
     setState(() {
       initialWalletLoading = true;
@@ -112,14 +139,11 @@ class _WalletCardWidgetState extends ConsumerState<WalletCardWidget> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                 decoration: BoxDecoration(
-                  color: Theme.of(context)
-                      .colorScheme
-                      .surface
-                      .withOpacity(0.7),
+                  color: Theme.of(context).colorScheme.surface.withOpacity(0.7),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Text(
-                  'Not Activated',
+                  walletExists ? 'Asset not found' : 'Not Activated',
                   style: Theme.of(context).textTheme.bodySmall!.copyWith(
                         color: Theme.of(context).colorScheme.onPrimaryContainer,
                         fontWeight: FontWeight.w500,
@@ -176,6 +200,7 @@ class _WalletCardWidgetState extends ConsumerState<WalletCardWidget> {
           Navigator.of(context).push(MaterialPageRoute(
             builder: (context) => WalletDetailsScreen(
               wallet: widget.wallet,
+              walletExists: walletExists,
             ),
           ));
         },

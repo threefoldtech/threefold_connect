@@ -7,8 +7,9 @@ import 'package:threebotlogin/screens/wallets/wallet_assets.dart';
 import 'package:threebotlogin/screens/wallets/wallet_info.dart';
 
 class WalletDetailsScreen extends ConsumerStatefulWidget {
-  const WalletDetailsScreen({super.key, required this.wallet});
+  const WalletDetailsScreen({super.key, required this.wallet, required this.walletExists});
   final Wallet wallet;
+  final bool walletExists;
 
   @override
   ConsumerState<WalletDetailsScreen> createState() =>
@@ -37,6 +38,7 @@ class _WalletDetailsScreenState extends ConsumerState<WalletDetailsScreen> {
     } else {
       content = WalletAssetsWidget(
         wallet: widget.wallet,
+        walletExists: widget.walletExists,
       );
     }
     return Scaffold(

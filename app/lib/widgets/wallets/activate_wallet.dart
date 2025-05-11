@@ -7,11 +7,12 @@ import 'package:threebotlogin/models/wallet.dart';
 import 'package:threebotlogin/providers/wallets_provider.dart';
 import 'package:threebotlogin/services/stellar_service.dart' as StellarService;
 import 'package:threebotlogin/widgets/custom_dialog.dart';
-import 'package:threebotlogin/services/tfchain_service.dart' as TFChainService;
 
 class ActivateWalletWidget extends ConsumerStatefulWidget {
-  const ActivateWalletWidget({super.key, required this.wallet});
+  const ActivateWalletWidget(
+      {super.key, required this.wallet, required this.walletExists});
   final Wallet wallet;
+  final bool walletExists;
 
   @override
   ConsumerState<ActivateWalletWidget> createState() =>
@@ -23,65 +24,15 @@ class _ActivateWalletWidgetState extends ConsumerState<ActivateWalletWidget> {
   String? walletError;
   bool saveLoading = false;
   late WalletsNotifier walletRef;
-  int tftPrice = 0;
-  bool isLoadingPrice = true;
 
-  // Activation Fees in XLM
-  static const int activationFee = 3;
+  // Fees in TFT
+  static const int activationFee = 2;
+  static const int trustlineFee = 1;
 
   @override
   void initState() {
     super.initState();
     walletRef = ref.read(walletsNotifier.notifier);
-    _loadTFTPrice();
-  }
-
-  Future<void> _loadTFTPrice() async {
-    setState(() {
-      isLoadingPrice = true;
-    });
-
-    try {
-      final price = await StellarService.getTFTPriceFromXLM();
-      if (price == 0) {
-        final price =
-            await TFChainService.getTFTPrice(Globals().chainUrl) * 0.5;
-        if (mounted) {
-          setState(() {
-            tftPrice = price.ceil();
-            isLoadingPrice = false;
-          });
-        }
-        return;
-      }
-      if (mounted) {
-        setState(() {
-          tftPrice = price;
-          isLoadingPrice = false;
-        });
-      }
-    } catch (e) {
-      logger.e('Failed to load TFT price: $e');
-      try {
-        final price =
-            await TFChainService.getTFTPrice(Globals().chainUrl) * 0.5;
-        if (mounted) {
-          setState(() {
-            tftPrice = price.ceil();
-            isLoadingPrice = false;
-          });
-        }
-      } catch (tfchainError) {
-        logger
-            .e('Failed to load TFT price from TFChain fallback: $tfchainError');
-        if (mounted) {
-          setState(() {
-            tftPrice = 0;
-            isLoadingPrice = false;
-          });
-        }
-      }
-    }
   }
 
   List<DropdownMenuEntry<Wallet>> _buildDropdownMenuEntries(
@@ -92,7 +43,7 @@ class _ActivateWalletWidgetState extends ConsumerState<ActivateWalletWidget> {
         .map((wallet) {
       return DropdownMenuEntry<Wallet>(
         value: wallet,
-        label: "${wallet.name} (${wallet.stellarBalance} TFT)",
+        label: '${wallet.name} (${wallet.stellarBalance} TFT)',
         labelWidget: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -103,7 +54,7 @@ class _ActivateWalletWidgetState extends ConsumerState<ActivateWalletWidget> {
                   ),
             ),
             Text(
-              "${wallet.stellarBalance} TFT",
+              '${wallet.stellarBalance} TFT',
               style: Theme.of(context).textTheme.bodyMedium!.copyWith(
                     color: Theme.of(context).colorScheme.onSurfaceVariant,
                   ),
@@ -122,7 +73,7 @@ class _ActivateWalletWidgetState extends ConsumerState<ActivateWalletWidget> {
       return false;
     }
     if (double.parse(_selectedWallet!.stellarBalance) <
-        (tftPrice * activationFee)) {
+        (widget.walletExists ? trustlineFee : activationFee)) {
       setState(() {
         walletError = 'Selected wallet does not have enough TFTs on Stellar';
       });
@@ -131,130 +82,136 @@ class _ActivateWalletWidgetState extends ConsumerState<ActivateWalletWidget> {
     return true;
   }
 
-  Future<void> activateWallet() async {
+  Future addTFTAsset() async {
     if (!_validateWallet()) return;
     try {
       setState(() {
         saveLoading = true;
         walletError = null;
       });
-
-      bool accountExists = false;
-      try {
-        await StellarService.getStellarAccount(widget.wallet.stellarAddress);
-        accountExists = true;
-        logger.d('Account already exists on Stellar network');
-
+      final trustlineAdded = await StellarService.addTFTTrustline(
+          widget.wallet.stellarSecret, 'TFT');
+      if (trustlineAdded) {
         try {
-          final trustlineAdded =
-              await StellarService.addTrustline(widget.wallet.stellarSecret);
-          if (trustlineAdded) {
-            logger.d('TFT trustline added successfully');
-            await showDialog(
-              context: context,
-              builder: (BuildContext context) => CustomDialog(
-                type: DialogType.Info,
-                image: Icons.check,
-                title: 'Trustline Added',
-                description:
-                    'Your wallet already existed on Stellar. TFT trustline has been added successfully.',
-                actions: <Widget>[
-                  TextButton(
-                    child: const Text('Close'),
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
-                  ),
-                ],
+          logger.d('Transferring trustline fee');
+          await StellarService.transfer(
+            _selectedWallet!.stellarSecret,
+            Globals().activationServiceAddress,
+            trustlineFee.toString(),
+          );
+        } catch (transferError) {
+          logger.e('Transfer error: $transferError');
+        }
+        logger.d('TFT trustline added successfully');
+        await showDialog(
+          context: context,
+          builder: (BuildContext context) => CustomDialog(
+            type: DialogType.Info,
+            image: Icons.check,
+            title: 'Trustline Added',
+            description: 'TFT trustline has been added successfully.',
+            actions: <Widget>[
+              TextButton(
+                child: const Text('Close'),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
               ),
-            );
-            walletRef.reloadBalances();
-            Navigator.pop(context);
-            return;
-          } else {
-            throw Exception('Failed to add trustline');
-          }
-        } catch (trustlineError) {
-          logger.e('Failed to add trustline: $trustlineError');
-          await showDialog(
-            context: context,
-            builder: (BuildContext context) => CustomDialog(
-              type: DialogType.Error,
-              image: Icons.error,
-              title: 'Trustline Error',
-              description:
-                  'Your wallet exists but failed to add the TFT trustline. Please try again.',
-              actions: <Widget>[
-                TextButton(
-                  child: const Text('Close'),
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                ),
-              ],
-            ),
-          );
-          return;
-        }
-      } catch (accountError) {
-        accountExists = false;
-        logger.d('Account does not exist, will proceed with activation');
+            ],
+          ),
+        );
+        walletRef.reloadBalances();
+        Navigator.pop(context);
+        return;
+      } else {
+        throw Exception('Failed to add trustline');
       }
+    } catch (e) {
+      logger.e('Failed to add trustline: $e');
+      await showDialog(
+        context: context,
+        builder: (BuildContext context) => CustomDialog(
+          type: DialogType.Error,
+          image: Icons.error,
+          title: 'Trustline Error',
+          description: 'Failed to add the TFT trustline. Please try again.',
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Close'),
+              onPressed: () {
+                Navigator.pop(context);
+              },
+            ),
+          ],
+        ),
+      );
+      return;
+    } finally {
+      setState(() {
+        saveLoading = false;
+      });
+    }
+  }
 
-      if (!accountExists) {
-        final activated =
-            await StellarService.initialize(widget.wallet.stellarSecret);
-        if (activated) {
-          logger.d('Wallet activated successfully');
-          try {
-            logger.d('Transferring activation fee');
-            await StellarService.transfer(
-              _selectedWallet!.stellarSecret,
-              Globals().activationServiceAddress,
-              (activationFee * tftPrice).toString(),
-            );
-          } catch (transferError) {
-            logger.e('Transfer error: $transferError');
-          }
-          await showDialog(
-            context: context,
-            builder: (BuildContext context) => CustomDialog(
-              type: DialogType.Info,
-              image: Icons.check,
-              title: 'Wallet Activated',
-              description: 'Your wallet has been activated successfully',
-              actions: <Widget>[
-                TextButton(
-                  child: const Text('Close'),
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                ),
-              ],
-            ),
+  Future<void> activateWallet() async {
+    try {
+      setState(() {
+        saveLoading = true;
+        walletError = null;
+      });
+
+      final activated =
+          await StellarService.initialize(widget.wallet.stellarSecret);
+      if (activated) {
+        logger.d('Wallet activated successfully');
+        try {
+          logger.d('Transferring activation fee');
+          await StellarService.transfer(
+            _selectedWallet!.stellarSecret,
+            Globals().activationServiceAddress,
+            activationFee.toString(),
           );
-          walletRef.reloadBalances();
-          Navigator.pop(context);
-        } else {
-          logger.e('Failed to activate wallet');
-          await showDialog(
-            context: context,
-            builder: (BuildContext context) => CustomDialog(
-              type: DialogType.Error,
-              image: Icons.error,
-              title: 'Error',
-              description: 'Failed to activate wallet. Please try again.',
-              actions: <Widget>[
-                TextButton(
-                  child: const Text('Close'),
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                ),
-              ],
-            ),
-          );
+        } catch (transferError) {
+          logger.e('Transfer error: $transferError');
         }
+        await showDialog(
+          context: context,
+          builder: (BuildContext context) => CustomDialog(
+            type: DialogType.Info,
+            image: Icons.check,
+            title: 'Wallet Activated',
+            description: 'Your wallet has been activated successfully',
+            actions: <Widget>[
+              TextButton(
+                child: const Text('Close'),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              ),
+            ],
+          ),
+        );
+        walletRef.reloadBalances();
+        Navigator.pop(context);
+      } else {
+        logger.e('Failed to activate wallet');
+        await showDialog(
+          context: context,
+          builder: (BuildContext context) => CustomDialog(
+            type: DialogType.Error,
+            image: Icons.error,
+            title: 'Error',
+            description: 'Failed to activate wallet. Please try again.',
+            actions: <Widget>[
+              TextButton(
+                child: const Text('Close'),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              ),
+            ],
+          ),
+        );
       }
     } catch (e) {
       logger.e('Activation error: $e');
@@ -300,7 +257,9 @@ class _ActivateWalletWidgetState extends ConsumerState<ActivateWalletWidget> {
                   children: [
                     Center(
                       child: Text(
-                        'Activate Stellar',
+                        widget.walletExists
+                            ? 'Add TFT Asset'
+                            : 'Activate Stellar',
                         style: Theme.of(context)
                             .textTheme
                             .headlineSmall!
@@ -311,7 +270,9 @@ class _ActivateWalletWidgetState extends ConsumerState<ActivateWalletWidget> {
                     ),
                     const SizedBox(height: 20),
                     Text(
-                      'Please select a wallet to activate Stellar.',
+                      widget.walletExists
+                          ? 'Please select a wallet to add TFT asset.'
+                          : 'Please select a wallet to activate Stellar.',
                       style: Theme.of(context).textTheme.bodyLarge!.copyWith(
                             color: Theme.of(context).colorScheme.onSurface,
                           ),
@@ -329,45 +290,18 @@ class _ActivateWalletWidgetState extends ConsumerState<ActivateWalletWidget> {
                         ),
                         const SizedBox(width: 8),
                         Expanded(
-                          child: isLoadingPrice
-                              ? Row(
-                                  children: [
-                                    Text(
-                                      'Loading activation cost...',
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .bodySmall!
-                                          .copyWith(
-                                            color: Theme.of(context)
-                                                .colorScheme
-                                                .primary,
-                                          ),
-                                    ),
-                                    const SizedBox(width: 8),
-                                    SizedBox(
-                                      width: 12,
-                                      height: 12,
-                                      child: CircularProgressIndicator(
-                                        strokeWidth: 2,
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .primary,
-                                      ),
-                                    ),
-                                  ],
-                                )
-                              : Text(
-                                  'This will consume ${tftPrice * activationFee} TFTs from the selected wallet.',
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .bodySmall!
-                                      .copyWith(
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .primary,
-                                      ),
-                                  softWrap: true,
+                          child: Text(
+                            widget.walletExists
+                                ? 'This will consume $trustlineFee TFTs from the selected wallet.'
+                                : 'This will consume $activationFee TFTs from the selected wallet.',
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodySmall!
+                                .copyWith(
+                                  color: Theme.of(context).colorScheme.primary,
                                 ),
+                            softWrap: true,
+                          ),
                         ),
                       ],
                     ),
@@ -446,9 +380,10 @@ class _ActivateWalletWidgetState extends ConsumerState<ActivateWalletWidget> {
                           width: 5,
                         ),
                         ElevatedButton(
-                            onPressed:
-                                saveLoading || isLoadingPrice || tftPrice == 0
-                                    ? null
+                            onPressed: saveLoading
+                                ? null
+                                : widget.walletExists
+                                    ? () async => await addTFTAsset()
                                     : () async => await activateWallet(),
                             child: saveLoading
                                 ? const SizedBox(
@@ -457,7 +392,9 @@ class _ActivateWalletWidgetState extends ConsumerState<ActivateWalletWidget> {
                                     child: CircularProgressIndicator(
                                       strokeWidth: 2,
                                     ))
-                                : const Text('Activate'))
+                                : widget.walletExists
+                                    ? const Text('Add TFT Asset')
+                                    : const Text('Activate'))
                       ],
                     ),
                   ],
