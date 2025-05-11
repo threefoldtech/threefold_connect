@@ -119,7 +119,8 @@ class _WalletCardWidgetState extends ConsumerState<WalletCardWidget> {
                 ),
                 child: Text(
                   widget.wallet.stellarBalance == '-1'
-                      ? 'Asset not found'
+                      ? 'Asset Not Found'
+
                       : 'Not Activated',
                   style: Theme.of(context).textTheme.bodySmall!.copyWith(
                         color: Theme.of(context).colorScheme.onPrimaryContainer,
