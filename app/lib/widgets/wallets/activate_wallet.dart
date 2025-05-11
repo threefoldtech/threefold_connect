@@ -312,7 +312,7 @@ class _ActivateWalletWidgetState extends ConsumerState<ActivateWalletWidget> {
                       child: Text(
                         widget.wallet.stellarBalance == '-1'
                             ? 'Add TFT Asset'
-                            : 'Activate Stellar',
+                            : 'Activate',
                         style: Theme.of(context)
                             .textTheme
                             .headlineSmall!
