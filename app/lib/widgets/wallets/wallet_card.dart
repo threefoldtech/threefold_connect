@@ -68,7 +68,7 @@ class _WalletCardWidgetState extends ConsumerState<WalletCardWidget> {
     final wallet =
         wallets.where((w) => w.name == widget.wallet.name).firstOrNull;
     if (widget.wallet.type == WalletType.NATIVE &&
-        widget.wallet.stellarBalance == '-1') {
+        widget.wallet.stellarBalance == '-2') {
       cardContent = [
         Container(
           alignment: Alignment.centerRight,
