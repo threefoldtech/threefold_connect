@@ -112,7 +112,7 @@ class _NewFarmState extends State<NewFarm> {
       });
       return false;
     }
-    if (_selectedWallet!.stellarBalance == '-1') {
+    if (double.parse(_selectedWallet!.stellarBalance) <= -1) {
       setState(() {
         walletError = 'Wallet not activated on stellar';
       });

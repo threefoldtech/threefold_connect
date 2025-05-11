@@ -9,6 +9,7 @@ import 'package:threebotlogin/screens/wallets/bridge.dart';
 import 'package:threebotlogin/screens/wallets/receive.dart';
 import 'package:threebotlogin/screens/wallets/send.dart';
 import 'package:threebotlogin/services/stellar_service.dart' as Stellar;
+import 'package:threebotlogin/widgets/wallets/activate_wallet.dart';
 import 'package:threebotlogin/widgets/wallets/arrow_inward.dart';
 import 'package:threebotlogin/widgets/wallets/balance_tile.dart';
 
@@ -57,6 +58,18 @@ class _WalletAssetsWidgetState extends State<WalletAssetsWidget> {
   void dispose() {
     reloadBalance = false;
     super.dispose();
+  }
+
+  _openActivateStellarOverlay() {
+    showModalBottomSheet(
+        isScrollControlled: true,
+        useSafeArea: true,
+        isDismissible: false,
+        constraints: const BoxConstraints(maxWidth: double.infinity),
+        context: context,
+        builder: (ctx) => ActivateWalletWidget(
+              wallet: widget.wallet,
+            ));
   }
 
   @override
@@ -210,9 +223,14 @@ class _WalletAssetsWidgetState extends State<WalletAssetsWidget> {
               balance: formatAmount(widget.wallet.tfchainBalance),
               loading: tfchainBalaceLoading,
             ),
-          const SizedBox(
-            height: 20,
-          ),
+          const SizedBox(height: 10),
+          if (double.parse(widget.wallet.stellarBalance) <= -1)
+            WalletBalanceTileWidget(
+              name: ChainType.Stellar,
+              balance: widget.wallet.stellarBalance,
+              loading: false,
+              onActivate: _openActivateStellarOverlay,
+            ),
           ...vestWidgets
         ],
       ),

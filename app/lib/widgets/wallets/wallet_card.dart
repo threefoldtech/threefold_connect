@@ -23,6 +23,7 @@ class WalletCardWidget extends ConsumerStatefulWidget {
 class _WalletCardWidgetState extends ConsumerState<WalletCardWidget> {
   bool initialWalletLoading = false;
   List<Wallet> wallets = [];
+
   _initializeWallet() async {
     setState(() {
       initialWalletLoading = true;
@@ -67,7 +68,7 @@ class _WalletCardWidgetState extends ConsumerState<WalletCardWidget> {
     final wallet =
         wallets.where((w) => w.name == widget.wallet.name).firstOrNull;
     if (widget.wallet.type == WalletType.NATIVE &&
-        widget.wallet.stellarBalance == '-1') {
+        widget.wallet.stellarBalance == '-2') {
       cardContent = [
         Container(
           alignment: Alignment.centerRight,
@@ -91,32 +92,50 @@ class _WalletCardWidgetState extends ConsumerState<WalletCardWidget> {
       ];
     } else {
       cardContent = [
-        if (double.parse(widget.wallet.stellarBalance) >= 0)
-          Row(
-            children: [
-              SizedBox(
-                  width: 35,
-                  child: Image.asset(
-                    'assets/stellar.png',
-                    color: Theme.of(context).colorScheme.onSurface,
-                    width: 20,
-                    height: 20,
-                  )),
-              Text(
-                'Stellar',
-                style: Theme.of(context).textTheme.bodyLarge!.copyWith(
-                      color: Theme.of(context).colorScheme.onSecondaryContainer,
-                    ),
+        Row(
+          children: [
+            SizedBox(
+                width: 35,
+                child: Image.asset(
+                  'assets/stellar.png',
+                  color: Theme.of(context).colorScheme.onSurface,
+                  width: 20,
+                  height: 20,
+                )),
+            Text(
+              'Stellar',
+              style: Theme.of(context).textTheme.bodyLarge!.copyWith(
+                    color: Theme.of(context).colorScheme.onSecondaryContainer,
+                  ),
+            ),
+            const Spacer(),
+            if (double.parse(widget.wallet.stellarBalance) <= -1)
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.surface.withOpacity(0.7),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Text(
+                  widget.wallet.stellarBalance == '-1'
+                      ? 'Asset Not Found'
+                      : 'Not Activated',
+                  style: Theme.of(context).textTheme.bodySmall!.copyWith(
+                        color: Theme.of(context).colorScheme.onPrimaryContainer,
+                        fontWeight: FontWeight.w500,
+                      ),
+                ),
               ),
-              const Spacer(),
+            if (widget.wallet.stellarBalance != '-1' &&
+                widget.wallet.stellarBalance != '-2')
               Text(
                 '${formatAmount(widget.wallet.stellarBalance)} TFT',
                 style: Theme.of(context).textTheme.bodyLarge!.copyWith(
                       color: Theme.of(context).colorScheme.onSecondaryContainer,
                     ),
               ),
-            ],
-          ),
+          ],
+        ),
         if (double.parse(widget.wallet.tfchainBalance) >= 0)
           Row(
             children: [
@@ -152,7 +171,7 @@ class _WalletCardWidgetState extends ConsumerState<WalletCardWidget> {
       child: InkWell(
         onTap: () {
           if (widget.wallet.type == WalletType.NATIVE &&
-              widget.wallet.stellarBalance == '-1') {
+              double.parse(widget.wallet.stellarBalance) <= -1) {
             return;
           }
           Navigator.of(context).push(MaterialPageRoute(
@@ -189,7 +208,7 @@ class _WalletCardWidgetState extends ConsumerState<WalletCardWidget> {
                       ),
                       borderRadius: BorderRadius.circular(20),
                     ),
-                    child: Text(capitalize(wallet.verificationStatus.name),                   
+                    child: Text(capitalize(wallet.verificationStatus.name),
                         style: Theme.of(context).textTheme.bodySmall!.copyWith(
                               color: wallet.verificationStatus ==
                                       VerificationState.VERIFIED

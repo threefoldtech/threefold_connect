@@ -124,11 +124,15 @@ class _FarmScreenState extends ConsumerState<FarmScreen>
         farmId: farm.farmID,
         nodes: nodes
             .map((node) => Node(
-                nodeId: node.nodeId,
-                status: NodeStatus.values.firstWhere(
-                  (e) =>
-                      e.toString().toLowerCase() == 'nodestatus.${node.status}',
-                )))
+                  nodeId: node.nodeId,
+                  status: NodeStatus.values.firstWhere(
+                    (e) =>
+                        e.toString().toLowerCase() ==
+                        'nodestatus.${node.status}',
+                  ),
+                  country: node.location!.country,
+                  uptime: node.uptime,
+                ))
             .toList(),
       );
     }).toList());
@@ -157,7 +161,12 @@ class _FarmScreenState extends ConsumerState<FarmScreen>
               farmId: f.farmID!,
               nodes: nodes
                   .where((n) => n.farmID == f.farmID)
-                  .map((n) => Node(nodeId: n.nodeID, status: NodeStatus.Up))
+                  .map((n) => Node(
+                      nodeId: n.nodeID,
+                      status: NodeStatus.Up,
+                      country: n.location.country,
+                      uptime:
+                          (n.uptime.isNotEmpty) ? n.uptime.last.duration : 0))
                   .toList(),
             )));
       } catch (e) {
