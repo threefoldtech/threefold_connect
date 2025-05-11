@@ -152,7 +152,7 @@ class _WalletSendScreenState extends ConsumerState<WalletSendScreen> {
         return false;
       } else {
         final balance = await Stellar.getBalanceByAccountId(toAddress);
-        if (balance == '-1') {
+        if (double.parse(balance) <= -1) {
           setState(() {
             toAddressError = 'Wallet not activated on stellar';
           });

@@ -131,7 +131,7 @@ class _FarmItemWidgetState extends State<FarmItemWidget> {
     if (addressError == null) {
       try {
         final balance = await getBalanceByAccountId(address);
-        if (balance == '-1') {
+        if (double.parse(balance) <= -1) {
           setState(() {
             addressError = 'Wallet not activated on stellar';
           });

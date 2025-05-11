@@ -99,6 +99,7 @@ Future<String> getBalanceByAccountId(String accountId) async {
     }
   } catch (e) {
     logger.i("Couldn't load the account balance due to $e");
+    return '-2';
   }
   return '-1';
 }

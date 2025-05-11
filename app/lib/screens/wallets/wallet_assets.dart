@@ -224,8 +224,7 @@ class _WalletAssetsWidgetState extends State<WalletAssetsWidget> {
               loading: tfchainBalaceLoading,
             ),
           const SizedBox(height: 10),
-          if (widget.wallet.stellarBalance == '-1' ||
-              widget.wallet.stellarBalance == '-2')
+          if (double.parse(widget.wallet.stellarBalance) <= -1)
             WalletBalanceTileWidget(
               name: ChainType.Stellar,
               balance: widget.wallet.stellarBalance,
