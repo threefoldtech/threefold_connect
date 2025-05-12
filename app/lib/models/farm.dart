@@ -4,10 +4,14 @@ class Node {
   Node({
     required this.nodeId,
     required this.status,
+    this.country,
+    this.uptime,
     this.updatedAt,
   });
   final int nodeId;
   final NodeStatus status;
+  final int? uptime;
+  final String? country;
   final int? updatedAt;
 }
 

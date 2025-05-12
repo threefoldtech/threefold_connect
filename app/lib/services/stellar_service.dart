@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:stellar_client/models/transaction.dart';
@@ -34,7 +35,7 @@ bool isValidStellarAddress(String address) {
 Future<Map<String, String>> getBalanceByClient(Client client) async {
   try {
     final stellarBalances = await client.getBalance();
-    final balances = <String, String>{'TFT': '0', 'USDC': '0'};
+    final balances = <String, String>{'TFT': '-1', 'USDC': '-1'};
 
     for (final balance in stellarBalances) {
       if (balance.assetCode == 'TFT' || balance.assetCode == 'USDC') {
@@ -45,9 +46,8 @@ Future<Map<String, String>> getBalanceByClient(Client client) async {
     return balances;
   } catch (e) {
     logger.i("Couldn't load the account balance due to $e");
-    return {'TFT': '-1', 'USDC': '-1'};
-  }
-}
+    return {'TFT': '-2', 'USDC': '-2'};
+  }}
 
 Future<String> getBalance(String secret) async {
   final client = Client(NetworkType.PUBLIC, secret);
@@ -86,9 +86,9 @@ Future<void> transfer(String secret, String dest, String amount,
   );
 }
 
-Future<void> initialize(String secret) async {
+Future<bool> initialize(String secret) async {
   final client = Client(NetworkType.PUBLIC, secret);
-  await client.activateThroughThreefoldService();
+  return await client.activateThroughThreefoldService();
 }
 
 Future<String> getBalanceByAccountId(String accountId) async {
@@ -103,8 +103,56 @@ Future<String> getBalanceByAccountId(String accountId) async {
     }
   } catch (e) {
     logger.i("Couldn't load the account balance due to $e");
+    return '-2';
   }
   return '-1';
+}
+
+Future<int> getTFTPriceFromXLM() async {
+  const String baseUrl = 'https://horizon.stellar.org';
+  const String counterAssetCode = 'TFT';
+  const String counterAssetIssuer =
+      'GBOVQKJYHXRR3DX6NOX2RRYFRCUMSADGDESTDNBDS6CDVLGVESRTAC47';
+  final String requestUrl = '$baseUrl/trades?base_asset_type=native'
+      '&counter_asset_type=credit_alphanum4'
+      '&counter_asset_code=$counterAssetCode'
+      '&counter_asset_issuer=$counterAssetIssuer'
+      '&order=desc&limit=1';
+
+  try {
+    final response = await http.get(Uri.parse(requestUrl));
+
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      final List<dynamic> trades = data['_embedded']?['records'] ?? [];
+
+      if (trades.isNotEmpty) {
+        final trade = trades[0];
+        final double baseAmount = double.parse(trade['base_amount']);
+        final double counterAmount = double.parse(trade['counter_amount']);
+
+        final double pricePerTFT = counterAmount / baseAmount;
+        logger.i('Last traded price for 1 XLM in TFT: $pricePerTFT');
+        final int roundedPrice = pricePerTFT.ceil();
+
+        return roundedPrice;
+      } else {
+        logger.i('No recent trades found.');
+        return 0;
+      }
+    } else {
+      logger.e('Error fetching last traded price: ${response.statusCode}');
+      throw Exception('Error getting price');
+    }
+  } catch (e) {
+    logger.e('Error: $e');
+    throw Exception('Error getting price');
+  }
+}
+
+Future<bool> addTFTTrustline(String secret, String assetCode) async {
+  final client = Client(NetworkType.PUBLIC, secret);
+  return await client.addTrustLineThroughThreefoldService(assetCode);
 }
 
 Future<Stream<OrderBook>> listOrderBook(

@@ -173,7 +173,7 @@ class _MobileRegistrationScreenState extends State<MobileRegistrationScreen> {
         base64.encode(_registrationData.keyPair.publicKey));
 
     if (response.statusCode == 200) {
-      saveRegistration();
+      await saveRegistration();
 
       Navigator.pop(context); // Remove loading screen
       Navigator.pop(context, true); // Pop this
@@ -253,13 +253,13 @@ class _MobileRegistrationScreenState extends State<MobileRegistrationScreen> {
     }
   }
 
-  void saveRegistration() async {
+  saveRegistration() async {
     await savePrivateKey(_registrationData.keyPair.secretKey.extractBytes());
     await savePublicKey(_registrationData.keyPair.publicKey);
     await saveFingerprint(false);
+    await savePhrase(_registrationData.phrase);
     await saveEmail(_registrationData.email, null);
     await saveDoubleName(_registrationData.doubleName);
-    await savePhrase(_registrationData.phrase);
 
     FlutterPkid client = await getPkidClient();
     client.setPKidDoc('email', json.encode({'email': _registrationData.email}));
