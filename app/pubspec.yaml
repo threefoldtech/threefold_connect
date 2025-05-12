@@ -57,7 +57,7 @@ dependencies:
   open_file: ^3.5.10
   pinenacl: ^0.6.0
   pinput: ^5.0.1
-  build_runner: ^2.4.13
+  build_runner: ^2.4.11
   smooth_page_indicator: ^1.2.0+3
   webview_flutter: ^4.10.0
   qr_flutter: ^4.1.0
@@ -93,6 +93,7 @@ dev_dependencies:
   flutter_lints: ^5.0.0
 
 dependency_overrides:
+  dart_style: ^2.3.0
   intl: ^0.19.0
   shared_preferences_android: 2.0.12
   signer:
@@ -100,7 +101,6 @@ dependency_overrides:
       url: https://github.com/threefoldtech/tfgrid-sdk-dart.git
       path: packages/signer
       ref: development
-  dart_style: ^3.0.1
 
 flutter:
   uses-material-design: true
