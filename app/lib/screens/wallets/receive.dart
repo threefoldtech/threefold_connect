@@ -86,7 +86,7 @@ class _WalletReceiveScreenState extends State<WalletReceiveScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final bool hideStellar = widget.wallet.stellarBalance == '-1';
+    final bool hideStellar = double.parse(widget.wallet.stellarBalance) <= -1;
     if (hideStellar) {
       onChangeChain(ChainType.TFChain);
     }
