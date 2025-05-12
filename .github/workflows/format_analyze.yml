@@ -28,6 +28,7 @@ jobs:
 
       - name: Init build script
         run: ./build.sh --init
+
       - name: Initialize Reflectable
         run: dart run build_runner build --delete-conflicting-outputs
 
