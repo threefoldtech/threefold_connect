@@ -9,7 +9,6 @@ import 'package:threebotlogin/helpers/logger.dart';
 import 'package:threebotlogin/models/market_data.dart';
 import 'package:threebotlogin/models/offer.dart';
 import 'package:threebotlogin/models/order_book.dart';
-import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 bool isValidStellarSecret(String seed) {
