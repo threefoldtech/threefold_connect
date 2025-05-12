@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:stellar_flutter_sdk/stellar_flutter_sdk.dart';
 import 'package:threebotlogin/helpers/logger.dart';
 import 'package:threebotlogin/models/offer.dart';
-import 'package:threebotlogin/models/wallet.dart';
+import 'package:threebotlogin/models/wallet.dart' as Wallet;
 import 'package:threebotlogin/services/stellar_service.dart';
 import 'package:threebotlogin/widgets/market/orders_notifier.dart';
 import 'package:threebotlogin/widgets/market/orders_widget.dart';
 
 class OrderWidget extends StatefulWidget {
-  final Wallet selectedWallet;
+  final Wallet.Wallet selectedWallet;
   const OrderWidget({super.key, required this.selectedWallet});
 
   @override
@@ -51,27 +52,24 @@ class _OrderWidgetState extends State<OrderWidget>
       loading = true;
     });
 
+    Asset sellingAsset = AssetTypeCreditAlphaNum4(
+        'USDC', 'GA5ZSEJYB37JRC5AVCIA5MOP4RHTM335X2KGX3IHOJAPP5RE34K4KZVN');
+    Asset buyingAsset = AssetTypeCreditAlphaNum4(
+        'TFT', 'GBOVQKJYHXRR3DX6NOX2RRYFRCUMSADGDESTDNBDS6CDVLGVESRTAC47');
+
     try {
       final currentOrders =
           await getActiveOrders(widget.selectedWallet.stellarSecret);
-      final ordersHistory =
-          await getOrdersHistory(widget.selectedWallet.stellarSecret);
+      final ordersHistory = await getOrdersHistory(
+          widget.selectedWallet.stellarSecret, sellingAsset, buyingAsset);
 
       if (activeOrders.isNotEmpty) activeOrders.clear();
       if (previousOrders.isNotEmpty) previousOrders.clear();
-      final filteredActiveOrders = currentOrders.where(
-        (order) =>
-            (order.sellingAsset == 'USDC' && order.buyingAsset == 'TFT') ||
-            (order.sellingAsset == 'TFT' && order.buyingAsset == 'USDC'),
-      );
+      final filteredActiveOrders = currentOrders.where((order) =>
+          (order.sellingAsset == 'USDC' && order.buyingAsset == 'TFT'));
 
-      final filteredOrderHistory = ordersHistory.where(
-        (order) =>
-            (order.sellingAsset == 'USDC' && order.buyingAsset == 'TFT') ||
-            (order.sellingAsset == 'TFT' && order.buyingAsset == 'USDC'),
-      );
       activeOrders.addAll(filteredActiveOrders);
-      previousOrders.addAll(filteredOrderHistory);
+      previousOrders.addAll(ordersHistory);
     } catch (e) {
       logger.e('Failed to load orders due to $e');
       if (context.mounted) {

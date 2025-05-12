@@ -70,10 +70,12 @@ class _OrdersWidgetState extends State<OrdersWidget> {
         ),
       );
     }
-
+    final sortedOffers = List<Offer>.from(widget.offers);
+    sortedOffers.sort((a, b) => DateTime.parse(b.lastModifiedTime)
+        .compareTo(DateTime.parse(a.lastModifiedTime)));
     return ListView(
       padding: const EdgeInsets.only(top: 8, bottom: 80),
-      children: widget.offers.map((offer) {
+      children: sortedOffers.map((offer) {
         return Padding(
           padding: const EdgeInsets.only(bottom: 8),
           child: OrderCardWidget(

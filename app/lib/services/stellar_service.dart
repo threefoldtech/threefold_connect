@@ -171,8 +171,16 @@ Future<double> getLastTradedTFTPrice() async {
         final double baseAmount = double.parse(trade['base_amount']);
         final double counterAmount = double.parse(trade['counter_amount']);
 
+        if (baseAmount == 0 || baseAmount.isNaN) {
+          logger.e('Invalid base amount: $baseAmount');
+          return 0;
+        }
+
         final double pricePerUSDC = counterAmount / baseAmount;
-        logger.i('Last traded price for 1 USDC in TFT: $pricePerUSDC');
+        if (pricePerUSDC.isInfinite || pricePerUSDC.isNaN) {
+          logger.e('Invalid price calculation: $pricePerUSDC');
+          return 0;
+        }
         return pricePerUSDC;
       } else {
         logger.i('No recent trades found.');
@@ -221,10 +229,14 @@ Future<List<Offer>> getActiveOrders(String secret) async {
   return orders.map((order) => Offer.fromOfferResponse(order)).toList();
 }
 
-Future<List<Offer>> getOrdersHistory(String secret) async {
+Future<List<Offer>> getOrdersHistory(
+    String secret, Asset sellingAsset, Asset buyingAsset) async {
   final client = Client(NetworkType.PUBLIC, secret);
   final orders = await getTradingHistory(
-      network: NetworkType.PUBLIC, accountId: client.accountId);
+      network: NetworkType.PUBLIC,
+      accountId: client.accountId,
+      baseAsset: sellingAsset,
+      counterAsset: buyingAsset);
   return orders.map((order) => Offer.fromTradeResponse(order)).toList();
 }
 

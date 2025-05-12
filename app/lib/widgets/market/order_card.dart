@@ -44,45 +44,17 @@ class _OrderCardWidgetState extends ConsumerState<OrderCardWidget> {
       }
       final double totalCost = amount * pricePerTFT;
 
-      final bool isBuyOrder = widget.offer.sellingAsset == 'USDC' &&
-          widget.offer.buyingAsset == 'TFT';
-      final bool isSellOrder = widget.offer.sellingAsset == 'TFT' &&
-          widget.offer.buyingAsset == 'USDC';
-
-      final String orderTypeText = isBuyOrder ? 'Buy' : 'Sell';
-
       List<Widget> cardContent = [];
 
-      if (isBuyOrder) {
-        cardContent = [
-          _buildInfoRow(
-              context, 'Amount:', '- ${amount.toStringAsFixed(2)} USDC'),
-          _buildInfoRow(context, 'Price per TFT:',
-              '${pricePerTFT.toStringAsFixed(4)} USDC',
-              isHighlighted: true),
-          _buildInfoRow(context, 'Total Received:',
-              '+ ${(amount / pricePerTFT).toStringAsFixed(4)} TFT'),
-        ];
-      } else if (isSellOrder) {
-        cardContent = [
-          _buildInfoRow(
-              context, 'Amount:', '- ${amount.toStringAsFixed(2)} TFT'),
-          _buildInfoRow(context, 'Price per TFT:',
-              '${pricePerTFT.toStringAsFixed(4)} USDC',
-              isHighlighted: true),
-          _buildInfoRow(context, 'Total Received:',
-              '+ ${totalCost.toStringAsFixed(4)} USDC'),
-        ];
-      } else {
-        cardContent = [
-          Text(
-            'Unknown order type: ${widget.offer.sellingAsset} -> ${widget.offer.buyingAsset}',
-            style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                  color: Theme.of(context).colorScheme.error,
-                ),
-          ),
-        ];
-      }
+      cardContent = [
+        _buildInfoRow(
+            context, 'Amount:', '- ${amount.toStringAsFixed(2)} USDC'),
+        _buildInfoRow(
+            context, 'Price per TFT:', '${pricePerTFT.toStringAsFixed(4)} USDC',
+            isHighlighted: true),
+        _buildInfoRow(context, 'Total Received:',
+            '+ ${(totalCost).toStringAsFixed(4)} TFT'),
+      ];
 
       return Card(
         margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
@@ -114,9 +86,7 @@ class _OrderCardWidgetState extends ConsumerState<OrderCardWidget> {
                       width: 24,
                       height: 24,
                       child: Image.asset(
-                        isBuyOrder
-                            ? 'assets/usdc-icon.png'
-                            : 'assets/tf_chain.png',
+                        'assets/usdc-icon.png',
                         color: Theme.of(context).colorScheme.onSurface,
                       ),
                     ),
@@ -131,9 +101,7 @@ class _OrderCardWidgetState extends ConsumerState<OrderCardWidget> {
                       width: 24,
                       height: 24,
                       child: Image.asset(
-                        isBuyOrder
-                            ? 'assets/tf_chain.png'
-                            : 'assets/usdc-icon.png',
+                        'assets/tf_chain.png',
                         color: Theme.of(context).colorScheme.onSurface,
                       ),
                     ),
@@ -142,21 +110,15 @@ class _OrderCardWidgetState extends ConsumerState<OrderCardWidget> {
                       padding: const EdgeInsets.symmetric(
                           horizontal: 12, vertical: 4),
                       decoration: BoxDecoration(
-                        color: isBuyOrder
-                            ? Theme.of(context).colorScheme.primaryContainer
-                            : Theme.of(context).colorScheme.errorContainer,
+                        color: Theme.of(context).colorScheme.primaryContainer,
                         borderRadius: BorderRadius.circular(16),
                       ),
                       child: Text(
-                        orderTypeText,
+                        'Buy',
                         style: Theme.of(context).textTheme.bodySmall!.copyWith(
-                              color: isBuyOrder
-                                  ? Theme.of(context)
-                                      .colorScheme
-                                      .onPrimaryContainer
-                                  : Theme.of(context)
-                                      .colorScheme
-                                      .onErrorContainer,
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .onPrimaryContainer,
                               fontWeight: FontWeight.bold,
                             ),
                       ),

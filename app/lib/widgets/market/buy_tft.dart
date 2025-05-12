@@ -295,7 +295,7 @@ class _BuyTFTWidgetState extends State<BuyTFTWidget> {
                             ),
                         focusNode: textFieldFocusNode,
                         keyboardType: const TextInputType.numberWithOptions(
-                            decimal: true),
+                            decimal: true, signed: false),
                         controller: amountController,
                         textInputAction: TextInputAction.done,
                         decoration: InputDecoration(
@@ -393,7 +393,7 @@ class _BuyTFTWidgetState extends State<BuyTFTWidget> {
                               color: Theme.of(context).colorScheme.onSurface,
                             ),
                         keyboardType: const TextInputType.numberWithOptions(
-                            decimal: true),
+                            decimal: true, signed: false),
                         controller: priceController,
                         textInputAction: TextInputAction.done,
                         decoration: InputDecoration(
