@@ -99,6 +99,7 @@ dependency_overrides:
       url: https://github.com/threefoldtech/tfgrid-sdk-dart.git
       path: packages/signer
       ref: development
+  dart_style: ^3.0.1
 
 flutter:
   uses-material-design: true
