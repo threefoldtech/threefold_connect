@@ -354,8 +354,11 @@ class _OverviewWidgetState extends ConsumerState<OverviewWidget> {
       isDismissible: true,
       constraints: const BoxConstraints(maxWidth: double.infinity),
       builder: (context) {
-        final filteredWallets =
-            wallets.where((wallet) => wallet.stellarBalance != '-1').toList();
+        final filteredWallets = wallets
+            .where((wallet) =>
+                double.parse(wallet.stellarBalance) >= 0 &&
+                double.parse(wallet.usdcBalance) >= 0)
+            .toList();
         return WalletSelectionSheet(
           wallets: filteredWallets,
           selectedWallet: _selectedWallet,

@@ -11,6 +11,14 @@ import 'package:threebotlogin/models/offer.dart';
 import 'package:threebotlogin/models/order_book.dart';
 import 'package:http/http.dart' as http;
 
+const String tftAssetCode = 'TFT';
+const String tftAssetIssuer =
+    'GBOVQKJYHXRR3DX6NOX2RRYFRCUMSADGDESTDNBDS6CDVLGVESRTAC47';
+const String usdcAssetCode = 'USDC';
+const String usdcAssetIssuer =
+    'GA5ZSEJYB37JRC5AVCIA5MOP4RHTM335X2KGX3IHOJAPP5RE34K4KZVN';
+const horizonUrl = 'https://horizon.stellar.org';
+
 bool isValidStellarSecret(String seed) {
   try {
     StrKey.decodeStellarSecretSeed(seed);
@@ -46,7 +54,8 @@ Future<Map<String, String>> getBalanceByClient(Client client) async {
   } catch (e) {
     logger.i("Couldn't load the account balance due to $e");
     return {'TFT': '-2', 'USDC': '-2'};
-  }}
+  }
+}
 
 Future<String> getBalance(String secret) async {
   final client = Client(NetworkType.PUBLIC, secret);
@@ -108,14 +117,10 @@ Future<String> getBalanceByAccountId(String accountId) async {
 }
 
 Future<int> getTFTPriceFromXLM() async {
-  const String baseUrl = 'https://horizon.stellar.org';
-  const String counterAssetCode = 'TFT';
-  const String counterAssetIssuer =
-      'GBOVQKJYHXRR3DX6NOX2RRYFRCUMSADGDESTDNBDS6CDVLGVESRTAC47';
-  final String requestUrl = '$baseUrl/trades?base_asset_type=native'
+  final String requestUrl = '$horizonUrl/trades?base_asset_type=native'
       '&counter_asset_type=credit_alphanum4'
-      '&counter_asset_code=$counterAssetCode'
-      '&counter_asset_issuer=$counterAssetIssuer'
+      '&counter_asset_code=$tftAssetCode'
+      '&counter_asset_issuer=$tftAssetIssuer'
       '&order=desc&limit=1';
 
   try {
@@ -157,7 +162,7 @@ Future<bool> addTFTTrustline(String secret, String assetCode) async {
 Future<Stream<OrderBook>> listOrderBook(
     Asset sellingAsset, Asset buyingAsset) async {
   final stream = await getOrderBook(
-      horizonUrl: 'https://horizon.stellar.org/',
+      horizonUrl: horizonUrl,
       sellingAsset: sellingAsset,
       buyingAsset: buyingAsset);
 
@@ -190,20 +195,13 @@ Future<Stream<OrderBook>> listOrderBook(
 }
 
 Future<double> getLastTradedTFTPrice() async {
-  const String baseUrl = 'https://horizon.stellar.org';
-  const String baseAssetCode = 'USDC';
-  const String baseAssetIssuer =
-      'GA5ZSEJYB37JRC5AVCIA5MOP4RHTM335X2KGX3IHOJAPP5RE34K4KZVN';
-  const String counterAssetCode = 'TFT';
-  const String counterAssetIssuer =
-      'GBOVQKJYHXRR3DX6NOX2RRYFRCUMSADGDESTDNBDS6CDVLGVESRTAC47';
-
-  final String requestUrl = '$baseUrl/trades?base_asset_type=credit_alphanum4'
-      '&base_asset_code=$baseAssetCode'
-      '&base_asset_issuer=$baseAssetIssuer'
+  final String requestUrl =
+      '$horizonUrl/trades?base_asset_type=credit_alphanum4'
+      '&base_asset_code=$usdcAssetCode'
+      '&base_asset_issuer=$usdcAssetIssuer'
       '&counter_asset_type=credit_alphanum4'
-      '&counter_asset_code=$counterAssetCode'
-      '&counter_asset_issuer=$counterAssetIssuer'
+      '&counter_asset_code=$tftAssetCode'
+      '&counter_asset_issuer=$tftAssetIssuer'
       '&order=desc&limit=1';
 
   try {
@@ -244,9 +242,9 @@ Future<double> getLastTradedTFTPrice() async {
 }
 
 Future<TftMarketData?> fetchTftMarketData() async {
-  final url = Uri.parse('https://horizon.stellar.org/trades?'
-      'base_asset_type=credit_alphanum4&base_asset_code=TFT&base_asset_issuer=GBOVQKJYHXRR3DX6NOX2RRYFRCUMSADGDESTDNBDS6CDVLGVESRTAC47'
-      '&counter_asset_type=credit_alphanum4&counter_asset_code=USDC&counter_asset_issuer=GA5ZSEJYB37JRC5AVCIA5MOP4RHTM335X2KGX3IHOJAPP5RE34K4KZVN'
+  final url = Uri.parse('$horizonUrl/trades?'
+      'base_asset_type=credit_alphanum4&base_asset_code=$tftAssetCode&base_asset_issuer=$tftAssetIssuer'
+      '&counter_asset_type=credit_alphanum4&counter_asset_code=$usdcAssetCode&counter_asset_issuer=$usdcAssetIssuer'
       '&order=desc'
       '&limit=200');
 

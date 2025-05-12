@@ -52,10 +52,9 @@ class _OrderWidgetState extends State<OrderWidget>
       loading = true;
     });
 
-    Asset sellingAsset = AssetTypeCreditAlphaNum4(
-        'USDC', 'GA5ZSEJYB37JRC5AVCIA5MOP4RHTM335X2KGX3IHOJAPP5RE34K4KZVN');
-    Asset buyingAsset = AssetTypeCreditAlphaNum4(
-        'TFT', 'GBOVQKJYHXRR3DX6NOX2RRYFRCUMSADGDESTDNBDS6CDVLGVESRTAC47');
+    Asset sellingAsset =
+        AssetTypeCreditAlphaNum4(usdcAssetCode, usdcAssetIssuer);
+    Asset buyingAsset = AssetTypeCreditAlphaNum4(tftAssetCode, tftAssetIssuer);
 
     try {
       final currentOrders =

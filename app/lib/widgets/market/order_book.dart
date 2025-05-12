@@ -21,10 +21,8 @@ class _OrderbookWidgetState extends State<OrderbookWidget> {
 
   void _loadOrderBook() async {
     _orderBookStream = await listOrderBook(
-        AssetTypeCreditAlphaNum4(
-            'USDC', 'GA5ZSEJYB37JRC5AVCIA5MOP4RHTM335X2KGX3IHOJAPP5RE34K4KZVN'),
-        AssetTypeCreditAlphaNum4(
-            'TFT', 'GBOVQKJYHXRR3DX6NOX2RRYFRCUMSADGDESTDNBDS6CDVLGVESRTAC47'));
+        AssetTypeCreditAlphaNum4(usdcAssetCode, usdcAssetIssuer),
+        AssetTypeCreditAlphaNum4(tftAssetCode, tftAssetIssuer));
     setState(() {});
   }
 

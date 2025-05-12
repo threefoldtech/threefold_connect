@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:threebotlogin/models/wallet.dart';
-import 'package:threebotlogin/providers/wallets_provider.dart';
 import 'package:threebotlogin/widgets/layout_drawer.dart';
 import 'package:threebotlogin/widgets/market/order_book.dart';
 import 'package:threebotlogin/widgets/market/overview.dart';
@@ -23,23 +22,6 @@ class _MarketPageState extends ConsumerState<MarketPage>
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
-    getWallets();
-  }
-
-  void getWallets() async {
-    try {
-      setState(() {
-        loading = true;
-      });
-      await ref.read(walletsNotifier.notifier).list();
-      wallets = ref.read(walletsNotifier);
-    } catch (e) {
-      throw Exception('Failed to get wallets due to $e');
-    } finally {
-      setState(() {
-        loading = false;
-      });
-    }
   }
 
   @override
