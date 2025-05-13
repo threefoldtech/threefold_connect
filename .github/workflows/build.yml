@@ -30,11 +30,13 @@ jobs:
       - name: Ensure Build Script is Executable
         run: chmod +x build.sh
 
-      - name: Run Build Script
-        # shell: bash  
+      - name: Run Build Script with Debug Logging
+        shell: bash
         run: |
+          set -x
           ./build.sh --init
-          ./build.sh --build --production --debug
+          ./build.sh --build --production --debug 2>&1 | tee build_output.log
+          cat build_output.log
 
       - name: Verify APK Exists
         run: |
@@ -47,4 +49,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: app-apk
-          path: app/build/app/outputs/flutter-apk/app-debug.apk
+          path: build/app/outputs/flutter-apk/app-debug.apk
