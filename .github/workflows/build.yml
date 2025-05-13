@@ -30,16 +30,24 @@ jobs:
       - name: Ensure Build Script is Executable
         run: chmod +x build.sh
 
-      - name: Run Build Script with Debug Logging
+      - name: Run Build Script --init
         shell: bash
         run: |
-          set -x
-          ./build.sh --init
-          ./build.sh --build --production --debug 2>&1 | tee build_output.log
+          set -x # Enable verbose output for this step
+          ./build.sh --init 2>&1 | tee build_init_output.log # Redirect stderr to stdout and save to log
+          cat build_init_output.log
+
+      - name: Run Build Script --build
+        shell: bash
+        run: |
+          set -x # Enable verbose output for this step
+          # This step runs the build command after init has completed
+          ./build.sh --build --production --debug 2>&1 | tee build_output.log # Redirect stderr to stdout and save to log
           cat build_output.log
 
       - name: Verify APK Exists
         run: |
+          # This check will now run after the --build step
           if [ ! -f "build/app/outputs/flutter-apk/app-debug.apk" ]; then
             echo "APK not found! Build failed."
             exit 1
@@ -49,4 +57,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: app-apk
-          path: build/app/outputs/flutter-apk/app-debug.apk
+          path: app/build/app/outputs/flutter-apk/app-debug.apk
