@@ -94,27 +94,35 @@ When you are using the secure 2FA authentication, some third party apps require 
 
 If you have Threefold related questions, we provide a support chat where we will answer your questions as soon as possible!
 
+## How to build an APK
 
-## Local development
+To build an APK for distribution or testing:
 
-### Frontend
+1. Initialize the environment if you haven't already:
 
-Make sure the correct configuration is inside config.js. After that start the frontend by doing:
+   ```bash
+   ./build.sh --init
+   ```
 
-`yarn && yarn serve`
+2. Choose your target environment:
 
-### Backend
+   ```bash
+   ./build.sh --switch --[local|testing|staging|production]
+   ```
 
-Go inside virtual environment:
+3. Build the APK:
 
-`source ./venv/bin/activate`
+   ```bash
+   # For debug build
+   ./build.sh --build --[local|testing|staging|production] --debug
 
-Start UWSGI backend:
+   # For release build
+   ./build.sh --build --[local|testing|staging|production] --release
+   ```
 
-```bash
-uwsgi --http :5000 --gevent 1000 --http-websockets --master --wsgi-file __main__.py --callable app -s 0.0.0.0:3030
-: 1643024584:0;uwsgi --http :5000 --gevent 1000 --http-websockets --master --wsgi-file __main__.py --callable app -s 0.0.0.0:3030
-```
+4. The generated APK will be available at:
+   - Debug APK: `build/app/outputs/flutter-apk/app-debug.apk`
+   - Release APK: `build/app/outputs/flutter-apk/app-release.apk`
 
 ## How to run the app on Android
 

@@ -2,31 +2,44 @@
 
 The (temporary) backend for 3Bot login.
 
+## Run service
+
+Go inside virtual environment:
+
+`source ./venv/bin/activate`
+
+Start UWSGI backend:
+
+```bash
+uwsgi --http :5000 --gevent 1000 --http-websockets --master --wsgi-file __main__.py --callable app -s 0.0.0.0:3030
+: 1643024584:0;uwsgi --http :5000 --gevent 1000 --http-websockets --master --wsgi-file __main__.py --callable app -s 0.0.0.0:3030
+```
+
 ## Data to save
 
 ### User
 
 A user is someone that authenticates using 3botlogin.
 
-| Key | Type | Example | Description |
-| --- | --- | --- | --- |
-| double_name | String | ivan.coene | The name of the user (case insensitive) |
-| sid | String | EWFWEGFWGWGWDS | Socket ID |
-| email | String | <ivan.coene@gmail.com> | The email of the user (case insensitive) |
-| public_key | string | G1gcbyeTnR2i...H8_3yV3cuF | The public key of the user to verify access |
-| device_id | String | abc | The ID of the device where we can send notifications to |
+| Key         | Type    |  Example                  | Description                                             |
+| ----------- | ------- | ------------------------- | ------------------------------------------------------- |
+| double_name |  String | ivan.coene                | The name of the user (case insensitive)                 |
+| sid         |  String | EWFWEGFWGWGWDS            | Socket ID                                               |
+| email       |  String | <ivan.coene@gmail.com>    | The email of the user (case insensitive)                |
+| public_key  |  string | G1gcbyeTnR2i...H8_3yV3cuF | The public key of the user to verify access             |
+| device_id   |  String | abc                       | The ID of the device where we can send notifications to |
 
 ### Login attempt
 
 When a user tries to log in, an entry is added
 
-| Key | Type | Example | Description |
-| --- | --- | --- | --- |
-| double_name | String | ivan.coene | The name of the user (case insensitive) |  
-| state_hash | String | 1gcbyeTnR2iZSfx6r2qIuvhH8 | The "identifier" of a login-attempt |
-| timestamp | Datetime | 2002-12-25 00:00:00-06:39 | The time when this satehash came in |
-| scanned | Boolean | false | Flag to keep the QR-scanned state |
-| singed_statehash | String | 1gcbyeTnR2iZSfx6r2qIuvhH8 | The signed version of the state hash|
+| Key              | Type     |  Example                   | Description                             |
+| ---------------- | -------- | -------------------------- | --------------------------------------- |
+| double_name      |  String  | ivan.coene                 | The name of the user (case insensitive) |
+| state_hash       | String   | 1gcbyeTnR2iZSfx6r2qIuvhH8  |  The "identifier" of a login-attempt    |
+|  timestamp       | Datetime |  2002-12-25 00:00:00-06:39 | The time when this satehash came in     |
+| scanned          | Boolean  | false                      | Flag to keep the QR-scanned state       |
+| singed_statehash | String   | 1gcbyeTnR2iZSfx6r2qIuvhH8  |  The signed version of the state hash   |
 
 ## Run in dev mode
 
