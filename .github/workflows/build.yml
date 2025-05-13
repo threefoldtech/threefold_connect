@@ -30,20 +30,11 @@ jobs:
       - name: Ensure Build Script is Executable
         run: chmod +x build.sh
 
-      - name: Run Build Script --init
+      - name: Run Build Script
         shell: bash
         run: |
-          set -x # Enable verbose output for this step
-          ./build.sh --init 2>&1 | tee build_init_output.log # Redirect stderr to stdout and save to log
-          cat build_init_output.log
-
-      - name: Run Build Script --build
-        shell: bash
-        run: |
-          set -x # Enable verbose output for this step
-          # This step runs the build command after init has completed
-          ./build.sh --build --production --debug 2>&1 | tee build_output.log # Redirect stderr to stdout and save to log
-          cat build_output.log
+          ./build.sh --init
+          ./build.sh --build --production --debug
 
       - name: Verify APK Exists
         run: |
