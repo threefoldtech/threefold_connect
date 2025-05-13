@@ -38,7 +38,6 @@ jobs:
 
       - name: Verify APK Exists
         run: |
-          # This check will now run after the --build step
           if [ ! -f "build/app/outputs/flutter-apk/app-debug.apk" ]; then
             echo "APK not found! Build failed."
             exit 1
