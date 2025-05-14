@@ -19,31 +19,31 @@ class TftMarketData {
     if (trades.isEmpty) return TftMarketData.empty();
 
     final latestTrade = trades.first;
-    final double lastPrice = double.parse(latestTrade['base_amount']) /
+    final double lastUsdcPrice = double.parse(latestTrade['base_amount']) /
         double.parse(latestTrade['counter_amount']);
-    final double lastUsdPrice = 1 / lastPrice;
+    final double lastPrice = 1 / lastUsdcPrice;
 
-    double high24h = lastPrice;
-    double low24h = lastPrice;
+    double high24h = lastUsdcPrice;
+    double low24h = lastUsdcPrice;
     double volume24h = 0;
 
     final oldestTrade = trades.last;
-    final double oldestPrice = double.parse(oldestTrade['base_amount']) /
+    final double oldestUsdcPrice = double.parse(oldestTrade['base_amount']) /
         double.parse(oldestTrade['counter_amount']);
 
     for (var trade in trades) {
-      double price = double.parse(trade['base_amount']) /
+      double usdcPrice = double.parse(trade['base_amount']) /
           double.parse(trade['counter_amount']);
-      high24h = price > high24h ? price : high24h;
-      low24h = price < low24h ? price : low24h;
+      high24h = usdcPrice > high24h ? usdcPrice : high24h;
+      low24h = usdcPrice < low24h ? usdcPrice : low24h;
       volume24h += double.parse(trade['counter_amount']);
     }
 
-    final double change24h = ((lastPrice - oldestPrice) / oldestPrice) * 100;
+    final double change24h = ((lastUsdcPrice - oldestUsdcPrice) / oldestUsdcPrice) * 100;
 
     return TftMarketData(
-      lastPrice: lastPrice,
-      lastUsdPrice: lastUsdPrice,
+      lastPrice: 1 / lastPrice,
+      lastUsdPrice: lastUsdcPrice,
       change24h: change24h,
       high24h: high24h,
       low24h: low24h,

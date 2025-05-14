@@ -69,7 +69,70 @@ class _OverviewWidgetState extends ConsumerState<OverviewWidget> {
     return Column(
       mainAxisAlignment: MainAxisAlignment.start,
       children: [
-        const SizedBox(height: 8),
+        Container(
+            width: double.infinity,
+            margin: EdgeInsets.symmetric(
+                horizontal: MediaQuery.of(context).size.width * 0.04,
+                vertical: 8),
+            padding: const EdgeInsets.all(14.0),
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.surfaceContainerHigh,
+              borderRadius: BorderRadius.circular(8.0),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Image.asset(
+                  'assets/tf_chain.png',
+                  color: Theme.of(context).colorScheme.onSurface,
+                  width: 30,
+                  height: 30,
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  'TFT',
+                  style: Theme.of(context).textTheme.titleMedium!.copyWith(
+                        color: Theme.of(context).colorScheme.onSurface,
+                      ),
+                ),
+                const Spacer(),
+                SizedBox(
+                  width: 50,
+                  child: Center(
+                    child: GestureDetector(
+                      onTap: null,
+                      child: CircleAvatar(
+                        radius: 25,
+                        backgroundColor:
+                            Theme.of(context).colorScheme.primaryContainer,
+                        child: Icon(
+                          Icons.arrow_forward,
+                          color:
+                              Theme.of(context).colorScheme.onPrimaryContainer,
+                          size: 30,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                const Spacer(),
+                Image.asset(
+                  'assets/usdc-icon.png',
+                  color: Theme.of(context).colorScheme.onSurface,
+                  width: 30,
+                  height: 30,
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  'USDC',
+                  style: Theme.of(context).textTheme.titleMedium!.copyWith(
+                        color: Theme.of(context).colorScheme.onSurface,
+                      ),
+                ),
+              ],
+            )),
+        const SizedBox(height: 10),
         if (tftPrice == null)
           const CircularProgressIndicator()
         else
@@ -88,7 +151,7 @@ class _OverviewWidgetState extends ConsumerState<OverviewWidget> {
                 width: 5,
               ),
               Text(
-                'TFT',
+                'USDC',
                 style: Theme.of(context).textTheme.headlineLarge!.copyWith(
                       fontWeight: FontWeight.bold,
                       color: Theme.of(context).colorScheme.primary,
@@ -222,7 +285,7 @@ class _OverviewWidgetState extends ConsumerState<OverviewWidget> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     _buildMarketColumn('Last Price',
-                                        '${marketData.lastPrice.toStringAsFixed(7)} TFT'),
+                                        '${marketData.lastPrice.toStringAsFixed(7)} USDC'),
                                     _buildMarketColumn('Last USD Price',
                                         '\$${marketData.lastUsdPrice.toStringAsFixed(7)}'),
                                     _buildMarketColumn('24H Change',
@@ -236,11 +299,11 @@ class _OverviewWidgetState extends ConsumerState<OverviewWidget> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     _buildMarketColumn('24H High',
-                                        '${marketData.high24h.toStringAsFixed(7)} TFT'),
+                                        '${marketData.high24h.toStringAsFixed(7)} USDC'),
                                     _buildMarketColumn('24H Low',
-                                        '${marketData.low24h.toStringAsFixed(7)} TFT'),
+                                        '${marketData.low24h.toStringAsFixed(7)} USDC'),
                                     _buildMarketColumn('24H Volume',
-                                        '${marketData.volume24h.toStringAsFixed(7)}K TFT'),
+                                        '${marketData.volume24h.toStringAsFixed(7)}K USDC'),
                                   ],
                                 ),
                               ),
@@ -359,6 +422,38 @@ class _OverviewWidgetState extends ConsumerState<OverviewWidget> {
                 double.parse(wallet.stellarBalance) >= 0 &&
                 double.parse(wallet.usdcBalance) >= 0)
             .toList();
+
+        if (filteredWallets.isEmpty) {
+          return Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.surface,
+              borderRadius:
+                  const BorderRadius.vertical(top: Radius.circular(16)),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  'No Wallets Available',
+                  style: Theme.of(context).textTheme.titleLarge!.copyWith(
+                      color: Theme.of(context).colorScheme.onPrimaryContainer),
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  'No wallets with TFT and USDC assets found.',
+                  style: Theme.of(context)
+                      .textTheme
+                      .bodyMedium!
+                      .copyWith(color: Theme.of(context).colorScheme.onSurface),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 8),
+              ],
+            ),
+          );
+        }
         return WalletSelectionSheet(
           wallets: filteredWallets,
           selectedWallet: _selectedWallet,

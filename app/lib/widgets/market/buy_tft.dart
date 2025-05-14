@@ -1,6 +1,7 @@
 import 'package:decimal/decimal.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
+import 'package:threebotlogin/helpers/logger.dart';
 import 'package:threebotlogin/helpers/transaction_helpers.dart';
 import 'package:threebotlogin/models/offer.dart';
 import 'package:threebotlogin/models/wallet.dart';
@@ -26,6 +27,8 @@ class _BuyTFTWidgetState extends State<BuyTFTWidget> {
   String? amountError;
   String? priceError;
   bool loading = false;
+  bool loadingPrice = true;
+  double? currentMarketPrice;
   List percentages = [25, 50, 75, 100];
 
   @override
@@ -38,6 +41,7 @@ class _BuyTFTWidgetState extends State<BuyTFTWidget> {
     amountController.addListener(_calculateTotal);
     priceController.addListener(_calculateTotal);
     if (widget.edit) _calculateTotal();
+    _fetchCurrentMarketPrice();
   }
 
   @override
@@ -51,6 +55,36 @@ class _BuyTFTWidgetState extends State<BuyTFTWidget> {
     amountController.removeListener(_calculateTotal);
     priceController.removeListener(_calculateTotal);
     super.dispose();
+  }
+
+  Future<void> _fetchCurrentMarketPrice() async {
+    try {
+      setState(() {
+        loadingPrice = true;
+      });
+
+      final marketData = await Stellar.fetchTftMarketData();
+      if (marketData != null && marketData.lastUsdPrice > 0) {
+        setState(() {
+          currentMarketPrice = 1 / marketData.lastUsdPrice;
+          loadingPrice = false;
+
+          if (!widget.edit && priceController.text.isEmpty) {
+            priceController.text = currentMarketPrice!.toStringAsFixed(7);
+            _calculateTotal();
+          }
+        });
+      } else {
+        setState(() {
+          loadingPrice = false;
+        });
+      }
+    } catch (e) {
+      logger.e('Error fetching market price: $e');
+      setState(() {
+        loadingPrice = false;
+      });
+    }
   }
 
   bool _validateAmount() {

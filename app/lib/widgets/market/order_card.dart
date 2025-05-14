@@ -37,7 +37,9 @@ class _OrderCardWidgetState extends ConsumerState<OrderCardWidget> {
       final double amount = double.parse(widget.offer.amount);
       double pricePerTFT;
       try {
-        pricePerTFT = double.parse(widget.offer.price);
+        pricePerTFT = double.parse(widget.offer.price) > 0
+            ? 1 / double.parse(widget.offer.price)
+            : 0;
       } catch (e) {
         logger.e('Error parsing price: ${widget.offer.price}, error: $e');
         pricePerTFT = 0;
@@ -47,13 +49,14 @@ class _OrderCardWidgetState extends ConsumerState<OrderCardWidget> {
       List<Widget> cardContent = [];
 
       cardContent = [
-        _buildInfoRow(
-            context, 'Amount:', '- ${amount.toStringAsFixed(2)} USDC'),
+        _buildInfoRow(context, 'Amount:', '- ${amount.toStringAsFixed(2)} USDC',
+            textColor: Theme.of(context).colorScheme.error),
         _buildInfoRow(
             context, 'Price per TFT:', '${pricePerTFT.toStringAsFixed(4)} USDC',
             isHighlighted: true),
         _buildInfoRow(context, 'Total Received:',
-            '+ ${(totalCost).toStringAsFixed(4)} TFT'),
+            '+ ${(totalCost).toStringAsFixed(4)} TFT',
+            textColor: Theme.of(context).colorScheme.primary),
       ];
 
       return Card(
@@ -158,8 +161,13 @@ class _OrderCardWidgetState extends ConsumerState<OrderCardWidget> {
     }
   }
 
-  Widget _buildInfoRow(BuildContext context, String label, String value,
-      {bool isHighlighted = false}) {
+  Widget _buildInfoRow(
+    BuildContext context,
+    String label,
+    String value, {
+    bool isHighlighted = false,
+    Color? textColor,
+  }) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 8),
       child: Row(
@@ -179,7 +187,7 @@ class _OrderCardWidgetState extends ConsumerState<OrderCardWidget> {
                       fontWeight: FontWeight.bold,
                     )
                 : Theme.of(context).textTheme.bodyMedium!.copyWith(
-                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      color: textColor,
                     ),
           ),
         ],

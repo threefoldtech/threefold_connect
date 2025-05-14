@@ -21,8 +21,9 @@ class _OrderbookWidgetState extends State<OrderbookWidget> {
 
   void _loadOrderBook() async {
     _orderBookStream = await listOrderBook(
-        AssetTypeCreditAlphaNum4(usdcAssetCode, usdcAssetIssuer),
-        AssetTypeCreditAlphaNum4(tftAssetCode, tftAssetIssuer));
+      AssetTypeCreditAlphaNum4(tftAssetCode, tftAssetIssuer),
+      AssetTypeCreditAlphaNum4(usdcAssetCode, usdcAssetIssuer),
+    );
     setState(() {});
   }
 
@@ -94,11 +95,11 @@ class _OrderbookWidgetState extends State<OrderbookWidget> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
-                  Text('Amount (USDC)',
+                  Text('Amount (TFT)',
                       style: Theme.of(context).textTheme.bodySmall!.copyWith(
                           fontWeight: FontWeight.bold,
                           color: Theme.of(context).colorScheme.onSurface)),
-                  Text('Price (TFT)',
+                  Text('Price (USDC)',
                       style: Theme.of(context).textTheme.bodySmall!.copyWith(
                           fontWeight: FontWeight.bold,
                           color: Theme.of(context).colorScheme.onSurface)),
@@ -113,11 +114,11 @@ class _OrderbookWidgetState extends State<OrderbookWidget> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
-                  Text('Amount (USDC)',
+                  Text('Amount (TFT)',
                       style: Theme.of(context).textTheme.bodySmall!.copyWith(
                           fontWeight: FontWeight.bold,
                           color: Theme.of(context).colorScheme.onSurface)),
-                  Text('Price (TFT)',
+                  Text('Price (USDC)',
                       style: Theme.of(context).textTheme.bodySmall!.copyWith(
                           fontWeight: FontWeight.bold,
                           color: Theme.of(context).colorScheme.onSurface)),
@@ -144,22 +145,36 @@ class _OrderbookWidgetState extends State<OrderbookWidget> {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceAround,
                         children: [
-                          Text(bid != null ? bid.amount.toString() : '',
+                          Text(
+                              bid != null
+                                  ? (double.tryParse(bid.price) != null &&
+                                          double.parse(bid.price) > 0)
+                                      ? (double.parse(bid.amount) /
+                                              double.parse(bid.price))
+                                          .toStringAsFixed(7)
+                                      : ''
+                                  : '',
                               style: Theme.of(context)
                                   .textTheme
                                   .bodySmall!
                                   .copyWith(
                                       color: Theme.of(context)
                                           .colorScheme
-                                          .onPrimaryContainer)),
-                          Text(bid != null ? bid.price.toString() : '',
+                                          .primary)),
+                          Text(
+                              bid != null
+                                  ? (double.tryParse(bid.price) != null &&
+                                          double.parse(bid.price) > 0)
+                                      ? bid.price.toString()
+                                      : ''
+                                  : '',
                               style: Theme.of(context)
                                   .textTheme
                                   .bodySmall!
                                   .copyWith(
                                       color: Theme.of(context)
                                           .colorScheme
-                                          .onPrimaryContainer)),
+                                          .primary)),
                         ],
                       ),
                     ),
@@ -179,17 +194,15 @@ class _OrderbookWidgetState extends State<OrderbookWidget> {
                                   .textTheme
                                   .bodySmall!
                                   .copyWith(
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .onPrimaryContainer)),
+                                      color:
+                                          Theme.of(context).colorScheme.error)),
                           Text(ask != null ? ask.price.toString() : '',
                               style: Theme.of(context)
                                   .textTheme
                                   .bodySmall!
                                   .copyWith(
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .onPrimaryContainer)),
+                                      color:
+                                          Theme.of(context).colorScheme.error)),
                         ],
                       ),
                     ),

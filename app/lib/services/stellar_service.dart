@@ -226,7 +226,7 @@ Future<double> getLastTradedTFTPrice() async {
           logger.e('Invalid price calculation: $pricePerUSDC');
           return 0;
         }
-        return pricePerUSDC;
+        return 1 / pricePerUSDC;
       } else {
         logger.i('No recent trades found.');
         return 0;
@@ -243,8 +243,8 @@ Future<double> getLastTradedTFTPrice() async {
 
 Future<TftMarketData?> fetchTftMarketData() async {
   final url = Uri.parse('$horizonUrl/trades?'
-      'base_asset_type=credit_alphanum4&base_asset_code=$tftAssetCode&base_asset_issuer=$tftAssetIssuer'
-      '&counter_asset_type=credit_alphanum4&counter_asset_code=$usdcAssetCode&counter_asset_issuer=$usdcAssetIssuer'
+      'base_asset_type=credit_alphanum4&base_asset_code=$usdcAssetCode&base_asset_issuer=$usdcAssetIssuer'
+      '&counter_asset_type=credit_alphanum4&counter_asset_code=$tftAssetCode&counter_asset_issuer=$tftAssetIssuer'
       '&order=desc'
       '&limit=200');
 

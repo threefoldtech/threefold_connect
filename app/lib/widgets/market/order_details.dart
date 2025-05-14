@@ -147,13 +147,13 @@ class _OrderDetailsWidgetState extends State<OrderDetailsWidget> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(
-                          'Sell ',
-                          style:
-                              Theme.of(context).textTheme.bodyLarge!.copyWith(
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .onPrimaryContainer,
-                                  ),
+                          'Buy ',
+                          style: Theme.of(context)
+                              .textTheme
+                              .bodyLarge!
+                              .copyWith(
+                                color: Theme.of(context).colorScheme.primary,
+                              ),
                         ),
                         Text(
                           '(Active)',
@@ -180,14 +180,33 @@ class _OrderDetailsWidgetState extends State<OrderDetailsWidget> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Sell Amount',
+                      'Buy Amount',
                       style: Theme.of(context).textTheme.bodyLarge!.copyWith(
                             color:
                                 Theme.of(context).colorScheme.onSurfaceVariant,
                           ),
                     ),
                     Text(
-                      '${amount.toStringAsFixed(2)} USDC',
+                      '${totalCost.toStringAsFixed(2)} TFT',
+                      style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                            color: Theme.of(context).colorScheme.onSurface,
+                          ),
+                    ),
+                    const SizedBox(
+                      height: 10,
+                    ),
+                    const SizedBox(
+                      height: 10,
+                    ),
+                    Text(
+                      'Price Per TFT',
+                      style: Theme.of(context).textTheme.bodyLarge!.copyWith(
+                            color:
+                                Theme.of(context).colorScheme.onSurfaceVariant,
+                          ),
+                    ),
+                    Text(
+                      '${pricePerUSDC.toString()} USDC',
                       style: Theme.of(context).textTheme.bodyMedium!.copyWith(
                             color: Theme.of(context).colorScheme.onSurface,
                           ),
@@ -212,30 +231,14 @@ class _OrderDetailsWidgetState extends State<OrderDetailsWidget> {
                       height: 10,
                     ),
                     Text(
-                      'Price Per TFT',
+                      'Sell Amount',
                       style: Theme.of(context).textTheme.bodyLarge!.copyWith(
                             color:
                                 Theme.of(context).colorScheme.onSurfaceVariant,
                           ),
                     ),
                     Text(
-                      '${pricePerUSDC.toString()} USDC',
-                      style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                            color: Theme.of(context).colorScheme.onSurface,
-                          ),
-                    ),
-                    const SizedBox(
-                      height: 10,
-                    ),
-                    Text(
-                      'Buy Total',
-                      style: Theme.of(context).textTheme.bodyLarge!.copyWith(
-                            color:
-                                Theme.of(context).colorScheme.onSurfaceVariant,
-                          ),
-                    ),
-                    Text(
-                      '${totalCost.toStringAsFixed(2)} TFT',
+                      '${amount.toStringAsFixed(2)} USDC',
                       style: Theme.of(context).textTheme.bodyMedium!.copyWith(
                             color: Theme.of(context).colorScheme.onSurface,
                           ),
@@ -315,7 +318,7 @@ class _OrderDetailsWidgetState extends State<OrderDetailsWidget> {
                         _cancelOrder();
                       },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Theme.of(context).colorScheme.surface,
+                        backgroundColor: Theme.of(context).colorScheme.errorContainer,
                       ),
                       child: loading
                           ? const SizedBox(
