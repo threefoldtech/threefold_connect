@@ -60,7 +60,7 @@ Inside the app, you can vote on TFChain proposals and view the results of your v
 
 Inside the app you can sign content with one of your wallets.
 
-The content is hashed using md5 and signed using the private key of the wallet.
+The content is hashed by md5 and signed by sr25519 using one of your wallets.
 
 There are 3 ways to sign:
 
