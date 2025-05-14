@@ -57,7 +57,7 @@ dependencies:
   open_file: ^3.5.10
   pinenacl: ^0.6.0
   pinput: ^5.0.1
-  build_runner: ^2.4.11
+  build_runner: ^2.4.13
   smooth_page_indicator: ^1.2.0+3
   webview_flutter: ^4.10.0
   qr_flutter: ^4.1.0
