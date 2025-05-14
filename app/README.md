@@ -96,6 +96,10 @@ If you have Threefold related questions, we provide a support chat where we will
 
 ## How to build an APK
 
+### Prerequisites
+
+- Flutter 3.27.2
+
 To build an APK for distribution or testing:
 
 1. Initialize the environment if you haven't already:
