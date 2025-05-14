@@ -73,9 +73,9 @@ There are 3 ways to sign:
   - The app decodes the QR code and displays the content for review
   - Choose which wallet to use for signing
   - The QR code may contain:
-    - Direct content to sign
-    - A source URL to fetch content from
-    - An optional destination URL for the signed data
+    - Direct content to sign (JSON key: `content`)
+    - A source URL to fetch content from (JSON key: `src`)
+    - An optional destination URL for the signed data (JSON key: `dest`)
 - **Sign with link**
   - Click on a specially formatted link
   - The app automatically fetches content from the link
