@@ -125,7 +125,7 @@ class _ContactsScreenState extends State<ContactsScreen> {
                     unselectedLabelColor:
                         Theme.of(context).colorScheme.onSurface,
                     dividerColor: Theme.of(context).scaffoldBackgroundColor,
-                    labelStyle: Theme.of(context).textTheme.titleLarge,
+                    labelStyle: Theme.of(context).textTheme.titleMedium,
                     unselectedLabelStyle:
                         Theme.of(context).textTheme.titleMedium,
                     tabs: const [

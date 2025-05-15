@@ -132,7 +132,7 @@ class _WalletAssetsWidgetState extends State<WalletAssetsWidget> {
                     const SizedBox(height: 10),
                     Text(
                       'Send',
-                      style: Theme.of(context).textTheme.titleLarge!.copyWith(
+                      style: Theme.of(context).textTheme.titleMedium!.copyWith(
                           color: Theme.of(context).colorScheme.primary),
                     ),
                   ],
@@ -161,7 +161,7 @@ class _WalletAssetsWidgetState extends State<WalletAssetsWidget> {
                     const SizedBox(height: 10),
                     Text(
                       'Receive',
-                      style: Theme.of(context).textTheme.titleLarge!.copyWith(
+                      style: Theme.of(context).textTheme.titleMedium!.copyWith(
                           color: Theme.of(context).colorScheme.primary),
                     ),
                   ],
@@ -191,7 +191,7 @@ class _WalletAssetsWidgetState extends State<WalletAssetsWidget> {
                     const SizedBox(height: 10),
                     Text(
                       'Bridge',
-                      style: Theme.of(context).textTheme.titleLarge!.copyWith(
+                      style: Theme.of(context).textTheme.titleMedium!.copyWith(
                           color: Theme.of(context).colorScheme.primary),
                     ),
                   ],

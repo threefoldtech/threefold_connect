@@ -265,7 +265,7 @@ class _WalletSendScreenState extends ConsumerState<WalletSendScreen> {
                           'Scan QR Code',
                           style: Theme.of(context)
                               .textTheme
-                              .titleLarge!
+                              .titleMedium!
                               .copyWith(
                                   color: Theme.of(context).colorScheme.primary,
                                   fontWeight: FontWeight.bold),
