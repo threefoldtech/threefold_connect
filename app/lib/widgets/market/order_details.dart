@@ -240,7 +240,7 @@ class _OrderDetailsWidgetState extends State<OrderDetailsWidget> {
                     Text(
                       '${amount.toStringAsFixed(2)} USDC',
                       style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                            color: Theme.of(context).colorScheme.onSurface,
+                            color: Theme.of(context).colorScheme.error,
                           ),
                     ),
                   ],
