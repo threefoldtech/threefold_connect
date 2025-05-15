@@ -32,7 +32,7 @@ class Market implements App {
 
   @override
   bool pinRequired() {
-    return false;
+    return true;
   }
 
   @override
