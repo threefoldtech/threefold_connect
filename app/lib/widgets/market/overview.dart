@@ -256,7 +256,7 @@ class _OverviewWidgetState extends ConsumerState<OverviewWidget> {
                         'Market Stats',
                         style: Theme.of(context)
                             .textTheme
-                            .titleMedium!
+                            .titleLarge!
                             .copyWith(
                                 fontWeight: FontWeight.bold,
                                 color: Theme.of(context)
