@@ -331,10 +331,10 @@ class _OverviewWidgetState extends ConsumerState<OverviewWidget> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Assets Balances',
+                            'Balance',
                             style: Theme.of(context)
                                 .textTheme
-                                .titleMedium!
+                                .titleLarge!
                                 .copyWith(
                                     fontWeight: FontWeight.bold,
                                     color: Theme.of(context)
