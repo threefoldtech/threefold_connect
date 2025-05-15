@@ -607,7 +607,7 @@ class _BuyTFTWidgetState extends State<BuyTFTWidget> {
                             },
                             style: ElevatedButton.styleFrom(
                               backgroundColor:
-                                  Theme.of(context).colorScheme.surface,
+                                  Theme.of(context).colorScheme.surfaceContainerHigh,
                             ),
                             child: Text(
                               'Cancel',
