@@ -386,7 +386,7 @@ class _WalletBridgeScreenState extends ConsumerState<WalletBridgeScreen> {
                             'Submit',
                             style: Theme.of(context)
                                 .textTheme
-                                .titleLarge!
+                                .titleMedium!
                                 .copyWith(
                                     color:
                                         Theme.of(context).colorScheme.primary,

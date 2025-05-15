@@ -191,7 +191,7 @@ class _FarmScreenState extends ConsumerState<FarmScreen>
               onPressed: _openAddFarmOverlay,
               child: Text(
                 'Create New Farm',
-                style: Theme.of(context).textTheme.bodyLarge!.copyWith(
+                style: Theme.of(context).textTheme.bodyMedium!.copyWith(
                       color: Theme.of(context).colorScheme.onPrimaryContainer,
                       fontWeight: FontWeight.bold,
                     ),

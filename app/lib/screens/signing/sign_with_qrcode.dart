@@ -240,7 +240,7 @@ class _SignWithQRCodeScreenState extends ConsumerState<SignWithQRCodeScreen>
                         : Text('Sign',
                             style: Theme.of(context)
                                 .textTheme
-                                .titleLarge!
+                                .titleMedium!
                                 .copyWith(
                                   color: Theme.of(context)
                                       .colorScheme

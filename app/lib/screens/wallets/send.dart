@@ -431,7 +431,7 @@ class _WalletSendScreenState extends ConsumerState<WalletSendScreen> {
                           'Transfer',
                           style: Theme.of(context)
                               .textTheme
-                              .titleLarge!
+                              .titleMedium!
                               .copyWith(
                                   color: Theme.of(context).colorScheme.primary,
                                   fontWeight: FontWeight.bold),

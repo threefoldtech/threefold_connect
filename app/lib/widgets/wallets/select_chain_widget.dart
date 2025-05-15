@@ -28,7 +28,7 @@ class SelectChainWidget extends StatelessWidget {
                       : colorScheme.secondaryContainer))),
       child: Text(
         label,
-        style: Theme.of(context).textTheme.titleLarge!.copyWith(
+        style: Theme.of(context).textTheme.titleMedium!.copyWith(
             color: active
                 ? colorScheme.onPrimaryContainer
                 : colorScheme.onSurface),

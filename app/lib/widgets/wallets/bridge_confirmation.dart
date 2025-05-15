@@ -157,7 +157,7 @@ class _BridgeConfirmationWidgetState extends State<BridgeConfirmationWidget> {
                         ))
                     : Text(
                         'Confirm',
-                        style: Theme.of(context).textTheme.titleLarge!.copyWith(
+                        style: Theme.of(context).textTheme.titleMedium!.copyWith(
                             color: Theme.of(context).colorScheme.primary,
                             fontWeight: FontWeight.bold),
                         textAlign: TextAlign.center,
@@ -178,7 +178,7 @@ class _BridgeConfirmationWidgetState extends State<BridgeConfirmationWidget> {
                 ),
                 child: Text(
                   'Cancel',
-                  style: Theme.of(context).textTheme.titleLarge!.copyWith(
+                  style: Theme.of(context).textTheme.titleMedium!.copyWith(
                       color: Theme.of(context).colorScheme.onSurface,
                       fontWeight: FontWeight.bold),
                   textAlign: TextAlign.center,
