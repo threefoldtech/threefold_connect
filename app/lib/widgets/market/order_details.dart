@@ -189,7 +189,7 @@ class _OrderDetailsWidgetState extends State<OrderDetailsWidget> {
                     Text(
                       '${totalCost.toStringAsFixed(2)} TFT',
                       style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                            color: Theme.of(context).colorScheme.onSurface,
+                            color: Theme.of(context).colorScheme.primary,
                           ),
                     ),
                     const SizedBox(
