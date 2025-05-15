@@ -133,9 +133,11 @@ Future<Wallet> loadWallet(String walletName, String walletSeed,
     stellarAddress: stellarClient.accountId,
     tfchainSecret: tfchainClient.mnemonicOrSecretSeed,
     tfchainAddress: tfchainClient.address,
-    stellarBalance: stellarBalances['TFT'] ?? '0',
+    stellarBalances: {
+      'TFT': stellarBalances['TFT'] ?? '0',
+      'USDC': stellarBalances['USDC'] ?? '-1',
+    },
     tfchainBalance: tfchainBalance,
-    usdcBalance: stellarBalances['USDC'] ?? '-1',
     type: walletType,
     verificationStatus: kycVerified.status,
   );

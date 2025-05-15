@@ -10,6 +10,7 @@ import 'package:threebotlogin/services/stellar_service.dart';
 import 'package:threebotlogin/widgets/market/buy_tft.dart';
 import 'package:threebotlogin/widgets/market/order.dart';
 import 'package:threebotlogin/widgets/market/wallet_selection.dart';
+import 'package:threebotlogin/services/stellar_service.dart' as Stellar;
 
 class OverviewWidget extends ConsumerStatefulWidget {
   const OverviewWidget({super.key});
@@ -23,15 +24,26 @@ class _OverviewWidgetState extends ConsumerState<OverviewWidget> {
   late Timer _timer;
   String lastUpdated = '--';
   Wallet? _selectedWallet;
+  bool loading = true;
+  bool failed = false;
+  TftMarketData? marketData;
+  String? usdcBalance;
+  String? stellarBalance;
 
   @override
   void initState() {
     super.initState();
     _fetchTFTPrice();
     _startPriceUpdater();
+    _fetchMarketData();
   }
 
   void _fetchTFTPrice() async {
+    if (!mounted) return;
+    setState(() {
+      loading = true;
+      failed = false;
+    });
     try {
       final price = await getLastTradedTFTPrice();
       setState(() {
@@ -39,7 +51,40 @@ class _OverviewWidgetState extends ConsumerState<OverviewWidget> {
         lastUpdated = _formattedDateTime();
       });
     } catch (e) {
+      setState(() {
+        failed = true;
+      });
       logger.i('Error fetching price: $e');
+    } finally {
+      setState(() {
+        loading = false;
+      });
+    }
+  }
+
+  Future<TftMarketData?> _fetchMarketData() async {
+    setState(() {
+      loading = true;
+      failed = false;
+    });
+    try {
+      final data = await Stellar.fetchTftMarketData();
+      setState(() {
+        marketData = data;
+        loading = false;
+        failed = false;
+      });
+      return data;
+    } catch (e) {
+      setState(() {
+        failed = true;
+      });
+      logger.e('Error fetching market data: $e');
+      return null;
+    } finally {
+      setState(() {
+        loading = false;
+      });
     }
   }
 
@@ -66,326 +111,427 @@ class _OverviewWidgetState extends ConsumerState<OverviewWidget> {
   @override
   Widget build(BuildContext context) {
     final wallets = ref.watch(walletsNotifier);
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.start,
-      children: [
-        Container(
-            width: double.infinity,
-            margin: EdgeInsets.symmetric(
-                horizontal: MediaQuery.of(context).size.width * 0.04,
-                vertical: 8),
-            padding: const EdgeInsets.all(14.0),
-            decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.surfaceContainerHigh,
-              borderRadius: BorderRadius.circular(8.0),
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Image.asset(
-                  'assets/tf_chain.png',
-                  color: Theme.of(context).colorScheme.onSurface,
-                  width: 30,
-                  height: 30,
-                ),
-                const SizedBox(width: 8),
-                Text(
-                  'TFT',
-                  style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                        color: Theme.of(context).colorScheme.onSurface,
-                      ),
-                ),
-                const Spacer(),
-                SizedBox(
-                  width: 50,
-                  child: Center(
-                    child: GestureDetector(
-                      onTap: null,
-                      child: CircleAvatar(
-                        radius: 25,
-                        backgroundColor:
-                            Theme.of(context).colorScheme.primaryContainer,
-                        child: Icon(
-                          Icons.arrow_forward,
-                          color:
-                              Theme.of(context).colorScheme.onPrimaryContainer,
-                          size: 30,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-                const Spacer(),
-                Image.asset(
-                  'assets/usdc-icon.png',
-                  color: Theme.of(context).colorScheme.onSurface,
-                  width: 30,
-                  height: 30,
-                ),
-                const SizedBox(width: 8),
-                Text(
-                  'USDC',
-                  style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                        color: Theme.of(context).colorScheme.onSurface,
-                      ),
-                ),
-              ],
-            )),
-        const SizedBox(height: 10),
-        if (tftPrice == null)
-          const CircularProgressIndicator()
-        else
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Text(
-                tftPrice!.toStringAsFixed(7),
-                style: Theme.of(context).textTheme.headlineLarge!.copyWith(
-                      fontWeight: FontWeight.bold,
-                      color: Theme.of(context).colorScheme.primary,
-                    ),
-              ),
-              const SizedBox(
-                width: 5,
-              ),
-              Text(
-                'USDC',
-                style: Theme.of(context).textTheme.headlineLarge!.copyWith(
-                      fontWeight: FontWeight.bold,
-                      color: Theme.of(context).colorScheme.primary,
-                    ),
-              ),
-            ],
-          ),
-        const SizedBox(height: 8),
-        Text(
-          'Last updated: $lastUpdated',
-          style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                color: Theme.of(context).colorScheme.onSurfaceVariant,
-              ),
-        ),
-        Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 16),
-            child: Row(
-              children: [
-                Expanded(
-                  child: SizedBox(
-                    height: 50,
-                    child: ElevatedButton(
-                      onPressed: () => _openWalletSelectionOverlay(wallets),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor:
-                            Theme.of(context).colorScheme.primaryContainer,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            _selectedWallet?.name ?? 'Select Wallet',
-                            style: Theme.of(context)
-                                .textTheme
-                                .bodyLarge!
-                                .copyWith(
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .onPrimaryContainer),
-                          ),
-                          Icon(Icons.arrow_drop_down,
-                              color: Theme.of(context)
-                                  .colorScheme
-                                  .onPrimaryContainer),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: SizedBox(
-                    height: 50,
-                    child: ElevatedButton(
-                      onPressed: _selectedWallet == null
-                          ? null
-                          : () async {
-                              Navigator.of(context).push(MaterialPageRoute(
-                                  builder: (context) => OrderWidget(
-                                        selectedWallet: _selectedWallet!,
-                                      )));
-                            },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor:
-                            Theme.of(context).colorScheme.primaryContainer,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                      ),
-                      child: Text(
-                        'My Orders',
-                        style: Theme.of(context).textTheme.bodyLarge!.copyWith(
-                              color: Theme.of(context)
-                                  .colorScheme
-                                  .onPrimaryContainer,
-                            ),
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            )),
-        SizedBox(
-          width: double.infinity,
+    Widget mainWidget;
+    if (loading) {
+      mainWidget = Center(
           child: Column(
-            children: [
-              Card(
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(5),
-                  side:
-                      BorderSide(color: Theme.of(context).colorScheme.primary),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Market Stats',
-                        style: Theme.of(context)
-                            .textTheme
-                            .titleLarge!
-                            .copyWith(
-                                fontWeight: FontWeight.bold,
-                                color: Theme.of(context)
-                                    .colorScheme
-                                    .onSecondaryContainer),
-                      ),
-                      FutureBuilder<TftMarketData?>(
-                        future: fetchTftMarketData(),
-                        builder: (context, snapshot) {
-                          if (snapshot.connectionState ==
-                              ConnectionState.waiting) {
-                            return const Center(
-                                child: CircularProgressIndicator());
-                          } else if (snapshot.hasError || !snapshot.hasData) {
-                            return const Center(
-                                child: Text('No trade data available.'));
-                          }
-
-                          final marketData = snapshot.data!;
-
-                          return Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    _buildMarketColumn('Last Price',
-                                        '${marketData.lastPrice.toStringAsFixed(7)} USDC'),
-                                    _buildMarketColumn('Last USD Price',
-                                        '\$${marketData.lastUsdPrice.toStringAsFixed(7)}'),
-                                    _buildMarketColumn('24H Change',
-                                        '${marketData.change24h.toStringAsFixed(7)}%'),
-                                  ],
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const CircularProgressIndicator(),
+          const SizedBox(height: 15),
+          Text(
+            'Loading Market...',
+            style: Theme.of(context).textTheme.bodyLarge!.copyWith(
+                color: Theme.of(context).colorScheme.onSurface,
+                fontWeight: FontWeight.bold),
+          ),
+        ],
+      ));
+    } else if (failed) {
+      mainWidget = Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const SizedBox(height: 15),
+            ElevatedButton.icon(
+              icon: const Icon(Icons.refresh),
+              label: const Text('Try Again'),
+              onPressed: () {
+                setState(() {
+                  failed = false;
+                  loading = true;
+                });
+                _fetchTFTPrice();
+              },
+            ),
+          ],
+        ),
+      );
+    } else {
+      mainWidget = RefreshIndicator(
+          onRefresh: handleRefresh,
+          child: ListView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              children: [
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    Container(
+                        width: double.infinity,
+                        margin: EdgeInsets.symmetric(
+                            horizontal:
+                                MediaQuery.of(context).size.width * 0.04,
+                            vertical: 8),
+                        padding: const EdgeInsets.all(14.0),
+                        decoration: BoxDecoration(
+                          color: Theme.of(context)
+                              .colorScheme
+                              .surfaceContainerHigh,
+                          borderRadius: BorderRadius.circular(8.0),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Image.asset(
+                              'assets/usdc-icon.png',
+                              color: Theme.of(context).colorScheme.onSurface,
+                              width: 30,
+                              height: 30,
+                            ),
+                            const SizedBox(width: 8),
+                            Text(
+                              'USDC',
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .titleMedium!
+                                  .copyWith(
+                                    color:
+                                        Theme.of(context).colorScheme.onSurface,
+                                  ),
+                            ),
+                            const Spacer(),
+                            SizedBox(
+                              width: 50,
+                              child: Center(
+                                child: GestureDetector(
+                                  onTap: null,
+                                  child: CircleAvatar(
+                                    radius: 25,
+                                    backgroundColor: Theme.of(context)
+                                        .colorScheme
+                                        .primaryContainer,
+                                    child: Icon(
+                                      Icons.arrow_forward,
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onPrimaryContainer,
+                                      size: 30,
+                                    ),
+                                  ),
                                 ),
                               ),
-                              const SizedBox(width: 16),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    _buildMarketColumn('24H High',
-                                        '${marketData.high24h.toStringAsFixed(7)} USDC'),
-                                    _buildMarketColumn('24H Low',
-                                        '${marketData.low24h.toStringAsFixed(7)} USDC'),
-                                    _buildMarketColumn('24H Volume',
-                                        '${marketData.volume24h.toStringAsFixed(7)}K USDC'),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          );
-                        },
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              const SizedBox(height: 16),
-              if (_selectedWallet != null)
-                SizedBox(
-                  width: double.infinity,
-                  child: Card(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(5),
-                      side: BorderSide(
-                          color: Theme.of(context).colorScheme.primary),
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                            ),
+                            const Spacer(),
+                            Image.asset(
+                              'assets/tf_chain.png',
+                              color: Theme.of(context).colorScheme.onSurface,
+                              width: 30,
+                              height: 30,
+                            ),
+                            const SizedBox(width: 8),
+                            Text(
+                              'TFT',
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .titleMedium!
+                                  .copyWith(
+                                    color:
+                                        Theme.of(context).colorScheme.onSurface,
+                                  ),
+                            ),
+                          ],
+                        )),
+                    const SizedBox(height: 10),
+                    if (tftPrice == null)
+                      const CircularProgressIndicator()
+                    else
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
                           Text(
-                            'Balance',
+                            tftPrice!.toStringAsFixed(7),
                             style: Theme.of(context)
                                 .textTheme
-                                .titleLarge!
+                                .headlineLarge!
                                 .copyWith(
-                                    fontWeight: FontWeight.bold,
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .onSecondaryContainer),
+                                  fontWeight: FontWeight.bold,
+                                  color: Theme.of(context).colorScheme.primary,
+                                ),
                           ),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              _buildMarketColumn('Total Balance (TFT)',
-                                  _selectedWallet!.stellarBalance),
-                              _buildMarketColumn('Total Balance (USDC)',
-                                  _selectedWallet!.usdcBalance),
-                            ],
+                          const SizedBox(
+                            width: 5,
+                          ),
+                          Text(
+                            'USDC',
+                            style: Theme.of(context)
+                                .textTheme
+                                .headlineLarge!
+                                .copyWith(
+                                  fontWeight: FontWeight.bold,
+                                  color: Theme.of(context).colorScheme.primary,
+                                ),
                           ),
                         ],
                       ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'Last updated: $lastUpdated',
+                      style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                            color:
+                                Theme.of(context).colorScheme.onSurfaceVariant,
+                          ),
                     ),
-                  ),
-                )
-            ],
-          ),
-        ),
-        const SizedBox(height: 16),
-        Center(
-          child: SizedBox(
-            width: MediaQuery.of(context).size.width - 40,
-            child: ElevatedButton(
-              onPressed: _selectedWallet == null
-                  ? null
-                  : () async {
-                      Navigator.of(context).push(MaterialPageRoute(
-                          builder: (context) => BuyTFTWidget(
-                                wallet: _selectedWallet!,
-                                edit: false,
-                              )));
-                    },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Theme.of(context).colorScheme.primaryContainer,
-              ),
-              child: Text(
-                'Buy TFT',
-                style: Theme.of(context).textTheme.bodyLarge!.copyWith(
-                      color: Theme.of(context).colorScheme.onPrimaryContainer,
+                    Padding(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 16.0, vertical: 16),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: SizedBox(
+                                height: 50,
+                                child: ElevatedButton(
+                                  onPressed: () =>
+                                      _openWalletSelectionOverlay(wallets),
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Theme.of(context)
+                                        .colorScheme
+                                        .primaryContainer,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                  ),
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        _selectedWallet?.name ??
+                                            'Select Wallet',
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .bodyLarge!
+                                            .copyWith(
+                                                color: Theme.of(context)
+                                                    .colorScheme
+                                                    .onPrimaryContainer),
+                                      ),
+                                      Icon(Icons.arrow_drop_down,
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .onPrimaryContainer),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 16),
+                            Expanded(
+                              child: SizedBox(
+                                height: 50,
+                                child: ElevatedButton(
+                                  onPressed: _selectedWallet == null
+                                      ? null
+                                      : () async {
+                                          Navigator.of(context).push(
+                                              MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      OrderWidget(
+                                                        selectedWallet:
+                                                            _selectedWallet!,
+                                                      )));
+                                        },
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Theme.of(context)
+                                        .colorScheme
+                                        .primaryContainer,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                  ),
+                                  child: Text(
+                                    'My Orders',
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .bodyLarge!
+                                        .copyWith(
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .onPrimaryContainer,
+                                        ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        )),
+                    SizedBox(
+                      width: double.infinity,
+                      child: Column(
+                        children: [
+                          Card(
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(5),
+                              side: BorderSide(
+                                  color: Theme.of(context).colorScheme.primary),
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.all(16.0),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'Market Stats',
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .titleLarge!
+                                        .copyWith(
+                                            fontWeight: FontWeight.bold,
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .onSecondaryContainer),
+                                  ),
+                                  Row(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            _buildMarketColumn('Last Price',
+                                                '${marketData!.lastPrice.toStringAsFixed(7)} USDC'),
+                                            _buildMarketColumn('Last USD Price',
+                                                '\$${marketData!.lastUsdPrice.toStringAsFixed(7)}'),
+                                            _buildMarketColumn('24H Change',
+                                                '${marketData!.change24h.toStringAsFixed(7)}%'),
+                                          ],
+                                        ),
+                                      ),
+                                      const SizedBox(width: 16),
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            _buildMarketColumn('24H High',
+                                                '${marketData!.high24h.toStringAsFixed(7)} USDC'),
+                                            _buildMarketColumn('24H Low',
+                                                '${marketData!.low24h.toStringAsFixed(7)} USDC'),
+                                            _buildMarketColumn('24H Volume',
+                                                '${marketData!.volume24h.toStringAsFixed(7)}K USDC'),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          if (_selectedWallet != null)
+                            SizedBox(
+                              width: double.infinity,
+                              child: Card(
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(5),
+                                  side: BorderSide(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .primary),
+                                ),
+                                child: Padding(
+                                  padding: const EdgeInsets.all(16.0),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        'Balance',
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .titleLarge!
+                                            .copyWith(
+                                                fontWeight: FontWeight.bold,
+                                                color: Theme.of(context)
+                                                    .colorScheme
+                                                    .onSecondaryContainer),
+                                      ),
+                                      Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          _buildMarketColumn(
+                                              'Total Balance (TFT)',
+                                              stellarBalance),
+                                          _buildMarketColumn(
+                                              'Total Balance (USDC)',
+                                              usdcBalance),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            )
+                        ],
+                      ),
                     ),
-              ),
-            ),
-          ),
-        ),
-      ],
-    );
+                    const SizedBox(height: 16),
+                    Center(
+                      child: SizedBox(
+                        width: MediaQuery.of(context).size.width - 40,
+                        child: ElevatedButton(
+                          onPressed: _selectedWallet == null
+                              ? null
+                              : () async {
+                                  Navigator.of(context).push(MaterialPageRoute(
+                                      builder: (context) => BuyTFTWidget(
+                                            wallet: _selectedWallet!,
+                                            edit: false,
+                                          )));
+                                },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor:
+                                Theme.of(context).colorScheme.primaryContainer,
+                          ),
+                          child: Text(
+                            'Buy TFT',
+                            style:
+                                Theme.of(context).textTheme.bodyLarge!.copyWith(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onPrimaryContainer,
+                                    ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ]));
+    }
+    return mainWidget;
+  }
+
+  Future<void> handleRefresh() async {
+    try {
+      setState(() {
+        loading = true;
+        failed = false;
+      });
+
+      final price = await getLastTradedTFTPrice();
+      final marketData = await _fetchMarketData();
+      setState(() {
+        tftPrice = price;
+        this.marketData = marketData;
+        lastUpdated = _formattedDateTime();
+        failed = false;
+      });
+    } catch (e) {
+      setState(() {
+        failed = true;
+      });
+      logger.i('Error fetching price: $e');
+    } finally {
+      setState(() {
+        loading = false;
+      });
+    }
   }
 
   Widget _buildMarketColumn(String title, String? value) {
@@ -419,8 +565,8 @@ class _OverviewWidgetState extends ConsumerState<OverviewWidget> {
       builder: (context) {
         final filteredWallets = wallets
             .where((wallet) =>
-                double.parse(wallet.stellarBalance) >= 0 &&
-                double.parse(wallet.usdcBalance) >= 0)
+                double.parse(stellarBalance!) >= 0 &&
+                double.parse(usdcBalance!) >= 0)
             .toList();
 
         if (filteredWallets.isEmpty) {

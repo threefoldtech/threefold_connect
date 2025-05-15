@@ -32,7 +32,7 @@ class _WalletCardWidgetState extends ConsumerState<WalletCardWidget> {
       final chainUrl = Globals().chainUrl;
       await initializeWallet(
           widget.wallet.stellarSecret, widget.wallet.tfchainSecret);
-      widget.wallet.stellarBalance =
+      widget.wallet.stellarBalances['TFT'] =
           await StellarService.getBalance(widget.wallet.stellarSecret);
       final tfchainBalance = await TFChainService.getBalance(
           chainUrl, widget.wallet.tfchainAddress);
@@ -68,7 +68,7 @@ class _WalletCardWidgetState extends ConsumerState<WalletCardWidget> {
     final wallet =
         wallets.where((w) => w.name == widget.wallet.name).firstOrNull;
     if (widget.wallet.type == WalletType.NATIVE &&
-        widget.wallet.stellarBalance == '-2') {
+        widget.wallet.stellarBalances['TFT'] == '-2') {
       cardContent = [
         Container(
           alignment: Alignment.centerRight,
@@ -109,7 +109,7 @@ class _WalletCardWidgetState extends ConsumerState<WalletCardWidget> {
                   ),
             ),
             const Spacer(),
-            if (double.parse(widget.wallet.stellarBalance) <= -1)
+            if (double.parse(widget.wallet.stellarBalances['TFT']!) <= -1)
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                 decoration: BoxDecoration(
@@ -117,7 +117,7 @@ class _WalletCardWidgetState extends ConsumerState<WalletCardWidget> {
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Text(
-                  widget.wallet.stellarBalance == '-1'
+                  widget.wallet.stellarBalances['TFT'] == '-1'
                       ? 'Asset Not Found'
                       : 'Not Activated',
                   style: Theme.of(context).textTheme.bodySmall!.copyWith(
@@ -126,10 +126,10 @@ class _WalletCardWidgetState extends ConsumerState<WalletCardWidget> {
                       ),
                 ),
               ),
-            if (widget.wallet.stellarBalance != '-1' &&
-                widget.wallet.stellarBalance != '-2')
+            if (widget.wallet.stellarBalances['TFT'] != '-1' &&
+                widget.wallet.stellarBalances['TFT'] != '-2')
               Text(
-                '${formatAmount(widget.wallet.stellarBalance)} TFT',
+                '${formatAmount(widget.wallet.stellarBalances['TFT']!)} TFT',
                 style: Theme.of(context).textTheme.bodyLarge!.copyWith(
                       color: Theme.of(context).colorScheme.onSecondaryContainer,
                     ),
@@ -171,7 +171,7 @@ class _WalletCardWidgetState extends ConsumerState<WalletCardWidget> {
       child: InkWell(
         onTap: () {
           if (widget.wallet.type == WalletType.NATIVE &&
-              double.parse(widget.wallet.stellarBalance) <= -1) {
+              double.parse(widget.wallet.stellarBalances['TFT']!) <= -1) {
             return;
           }
           Navigator.of(context).push(MaterialPageRoute(

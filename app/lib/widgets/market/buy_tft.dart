@@ -97,8 +97,7 @@ class _BuyTFTWidgetState extends State<BuyTFTWidget> {
       });
       return false;
     }
-
-    final balance = roundAmount(widget.wallet.usdcBalance);
+    final balance = roundAmount(widget.wallet.stellarBalances['USDC']!);
 
     if (balance - Decimal.parse(amount) <= Decimal.zero) {
       setState(() {
@@ -130,8 +129,8 @@ class _BuyTFTWidgetState extends State<BuyTFTWidget> {
   }
 
   calculateAmount(int percentage) {
-    final amount = Decimal.parse(widget.wallet.usdcBalance) *
-        (Decimal.fromInt(percentage).shift(-2));
+    final amount =
+        Decimal.parse(widget.wallet.stellarBalances['USDC']!!) * (Decimal.fromInt(percentage).shift(-2));
     amountController.text = roundAmount(amount.toString()).toString();
     _calculateTotal();
   }
@@ -380,7 +379,7 @@ class _BuyTFTWidgetState extends State<BuyTFTWidget> {
                       child: Align(
                         alignment: Alignment.centerRight,
                         child: Text(
-                          'Available: ${widget.wallet.usdcBalance} USDC',
+                          'Available: ${widget.wallet.stellarBalances['USDC']!} USDC',
                           style:
                               Theme.of(context).textTheme.bodySmall!.copyWith(
                                     color: Theme.of(context)
@@ -606,8 +605,9 @@ class _BuyTFTWidgetState extends State<BuyTFTWidget> {
                               Navigator.pop(context);
                             },
                             style: ElevatedButton.styleFrom(
-                              backgroundColor:
-                                  Theme.of(context).colorScheme.surfaceContainerHigh,
+                              backgroundColor: Theme.of(context)
+                                  .colorScheme
+                                  .surfaceContainerHigh,
                             ),
                             child: Text(
                               'Cancel',

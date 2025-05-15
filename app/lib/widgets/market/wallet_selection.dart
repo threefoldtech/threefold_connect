@@ -33,7 +33,8 @@ class WalletSelectionSheet extends StatelessWidget {
           ...wallets.map((wallet) => ListTile(
                 title: Text(wallet.name),
                 trailing: wallet.name == selectedWallet?.name
-                    ? const Icon(Icons.check, color: Colors.green)
+                    ? Icon(Icons.check,
+                        color: Theme.of(context).colorScheme.primary)
                     : null,
                 onTap: () => onWalletSelected(wallet),
               )),

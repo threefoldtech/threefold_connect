@@ -11,11 +11,10 @@ class Wallet {
     required this.name,
     required this.stellarSecret,
     required this.stellarAddress,
-    required this.stellarBalance,
+    required this.stellarBalances,
     required this.tfchainSecret,
     required this.tfchainAddress,
     required this.tfchainBalance,
-    required this.usdcBalance,
     required this.type,
     required this.verificationStatus,
   });
@@ -24,9 +23,8 @@ class Wallet {
   final String stellarAddress;
   final String tfchainSecret;
   final String tfchainAddress;
-  String stellarBalance;
+  final Map<String, String> stellarBalances;
   String tfchainBalance;
-  String usdcBalance;
   final WalletType type;
   VerificationState verificationStatus;
 }

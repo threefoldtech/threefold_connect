@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:threebotlogin/models/wallet.dart';
 import 'package:threebotlogin/widgets/layout_drawer.dart';
 import 'package:threebotlogin/widgets/market/order_book.dart';
 import 'package:threebotlogin/widgets/market/overview.dart';
@@ -14,10 +13,7 @@ class MarketPage extends ConsumerStatefulWidget {
 
 class _MarketPageState extends ConsumerState<MarketPage>
     with SingleTickerProviderStateMixin {
-  bool loading = false;
   late final TabController _tabController;
-  List<Wallet> wallets = [];
-
   @override
   void initState() {
     super.initState();
@@ -25,26 +21,16 @@ class _MarketPageState extends ConsumerState<MarketPage>
   }
 
   @override
+  void dispose() {
+    super.dispose();
+    _tabController.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    Widget content;
-    if (loading) {
-      content = Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const CircularProgressIndicator(),
-            const SizedBox(height: 15),
-            Text(
-              'Loading Market...',
-              style: Theme.of(context).textTheme.bodyLarge!.copyWith(
-                  color: Theme.of(context).colorScheme.onSurface,
-                  fontWeight: FontWeight.bold),
-            ),
-          ],
-        ),
-      );
-    } else {
-      content = DefaultTabController(
+    return LayoutDrawer(
+      titleText: 'Market',
+      content: DefaultTabController(
         length: 2,
         child: Column(
           children: [
@@ -83,8 +69,7 @@ class _MarketPageState extends ConsumerState<MarketPage>
             ),
           ],
         ),
-      );
-    }
-    return LayoutDrawer(titleText: 'Market', content: content);
+      ),
+    );
   }
 }

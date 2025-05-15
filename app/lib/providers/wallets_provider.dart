@@ -95,8 +95,8 @@ class WalletsNotifier extends StateNotifier<List<Wallet>> {
               await StellarService.getBalance(wallet.stellarSecret);
 
           if (tfchainBalance != wallet.tfchainBalance ||
-              stellarBalance != wallet.stellarBalance) {
-            wallet.stellarBalance = stellarBalance;
+              stellarBalance != wallet.stellarBalances['TFT']) {
+            wallet.stellarBalances['TFT'] = stellarBalance;
             wallet.tfchainBalance = tfchainBalance;
           }
         }
