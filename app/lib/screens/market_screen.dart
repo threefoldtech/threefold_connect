@@ -32,43 +32,36 @@ class _MarketPageState extends ConsumerState<MarketPage>
       titleText: 'Market',
       content: DefaultTabController(
         length: 2,
-        child: Column(
-          children: [
-            PreferredSize(
-              preferredSize: const Size.fromHeight(10.0),
-              child: Container(
-                color: Theme.of(context).scaffoldBackgroundColor,
-                child: TabBar(
-                  controller: _tabController,
-                  labelColor: Theme.of(context).colorScheme.primary,
-                  indicatorColor: Theme.of(context).colorScheme.primary,
-                  unselectedLabelColor: Theme.of(context).colorScheme.onSurface,
-                  dividerColor: Theme.of(context).scaffoldBackgroundColor,
-                  labelStyle: Theme.of(context).textTheme.titleLarge,
-                  unselectedLabelStyle: Theme.of(context).textTheme.titleMedium,
-                  tabs: const [
-                    Tab(text: 'Overview'),
-                    Tab(text: 'OrderBook'),
-                  ],
-                ),
+        child: Column(children: [
+          PreferredSize(
+            preferredSize: const Size.fromHeight(10.0),
+            child: Container(
+              color: Theme.of(context).scaffoldBackgroundColor,
+              child: TabBar(
+                controller: _tabController,
+                labelColor: Theme.of(context).colorScheme.primary,
+                indicatorColor: Theme.of(context).colorScheme.primary,
+                unselectedLabelColor: Theme.of(context).colorScheme.onSurface,
+                dividerColor: Theme.of(context).scaffoldBackgroundColor,
+                labelStyle: Theme.of(context).textTheme.titleLarge,
+                unselectedLabelStyle: Theme.of(context).textTheme.titleMedium,
+                tabs: const [
+                  Tab(text: 'Overview'),
+                  Tab(text: 'OrderBook'),
+                ],
               ),
             ),
-            Expanded(
-              child: SingleChildScrollView(
-                  padding: EdgeInsets.zero,
-                  child: SizedBox(
-                    height: MediaQuery.of(context).size.height,
-                    child: TabBarView(
-                      controller: _tabController,
-                      children: const [
-                        OverviewWidget(),
-                        OrderbookWidget(),
-                      ],
-                    ),
-                  )),
+          ),
+          Expanded(
+            child: TabBarView(
+              controller: _tabController,
+              children: const [
+                OverviewWidget(),
+                OrderbookWidget(),
+              ],
             ),
-          ],
-        ),
+          )
+        ]),
       ),
     );
   }

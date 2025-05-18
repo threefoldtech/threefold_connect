@@ -129,8 +129,8 @@ class _BuyTFTWidgetState extends State<BuyTFTWidget> {
   }
 
   calculateAmount(int percentage) {
-    final amount =
-        Decimal.parse(widget.wallet.stellarBalances['USDC']!!) * (Decimal.fromInt(percentage).shift(-2));
+    final amount = Decimal.parse(widget.wallet.stellarBalances['USDC']!) *
+        (Decimal.fromInt(percentage).shift(-2));
     amountController.text = roundAmount(amount.toString()).toString();
     _calculateTotal();
   }
@@ -208,7 +208,9 @@ class _BuyTFTWidgetState extends State<BuyTFTWidget> {
         builder: (BuildContext context) => CustomDialog(
             image: Icons.error,
             title: 'Error',
-            description: 'Error creating your order',
+            description: double.parse(widget.wallet.stellarBalances['XLM']!) < 1
+                ? 'You need to fund your account with at least 1 XLM to create an order'
+                : 'Error creating your order',
             actions: <Widget>[
               TextButton(
                 child: const Text('Close'),
@@ -275,7 +277,9 @@ class _BuyTFTWidgetState extends State<BuyTFTWidget> {
         builder: (BuildContext context) => CustomDialog(
             image: Icons.error,
             title: 'Error',
-            description: 'Error updating your order',
+            description: double.parse(widget.wallet.stellarBalances['XLM']!) < 1
+                ? 'You need to fund your account with at least 1 XLM to update your order'
+                : 'Error updating your order',
             actions: <Widget>[
               TextButton(
                 child: const Text('Close'),
@@ -309,18 +313,6 @@ class _BuyTFTWidgetState extends State<BuyTFTWidget> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const SizedBox(height: 30),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 15.0),
-                      child: Text(
-                        'Amount',
-                        style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                              fontWeight: FontWeight.bold,
-                              color: Theme.of(context)
-                                  .colorScheme
-                                  .onSecondaryContainer,
-                            ),
-                      ),
-                    ),
                     ListTile(
                       title: TextField(
                         style: Theme.of(context).textTheme.bodyMedium!.copyWith(
@@ -332,20 +324,8 @@ class _BuyTFTWidgetState extends State<BuyTFTWidget> {
                         controller: amountController,
                         textInputAction: TextInputAction.done,
                         decoration: InputDecoration(
-                          hintText: 'Enter amount',
+                          labelText: 'Amount',
                           errorText: amountError,
-                          border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(8),
-                              borderSide: BorderSide(
-                                color: Theme.of(context).colorScheme.outline,
-                              )),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8.0),
-                            borderSide: BorderSide(
-                              color: Theme.of(context).colorScheme.primary,
-                              width: 2.0,
-                            ),
-                          ),
                           suffixIcon: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
@@ -409,17 +389,6 @@ class _BuyTFTWidgetState extends State<BuyTFTWidget> {
                       ),
                     ),
                     const SizedBox(height: 100),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 15.0),
-                      child: Text(
-                        'Price',
-                        style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                            fontWeight: FontWeight.bold,
-                            color: Theme.of(context)
-                                .colorScheme
-                                .onSecondaryContainer),
-                      ),
-                    ),
                     ListTile(
                       title: TextField(
                         style: Theme.of(context).textTheme.bodyMedium!.copyWith(
@@ -430,20 +399,8 @@ class _BuyTFTWidgetState extends State<BuyTFTWidget> {
                         controller: priceController,
                         textInputAction: TextInputAction.done,
                         decoration: InputDecoration(
-                          hintText: 'Enter price',
+                          labelText: 'Price',
                           errorText: priceError,
-                          border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(8),
-                              borderSide: BorderSide(
-                                color: Theme.of(context).colorScheme.outline,
-                              )),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8.0),
-                            borderSide: BorderSide(
-                              color: Theme.of(context).colorScheme.primary,
-                              width: 2.0,
-                            ),
-                          ),
                           suffixIcon: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
@@ -471,17 +428,6 @@ class _BuyTFTWidgetState extends State<BuyTFTWidget> {
                       ),
                     ),
                     const SizedBox(height: 20),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 15.0),
-                      child: Text(
-                        'Total',
-                        style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                            fontWeight: FontWeight.bold,
-                            color: Theme.of(context)
-                                .colorScheme
-                                .onSecondaryContainer),
-                      ),
-                    ),
                     ListTile(
                       title: TextField(
                         style: Theme.of(context).textTheme.bodyMedium!.copyWith(
@@ -493,19 +439,7 @@ class _BuyTFTWidgetState extends State<BuyTFTWidget> {
                         readOnly: true,
                         textInputAction: TextInputAction.done,
                         decoration: InputDecoration(
-                          hintText: 'Total amount',
-                          border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(8),
-                              borderSide: BorderSide(
-                                color: Theme.of(context).colorScheme.outline,
-                              )),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8.0),
-                            borderSide: BorderSide(
-                              color: Theme.of(context).colorScheme.primary,
-                              width: 2.0,
-                            ),
-                          ),
+                          labelText: 'Total amount',
                           suffixIcon: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [

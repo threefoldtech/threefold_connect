@@ -42,10 +42,12 @@ bool isValidStellarAddress(String address) {
 Future<Map<String, String>> getBalanceByClient(Client client) async {
   try {
     final stellarBalances = await client.getBalance();
-    final balances = <String, String>{'TFT': '-1', 'USDC': '-1'};
+    final balances = <String, String>{'TFT': '-1', 'USDC': '-1', 'XLM': '-1'};
 
     for (final balance in stellarBalances) {
-      if (balance.assetCode == 'TFT' || balance.assetCode == 'USDC') {
+      if (balance.assetCode == 'TFT' ||
+          balance.assetCode == 'USDC' ||
+          balance.assetCode == 'XLM') {
         balances[balance.assetCode] =
             double.parse(balance.balance) == 0 ? '0' : balance.balance;
       }
@@ -53,7 +55,7 @@ Future<Map<String, String>> getBalanceByClient(Client client) async {
     return balances;
   } catch (e) {
     logger.i("Couldn't load the account balance due to $e");
-    return {'TFT': '-2', 'USDC': '-2'};
+    return {'TFT': '-2', 'USDC': '-2', 'XLM': '-2'};
   }
 }
 

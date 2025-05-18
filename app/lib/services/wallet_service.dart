@@ -134,8 +134,9 @@ Future<Wallet> loadWallet(String walletName, String walletSeed,
     tfchainSecret: tfchainClient.mnemonicOrSecretSeed,
     tfchainAddress: tfchainClient.address,
     stellarBalances: {
-      'TFT': stellarBalances['TFT'] ?? '0',
+      'TFT': stellarBalances['TFT'] ?? '-1',
       'USDC': stellarBalances['USDC'] ?? '-1',
+      'XLM': stellarBalances['XLM'] ?? '-1'
     },
     tfchainBalance: tfchainBalance,
     type: walletType,

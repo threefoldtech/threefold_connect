@@ -27,8 +27,6 @@ class _OverviewWidgetState extends ConsumerState<OverviewWidget> {
   bool loading = true;
   bool failed = false;
   TftMarketData? marketData;
-  String? usdcBalance;
-  String? stellarBalance;
 
   @override
   void initState() {
@@ -49,6 +47,7 @@ class _OverviewWidgetState extends ConsumerState<OverviewWidget> {
       setState(() {
         tftPrice = price;
         lastUpdated = _formattedDateTime();
+        failed = false;
       });
     } catch (e) {
       setState(() {
@@ -71,7 +70,6 @@ class _OverviewWidgetState extends ConsumerState<OverviewWidget> {
       final data = await Stellar.fetchTftMarketData();
       setState(() {
         marketData = data;
-        loading = false;
         failed = false;
       });
       return data;
@@ -284,14 +282,6 @@ class _OverviewWidgetState extends ConsumerState<OverviewWidget> {
                                 child: ElevatedButton(
                                   onPressed: () =>
                                       _openWalletSelectionOverlay(wallets),
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: Theme.of(context)
-                                        .colorScheme
-                                        .primaryContainer,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                  ),
                                   child: Row(
                                     mainAxisAlignment:
                                         MainAxisAlignment.spaceBetween,
@@ -342,14 +332,22 @@ class _OverviewWidgetState extends ConsumerState<OverviewWidget> {
                                   ),
                                   child: Text(
                                     'My Orders',
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .bodyLarge!
-                                        .copyWith(
-                                          color: Theme.of(context)
-                                              .colorScheme
-                                              .onPrimaryContainer,
-                                        ),
+                                    style: _selectedWallet == null
+                                        ? Theme.of(context)
+                                            .textTheme
+                                            .bodyLarge!
+                                            .copyWith(
+                                                color: Theme.of(context)
+                                                    .colorScheme
+                                                    .onSurfaceVariant)
+                                        : Theme.of(context)
+                                            .textTheme
+                                            .bodyLarge!
+                                            .copyWith(
+                                              color: Theme.of(context)
+                                                  .colorScheme
+                                                  .onPrimaryContainer,
+                                            ),
                                   ),
                                 ),
                               ),
@@ -455,11 +453,17 @@ class _OverviewWidgetState extends ConsumerState<OverviewWidget> {
                                             CrossAxisAlignment.start,
                                         children: [
                                           _buildMarketColumn(
-                                              'Total Balance (TFT)',
-                                              stellarBalance),
+                                              'TFT Balance',
+                                              _selectedWallet
+                                                  ?.stellarBalances['TFT']!),
                                           _buildMarketColumn(
-                                              'Total Balance (USDC)',
-                                              usdcBalance),
+                                              'USDC Balance',
+                                              _selectedWallet
+                                                  ?.stellarBalances['USDC']!),
+                                          _buildMarketColumn(
+                                              'XLM Balance',
+                                              _selectedWallet
+                                                  ?.stellarBalances['XLM']!),
                                         ],
                                       ),
                                     ],
@@ -484,14 +488,20 @@ class _OverviewWidgetState extends ConsumerState<OverviewWidget> {
                                             edit: false,
                                           )));
                                 },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor:
-                                Theme.of(context).colorScheme.primaryContainer,
-                          ),
                           child: Text(
                             'Buy TFT',
-                            style:
-                                Theme.of(context).textTheme.bodyLarge!.copyWith(
+                            style: _selectedWallet == null
+                                ? Theme.of(context)
+                                    .textTheme
+                                    .bodyLarge!
+                                    .copyWith(
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .onSurfaceVariant)
+                                : Theme.of(context)
+                                    .textTheme
+                                    .bodyLarge!
+                                    .copyWith(
                                       color: Theme.of(context)
                                           .colorScheme
                                           .onPrimaryContainer,
@@ -516,6 +526,8 @@ class _OverviewWidgetState extends ConsumerState<OverviewWidget> {
 
       final price = await getLastTradedTFTPrice();
       final marketData = await _fetchMarketData();
+      if (!mounted) return;
+
       setState(() {
         tftPrice = price;
         this.marketData = marketData;
@@ -565,8 +577,8 @@ class _OverviewWidgetState extends ConsumerState<OverviewWidget> {
       builder: (context) {
         final filteredWallets = wallets
             .where((wallet) =>
-                double.parse(stellarBalance!) >= 0 &&
-                double.parse(usdcBalance!) >= 0)
+                double.parse(wallet.stellarBalances['TFT']!) >= 0 &&
+                double.parse(wallet.stellarBalances['USDC']!) >= 0)
             .toList();
 
         if (filteredWallets.isEmpty) {
@@ -606,6 +618,10 @@ class _OverviewWidgetState extends ConsumerState<OverviewWidget> {
           onWalletSelected: (Wallet wallet) {
             setState(() {
               _selectedWallet = wallet;
+              logger.i('Selected wallet: ${wallet.name}');
+              logger.i('TFT balance: ${wallet.stellarBalances['TFT']}');
+              logger.i('USDC balance: ${wallet.stellarBalances['USDC']}');
+              logger.i('XLM balance: ${wallet.stellarBalances['XLM']}');
             });
             Navigator.pop(context);
           },
