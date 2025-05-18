@@ -59,9 +59,3 @@ sudo apt-get install sqlite3
 ## Config file
 
 Rename config.ini.example to config.ini and add your API key.
-
-## From version 2.0.0 the app has switched to the grids explorer
-
-<https://explorer.devnet.grid.tf/explorer#api-Users-createUser>
-<https://explorer.testnet.grid.tf/explorer#api-Users-createUser>
-<https://explorer.grid.tf/explorer#api-Users-createUser>
