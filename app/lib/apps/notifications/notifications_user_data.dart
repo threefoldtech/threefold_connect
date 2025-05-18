@@ -22,7 +22,6 @@ Future<void> setNodeStatusNotificationEnabled(bool value) async {
   try {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool(nodeStatusNotificationEnabledKey, value);
-    print('Notification preference saved: $value');
   } catch (e) {
     logger.e('Error saving notification preference: $e');
   }
