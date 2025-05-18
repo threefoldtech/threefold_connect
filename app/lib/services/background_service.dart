@@ -1,4 +1,5 @@
 import 'package:background_fetch/background_fetch.dart';
+import 'package:threebotlogin/models/farm.dart';
 import 'package:threebotlogin/services/nodes_check_service.dart';
 import 'notification_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -32,51 +33,55 @@ void backgroundFetchHeadlessTask(HeadlessTask task) async {
 }
 
 Future<void> checkNodeStatus(String taskId) async {
-  final offlineNodes = await NodeCheckService.pingNodesInBackground();
-  if (offlineNodes.isEmpty) {
+  try {
+    final offlineNodes = await NodeCheckService.pingNodesInBackground();
+
+    if (offlineNodes.isEmpty) return;
+
+    final StringBuffer bodyBuffer = StringBuffer();
+    final List<Node> nodesToNotify = [];
+    final now = DateTime.now();
+    final nowInMs = now.millisecondsSinceEpoch;
+    final sevenDaysAgoTimestampMs =
+        now.subtract(const Duration(days: 7)).millisecondsSinceEpoch;
+
+    for (final node in offlineNodes) {
+      final nodeUpdatedAtMs = node.updatedAt! * 1000;
+
+      if (nodeUpdatedAtMs <= sevenDaysAgoTimestampMs) continue;
+
+      final downtime = Duration(milliseconds: nowInMs - nodeUpdatedAtMs);
+
+      final checkInterval = _getCheckInterval(downtime);
+
+      bool passesIntervalCheck = false;
+      if (downtime.inMinutes > 0 && checkInterval.inMinutes > 0) {
+        passesIntervalCheck = downtime.inMinutes % checkInterval.inMinutes < 15;
+      }
+
+      if (passesIntervalCheck) {
+        nodesToNotify.add(node);
+        final formattedDowntime = _formatDowntime(downtime);
+        bodyBuffer
+            .writeln('Node ${node.nodeId}: offline for $formattedDowntime');
+      }
+    }
+
+    if (nodesToNotify.isEmpty) return;
+
+    await NotificationService().showNotification(
+      id: nodesToNotify.hashCode,
+      title: nodesToNotify.length == 1
+          ? 'Node Alert 🚨'
+          : '${nodesToNotify.length} Nodes Offline 🚨',
+      body: bodyBuffer.toString().trim(),
+      groupKey: 'offline_nodes',
+    );
+  } catch (e) {
+    logger.e('Error in checkNodeStatus for task $taskId: $e');
+  } finally {
     BackgroundFetch.finish(taskId);
-    return;
   }
-
-  final now = DateTime.now().millisecondsSinceEpoch;
-  final sevenDaysAgoTimestamp =
-      DateTime.now().subtract(const Duration(days: 7)).millisecondsSinceEpoch;
-
-  final nodesToNotify = offlineNodes.where((node) {
-    final nodeUpdatedAtMs = node.updatedAt! * 1000;
-    if (nodeUpdatedAtMs <= sevenDaysAgoTimestamp) return false;
-
-    final downtime = Duration(milliseconds: now - nodeUpdatedAtMs);
-    final checkInterval = _getCheckInterval(downtime);
-
-    return downtime.inMinutes % checkInterval.inMinutes < 15;
-  }).toList();
-
-  if (nodesToNotify.isEmpty) {
-    BackgroundFetch.finish(taskId);
-    return;
-  }
-
-  const groupKey = 'offline_nodes';
-  final StringBuffer bodyBuffer = StringBuffer();
-
-  for (final node in nodesToNotify) {
-    final nodeUpdatedAtMs = node.updatedAt! * 1000;
-    final downtime =
-        _formatDowntime(Duration(milliseconds: now - nodeUpdatedAtMs));
-
-    bodyBuffer.writeln('Node ${node.nodeId}: offline for $downtime');
-  }
-
-  await NotificationService().showNotification(
-    id: nodesToNotify.hashCode,
-    title: nodesToNotify.length == 1
-        ? 'Node Alert 🚨'
-        : '${nodesToNotify.length} Nodes Offline 🚨',
-    body: bodyBuffer.toString().trim(),
-    groupKey: groupKey,
-  );
-  BackgroundFetch.finish(taskId);
 }
 
 Duration _getCheckInterval(Duration downtime) {

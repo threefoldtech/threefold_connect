@@ -10,8 +10,8 @@ class NotificationsScreen extends StatefulWidget {
 }
 
 class _NotificationsScreenState extends State<NotificationsScreen> {
-  bool _nodeStatusNotificationEnabled = true;
-
+  late bool loading;
+  late bool _nodeStatusNotificationEnabled;
   static const String _nodeStatusNotificationEnabledKey =
       'nodeStatusNotificationEnabled';
 
@@ -22,10 +22,14 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
   }
 
   void _loadNotificationPreference() async {
+    setState(() {
+      loading = true;
+    });
     final prefs = await SharedPreferences.getInstance();
     setState(() {
       _nodeStatusNotificationEnabled =
           prefs.getBool(_nodeStatusNotificationEnabledKey) ?? true;
+      loading = false;
     });
   }
 
@@ -45,23 +49,39 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
   Widget _buildNotificationSettings() {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 16.0),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: <Widget>[
-          SwitchListTile(
-            title: const Text('Enable node status notifications'),
-            value: _nodeStatusNotificationEnabled,
-            onChanged: (bool newValue) {
-              setState(() {
-                _nodeStatusNotificationEnabled = newValue;
-              });
-              _setNodeStatusNotification(newValue);
-            },
-            secondary: const Icon(Icons.notifications),
-          ),
-        ],
-      ),
+      child: loading
+          ? Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const CircularProgressIndicator(),
+                  const SizedBox(height: 15),
+                  Text(
+                    'Loading notifications settings...',
+                    style: Theme.of(context).textTheme.bodyLarge!.copyWith(
+                        color: Theme.of(context).colorScheme.onSurface,
+                        fontWeight: FontWeight.bold),
+                  ),
+                ],
+              ),
+            )
+          : Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: <Widget>[
+                SwitchListTile(
+                  title: const Text('Enable node status notifications'),
+                  value: _nodeStatusNotificationEnabled,
+                  onChanged: (bool newValue) {
+                    setState(() {
+                      _nodeStatusNotificationEnabled = newValue;
+                    });
+                    _setNodeStatusNotification(newValue);
+                  },
+                  secondary: const Icon(Icons.monitor_heart),
+                ),
+              ],
+            ),
     );
   }
 }
