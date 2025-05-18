@@ -6,6 +6,7 @@ import 'package:threebotlogin/helpers/logger.dart';
 import 'package:threebotlogin/widgets/layout_drawer.dart';
 import 'package:threebotlogin/widgets/dao/proposals.dart';
 import 'package:threebotlogin/services/tfchain_service.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 
 class DaoPage extends StatefulWidget {
   const DaoPage({super.key});
@@ -21,13 +22,32 @@ class _DaoPageState extends State<DaoPage> with SingleTickerProviderStateMixin {
   bool failed = false;
   late final TabController _tabController;
 
+  @override
+  void initState() {
+    super.initState();
+    loadProposals();
+    _tabController = TabController(length: 2, vsync: this);
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
+  }
+
   Future<void> loadProposals() async {
-    setState(() {
-      loading = true;
-      failed = false;
-    });
+    _setLoadingState();
 
     try {
+      final connectivityResult = await (Connectivity().checkConnectivity());
+
+      if (connectivityResult.contains(ConnectivityResult.none)) {
+        _handleFailure(
+          'No internet connection. Please check your network.',
+        );
+        return;
+      }
+
       final proposals = await getProposals().timeout(
         const Duration(minutes: 1),
         onTimeout: () {
@@ -35,64 +55,63 @@ class _DaoPageState extends State<DaoPage> with SingleTickerProviderStateMixin {
         },
       );
 
-      logger.i('Proposals loaded successfully');
-
-      if (activeList.isNotEmpty) activeList.clear();
-      if (inactiveList.isNotEmpty) inactiveList.clear();
-      activeList.addAll(proposals['activeProposals']!);
-      inactiveList.addAll(proposals['inactiveProposals']!);
-      setState(() {
-        loading = false;
-        failed = false;
-      });
+      _handleSuccess(proposals);
     } on TimeoutException catch (e) {
-      logger.e('Loading proposals timed out: $e');
-      if (context.mounted) {
-        final timeoutFailure = SnackBar(
-          content: Text(
-            'Loading proposals timed out. Please try again.',
-            style: Theme.of(context)
-                .textTheme
-                .bodyMedium!
-                .copyWith(color: Theme.of(context).colorScheme.errorContainer),
-          ),
-          duration: const Duration(seconds: 3),
-        );
-        ScaffoldMessenger.of(context).clearSnackBars();
-        ScaffoldMessenger.of(context).showSnackBar(timeoutFailure);
-      }
-      setState(() {
-        loading = false;
-        failed = true;
-      });
-    } catch (e) {
-      logger.e('Failed to load proposals due to $e');
-      if (context.mounted) {
-        final loadingProposalFailure = SnackBar(
-          content: Text(
-            'Failed to load proposals',
-            style: Theme.of(context)
-                .textTheme
-                .bodyMedium!
-                .copyWith(color: Theme.of(context).colorScheme.errorContainer),
-          ),
-          duration: const Duration(seconds: 3),
-        );
-        ScaffoldMessenger.of(context).clearSnackBars();
-        ScaffoldMessenger.of(context).showSnackBar(loadingProposalFailure);
-      }
-      setState(() {
-        loading = false;
-        failed = true;
-      });
+      _handleFailure(
+        'Loading proposals timed out. Please check your network',
+        error: e,
+      );
+    } on Exception catch (e) {
+      _handleFailure(
+        'Failed to load proposals. Please try again.',
+        error: e,
+      );
     }
   }
 
-  @override
-  void initState() {
-    super.initState();
-    loadProposals();
-    _tabController = TabController(length: 2, vsync: this);
+  void _setLoadingState() {
+    setState(() {
+      loading = true;
+      failed = false;
+    });
+  }
+
+  void _handleSuccess(Map<String, List<Proposal>?> proposals) {
+    activeList.clear();
+    inactiveList.clear();
+    activeList.addAll(proposals['activeProposals'] ?? []);
+    inactiveList.addAll(proposals['inactiveProposals'] ?? []);
+
+    setState(() {
+      loading = false;
+      failed = false;
+    });
+  }
+
+  void _handleFailure(String userMessage, {Object? error}) {
+    if (error != null) {
+      logger.e('Load proposals failed', error: error);
+    }
+
+    if (mounted) {
+      final errorSnackbar = SnackBar(
+        content: Text(
+          userMessage,
+          style: Theme.of(context)
+              .textTheme
+              .bodyMedium!
+              .copyWith(color: Theme.of(context).colorScheme.errorContainer),
+        ),
+        duration: const Duration(seconds: 3),
+      );
+      ScaffoldMessenger.of(context).clearSnackBars();
+      ScaffoldMessenger.of(context).showSnackBar(errorSnackbar);
+    }
+
+    setState(() {
+      loading = false;
+      failed = true;
+    });
   }
 
   @override
@@ -102,9 +121,10 @@ class _DaoPageState extends State<DaoPage> with SingleTickerProviderStateMixin {
       content = Center(
           child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisSize: MainAxisSize.min,
         children: [
           const CircularProgressIndicator(),
-          const SizedBox(height: 15),
+          const SizedBox(height: 16),
           Text(
             'Loading Proposals...',
             style: Theme.of(context).textTheme.bodyLarge!.copyWith(
@@ -117,66 +137,61 @@ class _DaoPageState extends State<DaoPage> with SingleTickerProviderStateMixin {
       content = Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
           children: [
-            const SizedBox(height: 15),
             ElevatedButton.icon(
               icon: const Icon(Icons.refresh),
               label: const Text('Try Again'),
-              onPressed: () async {
-                setState(() {
-                  failed = false;
-                  loading = true;
-                });
-                await loadProposals();
+              onPressed: () {
+                loadProposals();
               },
             ),
+            const SizedBox(height: 16),
           ],
         ),
       );
     } else {
-      content = DefaultTabController(
-        length: 2,
-        child: Column(
-          children: [
-            PreferredSize(
-              preferredSize: const Size.fromHeight(50.0),
-              child: Container(
-                color: Theme.of(context).scaffoldBackgroundColor,
-                child: TabBar(
-                  controller: _tabController,
-                  labelColor: Theme.of(context).colorScheme.primary,
-                  indicatorColor: Theme.of(context).colorScheme.primary,
-                  unselectedLabelColor: Theme.of(context).colorScheme.onSurface,
-                  dividerColor: Theme.of(context).scaffoldBackgroundColor,
-                  labelStyle: Theme.of(context).textTheme.titleLarge,
-                  unselectedLabelStyle: Theme.of(context).textTheme.titleMedium,
-                  tabs: const [
-                    Tab(text: 'Active'),
-                    Tab(text: 'Executable'),
-                  ],
-                ),
-              ),
-            ),
-            Expanded(
-              child: TabBarView(
+      content = Column(
+        children: [
+          PreferredSize(
+            preferredSize: const Size.fromHeight(50.0),
+            child: Container(
+              color: Theme.of(context).scaffoldBackgroundColor,
+              child: TabBar(
                 controller: _tabController,
-                children: [
-                  RefreshIndicator(
-                      onRefresh: loadProposals,
-                      child: ProposalsWidget(
-                        proposals: activeList,
-                        active: true,
-                      )),
-                  RefreshIndicator(
-                      onRefresh: loadProposals,
-                      child: ProposalsWidget(
-                        proposals: inactiveList,
-                      )),
+                labelColor: Theme.of(context).colorScheme.primary,
+                indicatorColor: Theme.of(context).colorScheme.primary,
+                unselectedLabelColor: Theme.of(context).colorScheme.onSurface,
+                dividerColor: Theme.of(context).scaffoldBackgroundColor,
+                labelStyle: Theme.of(context).textTheme.titleLarge,
+                unselectedLabelStyle: Theme.of(context).textTheme.titleMedium,
+                tabs: const [
+                  Tab(text: 'Active'),
+                  Tab(text: 'Executable'),
                 ],
               ),
             ),
-          ],
-        ),
+          ),
+          Expanded(
+            child: TabBarView(
+              controller: _tabController,
+              children: [
+                RefreshIndicator(
+                    onRefresh: loadProposals,
+                    child: ProposalsWidget(
+                      proposals: activeList,
+                      active: true,
+                    )),
+                RefreshIndicator(
+                    onRefresh: loadProposals,
+                    child: ProposalsWidget(
+                      proposals: inactiveList,
+                      active: false,
+                    )),
+              ],
+            ),
+          ),
+        ],
       );
     }
     return LayoutDrawer(titleText: 'Dao', content: content);

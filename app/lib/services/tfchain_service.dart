@@ -71,14 +71,12 @@ Future<double> getBalance(String chainUrl, String address) async {
 Future<double> getBalanceByClient(TFChain.Client client) async {
   await client.connect();
   final balance = (await client.balances.getMyBalance())!.data.free;
-  await client.disconnect();
   return balance / BigInt.from(10).pow(7);
 }
 
 Future<int> getTwinIdByClient(TFChain.Client client) async {
   await client.connect();
   final twinId = await client.twins.getMyTwinId();
-  await client.disconnect();
   return twinId ?? 0;
 }
 
@@ -93,7 +91,6 @@ Future<int> getTwinIdByQueryClient(String address) async {
   final client = TFChain.QueryClient(chainUrl);
   await client.connect();
   final twinId = await client.twins.getTwinIdByAccountId(address: address);
-  await client.disconnect();
   return twinId ?? 0;
 }
 
@@ -107,10 +104,6 @@ Future<Map<String, List<Proposal>>> getProposals() async {
     return proposals;
   } catch (e) {
     throw Exception('Failed to get DAO proposals due to $e');
-  } finally {
-    if (proposals != null) {
-      await client.disconnect();
-    }
   }
 }
 
@@ -123,8 +116,6 @@ Future<DaoVotes> getProposalVotes(String hash) async {
     return votes;
   } catch (e) {
     throw Exception('Failed to get dao proposals votes due to $e');
-  } finally {
-    await client.disconnect();
   }
 }
 
@@ -138,8 +129,6 @@ Future<int> getProposalProgress(
     return progress;
   } catch (e) {
     throw Exception('Failed to get dao proposals progress due to $e');
-  } finally {
-    await client.disconnect();
   }
 }
 
@@ -153,8 +142,6 @@ Future<DaoVotes> vote(bool vote, String hash, int farmId, String seed) async {
     return daoVotes;
   } catch (e) {
     throw Exception('Failed to vote due to $e');
-  } finally {
-    await client.disconnect();
   }
 }
 
@@ -192,8 +179,6 @@ activateAccount(String tfchainSeed) async {
     await client.twins.create(relay: relayUrl, pk: []);
   } catch (e) {
     throw Exception('Failed to activate account due to $e');
-  } finally {
-    await client.disconnect();
   }
 }
 
@@ -214,8 +199,6 @@ Future<Farm?> createFarm(
     return farm;
   } catch (e) {
     throw Exception('Failed to create farm due to $e');
-  } finally {
-    await client.disconnect();
   }
 }
 
@@ -234,8 +217,6 @@ Future<void> addStellarAddress(
         .addStellarAddress(farmId: farmId, stellarAddress: stellarAddress);
   } catch (e) {
     throw Exception('Failed to add stellar address to farm due to $e');
-  } finally {
-    await client.disconnect();
   }
 }
 
@@ -247,16 +228,7 @@ Future<void> transfer(String secret, String dest, String amount) async {
     await client.balances.transfer(address: dest, amount: double.parse(amount));
   } catch (e) {
     throw Exception('Failed to transfer due to $e');
-  } finally {
-    await client.disconnect();
   }
-}
-
-Future<void> disconnect() async {
-  final chainUrl = Globals().chainUrl;
-  final client = TFChain.QueryClient(chainUrl);
-  await client.connect();
-  await client.disconnect();
 }
 
 Future<void> swapToStellar(String secret, String target, BigInt amount) async {
@@ -264,7 +236,6 @@ Future<void> swapToStellar(String secret, String target, BigInt amount) async {
   final client = TFChain.Client(chainUrl, secret, 'sr25519');
   await client.connect();
   await client.bridge.swapToStellar(target: target, amount: amount);
-  await client.disconnect();
 }
 
 Future<String> getMemo(String address) async {
@@ -280,8 +251,6 @@ Future<List<CouncilProposal>> getCouncilProposals(String chainUrl) async {
     return proposals;
   } catch (e) {
     throw Exception('Failed to get council proposals due to $e');
-  } finally {
-    await client.disconnect();
   }
 }
 
@@ -293,8 +262,6 @@ Future<List<String>> getCouncilMembers(String chainUrl) async {
     return members;
   } catch (e) {
     throw Exception('Failed to get council members due to $e');
-  } finally {
-    await client.disconnect();
   }
 }
 
@@ -307,8 +274,6 @@ Future<Votes> councilVote(
     return votes;
   } catch (e) {
     throw Exception('Failed to vote due to $e');
-  } finally {
-    await client.disconnect();
   }
 }
 
@@ -320,8 +285,6 @@ Future<Votes> getCouncilProposalVotes(String chainUrl, String hash) async {
     return votes;
   } catch (e) {
     throw Exception('Failed to get council proposals votes due to $e');
-  } finally {
-    await client.disconnect();
   }
 }
 
@@ -333,7 +296,5 @@ Future<int> getTFTPrice(String chainUrl) async {
     return price;
   } catch (e) {
     throw Exception('Failed to get TFT price due to $e');
-  } finally {
-    await client.disconnect();
   }
 }
