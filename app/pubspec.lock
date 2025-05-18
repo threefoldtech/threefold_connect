@@ -262,6 +262,22 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.19.0"
+  connectivity_plus:
+    dependency: "direct main"
+    description:
+      name: connectivity_plus
+      sha256: "051849e2bd7c7b3bc5844ea0d096609ddc3a859890ec3a9ac4a65a2620cc1f99"
+      url: "https://pub.dev"
+    source: hosted
+    version: "6.1.4"
+  connectivity_plus_platform_interface:
+    dependency: transitive
+    description:
+      name: connectivity_plus_platform_interface
+      sha256: "42657c1715d48b167930d5f34d00222ac100475f73d10162ddf43e714932f204"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.0.1"
   convert:
     dependency: "direct main"
     description:
@@ -278,6 +294,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.2.5"
+  cross_file:
+    dependency: transitive
+    description:
+      name: cross_file
+      sha256: "7caf6a750a0c04effbb52a676dce9a4a592e10ad35c34d6d2d0e4811160d5670"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.3.4+2"
   crypto:
     dependency: "direct main"
     description:
@@ -311,7 +335,7 @@ packages:
     source: hosted
     version: "1.0.8"
   dart_style:
-    dependency: transitive
+    dependency: "direct overridden"
     description:
       name: dart_style
       sha256: "7306ab8a2359a48d22310ad823521d723acfed60ee1f7e37388e8986853b6820"
@@ -1111,6 +1135,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.0"
+  nm:
+    dependency: transitive
+    description:
+      name: nm
+      sha256: "2c9aae4127bdc8993206464fcc063611e0e36e72018696cd9631023a31b24254"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.5.0"
   octo_image:
     dependency: transitive
     description:
@@ -1331,34 +1363,34 @@ packages:
     dependency: transitive
     description:
       name: polkadart
-      sha256: "46604b1c6fb4f35b564194e51c53a9a77a15291671db6cfbed9fb188831b8560"
+      sha256: b2369eeb33ee155dcdf2a7af18de8961037b9cc28640e200f1475cea497bc3ab
       url: "https://pub.dev"
     source: hosted
-    version: "0.5.0"
+    version: "0.7.1"
   polkadart_cli:
     dependency: transitive
     description:
       name: polkadart_cli
-      sha256: ea16dc9eef662fed6c330f357b38402bc1fd2b862b4e47bf1f9d84c48fa3135b
+      sha256: e02782bfd77446c6705ef61d378d49e25df8a2826c575825d7abf2047ea6c07b
       url: "https://pub.dev"
     source: hosted
-    version: "0.5.0"
+    version: "0.7.0"
   polkadart_keyring:
     dependency: transitive
     description:
       name: polkadart_keyring
-      sha256: bed5af744e801e88bf7d067ea477fc7eb0a5955801491a8b3e57b578d9de8bea
+      sha256: e99a93c845466dfb53e23bf650bd6ccd772d7cefe7c7ff2c93c6e86d387e5215
       url: "https://pub.dev"
     source: hosted
-    version: "0.5.0"
+    version: "0.7.0"
   polkadart_scale_codec:
     dependency: transitive
     description:
       name: polkadart_scale_codec
-      sha256: a9b295ddbd8ace501066800ab521575095464f324cb4185be386bd78ee9316d0
+      sha256: db0d61adc58d8b395e663558ba6b2aed2ab2291d343733c49c693de62a2498d2
       url: "https://pub.dev"
     source: hosted
-    version: "1.3.0"
+    version: "1.5.0"
   pool:
     dependency: transitive
     description:
@@ -1540,10 +1572,10 @@ packages:
     dependency: transitive
     description:
       name: secp256k1_ecdsa
-      sha256: "8d516e3f9ad716e721a4e961b890bb03bf3c68ba51bca256a617a055e3c7ef89"
+      sha256: "50bca61d6ad872829f6bd05c17a96441c1bcfe456ed5bf8cba710ceac86db5f1"
       url: "https://pub.dev"
     source: hosted
-    version: "0.5.0"
+    version: "0.6.1"
   shared_preferences:
     dependency: "direct main"
     description:
@@ -1621,7 +1653,7 @@ packages:
     description:
       path: "packages/signer"
       ref: development
-      resolved-ref: "0ce3b575e2f3dcd371be2152042978113b4eadb1"
+      resolved-ref: "7f33a44cd88b7b23fa0ccfe2253c6a8ea71a72d9"
       url: "https://github.com/threefoldtech/tfgrid-sdk-dart.git"
     source: git
     version: "0.1.0"
@@ -1738,10 +1770,10 @@ packages:
     dependency: transitive
     description:
       name: sr25519
-      sha256: d10247ff98330efb658042357c8c7fc46074c3c160ea16d3dcdfedf8a9a87b60
+      sha256: "122c930a933da6af018ec4a2ccdb853a7d0eb1a0891bfb03467e366b56f86f12"
       url: "https://pub.dev"
     source: hosted
-    version: "0.5.0"
+    version: "0.7.0"
   ss58:
     dependency: transitive
     description:
@@ -1819,18 +1851,18 @@ packages:
     dependency: transitive
     description:
       name: substrate_bip39
-      sha256: "6680dc10eb4f165659374eec5c5aa75920e720b3c00b65490e1dfe3d5ea5a52d"
+      sha256: ba880015808079804f40a0fde8c5bff0315ec6792fe3a4281a704e408f1c6bdb
       url: "https://pub.dev"
     source: hosted
-    version: "0.5.0"
+    version: "0.7.0"
   substrate_metadata:
     dependency: transitive
     description:
       name: substrate_metadata
-      sha256: "878bf0e818eed4543f0c9af303b8ffe201cb69bf56c32d717f1bdef88e691836"
+      sha256: "6f9e9e3e1078c0c143dd63824043370b9df582d34c431a759253ce2f9cbb7f13"
       url: "https://pub.dev"
     source: hosted
-    version: "1.3.0"
+    version: "1.5.0"
   synchronized:
     dependency: transitive
     description:
@@ -1860,7 +1892,7 @@ packages:
     description:
       path: "packages/tfchain_client"
       ref: development
-      resolved-ref: "4ef4d3bc2550017d987f27fd8c2264854c5cf683"
+      resolved-ref: "7f33a44cd88b7b23fa0ccfe2253c6a8ea71a72d9"
       url: "https://github.com/threefoldtech/tfgrid-sdk-dart"
     source: git
     version: "0.1.0"
@@ -2152,14 +2184,30 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.1.1"
+  web_socket:
+    dependency: transitive
+    description:
+      name: web_socket
+      sha256: "34d64019aa8e36bf9842ac014bb5d2f5586ca73df5e4d9bf5c936975cae6982c"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.1"
   web_socket_channel:
     dependency: transitive
     description:
       name: web_socket_channel
-      sha256: d88238e5eac9a42bb43ca4e721edba3c08c6354d4a53063afaa568516217621b
+      sha256: d645757fb0f4773d602444000a8131ff5d48c9e47adfe9772652dd1a4f2d45c8
       url: "https://pub.dev"
     source: hosted
-    version: "2.4.0"
+    version: "3.0.3"
+  web_socket_client:
+    dependency: transitive
+    description:
+      name: web_socket_client
+      sha256: "22264cb5143e9bb55c943d6b051d207fdd6470ffb77ee45778c9a7a0fda100bc"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.2.0"
   webview_flutter:
     dependency: "direct main"
     description:

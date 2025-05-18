@@ -81,7 +81,7 @@ class WalletsNotifier extends StateNotifier<List<Wallet>> {
   }
 
   void reloadBalances() async {
-    if (!_reload) return await TFChainService.disconnect();
+    if (!_reload) return;
     if (!_loading) {
       final chainUrl = Globals().chainUrl;
       await _mutex.protect(() async {

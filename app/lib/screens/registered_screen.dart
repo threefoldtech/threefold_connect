@@ -118,9 +118,11 @@ class _RegisteredScreenState extends State<RegisteredScreen>
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     HomeCardWidget(
-                        name: 'Identity', icon: Icons.person, pageNumber: 5),
+                        name: 'Settings', icon: Icons.settings, pageNumber: 6),
                     HomeCardWidget(
-                        name: 'Settings', icon: Icons.settings, pageNumber: 7),
+                        name: 'Notifications',
+                        icon: Icons.notifications,
+                        pageNumber: 9),
                   ],
                 ),
                 const SizedBox(height: 40),
