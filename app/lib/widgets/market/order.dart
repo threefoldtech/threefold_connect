@@ -4,7 +4,7 @@ import 'package:threebotlogin/helpers/logger.dart';
 import 'package:threebotlogin/models/offer.dart';
 import 'package:threebotlogin/models/wallet.dart' as Wallet;
 import 'package:threebotlogin/services/stellar_service.dart';
-import 'package:threebotlogin/widgets/market/orders_notifier.dart';
+import 'package:threebotlogin/providers/orders_notifier.dart';
 import 'package:threebotlogin/widgets/market/orders_widget.dart';
 
 class OrderWidget extends StatefulWidget {

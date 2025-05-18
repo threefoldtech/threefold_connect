@@ -41,7 +41,7 @@ class _BuyTFTWidgetState extends State<BuyTFTWidget> {
     amountController.addListener(_calculateTotal);
     priceController.addListener(_calculateTotal);
     if (widget.edit) _calculateTotal();
-    _fetchCurrentMarketPrice();
+    if (!widget.edit) _fetchCurrentMarketPrice();
   }
 
   @override

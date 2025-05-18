@@ -5,7 +5,7 @@ import 'package:threebotlogin/models/wallet.dart';
 import 'package:threebotlogin/services/stellar_service.dart' as Stellar;
 import 'package:threebotlogin/widgets/custom_dialog.dart';
 import 'package:threebotlogin/widgets/market/buy_tft.dart';
-import 'package:threebotlogin/widgets/market/orders_notifier.dart';
+import 'package:threebotlogin/providers/orders_notifier.dart';
 
 class OrderDetailsWidget extends StatefulWidget {
   final Wallet selectedWallet;
