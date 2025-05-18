@@ -122,7 +122,7 @@ class _RegisteredScreenState extends State<RegisteredScreen>
                     HomeCardWidget(
                         name: 'Notifications',
                         icon: Icons.notifications,
-                        pageNumber: 9),
+                        pageNumber: 10),
                   ],
                 ),
                 const SizedBox(height: 40),

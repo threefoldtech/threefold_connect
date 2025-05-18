@@ -217,7 +217,7 @@ class _LayoutDrawerState extends State<LayoutDrawer> {
                 title: const Text('Notifications'),
                 onTap: () {
                   Navigator.pop(context);
-                  globals.tabController.animateTo(9);
+                  globals.tabController.animateTo(10);
                 },
               ),
             ],
