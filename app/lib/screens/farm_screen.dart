@@ -72,7 +72,7 @@ class _FarmScreenState extends ConsumerState<FarmScreen>
 
       _handleSuccess();
     } on TimeoutException catch (e) {
-      _handleFailure('Loading farms timed out. Poor connection?', error: e);
+      _handleFailure('Loading farms timed out. Please check your network.', error: e);
     } on Exception catch (e) {
       _handleFailure('Failed to load farms due to an unexpected error.',
           error: e);
