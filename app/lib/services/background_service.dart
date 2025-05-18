@@ -1,6 +1,9 @@
 import 'package:background_fetch/background_fetch.dart';
+import 'package:threebotlogin/apps/notifications/notifications_user_data.dart';
+import 'package:threebotlogin/models/farm.dart';
 import 'package:threebotlogin/services/nodes_check_service.dart';
 import 'notification_service.dart';
+import 'package:threebotlogin/helpers/logger.dart';
 
 void backgroundFetchHeadlessTask(HeadlessTask task) async {
   final String taskId = task.taskId;
@@ -10,50 +13,70 @@ void backgroundFetchHeadlessTask(HeadlessTask task) async {
     BackgroundFetch.finish(taskId);
     return;
   }
-  await checkNodeStatus();
+  final bool notificationsEnabled = await isNodeStatusNotificationEnabled();
 
-  BackgroundFetch.finish(taskId);
+  logger.i(
+      'Background Fetch Headless Task: $taskId, Notifications Enabled: $notificationsEnabled');
+
+  if (!notificationsEnabled) {
+    logger.i(
+        '[BackgroundFetch] Node status notifications are disabled. Finishing task: $taskId');
+    BackgroundFetch.finish(taskId);
+    return;
+  }
+  await checkNodeStatus(taskId);
 }
 
-Future<void> checkNodeStatus() async {
-  final offlineNodes = await NodeCheckService.pingNodesInBackground();
-  if (offlineNodes.isEmpty) return;
+Future<void> checkNodeStatus(String taskId) async {
+  try {
+    final offlineNodes = await NodeCheckService.pingNodesInBackground();
 
-  final now = DateTime.now().millisecondsSinceEpoch;
-  final sevenDaysAgoTimestamp =
-      DateTime.now().subtract(const Duration(days: 7)).millisecondsSinceEpoch;
+    if (offlineNodes.isEmpty) return;
 
-  final nodesToNotify = offlineNodes.where((node) {
-    final nodeUpdatedAtMs = node.updatedAt! * 1000;
-    if (nodeUpdatedAtMs <= sevenDaysAgoTimestamp) return false;
+    final StringBuffer bodyBuffer = StringBuffer();
+    final List<Node> nodesToNotify = [];
+    final now = DateTime.now();
+    final nowInMs = now.millisecondsSinceEpoch;
+    final sevenDaysAgoTimestampMs =
+        now.subtract(const Duration(days: 7)).millisecondsSinceEpoch;
 
-    final downtime = Duration(milliseconds: now - nodeUpdatedAtMs);
-    final checkInterval = _getCheckInterval(downtime);
+    for (final node in offlineNodes) {
+      final nodeUpdatedAtMs = node.updatedAt! * 1000;
 
-    return downtime.inMinutes % checkInterval.inMinutes < 15;
-  }).toList();
+      if (nodeUpdatedAtMs <= sevenDaysAgoTimestampMs) continue;
 
-  if (nodesToNotify.isEmpty) return;
+      final downtime = Duration(milliseconds: nowInMs - nodeUpdatedAtMs);
 
-  const groupKey = 'offline_nodes';
-  final StringBuffer bodyBuffer = StringBuffer();
+      final checkInterval = _getCheckInterval(downtime);
 
-  for (final node in nodesToNotify) {
-    final nodeUpdatedAtMs = node.updatedAt! * 1000;
-    final downtime =
-        _formatDowntime(Duration(milliseconds: now - nodeUpdatedAtMs));
+      bool passesIntervalCheck = false;
+      if (downtime.inMinutes > 0 && checkInterval.inMinutes > 0) {
+        passesIntervalCheck = downtime.inMinutes % checkInterval.inMinutes < 15;
+      }
 
-    bodyBuffer.writeln('Node ${node.nodeId}: offline for $downtime');
+      if (passesIntervalCheck) {
+        nodesToNotify.add(node);
+        final formattedDowntime = _formatDowntime(downtime);
+        bodyBuffer
+            .writeln('Node ${node.nodeId}: offline for $formattedDowntime');
+      }
+    }
+
+    if (nodesToNotify.isEmpty) return;
+
+    await NotificationService().showNotification(
+      id: nodesToNotify.hashCode,
+      title: nodesToNotify.length == 1
+          ? 'Node Alert 🚨'
+          : '${nodesToNotify.length} Nodes Offline 🚨',
+      body: bodyBuffer.toString().trim(),
+      groupKey: 'offline_nodes',
+    );
+  } catch (e) {
+    logger.e('Error in checkNodeStatus for task $taskId: $e');
+  } finally {
+    BackgroundFetch.finish(taskId);
   }
-
-  await NotificationService().showNotification(
-    id: nodesToNotify.hashCode,
-    title: nodesToNotify.length == 1
-        ? 'Node Alert 🚨'
-        : '${nodesToNotify.length} Nodes Offline 🚨',
-    body: bodyBuffer.toString().trim(),
-    groupKey: groupKey,
-  );
 }
 
 Duration _getCheckInterval(Duration downtime) {

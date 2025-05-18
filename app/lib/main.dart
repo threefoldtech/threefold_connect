@@ -71,7 +71,7 @@ Future<void> main() async {
     ),
     (String taskId) async {
       logger.i('[BackgroundFetch] Task: $taskId');
-      await checkNodeStatus();
+      await checkNodeStatus(taskId);
       BackgroundFetch.finish(taskId);
     },
     (String taskId) async {

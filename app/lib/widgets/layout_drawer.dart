@@ -198,6 +198,17 @@ class _LayoutDrawerState extends State<LayoutDrawer> {
                     globals.tabController.animateTo(7);
                   },
                 ),
+              ListTile(
+                minLeadingWidth: 10,
+                leading: const Padding(
+                    padding: EdgeInsets.only(left: 10),
+                    child: Icon(Icons.notifications, size: 18)),
+                title: const Text('Notifications'),
+                onTap: () {
+                  Navigator.pop(context);
+                  globals.tabController.animateTo(9);
+                },
+              ),
             ],
           ),
         ),
