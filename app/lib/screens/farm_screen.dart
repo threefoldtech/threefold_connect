@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:registrar_client/models/farm.dart' as registrarFarm;
@@ -14,6 +15,7 @@ import 'package:threebotlogin/services/tfchain_service.dart';
 import 'package:threebotlogin/widgets/add_farm.dart';
 import 'package:threebotlogin/widgets/farm_item.dart';
 import 'package:threebotlogin/widgets/layout_drawer.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 
 class FarmScreen extends ConsumerStatefulWidget {
   const FarmScreen({super.key});
@@ -51,43 +53,82 @@ class _FarmScreenState extends ConsumerState<FarmScreen>
   }
 
   Future<void> listFarms() async {
-    try {
-      setState(() {
-        loading = true;
-        failed = false;
-        registrarClient = null;
-        v3Farms.clear();
-        v4Farms.clear();
-      });
-      await listWallets();
+    _setLoadingState();
 
-      if (wallets.isEmpty) return;
-      await listV3FarmsAndNodes();
-      await listV4FarmsAndNodes();
-      setState(() {
-        loading = false;
-      });
-    } catch (e) {
-      logger.e('Failed to get farms due to $e');
-      if (context.mounted) {
-        final loadingFarmsFailure = SnackBar(
-          content: Text(
-            'Failed to load farms',
-            style: Theme.of(context)
-                .textTheme
-                .bodyMedium!
-                .copyWith(color: Theme.of(context).colorScheme.errorContainer),
-          ),
-          duration: const Duration(seconds: 3),
+    try {
+      final connectivityResult = await (Connectivity().checkConnectivity());
+      if (connectivityResult.contains(ConnectivityResult.none)) {
+        _handleFailure(
+          'No internet connection. Please check your network.',
         );
-        ScaffoldMessenger.of(context).clearSnackBars();
-        ScaffoldMessenger.of(context).showSnackBar(loadingFarmsFailure);
+        return;
       }
-      setState(() {
-        failed = true;
-        loading = false;
-      });
+      await _fetchAllFarmData().timeout(
+        const Duration(minutes: 2),
+        onTimeout: () {
+          throw TimeoutException('Loading farm data timed out');
+        },
+      );
+
+      _handleSuccess();
+    } on TimeoutException catch (e) {
+      _handleFailure('Loading farms timed out. Please check your network.', error: e);
+    } on Exception catch (e) {
+      _handleFailure('Failed to load farms due to an unexpected error.',
+          error: e);
     }
+  }
+
+  Future<void> _fetchAllFarmData() async {
+    v3Farms.clear();
+    v4Farms.clear();
+    registrarClient = null;
+
+    await listWallets();
+
+    if (wallets.isEmpty) return;
+    await listV3FarmsAndNodes();
+    await listV4FarmsAndNodes();
+  }
+
+  void _setLoadingState() {
+    setState(() {
+      loading = true;
+      failed = false;
+      v3Farms.clear();
+      v4Farms.clear();
+      registrarClient = null;
+    });
+  }
+
+  void _handleSuccess() {
+    setState(() {
+      loading = false;
+      failed = false;
+    });
+    logger.i('Farm data loaded successfully.');
+  }
+
+  void _handleFailure(String userMessage, {Object? error}) {
+    if (mounted) {
+      final errorSnackbar = SnackBar(
+        content: Text(
+          userMessage,
+          style: Theme.of(context)
+              .textTheme
+              .bodyMedium!
+              .copyWith(color: Theme.of(context).colorScheme.errorContainer),
+        ),
+        duration: const Duration(seconds: 3),
+      );
+      ScaffoldMessenger.of(context).clearSnackBars();
+      ScaffoldMessenger.of(context).showSnackBar(errorSnackbar);
+    }
+
+    setState(() {
+      loading = false;
+      failed = true;
+    });
   }
 
   listV3FarmsAndNodes() async {
@@ -220,9 +261,10 @@ class _FarmScreenState extends ConsumerState<FarmScreen>
       mainWidget = Center(
           child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisSize: MainAxisSize.min,
         children: [
           const CircularProgressIndicator(),
-          const SizedBox(height: 15),
+          const SizedBox(height: 16),
           Text(
             'Loading Farms...',
             style: Theme.of(context).textTheme.bodyLarge!.copyWith(
@@ -235,67 +277,60 @@ class _FarmScreenState extends ConsumerState<FarmScreen>
       mainWidget = Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
           children: [
-            const SizedBox(height: 15),
             ElevatedButton.icon(
               icon: const Icon(Icons.refresh),
               label: const Text('Try Again'),
-              onPressed: () async {
-                setState(() {
-                  failed = false;
-                  loading = true;
-                });
-                await listFarms();
+              onPressed: () {
+                listFarms();
               },
             ),
+            const SizedBox(height: 16),
           ],
         ),
       );
     } else {
-      mainWidget = DefaultTabController(
-          length: 2,
-          child: Column(
-            children: [
-              PreferredSize(
-                preferredSize: const Size.fromHeight(50.0),
-                child: Container(
-                  color: Theme.of(context).scaffoldBackgroundColor,
-                  child: TabBar(
-                    controller: _tabController,
-                    labelColor: Theme.of(context).colorScheme.primary,
-                    indicatorColor: Theme.of(context).colorScheme.primary,
-                    unselectedLabelColor:
-                        Theme.of(context).colorScheme.onSurface,
-                    dividerColor: Theme.of(context).scaffoldBackgroundColor,
-                    labelStyle: Theme.of(context).textTheme.titleLarge,
-                    unselectedLabelStyle:
-                        Theme.of(context).textTheme.titleMedium,
-                    tabs: const [
-                      Tab(text: 'V3'),
-                      Tab(text: 'V4'),
-                    ],
-                  ),
-                ),
+      mainWidget = Column(
+        children: [
+          PreferredSize(
+            preferredSize: const Size.fromHeight(50.0),
+            child: Container(
+              color: Theme.of(context).scaffoldBackgroundColor,
+              child: TabBar(
+                controller: _tabController,
+                labelColor: Theme.of(context).colorScheme.primary,
+                indicatorColor: Theme.of(context).colorScheme.primary,
+                unselectedLabelColor: Theme.of(context).colorScheme.onSurface,
+                dividerColor: Theme.of(context).scaffoldBackgroundColor,
+                labelStyle: Theme.of(context).textTheme.titleLarge,
+                unselectedLabelStyle: Theme.of(context).textTheme.titleMedium,
+                tabs: const [
+                  Tab(text: 'V3'),
+                  Tab(text: 'V4'),
+                ],
               ),
-              Expanded(
-                child: TabBarView(controller: _tabController, children: [
-                  RefreshIndicator(
-                    onRefresh: listFarms,
-                    child: listFarmsWidget(v3Farms, false),
-                  ),
-                  RefreshIndicator(
-                    onRefresh: listFarms,
-                    child: listFarmsWidget(v4Farms, true),
-                  ),
-                ]),
-              )
-            ],
-          ));
+            ),
+          ),
+          Expanded(
+            child: TabBarView(controller: _tabController, children: [
+              RefreshIndicator(
+                onRefresh: listFarms,
+                child: listFarmsWidget(v3Farms, false),
+              ),
+              RefreshIndicator(
+                onRefresh: listFarms,
+                child: listFarmsWidget(v4Farms, true),
+              ),
+            ]),
+          )
+        ],
+      );
     }
     return LayoutDrawer(
       titleText: 'Farming',
       content: mainWidget,
-      appBarActions: loading
+      appBarActions: loading || failed
           ? []
           : [
               IconButton(
@@ -321,7 +356,7 @@ class _FarmScreenState extends ConsumerState<FarmScreen>
             ));
   }
 
-  _addFarm(Farm farm) async {
+  _addFarm(Farm farm) {
     setState(() {
       _tabController.index == 0 ? v3Farms.add(farm) : v4Farms.add(farm);
     });

@@ -6,7 +6,7 @@ import 'package:threebotlogin/apps/wallet/wallet.dart';
 import 'package:threebotlogin/screens/identity_verification_screen.dart';
 import 'package:threebotlogin/screens/preference_screen.dart';
 import 'package:threebotlogin/screens/registered_screen.dart';
-
+import 'package:threebotlogin/apps/notifications/notifications.dart';
 import 'apps/farmers/farmers.dart';
 import 'apps/news/news.dart';
 import 'apps/sign/sign.dart';
@@ -95,6 +95,14 @@ class JRouter {
             view: await Sign().widget(),
           ),
           app: Sign()),
+      AppInfo(
+          route: Route(
+            path: '/notifications',
+            name: 'Notifications',
+            icon: Icons.notifications,
+            view: await Notifications().widget(),
+          ),
+          app: null),
     ];
   }
 
