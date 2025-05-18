@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:threebotlogin/apps/notifications/notifications_user_data.dart';
 import 'package:threebotlogin/widgets/layout_drawer.dart';
 
 class NotificationsScreen extends StatefulWidget {
@@ -10,10 +10,8 @@ class NotificationsScreen extends StatefulWidget {
 }
 
 class _NotificationsScreenState extends State<NotificationsScreen> {
-  late bool loading;
+  bool loading = true;
   late bool _nodeStatusNotificationEnabled;
-  static const String _nodeStatusNotificationEnabledKey =
-      'nodeStatusNotificationEnabled';
 
   @override
   void initState() {
@@ -22,20 +20,11 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
   }
 
   void _loadNotificationPreference() async {
+    final bool enabled = await isNodeStatusNotificationEnabled();
     setState(() {
-      loading = true;
-    });
-    final prefs = await SharedPreferences.getInstance();
-    setState(() {
-      _nodeStatusNotificationEnabled =
-          prefs.getBool(_nodeStatusNotificationEnabledKey) ?? true;
+      _nodeStatusNotificationEnabled = enabled;
       loading = false;
     });
-  }
-
-  void _setNodeStatusNotification(bool newValue) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool(_nodeStatusNotificationEnabledKey, newValue);
   }
 
   @override
@@ -76,7 +65,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                     setState(() {
                       _nodeStatusNotificationEnabled = newValue;
                     });
-                    _setNodeStatusNotification(newValue);
+                    setNodeStatusNotificationEnabled(newValue);
                   },
                   secondary: const Icon(Icons.monitor_heart),
                 ),

@@ -1,12 +1,9 @@
 import 'package:background_fetch/background_fetch.dart';
+import 'package:threebotlogin/apps/notifications/notifications_user_data.dart';
 import 'package:threebotlogin/models/farm.dart';
 import 'package:threebotlogin/services/nodes_check_service.dart';
 import 'notification_service.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:threebotlogin/helpers/logger.dart';
-
-const String _nodeStatusNotificationEnabledKey =
-    'nodeStatusNotificationEnabled';
 
 void backgroundFetchHeadlessTask(HeadlessTask task) async {
   final String taskId = task.taskId;
@@ -16,9 +13,7 @@ void backgroundFetchHeadlessTask(HeadlessTask task) async {
     BackgroundFetch.finish(taskId);
     return;
   }
-  final prefs = await SharedPreferences.getInstance();
-  final bool notificationsEnabled =
-      prefs.getBool(_nodeStatusNotificationEnabledKey) ?? true;
+  final bool notificationsEnabled = await isNodeStatusNotificationEnabled();
 
   logger.i(
       'Background Fetch Headless Task: $taskId, Notifications Enabled: $notificationsEnabled');
