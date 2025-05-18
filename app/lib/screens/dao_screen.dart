@@ -58,7 +58,7 @@ class _DaoPageState extends State<DaoPage> with SingleTickerProviderStateMixin {
       _handleSuccess(proposals);
     } on TimeoutException catch (e) {
       _handleFailure(
-        'Loading proposals timed out. Poor connection?',
+        'Loading proposals timed out. Please check your network',
         error: e,
       );
     } on Exception catch (e) {
