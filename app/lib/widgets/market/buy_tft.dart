@@ -209,7 +209,7 @@ class _BuyTFTWidgetState extends State<BuyTFTWidget> {
             image: Icons.error,
             title: 'Error',
             description: double.parse(widget.wallet.stellarBalances['XLM']!) < 1
-                ? 'You need to fund your account with at least 1 XLM to create an order'
+                ? 'You need to fund your account with some XLMs to create an order'
                 : 'Error creating your order',
             actions: <Widget>[
               TextButton(
