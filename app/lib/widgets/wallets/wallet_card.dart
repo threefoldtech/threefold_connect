@@ -33,7 +33,7 @@ class _WalletCardWidgetState extends ConsumerState<WalletCardWidget> {
       await initializeWallet(
           widget.wallet.stellarSecret, widget.wallet.tfchainSecret);
       widget.wallet.stellarBalances['TFT'] =
-          await StellarService.getBalance(widget.wallet.stellarSecret);
+          await StellarService.getTFTBalance(widget.wallet.stellarSecret);
       final tfchainBalance = await TFChainService.getBalance(
           chainUrl, widget.wallet.tfchainAddress);
       widget.wallet.tfchainBalance =

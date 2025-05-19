@@ -74,7 +74,7 @@ class _WalletSendScreenState extends ConsumerState<WalletSendScreen> {
 
   _loadStellarBalance() async {
     widget.wallet.stellarBalances['TFT'] =
-        (await Stellar.getBalance(widget.wallet.stellarSecret)).toString();
+        (await Stellar.getTFTBalance(widget.wallet.stellarSecret)).toString();
     setState(() {});
   }
 
@@ -145,7 +145,8 @@ class _WalletSendScreenState extends ConsumerState<WalletSendScreen> {
           wallets.where((wallet) => wallet.stellarAddress == toAddress);
       final Wallet? wallet =
           matchingWallets.isNotEmpty ? matchingWallets.first : null;
-      if (wallet != null && double.parse(wallet.stellarBalances['TFT']!) <= -1) {
+      if (wallet != null &&
+          double.parse(wallet.stellarBalances['TFT']!) <= -1) {
         setState(() {
           toAddressError = 'Wallet not activated on stellar';
         });
@@ -218,7 +219,8 @@ class _WalletSendScreenState extends ConsumerState<WalletSendScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final bool hideStellar = double.parse(widget.wallet.stellarBalances['TFT']!) <= -1;
+    final bool hideStellar =
+        double.parse(widget.wallet.stellarBalances['TFT']!) <= -1;
     if (hideStellar && chainType == ChainType.Stellar) {
       onChangeChain(ChainType.TFChain);
     }

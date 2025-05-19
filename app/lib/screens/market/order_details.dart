@@ -31,6 +31,33 @@ class _OrderDetailsWidgetState extends State<OrderDetailsWidget> {
   }
 
   _cancelOrder() async {
+    final bool shouldCancel = await showDialog<bool>(
+          context: context,
+          barrierDismissible: false,
+          builder: (BuildContext customContext) => CustomDialog(
+            type: DialogType.Warning,
+            image: Icons.warning,
+            title: 'Cancel Order',
+            description: 'Are you sure you want to cancel this order?',
+            actions: <Widget>[
+              TextButton(
+                child: const Text('No'),
+                onPressed: () {
+                  Navigator.pop(customContext, false);
+                },
+              ),
+              TextButton(
+                child: const Text('Yes'),
+                onPressed: () {
+                  Navigator.pop(customContext, true);
+                },
+              ),
+            ],
+          ),
+        ) ??
+        false;
+
+    if (!shouldCancel) return;
     setState(() {
       loading = true;
     });
@@ -155,15 +182,29 @@ class _OrderDetailsWidgetState extends State<OrderDetailsWidget> {
                                 color: Theme.of(context).colorScheme.primary,
                               ),
                         ),
-                        Text(
-                          '(Active)',
-                          style: Theme.of(context)
-                              .textTheme
-                              .bodyLarge!
-                              .copyWith(
-                                color: Theme.of(context).colorScheme.onSurface,
+                        widget.active
+                            ? Text(
+                                '(Active)',
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodyLarge!
+                                    .copyWith(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onSurface,
+                                    ),
+                              )
+                            : Text(
+                                '(Inactive)',
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodyLarge!
+                                    .copyWith(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onSurface,
+                                    ),
                               ),
-                        ),
                       ],
                     ),
                   ],
@@ -318,7 +359,8 @@ class _OrderDetailsWidgetState extends State<OrderDetailsWidget> {
                         _cancelOrder();
                       },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Theme.of(context).colorScheme.errorContainer,
+                        backgroundColor:
+                            Theme.of(context).colorScheme.errorContainer,
                       ),
                       child: loading
                           ? const SizedBox(

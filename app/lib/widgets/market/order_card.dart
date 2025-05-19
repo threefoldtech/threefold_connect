@@ -44,7 +44,7 @@ class _OrderCardWidgetState extends ConsumerState<OrderCardWidget> {
         logger.e('Error parsing price: ${widget.offer.price}, error: $e');
         pricePerTFT = 0;
       }
-      final double totalCost = amount / pricePerTFT;
+      final double totalCost = pricePerTFT > 0 ? amount / pricePerTFT : 0;
 
       List<Widget> cardContent = [];
 

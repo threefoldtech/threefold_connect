@@ -69,7 +69,7 @@ class _WalletBridgeScreenState extends ConsumerState<WalletBridgeScreen> {
 
   _loadStellarBalance() async {
     widget.wallet.stellarBalances['TFT'] =
-        (await Stellar.getBalance(widget.wallet.stellarSecret)).toString();
+        (await Stellar.getTFTBalance(widget.wallet.stellarSecret)).toString();
     setState(() {});
   }
 
@@ -309,8 +309,9 @@ class _WalletBridgeScreenState extends ConsumerState<WalletBridgeScreen> {
                                               wallets: isWithdraw
                                                   ? wallets
                                                       .where((w) =>
-                                                          double.parse(w
-                                                              .stellarBalances['TFT']!) >=
+                                                          double.parse(
+                                                              w.stellarBalances[
+                                                                  'TFT']!) >=
                                                           0)
                                                       .toList()
                                                   : wallets,

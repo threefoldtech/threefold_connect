@@ -59,7 +59,7 @@ Future<Map<String, String>> getBalanceByClient(Client client) async {
   }
 }
 
-Future<String> getBalance(String secret) async {
+Future<String> getTFTBalance(String secret) async {
   final client = Client(NetworkType.PUBLIC, secret);
   final balances = await getBalanceByClient(client);
   return balances['TFT'] ?? '-1';

@@ -5,6 +5,8 @@ import 'package:threebotlogin/helpers/logger.dart';
 import 'package:threebotlogin/helpers/transaction_helpers.dart';
 import 'package:threebotlogin/models/offer.dart';
 import 'package:threebotlogin/models/wallet.dart';
+import 'package:threebotlogin/providers/orders_notifier.dart';
+import 'package:threebotlogin/screens/market/order.dart';
 import 'package:threebotlogin/services/stellar_service.dart' as Stellar;
 import 'package:threebotlogin/widgets/custom_dialog.dart';
 
@@ -105,6 +107,14 @@ class _BuyTFTWidgetState extends State<BuyTFTWidget> {
       });
       return false;
     }
+
+    if (Decimal.parse(amount) >
+        Decimal.parse(widget.wallet.stellarBalances['USDC']!)) {
+      setState(() {
+        amountError = 'Not enough balance';
+      });
+      return false;
+    }
     return true;
   }
 
@@ -179,6 +189,14 @@ class _BuyTFTWidgetState extends State<BuyTFTWidget> {
                   child: const Text('Close'),
                   onPressed: () {
                     Navigator.pop(context);
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => OrderWidget(
+                            selectedWallet: widget.wallet,
+                          ),
+                        ));
+                    OrderNotifier.emitUpdate();
                   },
                 )
               ]),
@@ -190,6 +208,7 @@ class _BuyTFTWidgetState extends State<BuyTFTWidget> {
           builder: (BuildContext context) => CustomDialog(
               image: Icons.error,
               title: 'Failed!',
+              type: DialogType.Error,
               description: 'Failed to create your order.',
               actions: <Widget>[
                 TextButton(
@@ -208,6 +227,7 @@ class _BuyTFTWidgetState extends State<BuyTFTWidget> {
         builder: (BuildContext context) => CustomDialog(
             image: Icons.error,
             title: 'Error',
+            type: DialogType.Error,
             description: double.parse(widget.wallet.stellarBalances['XLM']!) < 1
                 ? 'You need to fund your account with some XLMs to create an order'
                 : 'Error creating your order',
@@ -248,6 +268,9 @@ class _BuyTFTWidgetState extends State<BuyTFTWidget> {
                   child: const Text('Close'),
                   onPressed: () {
                     Navigator.pop(context);
+                    Navigator.pop(context);
+                    Navigator.pop(context);
+                    OrderNotifier.emitUpdate();
                   },
                 )
               ]),
@@ -259,6 +282,7 @@ class _BuyTFTWidgetState extends State<BuyTFTWidget> {
           builder: (BuildContext context) => CustomDialog(
               image: Icons.error,
               title: 'Failed!',
+              type: DialogType.Error,
               description: 'Failed to update your order.',
               actions: <Widget>[
                 TextButton(
@@ -277,6 +301,7 @@ class _BuyTFTWidgetState extends State<BuyTFTWidget> {
         builder: (BuildContext context) => CustomDialog(
             image: Icons.error,
             title: 'Error',
+            type: DialogType.Error,
             description: double.parse(widget.wallet.stellarBalances['XLM']!) < 1
                 ? 'You need to fund your account with some XLMs to update your order'
                 : 'Error updating your order',
