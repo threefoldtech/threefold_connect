@@ -6,9 +6,8 @@ import 'package:threebotlogin/helpers/logger.dart';
 import 'package:threebotlogin/models/market_data.dart';
 import 'package:threebotlogin/models/wallet.dart';
 import 'package:threebotlogin/providers/wallets_provider.dart';
-import 'package:threebotlogin/services/stellar_service.dart';
-import 'package:threebotlogin/widgets/market/buy_tft.dart';
-import 'package:threebotlogin/widgets/market/order.dart';
+import 'package:threebotlogin/screens/market/buy_tft.dart';
+import 'package:threebotlogin/screens/market/order.dart';
 import 'package:threebotlogin/widgets/market/wallet_selection.dart';
 import 'package:threebotlogin/services/stellar_service.dart' as Stellar;
 
@@ -20,7 +19,6 @@ class OverviewWidget extends ConsumerStatefulWidget {
 }
 
 class _OverviewWidgetState extends ConsumerState<OverviewWidget> {
-  double? tftPrice;
   late Timer _timer;
   String lastUpdated = '--';
   Wallet? _selectedWallet;
@@ -31,34 +29,8 @@ class _OverviewWidgetState extends ConsumerState<OverviewWidget> {
   @override
   void initState() {
     super.initState();
-    _fetchTFTPrice();
     _startPriceUpdater();
     _fetchMarketData();
-  }
-
-  void _fetchTFTPrice() async {
-    if (!mounted) return;
-    setState(() {
-      loading = true;
-      failed = false;
-    });
-    try {
-      final price = await getLastTradedTFTPrice();
-      setState(() {
-        tftPrice = price;
-        lastUpdated = _formattedDateTime();
-        failed = false;
-      });
-    } catch (e) {
-      setState(() {
-        failed = true;
-      });
-      logger.i('Error fetching price: $e');
-    } finally {
-      setState(() {
-        loading = false;
-      });
-    }
   }
 
   Future<TftMarketData?> _fetchMarketData() async {
@@ -72,6 +44,7 @@ class _OverviewWidgetState extends ConsumerState<OverviewWidget> {
         marketData = data;
         failed = false;
       });
+      lastUpdated = _formattedDateTime();
       return data;
     } catch (e) {
       setState(() {
@@ -88,7 +61,7 @@ class _OverviewWidgetState extends ConsumerState<OverviewWidget> {
 
   void _startPriceUpdater() {
     _timer = Timer.periodic(const Duration(minutes: 5), (timer) {
-      _fetchTFTPrice();
+      _fetchMarketData();
     });
   }
 
@@ -139,7 +112,7 @@ class _OverviewWidgetState extends ConsumerState<OverviewWidget> {
                   failed = false;
                   loading = true;
                 });
-                _fetchTFTPrice();
+                _fetchMarketData();
               },
             ),
           ],
@@ -231,38 +204,35 @@ class _OverviewWidgetState extends ConsumerState<OverviewWidget> {
                           ],
                         )),
                     const SizedBox(height: 10),
-                    if (tftPrice == null)
-                      const CircularProgressIndicator()
-                    else
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Text(
-                            tftPrice!.toStringAsFixed(7),
-                            style: Theme.of(context)
-                                .textTheme
-                                .headlineLarge!
-                                .copyWith(
-                                  fontWeight: FontWeight.bold,
-                                  color: Theme.of(context).colorScheme.primary,
-                                ),
-                          ),
-                          const SizedBox(
-                            width: 5,
-                          ),
-                          Text(
-                            'USDC',
-                            style: Theme.of(context)
-                                .textTheme
-                                .headlineLarge!
-                                .copyWith(
-                                  fontWeight: FontWeight.bold,
-                                  color: Theme.of(context).colorScheme.primary,
-                                ),
-                          ),
-                        ],
-                      ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Text(
+                          marketData!.lastPrice.toStringAsFixed(7),
+                          style: Theme.of(context)
+                              .textTheme
+                              .headlineLarge!
+                              .copyWith(
+                                fontWeight: FontWeight.bold,
+                                color: Theme.of(context).colorScheme.primary,
+                              ),
+                        ),
+                        const SizedBox(
+                          width: 5,
+                        ),
+                        Text(
+                          'USDC',
+                          style: Theme.of(context)
+                              .textTheme
+                              .headlineLarge!
+                              .copyWith(
+                                fontWeight: FontWeight.bold,
+                                color: Theme.of(context).colorScheme.primary,
+                              ),
+                        ),
+                      ],
+                    ),
                     const SizedBox(height: 8),
                     Text(
                       'Last updated: $lastUpdated',
@@ -322,14 +292,6 @@ class _OverviewWidgetState extends ConsumerState<OverviewWidget> {
                                                             _selectedWallet!,
                                                       )));
                                         },
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: Theme.of(context)
-                                        .colorScheme
-                                        .primaryContainer,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                  ),
                                   child: Text(
                                     'My Orders',
                                     style: _selectedWallet == null
@@ -524,12 +486,10 @@ class _OverviewWidgetState extends ConsumerState<OverviewWidget> {
         failed = false;
       });
 
-      final price = await getLastTradedTFTPrice();
       final marketData = await _fetchMarketData();
       if (!mounted) return;
 
       setState(() {
-        tftPrice = price;
         this.marketData = marketData;
         lastUpdated = _formattedDateTime();
         failed = false;

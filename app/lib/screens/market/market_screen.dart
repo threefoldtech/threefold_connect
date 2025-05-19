@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:threebotlogin/widgets/layout_drawer.dart';
-import 'package:threebotlogin/widgets/market/order_book.dart';
-import 'package:threebotlogin/widgets/market/overview.dart';
+import 'package:threebotlogin/screens/market/order_book.dart';
+import 'package:threebotlogin/screens/market/overview.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class MarketPage extends ConsumerStatefulWidget {

@@ -4,7 +4,7 @@ import 'package:threebotlogin/helpers/logger.dart';
 import 'package:threebotlogin/models/offer.dart';
 import 'package:intl/intl.dart';
 import 'package:threebotlogin/models/wallet.dart' as Wallet;
-import 'package:threebotlogin/widgets/market/order_details.dart';
+import 'package:threebotlogin/screens/market/order_details.dart';
 
 class OrderCardWidget extends ConsumerStatefulWidget {
   final Offer offer;
