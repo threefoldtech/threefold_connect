@@ -1,9 +1,12 @@
+import 'dart:async';
 import 'dart:convert';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import 'package:http/http.dart' as http;
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:threebotlogin/helpers/globals.dart';
+import 'package:threebotlogin/helpers/logger.dart';
 import 'package:threebotlogin/widgets/layout_drawer.dart';
 import 'package:xml2json/xml2json.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -22,6 +25,9 @@ class _NewsScreenState extends State<NewsScreen> {
   final PagingController<int, Map<String, dynamic>> _pagingController =
       PagingController(firstPageKey: 0);
   final String newsUrl = Globals().newsUrl;
+  bool _isLoading = false;
+  bool _hasError = false;
+  String? _errorMessage;
 
   @override
   void initState() {
@@ -30,8 +36,25 @@ class _NewsScreenState extends State<NewsScreen> {
   }
 
   Future<void> getArticles(int pageKey) async {
+    if (_isLoading) return;
+
+    _isLoading = true;
     try {
-      final response = await http.get(Uri.parse(newsUrl));
+      final connectivityResult = await Connectivity().checkConnectivity();
+      if (connectivityResult.contains(ConnectivityResult.none)) {
+        throw Exception('No internet connection. Please check your network.');
+      }
+
+      final response = await http.get(Uri.parse(newsUrl)).timeout(
+        const Duration(seconds: 30),
+        onTimeout: () {
+          throw TimeoutException('Loading news feed timed out');
+        },
+      );
+
+      if (response.statusCode != 200) {
+        throw Exception('Failed to load news feed: ${response.statusCode}');
+      }
       xml2json.parse(response.body);
 
       var data = json.decode(xml2json.toGData());
@@ -47,9 +70,50 @@ class _NewsScreenState extends State<NewsScreen> {
       isLastPage
           ? _pagingController.appendLastPage(newArticles)
           : _pagingController.appendPage(newArticles, pageKey + 1);
-    } catch (e) {
-      _pagingController.error = e;
+
+      _isLoading = false;
+      _hasError = false;
+      _errorMessage = null;
+    } on TimeoutException catch (e) {
+      _handleError(
+          'Loading news feed timed out. Please check your connection.', e);
+    } on Exception catch (e) {
+      _handleError(
+          e.toString().contains('No internet connection')
+              ? 'No internet connection. Please check your network.'
+              : 'Failed to load news feed. Please try again.',
+          e);
     }
+  }
+
+  void _handleError(String message, Exception error) {
+    logger.e('News feed error: $message', error: error);
+
+    _isLoading = false;
+    _hasError = true;
+    _errorMessage = message;
+
+    _pagingController.error = message;
+
+    if (mounted && context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            message,
+            style: Theme.of(context)
+                .textTheme
+                .bodyMedium!
+                .copyWith(color: Theme.of(context).colorScheme.errorContainer),
+          ),
+          duration: const Duration(seconds: 3),
+        ),
+      );
+    }
+  }
+
+  Future<void> _refreshNews() async {
+    _pagingController.refresh();
+    return Future.delayed(const Duration(milliseconds: 300));
   }
 
   @override
@@ -63,7 +127,7 @@ class _NewsScreenState extends State<NewsScreen> {
     return LayoutDrawer(
       titleText: 'News',
       content: RefreshIndicator(
-        onRefresh: () async => _pagingController.refresh(),
+        onRefresh: _refreshNews,
         child: PagedListView<int, Map<String, dynamic>>(
           pagingController: _pagingController,
           builderDelegate: PagedChildBuilderDelegate<Map<String, dynamic>>(
@@ -79,6 +143,49 @@ class _NewsScreenState extends State<NewsScreen> {
                       style: Theme.of(context).textTheme.bodyLarge!.copyWith(
                           color: Theme.of(context).colorScheme.onSurface,
                           fontWeight: FontWeight.bold)),
+                ],
+              ),
+            ),
+            firstPageErrorIndicatorBuilder: (context) => Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.error_outline,
+                    size: 48,
+                    color: Theme.of(context).colorScheme.error,
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    _errorMessage ?? 'Failed to load news feed',
+                    style: Theme.of(context).textTheme.bodyLarge!.copyWith(
+                        color: Theme.of(context).colorScheme.onSurface),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 16),
+                  ElevatedButton.icon(
+                    onPressed: _refreshNews,
+                    icon: const Icon(Icons.refresh),
+                    label: const Text('Try Again'),
+                  ),
+                ],
+              ),
+            ),
+            noItemsFoundIndicatorBuilder: (context) => Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.article_outlined,
+                    size: 48,
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'No articles found',
+                    style: Theme.of(context).textTheme.bodyLarge!.copyWith(
+                        color: Theme.of(context).colorScheme.onSurface),
+                  ),
                 ],
               ),
             ),

@@ -1,3 +1,6 @@
+import 'dart:async';
+
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -14,6 +17,7 @@ mixin SigningMixin<T extends ConsumerStatefulWidget> on ConsumerState<T> {
   bool isLoading = false;
   bool isLoadingWallets = false;
   bool loadingFailed = false;
+  String? walletLoadingError;
   String? walletError;
   String? destUrlError;
 
@@ -132,20 +136,41 @@ mixin SigningMixin<T extends ConsumerStatefulWidget> on ConsumerState<T> {
   }
 
   Future<void> checkWalletsListed() async {
+    final connectivityResult = await Connectivity().checkConnectivity();
+
+    if (connectivityResult.contains(ConnectivityResult.none)) {
+      _handleWalletLoadingFailure(
+          'No internet connection. Please check your network.');
+      return;
+    }
+
     final walletsNotifierRef = ref.read(walletsNotifier.notifier);
     if (!walletsNotifierRef.isListed) {
       setState(() {
         isLoadingWallets = true;
         loadingFailed = false;
+        walletLoadingError = null;
         selectedWallet = null;
       });
+
       try {
-        await walletsNotifierRef.list();
-      } catch (e) {
+        await walletsNotifierRef.list().timeout(
+          const Duration(seconds: 30),
+          onTimeout: () {
+            throw TimeoutException('Loading wallets timed out');
+          },
+        );
+      } on TimeoutException catch (e) {
+        logger.e('Wallet loading timed out: $e');
         if (mounted) {
-          setState(() {
-            loadingFailed = true;
-          });
+          _handleWalletLoadingFailure(
+              'Loading wallets timed out. Please check your connection.');
+        }
+      } catch (e) {
+        logger.e('Failed to load wallets: $e');
+        if (mounted) {
+          _handleWalletLoadingFailure(
+              'Failed to load wallets. Please try again.');
         }
       } finally {
         if (mounted) {
@@ -157,10 +182,42 @@ mixin SigningMixin<T extends ConsumerStatefulWidget> on ConsumerState<T> {
     }
   }
 
+  void _handleWalletLoadingFailure(String errorMessage) {
+    setState(() {
+      isLoadingWallets = false;
+      loadingFailed = true;
+      walletLoadingError = errorMessage;
+    });
+
+    if (mounted && context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            errorMessage,
+            style: Theme.of(context)
+                .textTheme
+                .bodyMedium!
+                .copyWith(color: Theme.of(context).colorScheme.errorContainer),
+          ),
+          duration: const Duration(seconds: 3),
+        ),
+      );
+    }
+  }
+
   Future<void> retryLoadingWallets() async {
+    final connectivityResult = await Connectivity().checkConnectivity();
+
+    if (connectivityResult.contains(ConnectivityResult.none)) {
+      _handleWalletLoadingFailure(
+          'No internet connection. Please check your network.');
+      return;
+    }
+
     setState(() {
       isLoadingWallets = true;
       loadingFailed = false;
+      walletLoadingError = null;
       selectedWallet = null;
     });
 
@@ -168,7 +225,13 @@ mixin SigningMixin<T extends ConsumerStatefulWidget> on ConsumerState<T> {
     walletsNotifierRef.clear();
 
     try {
-      await walletsNotifierRef.list();
+      await walletsNotifierRef.list().timeout(
+        const Duration(seconds: 30),
+        onTimeout: () {
+          throw TimeoutException('Loading wallets timed out');
+        },
+      );
+
       if (mounted && context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -181,28 +244,17 @@ mixin SigningMixin<T extends ConsumerStatefulWidget> on ConsumerState<T> {
           ),
         );
       }
-    } catch (e) {
+    } on TimeoutException catch (e) {
+      logger.e('Wallet loading timed out on retry: $e');
       if (mounted) {
-        setState(() {
-          loadingFailed = true;
-        });
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              'Failed to load wallets. Please check your connection.',
-              style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                  color: Theme.of(context).colorScheme.errorContainer),
-            ),
-            duration: const Duration(seconds: 3),
-            action: SnackBarAction(
-              label: 'Retry',
-              textColor: Theme.of(context).colorScheme.errorContainer,
-              onPressed: () {
-                retryLoadingWallets();
-              },
-            ),
-          ),
-        );
+        _handleWalletLoadingFailure(
+            'Loading wallets timed out. Please check your connection.');
+      }
+    } catch (e) {
+      logger.e('Failed to load wallets on retry: $e');
+      if (mounted) {
+        _handleWalletLoadingFailure(
+            'Failed to load wallets. Please try again.');
       }
     } finally {
       if (mounted) {
@@ -258,8 +310,8 @@ mixin SigningMixin<T extends ConsumerStatefulWidget> on ConsumerState<T> {
                           child: Text(wallet.name,
                               style: Theme.of(context)
                                   .textTheme
-                                  .bodyMedium
-                                  !.copyWith(
+                                  .bodyMedium!
+                                  .copyWith(
                                     color:
                                         Theme.of(context).colorScheme.onSurface,
                                   )),
