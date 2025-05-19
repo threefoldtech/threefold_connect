@@ -32,6 +32,7 @@ class _BuyTFTWidgetState extends State<BuyTFTWidget> {
   bool loadingPrice = true;
   double? currentMarketPrice;
   List percentages = [25, 50, 75, 100];
+  String availableUSDC = '0';
 
   @override
   void initState() {
@@ -44,6 +45,7 @@ class _BuyTFTWidgetState extends State<BuyTFTWidget> {
     priceController.addListener(_calculateTotal);
     if (widget.edit) _calculateTotal();
     if (!widget.edit) _fetchCurrentMarketPrice();
+    _getAvailableUSDC();
   }
 
   @override
@@ -57,6 +59,14 @@ class _BuyTFTWidgetState extends State<BuyTFTWidget> {
     amountController.removeListener(_calculateTotal);
     priceController.removeListener(_calculateTotal);
     super.dispose();
+  }
+
+  _getAvailableUSDC() async {
+    final available = await Stellar.getAvailableUSDCBalance(
+        widget.wallet.stellarSecret, widget.offer);
+    setState(() {
+      availableUSDC = available;
+    });
   }
 
   Future<void> _fetchCurrentMarketPrice() async {
@@ -99,7 +109,7 @@ class _BuyTFTWidgetState extends State<BuyTFTWidget> {
       });
       return false;
     }
-    final balance = roundAmount(widget.wallet.stellarBalances['USDC']!);
+    final balance = roundAmount(availableUSDC);
 
     if (balance - Decimal.parse(amount) <= Decimal.zero) {
       setState(() {
@@ -108,8 +118,7 @@ class _BuyTFTWidgetState extends State<BuyTFTWidget> {
       return false;
     }
 
-    if (Decimal.parse(amount) >
-        Decimal.parse(widget.wallet.stellarBalances['USDC']!)) {
+    if (Decimal.parse(amount) > Decimal.parse(availableUSDC)) {
       setState(() {
         amountError = 'Not enough balance';
       });
@@ -139,8 +148,8 @@ class _BuyTFTWidgetState extends State<BuyTFTWidget> {
   }
 
   calculateAmount(int percentage) {
-    final amount = Decimal.parse(widget.wallet.stellarBalances['USDC']!) *
-        (Decimal.fromInt(percentage).shift(-2));
+    final amount =
+        Decimal.parse(availableUSDC) * (Decimal.fromInt(percentage).shift(-2));
     amountController.text = roundAmount(amount.toString()).toString();
     _calculateTotal();
   }
@@ -249,6 +258,33 @@ class _BuyTFTWidgetState extends State<BuyTFTWidget> {
   }
 
   _updateOrder() async {
+    final bool shouldCancel = await showDialog<bool>(
+          context: context,
+          barrierDismissible: false,
+          builder: (BuildContext customContext) => CustomDialog(
+            type: DialogType.Warning,
+            image: Icons.warning,
+            title: 'Update Order',
+            description: 'Are you sure you want to update this order?',
+            actions: <Widget>[
+              TextButton(
+                child: const Text('No'),
+                onPressed: () {
+                  Navigator.pop(customContext, false);
+                },
+              ),
+              TextButton(
+                child: const Text('Yes'),
+                onPressed: () {
+                  Navigator.pop(customContext, true);
+                },
+              ),
+            ],
+          ),
+        ) ??
+        false;
+
+    if (!shouldCancel) return;
     setState(() {
       loading = true;
     });
@@ -384,7 +420,7 @@ class _BuyTFTWidgetState extends State<BuyTFTWidget> {
                       child: Align(
                         alignment: Alignment.centerRight,
                         child: Text(
-                          'Available: ${widget.wallet.stellarBalances['USDC']!} USDC',
+                          'Available: $availableUSDC USDC',
                           style:
                               Theme.of(context).textTheme.bodySmall!.copyWith(
                                     color: Theme.of(context)

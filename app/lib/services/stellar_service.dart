@@ -308,3 +308,25 @@ Future<bool> updateOrder(
   return await client.updateOrder(
       amount: amount, price: price, offerId: offerID);
 }
+
+// The provided offer won't be counted from available balance
+Future<String> getAvailableUSDCBalance(
+    String secret, Offer? currentOffer) async {
+  final client = Client(NetworkType.PUBLIC, secret);
+  final offers = (await client.listMyOffers()).where((offer) =>
+      offer.id != currentOffer?.id && getAssetName(offer.selling) == 'USDC');
+  final totalReserved = offers.fold<double>(0, (sum, offer) {
+    return sum + double.parse(offer.amount);
+  });
+  final balance = await getBalanceByClient(client);
+  return (double.parse(balance['USDC']!) - totalReserved).toStringAsFixed(7);
+}
+
+String getAssetName(Asset asset) {
+  if (asset is AssetTypeNative) {
+    return 'XLM';
+  } else if (asset is AssetTypeCreditAlphaNum) {
+    return asset.code;
+  }
+  return 'Unknown Asset';
+}

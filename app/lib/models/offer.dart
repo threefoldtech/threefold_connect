@@ -1,4 +1,5 @@
 import 'package:stellar_flutter_sdk/stellar_flutter_sdk.dart';
+import 'package:threebotlogin/services/stellar_service.dart';
 
 class Offer {
   final String id;
@@ -65,15 +66,6 @@ class Offer {
       price: priceStr,
       lastModifiedTime: response.ledgerCloseTime,
     );
-  }
-
-  static String getAssetName(Asset asset) {
-    if (asset is AssetTypeNative) {
-      return 'XLM';
-    } else if (asset is AssetTypeCreditAlphaNum) {
-      return asset.code;
-    }
-    return 'Unknown Asset';
   }
 
   static String _getAssetNameFromTrade(
