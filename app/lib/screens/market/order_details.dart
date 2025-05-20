@@ -109,7 +109,9 @@ class _OrderDetailsWidgetState extends State<OrderDetailsWidget> {
         builder: (BuildContext context) => CustomDialog(
             image: Icons.error,
             title: 'Error',
-            description: 'Error cancelling your order',
+            description: e.toString().contains('low reserve')
+                ? 'You need to fund your account with some XLMs to create an order'
+                : 'Error cancelling your order',
             actions: <Widget>[
               TextButton(
                 child: const Text('Close'),

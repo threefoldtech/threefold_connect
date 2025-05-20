@@ -237,7 +237,7 @@ class _BuyTFTWidgetState extends State<BuyTFTWidget> {
             image: Icons.error,
             title: 'Error',
             type: DialogType.Error,
-            description: double.parse(widget.wallet.stellarBalances['XLM']!) < 1
+            description: e.toString().contains('low reserve')
                 ? 'You need to fund your account with some XLMs to create an order'
                 : 'Error creating your order',
             actions: <Widget>[
@@ -338,7 +338,7 @@ class _BuyTFTWidgetState extends State<BuyTFTWidget> {
             image: Icons.error,
             title: 'Error',
             type: DialogType.Error,
-            description: double.parse(widget.wallet.stellarBalances['XLM']!) < 1
+            description: e.toString().contains('low reserve')
                 ? 'You need to fund your account with some XLMs to update your order'
                 : 'Error updating your order',
             actions: <Widget>[
