@@ -109,7 +109,7 @@ Future<void> _checkNodesAndNotify(String taskId) async {
       final nodeUpdatedAtMs = node.updatedAt! * 1000;
 
       // Filter out nodes updated more than 7 days ago
-      // if (nodeUpdatedAtMs <= sevenDaysAgoTimestampMs) continue;
+      if (nodeUpdatedAtMs <= sevenDaysAgoTimestampMs) continue;
 
       final downtime = Duration(milliseconds: nowInMs - nodeUpdatedAtMs);
       final checkInterval = _getCheckInterval(downtime);
@@ -118,11 +118,12 @@ Future<void> _checkNodesAndNotify(String taskId) async {
       if (downtime.inMinutes > 0 && checkInterval.inMinutes > 0) {
         passesIntervalCheck = downtime.inMinutes % checkInterval.inMinutes < 15;
       }
-      // if (passesIntervalCheck) {
-      nodesToNotify.add(node);
-      final formattedDowntime = _formatDowntime(downtime);
-      bodyBuffer.writeln('Node ${node.nodeId}: offline for $formattedDowntime');
-      // }
+      if (passesIntervalCheck) {
+        nodesToNotify.add(node);
+        final formattedDowntime = _formatDowntime(downtime);
+        bodyBuffer
+            .writeln('Node ${node.nodeId}: offline for $formattedDowntime');
+      }
     }
 
     if (nodesToNotify.isEmpty) return;
