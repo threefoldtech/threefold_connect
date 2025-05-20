@@ -1,7 +1,8 @@
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:threebotlogin/helpers/logger.dart';
 
 const String nodeStatusNotificationEnabledKey = 'nodeStatusNotificationEnabled';
+const String _contractNotificationsEnabledKey =
+    'contract_notifications_enabled';
 
 Future<List<String>?> getNotificationSettings() async {
   final prefs = await SharedPreferences.getInstance();
@@ -10,19 +11,21 @@ Future<List<String>?> getNotificationSettings() async {
 }
 
 Future<bool> isNodeStatusNotificationEnabled() async {
-  try {
-    final prefs = await SharedPreferences.getInstance();
-    return prefs.getBool(nodeStatusNotificationEnabledKey) ?? true;
-  } catch (e) {
-    return true;
-  }
+  final prefs = await SharedPreferences.getInstance();
+  return prefs.getBool(nodeStatusNotificationEnabledKey) ?? true;
 }
 
 Future<void> setNodeStatusNotificationEnabled(bool value) async {
-  try {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool(nodeStatusNotificationEnabledKey, value);
-  } catch (e) {
-    logger.e('Error saving notification preference: $e');
-  }
+  final prefs = await SharedPreferences.getInstance();
+  await prefs.setBool(nodeStatusNotificationEnabledKey, value);
+}
+
+Future<bool> isContractNotificationEnabled() async {
+  final prefs = await SharedPreferences.getInstance();
+  return prefs.getBool(_contractNotificationsEnabledKey) ?? true;
+}
+
+Future<void> setContractNotificationEnabled(bool enabled) async {
+  final prefs = await SharedPreferences.getInstance();
+  await prefs.setBool(_contractNotificationsEnabledKey, enabled);
 }

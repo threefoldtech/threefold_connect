@@ -46,19 +46,6 @@ Future<void> main() async {
   await NotificationService().initNotification();
 
   BackgroundFetch.registerHeadlessTask(backgroundFetchHeadlessTask);
-
-  bool initDone = await getInitDone();
-  String? doubleName = await getDoubleName();
-
-  await setGlobalValues();
-  bool registered = doubleName != null;
-
-  runApp(
-    ProviderScope(
-      child: MyApp(initDone: initDone, registered: registered),
-    ),
-  );
-
   BackgroundFetch.configure(
     BackgroundFetchConfig(
       minimumFetchInterval: 15,
@@ -71,13 +58,24 @@ Future<void> main() async {
     ),
     (String taskId) async {
       logger.i('[BackgroundFetch] Task: $taskId');
-      await checkNodeStatus(taskId);
-      BackgroundFetch.finish(taskId);
+      backgroundFetchHeadlessTask(HeadlessTask(taskId, false));
     },
     (String taskId) async {
       logger.i('[BackgroundFetch] Timeout: $taskId');
       BackgroundFetch.finish(taskId);
     },
+  );
+
+  bool initDone = await getInitDone();
+  String? doubleName = await getDoubleName();
+
+  await setGlobalValues();
+  bool registered = doubleName != null;
+
+  runApp(
+    ProviderScope(
+      child: MyApp(initDone: initDone, registered: registered),
+    ),
   );
 }
 

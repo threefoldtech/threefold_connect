@@ -1,6 +1,9 @@
 import 'package:background_fetch/background_fetch.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:gridproxy_client/models/contracts.dart';
 import 'package:threebotlogin/apps/notifications/notifications_user_data.dart';
 import 'package:threebotlogin/models/farm.dart';
+import 'package:threebotlogin/services/contract_check_service.dart';
 import 'package:threebotlogin/services/nodes_check_service.dart';
 import 'notification_service.dart';
 import 'package:threebotlogin/helpers/logger.dart';
@@ -9,29 +12,91 @@ void backgroundFetchHeadlessTask(HeadlessTask task) async {
   final String taskId = task.taskId;
   final bool timeout = task.timeout;
 
-  if (timeout) {
-    BackgroundFetch.finish(taskId);
-    return;
-  }
-  final bool notificationsEnabled = await isNodeStatusNotificationEnabled();
+  final container = ProviderContainer();
 
-  logger.i(
-      'Background Fetch Headless Task: $taskId, Notifications Enabled: $notificationsEnabled');
+  try {
+    if (timeout) {
+      logger.w('[BackgroundFetch] Task timed out: $taskId');
+      BackgroundFetch.finish(taskId);
+      return;
+    }
 
-  if (!notificationsEnabled) {
     logger.i(
-        '[BackgroundFetch] Node status notifications are disabled. Finishing task: $taskId');
+        '[BackgroundFetch] Headless Task: $taskId started. Time: ${DateTime.now()}');
+
+    // Run contract and node checks concurrently
+    await Future.wait([
+      _checkContractsAndNotify(container, taskId),
+      _checkNodesAndNotify(taskId),
+    ]);
+  } catch (e, stack) {
+    logger.e('[BackgroundFetch] Error during task $taskId: $e',
+        error: e, stackTrace: stack);
+  } finally {
+    container.dispose();
     BackgroundFetch.finish(taskId);
-    return;
+    logger.i('[BackgroundFetch] Task finished: $taskId');
   }
-  await checkNodeStatus(taskId);
 }
 
-Future<void> checkNodeStatus(String taskId) async {
+Future<void> _checkContractsAndNotify(
+    ProviderContainer container, String taskId) async {
   try {
-    final offlineNodes = await NodeCheckService.pingNodesInBackground();
+    final List<ContractInfo> allContractsInGracePeriod = await container
+        .read(contractCheckServiceProvider)
+        .checkContractsState();
 
-    if (offlineNodes.isEmpty) return;
+    if (allContractsInGracePeriod.isNotEmpty) {
+      final bool contractNotificationsEnabled =
+          await isContractNotificationEnabled();
+      logger.i(
+          '[ContractsCheck] Contracts in grace period: ${allContractsInGracePeriod.length}. Contract Notifications enabled: $contractNotificationsEnabled');
+
+      if (contractNotificationsEnabled) {
+        String notificationBody =
+            'You have ${allContractsInGracePeriod.length} contract(s) in grace period.';
+        final String contractIds =
+            allContractsInGracePeriod.map((c) => c.contract_id).join(', ');
+        notificationBody += '\nContract IDs: $contractIds';
+
+        await NotificationService().showNotification(
+          id: 'contract_grace_period',
+          title: 'Contract Grace Period Alert! ⏳',
+          body: notificationBody,
+          groupKey: 'contract_alerts',
+        );
+      }
+    }
+  } catch (e, stack) {
+    logger.e(
+        '[ContractsCheck] Error during contracts check for task $taskId: $e',
+        error: e,
+        stackTrace: stack);
+    rethrow;
+  }
+}
+
+Future<void> _checkNodesAndNotify(String taskId) async {
+  try {
+    final bool nodeNotificationsEnabled =
+        await isNodeStatusNotificationEnabled();
+    logger.i(
+        '[NodesCheck] Node Notifications Enabled: $nodeNotificationsEnabled for task $taskId');
+
+    if (!nodeNotificationsEnabled) {
+      logger.i(
+          '[NodesCheck] Node notifications are disabled by user setting. Exiting _checkNodesAndNotify for task $taskId.');
+      return;
+    }
+
+    final offlineNodes = await NodeCheckService.pingNodesInBackground();
+    if (offlineNodes.isEmpty) {
+      logger.i(
+          '[NodesCheck] No raw offline nodes found from pingNodesInBackground(). Exiting _checkNodesAndNotify for task $taskId.');
+      return;
+    }
+    logger.i(
+        '[NodesCheck] Found ${offlineNodes.length} raw offline nodes for task $taskId.');
 
     final StringBuffer bodyBuffer = StringBuffer();
     final List<Node> nodesToNotify = [];
@@ -43,39 +108,37 @@ Future<void> checkNodeStatus(String taskId) async {
     for (final node in offlineNodes) {
       final nodeUpdatedAtMs = node.updatedAt! * 1000;
 
-      if (nodeUpdatedAtMs <= sevenDaysAgoTimestampMs) continue;
+      // Filter out nodes updated more than 7 days ago
+      // if (nodeUpdatedAtMs <= sevenDaysAgoTimestampMs) continue;
 
       final downtime = Duration(milliseconds: nowInMs - nodeUpdatedAtMs);
-
       final checkInterval = _getCheckInterval(downtime);
 
       bool passesIntervalCheck = false;
       if (downtime.inMinutes > 0 && checkInterval.inMinutes > 0) {
         passesIntervalCheck = downtime.inMinutes % checkInterval.inMinutes < 15;
       }
-
-      if (passesIntervalCheck) {
-        nodesToNotify.add(node);
-        final formattedDowntime = _formatDowntime(downtime);
-        bodyBuffer
-            .writeln('Node ${node.nodeId}: offline for $formattedDowntime');
-      }
+      // if (passesIntervalCheck) {
+      nodesToNotify.add(node);
+      final formattedDowntime = _formatDowntime(downtime);
+      bodyBuffer.writeln('Node ${node.nodeId}: offline for $formattedDowntime');
+      // }
     }
 
     if (nodesToNotify.isEmpty) return;
 
     await NotificationService().showNotification(
-      id: nodesToNotify.hashCode,
+      id: 'offline_nodes_alert',
       title: nodesToNotify.length == 1
           ? 'Node Alert 🚨'
           : '${nodesToNotify.length} Nodes Offline 🚨',
       body: bodyBuffer.toString().trim(),
       groupKey: 'offline_nodes',
     );
-  } catch (e) {
-    logger.e('Error in checkNodeStatus for task $taskId: $e');
-  } finally {
-    BackgroundFetch.finish(taskId);
+  } catch (e, stack) {
+    logger.e('[NodesCheck] Error in node check for task $taskId: $e',
+        error: e, stackTrace: stack);
+    rethrow;
   }
 }
 
@@ -98,7 +161,9 @@ String _formatDowntime(Duration duration) {
     return '${duration.inDays} days';
   } else if (duration.inHours > 0) {
     return '${duration.inHours} hours';
-  } else {
+  } else if (duration.inMinutes > 0) {
     return '${duration.inMinutes} minutes';
+  } else {
+    return '${duration.inSeconds} seconds';
   }
 }

@@ -1,126 +1,174 @@
-import 'dart:convert';
-import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:threebotlogin/helpers/logger.dart';
 import 'package:threebotlogin/main.dart';
+import 'package:threebotlogin/helpers/logger.dart';
+import 'package:flutter/material.dart';
+import 'dart:convert';
+
 import 'package:threebotlogin/widgets/custom_dialog.dart';
 
-class NotificationService {
-  static final NotificationService _instance = NotificationService._internal();
-  factory NotificationService() => _instance;
-  NotificationService._internal();
+@pragma('vm:entry-point')
+void notificationTapBackground(NotificationResponse notificationResponse) {
+  if (notificationResponse.payload != null) {
+    NotificationService._handleNotificationTapStatic(notificationResponse.payload!);
+  }
+}
 
-  final notificationsPlugin = FlutterLocalNotificationsPlugin();
-  bool _isInitialized = false;
+class NotificationService {
+  static final FlutterLocalNotificationsPlugin _flutterLocalNotificationsPlugin =
+      FlutterLocalNotificationsPlugin();
 
   Future<void> initNotification() async {
-    if (_isInitialized) return;
+    const AndroidInitializationSettings initializationSettingsAndroid =
+        AndroidInitializationSettings('@mipmap/launcher_icon');
 
-    final NotificationAppLaunchDetails? launchDetails =
-        await notificationsPlugin.getNotificationAppLaunchDetails();
-
-    if (launchDetails?.didNotificationLaunchApp ?? false) {
-      _handleNotificationTap(launchDetails?.notificationResponse);
-    }
-
-    const initSettingsAndroid =
-        AndroidInitializationSettings('@mipmap/ic_launcher');
-    const initSettingsIOS = DarwinInitializationSettings(
+    const DarwinInitializationSettings initializationSettingsIOS =
+        DarwinInitializationSettings(
       requestAlertPermission: true,
       requestBadgePermission: true,
       requestSoundPermission: true,
     );
 
-    const initSettings = InitializationSettings(
-      android: initSettingsAndroid,
-      iOS: initSettingsIOS,
+    const InitializationSettings initializationSettings =
+        InitializationSettings(
+      android: initializationSettingsAndroid,
+      iOS: initializationSettingsIOS,
     );
 
-    await notificationsPlugin.initialize(
-      initSettings,
-      onDidReceiveNotificationResponse: (details) =>
-          _handleNotificationTap(details),
+    await _flutterLocalNotificationsPlugin.initialize(
+      initializationSettings,
+      onDidReceiveNotificationResponse:
+          (NotificationResponse notificationResponse) async {
+        if (notificationResponse.payload != null) {
+          NotificationService._handleNotificationTapStatic(notificationResponse.payload!);
+        }
+      },
+      onDidReceiveBackgroundNotificationResponse: notificationTapBackground,
     );
-    await notificationsPlugin
-        .resolvePlatformSpecificImplementation<
-            AndroidFlutterLocalNotificationsPlugin>()
-        ?.requestNotificationsPermission();
+  }
 
-    _isInitialized = true;
+  static AndroidNotificationDetails _androidNotificationDetails(String groupKey) {
+    return AndroidNotificationDetails(
+      'channel ID',
+      'channel name',
+      channelDescription: 'channel description',
+      importance: Importance.max,
+      priority: Priority.high,
+      groupKey: groupKey,
+      setAsGroupSummary: false,
+    );
+  }
+
+  static DarwinNotificationDetails _iOSNotificationDetails() {
+    return const DarwinNotificationDetails(
+      presentAlert: true,
+      presentBadge: true,
+      presentSound: true,
+    );
   }
 
   Future<void> showNotification({
-    int id = 0,
+    required String id,
     required String title,
     required String body,
-    String? groupKey,
-    bool isGroupSummary = false,
+    required String groupKey,
   }) async {
-    try {
-      if (!_isInitialized) {
-        await initNotification();
-      }
-
-      final androidDetails = AndroidNotificationDetails(
-        'node_status_channel',
-        'Node Status',
-        channelDescription: 'Notify user when node goes offline',
-        importance: Importance.max,
-        priority: Priority.high,
-        groupKey: groupKey,
-      );
-
-      final iosDetails = DarwinNotificationDetails(
-          presentAlert: true,
-          presentBadge: true,
-          presentSound: true,
-          threadIdentifier: groupKey,
-          interruptionLevel: InterruptionLevel.timeSensitive);
-
-      final notificationDetails = NotificationDetails(
-        android: androidDetails,
-        iOS: iosDetails,
-      );
-
-      final payload = json.encode({
+    final int notificationId = id.hashCode;
+    await _flutterLocalNotificationsPlugin.show(
+      notificationId,
+      title,
+      body,
+      NotificationDetails(
+        android: _androidNotificationDetails(groupKey),
+        iOS: _iOSNotificationDetails(),
+      ),
+      payload: jsonEncode({
         'title': title,
         'body': body,
-      });
-
-      await notificationsPlugin.show(
-        id,
-        title,
-        body,
-        notificationDetails,
-        payload: payload,
-      );
-    } catch (e) {
-      logger.e('[NotificationService] Failed to show notification: $e');
-    }
+        'groupKey': groupKey,
+      }),
+    );
+    logger.i('[NotificationService] Notification shown: ID $notificationId, Title: "$title"');
   }
 
-  void _handleNotificationTap(NotificationResponse? response) {
-    if (response?.payload != null) {
-      final Map<String, dynamic> payload = json.decode(response!.payload!);
-      showNodeStatusDialog(
-        navigatorKey.currentContext!,
-        payload['title'],
-        payload['body'],
-      );
-    }
-  }
+  static void _handleNotificationTapStatic(String payload) async {
+    logger.i('[NotificationService Static] Notification tapped, payload: $payload');
 
-  void showNodeStatusDialog(BuildContext context, String title, String body) {
     try {
-      if (!context.mounted) return;
+      final Map<String, dynamic> data = jsonDecode(payload);
+      final String groupKey = data['groupKey'] as String;
+      final String title = data['title'] as String;
+      final String body = data['body'] as String;
 
-      showDialog(
+      logger.i('[NotificationService Static] Processing tapped notification with groupKey: $groupKey');
+
+      if (navigatorKey.currentContext != null) {
+        if (groupKey == 'contract_alerts') {
+          NotificationService.showContractAlertDialog(
+            title: title,
+            body: body,
+          );
+        } else if (groupKey == 'offline_nodes') {
+          NotificationService.showNodeAlertDialog(
+            title: title,
+            body: body,
+          );
+        }
+      } else {
+        logger.w('[NotificationService Static] navigatorKey.currentContext is null. Cannot show dialog directly from background notification tap. Payload: $payload');
+      }
+    } catch (e, stack) {
+      logger.e('[NotificationService Static] Error parsing notification payload or handling tap: $e', error: e, stackTrace: stack);
+    }
+  }
+
+  static Future<void> showContractAlertDialog({
+    required String title,
+    required String body,
+  }) async {
+    if (navigatorKey.currentContext == null) {
+      logger.w('[NotificationService Static] Cannot show contract alert dialog, navigatorKey.currentContext is null.');
+      return;
+    }
+
+    await NotificationService._showAppDialog(
+      navigatorKey.currentContext!,
+      title: title,
+      content: Text(body),
+      icon: Icons.assignment_outlined,
+    );
+    logger.i('[NotificationService Static] Dialog shown: $title');
+  }
+
+  static Future<void> showNodeAlertDialog({
+    required String title,
+    required String body,
+  }) async {
+    if (navigatorKey.currentContext == null) {
+      logger.w('[NotificationService Static] Cannot show node alert dialog, navigatorKey.currentContext is null.');
+      return;
+    }
+
+    await NotificationService._showAppDialog(
+      navigatorKey.currentContext!,
+      title: title,
+      content: Text(body),
+      icon: Icons.power_off_outlined,
+    );
+    logger.i('[NotificationService Static] Dialog shown: $title');
+  }
+
+  static Future<void> _showAppDialog(
+    BuildContext context, {
+    required String title,
+    required Text content,
+    required IconData icon,
+  }) {
+    return showDialog(
         context: context,
         builder: (BuildContext context) => CustomDialog(
-          type: DialogType.Warning,
-          image: Icons.warning,
+          image: icon,
           title: title,
-          description: body,
+          description: content.data,
           actions: <Widget>[
             TextButton(
               child: const Text('Close'),
@@ -131,8 +179,5 @@ class NotificationService {
           ],
         ),
       );
-    } catch (e) {
-      logger.e('[NotificationService] Failed to show dialog: $e');
-    }
   }
 }

@@ -15,23 +15,22 @@ class ContractCheckService {
 
   ContractCheckService(this._ref);
 
-  Future<List<ContractInfo>> checkContractState() async {
+  Future<List<ContractInfo>> checkContractsState() async {
     List<ContractInfo> allContracts = [];
 
     try {
       final walletsNotifierInstance = _ref.read(walletsNotifier.notifier);
-
       await walletsNotifierInstance.waitUntilListed();
 
       final List<Wallet> wallets = _ref.read(walletsNotifier);
+      if (wallets.isEmpty) return [];
 
       for (final w in wallets) {
         final twinId = await getTwinId(w.tfchainSecret);
         if (twinId != 0) {
-           List<ContractInfo> contracts = await getGracePeriodContractsByTwinId(twinId);
-           allContracts.addAll(contracts);
-        } else {
-           logger.w('[ContractCheckService] Could not get valid twinId for wallet: ${w.name}');
+          List<ContractInfo> contracts =
+              await getGracePeriodContractsByTwinId(twinId);
+          allContracts.addAll(contracts);
         }
       }
       return allContracts;
