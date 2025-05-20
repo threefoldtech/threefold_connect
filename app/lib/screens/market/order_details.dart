@@ -110,7 +110,7 @@ class _OrderDetailsWidgetState extends State<OrderDetailsWidget> {
             image: Icons.error,
             title: 'Error',
             description: e.toString().contains('low reserve')
-                ? 'You need to fund your account with some XLMs to create an order'
+                ? 'You need to fund your account with some XLMs to cancel an order'
                 : 'Error cancelling your order',
             actions: <Widget>[
               TextButton(
