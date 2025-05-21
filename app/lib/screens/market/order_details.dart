@@ -102,7 +102,7 @@ class _OrderDetailsWidgetState extends State<OrderDetailsWidget> {
               ]),
         );
       }
-    } on StellarBalanceException catch (e) {
+    } on StellarBalanceException catch (_) {
       showDialog(
         barrierDismissible: false,
         context: context,
