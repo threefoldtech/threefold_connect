@@ -369,7 +369,7 @@ class _BuyTFTWidgetState extends State<BuyTFTWidget> {
               ]),
         );
       }
-    } on StellarBalanceException catch (e) {
+    } on StellarBalanceException catch (_) {
       showDialog(
         barrierDismissible: false,
         context: context,
