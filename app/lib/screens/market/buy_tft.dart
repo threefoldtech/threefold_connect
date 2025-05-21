@@ -258,9 +258,8 @@ class _BuyTFTWidgetState extends State<BuyTFTWidget> {
             image: Icons.error,
             title: 'Balance Error',
             type: DialogType.Error,
-            description: e.isLowReserve
-                ? 'You need to fund your account with some XLMs to create your order'
-                : 'Error creating your order: ${e.toString()}',
+            description:
+                'You need to fund your account with some XLMs to create your order',
             actions: <Widget>[
               TextButton(
                 child: const Text('Close'),
@@ -378,9 +377,8 @@ class _BuyTFTWidgetState extends State<BuyTFTWidget> {
             image: Icons.error,
             title: 'Balance Error',
             type: DialogType.Error,
-            description: e.isLowReserve
-                ? 'You need to fund your account with some XLMs to update your order'
-                : 'Error updating your order: ${e.toString()}',
+            description:
+                'You need to fund your account with some XLMs to update your order',
             actions: <Widget>[
               TextButton(
                 child: const Text('Close'),

@@ -110,9 +110,8 @@ class _OrderDetailsWidgetState extends State<OrderDetailsWidget> {
             image: Icons.error,
             title: 'Balance Error',
             type: DialogType.Error,
-            description: e.isLowReserve
-                ? 'You need to fund your account with some XLMs to cancel your order'
-                : 'Error cancelling your order: ${e.toString()}',
+            description:
+                'You need to fund your account with some XLMs to cancel your order',
             actions: <Widget>[
               TextButton(
                 child: const Text('Close'),

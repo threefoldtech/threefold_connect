@@ -118,6 +118,8 @@ class _RegisteredScreenState extends State<RegisteredScreen>
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     HomeCardWidget(
+                        name: 'Identity', icon: Icons.person, pageNumber: 5),
+                    HomeCardWidget(
                         name: 'Settings', icon: Icons.settings, pageNumber: 6),
                     // HomeCardWidget(
                     //     name: 'Notifications',

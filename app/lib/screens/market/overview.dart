@@ -70,7 +70,6 @@ class _OverviewWidgetState extends ConsumerState<OverviewWidget> {
     });
 
     final walletsNotifierRef = ref.read(walletsNotifier.notifier);
-    walletsNotifierRef.clear();
 
     try {
       await walletsNotifierRef.list();
