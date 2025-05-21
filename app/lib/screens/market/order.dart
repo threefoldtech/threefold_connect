@@ -1,3 +1,6 @@
+import 'dart:async';
+
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:stellar_flutter_sdk/stellar_flutter_sdk.dart';
 import 'package:threebotlogin/helpers/logger.dart';
@@ -18,6 +21,7 @@ class OrderWidget extends StatefulWidget {
 class _OrderWidgetState extends State<OrderWidget>
     with SingleTickerProviderStateMixin {
   bool loading = true;
+  bool failed = false;
   late final TabController _tabController;
   final List<Offer> activeOrders = [];
   final List<Offer> previousOrders = [];
@@ -48,19 +52,38 @@ class _OrderWidgetState extends State<OrderWidget>
   }
 
   Future<void> loadOrders() async {
-    setState(() {
-      loading = true;
-    });
-
-    Asset sellingAsset =
-        AssetTypeCreditAlphaNum4(usdcAssetCode, usdcAssetIssuer);
-    Asset buyingAsset = AssetTypeCreditAlphaNum4(tftAssetCode, tftAssetIssuer);
+    _setLoadingState();
 
     try {
+      final connectivityResult = await (Connectivity().checkConnectivity());
+
+      if (connectivityResult.contains(ConnectivityResult.none)) {
+        _handleFailure(
+          'No internet connection. Please check your network.',
+        );
+        return;
+      }
+
+      Asset sellingAsset =
+          AssetTypeCreditAlphaNum4(usdcAssetCode, usdcAssetIssuer);
+      Asset buyingAsset =
+          AssetTypeCreditAlphaNum4(tftAssetCode, tftAssetIssuer);
+
       final currentOrders =
-          await getActiveOrders(widget.selectedWallet.stellarSecret);
+          await getActiveOrders(widget.selectedWallet.stellarSecret).timeout(
+        const Duration(minutes: 1),
+        onTimeout: () {
+          throw TimeoutException('Loading active orders timed out');
+        },
+      );
       final ordersHistory = await getOrdersHistory(
-          widget.selectedWallet.stellarSecret, sellingAsset, buyingAsset);
+              widget.selectedWallet.stellarSecret, sellingAsset, buyingAsset)
+          .timeout(
+        const Duration(minutes: 1),
+        onTimeout: () {
+          throw TimeoutException('Loading orders history timed out');
+        },
+      );
 
       if (activeOrders.isNotEmpty) activeOrders.clear();
       if (previousOrders.isNotEmpty) previousOrders.clear();
@@ -69,27 +92,54 @@ class _OrderWidgetState extends State<OrderWidget>
 
       activeOrders.addAll(filteredActiveOrders);
       previousOrders.addAll(ordersHistory);
+    } on TimeoutException catch (e) {
+      _handleFailure(
+        'Loading orders timed out. Please check your network',
+        error: e,
+      );
     } catch (e) {
-      logger.e('Failed to load orders due to $e');
-      if (context.mounted) {
-        final loadingOrdersFailure = SnackBar(
-          content: Text(
-            'Failed to load orders',
-            style: Theme.of(context)
-                .textTheme
-                .bodyMedium!
-                .copyWith(color: Theme.of(context).colorScheme.errorContainer),
-          ),
-          duration: const Duration(seconds: 3),
-        );
-        ScaffoldMessenger.of(context).clearSnackBars();
-        ScaffoldMessenger.of(context).showSnackBar(loadingOrdersFailure);
-      }
+      _handleFailure(
+        'Failed to load orders. Please try again.',
+        error: e,
+      );
     } finally {
       setState(() {
         loading = false;
       });
     }
+  }
+
+  void _handleFailure(String userMessage, {Object? error}) {
+    if (error != null) {
+      logger.e('Load proposals failed', error: error);
+    }
+
+    if (mounted) {
+      final errorSnackbar = SnackBar(
+        content: Text(
+          userMessage,
+          style: Theme.of(context)
+              .textTheme
+              .bodyMedium!
+              .copyWith(color: Theme.of(context).colorScheme.errorContainer),
+        ),
+        duration: const Duration(seconds: 3),
+      );
+      ScaffoldMessenger.of(context).clearSnackBars();
+      ScaffoldMessenger.of(context).showSnackBar(errorSnackbar);
+    }
+
+    setState(() {
+      loading = false;
+      failed = true;
+    });
+  }
+
+  void _setLoadingState() {
+    setState(() {
+      loading = true;
+      failed = false;
+    });
   }
 
   @override
@@ -110,6 +160,23 @@ class _OrderWidgetState extends State<OrderWidget>
           ),
         ],
       ));
+    } else if (failed) {
+      content = Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ElevatedButton.icon(
+              icon: const Icon(Icons.refresh),
+              label: const Text('Try Again'),
+              onPressed: () {
+                loadOrders();
+              },
+            ),
+            const SizedBox(height: 16),
+          ],
+        ),
+      );
     } else {
       content = DefaultTabController(
         length: 2,

@@ -30,7 +30,6 @@ class _BuyTFTWidgetState extends State<BuyTFTWidget> {
   String? amountError;
   String? priceError;
   bool loading = false;
-  bool loadingPrice = true;
   double? currentMarketPrice;
   List percentages = [25, 50, 75, 100];
   bool loadingBalance = true;
@@ -91,15 +90,10 @@ class _BuyTFTWidgetState extends State<BuyTFTWidget> {
 
   Future<void> _fetchCurrentMarketPrice() async {
     try {
-      setState(() {
-        loadingPrice = true;
-      });
-
       final marketData = await Stellar.fetchTftMarketData();
       if (marketData != null && marketData.lastUsdPrice > 0) {
         setState(() {
           currentMarketPrice = 1 / marketData.lastUsdPrice;
-          loadingPrice = false;
 
           if (!widget.edit && priceController.text.isEmpty) {
             priceController.text = currentMarketPrice!.toStringAsFixed(7);
@@ -108,14 +102,12 @@ class _BuyTFTWidgetState extends State<BuyTFTWidget> {
         });
       } else {
         setState(() {
-          loadingPrice = false;
           priceController.text = '';
         });
       }
     } catch (e) {
       logger.e('Error fetching market price: $e');
       setState(() {
-        loadingPrice = false;
         priceController.text = '';
       });
     }
