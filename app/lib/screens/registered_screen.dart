@@ -119,10 +119,10 @@ class _RegisteredScreenState extends State<RegisteredScreen>
                   children: [
                     HomeCardWidget(
                         name: 'Settings', icon: Icons.settings, pageNumber: 6),
-                    HomeCardWidget(
-                        name: 'Notifications',
-                        icon: Icons.notifications,
-                        pageNumber: 10),
+                    // HomeCardWidget(
+                    //     name: 'Notifications',
+                    //     icon: Icons.notifications,
+                    //     pageNumber: 9),
                   ],
                 ),
                 const SizedBox(height: 40),
