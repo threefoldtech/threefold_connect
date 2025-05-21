@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:threebotlogin/helpers/logger.dart';
+import 'package:stellar_client/models/exceptions.dart';
 import 'package:threebotlogin/models/offer.dart';
 import 'package:threebotlogin/models/wallet.dart';
 import 'package:threebotlogin/services/stellar_service.dart' as Stellar;
@@ -102,16 +102,17 @@ class _OrderDetailsWidgetState extends State<OrderDetailsWidget> {
               ]),
         );
       }
-    } catch (e) {
+    } on StellarBalanceException catch (e) {
       showDialog(
         barrierDismissible: false,
         context: context,
         builder: (BuildContext context) => CustomDialog(
             image: Icons.error,
-            title: 'Error',
-            description: e.toString().contains('low reserve')
-                ? 'You need to fund your account with some XLMs to cancel an order'
-                : 'Error cancelling your order',
+            title: 'Balance Error',
+            type: DialogType.Error,
+            description: e.isLowReserve
+                ? 'You need to fund your account with some XLMs to cancel your order'
+                : 'Error cancelling your order: ${e.toString()}',
             actions: <Widget>[
               TextButton(
                 child: const Text('Close'),
@@ -121,7 +122,25 @@ class _OrderDetailsWidgetState extends State<OrderDetailsWidget> {
               )
             ]),
       );
-      logger.e('Error cancelling order due to $e');
+      return;
+    } catch (e) {
+      showDialog(
+        barrierDismissible: false,
+        context: context,
+        builder: (BuildContext context) => CustomDialog(
+            image: Icons.error,
+            title: 'Error',
+            type: DialogType.Error,
+            description: 'Error cancelling your order: ${e.toString()}',
+            actions: <Widget>[
+              TextButton(
+                child: const Text('Close'),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              )
+            ]),
+      );
       return;
     } finally {
       setState(() {

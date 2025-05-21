@@ -24,6 +24,8 @@ class _OverviewWidgetState extends ConsumerState<OverviewWidget> {
   Wallet? _selectedWallet;
   bool loading = true;
   bool failed = false;
+  bool isLoadingWallets = false;
+  bool loadingWalletsFailed = false;
   TftMarketData? marketData;
 
   @override
@@ -31,6 +33,89 @@ class _OverviewWidgetState extends ConsumerState<OverviewWidget> {
     super.initState();
     _startPriceUpdater();
     _fetchMarketData();
+    _checkWalletsListed();
+  }
+
+  Future<void> _checkWalletsListed() async {
+    final walletsNotifierRef = ref.read(walletsNotifier.notifier);
+    if (!walletsNotifierRef.isListed) {
+      setState(() {
+        isLoadingWallets = true;
+        loadingWalletsFailed = false;
+        _selectedWallet = null;
+      });
+      try {
+        await walletsNotifierRef.list();
+      } catch (e) {
+        if (mounted) {
+          setState(() {
+            loadingWalletsFailed = true;
+          });
+        }
+      } finally {
+        if (mounted) {
+          setState(() {
+            isLoadingWallets = false;
+          });
+        }
+      }
+    }
+  }
+
+  Future<void> _retryLoadingWallets() async {
+    setState(() {
+      isLoadingWallets = true;
+      loadingWalletsFailed = false;
+      _selectedWallet = null;
+    });
+
+    final walletsNotifierRef = ref.read(walletsNotifier.notifier);
+    walletsNotifierRef.clear();
+
+    try {
+      await walletsNotifierRef.list();
+      if (mounted && context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              'Wallets loaded successfully',
+              style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                  color: Theme.of(context).colorScheme.primaryContainer),
+            ),
+            duration: const Duration(seconds: 2),
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          loadingWalletsFailed = true;
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              'Failed to load wallets. Please check your connection.',
+              style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                  color: Theme.of(context).colorScheme.errorContainer),
+            ),
+            duration: const Duration(seconds: 3),
+            action: SnackBarAction(
+              label: 'Retry',
+              textColor: Theme.of(context).colorScheme.errorContainer,
+              onPressed: () {
+                _retryLoadingWallets();
+              },
+            ),
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          isLoadingWallets = false;
+        });
+      }
+    }
   }
 
   Future<TftMarketData?> _fetchMarketData() async {
@@ -40,6 +125,14 @@ class _OverviewWidgetState extends ConsumerState<OverviewWidget> {
     });
     try {
       final data = await Stellar.fetchTftMarketData();
+      if (data == null) {
+        setState(() {
+          failed = true;
+          marketData = TftMarketData.empty();
+        });
+        logger.e('Error fetching market data: received null data');
+        return null;
+      }
       setState(() {
         marketData = data;
         failed = false;
@@ -49,6 +142,7 @@ class _OverviewWidgetState extends ConsumerState<OverviewWidget> {
     } catch (e) {
       setState(() {
         failed = true;
+        marketData = TftMarketData.empty();
       });
       logger.e('Error fetching market data: $e');
       return null;
@@ -83,7 +177,7 @@ class _OverviewWidgetState extends ConsumerState<OverviewWidget> {
   Widget build(BuildContext context) {
     final wallets = ref.watch(walletsNotifier);
     Widget mainWidget;
-    if (loading) {
+    if (loading || isLoadingWallets) {
       mainWidget = Center(
           child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -98,7 +192,7 @@ class _OverviewWidgetState extends ConsumerState<OverviewWidget> {
           ),
         ],
       ));
-    } else if (failed) {
+    } else if (failed || loadingWalletsFailed || marketData == null) {
       mainWidget = Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -113,6 +207,7 @@ class _OverviewWidgetState extends ConsumerState<OverviewWidget> {
                   loading = true;
                 });
                 _fetchMarketData();
+                _retryLoadingWallets();
               },
             ),
           ],
@@ -578,10 +673,6 @@ class _OverviewWidgetState extends ConsumerState<OverviewWidget> {
           onWalletSelected: (Wallet wallet) {
             setState(() {
               _selectedWallet = wallet;
-              logger.i('Selected wallet: ${wallet.name}');
-              logger.i('TFT balance: ${wallet.stellarBalances['TFT']}');
-              logger.i('USDC balance: ${wallet.stellarBalances['USDC']}');
-              logger.i('XLM balance: ${wallet.stellarBalances['XLM']}');
             });
             Navigator.pop(context);
           },

@@ -1,6 +1,7 @@
 import 'package:decimal/decimal.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
+import 'package:stellar_client/models/exceptions.dart';
 import 'package:threebotlogin/helpers/logger.dart';
 import 'package:threebotlogin/helpers/transaction_helpers.dart';
 import 'package:threebotlogin/models/offer.dart';
@@ -32,7 +33,8 @@ class _BuyTFTWidgetState extends State<BuyTFTWidget> {
   bool loadingPrice = true;
   double? currentMarketPrice;
   List percentages = [25, 50, 75, 100];
-  String availableUSDC = '0';
+  bool loadingBalance = true;
+  String? availableUSDC;
 
   @override
   void initState() {
@@ -62,11 +64,29 @@ class _BuyTFTWidgetState extends State<BuyTFTWidget> {
   }
 
   _getAvailableUSDC() async {
-    final available = await Stellar.getAvailableUSDCBalance(
-        widget.wallet.stellarSecret, widget.offer);
     setState(() {
-      availableUSDC = available;
+      loadingBalance = true;
     });
+
+    try {
+      final available = await Stellar.getAvailableUSDCBalance(
+          widget.wallet.stellarSecret, widget.offer);
+
+      if (mounted) {
+        setState(() {
+          availableUSDC = available;
+          loadingBalance = false;
+        });
+      }
+    } catch (e) {
+      logger.e('Error fetching USDC balance: $e');
+      if (mounted) {
+        setState(() {
+          availableUSDC = '0';
+          loadingBalance = false;
+        });
+      }
+    }
   }
 
   Future<void> _fetchCurrentMarketPrice() async {
@@ -103,13 +123,20 @@ class _BuyTFTWidgetState extends State<BuyTFTWidget> {
     final amount = amountController.text.trim();
     amountError = null;
 
+    if (loadingBalance) {
+      setState(() {
+        amountError = 'Please wait for balance to load';
+      });
+      return false;
+    }
+
     if (amount.isEmpty) {
       setState(() {
         amountError = "Amount can't be empty";
       });
       return false;
     }
-    final balance = roundAmount(availableUSDC);
+    final balance = roundAmount(availableUSDC ?? '0');
 
     if (balance - Decimal.parse(amount) <= Decimal.zero) {
       setState(() {
@@ -118,7 +145,7 @@ class _BuyTFTWidgetState extends State<BuyTFTWidget> {
       return false;
     }
 
-    if (Decimal.parse(amount) > Decimal.parse(availableUSDC)) {
+    if (Decimal.parse(amount) > Decimal.parse(availableUSDC ?? '0')) {
       setState(() {
         amountError = 'Not enough balance';
       });
@@ -148,8 +175,8 @@ class _BuyTFTWidgetState extends State<BuyTFTWidget> {
   }
 
   calculateAmount(int percentage) {
-    final amount =
-        Decimal.parse(availableUSDC) * (Decimal.fromInt(percentage).shift(-2));
+    final amount = Decimal.parse(availableUSDC ?? '0') *
+        (Decimal.fromInt(percentage).shift(-2));
     amountController.text = roundAmount(amount.toString()).toString();
     _calculateTotal();
   }
@@ -229,6 +256,27 @@ class _BuyTFTWidgetState extends State<BuyTFTWidget> {
               ]),
         );
       }
+    } on StellarBalanceException catch (e) {
+      showDialog(
+        barrierDismissible: false,
+        context: context,
+        builder: (BuildContext context) => CustomDialog(
+            image: Icons.error,
+            title: 'Balance Error',
+            type: DialogType.Error,
+            description: e.isLowReserve
+                ? 'You need to fund your account with some XLMs to create your order'
+                : 'Error creating your order: ${e.toString()}',
+            actions: <Widget>[
+              TextButton(
+                child: const Text('Close'),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              )
+            ]),
+      );
+      return;
     } catch (e) {
       showDialog(
         barrierDismissible: false,
@@ -237,9 +285,7 @@ class _BuyTFTWidgetState extends State<BuyTFTWidget> {
             image: Icons.error,
             title: 'Error',
             type: DialogType.Error,
-            description: e.toString().contains('low reserve')
-                ? 'You need to fund your account with some XLMs to create an order'
-                : 'Error creating your order',
+            description: 'Error creating your order: ${e.toString()}',
             actions: <Widget>[
               TextButton(
                 child: const Text('Close'),
@@ -330,6 +376,27 @@ class _BuyTFTWidgetState extends State<BuyTFTWidget> {
               ]),
         );
       }
+    } on StellarBalanceException catch (e) {
+      showDialog(
+        barrierDismissible: false,
+        context: context,
+        builder: (BuildContext context) => CustomDialog(
+            image: Icons.error,
+            title: 'Balance Error',
+            type: DialogType.Error,
+            description: e.isLowReserve
+                ? 'You need to fund your account with some XLMs to update your order'
+                : 'Error updating your order: ${e.toString()}',
+            actions: <Widget>[
+              TextButton(
+                child: const Text('Close'),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              )
+            ]),
+      );
+      return;
     } catch (e) {
       showDialog(
         barrierDismissible: false,
@@ -338,9 +405,7 @@ class _BuyTFTWidgetState extends State<BuyTFTWidget> {
             image: Icons.error,
             title: 'Error',
             type: DialogType.Error,
-            description: e.toString().contains('low reserve')
-                ? 'You need to fund your account with some XLMs to update your order'
-                : 'Error updating your order',
+            description: 'Error updating your order: ${e.toString()}',
             actions: <Widget>[
               TextButton(
                 child: const Text('Close'),
@@ -419,15 +484,44 @@ class _BuyTFTWidgetState extends State<BuyTFTWidget> {
                       padding: const EdgeInsets.symmetric(horizontal: 15.0),
                       child: Align(
                         alignment: Alignment.centerRight,
-                        child: Text(
-                          'Available: $availableUSDC USDC',
-                          style:
-                              Theme.of(context).textTheme.bodySmall!.copyWith(
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .onSurfaceVariant,
+                        child: loadingBalance
+                            ? Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  SizedBox(
+                                    width: 12,
+                                    height: 12,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                      color:
+                                          Theme.of(context).colorScheme.primary,
+                                    ),
                                   ),
-                        ),
+                                  const SizedBox(width: 8),
+                                  Text(
+                                    'Loading balance...',
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .bodySmall!
+                                        .copyWith(
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .onSurfaceVariant,
+                                        ),
+                                  ),
+                                ],
+                              )
+                            : Text(
+                                'Available: $availableUSDC USDC',
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodySmall!
+                                    .copyWith(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onSurfaceVariant,
+                                    ),
+                              ),
                       ),
                     ),
                     const SizedBox(height: 10),
@@ -442,7 +536,9 @@ class _BuyTFTWidgetState extends State<BuyTFTWidget> {
                                     shape: const RoundedRectangleBorder(
                                         borderRadius: BorderRadius.all(
                                             Radius.circular(5)))),
-                                onPressed: () => calculateAmount(percentage),
+                                onPressed: loadingBalance
+                                    ? null
+                                    : () => calculateAmount(percentage),
                                 child: Text('$percentage%'),
                               ),
                             )
@@ -550,17 +646,19 @@ class _BuyTFTWidgetState extends State<BuyTFTWidget> {
                       child: SizedBox(
                         width: double.infinity,
                         child: ElevatedButton(
-                          onPressed: () async {
-                            if (_validateAmount() && _validatePrice()) {
-                              if (widget.edit && _checkForChanges()) {
-                                _updateOrder();
-                              } else {
-                                _createOrder();
-                              }
-                            } else {
-                              setState(() {});
-                            }
-                          },
+                          onPressed: loading || loadingBalance
+                              ? null
+                              : () async {
+                                  if (_validateAmount() && _validatePrice()) {
+                                    if (widget.edit && _checkForChanges()) {
+                                      _updateOrder();
+                                    } else {
+                                      _createOrder();
+                                    }
+                                  } else {
+                                    setState(() {});
+                                  }
+                                },
                           style: ElevatedButton.styleFrom(),
                           child: loading
                               ? const Row(

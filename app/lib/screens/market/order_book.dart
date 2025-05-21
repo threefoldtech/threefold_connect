@@ -1,5 +1,9 @@
+import 'dart:async';
+
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:stellar_flutter_sdk/stellar_flutter_sdk.dart';
+import 'package:threebotlogin/helpers/logger.dart';
 import 'package:threebotlogin/models/order_book.dart';
 import 'package:threebotlogin/services/stellar_service.dart';
 
@@ -12,6 +16,8 @@ class OrderbookWidget extends StatefulWidget {
 
 class _OrderbookWidgetState extends State<OrderbookWidget> {
   Stream<OrderBook>? _orderBookStream;
+  bool _isLoading = true;
+  bool failed = false;
 
   @override
   void initState() {
@@ -20,15 +26,116 @@ class _OrderbookWidgetState extends State<OrderbookWidget> {
   }
 
   void _loadOrderBook() async {
-    _orderBookStream = await listOrderBook(
-      AssetTypeCreditAlphaNum4(tftAssetCode, tftAssetIssuer),
-      AssetTypeCreditAlphaNum4(usdcAssetCode, usdcAssetIssuer),
-    );
-    setState(() {});
+    _setLoadingState();
+
+    try {
+      final connectivityResult = await (Connectivity().checkConnectivity());
+      if (connectivityResult.contains(ConnectivityResult.none)) {
+        _handleFailure(
+          'No internet connection. Please check your network.',
+        );
+        return;
+      }
+
+      _orderBookStream = await listOrderBook(
+        AssetTypeCreditAlphaNum4(tftAssetCode, tftAssetIssuer),
+        AssetTypeCreditAlphaNum4(usdcAssetCode, usdcAssetIssuer),
+      ).timeout(
+        const Duration(minutes: 1),
+        onTimeout: () {
+          throw TimeoutException('Loading orderbook timed out');
+        },
+      );
+
+      _orderBookStream!.first.timeout(
+        const Duration(seconds: 15),
+        onTimeout: () {
+          throw TimeoutException('No data received from orderbook stream');
+        },
+      );
+      setState(() {
+        _isLoading = false;
+        failed = false;
+      });
+    } on TimeoutException catch (e) {
+      _handleFailure(
+        'Loading orderbook timed out. Please check your network',
+        error: e,
+      );
+    } catch (e) {
+      _handleFailure(
+        'Failed to load orderbook. Please try again.',
+        error: e,
+      );
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
+
+  void _setLoadingState() {
+    setState(() {
+      _isLoading = true;
+      failed = false;
+    });
+  }
+
+  void _handleFailure(String userMessage, {Object? error}) {
+    if (error != null) {
+      logger.e('Load orderbook failed', error: error);
+    }
+
+    if (mounted) {
+      final errorSnackbar = SnackBar(
+        content: Text(
+          userMessage,
+          style: Theme.of(context)
+              .textTheme
+              .bodyMedium!
+              .copyWith(color: Theme.of(context).colorScheme.errorContainer),
+        ),
+        duration: const Duration(seconds: 3),
+      );
+      ScaffoldMessenger.of(context).clearSnackBars();
+      ScaffoldMessenger.of(context).showSnackBar(errorSnackbar);
+    }
+
+    setState(() {
+      _isLoading = false;
+      failed = true;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
+    if (_isLoading) {
+      return const Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            CircularProgressIndicator(),
+            SizedBox(height: 16),
+            Text('Loading orderbook...'),
+          ],
+        ),
+      );
+    }
+
+    if (failed) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            ElevatedButton.icon(
+              icon: const Icon(Icons.refresh),
+              label: const Text('Try Again'),
+              onPressed: _loadOrderBook,
+            ),
+          ],
+        ),
+      );
+    }
     return _orderBookStream == null
         ? const Center(child: CircularProgressIndicator())
         : StreamBuilder<OrderBook>(
