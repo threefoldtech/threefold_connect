@@ -123,7 +123,7 @@ class _RegisteredScreenState extends State<RegisteredScreen>
                         pageNumber: 9),
                   ],
                 ),
-                const SizedBox(height: 20), // Added some spacing
+                const SizedBox(height: 40),
                 const Row(
                   children: [Spacer(), CrispChatbot(), SizedBox(width: 20)],
                 )
