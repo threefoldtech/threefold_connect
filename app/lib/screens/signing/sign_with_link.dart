@@ -296,7 +296,7 @@ class _SignWithLinkScreenState extends ConsumerState<SignWithLinkScreen>
                         : Text('Sign',
                             style: Theme.of(context)
                                 .textTheme
-                                .titleLarge!
+                                .titleMedium!
                                 .copyWith(
                                   color: Theme.of(context)
                                       .colorScheme
