@@ -127,7 +127,7 @@ class MyApp extends ConsumerWidget {
             backgroundColor: kColorScheme.primary,
             foregroundColor: kColorScheme.onPrimary,
           ),
-          cardTheme: const CardTheme().copyWith(
+          cardTheme: const CardThemeData().copyWith(
               color: kColorScheme.surfaceContainer,
               margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8)),
           elevatedButtonTheme: ElevatedButtonThemeData(
@@ -154,7 +154,7 @@ class MyApp extends ConsumerWidget {
             backgroundColor: kDarkColorScheme.primaryContainer,
             foregroundColor: kDarkColorScheme.onPrimaryContainer,
           ),
-          cardTheme: const CardTheme().copyWith(
+          cardTheme: const CardThemeData().copyWith(
               color: kDarkColorScheme.surfaceContainer,
               margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8)),
           elevatedButtonTheme: ElevatedButtonThemeData(
