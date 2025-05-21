@@ -109,12 +109,14 @@ class _BuyTFTWidgetState extends State<BuyTFTWidget> {
       } else {
         setState(() {
           loadingPrice = false;
+          priceController.text = '';
         });
       }
     } catch (e) {
       logger.e('Error fetching market price: $e');
       setState(() {
         loadingPrice = false;
+        priceController.text = '';
       });
     }
   }
