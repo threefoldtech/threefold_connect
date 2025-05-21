@@ -9,13 +9,14 @@ import 'package:threebotlogin/widgets/custom_dialog.dart';
 @pragma('vm:entry-point')
 void notificationTapBackground(NotificationResponse notificationResponse) {
   if (notificationResponse.payload != null) {
-    NotificationService._handleNotificationTapStatic(notificationResponse.payload!);
+    NotificationService._handleNotificationTapStatic(
+        notificationResponse.payload!);
   }
 }
 
 class NotificationService {
-  static final FlutterLocalNotificationsPlugin _flutterLocalNotificationsPlugin =
-      FlutterLocalNotificationsPlugin();
+  static final FlutterLocalNotificationsPlugin
+      _flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
 
   Future<void> initNotification() async {
     const AndroidInitializationSettings initializationSettingsAndroid =
@@ -39,14 +40,18 @@ class NotificationService {
       onDidReceiveNotificationResponse:
           (NotificationResponse notificationResponse) async {
         if (notificationResponse.payload != null) {
-          NotificationService._handleNotificationTapStatic(notificationResponse.payload!);
+          // Ensure the app is brought to foreground
+          await _flutterLocalNotificationsPlugin.cancelAll();
+          NotificationService._handleNotificationTapStatic(
+              notificationResponse.payload!);
         }
       },
       onDidReceiveBackgroundNotificationResponse: notificationTapBackground,
     );
   }
 
-  static AndroidNotificationDetails _androidNotificationDetails(String groupKey) {
+  static AndroidNotificationDetails _androidNotificationDetails(
+      String groupKey) {
     return AndroidNotificationDetails(
       'channel ID',
       'channel name',
@@ -87,11 +92,13 @@ class NotificationService {
         'groupKey': groupKey,
       }),
     );
-    logger.i('[NotificationService] Notification shown: ID $notificationId, Title: "$title"');
+    logger.i(
+        '[NotificationService] Notification shown: ID $notificationId, Title: "$title"');
   }
 
   static void _handleNotificationTapStatic(String payload) async {
-    logger.i('[NotificationService Static] Notification tapped, payload: $payload');
+    logger.i(
+        '[NotificationService Static] Notification tapped, payload: $payload');
 
     try {
       final Map<String, dynamic> data = jsonDecode(payload);
@@ -99,25 +106,39 @@ class NotificationService {
       final String title = data['title'] as String;
       final String body = data['body'] as String;
 
-      logger.i('[NotificationService Static] Processing tapped notification with groupKey: $groupKey');
+      logger.i(
+          '[NotificationService Static] Processing tapped notification with groupKey: $groupKey');
+
+      // Wait for app to be in foreground if needed
+      await Future.delayed(const Duration(milliseconds: 500));
+
+      if (navigatorKey.currentContext == null) {
+        logger.w(
+            '[NotificationService Static] Context is null, retrying in 1 second...');
+        await Future.delayed(const Duration(seconds: 1));
+      }
 
       if (navigatorKey.currentContext != null) {
         if (groupKey == 'contract_alerts') {
-          NotificationService.showContractAlertDialog(
+          await NotificationService.showContractAlertDialog(
             title: title,
             body: body,
           );
         } else if (groupKey == 'offline_nodes') {
-          NotificationService.showNodeAlertDialog(
+          await NotificationService.showNodeAlertDialog(
             title: title,
             body: body,
           );
         }
       } else {
-        logger.w('[NotificationService Static] navigatorKey.currentContext is null. Cannot show dialog directly from background notification tap. Payload: $payload');
+        logger.w(
+            '[NotificationService Static] Could not get valid context after retry');
       }
     } catch (e, stack) {
-      logger.e('[NotificationService Static] Error parsing notification payload or handling tap: $e', error: e, stackTrace: stack);
+      logger.e(
+          '[NotificationService Static] Error handling notification tap: $e',
+          error: e,
+          stackTrace: stack);
     }
   }
 
@@ -126,7 +147,8 @@ class NotificationService {
     required String body,
   }) async {
     if (navigatorKey.currentContext == null) {
-      logger.w('[NotificationService Static] Cannot show contract alert dialog, navigatorKey.currentContext is null.');
+      logger.w(
+          '[NotificationService Static] Cannot show contract alert dialog, navigatorKey.currentContext is null.');
       return;
     }
 
@@ -144,7 +166,8 @@ class NotificationService {
     required String body,
   }) async {
     if (navigatorKey.currentContext == null) {
-      logger.w('[NotificationService Static] Cannot show node alert dialog, navigatorKey.currentContext is null.');
+      logger.w(
+          '[NotificationService Static] Cannot show node alert dialog, navigatorKey.currentContext is null.');
       return;
     }
 
@@ -164,20 +187,25 @@ class NotificationService {
     required IconData icon,
   }) {
     return showDialog(
-        context: context,
-        builder: (BuildContext context) => CustomDialog(
-          image: icon,
-          title: title,
-          description: content.data,
-          actions: <Widget>[
-            TextButton(
-              child: const Text('Close'),
-              onPressed: () {
-                Navigator.pop(context);
-              },
-            ),
-          ],
-        ),
-      );
+      context: context,
+      builder: (BuildContext context) {
+        return PopScope(
+          canPop: false,
+          child: CustomDialog(
+            image: icon,
+            title: title,
+            description: content.data,
+            actions: <Widget>[
+              TextButton(
+                child: const Text('Close'),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
   }
 }
