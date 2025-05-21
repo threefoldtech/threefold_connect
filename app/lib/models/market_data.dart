@@ -39,7 +39,8 @@ class TftMarketData {
       volume24h += double.parse(trade['counter_amount']);
     }
 
-    final double change24h = ((lastUsdcPrice - oldestUsdcPrice) / oldestUsdcPrice) * 100;
+    final double change24h =
+        ((lastUsdcPrice - oldestUsdcPrice) / oldestUsdcPrice) * 100;
 
     return TftMarketData(
       lastPrice: 1 / lastPrice,
