@@ -166,7 +166,7 @@ class _WalletReceiveScreenState extends State<WalletReceiveScreen> {
                           'Generate QR Code',
                           style: Theme.of(context)
                               .textTheme
-                              .titleLarge!
+                              .titleMedium!
                               .copyWith(
                                   color: Theme.of(context).colorScheme.primary,
                                   fontWeight: FontWeight.bold),
