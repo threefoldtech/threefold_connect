@@ -39,9 +39,10 @@ class NotificationService {
       initializationSettings,
       onDidReceiveNotificationResponse:
           (NotificationResponse notificationResponse) async {
-        if (notificationResponse.payload != null) {
-          // Ensure the app is brought to foreground
-          await _flutterLocalNotificationsPlugin.cancelAll();
+        if (notificationResponse.payload != null &&
+            notificationResponse.id != null) {
+          await _flutterLocalNotificationsPlugin
+              .cancel(notificationResponse.id!);
           NotificationService._handleNotificationTapStatic(
               notificationResponse.payload!);
         }
@@ -112,28 +113,17 @@ class NotificationService {
       // Wait for app to be in foreground if needed
       await Future.delayed(const Duration(milliseconds: 500));
 
-      if (navigatorKey.currentContext == null) {
-        logger.w(
-            '[NotificationService Static] Context is null, retrying in 1 second...');
-        await Future.delayed(const Duration(seconds: 1));
-      }
-
       if (navigatorKey.currentContext != null) {
-        if (groupKey == 'contract_alerts') {
+        if (groupKey == 'contract_alerts' ||
+            groupKey == 'offline_nodes' ||
+            groupKey == 'offline_workload_nodes') {
           await NotificationService.showContractAlertDialog(
             title: title,
             body: body,
           );
-        } else if (groupKey == 'offline_nodes') {
-          await NotificationService.showNodeAlertDialog(
-            title: title,
-            body: body,
-          );
         }
-      } else {
-        logger.w(
-            '[NotificationService Static] Could not get valid context after retry');
       }
+      return;
     } catch (e, stack) {
       logger.e(
           '[NotificationService Static] Error handling notification tap: $e',

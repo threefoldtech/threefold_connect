@@ -835,7 +835,7 @@ packages:
     description:
       path: "packages/gridproxy_client"
       ref: development
-      resolved-ref: "4ef4d3bc2550017d987f27fd8c2264854c5cf683"
+      resolved-ref: a2e6e9d8a560d93474c77edacb0b8e8f04187cef
       url: "https://github.com/threefoldtech/tfgrid-sdk-dart"
     source: git
     version: "1.0.0"

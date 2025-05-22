@@ -67,15 +67,28 @@ Future<bool> isFarmNameAvailable(String name) async {
   }
 }
 
-Future<List<ContractInfo>> getGracePeriodContractsByTwinId(int twinId) async {
+Future<List<ContractInfo>> getContracts(
+    int twinId, List<ContractState> state) async {
   try {
     initializeReflectable();
     final gridproxyUrl = Globals().gridproxyUrl;
     GridProxyClient client = GridProxyClient(gridproxyUrl);
-    final contracts =
-        await client.contracts.list(ContractInfoQueryParams(twin_id: twinId, state: ContractState.GracePeriod));
+    final contracts = await client.contracts.list(ContractInfoQueryParams(
+        twin_id: twinId, state: state, type: ContractTypes.node));
     return contracts;
   } catch (e) {
     throw Exception('Failed to get contracts due to $e');
+  }
+}
+
+Future<Node> getNodeById(int id) async {
+  try {
+    initializeReflectable();
+    final gridproxyUrl = Globals().gridproxyUrl;
+    GridProxyClient client = GridProxyClient(gridproxyUrl);
+    final node = await client.nodes.getById(nodeID: id);
+    return node;
+  } catch (e) {
+    throw Exception('Failed to get node due to $e');
   }
 }

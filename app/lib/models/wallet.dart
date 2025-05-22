@@ -17,6 +17,7 @@ class Wallet {
     required this.tfchainBalance,
     required this.type,
     required this.verificationStatus,
+    required this.twinId,
   });
   String name;
   final String stellarSecret;
@@ -27,6 +28,7 @@ class Wallet {
   String tfchainBalance;
   final WalletType type;
   VerificationState verificationStatus;
+  int twinId = 0;
 }
 
 class PkidWallet {
