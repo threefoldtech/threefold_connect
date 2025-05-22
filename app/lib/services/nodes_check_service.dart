@@ -15,7 +15,7 @@ class NodeCheckService {
 
       if (wallets.isEmpty) return [];
 
-      final twinIds = wallets.map((w) => w.twinId!).toList();
+      final twinIds = wallets.map((w) => w.twinId).toList();
       final farmsList = await getFarmsByTwinIds(twinIds);
       final allNodes = <Node>[];
       for (final farm in farmsList) {
@@ -53,9 +53,10 @@ class NodeCheckService {
 
       // Get unique node IDs from all wallet contracts
       final nodeIds = (await Future.wait(wallets.map((w) => getContracts(
-              w.twinId!, [ContractState.Created, ContractState.GracePeriod]))))
+              w.twinId, [ContractState.Created, ContractState.GracePeriod]))))
           .expand((contracts) => contracts)
-          .map((c) => c.nodeId!)
+          .map((c) => c.nodeId)
+          .whereType<int>()
           .toSet()
           .toList();
 
@@ -71,14 +72,14 @@ class NodeCheckService {
   }
 
   static Future<List<int>> _getOfflineNodes(List<int> nodeIds) async {
-    final nodes = await Future.wait(nodeIds.map(_fetchNodeStatus));
+    final nodes = await Future.wait(nodeIds.map(fetchNodeStatus));
     return nodes
         .where((n) => n.status == NodeStatus.Down)
         .map((n) => n.nodeId)
         .toList();
   }
 
-  static Future<Node> _fetchNodeStatus(int nodeId) async {
+  static Future<Node> fetchNodeStatus(int nodeId) async {
     final nodeData = await getNodeById(nodeId);
     return Node(
       nodeId: nodeId,

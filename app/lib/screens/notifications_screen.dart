@@ -100,7 +100,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                     });
                     setWorkloadNotificationEnabled(newValue);
                   },
-                  secondary: const Icon(Icons.description),
+                  secondary: const Icon(Icons.monitor_heart),
                 ),
               ],
             ),

@@ -24,10 +24,11 @@ void backgroundFetchHeadlessTask(HeadlessTask task) async {
     logger.i(
         '[BackgroundFetch] Headless Task: $taskId started. Time: ${DateTime.now()}');
 
-    // Run contract and node checks concurrently
+    // Run checks concurrently
     await Future.wait([
       _checkContractsAndNotify(container, taskId),
       _checkMyNodesAndNotify(taskId),
+      _checkWorkloadNodesAndNotify(taskId),
     ]);
   } catch (e, stack) {
     logger.e('[BackgroundFetch] Error during task $taskId: $e',
@@ -139,6 +140,58 @@ Future<void> _checkMyNodesAndNotify(String taskId) async {
   } catch (e, stack) {
     logger.e('[NodesCheck] Error in node check for task $taskId: $e',
         error: e, stackTrace: stack);
+    rethrow;
+  }
+}
+
+Future<void> _checkWorkloadNodesAndNotify(String taskId) async {
+  try {
+    final bool nodeNotificationsEnabled = await isWorkloadNotificationEnabled();
+    logger.i(
+        '[NodesCheck] Workload Node Notifications Enabled: $nodeNotificationsEnabled for task $taskId');
+
+    if (!nodeNotificationsEnabled) {
+      logger.i(
+          '[NodesCheck] Node notifications are disabled by user setting. Exiting _checkWorkloadNodesAndNotify for task $taskId.');
+      return;
+    }
+
+    final offlineNodeIds = await NodeCheckService.pingWorkloadNodes();
+    if (offlineNodeIds.isEmpty) {
+      logger.i(
+          '[NodesCheck] No workload offline nodes found from pingWorkloadNodes(). Exiting _checkWorkloadNodesAndNotify for task $taskId.');
+      return;
+    }
+    logger.i(
+        '[NodesCheck] Found ${offlineNodeIds.length} workload offline nodes for task $taskId.');
+
+    final StringBuffer bodyBuffer = StringBuffer();
+    final List<int> nodesToNotify = [];
+
+    // Fetch node details in parallel
+    final nodes = await Future.wait(
+        offlineNodeIds.map((id) => NodeCheckService.fetchNodeStatus(id)));
+
+    for (final node in nodes) {
+      nodesToNotify.add(node.nodeId);
+      bodyBuffer.writeln('You have workloads on offline Node ${node.nodeId}');
+    }
+
+    if (nodesToNotify.isEmpty) return;
+
+    await NotificationService().showNotification(
+      id: 'offline_workload_nodes_alert',
+      title: nodesToNotify.length == 1
+          ? 'Workload Node Alert 🚨'
+          : '${nodesToNotify.length} Workload Nodes Offline 🚨',
+      body: bodyBuffer.toString().trim(),
+      groupKey: 'offline_workload_nodes',
+    );
+  } catch (e, stack) {
+    logger.e(
+        '[WorkloadNodesCheck] Error in workload node check for task $taskId: $e',
+        error: e,
+        stackTrace: stack);
     rethrow;
   }
 }
