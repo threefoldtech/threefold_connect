@@ -79,6 +79,8 @@ Future<void> checkNodeStatus(String taskId) async {
   }
 }
 
+
+
 Duration _getCheckInterval(Duration downtime) {
   if (downtime < const Duration(hours: 1)) {
     return const Duration(minutes: 15); // 0-1 hour: check every 15 min
