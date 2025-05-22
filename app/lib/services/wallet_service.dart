@@ -125,6 +125,7 @@ Future<Wallet> loadWallet(String walletName, String walletSeed,
   final kycVerified = await getVerificationStatus(
       address: tfchainClient.keypair!.address,
       idenfyServiceUrl: idenfyServiceUrl);
+  final twinId = await TFChainService.getTwinIdByClient(tfchainClient);
   final wallet = Wallet(
     name: walletName,
     stellarSecret: stellarClient.secretSeed,
@@ -135,6 +136,7 @@ Future<Wallet> loadWallet(String walletName, String walletSeed,
     tfchainBalance: tfchainBalance,
     type: walletType,
     verificationStatus: kycVerified.status,
+    twinId: twinId,
   );
   return wallet;
 }

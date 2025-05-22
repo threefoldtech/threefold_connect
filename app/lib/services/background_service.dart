@@ -27,7 +27,7 @@ void backgroundFetchHeadlessTask(HeadlessTask task) async {
     // Run contract and node checks concurrently
     await Future.wait([
       _checkContractsAndNotify(container, taskId),
-      _checkNodesAndNotify(taskId),
+      _checkMyNodesAndNotify(taskId),
     ]);
   } catch (e, stack) {
     logger.e('[BackgroundFetch] Error during task $taskId: $e',
@@ -76,7 +76,7 @@ Future<void> _checkContractsAndNotify(
   }
 }
 
-Future<void> _checkNodesAndNotify(String taskId) async {
+Future<void> _checkMyNodesAndNotify(String taskId) async {
   try {
     final bool nodeNotificationsEnabled =
         await isNodeStatusNotificationEnabled();
@@ -85,14 +85,14 @@ Future<void> _checkNodesAndNotify(String taskId) async {
 
     if (!nodeNotificationsEnabled) {
       logger.i(
-          '[NodesCheck] Node notifications are disabled by user setting. Exiting _checkNodesAndNotify for task $taskId.');
+          '[NodesCheck] Node notifications are disabled by user setting. Exiting _checkMyNodesAndNotify for task $taskId.');
       return;
     }
 
-    final offlineNodes = await NodeCheckService.pingNodesInBackground();
+    final offlineNodes = await NodeCheckService.pingMyNodes();
     if (offlineNodes.isEmpty) {
       logger.i(
-          '[NodesCheck] No raw offline nodes found from pingNodesInBackground(). Exiting _checkNodesAndNotify for task $taskId.');
+          '[NodesCheck] No raw offline nodes found from pingMyNodes(). Exiting _checkMyNodesAndNotify for task $taskId.');
       return;
     }
     logger.i(

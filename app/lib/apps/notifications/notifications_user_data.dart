@@ -1,6 +1,7 @@
 import 'package:shared_preferences/shared_preferences.dart';
 
 const String nodeStatusNotificationEnabledKey = 'nodeStatusNotificationEnabled';
+const String nodeWorkloadNotificationEnabledKey = 'nodeWorkloadNotificationEnabled';
 const String _contractNotificationsEnabledKey =
     'contract_notifications_enabled';
 
@@ -28,4 +29,14 @@ Future<bool> isContractNotificationEnabled() async {
 Future<void> setContractNotificationEnabled(bool enabled) async {
   final prefs = await SharedPreferences.getInstance();
   await prefs.setBool(_contractNotificationsEnabledKey, enabled);
+}
+
+Future<bool> isWorkloadNotificationEnabled() async {
+  final prefs = await SharedPreferences.getInstance();
+  return prefs.getBool(nodeWorkloadNotificationEnabledKey) ?? true;
+}
+
+Future<void> setWorkloadNotificationEnabled(bool enabled) async {
+  final prefs = await SharedPreferences.getInstance();
+  await prefs.setBool(nodeWorkloadNotificationEnabledKey, enabled);
 }

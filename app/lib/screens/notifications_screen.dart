@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:threebotlogin/apps/notifications/notifications_user_data.dart';
+import 'package:threebotlogin/services/nodes_check_service.dart';
 import 'package:threebotlogin/widgets/layout_drawer.dart';
 
 class NotificationsScreen extends StatefulWidget {
@@ -13,6 +14,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
   bool loading = true;
   late bool _nodeStatusNotificationEnabled;
   late bool _contractNotificationsEnabled;
+  late bool _workloadNotificationEnabled;
 
   @override
   void initState() {
@@ -22,13 +24,16 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
 
   void _loadNotificationPreferences() async {
     final bool nodeEnabled = await isNodeStatusNotificationEnabled();
-    final bool contractEnabled =
+    final bool contractEnabled = await isContractNotificationEnabled();
+    final bool nodeWorkloadStatusEnabled =
         await isContractNotificationEnabled();
     setState(() {
       _nodeStatusNotificationEnabled = nodeEnabled;
       _contractNotificationsEnabled = contractEnabled;
+      _workloadNotificationEnabled = nodeWorkloadStatusEnabled;
       loading = false;
     });
+    await NodeCheckService.pingWorkloadNodes();
   }
 
   @override
@@ -82,6 +87,18 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                       _contractNotificationsEnabled = newValue;
                     });
                     setContractNotificationEnabled(newValue);
+                  },
+                  secondary: const Icon(Icons.description),
+                ),
+                SwitchListTile(
+                  title:
+                      const Text('Enable workload node status notifications'),
+                  value: _workloadNotificationEnabled,
+                  onChanged: (bool newValue) {
+                    setState(() {
+                      _workloadNotificationEnabled = newValue;
+                    });
+                    setWorkloadNotificationEnabled(newValue);
                   },
                   secondary: const Icon(Icons.description),
                 ),

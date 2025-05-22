@@ -29,7 +29,7 @@ class ContractCheckService {
         final twinId = await getTwinId(w.tfchainSecret);
         if (twinId != 0) {
           List<ContractInfo> contracts =
-              await getGracePeriodContractsByTwinId(twinId);
+              await getContracts(twinId, [ContractState.GracePeriod]);
           allContracts.addAll(contracts);
         }
       }
