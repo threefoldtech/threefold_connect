@@ -72,7 +72,8 @@ class _FarmScreenState extends ConsumerState<FarmScreen>
 
       _handleSuccess();
     } on TimeoutException catch (e) {
-      _handleFailure('Loading farms timed out. Please check your network.', error: e);
+      _handleFailure('Loading farms timed out. Please check your network.',
+          error: e);
     } on Exception catch (e) {
       _handleFailure('Failed to load farms due to an unexpected error.',
           error: e);
@@ -303,7 +304,7 @@ class _FarmScreenState extends ConsumerState<FarmScreen>
                 indicatorColor: Theme.of(context).colorScheme.primary,
                 unselectedLabelColor: Theme.of(context).colorScheme.onSurface,
                 dividerColor: Theme.of(context).scaffoldBackgroundColor,
-                labelStyle: Theme.of(context).textTheme.titleLarge,
+                labelStyle: Theme.of(context).textTheme.titleMedium,
                 unselectedLabelStyle: Theme.of(context).textTheme.titleMedium,
                 tabs: const [
                   Tab(text: 'V3'),
