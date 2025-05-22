@@ -192,7 +192,7 @@ class _OrderWidgetState extends State<OrderWidget>
                   indicatorColor: Theme.of(context).colorScheme.primary,
                   unselectedLabelColor: Theme.of(context).colorScheme.onSurface,
                   dividerColor: Theme.of(context).scaffoldBackgroundColor,
-                  labelStyle: Theme.of(context).textTheme.titleLarge,
+                  labelStyle: Theme.of(context).textTheme.titleMedium,
                   unselectedLabelStyle: Theme.of(context).textTheme.titleMedium,
                   tabs: const [
                     Tab(text: 'Active Order'),
