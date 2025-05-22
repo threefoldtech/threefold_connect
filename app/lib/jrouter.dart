@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:threebotlogin/app.dart';
 import 'package:threebotlogin/apps/council/council.dart';
 import 'package:threebotlogin/apps/dao/dao.dart';
+import 'package:threebotlogin/apps/market/market.dart';
 import 'package:threebotlogin/apps/wallet/wallet.dart';
 import 'package:threebotlogin/screens/identity_verification_screen.dart';
 import 'package:threebotlogin/screens/preference_screen.dart';
@@ -71,6 +72,15 @@ class JRouter {
             view: const IdentityVerificationScreen(),
           ),
           app: null),
+      AppInfo(
+        route: Route(
+          path: '/market',
+          name: 'Market',
+          icon: Icons.show_chart_sharp,
+          view: await Market().widget(),
+        ),
+        app: Market(),
+      ),
       AppInfo(
           route: Route(
             path: '/settings',

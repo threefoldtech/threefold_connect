@@ -344,10 +344,10 @@ class _FarmDetailsState extends State<FarmDetails> {
                                                   wallets: widget.wallets
                                                       .where((w) =>
                                                           double.tryParse(w
-                                                                  .stellarBalance) !=
+                                                                  .stellarBalances['TFT']!) !=
                                                               null &&
                                                           double.parse(w
-                                                                  .stellarBalance) >=
+                                                                  .stellarBalances['TFT']!) >=
                                                               0)
                                                       .toList(),
                                                   onSelectToAddress:

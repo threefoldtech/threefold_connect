@@ -1,0 +1,45 @@
+import 'package:flutter/material.dart';
+import 'package:threebotlogin/models/wallet.dart';
+
+class WalletSelectionSheet extends StatelessWidget {
+  final List<Wallet> wallets;
+  final Wallet? selectedWallet;
+  final void Function(Wallet) onWalletSelected;
+
+  const WalletSelectionSheet({
+    super.key,
+    required this.wallets,
+    required this.selectedWallet,
+    required this.onWalletSelected,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surface,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            'Select Wallet',
+            style: Theme.of(context).textTheme.titleLarge!.copyWith(
+                color: Theme.of(context).colorScheme.onPrimaryContainer),
+          ),
+          const SizedBox(height: 12),
+          ...wallets.map((wallet) => ListTile(
+                title: Text(wallet.name),
+                trailing: wallet.name == selectedWallet?.name
+                    ? Icon(Icons.check,
+                        color: Theme.of(context).colorScheme.primary)
+                    : null,
+                onTap: () => onWalletSelected(wallet),
+              )),
+        ],
+      ),
+    );
+  }
+}

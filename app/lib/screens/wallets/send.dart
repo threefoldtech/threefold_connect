@@ -73,8 +73,8 @@ class _WalletSendScreenState extends ConsumerState<WalletSendScreen> {
   }
 
   _loadStellarBalance() async {
-    widget.wallet.stellarBalance =
-        (await Stellar.getBalance(widget.wallet.stellarSecret)).toString();
+    widget.wallet.stellarBalances['TFT'] =
+        (await Stellar.getTFTBalance(widget.wallet.stellarSecret)).toString();
     setState(() {});
   }
 
@@ -86,7 +86,7 @@ class _WalletSendScreenState extends ConsumerState<WalletSendScreen> {
             .read(walletsNotifier.notifier);
     final wallet = walletRef.getUpdatedWallet(widget.wallet.name)!;
     widget.wallet.tfchainBalance = wallet.tfchainBalance;
-    widget.wallet.stellarBalance = wallet.stellarBalance;
+    widget.wallet.stellarBalances['TFT'] = wallet.stellarBalances['TFT']!;
     setState(() {});
     await Future.delayed(Duration(seconds: refreshBalance));
     await _reloadBalances();
@@ -145,7 +145,8 @@ class _WalletSendScreenState extends ConsumerState<WalletSendScreen> {
           wallets.where((wallet) => wallet.stellarAddress == toAddress);
       final Wallet? wallet =
           matchingWallets.isNotEmpty ? matchingWallets.first : null;
-      if (wallet != null && double.parse(wallet.stellarBalance) <= -1) {
+      if (wallet != null &&
+          double.parse(wallet.stellarBalances['TFT']!) <= -1) {
         setState(() {
           toAddressError = 'Wallet not activated on stellar';
         });
@@ -184,7 +185,7 @@ class _WalletSendScreenState extends ConsumerState<WalletSendScreen> {
     }
     final balance = roundAmount(chainType == ChainType.TFChain
         ? widget.wallet.tfchainBalance
-        : widget.wallet.stellarBalance);
+        : widget.wallet.stellarBalances['TFT']!);
 
     if (balance - Decimal.parse(amount) - fee < Decimal.zero) {
       amountError = 'Balance is not enough';
@@ -218,12 +219,13 @@ class _WalletSendScreenState extends ConsumerState<WalletSendScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final bool hideStellar = double.parse(widget.wallet.stellarBalance) <= -1;
+    final bool hideStellar =
+        double.parse(widget.wallet.stellarBalances['TFT']!) <= -1;
     if (hideStellar && chainType == ChainType.Stellar) {
       onChangeChain(ChainType.TFChain);
     }
     String balance = chainType == ChainType.Stellar
-        ? widget.wallet.stellarBalance
+        ? widget.wallet.stellarBalances['TFT']!
         : widget.wallet.tfchainBalance;
     final isBiggerThanFee = roundAmount(balance) > fee;
 
@@ -518,7 +520,7 @@ class _WalletSendScreenState extends ConsumerState<WalletSendScreen> {
   calculateAmount(int percentage) {
     final amount = (Decimal.parse(chainType == ChainType.TFChain
                 ? widget.wallet.tfchainBalance
-                : widget.wallet.stellarBalance) -
+                : widget.wallet.stellarBalances['TFT']!) -
             fee) *
         (Decimal.fromInt(percentage).shift(-2));
     amountController.text = roundAmount(amount.toString()).toString();

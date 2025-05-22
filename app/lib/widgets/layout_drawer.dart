@@ -31,7 +31,7 @@ class _LayoutDrawerState extends State<LayoutDrawer> {
       } else if (index == 2) {
         globals.tabController.animateTo(3);
       } else if (index == 3) {
-        globals.tabController.animateTo(6);
+        globals.tabController.animateTo(7);
       } else {
         return;
       }
@@ -161,7 +161,18 @@ class _LayoutDrawerState extends State<LayoutDrawer> {
                 title: const Text('Sign'),
                 onTap: () {
                   Navigator.pop(context);
-                  globals.tabController.animateTo(8);
+                  globals.tabController.animateTo(9);
+                },
+              ),
+              ListTile(
+                minLeadingWidth: 10,
+                leading: const Padding(
+                    padding: EdgeInsets.only(left: 10),
+                    child: Icon(Icons.show_chart_sharp, size: 18)),
+                title: const Text('Market'),
+                onTap: () {
+                  Navigator.pop(context);
+                  globals.tabController.animateTo(6);
                 },
               ),
               ListTile(
@@ -183,7 +194,7 @@ class _LayoutDrawerState extends State<LayoutDrawer> {
                 title: const Text('Settings'),
                 onTap: () {
                   Navigator.pop(context);
-                  globals.tabController.animateTo(6);
+                  globals.tabController.animateTo(7);
                 },
               ),
               if (Globals().council)
@@ -195,7 +206,7 @@ class _LayoutDrawerState extends State<LayoutDrawer> {
                   title: const Text('Council'),
                   onTap: () {
                     Navigator.pop(context);
-                    globals.tabController.animateTo(7);
+                    globals.tabController.animateTo(8);
                   },
                 ),
               // ListTile(
