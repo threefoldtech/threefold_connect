@@ -120,7 +120,7 @@ class _RegisteredScreenState extends State<RegisteredScreen>
                     HomeCardWidget(
                         name: 'Identity', icon: Icons.person, pageNumber: 5),
                     HomeCardWidget(
-                        name: 'Settings', icon: Icons.settings, pageNumber: 6),
+                        name: 'Settings', icon: Icons.settings, pageNumber: 7),
                     // HomeCardWidget(
                     //     name: 'Notifications',
                     //     icon: Icons.notifications,
