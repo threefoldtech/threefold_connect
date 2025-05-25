@@ -29,7 +29,9 @@ void backgroundFetchHeadlessTask(HeadlessTask task) async {
 
 Future<void> checkNodeStatus(String taskId) async {
   try {
-    final offlineNodes = await NodeCheckService.pingNodesInBackground();
+    final v3OfflineNodes = await NodeCheckService.pingV3NodesInBackground();
+    final v4OfflineNodes = await NodeCheckService.pingV4NodesInBackground();
+    final offlineNodes = [...v3OfflineNodes, ...v4OfflineNodes];
 
     if (offlineNodes.isEmpty) return;
 
@@ -78,8 +80,6 @@ Future<void> checkNodeStatus(String taskId) async {
     BackgroundFetch.finish(taskId);
   }
 }
-
-
 
 Duration _getCheckInterval(Duration downtime) {
   if (downtime < const Duration(hours: 1)) {

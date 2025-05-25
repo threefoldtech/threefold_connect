@@ -7,12 +7,11 @@ import 'package:threebotlogin/providers/wallets_provider.dart';
 import 'package:threebotlogin/services/crypto_service.dart';
 import 'package:threebotlogin/services/gridproxy_service.dart';
 import 'package:threebotlogin/services/tfchain_service.dart';
-import 'package:registrar_client/models/farm.dart' as registrarFarm;
 import 'package:registrar_client/models/node.dart' as registrarNode;
 import 'package:registrar_client/registrar_client.dart' as registrar;
 
 class NodeCheckService {
-  static Future<List<Node>> pingNodesInBackground() async {
+  static Future<List<Node>> pingV3NodesInBackground() async {
     final container = ProviderContainer();
     try {
       final walletsNotifierInstance = container.read(walletsNotifier.notifier);
@@ -60,6 +59,8 @@ class NodeCheckService {
 
   static Future<List<Node>> pingV4NodesInBackground() async {
     final container = ProviderContainer();
+    final List<Node> allOfflineNodes = [];
+
     try {
       final walletsNotifierInstance = container.read(walletsNotifier.notifier);
 
@@ -75,11 +76,18 @@ class NodeCheckService {
             await registrarClient.accounts.getByPublicKey(publicKey);
         final nodes = await registrarClient.nodes
             .list(registrarNode.NodeFilter(twinID: account.twinID));
-        for (var node in nodes) {
-          print(node);
-        }
+        final offlineNodes = nodes.where((n) => !n.online).toList();
+
+        allOfflineNodes.addAll(offlineNodes.map((node) => Node(
+              nodeId: node.nodeID,
+              status: node.online ? NodeStatus.Up : NodeStatus.Down,
+              updatedAt: int.tryParse(node.lastSeen),
+              online: node.online,
+              lastSeen: node.lastSeen,
+            )));
       }
-      return [];
+
+      return allOfflineNodes;
     } catch (e) {
       logger.e('[NodeCheckService] Error: $e');
       return [];
