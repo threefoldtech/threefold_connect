@@ -90,11 +90,11 @@ class _ActivateWalletWidgetState extends ConsumerState<ActivateWalletWidget> {
     return wallets
         .where((wallet) =>
             wallet != widget.wallet &&
-            double.parse(widget.wallet.stellarBalances['TFT']!) > -1)
+            double.parse(wallet.stellarBalances['TFT']!) > -1)
         .map((wallet) {
       return DropdownMenuEntry<Wallet>(
         value: wallet,
-        label: '${wallet.name} (${widget.wallet.stellarBalances['TFT']!} TFT)',
+        label: '${wallet.name} (${wallet.stellarBalances['TFT']!} TFT)',
         labelWidget: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -105,7 +105,7 @@ class _ActivateWalletWidgetState extends ConsumerState<ActivateWalletWidget> {
                   ),
             ),
             Text(
-              '${widget.wallet.stellarBalances['TFT']!} TFT',
+              '${wallet.stellarBalances['TFT']!} TFT',
               style: Theme.of(context).textTheme.bodyMedium!.copyWith(
                     color: Theme.of(context).colorScheme.onSurfaceVariant,
                   ),
