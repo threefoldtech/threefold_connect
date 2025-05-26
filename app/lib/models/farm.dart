@@ -7,17 +7,12 @@ class Node {
     this.country,
     this.uptime,
     this.updatedAt,
-    // v4 nodes 
-    this.online = false,
-    this.lastSeen,
   });
   final int nodeId;
   final NodeStatus status;
   final int? uptime;
   final String? country;
   final int? updatedAt;
-  final bool online;
-  final String? lastSeen;
 }
 
 class Farm {

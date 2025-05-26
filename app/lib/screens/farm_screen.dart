@@ -72,7 +72,8 @@ class _FarmScreenState extends ConsumerState<FarmScreen>
 
       _handleSuccess();
     } on TimeoutException catch (e) {
-      _handleFailure('Loading farms timed out. Please check your network.', error: e);
+      _handleFailure('Loading farms timed out. Please check your network.',
+          error: e);
     } on Exception catch (e) {
       _handleFailure('Failed to load farms due to an unexpected error.',
           error: e);
@@ -181,15 +182,19 @@ class _FarmScreenState extends ConsumerState<FarmScreen>
         for (var f in farms) {
           final farmNodes = await registrarClient!.nodes
               .list(registrarNode.NodeFilter(farmID: f.farmID));
+          final nodes = farmNodes.map((n) {
+            // Convert ISO timestamp to Unix timestamp
+            final lastSeenDate = DateTime.parse(n.lastSeen);
+            final unixTimestamp = lastSeenDate.millisecondsSinceEpoch ~/ 1000;
 
-          final nodes = farmNodes
-              .map((n) => Node(
-                    nodeId: n.nodeID,
-                    status: n.online ? NodeStatus.Up : NodeStatus.Down,
-                    country: n.location.country,
-                    uptime: (n.uptime.isNotEmpty) ? n.uptime.last.duration : 0,
-                  ))
-              .toList();
+            return Node(
+              nodeId: n.nodeID,
+              status: n.online ? NodeStatus.Up : NodeStatus.Down,
+              country: n.location.country,
+              uptime: (n.uptime.isNotEmpty) ? n.uptime.last.duration : 0,
+              updatedAt: unixTimestamp,
+            );
+          }).toList();
 
           v4Farms.addAll(farms.map((f) => Farm(
                 name: f.farmName,
