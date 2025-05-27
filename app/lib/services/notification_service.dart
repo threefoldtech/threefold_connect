@@ -1,50 +1,65 @@
 import 'dart:convert';
+import 'dart:async';
+import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:threebotlogin/helpers/logger.dart';
 import 'package:threebotlogin/main.dart';
 import 'package:threebotlogin/widgets/custom_dialog.dart';
+
+@pragma('vm:entry-point')
+Future<void> onActionReceivedMethod(ReceivedAction receivedAction) async {
+  logger.i('[NotificationService] Action received: ${receivedAction.title}');
+  final payload = receivedAction.payload?['data'];
+  if (payload != null) {
+    final Map<String, dynamic> data = json.decode(payload);
+    logger.i('[NotificationService] Processing notification payload: $data');
+    NotificationService()._handleNotificationTap(data);
+  }
+}
 
 class NotificationService {
   static final NotificationService _instance = NotificationService._internal();
   factory NotificationService() => _instance;
   NotificationService._internal();
 
-  final notificationsPlugin = FlutterLocalNotificationsPlugin();
   bool _isInitialized = false;
+  Map<String, dynamic>? _pendingPayload;
+  bool _isAppResumed = false;
+  int _notificationCount = 0;
 
   Future<void> initNotification() async {
     if (_isInitialized) return;
 
-    final NotificationAppLaunchDetails? launchDetails =
-        await notificationsPlugin.getNotificationAppLaunchDetails();
-
-    if (launchDetails?.didNotificationLaunchApp ?? false) {
-      _handleNotificationTap(launchDetails?.notificationResponse);
-    }
-
-    const initSettingsAndroid =
-        AndroidInitializationSettings('@mipmap/ic_launcher');
-    const initSettingsIOS = DarwinInitializationSettings(
-      requestAlertPermission: true,
-      requestBadgePermission: true,
-      requestSoundPermission: true,
+    await AwesomeNotifications().initialize(
+      null,
+      [
+        NotificationChannel(
+          channelKey: 'node_status_channel',
+          channelName: 'Node Status',
+          channelDescription: 'Notify user when node goes offline',
+          importance: NotificationImportance.High,
+          channelShowBadge: true,
+          enableVibration: true,
+          enableLights: true,
+          criticalAlerts: true,
+          soundSource: 'resource://raw/notification_sound',
+        ),
+      ],
+      debug: true,
     );
 
-    const initSettings = InitializationSettings(
-      android: initSettingsAndroid,
-      iOS: initSettingsIOS,
+    AwesomeNotifications().setListeners(
+      onActionReceivedMethod: onActionReceivedMethod,
+      onNotificationCreatedMethod: _onNotificationCreated,
+      onNotificationDisplayedMethod: _onNotificationDisplayed,
+      onDismissActionReceivedMethod: _onDismissActionReceived,
     );
 
-    await notificationsPlugin.initialize(
-      initSettings,
-      onDidReceiveNotificationResponse: (details) =>
-          _handleNotificationTap(details),
-    );
-    await notificationsPlugin
-        .resolvePlatformSpecificImplementation<
-            AndroidFlutterLocalNotificationsPlugin>()
-        ?.requestNotificationsPermission();
+    await AwesomeNotifications().isNotificationAllowed().then((isAllowed) {
+      if (!isAllowed) {
+        AwesomeNotifications().requestPermissionToSendNotifications();
+      }
+    });
 
     _isInitialized = true;
   }
@@ -61,78 +76,158 @@ class NotificationService {
         await initNotification();
       }
 
-      final androidDetails = AndroidNotificationDetails(
-        'node_status_channel',
-        'Node Status',
-        channelDescription: 'Notify user when node goes offline',
-        importance: Importance.max,
-        priority: Priority.high,
-        groupKey: groupKey,
-      );
-
-      final iosDetails = DarwinNotificationDetails(
-          presentAlert: true,
-          presentBadge: true,
-          presentSound: true,
-          threadIdentifier: groupKey,
-          interruptionLevel: InterruptionLevel.timeSensitive);
-
-      final notificationDetails = NotificationDetails(
-        android: androidDetails,
-        iOS: iosDetails,
-      );
-
       final payload = json.encode({
         'title': title,
         'body': body,
       });
 
-      await notificationsPlugin.show(
-        id,
-        title,
-        body,
-        notificationDetails,
-        payload: payload,
+      _notificationCount++;
+      await _updateBadgeCount();
+
+      await AwesomeNotifications().createNotification(
+        content: NotificationContent(
+          id: id,
+          channelKey: 'node_status_channel',
+          title: title,
+          body: body,
+          payload: {'data': payload},
+          notificationLayout: NotificationLayout.Default,
+          category: NotificationCategory.Message,
+          wakeUpScreen: true,
+          fullScreenIntent: true,
+          criticalAlert: true,
+          autoDismissible: false,
+          displayOnForeground: true,
+          displayOnBackground: true,
+          actionType: ActionType.Default,
+          badge: _notificationCount,
+        ),
+        actionButtons: [
+          NotificationActionButton(
+            key: 'SHOW_DIALOG',
+            label: 'Show Details',
+            actionType: ActionType.Default,
+          ),
+        ],
       );
     } catch (e) {
       logger.e('[NotificationService] Failed to show notification: $e');
     }
   }
 
-  void _handleNotificationTap(NotificationResponse? response) {
-    if (response?.payload != null) {
-      final Map<String, dynamic> payload = json.decode(response!.payload!);
-      showNodeStatusDialog(
-        navigatorKey.currentContext!,
-        payload['title'],
-        payload['body'],
-      );
+  Future<void> _updateBadgeCount() async {
+    try {
+      await AwesomeNotifications().setGlobalBadgeCounter(_notificationCount);
+      logger.i(
+          '[NotificationService] Updated badge count to: $_notificationCount');
+    } catch (e) {
+      logger.e('[NotificationService] Failed to update badge count: $e');
     }
   }
 
-  void showNodeStatusDialog(BuildContext context, String title, String body) {
-    try {
-      if (!context.mounted) return;
+  void _handleNotificationTap(Map<String, dynamic> data) {
+    logger
+        .i('[NotificationService] Handling notification tap with data: $data');
+    _pendingPayload = data;
+    _isAppResumed = false;
 
-      showDialog(
-        context: context,
-        builder: (BuildContext context) => CustomDialog(
-          type: DialogType.Warning,
-          image: Icons.warning,
-          title: title,
-          description: body,
-          actions: <Widget>[
-            TextButton(
-              child: const Text('Close'),
-              onPressed: () {
-                Navigator.pop(context);
-              },
-            ),
-          ],
-        ),
-      );
-    } catch (e) {
-      logger.e('[NotificationService] Failed to show dialog: $e');
+    if (_isAppResumed && navigatorKey.currentContext != null) {
+      _showDialog();
     }
+  }
+
+  void onAppResumed() {
+    logger.i('[NotificationService] App resumed');
+    _isAppResumed = true;
+
+    if (_pendingPayload != null) {
+      _showDialog();
+    }
+  }
+
+  void _showDialog() {
+    if (_pendingPayload == null || navigatorKey.currentContext == null) {
+      logger.w(
+          '[NotificationService] Cannot show dialog: missing payload or context');
+      return;
+    }
+
+    logger.i(
+        '[NotificationService] Showing dialog with title: ${_pendingPayload!['title']}');
+
+    WidgetsBinding.instance.ensureVisualUpdate();
+
+    Future.delayed(const Duration(milliseconds: 100), () {
+      if (!navigatorKey.currentContext!.mounted) {
+        logger.w('[NotificationService] Context not mounted after delay');
+        return;
+      }
+
+      try {
+        logger.i('[NotificationService] Attempting to show dialog...');
+        showDialog(
+          context: navigatorKey.currentContext!,
+          barrierDismissible: false,
+          routeSettings: const RouteSettings(name: 'node_status_dialog'),
+          builder: (BuildContext context) {
+            logger.i('[NotificationService] Building dialog widget');
+            return WillPopScope(
+              onWillPop: () async => false,
+              child: CustomDialog(
+                type: DialogType.Warning,
+                image: Icons.warning,
+                title: _pendingPayload!['title'],
+                description: _pendingPayload!['body'],
+                actions: <Widget>[
+                  TextButton(
+                    child: const Text('Close'),
+                    onPressed: () {
+                      logger.i(
+                          '[NotificationService] Dialog close button pressed');
+                      Navigator.of(context).pop();
+                      _decrementNotificationCount();
+                    },
+                  ),
+                ],
+              ),
+            );
+          },
+        ).then((_) {
+          logger.i('[NotificationService] Dialog shown successfully');
+          _pendingPayload = null;
+        }).catchError((error) {
+          logger.e('[NotificationService] Error showing dialog: $error');
+          _pendingPayload = null;
+        });
+      } catch (e) {
+        logger.e('[NotificationService] Failed to show dialog: $e');
+        _pendingPayload = null;
+      }
+    });
+  }
+
+  Future<void> _decrementNotificationCount() async {
+    if (_notificationCount > 0) {
+      _notificationCount--;
+      await _updateBadgeCount();
+    }
+  }
+
+  @pragma('vm:entry-point')
+  Future<void> _onNotificationCreated(
+      ReceivedNotification receivedNotification) async {
+    logger.i('Notification created: ${receivedNotification.title}');
+  }
+
+  @pragma('vm:entry-point')
+  Future<void> _onNotificationDisplayed(
+      ReceivedNotification receivedNotification) async {
+    logger.i('Notification displayed: ${receivedNotification.title}');
+  }
+
+  @pragma('vm:entry-point')
+  Future<void> _onDismissActionReceived(ReceivedAction receivedAction) async {
+    logger.i('Notification dismissed: ${receivedAction.title}');
+    _decrementNotificationCount();
   }
 }
