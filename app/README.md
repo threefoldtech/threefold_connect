@@ -45,8 +45,8 @@ In the ThreeFold Connect app, you can:
 
 - Receive proactive notifications when nodes go offline
 - Smart notification system that categorizes offline nodes:
-  - Recent outages (0-1 hour): Notifications every 15 minutes
-  - Short outages (1-4 hours): Notifications every hour
+  - Recent outages (0-2 hour): Notifications every 15 minutes
+  - Short outages (2-4 hours): Notifications every hour
   - Medium outages (4-24 hours): Notifications every 4 hours
   - Extended outages (1-3 days): Notifications every 12 hours
   - Long outages (3-7 days): Notifications once daily
