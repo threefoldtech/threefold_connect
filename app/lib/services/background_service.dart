@@ -83,7 +83,7 @@ Duration _getCheckInterval(Duration downtime) {
   if (downtime < const Duration(hours: 2)) {
     return const Duration(minutes: 15); // 0-2 hour: check every 15 min
   } else if (downtime < const Duration(hours: 4)) {
-    return const Duration(hours: 1); // 1-4 hours: check every hour
+    return const Duration(hours: 1); // 2-4 hours: check every hour
   } else if (downtime < const Duration(hours: 24)) {
     return const Duration(hours: 4); // 4-24 hours: check every 4 hours
   } else if (downtime < const Duration(days: 3)) {
