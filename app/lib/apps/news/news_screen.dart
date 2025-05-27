@@ -26,7 +26,6 @@ class _NewsScreenState extends State<NewsScreen> {
       PagingController(firstPageKey: 0);
   final String newsUrl = Globals().newsUrl;
   bool _isLoading = false;
-  String? _errorMessage;
 
   @override
   void initState() {
@@ -71,7 +70,6 @@ class _NewsScreenState extends State<NewsScreen> {
           : _pagingController.appendPage(newArticles, pageKey + 1);
 
       _isLoading = false;
-      _errorMessage = null;
     } on TimeoutException catch (e) {
       _handleError(
           'Loading news feed timed out. Please check your connection.', e);
@@ -88,7 +86,6 @@ class _NewsScreenState extends State<NewsScreen> {
     logger.e('News feed error: $message', error: error);
 
     _isLoading = false;
-    _errorMessage = message;
 
     _pagingController.error = message;
 
