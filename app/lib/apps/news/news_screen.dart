@@ -147,19 +147,6 @@ class _NewsScreenState extends State<NewsScreen> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(
-                    Icons.error_outline,
-                    size: 48,
-                    color: Theme.of(context).colorScheme.error,
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    _errorMessage ?? 'Failed to load news feed',
-                    style: Theme.of(context).textTheme.bodyLarge!.copyWith(
-                        color: Theme.of(context).colorScheme.onSurface),
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 16),
                   ElevatedButton.icon(
                     onPressed: _refreshNews,
                     icon: const Icon(Icons.refresh),
