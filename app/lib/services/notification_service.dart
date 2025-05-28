@@ -9,6 +9,11 @@ import 'package:threebotlogin/widgets/custom_dialog.dart';
 @pragma('vm:entry-point')
 Future<void> onActionReceivedMethod(ReceivedAction receivedAction) async {
   logger.i('[NotificationService] Action received: ${receivedAction.title}');
+
+  if (receivedAction.id != null) {
+    await AwesomeNotifications().dismiss(receivedAction.id!);
+  }
+
   final payload = receivedAction.payload?['data'];
   if (payload != null) {
     final Map<String, dynamic> data = json.decode(payload);
@@ -96,7 +101,7 @@ class NotificationService {
           wakeUpScreen: true,
           fullScreenIntent: true,
           criticalAlert: true,
-          autoDismissible: false,
+          autoDismissible: true,
           displayOnForeground: true,
           displayOnBackground: true,
           actionType: ActionType.Default,
@@ -107,6 +112,7 @@ class NotificationService {
             key: 'SHOW_DIALOG',
             label: 'Show Details',
             actionType: ActionType.Default,
+            autoDismissible: true,
           ),
         ],
       );
