@@ -110,17 +110,6 @@ class _LayoutDrawerState extends State<LayoutDrawer> {
                 minLeadingWidth: 10,
                 leading: const Padding(
                     padding: EdgeInsets.only(left: 10),
-                    child: Icon(Icons.article, size: 18)),
-                title: const Text('News'),
-                onTap: () {
-                  Navigator.pop(context);
-                  globals.tabController.animateTo(1);
-                },
-              ),
-              ListTile(
-                minLeadingWidth: 10,
-                leading: const Padding(
-                    padding: EdgeInsets.only(left: 10),
                     child: Icon(Icons.account_balance_wallet, size: 18)),
                 title: const Text('Wallet'),
                 onTap: () {
@@ -142,6 +131,17 @@ class _LayoutDrawerState extends State<LayoutDrawer> {
                 )
               else
                 Container(),
+              ListTile(
+                minLeadingWidth: 10,
+                leading: const Padding(
+                    padding: EdgeInsets.only(left: 10),
+                    child: Icon(Icons.show_chart_sharp, size: 18)),
+                title: const Text('Market'),
+                onTap: () {
+                  Navigator.pop(context);
+                  globals.tabController.animateTo(6);
+                },
+              ),
               ListTile(
                 minLeadingWidth: 10,
                 leading: const Padding(
@@ -168,11 +168,11 @@ class _LayoutDrawerState extends State<LayoutDrawer> {
                 minLeadingWidth: 10,
                 leading: const Padding(
                     padding: EdgeInsets.only(left: 10),
-                    child: Icon(Icons.show_chart_sharp, size: 18)),
-                title: const Text('Market'),
+                    child: Icon(Icons.article, size: 18)),
+                title: const Text('News'),
                 onTap: () {
                   Navigator.pop(context);
-                  globals.tabController.animateTo(6);
+                  globals.tabController.animateTo(1);
                 },
               ),
               ListTile(

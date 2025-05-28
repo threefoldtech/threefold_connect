@@ -94,11 +94,13 @@ class _RegisteredScreenState extends State<RegisteredScreen>
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     HomeCardWidget(
+                        name: 'Market',
+                        icon: Icons.show_chart_sharp,
+                        pageNumber: 6),
+                    HomeCardWidget(
                         name: 'Dao',
                         icon: Icons.how_to_vote_outlined,
                         pageNumber: 4),
-                    HomeCardWidget(
-                        name: 'Sign', icon: Icons.draw_sharp, pageNumber: 9),
                   ],
                 ),
                 const Row(
@@ -106,9 +108,7 @@ class _RegisteredScreenState extends State<RegisteredScreen>
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     HomeCardWidget(
-                        name: 'Market',
-                        icon: Icons.show_chart_sharp,
-                        pageNumber: 6),
+                        name: 'Sign', icon: Icons.draw_sharp, pageNumber: 9),
                     HomeCardWidget(
                         name: 'News', icon: Icons.article, pageNumber: 1),
                   ],
