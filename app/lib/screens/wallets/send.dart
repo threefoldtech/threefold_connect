@@ -475,6 +475,7 @@ class _WalletSendScreenState extends ConsumerState<WalletSendScreen> {
         return;
       }
       toController.text = code.path;
+      _validateToAddress();
       if (code.queryParameters.containsKey('amount')) {
         amountController.text = code.queryParameters['amount']!;
       }
