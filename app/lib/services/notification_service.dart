@@ -47,7 +47,6 @@ class NotificationService {
           enableVibration: true,
           enableLights: true,
           criticalAlerts: true,
-          soundSource: 'resource://raw/notification_sound',
         ),
       ],
       debug: true,
