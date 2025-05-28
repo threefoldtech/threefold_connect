@@ -178,26 +178,34 @@ class _FarmScreenState extends ConsumerState<FarmScreen>
             await registrarClient!.accounts.getByPublicKey(publicKey);
         final farms = await registrarClient!.farms
             .list(registrarFarm.FarmFilter(twinID: account.twinID));
-        final nodes = await registrarClient!.nodes
-            .list(registrarNode.NodeFilter(twinID: account.twinID));
 
-        v4Farms.addAll(farms.map((f) => Farm(
-              name: f.farmName,
-              walletAddress: f.stellarAddress!,
-              tfchainWalletSecret: w.tfchainSecret,
-              walletName: w.name,
-              twinId: f.twinID,
-              farmId: f.farmID!,
-              nodes: nodes
-                  .where((n) => n.farmID == f.farmID)
-                  .map((n) => Node(
-                      nodeId: n.nodeID,
-                      status: NodeStatus.Up,
-                      country: n.location.country,
-                      uptime:
-                          (n.uptime.isNotEmpty) ? n.uptime.last.duration : 0))
-                  .toList(),
-            )));
+        for (var f in farms) {
+          final farmNodes = await registrarClient!.nodes
+              .list(registrarNode.NodeFilter(farmID: f.farmID));
+          final nodes = farmNodes.map((n) {
+            // Convert ISO timestamp to Unix timestamp
+            final lastSeenDate = DateTime.parse(n.lastSeen);
+            final unixTimestamp = lastSeenDate.millisecondsSinceEpoch ~/ 1000;
+
+            return Node(
+              nodeId: n.nodeID,
+              status: n.online ? NodeStatus.Up : NodeStatus.Down,
+              country: n.location.country,
+              uptime: (n.uptime.isNotEmpty) ? n.uptime.last.duration : 0,
+              updatedAt: unixTimestamp,
+            );
+          }).toList();
+
+          v4Farms.addAll(farms.map((f) => Farm(
+                name: f.farmName,
+                walletAddress: f.stellarAddress!,
+                tfchainWalletSecret: w.tfchainSecret,
+                walletName: w.name,
+                twinId: f.twinID,
+                farmId: f.farmID!,
+                nodes: nodes,
+              )));
+        }
       } catch (e) {
         continue;
       }

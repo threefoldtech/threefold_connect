@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:threebotlogin/helpers/logger.dart';
 import 'package:threebotlogin/main.dart';
 import 'package:threebotlogin/screens/home_screen.dart';
+import 'package:threebotlogin/services/notification_service.dart';
 
 class AppLifecycleObserver extends ConsumerStatefulWidget {
   final Widget child;
@@ -47,6 +48,11 @@ class _AppLifecycleObserverState extends ConsumerState<AppLifecycleObserver>
       ref.read(lastPausedProvider.notifier).state = now;
       logger.i('App Paused. Last paused time updated: $now');
     } else if (state == AppLifecycleState.resumed) {
+      logger.i('App Resumed. Notifying notification service.');
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        NotificationService().onAppResumed();
+      });
+
       if (now - lastPaused >= pinCheckTimeout) {
         logger.i('Timeout expired. Requiring authentication.');
         // Navigate to Home Screen

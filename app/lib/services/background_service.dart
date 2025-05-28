@@ -16,7 +16,7 @@ void backgroundFetchHeadlessTask(HeadlessTask task) async {
   final bool notificationsEnabled = await isNodeStatusNotificationEnabled();
 
   logger.i(
-      'Background Fetch Headless Task: $taskId, Notifications Enabled: $notificationsEnabled');
+      '[BackgroundFetch] Headless Task: $taskId, Notifications Enabled: $notificationsEnabled');
 
   if (!notificationsEnabled) {
     logger.i(
@@ -29,9 +29,18 @@ void backgroundFetchHeadlessTask(HeadlessTask task) async {
 
 Future<void> checkNodeStatus(String taskId) async {
   try {
-    final offlineNodes = await NodeCheckService.pingNodesInBackground();
+    final v3OfflineNodes = await NodeCheckService.pingV3NodesInBackground();
+    final v4OfflineNodes = await NodeCheckService.pingV4NodesInBackground();
+    final offlineNodes = [...v3OfflineNodes, ...v4OfflineNodes];
 
-    if (offlineNodes.isEmpty) return;
+    logger.i(
+        '[BackgroundFetch] Total offline nodes found: ${offlineNodes.length} for task $taskId');
+
+    if (offlineNodes.isEmpty) {
+      logger.i(
+          '[BackgroundFetch] No offline nodes found, finishing task $taskId');
+      return;
+    }
 
     final StringBuffer bodyBuffer = StringBuffer();
     final List<Node> nodesToNotify = [];
@@ -43,7 +52,11 @@ Future<void> checkNodeStatus(String taskId) async {
     for (final node in offlineNodes) {
       final nodeUpdatedAtMs = node.updatedAt! * 1000;
 
-      if (nodeUpdatedAtMs <= sevenDaysAgoTimestampMs) continue;
+      if (nodeUpdatedAtMs <= sevenDaysAgoTimestampMs) {
+        logger.i(
+            '[BackgroundFetch] Skipping node ${node.nodeId} - offline for more than 7 days');
+        continue;
+      }
 
       final downtime = Duration(milliseconds: nowInMs - nodeUpdatedAtMs);
 
@@ -62,7 +75,11 @@ Future<void> checkNodeStatus(String taskId) async {
       }
     }
 
-    if (nodesToNotify.isEmpty) return;
+    if (nodesToNotify.isEmpty) {
+      logger.i(
+          '[BackgroundFetch] No nodes to notify after interval check, finishing task $taskId');
+      return;
+    }
 
     await NotificationService().showNotification(
       id: nodesToNotify.hashCode,
@@ -73,8 +90,9 @@ Future<void> checkNodeStatus(String taskId) async {
       groupKey: 'offline_nodes',
     );
   } catch (e) {
-    logger.e('Error in checkNodeStatus for task $taskId: $e');
+    logger.e('[BackgroundFetch] Error in checkNodeStatus for task $taskId: $e');
   } finally {
+    logger.i('[BackgroundFetch] Finishing task $taskId');
     BackgroundFetch.finish(taskId);
   }
 }
