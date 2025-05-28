@@ -27,10 +27,6 @@ require File.expand_path(File.join('packages', 'flutter_tools', 'bin', 'podhelpe
 
 flutter_ios_podfile_setup
 
-awesome_pod_file = File.expand_path(File.join('plugins', 'awesome_notifications', 'ios', 'Scripts', 'AwesomePodFile'), '.symlinks')
-require awesome_pod_file
-update_awesome_main_target_settings('Runner', File.dirname(File.realpath(__FILE__)), flutter_root)
-
 target 'Runner' do
   use_frameworks!
   use_modular_headers!
@@ -42,10 +38,6 @@ post_install do |installer|
   installer.pods_project.targets.each do |target|
     flutter_additional_ios_build_settings(target)
   end
-
-  awesome_pod_file = File.expand_path(File.join('plugins', 'awesome_notifications', 'ios', 'Scripts', 'AwesomePodFile'), '.symlinks')
-  require awesome_pod_file
-  update_awesome_pod_build_settings(installer)
 
   installer.pods_project.targets.each do |target|
     if target.name == "lottie-ios"
