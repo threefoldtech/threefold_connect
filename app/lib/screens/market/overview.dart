@@ -654,7 +654,7 @@ class _OverviewWidgetState extends ConsumerState<OverviewWidget> {
                 ),
                 const SizedBox(height: 12),
                 Text(
-                  'No wallets with TFT and USDC assets found.',
+                  'You must have at least one activated wallet with both assets USDC and TFT.',
                   style: Theme.of(context)
                       .textTheme
                       .bodyMedium!
