@@ -238,35 +238,34 @@ class _WalletBridgeScreenState extends ConsumerState<WalletBridgeScreen> {
                         onTransactionChange: onTransactionChange,
                         disableDeposit: disableDeposit,
                         updateIsSolana: updateIsSolana),
-                    if (isSolana)
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 15.0),
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: <Widget>[
-                            Icon(
-                              Icons.info,
-                              color: Theme.of(context).colorScheme.primary,
-                              size: 16,
-                            ),
-                            const SizedBox(width: 8),
-                            Expanded(
-                              child: Text(
-                                'This bridge currently only supports Stellar to Solana transfers.',
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .bodySmall!
-                                    .copyWith(
-                                      color:
-                                          Theme.of(context).colorScheme.primary,
-                                    ),
-                                softWrap: true,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
                     const SizedBox(height: 20),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 15.0),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          Icon(
+                            Icons.info,
+                            color: Theme.of(context).colorScheme.primary,
+                            size: 16,
+                          ),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Text(
+                              'Some bridge options are not supported between certain chains.',
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodySmall!
+                                  .copyWith(
+                                    color:
+                                        Theme.of(context).colorScheme.primary,
+                                  ),
+                              softWrap: true,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                     ListTile(
                       title: TextField(
                           readOnly: true,
