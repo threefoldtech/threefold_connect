@@ -402,7 +402,6 @@ class _WalletDetailsWidgetState extends ConsumerState<WalletDetailsWidget> {
                     ),
                   ),
                   const SizedBox(height: 40),
-                  const Divider(height: 20, thickness: 1),
                   if (widget.wallet.type == WalletType.IMPORTED)
                     Center(
                       child: SizedBox(
