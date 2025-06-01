@@ -24,7 +24,7 @@ Future<List<ContractInfo>> getContractsByTwinId(int twinId) async {
 
     final client = GridProxyClient(gridproxyUrl);
     final contracts =
-        await client.contracts.list(ContractInfoQueryParams(twin_id: twinId, state: ContractState.GracePeriod));
+        await client.contracts.list(ContractInfoQueryParams(twin_id: twinId, state: [ContractState.Created, ContractState.GracePeriod]));
     return contracts;
   } catch (e) {
     throw Exception('Error fetching contracts: $e');

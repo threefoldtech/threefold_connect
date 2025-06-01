@@ -7,14 +7,14 @@ import 'package:threebotlogin/services/gridproxy_service.dart';
 import 'package:threebotlogin/services/tfchain_service.dart';
 import 'package:gridproxy_client/models/contracts.dart';
 import 'package:threebotlogin/widgets/wallets/contract_details.dart';
-import 'dart:convert';
 
 class WalletContractsWidget extends ConsumerStatefulWidget {
   const WalletContractsWidget({super.key, required this.wallet});
   final Wallet wallet;
 
   @override
-  ConsumerState<WalletContractsWidget> createState() => _WalletContractsWidgetState();
+  ConsumerState<WalletContractsWidget> createState() =>
+      _WalletContractsWidgetState();
 }
 
 class _WalletContractsWidgetState extends ConsumerState<WalletContractsWidget> {
@@ -33,42 +33,9 @@ class _WalletContractsWidgetState extends ConsumerState<WalletContractsWidget> {
       loading = true;
       failed = false;
     });
-    
     try {
-      int? twinId;
-      try {
-        twinId = await getTwinId(widget.wallet.tfchainSecret);
-        logger.i('Found twin ID: $twinId for wallet: ${widget.wallet.tfchainAddress}');
-      } catch (e) {
-        logger.w('Could not get twin ID: $e');
-      }
-      
-      if (twinId != null) {
-        try {
-          final contractsList = await getContractsByTwinId(twinId);
-          contracts = contractsList.cast<ContractInfo>();
-          logger.i('Loaded ${contracts.length} contracts for twin ID: $twinId');
-        } catch (e) {
-          logger.w('Error fetching contracts by twin ID: $e');
-          if (context.mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text('Error: ${e.toString().split(': ').last}'),
-                duration: const Duration(seconds: 3),
-              ),
-            );
-          }
-        }
-      } else {
-        if (context.mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Could not find a twin ID for this wallet. No contracts can be displayed.'),
-              duration: Duration(seconds: 5),
-            ),
-          );
-        }
-      }
+      final twinId = await getTwinId(widget.wallet.tfchainSecret);
+      contracts = await getContractsByTwinId(twinId);
     } catch (e) {
       logger.e('Failed to load contracts: $e');
       setState(() {
@@ -77,7 +44,7 @@ class _WalletContractsWidgetState extends ConsumerState<WalletContractsWidget> {
       if (context.mounted) {
         final loadingContractsFailure = SnackBar(
           content: Text(
-            'Failed to load contracts: ${e.toString().split(': ').last}',
+            'Failed to load contracts',
             style: Theme.of(context)
                 .textTheme
                 .bodyMedium!
@@ -98,7 +65,7 @@ class _WalletContractsWidgetState extends ConsumerState<WalletContractsWidget> {
   @override
   Widget build(BuildContext context) {
     Widget content;
-    
+
     if (loading) {
       content = Center(
         child: Column(
@@ -124,8 +91,10 @@ class _WalletContractsWidgetState extends ConsumerState<WalletContractsWidget> {
             const SizedBox(height: 15),
             Text(
               'Failed to load contracts',
-              style: Theme.of(context).textTheme.bodyLarge!.copyWith(
-                  color: Theme.of(context).colorScheme.error),
+              style: Theme.of(context)
+                  .textTheme
+                  .bodyLarge!
+                  .copyWith(color: Theme.of(context).colorScheme.error),
             ),
             const SizedBox(height: 15),
             ElevatedButton.icon(
@@ -144,14 +113,17 @@ class _WalletContractsWidgetState extends ConsumerState<WalletContractsWidget> {
             Icon(
               Icons.description_outlined,
               size: 64,
-              color: Theme.of(context).colorScheme.onSurfaceVariant.withOpacity(0.5),
+              color: Theme.of(context)
+                  .colorScheme
+                  .onSurfaceVariant
+                  .withOpacity(0.5),
             ),
             const SizedBox(height: 16),
             Text(
               'No contracts found for this wallet',
               style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                color: Theme.of(context).colorScheme.onSurface,
-              ),
+                    color: Theme.of(context).colorScheme.onSurface,
+                  ),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 8),
@@ -160,8 +132,8 @@ class _WalletContractsWidgetState extends ConsumerState<WalletContractsWidget> {
               child: Text(
                 'Contracts will appear here when you deploy workloads on the ThreeFold Grid',
                 style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                  color: Theme.of(context).colorScheme.onSurfaceVariant,
-                ),
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    ),
                 textAlign: TextAlign.center,
               ),
             ),
@@ -181,36 +153,21 @@ class _WalletContractsWidgetState extends ConsumerState<WalletContractsWidget> {
         ),
       );
     }
-    
+
     return content;
   }
-  
+
   Widget _buildContractListItem(BuildContext context, ContractInfo contract) {
-    final contractId = contract.contract_id.toString();
+    final contractId = contract.contract_id;
     final contractType = contract.type;
     final state = contract.state;
-    
+
     String name = '';
-    
-    if (contract.details != null && contract.details is Map) {
-      final details = contract.details as Map;
-      
-      if (contractType.toLowerCase() == 'name' && details.containsKey('name')) {
-        name = details['name']?.toString() ?? '';
-      }
-      else if (contractType.toLowerCase() == 'node' && 
-              details.containsKey('deployment_data') && 
-              details['deployment_data'] is String && 
-              details['deployment_data'].isNotEmpty) {
-        try {
-          final Map<String, dynamic> decoded = json.decode(details['deployment_data']);
-          name = decoded['name']?.toString() ?? '';
-        } catch (e) {
-          logger.d('Could not parse deployment_data JSON: $e');
-        }
-      }
+
+    if (contract.details != null && contractType.toLowerCase() == 'name') {
+      name = (contract.details as Map)['name'];
     }
-    
+
     // Get icon based on contract type
     IconData typeIcon = Icons.description_outlined;
     if (contractType.toLowerCase() == 'name') {
@@ -220,7 +177,7 @@ class _WalletContractsWidgetState extends ConsumerState<WalletContractsWidget> {
     } else if (contractType.toLowerCase() == 'rent') {
       typeIcon = Icons.storage_outlined;
     }
-    
+
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
       elevation: 2,
@@ -267,27 +224,38 @@ class _WalletContractsWidgetState extends ConsumerState<WalletContractsWidget> {
                       children: [
                         Text(
                           'Contract $contractId',
-                          style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                            fontWeight: FontWeight.bold,
-                            color: Theme.of(context).colorScheme.onSurface,
-                          ),
+                          style: Theme.of(context)
+                              .textTheme
+                              .titleMedium!
+                              .copyWith(
+                                fontWeight: FontWeight.bold,
+                                color: Theme.of(context).colorScheme.onSurface,
+                              ),
                           overflow: TextOverflow.ellipsis,
                         ),
                         const SizedBox(height: 4),
                         Row(
                           children: [
                             Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 8, vertical: 2),
                               decoration: BoxDecoration(
-                                color: Theme.of(context).colorScheme.surfaceVariant,
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .surfaceVariant,
                                 borderRadius: BorderRadius.circular(4),
                               ),
                               child: Text(
                                 contractType,
-                                style: Theme.of(context).textTheme.bodySmall!.copyWith(
-                                  color: Theme.of(context).colorScheme.onSurfaceVariant,
-                                  fontWeight: FontWeight.w500,
-                                ),
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodySmall!
+                                    .copyWith(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onSurfaceVariant,
+                                      fontWeight: FontWeight.w500,
+                                    ),
                               ),
                             ),
                             if (name.isNotEmpty) ...[
@@ -295,9 +263,14 @@ class _WalletContractsWidgetState extends ConsumerState<WalletContractsWidget> {
                               Expanded(
                                 child: Text(
                                   name,
-                                  style: Theme.of(context).textTheme.bodySmall!.copyWith(
-                                    color: Theme.of(context).colorScheme.onSurfaceVariant,
-                                  ),
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .bodySmall!
+                                      .copyWith(
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .onSurfaceVariant,
+                                      ),
                                   overflow: TextOverflow.ellipsis,
                                 ),
                               ),
@@ -320,9 +293,9 @@ class _WalletContractsWidgetState extends ConsumerState<WalletContractsWidget> {
                     Text(
                       'View Details',
                       style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                        color: Theme.of(context).colorScheme.primary,
-                        fontWeight: FontWeight.w500,
-                      ),
+                            color: Theme.of(context).colorScheme.primary,
+                            fontWeight: FontWeight.w500,
+                          ),
                     ),
                     Icon(
                       Icons.arrow_forward_ios,
@@ -338,20 +311,20 @@ class _WalletContractsWidgetState extends ConsumerState<WalletContractsWidget> {
       ),
     );
   }
-  
+
   Widget _buildStatusBadge(BuildContext context, String status) {
     final lowerStatus = status.toLowerCase();
     Color backgroundColor;
     Color textColor;
-    
+
     if (lowerStatus == 'created') {
       backgroundColor = Theme.of(context).colorScheme.primaryContainer;
-      textColor = Theme.of(context).colorScheme.onPrimary;
+      textColor = Theme.of(context).colorScheme.onPrimaryContainer;
     } else {
       backgroundColor = Theme.of(context).colorScheme.warningContainer;
       textColor = Theme.of(context).colorScheme.warning;
     }
-    
+
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       decoration: BoxDecoration(
@@ -361,13 +334,13 @@ class _WalletContractsWidgetState extends ConsumerState<WalletContractsWidget> {
       child: Text(
         _capitalizeFirstLetter(lowerStatus),
         style: Theme.of(context).textTheme.labelSmall!.copyWith(
-          color: textColor,
-          fontWeight: FontWeight.bold,
-        ),
+              color: textColor,
+              fontWeight: FontWeight.bold,
+            ),
       ),
     );
   }
-  
+
   String _capitalizeFirstLetter(String text) {
     if (text.isEmpty) return text;
     return text[0].toUpperCase() + text.substring(1);
