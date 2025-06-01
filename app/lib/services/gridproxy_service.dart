@@ -1,4 +1,5 @@
 import 'package:gridproxy_client/gridproxy_client.dart';
+import 'package:gridproxy_client/models/contracts.dart';
 import 'package:gridproxy_client/models/nodes.dart';
 import 'package:threebotlogin/helpers/globals.dart';
 import 'package:threebotlogin/main.reflectable.dart';
@@ -14,6 +15,20 @@ Future<double> getMySpending() async {
   final gridProxyClient = GridProxyClient(gridproxyUrl);
   final spending = await gridProxyClient.twins.getConsumption(twinID: twinId);
   return spending.overall_consumption;
+}
+
+Future<List<ContractInfo>> getContractsByTwinId(int twinId) async {
+  try {
+    initializeReflectable();
+    final gridproxyUrl = Globals().gridproxyUrl;
+
+    final client = GridProxyClient(gridproxyUrl);
+    final contracts =
+        await client.contracts.list(ContractInfoQueryParams(twin_id: twinId, state: ContractState.GracePeriod));
+    return contracts;
+  } catch (e) {
+    throw Exception('Error fetching contracts: $e');
+  }
 }
 
 Future<List<Farm>> getFarmsByTwinId(int twinId,
