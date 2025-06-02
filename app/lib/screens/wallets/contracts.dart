@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:threebotlogin/helpers/logger.dart';
@@ -7,6 +9,7 @@ import 'package:threebotlogin/services/tfchain_service.dart';
 import 'package:gridproxy_client/models/contracts.dart';
 import 'package:threebotlogin/widgets/wallets/contract_details.dart';
 import 'package:threebotlogin/helpers/contract_helpers.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 
 class WalletContractsWidget extends ConsumerStatefulWidget {
   const WalletContractsWidget({super.key, required this.wallet});
@@ -33,33 +36,72 @@ class _WalletContractsWidgetState extends ConsumerState<WalletContractsWidget> {
       loading = true;
       failed = false;
     });
+
     try {
-      final twinId = await getTwinId(widget.wallet.tfchainSecret);
-      contracts = await getContractsByTwinId(twinId);
-    } catch (e) {
-      logger.e('Failed to load contracts: $e');
-      setState(() {
-        failed = true;
-      });
-      if (context.mounted) {
-        final loadingContractsFailure = SnackBar(
-          content: Text(
-            'Failed to load contracts',
-            style: Theme.of(context)
-                .textTheme
-                .bodyMedium!
-                .copyWith(color: Theme.of(context).colorScheme.errorContainer),
-          ),
-          duration: const Duration(seconds: 3),
+      final connectivityResult = await (Connectivity().checkConnectivity());
+
+      if (connectivityResult.contains(ConnectivityResult.none)) {
+        _handleFailure(
+          'No internet connection. Please check your network.',
         );
-        ScaffoldMessenger.of(context).clearSnackBars();
-        ScaffoldMessenger.of(context).showSnackBar(loadingContractsFailure);
+        return;
       }
-    } finally {
+
+      final twinId = await getTwinId(widget.wallet.tfchainSecret).timeout(
+        const Duration(minutes: 1),
+        onTimeout: () {
+          throw TimeoutException('Loading contracts timed out');
+        },
+      );
+
+      contracts = await getContractsByTwinId(twinId).timeout(
+        const Duration(minutes: 1),
+        onTimeout: () {
+          throw TimeoutException('Loading contracts timed out');
+        },
+      );
+
       setState(() {
         loading = false;
+        failed = false;
       });
+    } on TimeoutException catch (e) {
+      _handleFailure(
+        'Loading contracts timed out. Please check your network.',
+        error: e,
+      );
+    } catch (e) {
+      _handleFailure(
+        'Failed to load contracts. Please try again.',
+        error: e,
+      );
     }
+  }
+
+  void _handleFailure(String userMessage, {Object? error}) {
+    if (error != null) {
+      logger.e('Load contracts failed', error: error);
+    }
+
+    if (mounted) {
+      final errorSnackbar = SnackBar(
+        content: Text(
+          userMessage,
+          style: Theme.of(context)
+              .textTheme
+              .bodyMedium!
+              .copyWith(color: Theme.of(context).colorScheme.errorContainer),
+        ),
+        duration: const Duration(seconds: 3),
+      );
+      ScaffoldMessenger.of(context).clearSnackBars();
+      ScaffoldMessenger.of(context).showSnackBar(errorSnackbar);
+    }
+
+    setState(() {
+      loading = false;
+      failed = true;
+    });
   }
 
   @override
