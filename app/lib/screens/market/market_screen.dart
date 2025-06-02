@@ -3,6 +3,7 @@ import 'package:threebotlogin/widgets/layout_drawer.dart';
 import 'package:threebotlogin/screens/market/order_book.dart';
 import 'package:threebotlogin/screens/market/overview.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:threebotlogin/models/wallet.dart';
 
 class MarketPage extends ConsumerStatefulWidget {
   const MarketPage({super.key});
@@ -14,6 +15,8 @@ class MarketPage extends ConsumerStatefulWidget {
 class _MarketPageState extends ConsumerState<MarketPage>
     with SingleTickerProviderStateMixin {
   late final TabController _tabController;
+  Wallet? _selectedWallet;
+
   @override
   void initState() {
     super.initState();
@@ -24,6 +27,12 @@ class _MarketPageState extends ConsumerState<MarketPage>
   void dispose() {
     super.dispose();
     _tabController.dispose();
+  }
+
+  void _onWalletSelected(Wallet wallet) {
+    setState(() {
+      _selectedWallet = wallet;
+    });
   }
 
   @override
@@ -55,9 +64,12 @@ class _MarketPageState extends ConsumerState<MarketPage>
           Expanded(
             child: TabBarView(
               controller: _tabController,
-              children: const [
-                OverviewWidget(),
-                OrderbookWidget(),
+              children: [
+                OverviewWidget(
+                  selectedWallet: _selectedWallet,
+                  onWalletSelected: _onWalletSelected,
+                ),
+                const OrderbookWidget(),
               ],
             ),
           )
