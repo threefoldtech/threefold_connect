@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:threebotlogin/helpers/logger.dart';
-import 'package:threebotlogin/main.dart';
 import 'package:threebotlogin/models/wallet.dart';
 import 'package:threebotlogin/services/gridproxy_service.dart';
 import 'package:threebotlogin/services/tfchain_service.dart';
 import 'package:gridproxy_client/models/contracts.dart';
 import 'package:threebotlogin/widgets/wallets/contract_details.dart';
+import 'package:threebotlogin/helpers/contract_helpers.dart';
 
 class WalletContractsWidget extends ConsumerStatefulWidget {
   const WalletContractsWidget({super.key, required this.wallet});
@@ -64,10 +64,8 @@ class _WalletContractsWidgetState extends ConsumerState<WalletContractsWidget> {
 
   @override
   Widget build(BuildContext context) {
-    Widget content;
-
     if (loading) {
-      content = Center(
+      return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -82,8 +80,10 @@ class _WalletContractsWidgetState extends ConsumerState<WalletContractsWidget> {
           ],
         ),
       );
-    } else if (failed) {
-      content = Center(
+    }
+
+    if (failed) {
+      return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -105,8 +105,10 @@ class _WalletContractsWidgetState extends ConsumerState<WalletContractsWidget> {
           ],
         ),
       );
-    } else if (contracts.isEmpty) {
-      content = Center(
+    }
+
+    if (contracts.isEmpty) {
+      return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -140,43 +142,25 @@ class _WalletContractsWidgetState extends ConsumerState<WalletContractsWidget> {
           ],
         ),
       );
-    } else {
-      content = RefreshIndicator(
-        onRefresh: _loadContracts,
-        child: ListView.builder(
-          padding: const EdgeInsets.symmetric(vertical: 8.0),
-          itemCount: contracts.length,
-          itemBuilder: (context, index) {
-            final contract = contracts[index];
-            return _buildContractListItem(context, contract);
-          },
-        ),
-      );
     }
 
-    return content;
+    return RefreshIndicator(
+      onRefresh: _loadContracts,
+      child: ListView.builder(
+        padding: const EdgeInsets.symmetric(vertical: 8.0),
+        itemCount: contracts.length,
+        itemBuilder: (context, index) {
+          final contract = contracts[index];
+          return _buildContractListItem(context, contract);
+        },
+      ),
+    );
   }
 
   Widget _buildContractListItem(BuildContext context, ContractInfo contract) {
     final contractId = contract.contract_id;
     final contractType = contract.type;
     final state = contract.state;
-
-    String name = '';
-
-    if (contract.details != null && contractType.toLowerCase() == 'name') {
-      name = (contract.details as Map)['name'];
-    }
-
-    // Get icon based on contract type
-    IconData typeIcon = Icons.description_outlined;
-    if (contractType.toLowerCase() == 'name') {
-      typeIcon = Icons.dns_outlined;
-    } else if (contractType.toLowerCase() == 'node') {
-      typeIcon = Icons.computer_outlined;
-    } else if (contractType.toLowerCase() == 'rent') {
-      typeIcon = Icons.storage_outlined;
-    }
 
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
@@ -212,7 +196,7 @@ class _WalletContractsWidgetState extends ConsumerState<WalletContractsWidget> {
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Icon(
-                      typeIcon,
+                      Icons.description,
                       color: Theme.of(context).colorScheme.onSecondaryContainer,
                       size: 24,
                     ),
@@ -258,29 +242,12 @@ class _WalletContractsWidgetState extends ConsumerState<WalletContractsWidget> {
                                     ),
                               ),
                             ),
-                            if (name.isNotEmpty) ...[
-                              const SizedBox(width: 8),
-                              Expanded(
-                                child: Text(
-                                  name,
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .bodySmall!
-                                      .copyWith(
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .onSurfaceVariant,
-                                      ),
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              ),
-                            ],
                           ],
                         ),
                       ],
                     ),
                   ),
-                  _buildStatusBadge(context, state),
+                  buildStatusBadge(context, state),
                 ],
               ),
               const SizedBox(height: 12),
@@ -310,40 +277,6 @@ class _WalletContractsWidgetState extends ConsumerState<WalletContractsWidget> {
         ),
       ),
     );
-  }
-
-  Widget _buildStatusBadge(BuildContext context, String status) {
-    final lowerStatus = status.toLowerCase();
-    Color backgroundColor;
-    Color textColor;
-
-    if (lowerStatus == 'created') {
-      backgroundColor = Theme.of(context).colorScheme.primaryContainer;
-      textColor = Theme.of(context).colorScheme.onPrimaryContainer;
-    } else {
-      backgroundColor = Theme.of(context).colorScheme.warningContainer;
-      textColor = Theme.of(context).colorScheme.warning;
-    }
-
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-      decoration: BoxDecoration(
-        color: backgroundColor,
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Text(
-        _capitalizeFirstLetter(lowerStatus),
-        style: Theme.of(context).textTheme.labelSmall!.copyWith(
-              color: textColor,
-              fontWeight: FontWeight.bold,
-            ),
-      ),
-    );
-  }
-
-  String _capitalizeFirstLetter(String text) {
-    if (text.isEmpty) return text;
-    return text[0].toUpperCase() + text.substring(1);
   }
 }
 
