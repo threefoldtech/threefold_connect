@@ -133,14 +133,7 @@ class _BuyTFTWidgetState extends State<BuyTFTWidget> {
     try {
       final decimalAmount = Decimal.parse(amount);
 
-      if (decimalAmount < Decimal.zero) {
-        setState(() {
-          amountError = 'Amount cannot be negative';
-        });
-        return false;
-      }
-
-      if (decimalAmount == Decimal.zero) {
+      if (decimalAmount <= Decimal.zero) {
         setState(() {
           amountError = 'Amount must be greater than zero';
         });
@@ -152,13 +145,6 @@ class _BuyTFTWidgetState extends State<BuyTFTWidget> {
       if (balance - decimalAmount <= Decimal.zero) {
         setState(() {
           amountError = 'Balance is not enough';
-        });
-        return false;
-      }
-
-      if (decimalAmount > Decimal.parse(availableUSDC ?? '0')) {
-        setState(() {
-          amountError = 'Not enough balance';
         });
         return false;
       }
@@ -466,9 +452,6 @@ class _BuyTFTWidgetState extends State<BuyTFTWidget> {
                             ),
                         focusNode: textFieldFocusNode,
                         onChanged: (_) {
-                          setState(() {
-                            amountError = null;
-                          });
                           _validateAmount();
                         },
                         keyboardType: const TextInputType.numberWithOptions(
