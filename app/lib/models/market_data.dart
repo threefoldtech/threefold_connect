@@ -22,10 +22,6 @@ class TftMarketData {
     double high24h = lastUsdcPrice;
     double low24h = lastUsdcPrice;
 
-    final oldestTrade = trades.last;
-    final double oldestUsdcPrice = double.parse(oldestTrade['base_amount']) /
-        double.parse(oldestTrade['counter_amount']);
-
     for (var trade in trades) {
       double usdcPrice = double.parse(trade['base_amount']) /
           double.parse(trade['counter_amount']);
