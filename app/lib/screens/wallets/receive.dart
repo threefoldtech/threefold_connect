@@ -86,7 +86,7 @@ class _WalletReceiveScreenState extends State<WalletReceiveScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final bool hideStellar = double.parse(widget.wallet.stellarBalance) <= -1;
+    final bool hideStellar = double.parse(widget.wallet.stellarBalances['TFT']!) <= -1;
     if (hideStellar) {
       onChangeChain(ChainType.TFChain);
     }
@@ -166,7 +166,7 @@ class _WalletReceiveScreenState extends State<WalletReceiveScreen> {
                           'Generate QR Code',
                           style: Theme.of(context)
                               .textTheme
-                              .titleLarge!
+                              .titleMedium!
                               .copyWith(
                                   color: Theme.of(context).colorScheme.primary,
                                   fontWeight: FontWeight.bold),

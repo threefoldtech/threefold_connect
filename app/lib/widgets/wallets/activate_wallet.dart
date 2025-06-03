@@ -89,11 +89,12 @@ class _ActivateWalletWidgetState extends ConsumerState<ActivateWalletWidget> {
       List<Wallet> wallets) {
     return wallets
         .where((wallet) =>
-            wallet != widget.wallet && double.parse(wallet.stellarBalance) > -1)
+            wallet != widget.wallet &&
+            double.parse(wallet.stellarBalances['TFT']!) > -1)
         .map((wallet) {
       return DropdownMenuEntry<Wallet>(
         value: wallet,
-        label: '${wallet.name} (${wallet.stellarBalance} TFT)',
+        label: '${wallet.name} (${wallet.stellarBalances['TFT']!} TFT)',
         labelWidget: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -104,7 +105,7 @@ class _ActivateWalletWidgetState extends ConsumerState<ActivateWalletWidget> {
                   ),
             ),
             Text(
-              '${wallet.stellarBalance} TFT',
+              '${wallet.stellarBalances['TFT']!} TFT',
               style: Theme.of(context).textTheme.bodyMedium!.copyWith(
                     color: Theme.of(context).colorScheme.onSurfaceVariant,
                   ),
@@ -122,8 +123,8 @@ class _ActivateWalletWidgetState extends ConsumerState<ActivateWalletWidget> {
       });
       return false;
     }
-    if (double.parse(_selectedWallet!.stellarBalance) <
-        (widget.wallet.stellarBalance == '-1'
+    if (double.parse(_selectedWallet!.stellarBalances['TFT']!) <
+        (widget.wallet.stellarBalances['TFT']! == '-1'
             ? (tftPrice * trustlineFee)
             : (tftPrice * activationFee))) {
       setState(() {
@@ -310,7 +311,7 @@ class _ActivateWalletWidgetState extends ConsumerState<ActivateWalletWidget> {
                   children: [
                     Center(
                       child: Text(
-                        widget.wallet.stellarBalance == '-1'
+                        widget.wallet.stellarBalances['TFT']! == '-1'
                             ? 'Add TFT Asset'
                             : 'Activate',
                         style: Theme.of(context)
@@ -323,7 +324,7 @@ class _ActivateWalletWidgetState extends ConsumerState<ActivateWalletWidget> {
                     ),
                     const SizedBox(height: 20),
                     Text(
-                      widget.wallet.stellarBalance == '-1'
+                      widget.wallet.stellarBalances['TFT']! == '-1'
                           ? 'Please select a wallet to fund adding the TFT asset.'
                           : 'Please select a wallet to fund the activation.',
                       style: Theme.of(context).textTheme.bodyLarge!.copyWith(
@@ -344,7 +345,7 @@ class _ActivateWalletWidgetState extends ConsumerState<ActivateWalletWidget> {
                         const SizedBox(width: 8),
                         Expanded(
                           child: Text(
-                            widget.wallet.stellarBalance == '-1'
+                            widget.wallet.stellarBalances['TFT']! == '-1'
                                 ? 'This will consume ${tftPrice * trustlineFee} TFTs from the selected wallet.'
                                 : 'This will consume ${tftPrice * activationFee} TFTs from the selected wallet.',
                             style: Theme.of(context)
@@ -435,7 +436,7 @@ class _ActivateWalletWidgetState extends ConsumerState<ActivateWalletWidget> {
                         ElevatedButton(
                             onPressed: saveLoading
                                 ? null
-                                : widget.wallet.stellarBalance == '-1'
+                                : widget.wallet.stellarBalances['TFT']! == '-1'
                                     ? () async => await addTFTAsset()
                                     : () async => await activateWallet(),
                             child: saveLoading
@@ -445,7 +446,7 @@ class _ActivateWalletWidgetState extends ConsumerState<ActivateWalletWidget> {
                                     child: CircularProgressIndicator(
                                       strokeWidth: 2,
                                     ))
-                                : widget.wallet.stellarBalance == '-1'
+                                : widget.wallet.stellarBalances['TFT'] == '-1'
                                     ? const Text('Add TFT Asset')
                                     : const Text('Activate'))
                       ],

@@ -101,7 +101,7 @@ class _SignWithTextScreenState extends ConsumerState<SignWithTextScreen>
                         : Text('Sign',
                             style: Theme.of(context)
                                 .textTheme
-                                .titleLarge
+                                .titleMedium
                                 !.copyWith(
                                   color: Theme.of(context)
                                       .colorScheme

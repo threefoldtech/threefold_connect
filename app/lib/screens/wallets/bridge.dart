@@ -68,8 +68,8 @@ class _WalletBridgeScreenState extends ConsumerState<WalletBridgeScreen> {
   }
 
   _loadStellarBalance() async {
-    widget.wallet.stellarBalance =
-        (await Stellar.getBalance(widget.wallet.stellarSecret)).toString();
+    widget.wallet.stellarBalances['TFT'] =
+        (await Stellar.getTFTBalance(widget.wallet.stellarSecret)).toString();
     setState(() {});
   }
 
@@ -81,7 +81,7 @@ class _WalletBridgeScreenState extends ConsumerState<WalletBridgeScreen> {
             .read(walletsNotifier.notifier);
     final wallet = walletRef.getUpdatedWallet(widget.wallet.name)!;
     widget.wallet.tfchainBalance = wallet.tfchainBalance;
-    widget.wallet.stellarBalance = wallet.stellarBalance;
+    widget.wallet.stellarBalances['TFT'] = wallet.stellarBalances['TFT']!;
     setState(() {});
     await Future.delayed(Duration(seconds: refreshBalance));
     await _reloadBalances();
@@ -180,7 +180,7 @@ class _WalletBridgeScreenState extends ConsumerState<WalletBridgeScreen> {
     }
     final balance = roundAmount(isWithdraw
         ? widget.wallet.tfchainBalance
-        : widget.wallet.stellarBalance);
+        : widget.wallet.stellarBalances['TFT']!);
     if (balance - Decimal.parse(amount) - totalFee < Decimal.zero) {
       amountError = 'Insufficient balance (fees included).';
       return false;
@@ -210,14 +210,14 @@ class _WalletBridgeScreenState extends ConsumerState<WalletBridgeScreen> {
   Widget build(BuildContext context) {
     List<Wallet> wallets = ref.read(walletsNotifier);
     final bool disableDeposit =
-        double.parse(widget.wallet.stellarBalance) <= -1;
+        double.parse(widget.wallet.stellarBalances['TFT']!) <= -1;
     if (disableDeposit && !isWithdraw) {
       onTransactionChange(BridgeOperation.Withdraw);
     }
 
     String balance = isWithdraw
         ? widget.wallet.tfchainBalance
-        : widget.wallet.stellarBalance;
+        : widget.wallet.stellarBalances['TFT']!;
     final isBiggerThanFee = roundAmount(balance) > totalFee;
 
     return Scaffold(
@@ -238,35 +238,34 @@ class _WalletBridgeScreenState extends ConsumerState<WalletBridgeScreen> {
                         onTransactionChange: onTransactionChange,
                         disableDeposit: disableDeposit,
                         updateIsSolana: updateIsSolana),
-                    if (isSolana)
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 15.0),
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: <Widget>[
-                            Icon(
-                              Icons.info,
-                              color: Theme.of(context).colorScheme.primary,
-                              size: 16,
-                            ),
-                            const SizedBox(width: 8),
-                            Expanded(
-                              child: Text(
-                                'This bridge currently only supports Stellar to Solana transfers.',
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .bodySmall!
-                                    .copyWith(
-                                      color:
-                                          Theme.of(context).colorScheme.primary,
-                                    ),
-                                softWrap: true,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
                     const SizedBox(height: 20),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 15.0),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          Icon(
+                            Icons.info,
+                            color: Theme.of(context).colorScheme.primary,
+                            size: 16,
+                          ),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Text(
+                              'Some bridge options are not supported between certain chains.',
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodySmall!
+                                  .copyWith(
+                                    color:
+                                        Theme.of(context).colorScheme.primary,
+                                  ),
+                              softWrap: true,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                     ListTile(
                       title: TextField(
                           readOnly: true,
@@ -309,8 +308,9 @@ class _WalletBridgeScreenState extends ConsumerState<WalletBridgeScreen> {
                                               wallets: isWithdraw
                                                   ? wallets
                                                       .where((w) =>
-                                                          double.parse(w
-                                                              .stellarBalance) >=
+                                                          double.parse(
+                                                              w.stellarBalances[
+                                                                  'TFT']!) >=
                                                           0)
                                                       .toList()
                                                   : wallets,
@@ -386,7 +386,7 @@ class _WalletBridgeScreenState extends ConsumerState<WalletBridgeScreen> {
                             'Submit',
                             style: Theme.of(context)
                                 .textTheme
-                                .titleLarge!
+                                .titleMedium!
                                 .copyWith(
                                     color:
                                         Theme.of(context).colorScheme.primary,
@@ -405,7 +405,7 @@ class _WalletBridgeScreenState extends ConsumerState<WalletBridgeScreen> {
   calculateAmount(int percentage) {
     final amount = (Decimal.parse(isWithdraw
                 ? widget.wallet.tfchainBalance
-                : widget.wallet.stellarBalance) -
+                : widget.wallet.stellarBalances['TFT']!) -
             totalFee) *
         (Decimal.fromInt(percentage).shift(-2));
     amountController.text = roundAmount(amount.toString()).toString();

@@ -163,7 +163,7 @@ class _DaoPageState extends State<DaoPage> with SingleTickerProviderStateMixin {
                 indicatorColor: Theme.of(context).colorScheme.primary,
                 unselectedLabelColor: Theme.of(context).colorScheme.onSurface,
                 dividerColor: Theme.of(context).scaffoldBackgroundColor,
-                labelStyle: Theme.of(context).textTheme.titleLarge,
+                labelStyle: Theme.of(context).textTheme.titleMedium,
                 unselectedLabelStyle: Theme.of(context).textTheme.titleMedium,
                 tabs: const [
                   Tab(text: 'Active'),

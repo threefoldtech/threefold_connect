@@ -59,7 +59,7 @@ class _SigningState extends State<Signing> {
           const SizedBox(height: 32),
           Text(
             'Choose Signing Method',
-            style: Theme.of(context).textTheme.headlineSmall!.copyWith(
+            style: Theme.of(context).textTheme.titleLarge!.copyWith(
                   fontWeight: FontWeight.bold,
                   color: Theme.of(context).colorScheme.onSurface,
                 ),

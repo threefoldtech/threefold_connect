@@ -115,11 +115,13 @@ Future<Wallet> loadWallet(String walletName, String walletSeed,
     WalletType walletType, String chainUrl, String idenfyServiceUrl) async {
   final (stellarClient, tfchainClient) =
       await loadWalletClients(walletName, walletSeed, walletType, chainUrl);
+
   final balances = await Future.wait([
     StellarService.getBalanceByClient(stellarClient),
-    TFChainService.getBalanceByClient(tfchainClient)
+    TFChainService.getBalanceByClient(tfchainClient),
   ]);
-  final stellarBalance = balances.first.toString();
+
+  final stellarBalances = balances.first as Map<String, String>;
   final tfchainBalance =
       balances.last.toString() == '0.0' ? '0' : balances.last.toString();
   final kycVerified = await getVerificationStatus(
@@ -131,11 +133,16 @@ Future<Wallet> loadWallet(String walletName, String walletSeed,
     stellarAddress: stellarClient.accountId,
     tfchainSecret: tfchainClient.mnemonicOrSecretSeed,
     tfchainAddress: tfchainClient.address,
-    stellarBalance: stellarBalance,
+    stellarBalances: {
+      'TFT': stellarBalances['TFT'] ?? '-1',
+      'USDC': stellarBalances['USDC'] ?? '-1',
+      'XLM': stellarBalances['XLM'] ?? '-1'
+    },
     tfchainBalance: tfchainBalance,
     type: walletType,
     verificationStatus: kycVerified.status,
   );
+
   return wallet;
 }
 

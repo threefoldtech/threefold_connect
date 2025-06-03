@@ -41,7 +41,7 @@ class _WalletAssetsWidgetState extends State<WalletAssetsWidget> {
             .read(walletsNotifier.notifier);
     final wallet = walletRef.getUpdatedWallet(widget.wallet.name)!;
     widget.wallet.tfchainBalance = wallet.tfchainBalance;
-    widget.wallet.stellarBalance = wallet.stellarBalance;
+    widget.wallet.stellarBalances['TFT'] = wallet.stellarBalances['TFT']!;
     setState(() {});
     await Future.delayed(Duration(seconds: refreshBalance));
     await _reloadBalances();
@@ -132,7 +132,7 @@ class _WalletAssetsWidgetState extends State<WalletAssetsWidget> {
                     const SizedBox(height: 10),
                     Text(
                       'Send',
-                      style: Theme.of(context).textTheme.titleLarge!.copyWith(
+                      style: Theme.of(context).textTheme.titleMedium!.copyWith(
                           color: Theme.of(context).colorScheme.primary),
                     ),
                   ],
@@ -161,7 +161,7 @@ class _WalletAssetsWidgetState extends State<WalletAssetsWidget> {
                     const SizedBox(height: 10),
                     Text(
                       'Receive',
-                      style: Theme.of(context).textTheme.titleLarge!.copyWith(
+                      style: Theme.of(context).textTheme.titleMedium!.copyWith(
                           color: Theme.of(context).colorScheme.primary),
                     ),
                   ],
@@ -191,7 +191,7 @@ class _WalletAssetsWidgetState extends State<WalletAssetsWidget> {
                     const SizedBox(height: 10),
                     Text(
                       'Bridge',
-                      style: Theme.of(context).textTheme.titleLarge!.copyWith(
+                      style: Theme.of(context).textTheme.titleMedium!.copyWith(
                           color: Theme.of(context).colorScheme.primary),
                     ),
                   ],
@@ -210,10 +210,10 @@ class _WalletAssetsWidgetState extends State<WalletAssetsWidget> {
           const SizedBox(
             height: 20,
           ),
-          if (double.parse(widget.wallet.stellarBalance) >= 0)
+          if (double.parse(widget.wallet.stellarBalances['TFT']!) >= 0)
             WalletBalanceTileWidget(
               name: ChainType.Stellar,
-              balance: formatAmount(widget.wallet.stellarBalance),
+              balance: formatAmount(widget.wallet.stellarBalances['TFT']!),
               loading: stellarBalaceLoading,
             ),
           const SizedBox(height: 10),
@@ -224,10 +224,10 @@ class _WalletAssetsWidgetState extends State<WalletAssetsWidget> {
               loading: tfchainBalaceLoading,
             ),
           const SizedBox(height: 10),
-          if (double.parse(widget.wallet.stellarBalance) <= -1)
+          if (double.parse(widget.wallet.stellarBalances['TFT']!) <= -1)
             WalletBalanceTileWidget(
               name: ChainType.Stellar,
-              balance: widget.wallet.stellarBalance,
+              balance: widget.wallet.stellarBalances['TFT']!,
               loading: false,
               onActivate: _openActivateStellarOverlay,
             ),

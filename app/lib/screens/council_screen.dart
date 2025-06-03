@@ -145,7 +145,7 @@ class _CouncilScreenState extends State<CouncilScreen> {
                           child: Text(
                             style: Theme.of(context)
                                 .textTheme
-                                .titleLarge!
+                                .titleMedium!
                                 .copyWith(
                                     color: errorMessage == null
                                         ? Theme.of(context).colorScheme.primary

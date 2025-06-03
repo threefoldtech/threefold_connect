@@ -1,9 +1,6 @@
 import 'package:background_fetch/background_fetch.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:gridproxy_client/models/contracts.dart';
 import 'package:threebotlogin/apps/notifications/notifications_user_data.dart';
 import 'package:threebotlogin/models/farm.dart';
-import 'package:threebotlogin/services/contract_check_service.dart';
 import 'package:threebotlogin/services/nodes_check_service.dart';
 import 'notification_service.dart';
 import 'package:threebotlogin/helpers/logger.dart';
@@ -12,91 +9,38 @@ void backgroundFetchHeadlessTask(HeadlessTask task) async {
   final String taskId = task.taskId;
   final bool timeout = task.timeout;
 
-  final container = ProviderContainer();
-
-  try {
-    if (timeout) {
-      logger.w('[BackgroundFetch] Task timed out: $taskId');
-      BackgroundFetch.finish(taskId);
-      return;
-    }
-
-    logger.i(
-        '[BackgroundFetch] Headless Task: $taskId started. Time: ${DateTime.now()}');
-
-    // Run contract and node checks concurrently
-    await Future.wait([
-      _checkContractsAndNotify(container, taskId),
-      _checkNodesAndNotify(taskId),
-    ]);
-  } catch (e, stack) {
-    logger.e('[BackgroundFetch] Error during task $taskId: $e',
-        error: e, stackTrace: stack);
-  } finally {
-    container.dispose();
+  if (timeout) {
     BackgroundFetch.finish(taskId);
-    logger.i('[BackgroundFetch] Task finished: $taskId');
+    return;
   }
-}
+  final bool notificationsEnabled = await isNodeStatusNotificationEnabled();
 
-Future<void> _checkContractsAndNotify(
-    ProviderContainer container, String taskId) async {
-  try {
-    final List<ContractInfo> allContractsInGracePeriod = await container
-        .read(contractCheckServiceProvider)
-        .checkContractsState();
+  logger.i(
+      '[BackgroundFetch] Headless Task: $taskId, Notifications Enabled: $notificationsEnabled');
 
-    if (allContractsInGracePeriod.isNotEmpty) {
-      final bool contractNotificationsEnabled =
-          await isContractNotificationEnabled();
-      logger.i(
-          '[ContractsCheck] Contracts in grace period: ${allContractsInGracePeriod.length}. Contract Notifications enabled: $contractNotificationsEnabled');
-
-      if (contractNotificationsEnabled) {
-        String notificationBody =
-            'You have ${allContractsInGracePeriod.length} contract(s) in grace period.';
-        final String contractIds =
-            allContractsInGracePeriod.map((c) => c.contract_id).join(', ');
-        notificationBody += '\nContract IDs: $contractIds';
-
-        await NotificationService().showNotification(
-          id: 'contract_grace_period',
-          title: 'Contract Grace Period Alert! ⏳',
-          body: notificationBody,
-          groupKey: 'contract_alerts',
-        );
-      }
-    }
-  } catch (e, stack) {
-    logger.e(
-        '[ContractsCheck] Error during contracts check for task $taskId: $e',
-        error: e,
-        stackTrace: stack);
-    rethrow;
-  }
-}
-
-Future<void> _checkNodesAndNotify(String taskId) async {
-  try {
-    final bool nodeNotificationsEnabled =
-        await isNodeStatusNotificationEnabled();
+  if (!notificationsEnabled) {
     logger.i(
-        '[NodesCheck] Node Notifications Enabled: $nodeNotificationsEnabled for task $taskId');
+        '[BackgroundFetch] Node status notifications are disabled. Finishing task: $taskId');
+    BackgroundFetch.finish(taskId);
+    return;
+  }
+  await checkNodeStatus(taskId);
+}
 
-    if (!nodeNotificationsEnabled) {
-      logger.i(
-          '[NodesCheck] Node notifications are disabled by user setting. Exiting _checkNodesAndNotify for task $taskId.');
-      return;
-    }
+Future<void> checkNodeStatus(String taskId) async {
+  try {
+    final v3OfflineNodes = await NodeCheckService.pingV3NodesInBackground();
+    final v4OfflineNodes = await NodeCheckService.pingV4NodesInBackground();
+    final offlineNodes = [...v3OfflineNodes, ...v4OfflineNodes];
 
-    final offlineNodes = await NodeCheckService.pingNodesInBackground();
+    logger.i(
+        '[BackgroundFetch] Total offline nodes found: ${offlineNodes.length} for task $taskId');
+
     if (offlineNodes.isEmpty) {
       logger.i(
-          '[NodesCheck] No raw offline nodes found from pingNodesInBackground(). Exiting _checkNodesAndNotify for task $taskId.');
+          '[BackgroundFetch] No offline nodes found, finishing task $taskId');
       return;
     }
-    logger.i(
-        '[NodesCheck] Found ${offlineNodes.length} raw offline nodes for task $taskId.');
 
     final StringBuffer bodyBuffer = StringBuffer();
     final List<Node> nodesToNotify = [];
@@ -108,16 +52,21 @@ Future<void> _checkNodesAndNotify(String taskId) async {
     for (final node in offlineNodes) {
       final nodeUpdatedAtMs = node.updatedAt! * 1000;
 
-      // Filter out nodes updated more than 7 days ago
-      if (nodeUpdatedAtMs <= sevenDaysAgoTimestampMs) continue;
+      if (nodeUpdatedAtMs <= sevenDaysAgoTimestampMs) {
+        logger.i(
+            '[BackgroundFetch] Skipping node ${node.nodeId} - offline for more than 7 days');
+        continue;
+      }
 
       final downtime = Duration(milliseconds: nowInMs - nodeUpdatedAtMs);
+
       final checkInterval = _getCheckInterval(downtime);
 
       bool passesIntervalCheck = false;
       if (downtime.inMinutes > 0 && checkInterval.inMinutes > 0) {
         passesIntervalCheck = downtime.inMinutes % checkInterval.inMinutes < 15;
       }
+
       if (passesIntervalCheck) {
         nodesToNotify.add(node);
         final formattedDowntime = _formatDowntime(downtime);
@@ -126,28 +75,33 @@ Future<void> _checkNodesAndNotify(String taskId) async {
       }
     }
 
-    if (nodesToNotify.isEmpty) return;
+    if (nodesToNotify.isEmpty) {
+      logger.i(
+          '[BackgroundFetch] No nodes to notify after interval check, finishing task $taskId');
+      return;
+    }
 
     await NotificationService().showNotification(
-      id: 'offline_nodes_alert',
+      id: nodesToNotify.hashCode,
       title: nodesToNotify.length == 1
           ? 'Node Alert 🚨'
           : '${nodesToNotify.length} Nodes Offline 🚨',
       body: bodyBuffer.toString().trim(),
       groupKey: 'offline_nodes',
     );
-  } catch (e, stack) {
-    logger.e('[NodesCheck] Error in node check for task $taskId: $e',
-        error: e, stackTrace: stack);
-    rethrow;
+  } catch (e) {
+    logger.e('[BackgroundFetch] Error in checkNodeStatus for task $taskId: $e');
+  } finally {
+    logger.i('[BackgroundFetch] Finishing task $taskId');
+    BackgroundFetch.finish(taskId);
   }
 }
 
 Duration _getCheckInterval(Duration downtime) {
-  if (downtime < const Duration(hours: 1)) {
-    return const Duration(minutes: 15); // 0-1 hour: check every 15 min
+  if (downtime < const Duration(hours: 2)) {
+    return const Duration(minutes: 15); // 0-2 hour: check every 15 min
   } else if (downtime < const Duration(hours: 4)) {
-    return const Duration(hours: 1); // 1-4 hours: check every hour
+    return const Duration(hours: 1); // 2-4 hours: check every hour
   } else if (downtime < const Duration(hours: 24)) {
     return const Duration(hours: 4); // 4-24 hours: check every 4 hours
   } else if (downtime < const Duration(days: 3)) {
@@ -159,12 +113,10 @@ Duration _getCheckInterval(Duration downtime) {
 
 String _formatDowntime(Duration duration) {
   if (duration.inDays > 0) {
-    return '${duration.inDays} days';
+    return '${duration.inDays} ${duration.inDays == 1 ? 'day' : 'days'}';
   } else if (duration.inHours > 0) {
-    return '${duration.inHours} hours';
-  } else if (duration.inMinutes > 0) {
-    return '${duration.inMinutes} minutes';
+    return '${duration.inHours} ${duration.inHours == 1 ? 'hour' : 'hours'}';
   } else {
-    return '${duration.inSeconds} seconds';
+    return '${duration.inMinutes} ${duration.inMinutes == 1 ? 'minute' : 'minutes'}';
   }
 }

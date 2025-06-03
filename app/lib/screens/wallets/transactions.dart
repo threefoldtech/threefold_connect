@@ -67,7 +67,7 @@ class _WalletTransactionsWidgetState extends State<WalletTransactionsWidget> {
   @override
   void initState() {
     super.initState();
-    if (double.parse(widget.wallet.stellarBalance) > -1) {
+    if (double.parse(widget.wallet.stellarBalances['TFT']!) > -1) {
       _pagingController.addPageRequestListener(_listTransactions);
     }
   }
@@ -80,7 +80,7 @@ class _WalletTransactionsWidgetState extends State<WalletTransactionsWidget> {
 
   @override
   Widget build(BuildContext context) {
-    if (double.parse(widget.wallet.stellarBalance) <= -1) {
+    if (double.parse(widget.wallet.stellarBalances['TFT']!) <= -1) {
       return Center(
         child: Text(
           'No transactions yet.',

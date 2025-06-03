@@ -94,21 +94,23 @@ class _RegisteredScreenState extends State<RegisteredScreen>
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     HomeCardWidget(
+                        name: 'Market',
+                        icon: Icons.show_chart_sharp,
+                        pageNumber: 6),
+                    HomeCardWidget(
                         name: 'Dao',
                         icon: Icons.how_to_vote_outlined,
                         pageNumber: 4),
-                    HomeCardWidget(
-                        name: 'Sign', icon: Icons.draw_sharp, pageNumber: 8),
                   ],
                 ),
                 const Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
+                    HomeCardWidget(
+                        name: 'Sign', icon: Icons.draw_sharp, pageNumber: 9),
                     HomeCardWidget(
                         name: 'News', icon: Icons.article, pageNumber: 1),
-                    HomeCardWidget(
-                        name: 'Identity', icon: Icons.person, pageNumber: 5),
                   ],
                 ),
                 const Row(
@@ -116,11 +118,13 @@ class _RegisteredScreenState extends State<RegisteredScreen>
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     HomeCardWidget(
-                        name: 'Settings', icon: Icons.settings, pageNumber: 6),
+                        name: 'Identity', icon: Icons.person, pageNumber: 5),
                     HomeCardWidget(
-                        name: 'Notifications',
-                        icon: Icons.notifications,
-                        pageNumber: 9),
+                        name: 'Settings', icon: Icons.settings, pageNumber: 7),
+                    // HomeCardWidget(
+                    //     name: 'Notifications',
+                    //     icon: Icons.notifications,
+                    //     pageNumber: 9),
                   ],
                 ),
                 const SizedBox(height: 40),
