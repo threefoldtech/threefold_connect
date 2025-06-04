@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:threebotlogin/helpers/logger.dart';
+import 'package:threebotlogin/helpers/transaction_helpers.dart';
 import 'package:threebotlogin/models/offer.dart';
 import 'package:intl/intl.dart';
 import 'package:threebotlogin/models/wallet.dart' as Wallet;
@@ -49,13 +50,13 @@ class _OrderCardWidgetState extends ConsumerState<OrderCardWidget> {
       List<Widget> cardContent = [];
 
       cardContent = [
-        _buildInfoRow(context, 'Amount:', '- ${amount.toStringAsFixed(2)} USDC',
+        _buildInfoRow(context, 'Amount:', '- ${formatSmallAmount(amount.toString())} USDC',
             textColor: Theme.of(context).colorScheme.error),
         _buildInfoRow(
-            context, 'Price per TFT:', '${pricePerTFT.toStringAsFixed(4)} USDC',
+            context, 'Price per TFT:', '${formatSmallAmount(pricePerTFT.toString())} USDC',
             isHighlighted: true),
         _buildInfoRow(context, 'Total Received:',
-            '+ ${(totalCost).toStringAsFixed(4)} TFT',
+            '+ ${formatSmallAmount(totalCost.toString())} TFT',
             textColor: Theme.of(context).colorScheme.primary),
       ];
 

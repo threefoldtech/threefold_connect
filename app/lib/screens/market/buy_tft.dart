@@ -184,7 +184,7 @@ class _BuyTFTWidgetState extends State<BuyTFTWidget> {
         final amount = Decimal.parse(amountText);
         final price = Decimal.parse(priceText);
         final total = amount * price;
-        totalAmountController.text = roundAmount(total.toString()).toString();
+        totalAmountController.text = formatSmallAmount(total.toString());
       } catch (e) {
         totalAmountController.text = '';
       }
