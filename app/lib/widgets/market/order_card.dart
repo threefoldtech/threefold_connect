@@ -50,13 +50,13 @@ class _OrderCardWidgetState extends ConsumerState<OrderCardWidget> {
       List<Widget> cardContent = [];
 
       cardContent = [
-        _buildInfoRow(context, 'Amount:', '- ${formatSmallAmount(amount.toString())} USDC',
+        _buildInfoRow(context, 'Amount:', '- ${formatAmountDisplay(amount.toString())} USDC',
             textColor: Theme.of(context).colorScheme.error),
         _buildInfoRow(
-            context, 'Price per TFT:', '${formatSmallAmount(pricePerTFT.toString())} USDC',
+            context, 'Price per TFT:', '${formatAmountDisplay(pricePerTFT.toString())} USDC',
             isHighlighted: true),
         _buildInfoRow(context, 'Total Received:',
-            '+ ${formatSmallAmount(totalCost.toString())} TFT',
+            '+ ${formatAmountDisplay(totalCost.toString())} TFT',
             textColor: Theme.of(context).colorScheme.primary),
       ];
 

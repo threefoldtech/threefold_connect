@@ -6,6 +6,7 @@ import 'package:stellar_client/models/vesting_account.dart';
 import 'package:stellar_client/stellar_client.dart';
 import 'package:stellar_flutter_sdk/stellar_flutter_sdk.dart';
 import 'package:threebotlogin/helpers/logger.dart';
+import 'package:threebotlogin/helpers/transaction_helpers.dart';
 import 'package:threebotlogin/models/market_data.dart';
 import 'package:threebotlogin/models/offer.dart';
 import 'package:threebotlogin/models/order_book.dart';
@@ -319,7 +320,7 @@ Future<String> getAvailableUSDCBalance(
     return sum + double.parse(offer.amount);
   });
   final balance = await getBalanceByClient(client);
-  return (double.parse(balance['USDC']!) - totalReserved).toStringAsFixed(7);
+  return formatAmountDisplay((double.parse(balance['USDC']!) - totalReserved).toString());
 }
 
 String getAssetName(Asset asset) {

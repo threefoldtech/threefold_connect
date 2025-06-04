@@ -249,7 +249,7 @@ class _OrderDetailsWidgetState extends State<OrderDetailsWidget> {
                           ),
                     ),
                     Text(
-                      '${formatSmallAmount(totalCost.toString())} TFT',
+                      '${formatAmountDisplay(totalCost.toString())} TFT',
                       style: Theme.of(context).textTheme.bodyMedium!.copyWith(
                             color: Theme.of(context).colorScheme.primary,
                           ),
@@ -268,7 +268,7 @@ class _OrderDetailsWidgetState extends State<OrderDetailsWidget> {
                           ),
                     ),
                     Text(
-                      '${formatSmallAmount(pricePerUSDC.toString())} USDC',
+                      '${formatAmountDisplay(pricePerUSDC.toString())} USDC',
                       style: Theme.of(context).textTheme.bodyMedium!.copyWith(
                             color: Theme.of(context).colorScheme.onSurface,
                           ),
@@ -284,7 +284,7 @@ class _OrderDetailsWidgetState extends State<OrderDetailsWidget> {
                           ),
                     ),
                     Text(
-                      '${formatSmallAmount(pricePerTFT.toString())} TFT',
+                      '${formatAmountDisplay(pricePerTFT.toString())} TFT',
                       style: Theme.of(context).textTheme.bodyMedium!.copyWith(
                             color: Theme.of(context).colorScheme.onSurface,
                           ),
@@ -300,7 +300,7 @@ class _OrderDetailsWidgetState extends State<OrderDetailsWidget> {
                           ),
                     ),
                     Text(
-                      '${formatSmallAmount(amount.toString())} USDC',
+                      '${formatAmountDisplay(amount.toString())} USDC',
                       style: Theme.of(context).textTheme.bodyMedium!.copyWith(
                             color: Theme.of(context).colorScheme.error,
                           ),

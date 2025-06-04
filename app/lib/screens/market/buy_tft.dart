@@ -39,9 +39,13 @@ class _BuyTFTWidgetState extends State<BuyTFTWidget> {
   void initState() {
     super.initState();
     amountController = TextEditingController(
-        text: widget.edit ? widget.offer?.amount.toString() ?? '' : '');
+        text: widget.edit
+            ? formatAmountDisplay(widget.offer?.amount.toString() ?? '')
+            : '');
     priceController = TextEditingController(
-        text: widget.edit ? widget.offer?.price.toString() ?? '' : '');
+        text: widget.edit
+            ? formatAmountDisplay(widget.offer?.price.toString() ?? '')
+            : '');
     amountController.addListener(_calculateTotal);
     priceController.addListener(_calculateTotal);
     if (widget.edit) _calculateTotal();
@@ -96,7 +100,7 @@ class _BuyTFTWidgetState extends State<BuyTFTWidget> {
           currentMarketPrice = 1 / marketData.lastUsdPrice;
 
           if (!widget.edit && priceController.text.isEmpty) {
-            priceController.text = currentMarketPrice!.toStringAsFixed(7);
+            priceController.text = formatAmountDisplay(currentMarketPrice!.toString());
             _calculateTotal();
           }
         });
@@ -171,7 +175,7 @@ class _BuyTFTWidgetState extends State<BuyTFTWidget> {
   calculateAmount(int percentage) {
     final amount = Decimal.parse(availableUSDC ?? '0') *
         (Decimal.fromInt(percentage).shift(-2));
-    amountController.text = roundAmount(amount.toString()).toString();
+    amountController.text = formatAmountDisplay(roundAmount(amount.toString()).toString());
     _calculateTotal();
   }
 
@@ -184,7 +188,7 @@ class _BuyTFTWidgetState extends State<BuyTFTWidget> {
         final amount = Decimal.parse(amountText);
         final price = Decimal.parse(priceText);
         final total = amount * price;
-        totalAmountController.text = formatSmallAmount(total.toString());
+        totalAmountController.text = formatAmountDisplay(total.toString());
       } catch (e) {
         totalAmountController.text = '';
       }
@@ -504,7 +508,7 @@ class _BuyTFTWidgetState extends State<BuyTFTWidget> {
                                 ],
                               )
                             : Text(
-                                'Available: $availableUSDC USDC',
+                                'Available: ${formatAmountDisplay(availableUSDC ?? '0')} USDC',
                                 style: Theme.of(context)
                                     .textTheme
                                     .bodySmall!
