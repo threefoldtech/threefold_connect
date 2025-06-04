@@ -14,21 +14,20 @@ import 'package:threebotlogin/services/pkid_service.dart';
 import 'package:threebotlogin/services/tools_service.dart';
 import 'package:threebotlogin/services/shared_preference_service.dart';
 import 'package:threebotlogin/widgets/custom_dialog.dart';
-import 'package:threebotlogin/widgets/layout_drawer.dart';
 import 'package:threebotlogin/widgets/phone_widget.dart';
 
-class IdentityVerificationScreen extends StatefulWidget {
-  const IdentityVerificationScreen({super.key});
+class IdentityScreen extends StatefulWidget {
+  const IdentityScreen({super.key});
 
   @override
-  State<IdentityVerificationScreen> createState() =>
-      IdentityVerificationScreenState();
+  State<IdentityScreen> createState() =>
+      IdentityScreenState();
 }
 
-class IdentityVerificationScreenState
-    extends State<IdentityVerificationScreen> {
-  static final GlobalKey<IdentityVerificationScreenState> globalKey =
-      GlobalKey<IdentityVerificationScreenState>();
+class IdentityScreenState
+    extends State<IdentityScreen> {
+  static final GlobalKey<IdentityScreenState> globalKey =
+      GlobalKey<IdentityScreenState>();
 
   final emailController = TextEditingController();
   final changeEmailController = TextEditingController();
@@ -726,9 +725,6 @@ class IdentityVerificationScreenState
       );
     }
 
-    return LayoutDrawer(
-      titleText: 'Identity',
-      content: content,
-    );
+    return content;
   }
 }

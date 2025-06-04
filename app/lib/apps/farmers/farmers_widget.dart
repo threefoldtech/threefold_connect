@@ -14,7 +14,7 @@ import 'package:threebotlogin/helpers/logger.dart';
 import 'package:threebotlogin/models/wallet_data.dart';
 import 'package:threebotlogin/screens/scan_screen.dart';
 import 'package:threebotlogin/services/shared_preference_service.dart';
-import 'package:threebotlogin/widgets/layout_drawer.dart';
+
 
 bool created = false;
 
@@ -153,15 +153,13 @@ class _FarmersState extends State<FarmersWidget>
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    return LayoutDrawer(
-        titleText: 'Farming',
-        content: Column(
-          children: <Widget>[
-            Expanded(
-              child: Container(child: iaWebView),
-            ),
-          ],
-        ));
+    return Column(
+      children: <Widget>[
+        Expanded(
+          child: Container(child: iaWebView),
+        ),
+      ],
+    );
   }
 
   @override

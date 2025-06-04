@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:tfchain_client/models/dao.dart';
 import 'package:threebotlogin/helpers/logger.dart';
-import 'package:threebotlogin/widgets/layout_drawer.dart';
+
 import 'package:threebotlogin/widgets/dao/proposals.dart';
 import 'package:threebotlogin/services/tfchain_service.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
@@ -194,6 +194,6 @@ class _DaoPageState extends State<DaoPage> with SingleTickerProviderStateMixin {
         ],
       );
     }
-    return LayoutDrawer(titleText: 'Dao', content: content);
+    return content;
   }
 }

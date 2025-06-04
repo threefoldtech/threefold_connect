@@ -24,7 +24,7 @@ import 'package:threebotlogin/services/pkid_service.dart';
 import 'package:threebotlogin/services/shared_preference_service.dart';
 import 'package:threebotlogin/services/wallet_service.dart';
 import 'package:threebotlogin/widgets/custom_dialog.dart';
-import 'package:threebotlogin/widgets/layout_drawer.dart';
+
 import 'package:threebotlogin/providers/theme_provider.dart';
 import 'package:threebotlogin/widgets/wallets/warning_dialog.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -94,9 +94,7 @@ class _PreferenceScreenState extends ConsumerState<PreferenceScreen> {
     } else {
       isDarkMode = themeMode == ThemeMode.dark;
     }
-    return LayoutDrawer(
-      titleText: 'Settings',
-      content: ListView(
+    return ListView(
         children: <Widget>[
           const ListTile(
             title: Text('Global settings'),
@@ -259,7 +257,6 @@ class _PreferenceScreenState extends ConsumerState<PreferenceScreen> {
             ],
           ),
         ],
-      ),
     );
   }
 

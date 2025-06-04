@@ -6,7 +6,7 @@ import 'package:threebotlogin/clipboard_hack/clipboard_hack.dart';
 import 'package:threebotlogin/events/events.dart';
 import 'package:threebotlogin/events/go_home_event.dart';
 import 'package:threebotlogin/helpers/logger.dart';
-import 'package:threebotlogin/widgets/layout_drawer.dart';
+import 'package:threebotlogin/widgets/app_layout.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 bool created = false;
@@ -83,9 +83,9 @@ class _NewsState extends State<NewsWidget> with AutomaticKeepAliveClientMixin {
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    return LayoutDrawer(
-        titleText: 'News',
-        content: Column(
+    return AppLayout(
+        title: 'News',
+        child: Column(
           children: <Widget>[
             Expanded(
               child: Container(child: iaWebView),

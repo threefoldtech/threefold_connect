@@ -6,7 +6,7 @@ import 'package:threebotlogin/models/wallet.dart';
 import 'package:threebotlogin/providers/wallets_provider.dart';
 import 'package:threebotlogin/services/shared_preference_service.dart';
 import 'package:threebotlogin/services/wallet_service.dart';
-import 'package:threebotlogin/widgets/layout_drawer.dart';
+
 import 'package:threebotlogin/widgets/wallets/add_wallet.dart';
 import 'package:threebotlogin/widgets/wallets/wallet_card.dart';
 import 'package:hashlib/hashlib.dart';
@@ -93,19 +93,7 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
               }));
     }
 
-    return LayoutDrawer(
-      titleText: 'Wallet',
-      content: mainWidget,
-      appBarActions: loading && !failed
-          ? []
-          : [
-              IconButton(
-                  onPressed: _openAddWalletOverlay,
-                  icon: const Icon(
-                    Icons.add,
-                  ))
-            ],
-    );
+    return mainWidget;
   }
 
   listMyWallets() async {
@@ -145,17 +133,6 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
     }
   }
 
-  _openAddWalletOverlay() {
-    showModalBottomSheet(
-        isScrollControlled: true,
-        useSafeArea: true,
-        isDismissible: false,
-        constraints: const BoxConstraints(maxWidth: double.infinity),
-        context: context,
-        builder: (ctx) => NewWallet(
-              wallets: wallets,
-            ));
-  }
 
   Future<void> _addInitialWallet() async {
     const walletName = 'Daily';

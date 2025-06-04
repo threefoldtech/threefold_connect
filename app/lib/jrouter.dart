@@ -4,9 +4,9 @@ import 'package:threebotlogin/apps/council/council.dart';
 import 'package:threebotlogin/apps/dao/dao.dart';
 import 'package:threebotlogin/apps/market/market.dart';
 import 'package:threebotlogin/apps/wallet/wallet.dart';
-import 'package:threebotlogin/screens/identity_verification_screen.dart';
+import 'package:threebotlogin/screens/identity_screen.dart';
 import 'package:threebotlogin/screens/preference_screen.dart';
-import 'package:threebotlogin/screens/registered_screen.dart';
+
 import 'package:threebotlogin/apps/notifications/notifications.dart';
 import 'apps/farmers/farmers.dart';
 import 'apps/news/news.dart';
@@ -26,14 +26,6 @@ class JRouter {
     routes = [
       AppInfo(
           route: Route(
-            path: '/',
-            name: 'Home',
-            icon: Icons.home,
-            view: RegisteredScreen(),
-          ),
-          app: null),
-      AppInfo(
-          route: Route(
             path: '/news',
             name: 'News',
             icon: Icons.article,
@@ -50,9 +42,9 @@ class JRouter {
           app: Wallet()),
       AppInfo(
           route: Route(
-            path: '/farmers',
-            name: 'Farmers',
-            icon: Icons.person_pin,
+            path: '/farming',
+            name: 'Farming',
+            icon: Icons.storage,
             view: await Farmers().widget(),
           ),
           app: Farmers()),
@@ -69,7 +61,7 @@ class JRouter {
             path: '/identityverification',
             name: 'IdentityVerification',
             icon: Icons.lock,
-            view: const IdentityVerificationScreen(),
+            view: const IdentityScreen(),
           ),
           app: null),
       AppInfo(
