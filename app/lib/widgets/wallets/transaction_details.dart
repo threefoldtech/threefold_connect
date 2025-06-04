@@ -80,7 +80,7 @@ class TransactionDetails extends StatelessWidget {
           const Divider(),
           buildDetailRow('Asset', transaction.asset),
           const Divider(),
-          buildDetailRow('Date', transaction.date),
+          buildDetailRow('Date', formatDateTime(transaction.date)),
           const Divider(),
           buildDetailRow('Memo', transaction.memo),
           const Divider(),

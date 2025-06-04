@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:stellar_client/models/exceptions.dart';
+import 'package:threebotlogin/helpers/transaction_helpers.dart';
 import 'package:threebotlogin/models/offer.dart';
 import 'package:threebotlogin/models/wallet.dart';
 import 'package:threebotlogin/services/stellar_service.dart' as Stellar;
@@ -327,7 +328,7 @@ class _OrderDetailsWidgetState extends State<OrderDetailsWidget> {
                                     ),
                           ),
                           Text(
-                            widget.offer.lastModifiedTime,
+                            formatDateTime(widget.offer.lastModifiedTime),
                             style: Theme.of(context)
                                 .textTheme
                                 .bodyMedium!

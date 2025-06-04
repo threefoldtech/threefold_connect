@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:threebotlogin/helpers/logger.dart';
+import 'package:threebotlogin/helpers/transaction_helpers.dart';
 import 'package:threebotlogin/models/market_data.dart';
 import 'package:threebotlogin/models/wallet.dart';
 import 'package:threebotlogin/providers/wallets_provider.dart';
@@ -136,7 +137,7 @@ class _OverviewWidgetState extends ConsumerState<OverviewWidget> {
         marketData = data;
         failed = false;
       });
-      lastUpdated = _formattedDateTime();
+      lastUpdated = formatDateTime(DateTime.now().toIso8601String());
       return data;
     } catch (e) {
       setState(() {
@@ -157,14 +158,6 @@ class _OverviewWidgetState extends ConsumerState<OverviewWidget> {
       _fetchMarketData();
     });
   }
-
-  String _formattedDateTime() {
-    final now = DateTime.now();
-    return '${now.year}-${_twoDigits(now.month)}-${_twoDigits(now.day)} '
-        '${_twoDigits(now.hour)}:${_twoDigits(now.minute)}:${_twoDigits(now.second)}';
-  }
-
-  String _twoDigits(int n) => n.toString().padLeft(2, '0');
 
   @override
   void dispose() {
@@ -572,7 +565,7 @@ class _OverviewWidgetState extends ConsumerState<OverviewWidget> {
 
       setState(() {
         this.marketData = marketData;
-        lastUpdated = _formattedDateTime();
+        lastUpdated = formatDateTime(DateTime.now().toIso8601String());
         failed = false;
       });
     } catch (e) {
