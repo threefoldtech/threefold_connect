@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:threebotlogin/helpers/logger.dart';
 import 'package:threebotlogin/models/offer.dart';
+// ignore: depend_on_referenced_packages
 import 'package:intl/intl.dart';
 import 'package:threebotlogin/models/wallet.dart' as Wallet;
 import 'package:threebotlogin/screens/market/order_details.dart';

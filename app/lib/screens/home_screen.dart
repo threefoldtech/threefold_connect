@@ -30,6 +30,7 @@ import 'package:threebotlogin/widgets/chat_widget.dart';
 import 'package:threebotlogin/widgets/home_card.dart';
 import 'package:threebotlogin/widgets/home_logo.dart';
 import 'package:threebotlogin/widgets/app_layout.dart';
+import 'package:threebotlogin/services/preloading_service.dart';
 import 'package:uni_links/uni_links.dart';
 
 /* Screen shows tab bar and all pages defined in router.dart */
@@ -352,6 +353,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
 
     Events().onEvent(PhoneEvent().runtimeType, (PhoneEvent event) {
       phoneVerification(context);
+    });
+
+    Future.delayed(const Duration(seconds: 2), () {
+      if (mounted) {
+        final preloadingService = ref.read(preloadingServiceProvider);
+        preloadingService.startPreloading(ref);
+      }
     });
   }
 
