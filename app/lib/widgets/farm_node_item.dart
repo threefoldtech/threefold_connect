@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:threebotlogin/helpers/country_code.dart';
+import 'package:threebotlogin/main.dart';
 import 'package:threebotlogin/models/farm.dart';
 import 'package:flag/flag.dart';
 
@@ -78,19 +79,23 @@ class _FarmNodeItemWidgetState extends State<FarmNodeItemWidget> {
     required Color borderColor,
     required Color textColor,
   }) {
-    return Container(
-      padding: const EdgeInsets.only(left: 8, right: 8, top: 4, bottom: 4),
-      decoration: BoxDecoration(
-        border: Border.all(
-          color: borderColor,
+    return Flexible(
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+        decoration: BoxDecoration(
+          border: Border.all(
+            color: borderColor,
+          ),
+          borderRadius: BorderRadius.circular(20),
         ),
-        borderRadius: BorderRadius.circular(20),
-      ),
-      child: Text(
-        label,
-        style: Theme.of(context).textTheme.bodySmall!.copyWith(
-              color: textColor,
-            ),
+        child: Text(
+          label,
+          style: Theme.of(context).textTheme.bodySmall!.copyWith(
+                color: textColor,
+              ),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+        ),
       ),
     );
   }
@@ -98,10 +103,14 @@ class _FarmNodeItemWidgetState extends State<FarmNodeItemWidget> {
   @override
   Widget build(BuildContext context) {
     String? countryCode = countryNameToCode[widget.node.country];
-    final statusColor = widget.node.status == NodeStatus.Up
-        ? Theme.of(context).colorScheme.primary
-        : Theme.of(context).colorScheme.error;
-
+    late Color statusColor;
+    if(widget.node.status == NodeStatus.Up) {
+      statusColor = Theme.of(context).colorScheme.primary;
+    } else if (widget.node.status == NodeStatus.Down) {
+      statusColor = Theme.of(context).colorScheme.error;
+    } else {
+      statusColor = Theme.of(context).colorScheme.warning;
+    }
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 10.0),
       child: Row(
@@ -130,23 +139,19 @@ class _FarmNodeItemWidgetState extends State<FarmNodeItemWidget> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Expanded(
-                      flex: 2,
-                      child: Text(
-                        'Node ID: ${widget.node.nodeId}',
-                        style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                              color: Theme.of(context).colorScheme.onSurface,
-                            ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
+                Text(
+                  'Node ID: ${widget.node.nodeId}',
+                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                        color: Theme.of(context).colorScheme.onSurface,
                       ),
-                    ),
-                    const SizedBox(width: 8.0),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                const SizedBox(height: 8.0),
 
+                // Chips in their own row with proper spacing
+                Row(
+                  children: [
                     // Country Chip
                     _buildChip(
                       label: widget.node.country!,
@@ -163,7 +168,7 @@ class _FarmNodeItemWidgetState extends State<FarmNodeItemWidget> {
                     ),
                   ],
                 ),
-                const SizedBox(height: 6.0),
+                const SizedBox(height: 8.0),
                 Text(
                   'Farm: ${widget.farmName}',
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
