@@ -47,7 +47,7 @@ class NodeCheckService {
         allNodes.addAll(nodes);
       }
       final offlineNodes =
-          allNodes.where((n) => n.status != NodeStatus.Up).toList();
+          allNodes.where((n) => n.status == NodeStatus.Down).toList();
 
       return offlineNodes;
     } catch (e) {
@@ -104,7 +104,7 @@ class NodeCheckService {
             }).toList();
 
             final offlineNodes =
-                nodes.where((n) => n.status != NodeStatus.Up).toList();
+                nodes.where((n) => n.status == NodeStatus.Down).toList();
             allOfflineNodes.addAll(offlineNodes);
           }
         } catch (e) {
