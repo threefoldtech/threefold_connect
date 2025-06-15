@@ -343,11 +343,13 @@ class _FarmDetailsState extends State<FarmDetails> {
                                                           .text,
                                                   wallets: widget.wallets
                                                       .where((w) =>
-                                                          double.tryParse(w
-                                                                  .stellarBalances['TFT']!) !=
+                                                          double.tryParse(
+                                                                  w.stellarBalances[
+                                                                      'TFT']!) !=
                                                               null &&
-                                                          double.parse(w
-                                                                  .stellarBalances['TFT']!) >=
+                                                          double.parse(
+                                                                  w.stellarBalances[
+                                                                      'TFT']!) >=
                                                               0)
                                                       .toList(),
                                                   onSelectToAddress:
@@ -504,24 +506,23 @@ class _FarmDetailsState extends State<FarmDetails> {
                           ),
                     ),
                   ],
-                  if (widget.farm.nodes.isNotEmpty)
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Divider(height: 20, thickness: 1),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 8.0),
-                          child: Text(
-                            'Nodes (${widget.farm.nodes.length})',
-                            style: Theme.of(context)
-                                .textTheme
-                                .titleMedium
-                                ?.copyWith(
-                                  color:
-                                      Theme.of(context).colorScheme.onSurface,
-                                ),
-                          ),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Divider(height: 20, thickness: 1),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 8.0),
+                        child: Text(
+                          'Nodes (${widget.farm.nodes.length})',
+                          style: Theme.of(context)
+                              .textTheme
+                              .titleMedium
+                              ?.copyWith(
+                                color: Theme.of(context).colorScheme.onSurface,
+                              ),
                         ),
+                      ),
+                      if (widget.farm.nodes.isNotEmpty)
                         ListView.builder(
                           shrinkWrap: true,
                           physics: const NeverScrollableScrollPhysics(),
@@ -548,8 +549,8 @@ class _FarmDetailsState extends State<FarmDetails> {
                             );
                           },
                         ),
-                      ],
-                    ),
+                    ],
+                  ),
                 ],
               ),
             ),
