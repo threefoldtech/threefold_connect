@@ -52,7 +52,7 @@ class _RegisteredScreenState extends State<RegisteredScreen>
             ),
           ),
           Container(
-            padding: const EdgeInsets.only(left: 10, right: 10, top: 50),
+            padding: const EdgeInsets.only(left: 10, right: 10, top: 10),
             height: MediaQuery.of(context).size.height * 0.6,
             width: MediaQuery.of(context).size.width,
             child: Column(
@@ -75,8 +75,8 @@ class _RegisteredScreenState extends State<RegisteredScreen>
                                   'Your portal to ThreeFold: access your wallets, your digital identity, your farms, and ThreeFold updates with ease.'),
                         ]),
                   ),
-                ),
-                const Spacer(),
+                    ),
+                const Spacer(flex: 1),
                 const Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -121,13 +121,20 @@ class _RegisteredScreenState extends State<RegisteredScreen>
                         name: 'Identity', icon: Icons.person, pageNumber: 5),
                     HomeCardWidget(
                         name: 'Settings', icon: Icons.settings, pageNumber: 7),
-                    // HomeCardWidget(
-                    //     name: 'Notifications',
-                    //     icon: Icons.notifications,
-                    //     pageNumber: 9),
                   ],
                 ),
-                const SizedBox(height: 40),
+                const Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    HomeCardWidget(
+                        name: 'Notifications',
+                        icon: Icons.notifications,
+                        pageNumber: 10,
+                        fullWidth: true),
+                  ],
+                ),
+                const Spacer(flex: 1),
                 const Row(
                   children: [Spacer(), CrispChatbot(), SizedBox(width: 20)],
                 )

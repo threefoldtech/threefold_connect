@@ -12,17 +12,21 @@ class NotificationsScreen extends StatefulWidget {
 class _NotificationsScreenState extends State<NotificationsScreen> {
   bool loading = true;
   late bool _nodeStatusNotificationEnabled;
+  late bool _contractNotificationsEnabled;
 
   @override
   void initState() {
     super.initState();
-    _loadNotificationPreference();
+    _loadNotificationPreferences();
   }
 
-  void _loadNotificationPreference() async {
-    final bool enabled = await isNodeStatusNotificationEnabled();
+  void _loadNotificationPreferences() async {
+    final bool nodeEnabled = await isNodeStatusNotificationEnabled();
+    final bool contractEnabled =
+        await isContractNotificationEnabled();
     setState(() {
-      _nodeStatusNotificationEnabled = enabled;
+      _nodeStatusNotificationEnabled = nodeEnabled;
+      _contractNotificationsEnabled = contractEnabled;
       loading = false;
     });
   }
@@ -68,6 +72,18 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                     setNodeStatusNotificationEnabled(newValue);
                   },
                   secondary: const Icon(Icons.monitor_heart),
+                ),
+                SwitchListTile(
+                  title:
+                      const Text('Enable contract grace period notifications'),
+                  value: _contractNotificationsEnabled,
+                  onChanged: (bool newValue) {
+                    setState(() {
+                      _contractNotificationsEnabled = newValue;
+                    });
+                    setContractNotificationEnabled(newValue);
+                  },
+                  secondary: const Icon(Icons.description),
                 ),
               ],
             ),

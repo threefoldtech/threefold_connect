@@ -6,6 +6,18 @@ import 'package:threebotlogin/helpers/logger.dart';
 import 'package:threebotlogin/main.dart';
 import 'package:threebotlogin/widgets/custom_dialog.dart';
 
+enum NotificationType {
+  nodeStatus,
+  contractAlert,
+  general,
+}
+
+class NotificationChannels {
+  static const String nodeStatus = 'node_status_channel';
+  static const String contractAlert = 'contract_alert_channel';
+  static const String general = 'general_channel';
+}
+
 @pragma('vm:entry-point')
 Future<void> onActionReceivedMethod(ReceivedAction receivedAction) async {
   logger.i('[NotificationService] Action received: ${receivedAction.title}');
@@ -39,7 +51,7 @@ class NotificationService {
       null,
       [
         NotificationChannel(
-          channelKey: 'node_status_channel',
+          channelKey: NotificationChannels.nodeStatus,
           channelName: 'Node Status',
           channelDescription: 'Notify user when node goes offline',
           importance: NotificationImportance.High,
@@ -47,6 +59,26 @@ class NotificationService {
           enableVibration: true,
           enableLights: true,
           criticalAlerts: true,
+        ),
+        NotificationChannel(
+          channelKey: NotificationChannels.contractAlert,
+          channelName: 'Contract Alerts',
+          channelDescription: 'Notify user about contract status changes',
+          importance: NotificationImportance.High,
+          channelShowBadge: true,
+          enableVibration: true,
+          enableLights: true,
+          criticalAlerts: true,
+        ),
+        NotificationChannel(
+          channelKey: NotificationChannels.general,
+          channelName: 'General Notifications',
+          channelDescription: 'General app notifications',
+          importance: NotificationImportance.Default,
+          channelShowBadge: true,
+          enableVibration: false,
+          enableLights: false,
+          criticalAlerts: false,
         ),
       ],
       debug: true,
@@ -74,32 +106,39 @@ class NotificationService {
     required String body,
     String? groupKey,
     bool isGroupSummary = false,
+    NotificationType type = NotificationType.general,
+    Map<String, dynamic>? additionalData,
   }) async {
     try {
       if (!_isInitialized) {
         await initNotification();
       }
 
+      final String channelKey = _getChannelKey(type);
+
       final payload = json.encode({
         'title': title,
         'body': body,
+        'type': type.name,
+        'additionalData': additionalData ?? {},
       });
 
       _notificationCount++;
       await _updateBadgeCount();
 
+      final bool isCritical = type == NotificationType.nodeStatus || type == NotificationType.contractAlert;
+
       await AwesomeNotifications().createNotification(
         content: NotificationContent(
           id: id,
-          channelKey: 'node_status_channel',
+          channelKey: channelKey,
           title: title,
           body: body,
           payload: {'data': payload},
           notificationLayout: NotificationLayout.Default,
           category: NotificationCategory.Message,
-          wakeUpScreen: true,
-          fullScreenIntent: true,
-          criticalAlert: true,
+          wakeUpScreen: isCritical,
+          criticalAlert: isCritical,
           autoDismissible: true,
           displayOnForeground: true,
           displayOnBackground: true,
@@ -117,6 +156,17 @@ class NotificationService {
       );
     } catch (e) {
       logger.e('[NotificationService] Failed to show notification: $e');
+    }
+  }
+
+  String _getChannelKey(NotificationType type) {
+    switch (type) {
+      case NotificationType.nodeStatus:
+        return NotificationChannels.nodeStatus;
+      case NotificationType.contractAlert:
+        return NotificationChannels.contractAlert;
+      case NotificationType.general:
+        return NotificationChannels.general;
     }
   }
 
@@ -170,17 +220,21 @@ class NotificationService {
 
       try {
         logger.i('[NotificationService] Attempting to show dialog...');
+
+        final notificationType = _pendingPayload!['type'] ?? 'general';
+        final dialogConfig = _getDialogConfig(notificationType);
+
         showDialog(
           context: navigatorKey.currentContext!,
           barrierDismissible: false,
-          routeSettings: const RouteSettings(name: 'node_status_dialog'),
+          routeSettings: RouteSettings(name: '${notificationType}_dialog'),
           builder: (BuildContext context) {
             logger.i('[NotificationService] Building dialog widget');
             return WillPopScope(
               onWillPop: () async => false,
               child: CustomDialog(
-                type: DialogType.Warning,
-                image: Icons.warning,
+                type: dialogConfig.dialogType,
+                image: dialogConfig.icon,
                 title: _pendingPayload!['title'],
                 description: _pendingPayload!['body'],
                 actions: <Widget>[
@@ -211,6 +265,27 @@ class NotificationService {
     });
   }
 
+  _DialogConfig _getDialogConfig(String notificationType) {
+    switch (notificationType) {
+      case 'nodeStatus':
+        return _DialogConfig(
+          dialogType: DialogType.Warning,
+          icon: Icons.warning,
+        );
+      case 'contractAlert':
+        return _DialogConfig(
+          dialogType: DialogType.Warning,
+          icon: Icons.schedule,
+        );
+      case 'general':
+      default:
+        return _DialogConfig(
+          dialogType: DialogType.Info,
+          icon: Icons.info,
+        );
+    }
+  }
+
   Future<void> _decrementNotificationCount() async {
     if (_notificationCount > 0) {
       _notificationCount--;
@@ -235,4 +310,14 @@ class NotificationService {
     logger.i('Notification dismissed: ${receivedAction.title}');
     _decrementNotificationCount();
   }
+}
+
+class _DialogConfig {
+  final DialogType dialogType;
+  final IconData icon;
+
+  _DialogConfig({
+    required this.dialogType,
+    required this.icon,
+  });
 }

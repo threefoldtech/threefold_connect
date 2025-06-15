@@ -1,6 +1,9 @@
 import 'package:background_fetch/background_fetch.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:gridproxy_client/models/contracts.dart';
 import 'package:threebotlogin/apps/notifications/notifications_user_data.dart';
 import 'package:threebotlogin/models/farm.dart';
+import 'package:threebotlogin/services/contract_check_service.dart';
 import 'package:threebotlogin/services/nodes_check_service.dart';
 import 'notification_service.dart';
 import 'package:threebotlogin/helpers/logger.dart';
@@ -13,6 +16,7 @@ void backgroundFetchHeadlessTask(HeadlessTask task) async {
     BackgroundFetch.finish(taskId);
     return;
   }
+
   final bool notificationsEnabled = await isNodeStatusNotificationEnabled();
 
   logger.i(
@@ -24,7 +28,20 @@ void backgroundFetchHeadlessTask(HeadlessTask task) async {
     BackgroundFetch.finish(taskId);
     return;
   }
-  await checkNodeStatus(taskId);
+
+  final container = ProviderContainer();
+
+  try {
+    await checkNodeStatus(taskId);
+    await checkContractsAndNotify(container, taskId);
+
+    logger.i('[BackgroundFetch] Background tasks completed successfully for task: $taskId');
+  } catch (e) {
+    logger.e('[BackgroundFetch] Error in background tasks for task $taskId: $e');
+  } finally {
+    container.dispose();
+    BackgroundFetch.finish(taskId);
+  }
 }
 
 Future<void> checkNodeStatus(String taskId) async {
@@ -88,12 +105,56 @@ Future<void> checkNodeStatus(String taskId) async {
           : '${nodesToNotify.length} Nodes Offline 🚨',
       body: bodyBuffer.toString().trim(),
       groupKey: 'offline_nodes',
+      type: NotificationType.nodeStatus,
+      additionalData: {
+        'nodeCount': nodesToNotify.length,
+        'nodeIds': nodesToNotify.map((n) => n.nodeId).toList(),
+      },
     );
   } catch (e) {
     logger.e('[BackgroundFetch] Error in checkNodeStatus for task $taskId: $e');
-  } finally {
-    logger.i('[BackgroundFetch] Finishing task $taskId');
-    BackgroundFetch.finish(taskId);
+  } 
+}
+
+Future<void> checkContractsAndNotify(
+    ProviderContainer container, String taskId) async {
+  try {
+    final List<ContractInfo> allContractsInGracePeriod = await container
+        .read(contractCheckServiceProvider)
+        .checkContractsState();
+
+    if (allContractsInGracePeriod.isNotEmpty) {
+      final bool contractNotificationsEnabled =
+          await isContractNotificationEnabled();
+      logger.i(
+          '[ContractsCheck] Contracts in grace period: ${allContractsInGracePeriod.length}. Contract Notifications enabled: $contractNotificationsEnabled');
+
+      if (contractNotificationsEnabled) {
+        String notificationBody =
+            'You have ${allContractsInGracePeriod.length} contract(s) in grace period.';
+        final String contractIds =
+            allContractsInGracePeriod.map((c) => c.contract_id).join(', ');
+        notificationBody += '\nContract IDs: $contractIds';
+
+        await NotificationService().showNotification(
+          id: 'contract_grace_period'.hashCode,
+          title: 'Contract Grace Period Alert! ⏳',
+          body: notificationBody,
+          groupKey: 'contract_alerts',
+          type: NotificationType.contractAlert,
+          additionalData: {
+            'contractCount': allContractsInGracePeriod.length,
+            'contractIds': allContractsInGracePeriod.map((c) => c.contract_id).toList(),
+          },
+        );
+      }
+    }
+  } catch (e, stack) {
+    logger.e(
+        '[ContractsCheck] Error during contracts check for task $taskId: $e',
+        error: e,
+        stackTrace: stack);
+    rethrow;
   }
 }
 

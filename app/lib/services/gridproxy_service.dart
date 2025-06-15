@@ -1,4 +1,5 @@
 import 'package:gridproxy_client/gridproxy_client.dart';
+import 'package:gridproxy_client/models/contracts.dart';
 import 'package:gridproxy_client/models/nodes.dart';
 import 'package:threebotlogin/helpers/globals.dart';
 import 'package:threebotlogin/main.reflectable.dart';
@@ -63,5 +64,18 @@ Future<bool> isFarmNameAvailable(String name) async {
     return farms.isEmpty;
   } catch (e) {
     throw Exception('Failed to get farms due to $e');
+  }
+}
+
+Future<List<ContractInfo>> getGracePeriodContractsByTwinId(int twinId) async {
+  try {
+    initializeReflectable();
+    final gridproxyUrl = Globals().gridproxyUrl;
+    GridProxyClient client = GridProxyClient(gridproxyUrl);
+    final contracts =
+        await client.contracts.list(ContractInfoQueryParams(twin_id: twinId, state: ContractState.GracePeriod));
+    return contracts;
+  } catch (e) {
+    throw Exception('Failed to get contracts due to $e');
   }
 }
