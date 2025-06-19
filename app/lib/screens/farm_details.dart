@@ -516,53 +516,51 @@ class _FarmDetailsState extends State<FarmDetails> {
                           ),
                     ),
                   ],
-                  if (widget.farm.nodes.isNotEmpty)
-                    if (widget.farm.nodes.isNotEmpty)
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Divider(height: 20, thickness: 1),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 8.0),
-                            child: Text(
-                              'Nodes (${widget.farm.nodes.length})',
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .titleMedium
-                                  ?.copyWith(
-                                    color:
-                                        Theme.of(context).colorScheme.onSurface,
-                                  ),
-                            ),
-                          ),
-                          ListView.builder(
-                            shrinkWrap: true,
-                            physics: const NeverScrollableScrollPhysics(),
-                            itemCount: sortedNodes.length,
-                            itemBuilder: (context, index) {
-                              final node = sortedNodes[index];
-                              return Card(
-                                margin: const EdgeInsets.symmetric(
-                                    vertical: 4.0, horizontal: 0.0),
-                                elevation: 1.0,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(5.0),
-                                  side: BorderSide(
-                                    color: Theme.of(context).dividerColor,
-                                    width: 1.0,
-                                  ),
-                                ),
-                                clipBehavior: Clip.antiAlias,
-                                child: FarmNodeItemWidget(
-                                  node: node,
-                                  isV4: widget.isV4,
-                                  farmName: widget.farm.name,
-                                ),
-                              );
-                            },
-                          ),
-                        ],
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Divider(height: 20, thickness: 1),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 8.0),
+                        child: Text(
+                          'Nodes (${widget.farm.nodes.length})',
+                          style: Theme.of(context)
+                              .textTheme
+                              .titleMedium
+                              ?.copyWith(
+                                color: Theme.of(context).colorScheme.onSurface,
+                              ),
+                        ),
                       ),
+                      if (widget.farm.nodes.isNotEmpty)
+                        ListView.builder(
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          itemCount: widget.farm.nodes.length,
+                          itemBuilder: (context, index) {
+                            final node = widget.farm.nodes[index];
+                            return Card(
+                              margin: const EdgeInsets.symmetric(
+                                  vertical: 4.0, horizontal: 0.0),
+                              elevation: 1.0,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(5.0),
+                                side: BorderSide(
+                                  color: Theme.of(context).dividerColor,
+                                  width: 1.0,
+                                ),
+                              ),
+                              clipBehavior: Clip.antiAlias,
+                              child: FarmNodeItemWidget(
+                                node: node,
+                                isV4: widget.isV4,
+                                farmName: widget.farm.name,
+                              ),
+                            );
+                          },
+                        ),
+                    ],
+                  ),
                 ],
               ),
             ),

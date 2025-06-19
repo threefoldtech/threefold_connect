@@ -113,10 +113,10 @@ Duration _getCheckInterval(Duration downtime) {
 
 String _formatDowntime(Duration duration) {
   if (duration.inDays > 0) {
-    return '${duration.inDays} days';
+    return '${duration.inDays} ${duration.inDays == 1 ? 'day' : 'days'}';
   } else if (duration.inHours > 0) {
-    return '${duration.inHours} hours';
+    return '${duration.inHours} ${duration.inHours == 1 ? 'hour' : 'hours'}';
   } else {
-    return '${duration.inMinutes} minutes';
+    return '${duration.inMinutes} ${duration.inMinutes == 1 ? 'minute' : 'minutes'}';
   }
 }

@@ -259,21 +259,12 @@ class _OverviewWidgetState extends ConsumerState<OverviewWidget> {
                             SizedBox(
                               width: 50,
                               child: Center(
-                                child: GestureDetector(
-                                  onTap: null,
-                                  child: CircleAvatar(
-                                    radius: 25,
-                                    backgroundColor: Theme.of(context)
-                                        .colorScheme
-                                        .primaryContainer,
-                                    child: Icon(
-                                      Icons.arrow_forward,
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .onPrimaryContainer,
-                                      size: 30,
-                                    ),
-                                  ),
+                                child: Icon(
+                                  Icons.arrow_forward,
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .onPrimaryContainer,
+                                  size: 30,
                                 ),
                               ),
                             ),
@@ -449,8 +440,6 @@ class _OverviewWidgetState extends ConsumerState<OverviewWidget> {
                                                 '${marketData!.lastPrice.toStringAsFixed(7)} USDC'),
                                             _buildMarketColumn('Last USD Price',
                                                 '\$${marketData!.lastUsdPrice.toStringAsFixed(7)}'),
-                                            _buildMarketColumn('24H Change',
-                                                '${marketData!.change24h.toStringAsFixed(7)}%'),
                                           ],
                                         ),
                                       ),
@@ -464,8 +453,6 @@ class _OverviewWidgetState extends ConsumerState<OverviewWidget> {
                                                 '${marketData!.high24h.toStringAsFixed(7)} USDC'),
                                             _buildMarketColumn('24H Low',
                                                 '${marketData!.low24h.toStringAsFixed(7)} USDC'),
-                                            _buildMarketColumn('24H Volume',
-                                                '${marketData!.volume24h.toStringAsFixed(7)}K USDC'),
                                           ],
                                         ),
                                       ),
