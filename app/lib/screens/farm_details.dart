@@ -536,9 +536,9 @@ class _FarmDetailsState extends State<FarmDetails> {
                         ListView.builder(
                           shrinkWrap: true,
                           physics: const NeverScrollableScrollPhysics(),
-                          itemCount: widget.farm.nodes.length,
+                          itemCount: sortedNodes.length,
                           itemBuilder: (context, index) {
-                            final node = widget.farm.nodes[index];
+                            final node = sortedNodes[index];
                             return Card(
                               margin: const EdgeInsets.symmetric(
                                   vertical: 4.0, horizontal: 0.0),
