@@ -4,7 +4,7 @@ import 'package:gridproxy_client/models/contracts.dart';
 import 'package:intl/intl.dart';
 import 'package:threebotlogin/main.dart';
 
-String capitalizeFirstLetter(String text) {
+String formatStatus(String text) {
   if (text.isEmpty) return text;
 
   if (text.toLowerCase() == 'graceperiod') {
@@ -81,7 +81,7 @@ Widget buildStatusBadge(BuildContext context, String status) {
       borderRadius: BorderRadius.circular(16),
     ),
     child: Text(
-      capitalizeFirstLetter(status),
+      formatStatus(status),
       style: Theme.of(context).textTheme.labelSmall!.copyWith(
             color: colors['text'],
             fontWeight: FontWeight.bold,
