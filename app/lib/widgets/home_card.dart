@@ -1,23 +1,21 @@
 import 'package:flutter/material.dart';
-import 'package:threebotlogin/helpers/globals.dart';
 
 class HomeCardWidget extends StatelessWidget {
   const HomeCardWidget({
     super.key,
     required this.name,
     required this.icon,
-    required this.pageNumber,
+    required this.onTap,
     this.fullWidth = false,
   });
 
   final String name;
   final IconData icon;
-  final int pageNumber;
+  final VoidCallback onTap;
   final bool fullWidth;
 
   @override
   Widget build(BuildContext context) {
-    Globals globals = Globals();
     final size = MediaQuery.of(context).size.width;
     const double margin = 3;
     return Card(
@@ -27,9 +25,7 @@ class HomeCardWidget extends StatelessWidget {
       clipBehavior: Clip.hardEdge,
       elevation: 2,
       child: InkWell(
-        onTap: () {
-          globals.tabController.animateTo(pageNumber);
-        },
+        onTap: onTap,
         child: Column(
           children: [
             Container(

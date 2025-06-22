@@ -6,7 +6,6 @@ import 'package:threebotlogin/apps/market/market.dart';
 import 'package:threebotlogin/apps/wallet/wallet.dart';
 import 'package:threebotlogin/screens/identity_screen.dart';
 import 'package:threebotlogin/screens/preference_screen.dart';
-
 import 'package:threebotlogin/apps/notifications/notifications.dart';
 import 'apps/farmers/farmers.dart';
 import 'apps/news/news.dart';
@@ -58,8 +57,8 @@ class JRouter {
           app: Dao()),
       AppInfo(
           route: Route(
-            path: '/identityverification',
-            name: 'IdentityVerification',
+            path: '/identity',
+            name: 'Identity',
             icon: Icons.lock,
             view: const IdentityScreen(),
           ),

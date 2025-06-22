@@ -120,11 +120,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
   }
 
   String _getCurrentPageTitle() {
-    // Index 0 is now the home page (handled directly in HomeScreen)
     if (globals.tabController.index == 0) {
       return 'Home';
     }
-    // Other indices are offset by 1 since we removed home from router
     int routerIndex = globals.tabController.index - 1;
     if (routerIndex >= 0 && routerIndex < Globals().router.routes.length) {
       return Globals().router.routes[routerIndex].route.name;
@@ -132,10 +130,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     return 'Home';
   }
 
-
-
   void _openAddFarmOverlay() {
-    // Get wallets from the provider
     final wallets = ref.read(walletsNotifier);
 
     showModalBottomSheet(
@@ -146,16 +141,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
         context: context,
         builder: (ctx) => NewFarm(
               onAddFarm: (farm) {
-                // The farm will be added through the provider/state management
                 Navigator.of(ctx).pop();
               },
-              wallets: wallets, // Now using actual wallets from provider
-              isV4: false, // This should be determined based on the current network
+              wallets: wallets,
+              isV4: false,
             ));
   }
 
   void _openAddWalletOverlay() {
-    // Get wallets from the provider
     final wallets = ref.read(walletsNotifier);
 
     showModalBottomSheet(
@@ -165,11 +158,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
         constraints: const BoxConstraints(maxWidth: double.infinity),
         context: context,
         builder: (ctx) => NewWallet(
-              wallets: wallets, // Now using actual wallets from provider
+              wallets: wallets,
             ));
   }
-
-
 
   Widget _buildDashboardContent() {
     return SingleChildScrollView(
@@ -221,50 +212,60 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                   ),
                 ),
                 const Spacer(),
-                const Row(
+                Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     HomeCardWidget(
                         name: 'Wallet',
                         icon: Icons.account_balance_wallet,
-                        pageNumber: 2),
+                        onTap: () => _navigateToScreen('/wallet')),
                     HomeCardWidget(
-                        name: 'Farming', icon: Icons.storage, pageNumber: 3),
+                        name: 'Farming',
+                        icon: Icons.storage,
+                        onTap: () => _navigateToScreen('/farming')),
                   ],
                 ),
-                const Row(
+                Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     HomeCardWidget(
                         name: 'Market',
                         icon: Icons.show_chart_sharp,
-                        pageNumber: 6),
+                        onTap: () => _navigateToScreen('/market')),
                     HomeCardWidget(
                         name: 'Dao',
                         icon: Icons.how_to_vote_outlined,
-                        pageNumber: 4),
+                        onTap: () => _navigateToScreen('/dao')),
                   ],
                 ),
-                const Row(
+                Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     HomeCardWidget(
-                        name: 'Sign', icon: Icons.draw_sharp, pageNumber: 9),
+                        name: 'Sign',
+                        icon: Icons.draw_sharp,
+                        onTap: () => _navigateToScreen('/sign')),
                     HomeCardWidget(
-                        name: 'News', icon: Icons.article, pageNumber: 1),
+                        name: 'News',
+                        icon: Icons.article,
+                        onTap: () => _navigateToScreen('/news')),
                   ],
                 ),
-                const Row(
+                Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     HomeCardWidget(
-                        name: 'Identity', icon: Icons.person, pageNumber: 5),
+                        name: 'Identity',
+                        icon: Icons.person,
+                        onTap: () => _navigateToScreen('/identity')),
                     HomeCardWidget(
-                        name: 'Settings', icon: Icons.settings, pageNumber: 7),
+                        name: 'Settings',
+                        icon: Icons.settings,
+                        onTap: () => _navigateToScreen('/settings')),
                   ],
                 ),
                 const SizedBox(height: 40),
@@ -279,54 +280,65 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     );
   }
 
+  void _navigateToScreen(String routePath) {
+    final index = Globals().router.routes.indexWhere((r) => r.route.path == routePath);
+    if (index != -1) {
+      globals.tabController.animateTo(index + 1); // +1 because home is at index 0
+    } else if (routePath == '/home') {
+      globals.tabController.animateTo(0);
+    }
+  }
+
   @override
   void initState() {
     super.initState();
     initUniLinks();
 
     globals.tabController = TabController(
-        initialIndex: 0, length: Globals().router.routes.length + 1, vsync: this); // +1 for home
+        initialIndex: 0, length: Globals().router.routes.length + 1, vsync: this);
     globals.tabController.addListener(_handleTabSelection);
     globals.tabController.addListener(() {
       if (mounted) {
-        setState(() {}); // Trigger rebuild when tab changes
+        setState(() {});
       }
     });
 
     Events().onEvent(GoHomeEvent().runtimeType, close);
 
     Events().onEvent(GoHomeEvent().runtimeType, (GoHomeEvent event) {
-      globals.tabController.animateTo(0, duration: const Duration(seconds: 0));
+      _navigateToScreen('/home');
     });
 
     Events().onEvent(GoNewsEvent().runtimeType, (GoNewsEvent event) {
-      globals.tabController.animateTo(1, duration: const Duration(seconds: 0));
+      _navigateToScreen('/news');
     });
 
-    // Needed to hardcode this to prevent double tapping and gaining access without knowing the pincode with the current logic that was implemented.
     Events().onEvent(GoWalletEvent().runtimeType, (GoWalletEvent event) {
-      if (pinCheckOpen) {
-        return;
-      }
-
-      int tabIndex = 2;
-
-      if (Globals().router.pinRequired(tabIndex)) {
-        checkPinAndNavigateIfSuccess(tabIndex);
+      final index = Globals().router.routes.indexWhere((r) => r.route.path == '/wallet');
+      if (index != -1) {
+        if (pinCheckOpen) {
+          return;
+        }
+        int tabIndex = index + 1;
+        if (Globals().router.pinRequired(tabIndex)) {
+          checkPinAndNavigateIfSuccess(tabIndex);
+        } else {
+          globals.tabController.animateTo(tabIndex);
+        }
       }
     });
 
     Events().onEvent(GoSupportEvent().runtimeType, (GoSupportEvent event) {
-      globals.tabController.animateTo(3, duration: const Duration(seconds: 0));
+      _navigateToScreen('/settings');
     });
 
     Events().onEvent(GoSettingsEvent().runtimeType, (GoSettingsEvent event) {
-      globals.tabController.animateTo(7, duration: const Duration(seconds: 0));
+      _navigateToScreen('/settings');
     });
 
     Events().onEvent(GoReservationsEvent().runtimeType,
         (GoReservationsEvent event) {
-      globals.tabController.animateTo(5, duration: const Duration(seconds: 0));
+      _navigateToScreen('/market');
     });
 
     Events().onEvent(NewLoginEvent().runtimeType, (NewLoginEvent event) {
@@ -344,8 +356,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     Events().onEvent(IdentityCallbackEvent().runtimeType,
         (IdentityCallbackEvent event) async {
       Future(() {
-        globals.tabController
-            .animateTo(0, duration: const Duration(seconds: 0));
+        _navigateToScreen('/identity');
         showIdentityMessage(context, event.type!);
       });
     });
@@ -378,7 +389,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
 
     String currentTitle = _getCurrentPageTitle();
 
-    // Don't show drawer/appbar for home page (RegisteredScreen)
     bool isHomePage = currentTitle == 'Home';
 
     return AppLayout(
@@ -390,7 +400,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
       child: PopScope(
         canPop: false,
         child: DefaultTabController(
-          length: Globals().router.routes.length + 1, // +1 for home
+          length: Globals().router.routes.length + 1,
           child: WillPopScope(
             onWillPop: onWillPop,
             child: Scaffold(
@@ -399,8 +409,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                   controller: globals.tabController,
                   physics: const NeverScrollableScrollPhysics(),
                   children: [
-                    _buildDashboardContent(), // Home content at index 0
-                    ...Globals().router.getContent(), // Other screens at indices 1+
+                    _buildDashboardContent(),
+                    ...Globals().router.getContent(),
                   ],
                 ),
               ),
@@ -413,17 +423,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
 
   Future<bool> onWillPop() {
     if (globals.tabController.index == 0) {
-      return Future(() => true); // if home screen exit
+      return Future(() => true);
     }
-    if (Globals().router.routes[globals.tabController.index].app == null) {
-      Events().emit(GoHomeEvent()); // if not an app, eg settings, go home
+    if (Globals().router.routes[globals.tabController.index - 1].app == null) {
+      Events().emit(GoHomeEvent());
+    } else {
+      Globals().router.routes[globals.tabController.index - 1].app!.back();
     }
-    Globals()
-        .router
-        .routes[globals.tabController.index]
-        .app!
-        .back(); // if app ask app to handle back event
-
     return Future(() => false);
   }
 }
