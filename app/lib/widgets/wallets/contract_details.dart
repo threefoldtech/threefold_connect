@@ -14,13 +14,38 @@ class ContractDetails extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     try {
-      List<Widget> detailRows = [];
-      final contractDetails = extractContractDetails(contract);
-      for (final entry in contractDetails.entries) {
-        detailRows.add(_buildDetailRow(entry.key, entry.value, context, isStatus: entry.key == 'Status'));
-        if (entry.value != contractDetails.entries.last.value) detailRows.add(const Divider());
+      List<Widget> detailRows = [];   
+      
+      detailRows.add(_buildDetailRow('Contract ID', contract.contract_id.toString(), context));
+      detailRows.add(const Divider());
+      detailRows.add(_buildDetailRow('Type', contract.type, context));
+      detailRows.add(const Divider());
+      detailRows.add(_buildDetailRow('Status', contract.state, context, isStatus: true));
+      detailRows.add(const Divider());
+      detailRows.add(_buildDetailRow('Twin ID', contract.twin_id.toString(), context));
+      detailRows.add(const Divider());
+      detailRows.add(_buildDetailRow('Created', formatDate(contract.created_at), context));
+      
+      if (contract.details is NameContract) {
+        detailRows.add(const Divider());
+        detailRows.add(_buildDetailRow('Name', (contract.details as NameContract).name, context));
+      } else if (contract.details is RentContract) {
+        final rentContract = contract.details as RentContract;
+        detailRows.add(const Divider());
+        detailRows.add(_buildDetailRow('Node ID', rentContract.nodeId.toString(), context));
+        detailRows.add(const Divider());
+        detailRows.add(_buildDetailRow('Farm Name', rentContract.farm_name, context));
+        detailRows.add(const Divider());
+        detailRows.add(_buildDetailRow('Farm ID', rentContract.farm_id.toString(), context));
+      } else if (contract.details is NodeContract) {
+        final nodeContract = contract.details as NodeContract;
+        detailRows.add(const Divider());
+        detailRows.add(_buildDetailRow('Node ID', nodeContract.nodeId.toString(), context));
+        detailRows.add(const Divider());
+        detailRows.add(_buildDetailRow('Deployment Hash', nodeContract.deployment_hash, context));
+        detailRows.add(const Divider());
+        detailRows.add(_buildDetailRow('Public IPs', nodeContract.number_of_public_ips.toString(), context));
       }
-
 
       return Padding(
         padding: const EdgeInsets.all(16.0),

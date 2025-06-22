@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:gridproxy_client/models/contracts.dart';
 // ignore: depend_on_referenced_packages
 import 'package:intl/intl.dart';
 import 'package:threebotlogin/main.dart';
@@ -47,28 +46,6 @@ Map<String, Color> getStatusBadgeColors(String status, BuildContext context) {
       'text': Theme.of(context).colorScheme.onWarningContainer,
     };
   }
-}
-
-Map<String, String> extractContractDetails(ContractInfo contract) {
-  Map<String, String> result = {};
-  result['Contract ID'] = contract.contract_id.toString();
-  result['Type'] = contract.type;
-  result['Status'] = contract.state;
-  result['Twin ID'] = contract.twin_id.toString();
-  result['Created'] = formatDate(contract.created_at);
-  if (contract.details is NameContract) {
-    result['Name'] = (contract.details as NameContract).name;
-  } else if (contract.details is RentContract) {
-    result['Node ID'] = (contract.details as RentContract).nodeId.toString();
-    result['Farm Name'] = (contract.details as RentContract).farm_name;
-    result['Farm ID'] = (contract.details as RentContract).farm_id.toString();
-  } else if (contract.details is NodeContract) {
-    result['Node ID'] = (contract.details as NodeContract).nodeId.toString();
-    result['Deployment Hash'] = (contract.details as NodeContract).deployment_hash;
-    result['Public IPs'] = (contract.details as NodeContract).number_of_public_ips.toString();
-  }
-
-  return result;
 }
 
 Widget buildStatusBadge(BuildContext context, String status) {
