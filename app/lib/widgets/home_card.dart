@@ -1,16 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:threebotlogin/constants/navigation_config.dart';
 
 class HomeCardWidget extends StatelessWidget {
   const HomeCardWidget({
     super.key,
-    required this.name,
-    required this.icon,
+    required this.navigationEntry,
     required this.onTap,
     this.fullWidth = false,
   });
 
-  final String name;
-  final IconData icon;
+  final NavigationEntry navigationEntry;
   final VoidCallback onTap;
   final bool fullWidth;
 
@@ -37,12 +36,12 @@ class HomeCardWidget extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Icon(
-                    icon,
+                    navigationEntry.icon,
                     color: Theme.of(context).colorScheme.onPrimaryContainer,
                   ),
                   const SizedBox(width: 7),
                   Text(
-                    name,
+                    navigationEntry.name,
                     style: Theme.of(context).textTheme.titleMedium!.copyWith(
                         color: Theme.of(context).colorScheme.onPrimaryContainer,
                         fontWeight: FontWeight.bold),

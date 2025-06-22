@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:threebotlogin/helpers/globals.dart';
+import 'package:threebotlogin/constants/navigation_config.dart';
 
 /// Main app layout wrapper that handles navigation, drawer, app bar, and bottom navigation
 /// This replaces the layout logic that was previously in HomeScreen
@@ -56,62 +57,45 @@ class _AppLayoutState extends State<AppLayout> {
     int currentTabIndex = globals.tabController.index;
 
     // Return app bar actions based on current tab
-    switch (currentTabIndex) {
-      case 3: // Farming screen
-        return widget.onAddFarm != null
-            ? [
-                IconButton(
-                  onPressed: widget.onAddFarm,
-                  icon: const Icon(Icons.add),
-                  tooltip: 'Add Farm',
-                )
-              ]
-            : null;
-      case 2: // Wallet screen
-        return widget.onAddWallet != null
-            ? [
-                IconButton(
-                  onPressed: widget.onAddWallet,
-                  icon: const Icon(Icons.add),
-                  tooltip: 'Add Wallet',
-                )
-              ]
-            : null;
-      default:
-        return null;
+    final currentEntry = NavigationConfig.getEntryByIndex(currentTabIndex);
+    if (currentEntry != null) {
+      switch (currentEntry.path) {
+        case '/farming': // Farming screen
+          return widget.onAddFarm != null
+              ? [
+                  IconButton(
+                    onPressed: widget.onAddFarm,
+                    icon: const Icon(Icons.add),
+                    tooltip: 'Add Farm',
+                  )
+                ]
+              : null;
+        case '/wallet': // Wallet screen
+          return widget.onAddWallet != null
+              ? [
+                  IconButton(
+                    onPressed: widget.onAddWallet,
+                    icon: const Icon(Icons.add),
+                    tooltip: 'Add Wallet',
+                  )
+                ]
+              : null;
+        default:
+          return null;
+      }
     }
+    return null;
   }
 
   /// Get current bottom navigation index
   int _getCurrentBottomNavIndex() {
-    int currentTabIndex = globals.tabController.index;
-
-    // Map tab indices to bottom navigation indices
-    switch (currentTabIndex) {
-      case 0: // Home
-        return 0;
-      case 2: // Wallet
-        return 1;
-      case 3: // Farming
-        return 2;
-      case 7: // Settings
-        return 3;
-      default:
-        return 0; // Default to home
-    }
+    return NavigationConfig.getBottomNavIndex(globals.tabController.index);
   }
 
   /// Handle bottom navigation tap
   void _selectScreen(index) {
-    if (index == 0) {
-      globals.tabController.animateTo(0);
-    } else if (index == 1) {
-      globals.tabController.animateTo(2);
-    } else if (index == 2) {
-      globals.tabController.animateTo(3);
-    } else if (index == 3) {
-      globals.tabController.animateTo(7);
-    }
+    int tabIndex = NavigationConfig.getTabIndexFromBottomNav(index);
+    globals.tabController.animateTo(tabIndex);
   }
 
   /// Build the navigation drawer
@@ -138,18 +122,18 @@ class _AppLayoutState extends State<AppLayout> {
             ),
           ),
           _buildDrawerItem(Icons.home, 'Home', 0),
-          _buildDrawerItem(Icons.account_balance_wallet, 'Wallet', 2),
+          _buildDrawerItem(Icons.account_balance_wallet, 'Wallet', NavigationConfig.getEntryByPath('/wallet')!.index),
           if (Globals().canSeeFarmers)
-            _buildDrawerItem(Icons.storage, 'Farming', 3)
+            _buildDrawerItem(Icons.storage, 'Farming', NavigationConfig.getEntryByPath('/farming')!.index)
           else
             Container(),
-          _buildDrawerItem(Icons.show_chart_sharp, 'Market', 6),
-          _buildDrawerItem(Icons.how_to_vote_outlined, 'Dao', 4),
-          _buildDrawerItem(Icons.draw_sharp, 'Sign', 9),
-          _buildDrawerItem(Icons.article, 'News', 1),
-          _buildDrawerItem(Icons.settings, 'Settings', 7),
+          _buildDrawerItem(Icons.show_chart_sharp, 'Market', NavigationConfig.getEntryByPath('/market')!.index),
+          _buildDrawerItem(Icons.how_to_vote_outlined, 'Dao', NavigationConfig.getEntryByPath('/dao')!.index),
+          _buildDrawerItem(Icons.draw_sharp, 'Sign', NavigationConfig.getEntryByPath('/sign')!.index),
+          _buildDrawerItem(Icons.article, 'News', NavigationConfig.getEntryByPath('/news')!.index),
+          _buildDrawerItem(Icons.settings, 'Settings', NavigationConfig.getEntryByPath('/settings')!.index),
           if (Globals().council)
-            _buildDrawerItem(Icons.how_to_vote_outlined, 'Council', 8),
+            _buildDrawerItem(Icons.how_to_vote_outlined, 'Council', NavigationConfig.getEntryByPath('/council')!.index),
         ],
       ),
     );

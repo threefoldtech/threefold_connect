@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:threebotlogin/app_config.dart';
+import 'package:threebotlogin/constants/navigation_config.dart';
 import 'package:threebotlogin/events/events.dart';
 import 'package:threebotlogin/helpers/environment.dart';
 import 'package:threebotlogin/helpers/flags.dart';
@@ -169,7 +170,7 @@ class _AppState extends State<MainScreen> {
     }
 
     await Globals().router.init();
-
+    NavigationConfig.initialize();
     _backendConnection = BackendConnection((await getDoubleName())!);
     _backendConnection.init();
 

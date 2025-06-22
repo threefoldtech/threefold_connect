@@ -17,6 +17,7 @@ import 'package:threebotlogin/events/go_wallet_event.dart';
 import 'package:threebotlogin/events/new_login_event.dart';
 import 'package:threebotlogin/events/uni_link_event.dart';
 import 'package:threebotlogin/helpers/globals.dart';
+import 'package:threebotlogin/constants/navigation_config.dart';
 import 'package:threebotlogin/main.dart';
 import 'package:threebotlogin/providers/wallets_provider.dart';
 import 'package:threebotlogin/screens/authentication_screen.dart';
@@ -49,6 +50,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
   String? initialLink;
   bool timeoutExpiredInBackground = true;
   bool pinCheckOpen = false;
+  late final NavigationEntry walletEntry;
+  late final NavigationEntry farmingEntry;
+  late final NavigationEntry marketEntry;
+  late final NavigationEntry daoEntry;
+  late final NavigationEntry signEntry;
+  late final NavigationEntry newsEntry;
+  late final NavigationEntry identityEntry;
+  late final NavigationEntry settingsEntry;
 
   @override
   void dispose() {
@@ -102,12 +111,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
       await emailVerificationDialog(context);
     }
 
-    if (globals.tabController.index != 2 && Globals().paymentRequest != null) {
+    final currentEntry = NavigationConfig.getEntryByIndex(globals.tabController.index);
+    if (currentEntry?.path != '/wallet' && Globals().paymentRequest != null) {
       Globals().paymentRequest = null;
       Globals().paymentRequestIsUsed = false;
     }
 
-    if (globals.tabController.previousIndex == 2 &&
+    final previousEntry = NavigationConfig.getEntryByIndex(globals.tabController.previousIndex);
+    if (previousEntry?.path == '/wallet' &&
         Globals().paymentRequest != null &&
         Globals().paymentRequestIsUsed == true) {
       Globals().paymentRequest = null;
@@ -115,8 +126,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
   }
 
   close(GoHomeEvent e) {
-    int homeTab = 0;
-    globals.tabController.animateTo(homeTab);
+    globals.tabController.animateTo(0);
   }
 
   String _getCurrentPageTitle() {
@@ -217,13 +227,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     HomeCardWidget(
-                        name: 'Wallet',
-                        icon: Icons.account_balance_wallet,
-                        onTap: () => _navigateToScreen('/wallet')),
+                        navigationEntry: walletEntry,
+                        onTap: () => _navigateToEntry(walletEntry)),
                     HomeCardWidget(
-                        name: 'Farming',
-                        icon: Icons.storage,
-                        onTap: () => _navigateToScreen('/farming')),
+                        navigationEntry: farmingEntry,
+                        onTap: () => _navigateToEntry(farmingEntry)),
                   ],
                 ),
                 Row(
@@ -231,13 +239,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     HomeCardWidget(
-                        name: 'Market',
-                        icon: Icons.show_chart_sharp,
-                        onTap: () => _navigateToScreen('/market')),
+                        navigationEntry: marketEntry,
+                        onTap: () => _navigateToEntry(marketEntry)),
                     HomeCardWidget(
-                        name: 'Dao',
-                        icon: Icons.how_to_vote_outlined,
-                        onTap: () => _navigateToScreen('/dao')),
+                        navigationEntry: daoEntry,
+                        onTap: () => _navigateToEntry(daoEntry)),
                   ],
                 ),
                 Row(
@@ -245,13 +251,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     HomeCardWidget(
-                        name: 'Sign',
-                        icon: Icons.draw_sharp,
-                        onTap: () => _navigateToScreen('/sign')),
+                        navigationEntry: signEntry,
+                        onTap: () => _navigateToEntry(signEntry)),
                     HomeCardWidget(
-                        name: 'News',
-                        icon: Icons.article,
-                        onTap: () => _navigateToScreen('/news')),
+                        navigationEntry: newsEntry,
+                        onTap: () => _navigateToEntry(newsEntry)),
                   ],
                 ),
                 Row(
@@ -259,13 +263,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     HomeCardWidget(
-                        name: 'Identity',
-                        icon: Icons.person,
-                        onTap: () => _navigateToScreen('/identity')),
+                        navigationEntry: identityEntry,
+                        onTap: () => _navigateToEntry(identityEntry)),
                     HomeCardWidget(
-                        name: 'Settings',
-                        icon: Icons.settings,
-                        onTap: () => _navigateToScreen('/settings')),
+                        navigationEntry: settingsEntry,
+                        onTap: () => _navigateToEntry(settingsEntry)),
                   ],
                 ),
                 const SizedBox(height: 40),
@@ -281,12 +283,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
   }
 
   void _navigateToScreen(String routePath) {
-    final index = Globals().router.routes.indexWhere((r) => r.route.path == routePath);
-    if (index != -1) {
-      globals.tabController.animateTo(index + 1); // +1 because home is at index 0
-    } else if (routePath == '/home') {
-      globals.tabController.animateTo(0);
-    }
+    NavigationConfig.navigateToPath(routePath);
+  }
+
+  void _navigateToEntry(NavigationEntry entry) {
+    NavigationConfig.navigateToEntry(entry);
   }
 
   @override
@@ -294,6 +295,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     super.initState();
     initUniLinks();
 
+    // Initialize navigation entries
+    walletEntry = NavigationConfig.getEntryByPath('/wallet')!;
+    farmingEntry = NavigationConfig.getEntryByPath('/farming')!;
+    marketEntry = NavigationConfig.getEntryByPath('/market')!;
+    daoEntry = NavigationConfig.getEntryByPath('/dao')!;
+    signEntry = NavigationConfig.getEntryByPath('/sign')!;
+    newsEntry = NavigationConfig.getEntryByPath('/news')!;
+    identityEntry = NavigationConfig.getEntryByPath('/identity')!;
+    settingsEntry = NavigationConfig.getEntryByPath('/settings')!;
     globals.tabController = TabController(
         initialIndex: 0, length: Globals().router.routes.length + 1, vsync: this);
     globals.tabController.addListener(_handleTabSelection);
@@ -314,12 +324,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     });
 
     Events().onEvent(GoWalletEvent().runtimeType, (GoWalletEvent event) {
-      final index = Globals().router.routes.indexWhere((r) => r.route.path == '/wallet');
-      if (index != -1) {
+      final navigationEntry = NavigationConfig.getEntryByPath('/wallet');
+      if (navigationEntry != null) {
         if (pinCheckOpen) {
           return;
         }
-        int tabIndex = index + 1;
+        int tabIndex = navigationEntry.index;
         if (Globals().router.pinRequired(tabIndex)) {
           checkPinAndNavigateIfSuccess(tabIndex);
         } else {
