@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:threebotlogin/widgets/layout_drawer.dart';
+
 import 'package:threebotlogin/screens/market/order_book.dart';
 import 'package:threebotlogin/screens/market/overview.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -28,41 +28,38 @@ class _MarketPageState extends ConsumerState<MarketPage>
 
   @override
   Widget build(BuildContext context) {
-    return LayoutDrawer(
-      titleText: 'Market',
-      content: DefaultTabController(
-        length: 2,
-        child: Column(children: [
-          PreferredSize(
-            preferredSize: const Size.fromHeight(10.0),
-            child: Container(
-              color: Theme.of(context).scaffoldBackgroundColor,
-              child: TabBar(
-                controller: _tabController,
-                labelColor: Theme.of(context).colorScheme.primary,
-                indicatorColor: Theme.of(context).colorScheme.primary,
-                unselectedLabelColor: Theme.of(context).colorScheme.onSurface,
-                dividerColor: Theme.of(context).scaffoldBackgroundColor,
-                labelStyle: Theme.of(context).textTheme.titleMedium,
-                unselectedLabelStyle: Theme.of(context).textTheme.titleMedium,
-                tabs: const [
-                  Tab(text: 'Overview'),
-                  Tab(text: 'OrderBook'),
-                ],
-              ),
-            ),
-          ),
-          Expanded(
-            child: TabBarView(
+    return DefaultTabController(
+      length: 2,
+      child: Column(children: [
+        PreferredSize(
+          preferredSize: const Size.fromHeight(10.0),
+          child: Container(
+            color: Theme.of(context).scaffoldBackgroundColor,
+            child: TabBar(
               controller: _tabController,
-              children: const [
-                OverviewWidget(),
-                OrderbookWidget(),
+              labelColor: Theme.of(context).colorScheme.primary,
+              indicatorColor: Theme.of(context).colorScheme.primary,
+              unselectedLabelColor: Theme.of(context).colorScheme.onSurface,
+              dividerColor: Theme.of(context).scaffoldBackgroundColor,
+              labelStyle: Theme.of(context).textTheme.titleMedium,
+              unselectedLabelStyle: Theme.of(context).textTheme.titleMedium,
+              tabs: const [
+                Tab(text: 'Overview'),
+                Tab(text: 'OrderBook'),
               ],
             ),
-          )
-        ]),
-      ),
+          ),
+        ),
+        Expanded(
+          child: TabBarView(
+            controller: _tabController,
+            children: const [
+              OverviewWidget(),
+              OrderbookWidget(),
+            ],
+          ),
+        )
+      ]),
     );
   }
 }

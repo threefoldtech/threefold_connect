@@ -14,7 +14,6 @@ import 'package:threebotlogin/services/gridproxy_service.dart';
 import 'package:threebotlogin/services/tfchain_service.dart';
 import 'package:threebotlogin/widgets/add_farm.dart';
 import 'package:threebotlogin/widgets/farm_item.dart';
-import 'package:threebotlogin/widgets/layout_drawer.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 
 class FarmScreen extends ConsumerStatefulWidget {
@@ -336,19 +335,7 @@ class _FarmScreenState extends ConsumerState<FarmScreen>
         ],
       );
     }
-    return LayoutDrawer(
-      titleText: 'Farming',
-      content: mainWidget,
-      appBarActions: loading || failed
-          ? []
-          : [
-              IconButton(
-                  onPressed: _openAddFarmOverlay,
-                  icon: const Icon(
-                    Icons.add,
-                  ))
-            ],
-    );
+    return mainWidget;
   }
 
   _openAddFarmOverlay() {

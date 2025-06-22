@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:threebotlogin/apps/notifications/notifications_user_data.dart';
-import 'package:threebotlogin/widgets/layout_drawer.dart';
 
 class NotificationsScreen extends StatefulWidget {
   const NotificationsScreen({super.key});
@@ -29,10 +28,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return LayoutDrawer(
-      titleText: 'Notifications',
-      content: _buildNotificationSettings(),
-    );
+    return _buildNotificationSettings();
   }
 
   Widget _buildNotificationSettings() {
