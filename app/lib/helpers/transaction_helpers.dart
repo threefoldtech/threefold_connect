@@ -13,97 +13,46 @@ Decimal roundAmount(String amount) {
   return parsedAmount;
 }
 
-/// Adds thousand separators to large numbers for better readability
-String _addThousandSeparators(String number) {
-  if (!number.contains('.')) {
-    // Whole number
-    final formatter = NumberFormat('#,###');
-    return formatter.format(int.parse(number));
-  } else {
-    // Decimal number
-    List<String> parts = number.split('.');
-    final formatter = NumberFormat('#,###');
-    String wholePart = formatter.format(int.parse(parts[0]));
-    return '$wholePart.${parts[1]}';
-  }
-}
-
-/// Formats decimal amounts for display with user-friendly precision
-/// following cryptocurrency app best practices for everyday users
 String formatAmountDisplay(String amount) {
   try {
     final Decimal decimalAmount = Decimal.parse(amount);
+    if (decimalAmount == Decimal.zero) return '0';
 
-    // Handle zero case
-    if (decimalAmount == Decimal.zero) {
-      return '0';
-    }
-
-    final double doubleAmount = decimalAmount.toDouble();
+    final Decimal absAmount = decimalAmount.abs();
+    final double doubleAmount = absAmount.toDouble();
     String formatted;
 
-    // User-friendly formatting based on amount size
-    if (doubleAmount >= 1000) {
-      // Large amounts: 2 decimal places max with thousand separators (e.g., 1,234.57)
-      formatted = decimalAmount.toStringAsFixed(2);
-      formatted = _addThousandSeparators(formatted);
+    if (absAmount % Decimal.one == Decimal.zero) {
+      formatted = NumberFormat('#,##0').format(doubleAmount);
+    } else if (doubleAmount >= 1000) {
+      formatted = NumberFormat('#,##0.00').format(doubleAmount);
     } else if (doubleAmount >= 1) {
-      // Medium amounts: 3 decimal places max (e.g., 123.456)
-      formatted = decimalAmount.toStringAsFixed(3);
+      formatted = NumberFormat('0.###').format(doubleAmount);
     } else if (doubleAmount >= 0.01) {
-      // Small amounts: 4 decimal places max (e.g., 0.1234)
-      formatted = decimalAmount.toStringAsFixed(4);
-    } 
-    else {
-      // Small amounts: Show with approximation for clarity
-      String str = decimalAmount.toString();
-      if (str.contains('.')) {
-        List<String> parts = str.split('.');
-        String decimals = parts[1];
-
-        // Find first non-zero digit
-        int firstNonZero = -1;
-        for (int i = 0; i < decimals.length; i++) {
-          if (decimals[i] != '0') {
-            firstNonZero = i;
-            break;
-          }
-        }
-
-        if (firstNonZero != -1) {
-          // Show 2-3 significant digits with approximation
-          int precision = firstNonZero + 2;
-          if (precision > 8) precision = 8; // Max 8 decimal places
-
-          String approximated = decimalAmount.toStringAsFixed(precision);
-          // Only add ~ if we're actually truncating/rounding
-          if (decimals.length > precision) {
-            formatted = '~$approximated';
-          } else {
-            formatted = approximated;
-          }
-        } else {
-          formatted = decimalAmount.toString();
-        }
+      formatted = NumberFormat('0.####').format(doubleAmount);
+    } else {
+      // Very small amounts: Show with approximation for clarity
+      String decimals = absAmount.toString().split('.').length > 1
+          ? absAmount.toString().split('.')[1]
+          : '';
+      int firstNonZero = decimals.indexOf(RegExp(r'[1-9]'));
+      if (firstNonZero != -1) {
+        int precision = (firstNonZero + 2).clamp(0, 8);
+        double approxValue = double.parse(absAmount.toStringAsFixed(precision));
+        String approximated = NumberFormat('0.${'0' * (precision - 1)}#').format(approxValue);
+        formatted = decimals.length > precision ? '~$approximated' : approximated;
       } else {
-        formatted = decimalAmount.toString();
+        formatted = NumberFormat('0.########').format(doubleAmount);
       }
     }
 
-    // Remove trailing zeros (but keep approximation symbol if present)
-    if (formatted.startsWith('~')) {
-      String number = formatted.substring(1);
-      number = number.replaceAll(RegExp(r'0+$'), '');
-      number = number.replaceAll(RegExp(r'\.$'), '');
-      formatted = '~$number';
-    } else {
-      formatted = formatted.replaceAll(RegExp(r'0+$'), '');
-      formatted = formatted.replaceAll(RegExp(r'\.$'), '');
+    // Remove trailing zeros after decimal point only (if any), but keep approximation symbol if present
+    if (formatted.contains('.')) {
+      formatted = formatted.replaceFirst(RegExp(r'(\.\d*?[1-9])0+\u001b'), r'$1\u001b');
+      formatted = formatted.replaceFirst(RegExp(r'\.$'), '');
     }
-
     return formatted;
   } catch (e) {
-    // If parsing fails, return the original amount
     return amount;
   }
 }
