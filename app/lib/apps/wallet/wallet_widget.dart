@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
-import 'package:mobile_scanner/mobile_scanner.dart';
+import 'package:threebotlogin/screens/scan_screen.dart' as scan;
 import 'package:threebotlogin/apps/wallet/wallet_config.dart';
 import 'package:threebotlogin/apps/wallet/wallet_events.dart';
 import 'package:threebotlogin/apps/wallet/wallet_user_data.dart';
@@ -132,7 +132,7 @@ class _WalletState extends State<WalletWidget>
     // QRCode scanner is black if we don't sleep here.
     bool slept =
         await Future.delayed(const Duration(milliseconds: 400), () => true);
-    late Barcode result;
+    late scan.Barcode result;
     if (slept) {
       result = await Navigator.push(
           context, MaterialPageRoute(builder: (context) => const ScanScreen()));

@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mobile_scanner/mobile_scanner.dart';
+import 'package:threebotlogin/screens/scan_screen.dart' as scan;
 import 'package:threebotlogin/helpers/form.dart';
 import 'package:threebotlogin/helpers/globals.dart';
 import 'package:threebotlogin/helpers/logger.dart';
@@ -454,47 +454,48 @@ class _WalletSendScreenState extends ConsumerState<WalletSendScreen> {
     // QRCode scanner is black if we don't sleep here.
     bool slept =
         await Future.delayed(const Duration(milliseconds: 400), () => true);
-    late Barcode result;
+    late scan.Barcode result;
     if (slept) {
       if (context.mounted) {
         result = await Navigator.push(context,
             MaterialPageRoute(builder: (context) => const ScanScreen()));
       }
     }
-    if (result.rawValue != null) {
-      late final Uri code;
+    
+    if (result.rawValue.isNotEmpty) {
       try {
-        code = Uri.parse(result.rawValue!);
+        final code = Uri.parse(result.rawValue);
+        if (code.scheme != 'tft' || code.path.isEmpty) {
+          _showInvalidQRCodeDialog();
+          return;
+        }
+        toController.text = code.path;
+        _validateToAddress();
+        if (code.queryParameters.containsKey('amount')) {
+          amountController.text = code.queryParameters['amount'] ?? '';
+        }
+        if (chainType == ChainType.Stellar) {
+          if (code.queryParameters.containsKey('memo_hash')) {
+            selectedMemoType = MemoType.HASH;
+            memoController.text = code.queryParameters['memo_hash'] ?? '';
+          } else if (code.queryParameters.containsKey('message')) {
+            selectedMemoType = MemoType.TEXT;
+            memoController.text = code.queryParameters['message'] ?? '';
+          }
+        }
+        setState(() {});
       } catch (e) {
         logger.e('Error parsing QR Code, Error: $e');
+        toController.text = result.rawValue;
+        await _validateToAddress();
         _showInvalidQRCodeDialog();
-        return;
       }
-      if (code.scheme != 'tft' || code.path.isEmpty) {
-        _showInvalidQRCodeDialog();
-        return;
-      }
-      toController.text = code.path;
-      _validateToAddress();
-      if (code.queryParameters.containsKey('amount')) {
-        amountController.text = code.queryParameters['amount']!;
-      }
-      if (chainType == ChainType.Stellar) {
-        if (code.queryParameters.containsKey('memo_hash')) {
-          selectedMemoType = MemoType.HASH;
-          memoController.text = code.queryParameters['memo_hash']!;
-        } else if (code.queryParameters.containsKey('message')) {
-          selectedMemoType = MemoType.TEXT;
-          memoController.text = code.queryParameters['message']!;
-        }
-      }
-      setState(() {});
     } else {
       _showInvalidQRCodeDialog();
       return;
     }
 
-    return result.rawValue!;
+    return result.rawValue;
   }
 
   void _showInvalidQRCodeDialog() {

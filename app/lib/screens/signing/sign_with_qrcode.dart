@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mobile_scanner/mobile_scanner.dart';
+import 'package:threebotlogin/screens/scan_screen.dart' as scan;
 import 'package:threebotlogin/helpers/logger.dart';
 import 'package:threebotlogin/providers/wallets_provider.dart';
 import 'package:threebotlogin/screens/scan_screen.dart';
@@ -74,15 +74,15 @@ class _SignWithQRCodeScreenState extends ConsumerState<SignWithQRCodeScreen>
     // QRCode scanner is black if we don't sleep here.
     bool slept =
         await Future.delayed(const Duration(milliseconds: 400), () => true);
-    late Barcode result;
+    late scan.Barcode result;
     if (slept) {
       if (context.mounted) {
         result = await Navigator.push(context,
             MaterialPageRoute(builder: (context) => const ScanScreen()));
       }
     }
-    if (result.rawValue != null) {
-      final Map<String, dynamic> jsonData = json.decode(result.rawValue!);
+    if (result.rawValue.isNotEmpty) {
+      final Map<String, dynamic> jsonData = json.decode(result.rawValue);
       setState(() {
         destUrlController.text = jsonData['dest'];
       });
@@ -131,7 +131,7 @@ class _SignWithQRCodeScreenState extends ConsumerState<SignWithQRCodeScreen>
       return;
     }
 
-    return result.rawValue!;
+    return result.rawValue;
   }
 
   @override

@@ -1,5 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:mobile_scanner/mobile_scanner.dart';
+import 'package:qr_code_scanner/qr_code_scanner.dart';
+
+// Custom Barcode class to replace mobile_scanner's Barcode
+class Barcode {
+  final String rawValue;
+  final BarcodeFormat format;
+  
+  Barcode(this.rawValue, this.format);
+}
 
 class ScanScreen extends StatefulWidget {
   const ScanScreen({super.key});
@@ -13,27 +21,57 @@ class _ScanScreenState extends State<ScanScreen> {
   bool popped = false;
 
   final GlobalKey qrKey = GlobalKey(debugLabel: 'QR');
+  QRViewController? controller;
+  bool isCameraInitialized = false;
+
+  @override
+  void reassemble() {
+    super.reassemble();
+    if (controller != null) {
+      controller!.pauseCamera();
+      controller!.resumeCamera();
+    }
+  }
+
+  @override
+  void dispose() {
+    controller?.dispose();
+    super.dispose();
+  }
+
+  void _onQRViewCreated(QRViewController controller) {
+    this.controller = controller;
+    setState(() {
+      isCameraInitialized = true;
+    });
+    controller.scannedDataStream.listen((scanData) {
+      if (!popped && scanData.code != null) {
+        popped = true;
+        Navigator.pop(context, Barcode(scanData.code!, scanData.format));
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Stack(
         children: [
-          MobileScanner(
-            onDetect: _handleBarcode,
-            fit: BoxFit.contain,
+          QRView(
+            key: qrKey,
+            onQRViewCreated: _onQRViewCreated,
+            overlay: QrScannerOverlayShape(
+              borderColor: Theme.of(context).colorScheme.primary,
+              borderRadius: 10,
+              borderLength: 30,
+              borderWidth: 10,
+              cutOutSize: MediaQuery.of(context).size.width * 0.8,
+            ),
           ),
           Align(alignment: Alignment.bottomCenter, child: content()),
         ],
       ),
     );
-  }
-
-  void _handleBarcode(BarcodeCapture barcodes) {
-    if (!popped) {
-      popped = true;
-      Navigator.pop(context, barcodes.barcodes.firstOrNull);
-    }
   }
 
   Widget content() {
