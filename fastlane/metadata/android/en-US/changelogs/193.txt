@@ -1,0 +1,4 @@
+- Enhanced security features
+- Improved UI/UX for wallet management
+- Bug fixes and performance improvements
+- Updated ThreeFold Grid connection protocols

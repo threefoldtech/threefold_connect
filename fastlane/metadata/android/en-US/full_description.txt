@@ -1,0 +1,12 @@
+ThreeFold Connect is a secure authentication and digital wallet application that allows you to:
+
+• Login to ThreeFold services and applications with secure authentication
+• Manage your digital TFT (ThreeFold Token) wallet
+• Create and restore wallets with easy backup options
+• Send and receive ThreeFold Tokens
+• Monitor your ThreeFold farming rewards and nodes
+• Validate your identity with 3Bot Connect
+• Access the ThreeFold ecosystem securely
+• Keep track of transactions and wallet activity
+
+ThreeFold Connect provides a secure and user-friendly interface for interacting with the ThreeFold Grid, a decentralized internet infrastructure powered by independent farmers worldwide.

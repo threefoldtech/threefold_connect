@@ -1,0 +1,1 @@
+Secure authentication and digital wallet for the ThreeFold ecosystem
