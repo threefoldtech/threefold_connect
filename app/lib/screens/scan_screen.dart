@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:mobile_scanner/mobile_scanner.dart';
+import 'package:flutter_zxing/flutter_zxing.dart';
 
 class ScanScreen extends StatefulWidget {
   const ScanScreen({super.key});
@@ -19,9 +19,9 @@ class _ScanScreenState extends State<ScanScreen> {
     return Scaffold(
       body: Stack(
         children: [
-          MobileScanner(
-            onDetect: _handleBarcode,
-            fit: BoxFit.contain,
+          ReaderWidget(
+            onScan: _handleBarcode,
+            scanDelay: const Duration(milliseconds: 100),
           ),
           Align(alignment: Alignment.bottomCenter, child: content()),
         ],
@@ -29,10 +29,10 @@ class _ScanScreenState extends State<ScanScreen> {
     );
   }
 
-  void _handleBarcode(BarcodeCapture barcodes) {
-    if (!popped) {
+  Future<void> _handleBarcode(Code code) async {
+    if (!popped && code.isValid) {
       popped = true;
-      Navigator.pop(context, barcodes.barcodes.firstOrNull);
+      Navigator.pop(context, code);
     }
   }
 

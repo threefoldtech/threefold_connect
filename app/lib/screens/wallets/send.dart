@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mobile_scanner/mobile_scanner.dart';
+import 'package:flutter_zxing/flutter_zxing.dart';
 import 'package:threebotlogin/helpers/form.dart';
 import 'package:threebotlogin/helpers/globals.dart';
 import 'package:threebotlogin/helpers/logger.dart';
@@ -454,17 +454,17 @@ class _WalletSendScreenState extends ConsumerState<WalletSendScreen> {
     // QRCode scanner is black if we don't sleep here.
     bool slept =
         await Future.delayed(const Duration(milliseconds: 400), () => true);
-    late Barcode result;
+    late Code result;
     if (slept) {
       if (context.mounted) {
         result = await Navigator.push(context,
             MaterialPageRoute(builder: (context) => const ScanScreen()));
       }
     }
-    if (result.rawValue != null) {
+    if (result.isValid && result.text != null && result.text!.isNotEmpty) {
       late final Uri code;
       try {
-        code = Uri.parse(result.rawValue!);
+        code = Uri.parse(result.text!);
       } catch (e) {
         logger.e('Error parsing QR Code, Error: $e');
         _showInvalidQRCodeDialog();
@@ -494,7 +494,7 @@ class _WalletSendScreenState extends ConsumerState<WalletSendScreen> {
       return;
     }
 
-    return result.rawValue!;
+    return result.text;
   }
 
   void _showInvalidQRCodeDialog() {
