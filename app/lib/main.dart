@@ -1,4 +1,4 @@
-import 'package:background_fetch/background_fetch.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -6,7 +6,7 @@ import 'package:threebotlogin/helpers/globals.dart';
 import 'package:threebotlogin/helpers/logger.dart';
 import 'package:threebotlogin/screens/app_lifecycle_observer.dart';
 import 'package:threebotlogin/screens/splash_screen.dart';
-import 'package:threebotlogin/services/background_service.dart';
+import 'package:threebotlogin/services/f_droid_background_service.dart';
 import 'package:threebotlogin/services/notification_service.dart';
 import 'package:threebotlogin/services/shared_preference_service.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -45,7 +45,13 @@ Future<void> main() async {
 
   await NotificationService().initNotification();
 
-  BackgroundFetch.registerHeadlessTask(backgroundFetchHeadlessTask);
+  // Initialize F-Droid compatible background service
+  try {
+    await FDroidBackgroundService.initialize();
+    logger.i('[Main] F-Droid background service initialized');
+  } catch (e) {
+    logger.e('[Main] Failed to initialize F-Droid background service: $e');
+  }
 
   bool initDone = await getInitDone();
   String? doubleName = await getDoubleName();
@@ -53,31 +59,20 @@ Future<void> main() async {
   await setGlobalValues();
   bool registered = doubleName != null;
 
+  // Start background tasks if app is initialized
+  if (initDone) {
+    try {
+      await FDroidBackgroundService.startPeriodicTask();
+      logger.i('[Main] Background tasks started');
+    } catch (e) {
+      logger.e('[Main] Failed to start background tasks: $e');
+    }
+  }
+
   runApp(
     ProviderScope(
       child: MyApp(initDone: initDone, registered: registered),
     ),
-  );
-
-  BackgroundFetch.configure(
-    BackgroundFetchConfig(
-      minimumFetchInterval: 15,
-      stopOnTerminate: false,
-      enableHeadless: true,
-      requiresBatteryNotLow: false,
-      requiresCharging: false,
-      requiresStorageNotLow: false,
-      requiredNetworkType: NetworkType.ANY,
-    ),
-    (String taskId) async {
-      logger.i('[BackgroundFetch] Task: $taskId');
-      await checkNodeStatus(taskId);
-      BackgroundFetch.finish(taskId);
-    },
-    (String taskId) async {
-      logger.i('[BackgroundFetch] Timeout: $taskId');
-      BackgroundFetch.finish(taskId);
-    },
   );
 }
 

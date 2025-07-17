@@ -88,8 +88,14 @@
 	<true/>
 	<key>UIBackgroundModes</key>
 	<array>
-  		<string>fetch</string>
+  		<string>background-fetch</string>
+  		<string>background-processing</string>
   		<string>remote-notification</string>
+	</array>
+
+	<key>BGTaskSchedulerPermittedIdentifiers</key>
+	<array>
+		<string>com.threefold.node_check_task</string>
 	</array>
 
 	<key>NSUserNotificationAlertStyle</key>
@@ -100,5 +106,9 @@
 
 	<key>NSUserNotificationUsageDescription</key>
 	<string>This app needs permission to send you notifications when your node is offline.</string>
+	<key>CADisableMinimumFrameDurationOnPhone</key>
+	<true/>
+	<key>UIApplicationSupportsIndirectInputEvents</key>
+	<true/>
 </dict>
 </plist>
