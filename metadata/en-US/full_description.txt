@@ -1,0 +1,4 @@
+ThreeFold Connect is your gateway to the ThreeFold Grid:
+- Securely store TFT (ThreeFold Token)
+- Authenticate with ThreeFold services
+- Open-source and privacy-focused
