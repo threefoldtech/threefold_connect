@@ -1,30 +1,27 @@
-import 'package:background_fetch/background_fetch.dart';
+import 'package:workmanager/workmanager.dart';
 import 'package:threebotlogin/apps/notifications/notifications_user_data.dart';
 import 'package:threebotlogin/models/farm.dart';
 import 'package:threebotlogin/services/nodes_check_service.dart';
 import 'notification_service.dart';
 import 'package:threebotlogin/helpers/logger.dart';
 
-void backgroundFetchHeadlessTask(HeadlessTask task) async {
-  final String taskId = task.taskId;
-  final bool timeout = task.timeout;
-
-  if (timeout) {
-    BackgroundFetch.finish(taskId);
-    return;
-  }
-  final bool notificationsEnabled = await isNodeStatusNotificationEnabled();
-
-  logger.i(
-      '[BackgroundFetch] Headless Task: $taskId, Notifications Enabled: $notificationsEnabled');
-
-  if (!notificationsEnabled) {
-    logger.i(
-        '[BackgroundFetch] Node status notifications are disabled. Finishing task: $taskId');
-    BackgroundFetch.finish(taskId);
-    return;
-  }
-  await checkNodeStatus(taskId);
+@pragma('vm:entry-point')
+void callbackDispatcher() {
+  Workmanager().executeTask((taskName, inputData) async {
+    logger.i('[Workmanager] Executing task: $taskName');
+    
+    final bool notificationsEnabled = await isNodeStatusNotificationEnabled();
+    
+    logger.i('[Workmanager] Notifications Enabled: $notificationsEnabled');
+    
+    if (!notificationsEnabled) {
+      logger.i('[Workmanager] Node status notifications are disabled.');
+      return true;
+    }
+    
+    await checkNodeStatus(taskName);
+    return true;
+  });
 }
 
 Future<void> checkNodeStatus(String taskId) async {
@@ -34,11 +31,10 @@ Future<void> checkNodeStatus(String taskId) async {
     final offlineNodes = [...v3OfflineNodes, ...v4OfflineNodes];
 
     logger.i(
-        '[BackgroundFetch] Total offline nodes found: ${offlineNodes.length} for task $taskId');
+        '[Workmanager] Total offline nodes found: ${offlineNodes.length} for task $taskId');
 
     if (offlineNodes.isEmpty) {
-      logger.i(
-          '[BackgroundFetch] No offline nodes found, finishing task $taskId');
+      logger.i('[Workmanager] No offline nodes found');
       return;
     }
 
@@ -54,7 +50,7 @@ Future<void> checkNodeStatus(String taskId) async {
 
       if (nodeUpdatedAtMs <= sevenDaysAgoTimestampMs) {
         logger.i(
-            '[BackgroundFetch] Skipping node ${node.nodeId} - offline for more than 7 days');
+            '[Workmanager] Skipping node ${node.nodeId} - offline for more than 7 days');
         continue;
       }
 
@@ -76,8 +72,7 @@ Future<void> checkNodeStatus(String taskId) async {
     }
 
     if (nodesToNotify.isEmpty) {
-      logger.i(
-          '[BackgroundFetch] No nodes to notify after interval check, finishing task $taskId');
+      logger.i('[Workmanager] No nodes to notify after interval check');
       return;
     }
 
@@ -90,10 +85,7 @@ Future<void> checkNodeStatus(String taskId) async {
       groupKey: 'offline_nodes',
     );
   } catch (e) {
-    logger.e('[BackgroundFetch] Error in checkNodeStatus for task $taskId: $e');
-  } finally {
-    logger.i('[BackgroundFetch] Finishing task $taskId');
-    BackgroundFetch.finish(taskId);
+    logger.e('[Workmanager] Error in checkNodeStatus for task $taskId: $e');
   }
 }
 

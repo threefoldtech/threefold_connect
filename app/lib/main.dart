@@ -1,4 +1,4 @@
-import 'package:background_fetch/background_fetch.dart';
+import 'package:workmanager/workmanager.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -45,7 +45,10 @@ Future<void> main() async {
 
   await NotificationService().initNotification();
 
-  BackgroundFetch.registerHeadlessTask(backgroundFetchHeadlessTask);
+  await Workmanager().initialize(
+    callbackDispatcher,
+    isInDebugMode: false,
+  );
 
   bool initDone = await getInitDone();
   String? doubleName = await getDoubleName();
@@ -59,26 +62,21 @@ Future<void> main() async {
     ),
   );
 
-  BackgroundFetch.configure(
-    BackgroundFetchConfig(
-      minimumFetchInterval: 15,
-      stopOnTerminate: false,
-      enableHeadless: true,
+  // Register periodic task for node status checking
+  await Workmanager().registerPeriodicTask(
+    'nodeStatusCheck',
+    'checkNodeStatus',
+    frequency: const Duration(minutes: 15),
+    constraints: Constraints(
+      networkType: NetworkType.connected,
       requiresBatteryNotLow: false,
       requiresCharging: false,
       requiresStorageNotLow: false,
-      requiredNetworkType: NetworkType.ANY,
     ),
-    (String taskId) async {
-      logger.i('[BackgroundFetch] Task: $taskId');
-      await checkNodeStatus(taskId);
-      BackgroundFetch.finish(taskId);
-    },
-    (String taskId) async {
-      logger.i('[BackgroundFetch] Timeout: $taskId');
-      BackgroundFetch.finish(taskId);
-    },
+    existingWorkPolicy: ExistingWorkPolicy.replace,
   );
+
+  logger.i('[Workmanager] Registered periodic task for node status checking');
 }
 
 Future<void> setGlobalValues() async {
