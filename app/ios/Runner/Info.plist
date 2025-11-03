@@ -2,8 +2,6 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>NSCameraUsageDescription</key>
-	<string>Required for document and facial capture</string>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
@@ -31,7 +29,7 @@
 			<string>org.jimber.threebot</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>threebot</string>
+				<string>threebot-staging</string>
 			</array>
 		</dict>
 	</array>
@@ -86,19 +84,9 @@
 	<false/>
 	<key>io.flutter.embedded_views_preview</key>
 	<true/>
-	<key>UIBackgroundModes</key>
-	<array>
-  		<string>fetch</string>
-  		<string>remote-notification</string>
-	</array>
-
-	<key>NSUserNotificationAlertStyle</key>
-	<string>alert</string>
-
-	<key>NSLocalNetworkUsageDescription</key>
-	<string>This app uses the network to monitor your node status.</string>
-
-	<key>NSUserNotificationUsageDescription</key>
-	<string>This app needs permission to send you notifications when your node is offline.</string>
+	<key>CADisableMinimumFrameDurationOnPhone</key>
+	<true/>
+	<key>UIApplicationSupportsIndirectInputEvents</key>
+	<true/>
 </dict>
 </plist>
