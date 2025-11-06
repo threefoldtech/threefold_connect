@@ -20,7 +20,7 @@ import 'package:threebotlogin/services/socket_service.dart';
 import 'package:threebotlogin/services/shared_preference_service.dart';
 import 'package:threebotlogin/widgets/error_widget.dart';
 import 'package:threebotlogin/widgets/home_logo.dart';
-import 'package:uni_links/uni_links.dart';
+import 'package:app_links/app_links.dart';
 import 'package:threebotlogin/services/tfchain_service.dart' as TFChain;
 
 class MainScreen extends StatefulWidget {
@@ -40,6 +40,7 @@ class _AppState extends State<MainScreen> {
   String? errorMessage;
 
   late BackendConnection _backendConnection;
+  late AppLinks _appLinks;
 
   @override
   void initState() {
@@ -310,14 +311,18 @@ class _AppState extends State<MainScreen> {
   }
 
   Future<void> initUniLinks() async {
-    initialLink = await getInitialLink();
+    _appLinks = AppLinks();
+    final uri = await _appLinks.getInitialLink();
+    if (uri != null) {
+      initialLink = uri.toString();
+    }
 
     // Doesn't seem needed in this scenario. Might be removed in the future.
-    _sub = linkStream.listen((String? incomingLink) {
-      if (!mounted) {
+    _sub = _appLinks.uriLinkStream.listen((Uri? uri) {
+      if (!mounted || uri == null) {
         return;
       }
-      initialLink = incomingLink;
+      initialLink = uri.toString();
     });
   }
 

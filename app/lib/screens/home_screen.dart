@@ -23,7 +23,7 @@ import 'package:threebotlogin/services/socket_service.dart';
 import 'package:threebotlogin/services/uni_link_service.dart';
 import 'package:threebotlogin/services/shared_preference_service.dart';
 import 'package:threebotlogin/widgets/email_verification_needed.dart';
-import 'package:uni_links/uni_links.dart';
+import 'package:app_links/app_links.dart';
 
 /* Screen shows tab bar and all pages defined in router.dart */
 class HomeScreen extends ConsumerStatefulWidget {
@@ -42,6 +42,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
   String? initialLink;
   bool timeoutExpiredInBackground = true;
   bool pinCheckOpen = false;
+  late AppLinks _appLinks;
 
   @override
   void dispose() {
@@ -191,11 +192,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     if (initialLink != null) {
       Events().emit(UniLinkEvent(Uri.parse(initialLink!), context));
     }
-    _sub = getLinksStream().listen((String? incomingLink) {
-      if (!mounted) {
+    
+    _appLinks = AppLinks();
+    _sub = _appLinks.uriLinkStream.listen((Uri? uri) {
+      if (!mounted || uri == null) {
         return;
       }
-      Events().emit(UniLinkEvent(Uri.parse(incomingLink!), context));
+      Events().emit(UniLinkEvent(uri, context));
     });
   }
 
