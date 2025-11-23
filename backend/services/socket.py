@@ -8,14 +8,12 @@ from services.logger import logger
 
 sio = SocketIO(
     cors_allowed_origins="*",
-    async_mode='gevent',
+    async_mode='eventlet',
     logger=False,
     engineio_logger=False,
     ping_timeout=60,
     ping_interval=25,
-    # Support both Socket.IO protocol v2 (old clients) and v4 (new clients)
     allow_upgrades=True,
-    # This allows backward compatibility with socket_io_client 1.0.2 and forward compatibility with 3.x
 )
 
 usersInRoom = {}
