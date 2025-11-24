@@ -1,17 +1,9 @@
-FROM python:2.7 as builder
-RUN apt-get update
-
-# Is optional, but if you are not going to use this then you will need to install
-# 'gnupg' for nodesource so it can setup node install
-RUN apt-get install -y build-essential python make gcc g++ curl
-
-# The next 2 steps will install node
-RUN curl -sL https://deb.nodesource.com/setup_15.x | bash -
-
-RUN apt-get install -y nodejs
+FROM node:18-bullseye as builder
+RUN apt-get update && \
+    apt-get install -y build-essential python3 make gcc g++ curl && \
+    rm -rf /var/lib/apt/lists/*
 
 # The next step is for installing yarn
-
 RUN npm install -g yarn
 
 WORKDIR /app
