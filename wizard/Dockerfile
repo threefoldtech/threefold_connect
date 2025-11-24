@@ -1,10 +1,7 @@
-FROM node:18-bullseye as builder
+FROM node:16-bullseye as builder
 RUN apt-get update && \
     apt-get install -y build-essential python3 make gcc g++ curl && \
     rm -rf /var/lib/apt/lists/*
-
-# The next step is for installing yarn
-RUN npm install -g yarn
 
 WORKDIR /app
 COPY package.json package.json
