@@ -7,25 +7,25 @@ environment: staging
 images:
   login:
     name: threebotlogin-staging
-    tag: staging-2
+    repo: threefolddev/3botlogin
   wizard:
-    name: wizard-prod
-    tag: latest
+    name: wizard-staging
+    repo: threefolddev/wizard
 
 
 ingress:
   # Used to create an Ingress record.
   hosts:
-    - name: login-helm-staging.jimbertesting.be
+    - name: login.staging.threefold.me
       # default paths for "/" and "/*" will be added
       path: /
       service: threebotlogin-staging
       port: 80
-    - name: login-helm-staging.jimbertesting.be
+    - name: login.staging.threefold.me
       path: /socket.io/
       service: threebotlogin-staging
       port: 5000
-    - name: wizard-helm-staging.jimbertesting.be
+    - name: wizard.staging.threefold.me
       path: /
-      service: wizard-prod
+      service: wizard-staging
       port: 82

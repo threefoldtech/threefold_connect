@@ -1,4 +1,4 @@
-FROM node:12 as builder
+FROM node:16 AS builder
 
 COPY frontend /frontend
 WORKDIR /frontend
@@ -13,16 +13,26 @@ WORKDIR /wizard
 RUN yarn install --frozen-lockfile && yarn build
 
 
-FROM nginx:1.21.1
+FROM nginx:1.25
 COPY backend/requirements.txt requirements.txt
 
-RUN apt update && apt install -y python3 python3-pip gcc libssl-dev python-gevent
-RUN CFLAGS="-I/usr/local/opt/openssl/include" LDFLAGS="-L/usr/local/opt/openssl/lib" \
-  UWSGI_PROFILE_OVERRIDE=ssl=true pip3 install uwsgi==2.0.19.1 -Iv
-# RUN pip3 install flask flask_socketio flask_cors pyfcm pynacl
-RUN pip3 install --upgrade pip
-RUN pip3 install -r requirements.txt --ignore-installed
-RUN pip3 install gevent
+RUN apt-get update && apt-get install -y \
+    python3 \
+    python3-pip \
+    gcc \
+    libssl-dev \
+    python3-dev \
+    libffi-dev \
+    && rm -rf /var/lib/apt/lists/*
+RUN pip3 install --break-system-packages uwsgi==2.0.26
+RUN pip3 install --break-system-packages --upgrade pip
+# Install stellar-sdk first to get compatible yarl version
+RUN pip3 install --break-system-packages stellar-sdk==9.1.0
+# Increase timeout and retries for slow network connections
+RUN pip3 install --break-system-packages \
+    --default-timeout=100 \
+    --retries=5 \
+    -r requirements.txt --ignore-installed
 
 COPY --from=builder /frontend/dist /var/www/html/frontend
 # COPY --from=builder /example/dist /var/www/html/example
@@ -35,4 +45,4 @@ COPY services.sh /services.sh
 RUN chmod +x /services.sh
 WORKDIR /usr/share/nginx/backend/
 
-CMD /./services.sh
+CMD ["/services.sh"]

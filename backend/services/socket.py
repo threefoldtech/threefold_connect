@@ -6,7 +6,15 @@ from flask_socketio import SocketIO, leave_room, join_room, emit
 import database as db
 from services.logger import logger
 
-sio = SocketIO(transports=["websocket"])
+sio = SocketIO(
+    cors_allowed_origins="*",
+    async_mode='gevent_uwsgi',
+    logger=False,
+    engineio_logger=False,
+    ping_timeout=60,
+    ping_interval=25,
+    allow_upgrades=True,
+)
 
 usersInRoom = {}
 messageQueue = {}
