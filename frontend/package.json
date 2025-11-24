@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "axios": "^1.8.2",
+    "socket.io-client": "^4.7.5",
     "bip39": "^2.5.0",
     "libsodium": "^0.7.6",
     "libsodium-wrappers": "^0.7.6",
