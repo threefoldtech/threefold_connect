@@ -29,3 +29,9 @@ ingress:
       path: /
       service: wizard-prod
       port: 82
+
+claims:
+  data:
+    name: threebotlogin
+    accessModes: ReadWriteMany
+    storage: 2G

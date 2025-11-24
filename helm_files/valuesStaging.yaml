@@ -29,3 +29,9 @@ ingress:
       path: /
       service: wizard-staging
       port: 82
+
+claims:
+  data:
+    name: threebotlogin-staging
+    accessModes: ReadWriteMany
+    storage: 2G
