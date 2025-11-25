@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:threebotlogin/helpers/logger.dart';
+import 'package:threebotlogin/helpers/transaction_helpers.dart';
 import 'package:threebotlogin/models/market_data.dart';
 import 'package:threebotlogin/models/wallet.dart';
 import 'package:threebotlogin/providers/wallets_provider.dart';
@@ -294,7 +295,7 @@ class _OverviewWidgetState extends ConsumerState<OverviewWidget> {
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         Text(
-                          marketData!.lastPrice.toStringAsFixed(7),
+                          formatAmountDisplay(marketData!.lastPrice.toString()),
                           style: Theme.of(context)
                               .textTheme
                               .headlineLarge!
@@ -437,9 +438,9 @@ class _OverviewWidgetState extends ConsumerState<OverviewWidget> {
                                               CrossAxisAlignment.start,
                                           children: [
                                             _buildMarketColumn('Last Price',
-                                                '${marketData!.lastPrice.toStringAsFixed(7)} USDC'),
+                                                '${formatAmountDisplay(marketData!.lastPrice.toString())} USDC'),
                                             _buildMarketColumn('Last USD Price',
-                                                '\$${marketData!.lastUsdPrice.toStringAsFixed(7)}'),
+                                                '\$${formatAmountDisplay(marketData!.lastUsdPrice.toString())}'),
                                           ],
                                         ),
                                       ),
@@ -450,9 +451,9 @@ class _OverviewWidgetState extends ConsumerState<OverviewWidget> {
                                               CrossAxisAlignment.start,
                                           children: [
                                             _buildMarketColumn('24H High',
-                                                '${marketData!.high24h.toStringAsFixed(7)} USDC'),
+                                                '${formatAmountDisplay(marketData!.high24h.toString())} USDC'),
                                             _buildMarketColumn('24H Low',
-                                                '${marketData!.low24h.toStringAsFixed(7)} USDC'),
+                                                '${formatAmountDisplay(marketData!.low24h.toString())} USDC'),
                                           ],
                                         ),
                                       ),
@@ -497,16 +498,16 @@ class _OverviewWidgetState extends ConsumerState<OverviewWidget> {
                                         children: [
                                           _buildMarketColumn(
                                               'TFT Balance',
-                                              _selectedWallet
-                                                  ?.stellarBalances['TFT']!),
+                                              formatAmountDisplay(_selectedWallet
+                                                  ?.stellarBalances['TFT']! ?? '0')),
                                           _buildMarketColumn(
                                               'USDC Balance',
-                                              _selectedWallet
-                                                  ?.stellarBalances['USDC']!),
+                                              formatAmountDisplay(_selectedWallet
+                                                  ?.stellarBalances['USDC']! ?? '0')),
                                           _buildMarketColumn(
                                               'XLM Balance',
-                                              _selectedWallet
-                                                  ?.stellarBalances['XLM']!),
+                                              formatAmountDisplay(_selectedWallet
+                                                  ?.stellarBalances['XLM']! ?? '0')),
                                         ],
                                       ),
                                     ],

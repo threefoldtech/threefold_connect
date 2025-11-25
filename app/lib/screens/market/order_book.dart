@@ -4,6 +4,7 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:stellar_flutter_sdk/stellar_flutter_sdk.dart';
 import 'package:threebotlogin/helpers/logger.dart';
+import 'package:threebotlogin/helpers/transaction_helpers.dart';
 import 'package:threebotlogin/models/order_book.dart';
 import 'package:threebotlogin/services/stellar_service.dart';
 
@@ -256,9 +257,9 @@ class _OrderbookWidgetState extends State<OrderbookWidget> {
                               bid != null
                                   ? (double.tryParse(bid.price) != null &&
                                           double.parse(bid.price) > 0)
-                                      ? (double.parse(bid.amount) /
+                                      ? formatAmountDisplay((double.parse(bid.amount) /
                                               double.parse(bid.price))
-                                          .toStringAsFixed(7)
+                                          .toString())
                                       : ''
                                   : '',
                               style: Theme.of(context)
@@ -272,7 +273,7 @@ class _OrderbookWidgetState extends State<OrderbookWidget> {
                               bid != null
                                   ? (double.tryParse(bid.price) != null &&
                                           double.parse(bid.price) > 0)
-                                      ? bid.price.toString()
+                                      ? formatAmountDisplay(bid.price.toString())
                                       : ''
                                   : '',
                               style: Theme.of(context)
@@ -296,14 +297,14 @@ class _OrderbookWidgetState extends State<OrderbookWidget> {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceAround,
                         children: [
-                          Text(ask != null ? ask.amount.toString() : '',
+                          Text(ask != null ? formatAmountDisplay(ask.amount.toString()) : '',
                               style: Theme.of(context)
                                   .textTheme
                                   .bodySmall!
                                   .copyWith(
                                       color:
                                           Theme.of(context).colorScheme.error)),
-                          Text(ask != null ? ask.price.toString() : '',
+                          Text(ask != null ? formatAmountDisplay(ask.price.toString()) : '',
                               style: Theme.of(context)
                                   .textTheme
                                   .bodySmall!

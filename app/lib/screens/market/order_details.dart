@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:stellar_client/models/exceptions.dart';
+import 'package:threebotlogin/helpers/transaction_helpers.dart';
 import 'package:threebotlogin/models/offer.dart';
 import 'package:threebotlogin/models/wallet.dart';
 import 'package:threebotlogin/services/stellar_service.dart' as Stellar;
@@ -248,7 +249,7 @@ class _OrderDetailsWidgetState extends State<OrderDetailsWidget> {
                           ),
                     ),
                     Text(
-                      '${totalCost.toStringAsFixed(2)} TFT',
+                      '${formatAmountDisplay(totalCost.toString())} TFT',
                       style: Theme.of(context).textTheme.bodyMedium!.copyWith(
                             color: Theme.of(context).colorScheme.primary,
                           ),
@@ -267,7 +268,7 @@ class _OrderDetailsWidgetState extends State<OrderDetailsWidget> {
                           ),
                     ),
                     Text(
-                      '${pricePerUSDC.toString()} USDC',
+                      '${formatAmountDisplay(pricePerUSDC.toString())} USDC',
                       style: Theme.of(context).textTheme.bodyMedium!.copyWith(
                             color: Theme.of(context).colorScheme.onSurface,
                           ),
@@ -283,7 +284,7 @@ class _OrderDetailsWidgetState extends State<OrderDetailsWidget> {
                           ),
                     ),
                     Text(
-                      '${pricePerTFT.toStringAsFixed(2)} TFT',
+                      '${formatAmountDisplay(pricePerTFT.toString())} TFT',
                       style: Theme.of(context).textTheme.bodyMedium!.copyWith(
                             color: Theme.of(context).colorScheme.onSurface,
                           ),
@@ -299,7 +300,7 @@ class _OrderDetailsWidgetState extends State<OrderDetailsWidget> {
                           ),
                     ),
                     Text(
-                      '${amount.toStringAsFixed(2)} USDC',
+                      '${formatAmountDisplay(amount.toString())} USDC',
                       style: Theme.of(context).textTheme.bodyMedium!.copyWith(
                             color: Theme.of(context).colorScheme.error,
                           ),
