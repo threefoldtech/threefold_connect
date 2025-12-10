@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:threebotlogin/helpers/logger.dart';
 import 'package:threebotlogin/main.dart';
 import 'package:threebotlogin/widgets/custom_dialog.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 @pragma('vm:entry-point')
 Future<void> onActionReceivedMethod(ReceivedAction receivedAction) async {
@@ -59,11 +60,15 @@ class NotificationService {
       onDismissActionReceivedMethod: _onDismissActionReceived,
     );
 
-    await AwesomeNotifications().isNotificationAllowed().then((isAllowed) {
-      if (!isAllowed) {
-        AwesomeNotifications().requestPermissionToSendNotifications();
+    final isAllowed = await AwesomeNotifications().isNotificationAllowed();
+    if (!isAllowed) {
+      final prefs = await SharedPreferences.getInstance();
+      final hasRequestedBefore = prefs.getBool('notification_permission_requested') ?? false;
+      if (!hasRequestedBefore) {
+        await AwesomeNotifications().requestPermissionToSendNotifications();
+        await prefs.setBool('notification_permission_requested', true);
       }
-    });
+    }
 
     _isInitialized = true;
   }
