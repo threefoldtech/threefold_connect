@@ -627,6 +627,9 @@ class _OverviewWidgetState extends ConsumerState<OverviewWidget> {
             .toList();
 
         if (filteredWallets.isEmpty) {
+          const errorMessage =
+              'You must have at least one activated wallet with both assets USDC & TFT';
+
           return Container(
             width: double.infinity,
             padding: const EdgeInsets.all(16),
@@ -645,7 +648,7 @@ class _OverviewWidgetState extends ConsumerState<OverviewWidget> {
                 ),
                 const SizedBox(height: 12),
                 Text(
-                  'No wallets with TFT and USDC assets found.',
+                  errorMessage,
                   style: Theme.of(context)
                       .textTheme
                       .bodyMedium!
