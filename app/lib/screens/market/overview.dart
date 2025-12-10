@@ -12,7 +12,14 @@ import 'package:threebotlogin/widgets/market/wallet_selection.dart';
 import 'package:threebotlogin/services/stellar_service.dart' as Stellar;
 
 class OverviewWidget extends ConsumerStatefulWidget {
-  const OverviewWidget({super.key});
+  final Wallet? selectedWallet;
+  final Function(Wallet) onWalletSelected;
+
+  const OverviewWidget({
+    super.key,
+    this.selectedWallet,
+    required this.onWalletSelected,
+  });
 
   @override
   ConsumerState<OverviewWidget> createState() => _OverviewWidgetState();
@@ -21,7 +28,6 @@ class OverviewWidget extends ConsumerStatefulWidget {
 class _OverviewWidgetState extends ConsumerState<OverviewWidget> {
   late Timer _timer;
   String lastUpdated = '--';
-  Wallet? _selectedWallet;
   bool loading = true;
   bool failed = false;
   bool isLoadingWallets = false;
@@ -42,7 +48,6 @@ class _OverviewWidgetState extends ConsumerState<OverviewWidget> {
       setState(() {
         isLoadingWallets = true;
         loadingWalletsFailed = false;
-        _selectedWallet = null;
       });
       try {
         await walletsNotifierRef.list();
@@ -66,7 +71,6 @@ class _OverviewWidgetState extends ConsumerState<OverviewWidget> {
     setState(() {
       isLoadingWallets = true;
       loadingWalletsFailed = false;
-      _selectedWallet = null;
     });
 
     final walletsNotifierRef = ref.read(walletsNotifier.notifier);
@@ -342,7 +346,7 @@ class _OverviewWidgetState extends ConsumerState<OverviewWidget> {
                                         MainAxisAlignment.spaceBetween,
                                     children: [
                                       Text(
-                                        _selectedWallet?.name ??
+                                        widget.selectedWallet?.name ??
                                             'Select Wallet',
                                         style: Theme.of(context)
                                             .textTheme
@@ -366,20 +370,20 @@ class _OverviewWidgetState extends ConsumerState<OverviewWidget> {
                               child: SizedBox(
                                 height: 50,
                                 child: ElevatedButton(
-                                  onPressed: _selectedWallet == null
+                                  onPressed: widget.selectedWallet == null
                                       ? null
                                       : () async {
                                           Navigator.of(context).push(
                                               MaterialPageRoute(
                                                   builder: (context) =>
                                                       OrderWidget(
-                                                        selectedWallet:
-                                                            _selectedWallet!,
+                                                        selectedWallet: widget
+                                                            .selectedWallet!,
                                                       )));
                                         },
                                   child: Text(
                                     'My Orders',
-                                    style: _selectedWallet == null
+                                    style: widget.selectedWallet == null
                                         ? Theme.of(context)
                                             .textTheme
                                             .bodyLarge!
@@ -463,7 +467,7 @@ class _OverviewWidgetState extends ConsumerState<OverviewWidget> {
                             ),
                           ),
                           const SizedBox(height: 16),
-                          if (_selectedWallet != null)
+                          if (widget.selectedWallet != null)
                             SizedBox(
                               width: double.infinity,
                               child: Card(
@@ -497,15 +501,15 @@ class _OverviewWidgetState extends ConsumerState<OverviewWidget> {
                                         children: [
                                           _buildMarketColumn(
                                               'TFT Balance',
-                                              _selectedWallet
+                                              widget.selectedWallet
                                                   ?.stellarBalances['TFT']!),
                                           _buildMarketColumn(
                                               'USDC Balance',
-                                              _selectedWallet
+                                              widget.selectedWallet
                                                   ?.stellarBalances['USDC']!),
                                           _buildMarketColumn(
                                               'XLM Balance',
-                                              _selectedWallet
+                                              widget.selectedWallet
                                                   ?.stellarBalances['XLM']!),
                                         ],
                                       ),
@@ -522,18 +526,18 @@ class _OverviewWidgetState extends ConsumerState<OverviewWidget> {
                       child: SizedBox(
                         width: MediaQuery.of(context).size.width - 40,
                         child: ElevatedButton(
-                          onPressed: _selectedWallet == null
+                          onPressed: widget.selectedWallet == null
                               ? null
                               : () async {
                                   Navigator.of(context).push(MaterialPageRoute(
                                       builder: (context) => BuyTFTWidget(
-                                            wallet: _selectedWallet!,
+                                            wallet: widget.selectedWallet!,
                                             edit: false,
                                           )));
                                 },
                           child: Text(
                             'Buy TFT',
-                            style: _selectedWallet == null
+                            style: widget.selectedWallet == null
                                 ? Theme.of(context)
                                     .textTheme
                                     .bodyLarge!
@@ -655,11 +659,9 @@ class _OverviewWidgetState extends ConsumerState<OverviewWidget> {
         }
         return WalletSelectionSheet(
           wallets: filteredWallets,
-          selectedWallet: _selectedWallet,
+          selectedWallet: widget.selectedWallet,
           onWalletSelected: (Wallet wallet) {
-            setState(() {
-              _selectedWallet = wallet;
-            });
+            widget.onWalletSelected(wallet);
             Navigator.pop(context);
           },
         );
