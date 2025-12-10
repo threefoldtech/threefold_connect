@@ -115,7 +115,6 @@ class _BuyTFTWidgetState extends State<BuyTFTWidget> {
 
   bool _validateAmount() {
     final amount = amountController.text.trim();
-    amountError = null;
 
     if (loadingBalance) {
       setState(() {
@@ -130,22 +129,36 @@ class _BuyTFTWidgetState extends State<BuyTFTWidget> {
       });
       return false;
     }
-    final balance = roundAmount(availableUSDC ?? '0');
 
-    if (balance - Decimal.parse(amount) <= Decimal.zero) {
+    try {
+      final decimalAmount = Decimal.parse(amount);
+
+      if (decimalAmount <= Decimal.zero) {
+        setState(() {
+          amountError = 'Amount must be greater than zero';
+        });
+        return false;
+      }
+
+      final balance = roundAmount(availableUSDC ?? '0');
+
+      if (balance - decimalAmount <= Decimal.zero) {
+        setState(() {
+          amountError = 'Balance is not enough';
+        });
+        return false;
+      }
+
       setState(() {
-        amountError = 'Balance is not enough';
+        amountError = null;
+      });
+      return true;
+    } catch (e) {
+      setState(() {
+        amountError = 'Invalid amount format';
       });
       return false;
     }
-
-    if (Decimal.parse(amount) > Decimal.parse(availableUSDC ?? '0')) {
-      setState(() {
-        amountError = 'Not enough balance';
-      });
-      return false;
-    }
-    return true;
   }
 
   bool _validatePrice() {
@@ -173,6 +186,7 @@ class _BuyTFTWidgetState extends State<BuyTFTWidget> {
         (Decimal.fromInt(percentage).shift(-2));
     amountController.text = roundAmount(amount.toString()).toString();
     _calculateTotal();
+    _validateAmount();
   }
 
   void _calculateTotal() {
@@ -437,6 +451,9 @@ class _BuyTFTWidgetState extends State<BuyTFTWidget> {
                               color: Theme.of(context).colorScheme.onSurface,
                             ),
                         focusNode: textFieldFocusNode,
+                        onChanged: (_) {
+                          _validateAmount();
+                        },
                         keyboardType: const TextInputType.numberWithOptions(
                             decimal: true, signed: false),
                         controller: amountController,
@@ -638,7 +655,9 @@ class _BuyTFTWidgetState extends State<BuyTFTWidget> {
                       child: SizedBox(
                         width: double.infinity,
                         child: ElevatedButton(
-                          onPressed: loading || loadingBalance
+                          onPressed: loading ||
+                                  loadingBalance ||
+                                  priceError != null
                               ? null
                               : () async {
                                   if (_validateAmount() && _validatePrice()) {
