@@ -1,3 +1,6 @@
+import 'dart:async';
+
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:threebotlogin/apps/wallet/wallet_config.dart';
@@ -108,41 +111,87 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
     );
   }
 
-  listMyWallets() async {
+  Future<void> listMyWallets() async {
+    _setLoadingState();
+
+    try {
+      final connectivityResult = await (Connectivity().checkConnectivity());
+
+      if (connectivityResult.contains(ConnectivityResult.none)) {
+        _handleFailure(
+          'No internet connection. Please check your network.',
+        );
+        return;
+      }
+
+      await _fetchWalletData().timeout(
+        const Duration(minutes: 1),
+        onTimeout: () {
+          throw TimeoutException('Loading wallets timed out');
+        },
+      );
+
+      _handleSuccess();
+    } on TimeoutException catch (e) {
+      _handleFailure(
+        'Loading wallets timed out. Please check your network.',
+        error: e,
+      );
+    } on Exception catch (e) {
+      _handleFailure(
+        'Failed to load wallets. Please try again.',
+        error: e,
+      );
+    }
+  }
+
+  void _setLoadingState() {
     setState(() {
       loading = true;
       failed = false;
     });
-    try {
-      await ref.read(walletsNotifier.notifier).list();
-      wallets = ref.read(walletsNotifier);
-      if (wallets.isEmpty) {
-        await _addInitialWallet();
-      }
-    } catch (e) {
-      setState(() {
-        failed = true;
-      });
-      logger.e('Failed to get wallets due to $e');
-      if (context.mounted) {
-        final loadingFarmsFailure = SnackBar(
-          content: Text(
-            'Failed to load wallets',
-            style: Theme.of(context)
-                .textTheme
-                .bodyMedium!
-                .copyWith(color: Theme.of(context).colorScheme.errorContainer),
-          ),
-          duration: const Duration(seconds: 3),
-        );
-        ScaffoldMessenger.of(context).clearSnackBars();
-        ScaffoldMessenger.of(context).showSnackBar(loadingFarmsFailure);
-      }
-    } finally {
-      setState(() {
-        loading = false;
-      });
+  }
+
+  Future<void> _fetchWalletData() async {
+    await ref.read(walletsNotifier.notifier).list();
+    wallets = ref.read(walletsNotifier);
+
+    if (wallets.isEmpty) {
+      await _addInitialWallet();
     }
+  }
+
+  void _handleSuccess() {
+    setState(() {
+      loading = false;
+      failed = false;
+    });
+  }
+
+  void _handleFailure(String userMessage, {Object? error}) {
+    if (error != null) {
+      logger.e('Load wallets failed', error: error);
+    }
+
+    if (mounted) {
+      final errorSnackbar = SnackBar(
+        content: Text(
+          userMessage,
+          style: Theme.of(context)
+              .textTheme
+              .bodyMedium!
+              .copyWith(color: Theme.of(context).colorScheme.errorContainer),
+        ),
+        duration: const Duration(seconds: 3),
+      );
+      ScaffoldMessenger.of(context).clearSnackBars();
+      ScaffoldMessenger.of(context).showSnackBar(errorSnackbar);
+    }
+
+    setState(() {
+      loading = false;
+      failed = true;
+    });
   }
 
   _openAddWalletOverlay() {
@@ -170,30 +219,36 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
   }
 
   Future<void> handleRefresh() async {
+    _setLoadingState();
+
     try {
-      loading = true;
-      await ref.refresh(walletsNotifier.notifier).list();
-      return;
-    } catch (e) {
-      failed = true;
-      logger.e('Failed to get wallets due to $e');
-      if (context.mounted) {
-        final loadingFarmsFailure = SnackBar(
-          content: Text(
-            'Failed to load wallets',
-            style: Theme.of(context)
-                .textTheme
-                .bodyMedium!
-                .copyWith(color: Theme.of(context).colorScheme.errorContainer),
-          ),
-          duration: const Duration(seconds: 3),
+      final connectivityResult = await (Connectivity().checkConnectivity());
+
+      if (connectivityResult.contains(ConnectivityResult.none)) {
+        _handleFailure(
+          'No internet connection. Please check your network.',
         );
-        ScaffoldMessenger.of(context).clearSnackBars();
-        ScaffoldMessenger.of(context).showSnackBar(loadingFarmsFailure);
+        return;
       }
-    } finally {
-      loading = false;
-      setState(() {});
+
+      await _fetchWalletData().timeout(
+        const Duration(minutes: 1),
+        onTimeout: () {
+          throw TimeoutException('Refreshing wallets timed out');
+        },
+      );
+
+      _handleSuccess();
+    } on TimeoutException catch (e) {
+      _handleFailure(
+        'Refreshing wallets timed out. Please check your network.',
+        error: e,
+      );
+    } on Exception catch (e) {
+      _handleFailure(
+        'Failed to refresh wallets. Please try again.',
+        error: e,
+      );
     }
   }
 }
