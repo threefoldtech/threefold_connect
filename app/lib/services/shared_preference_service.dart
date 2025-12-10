@@ -381,7 +381,13 @@ Future<List<WalletData>> getWallets() async {
 
 Future<bool> clearData() async {
   final SharedPreferences prefs = await SharedPreferences.getInstance();
+  // Preserve notification permission flag since it's tied to system permissions
+  final notificationPermissionRequested = prefs.getBool('notification_permission_requested') ?? false;
   bool cleared = await prefs.clear();
+  // Restore the notification permission flag after clearing
+  if (notificationPermissionRequested) {
+    await prefs.setBool('notification_permission_requested', true);
+  }
   saveInitDone();
   return cleared;
 }
