@@ -412,7 +412,7 @@ class _WalletDetailsWidgetState extends ConsumerState<WalletDetailsWidget> {
                               backgroundColor:
                                   Theme.of(context).colorScheme.errorContainer),
                           child: Text(
-                            'Delete',
+                            'Delete Wallet',
                             style:
                                 Theme.of(context).textTheme.bodyLarge!.copyWith(
                                       color: Theme.of(context)
