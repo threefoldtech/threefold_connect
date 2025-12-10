@@ -251,6 +251,16 @@ class _FarmDetailsState extends State<FarmDetails> {
 
   @override
   Widget build(BuildContext context) {
+    final sortedNodes = List.from(widget.farm.nodes)
+      ..sort((a, b) {
+        if (a.status == NodeStatus.Up && b.status != NodeStatus.Up) {
+          return -1;
+        } else if (a.status != NodeStatus.Up && b.status == NodeStatus.Up) {
+          return 1;
+        } else {
+          return 0;
+        }
+      });
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.farm.name),
@@ -526,9 +536,9 @@ class _FarmDetailsState extends State<FarmDetails> {
                         ListView.builder(
                           shrinkWrap: true,
                           physics: const NeverScrollableScrollPhysics(),
-                          itemCount: widget.farm.nodes.length,
+                          itemCount: sortedNodes.length,
                           itemBuilder: (context, index) {
-                            final node = widget.farm.nodes[index];
+                            final node = sortedNodes[index];
                             return Card(
                               margin: const EdgeInsets.symmetric(
                                   vertical: 4.0, horizontal: 0.0),
