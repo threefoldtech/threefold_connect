@@ -225,6 +225,11 @@ class _PreferenceScreenState extends ConsumerState<PreferenceScreen> {
             onTap: () async => {await _showTermsAndConds()},
           ),
           ListTile(
+            leading: const Icon(Icons.help_outline),
+            title: const Text('View Documentation'),
+            onTap: () async => {await _showDocumentation()},
+          ),
+          ListTile(
             leading: const Icon(Icons.logout_outlined),
             title: Text(
               'Log Out',
@@ -457,6 +462,15 @@ class _PreferenceScreenState extends ConsumerState<PreferenceScreen> {
     }
 
     await launchUrl(Uri.parse(url));
+  }
+
+  Future<void> _showDocumentation() async {
+    const String url = 'https://manual.grid.tf/labs/documentation/tfconnect_toc';
+
+    final Uri uri = Uri.parse(url);
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    }
   }
 
   void _showVersionInfo() {
