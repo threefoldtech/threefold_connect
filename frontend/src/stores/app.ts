@@ -91,10 +91,63 @@ export const useAppStore = defineStore('app', () => {
     socketService.emit('login', { doubleName: doubleName.value, encryptedLoginAttempt })
   }
 
+  const clearCheckStatus = () => {
+    nameCheckStatus.value = { checked: false, checking: false, available: false }
+  }
+
+  const setRandomRoom = (room: string) => {
+    randomRoom.value = room
+    socketService.emit('join', { room })
+  }
+
+  const setState = (state: string) => {
+    _state.value = state
+  }
+
+  const setScope = (newScope: string) => {
+    scope.value = newScope
+  }
+
+  const setAppId = (id: string) => {
+    appId.value = id
+  }
+
+  const setAppPublicKey = (key: string) => {
+    appPublicKey.value = key
+  }
+
+  const setRedirectUrl = (url: string) => {
+    redirectUrl.value = url
+  }
+
+  const SOCKET_signedAttempt = (data: any) => {
+    signedAttempt.value = data
+  }
+
+  const SOCKET_emailverified = () => {
+    emailVerificationStatus.value = { checked: true, checking: false, valid: true }
+  }
+
+  const SOCKET_emailverificationfailed = () => {
+    emailVerificationStatus.value = { checked: true, checking: false, valid: false }
+  }
+
+  const SOCKET_smsverified = () => {
+    smsVerificationStatus.value = { checked: true, checking: false, valid: true }
+  }
+
+  const SOCKET_smsverificationfailed = () => {
+    smsVerificationStatus.value = { checked: true, checking: false, valid: false }
+  }
+
   return {
     _state, redirectUrl, keys, doubleName, nameCheckStatus, emailVerificationStatus,
     smsVerificationStatus, signedAttempt, firstTime, isMobile, scope, appId, appPublicKey,
-    randomImageId, randomRoom, loginTimeleft, setDoubleName, checkName,
-    SOCKET_nameknown, SOCKET_namenotknown, loginUser
+    randomImageId, randomRoom, loginTimeleft, 
+    setDoubleName, checkName, clearCheckStatus, loginUser, setRandomRoom,
+    setState, setScope, setAppId, setAppPublicKey, setRedirectUrl,
+    SOCKET_nameknown, SOCKET_namenotknown, SOCKET_signedAttempt,
+    SOCKET_emailverified, SOCKET_emailverificationfailed,
+    SOCKET_smsverified, SOCKET_smsverificationfailed
   }
 })

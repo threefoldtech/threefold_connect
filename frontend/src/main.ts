@@ -20,9 +20,16 @@ setSocketInstance(socket)
 
 const store = useAppStore()
 
-socket.on('connect', () => store.SOCKET_nameknown?.())
+// Socket event listeners
+socket.on('connect', () => console.log('Socket connected'))
+socket.on('disconnect', () => console.log('Socket disconnected'))
 socket.on('nameknown', () => store.SOCKET_nameknown())
 socket.on('namenotknown', () => store.SOCKET_namenotknown())
+socket.on('signedAttempt', (data: any) => store.SOCKET_signedAttempt(data))
+socket.on('emailverified', () => store.SOCKET_emailverified())
+socket.on('emailverificationfailed', () => store.SOCKET_emailverificationfailed())
+socket.on('smsverified', () => store.SOCKET_smsverified())
+socket.on('smsverificationfailed', () => store.SOCKET_smsverificationfailed())
 
 router.beforeEach((to: RouteLocationNormalized, _from: RouteLocationNormalized, next: NavigationGuardNext) => {
   const publicRoutes = ['initial', 'error', 'verifyemail', 'verifysms', 'sign']

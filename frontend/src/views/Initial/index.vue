@@ -105,6 +105,7 @@ const nameRules = [
 ]
 
 const checkNameAvailability = () => {
+  store.clearCheckStatus()
   if (doubleName.value) {
     if (nameCheckerTimeOut.value != null) {
       clearTimeout(nameCheckerTimeOut.value)
@@ -167,11 +168,11 @@ onMounted(() => {
     }
   }
   
-  store._state = route.query.state as string || null
-  store.redirectUrl = route.query.redirecturl as string || null
-  store.appId = route.query.appid as string || null
-  store.appPublicKey = route.query.publickey as string || null
-  store.scope = route.query.scope as string || null
+  if (route.query.state) store.setState(route.query.state as string)
+  if (route.query.redirecturl) store.setRedirectUrl(route.query.redirecturl as string)
+  if (route.query.appid) store.setAppId(route.query.appid as string)
+  if (route.query.publickey) store.setAppPublicKey(route.query.publickey as string)
+  if (route.query.scope) store.setScope(route.query.scope as string)
 })
 </script>
 
