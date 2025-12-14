@@ -34,7 +34,7 @@
               </v-row>
               <v-row v-else>
                 <v-col cols="12">
-                  <b v-if="ref">This login attempt is no longer valid, please click <a :href="ref">here</a> to return.</b>
+                  <b v-if="referrer">This login attempt is no longer valid, please click <a :href="referrer">here</a> to return.</b>
                   <b v-else>This login attempt is no longer valid, please go back to the previous page.</b>
                 </v-col>
               </v-row>
@@ -82,7 +82,7 @@ const store = useAppStore()
 const isMobile = ref(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent))
 const dialog = ref(false)
 const loggedIn = ref(false)
-const ref = ref(document.referrer)
+const referrer = ref(document.referrer)
 
 const openApp = () => {
   if (isMobile.value) {
@@ -108,7 +108,7 @@ watch(() => store.signedAttempt, (val) => {
   if (val) {
     loggedIn.value = true
     const data = encodeURIComponent(JSON.stringify(val))
-    const union = store.redirectUrl?.indexOf('?') >= 0 ? '&' : '?'
+    const union = (store.redirectUrl?.indexOf('?') ?? -1) >= 0 ? '&' : '?'
     const safeRedirectUri = store.redirectUrl?.[0] === '/' ? store.redirectUrl : '/' + store.redirectUrl
     const url = `//${store.appId}${safeRedirectUri}${union}signedAttempt=${data}`
     window.location.href = url

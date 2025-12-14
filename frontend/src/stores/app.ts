@@ -3,8 +3,6 @@ import { ref } from 'vue'
 import socketService from '@/services/socketService'
 import cryptoService from '@/services/cryptoService'
 import userService from '@/services/userService'
-import axios from 'axios'
-import config from '@/config'
 import type { Keys, NameCheckStatus, VerificationStatus } from '@/types'
 
 const generateUUID = (): string => {
@@ -41,7 +39,6 @@ export const useAppStore = defineStore('app', () => {
   const randomImageId = ref<number | null>(null)
   const randomRoom = ref<string | null>(null)
   const loginTimeleft = ref(120)
-  const loginInterval = ref<number>()
 
   // Actions
   const setDoubleName = (name: string) => {

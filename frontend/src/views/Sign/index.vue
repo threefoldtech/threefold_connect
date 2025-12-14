@@ -73,7 +73,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, watch } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useAppStore } from '@/stores/app'
 import config from '@/config'
@@ -88,7 +88,6 @@ const dialog = ref(false)
 const isMobile = ref(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent))
 const isSignAttemptOnGoing = ref(false)
 const nameCheckerTimeOut = ref<number | null>(null)
-const isRedirecting = ref(false)
 
 const nameRegex = /^(\w+)$/
 const nameRules = [
