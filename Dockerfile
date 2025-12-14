@@ -4,14 +4,6 @@ COPY frontend /frontend
 WORKDIR /frontend
 RUN yarn install --frozen-lockfile && yarn build
 
-# COPY example /example
-# WORKDIR /example
-# RUN yarn install --frozen-lockfile && yarn build
-
-COPY wizard /wizard
-WORKDIR /wizard
-RUN yarn install --frozen-lockfile && yarn build
-
 
 FROM nginx:1.25
 COPY backend/requirements.txt requirements.txt
@@ -35,8 +27,6 @@ RUN pip3 install --break-system-packages \
     -r requirements.txt --ignore-installed
 
 COPY --from=builder /frontend/dist /var/www/html/frontend
-# COPY --from=builder /example/dist /var/www/html/example
-COPY --from=builder /wizard/dist /var/www/html/wizard
 
 COPY backend/ /usr/share/nginx/backend
 

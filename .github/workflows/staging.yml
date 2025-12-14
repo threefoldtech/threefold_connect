@@ -21,10 +21,6 @@ jobs:
         run: docker build . --file Dockerfile --tag threefolddev/3botlogin:staging-${{ github.sha }}
       - name: Push the 3botlogin Docker image
         run: docker push threefolddev/3botlogin:staging-${{ github.sha }}
-      - name: Build wizard Docker image
-        run: docker build wizard/ --file wizard/Dockerfile --tag threefolddev/wizard:staging-${{ github.sha }}
-      - name: Push wizard Docker image
-        run: docker push threefolddev/wizard:staging-${{ github.sha }}
 
   deploy:
     needs: [build]
@@ -37,4 +33,4 @@ jobs:
           echo ${{ secrets.TF_KUBE_CONFIG }} | base64 --decode > ${HOME}/.kube/config
       - name: Install or Upgrade production on cluster
         run: |
-          helm upgrade threebotlogin --install helm_files -f helm_files/valuesStaging.yaml --set images.login.tag=staging-${{ github.sha }} --set images.wizard.tag=staging-${{ github.sha }} -n threefoldconnect-staging
+          helm upgrade threebotlogin --install helm_files -f helm_files/valuesStaging.yaml --set images.login.tag=staging-${{ github.sha }} -n threefoldconnect-staging

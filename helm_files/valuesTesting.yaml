@@ -8,9 +8,6 @@ images:
   login:
     name: threebotlogin-testing
     tag: testing-v1.5.6-test10
-  wizard:
-    name: wizard-prod
-    tag: prodv1
 
 
 
@@ -27,7 +24,3 @@ ingress:
       path: /socket.io/
       service: threebotlogin-testing
       port: 3030
-    - name: wizard-helm-testing.jimbertesting.be
-      path: /
-      service: threebotlogin-testing
-      port: 82

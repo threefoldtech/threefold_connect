@@ -4,9 +4,6 @@ images:
   login:
     name: threebotlogin-prod
     tag: production-337f2c85635dc81a5e59756dcfc66303f6f6afd7
-  wizard:
-    name: wizard-prod
-    tag: latest
 
 
 ingress:
@@ -21,14 +18,6 @@ ingress:
       path: /socket.io/
       service: threebotlogin-prod
       port: 5000
-    - name: wizard.jimber.org
-      path: /
-      service: wizard-prod
-      port: 82
-    - name: wizard.threefold.me
-      path: /
-      service: wizard-prod
-      port: 82
 
 claims:
   data:

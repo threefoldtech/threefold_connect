@@ -9,9 +9,6 @@ images:
   login:
     repo: jimber/3botlogin
     containerPort: 80
-  wizard:
-    repo: jimber/wizard
-    containerPort: 80
 
 services:
   app: 
@@ -22,10 +19,6 @@ services:
     name: uwgsi
     port: 5000
     targetPort: 5000
-  wizard:
-    name: wizard
-    port: 82
-    targetPort: 80
 
 storage:
   type: local
