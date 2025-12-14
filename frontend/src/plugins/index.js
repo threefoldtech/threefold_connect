@@ -1,2 +1,0 @@
-import './vuetify'
-import './uuid'
