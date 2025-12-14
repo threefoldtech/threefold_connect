@@ -56,27 +56,34 @@ export const useAppStore = defineStore('app', () => {
   }
 
   const SOCKET_nameknown = () => {
+    console.log('Socket: name is known (user exists)')
     nameCheckStatus.value = { checked: true, checking: false, available: false }
   }
 
   const SOCKET_namenotknown = () => {
+    console.log('Socket: name is not known (user does not exist)')
     nameCheckStatus.value = { checked: true, checking: false, available: true }
   }
 
   const loginUser = async (data: { doubleName: string; mobile: boolean; firstTime: boolean }) => {
-    setDoubleName(data.doubleName)
-    signedAttempt.value = null
-    firstTime.value = data.firstTime
-    randomImageId.value = Math.floor(Math.random() * 266)
-    isMobile.value = data.mobile
+    try {
+      console.log('loginUser called with:', data)
+      setDoubleName(data.doubleName)
+      signedAttempt.value = null
+      firstTime.value = data.firstTime
+      randomImageId.value = Math.floor(Math.random() * 266)
+      isMobile.value = data.mobile
 
-    const publicKey = (await userService.getUserData(doubleName.value!)).data.publicKey
-    const newRandomRoom = generateUUID()
-    const locationId = localStorage.getItem('locationId') || generateUUID()
-    localStorage.setItem('locationId', locationId)
+      console.log('Fetching user public key for:', doubleName.value)
+      const userData = await userService.getUserData(doubleName.value!)
+      const publicKey = userData.data.publicKey
+      console.log('Got public key:', publicKey)
 
-    const encryptedLoginAttempt = await cryptoService.encrypt(
-      JSON.stringify({
+      const newRandomRoom = generateUUID()
+      const locationId = localStorage.getItem('locationId') || generateUUID()
+      localStorage.setItem('locationId', locationId)
+
+      const loginData = {
         doubleName: doubleName.value,
         state: _state.value,
         firstTime: data.firstTime,
@@ -86,14 +93,24 @@ export const useAppStore = defineStore('app', () => {
         appPublicKey: appPublicKey.value,
         randomImageId: !data.firstTime ? randomImageId.value?.toString() : null,
         locationId
-      }),
-      publicKey
-    )
+      }
+      console.log('Login data to encrypt:', loginData)
 
-    socketService.emit('leave', { room: doubleName.value })
-    randomRoom.value = newRandomRoom
-    socketService.emit('join', { room: newRandomRoom })
-    socketService.emit('login', { doubleName: doubleName.value, encryptedLoginAttempt })
+      const encryptedLoginAttempt = await cryptoService.encrypt(
+        JSON.stringify(loginData),
+        publicKey
+      )
+      console.log('Encrypted login attempt created')
+
+      socketService.emit('leave', { room: doubleName.value })
+      randomRoom.value = newRandomRoom
+      socketService.emit('join', { room: newRandomRoom })
+      console.log('Emitting login event to room:', newRandomRoom)
+      socketService.emit('login', { doubleName: doubleName.value, encryptedLoginAttempt })
+    } catch (error) {
+      console.error('Error in loginUser:', error)
+      throw error
+    }
   }
 
   const clearCheckStatus = () => {
@@ -126,6 +143,7 @@ export const useAppStore = defineStore('app', () => {
   }
 
   const SOCKET_signedAttempt = (data: any) => {
+    console.log('Received signedAttempt:', data)
     signedAttempt.value = data
   }
 
@@ -177,7 +195,7 @@ export const useAppStore = defineStore('app', () => {
   }
 
   const resendNotification = () => {
-    randomImageId.value = Math.floor(Math.random() * 266)
+    resetTimer()
     socketService.emit('resendlogin', { doubleName: doubleName.value })
   }
 

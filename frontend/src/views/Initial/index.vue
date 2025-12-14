@@ -116,24 +116,32 @@ const checkNameAvailability = () => {
   }
 }
 
-const login = () => {
-  store.loginUser({
-    doubleName: doubleName.value,
-    mobile: isMobile.value,
-    firstTime: false
-  })
-  
-  if (isMobile.value) {
-    let url = `${config.deeplink}login/?state=${encodeURIComponent(store._state || '')}`
-    if (store.scope) url += `&scope=${encodeURIComponent(store.scope)}`
-    if (store.appId) url += `&appId=${encodeURIComponent(store.appId)}`
-    if (store.appPublicKey) url += `&appPublicKey=${encodeURIComponent(store.appPublicKey)}`
-    if (store.redirectUrl) url += `&redirecturl=${encodeURIComponent(store.redirectUrl)}`
+const login = async () => {
+  try {
+    console.log('Starting login for:', doubleName.value)
+    await store.loginUser({
+      doubleName: doubleName.value,
+      mobile: isMobile.value,
+      firstTime: false
+    })
     
-    window.open(url)
+    if (isMobile.value) {
+      let url = `${config.deeplink}login/?state=${encodeURIComponent(store._state || '')}`
+      if (store.scope) url += `&scope=${encodeURIComponent(store.scope)}`
+      if (store.appId) url += `&appId=${encodeURIComponent(store.appId)}`
+      if (store.appPublicKey) url += `&appPublicKey=${encodeURIComponent(store.appPublicKey)}`
+      if (store.redirectUrl) url += `&redirecturl=${encodeURIComponent(store.redirectUrl)}`
+      
+      console.log('Opening mobile app with URL:', url)
+      window.open(url)
+    }
+    
+    console.log('Navigating to login page')
+    router.push({ name: 'login' })
+  } catch (error) {
+    console.error('Login failed:', error)
+    alert('Login failed. Please check console for details.')
   }
-  
-  router.push({ name: 'login' })
 }
 
 const promptLoginToMobileUser = () => {
