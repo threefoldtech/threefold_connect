@@ -39,6 +39,11 @@ export const useAppStore = defineStore('app', () => {
   const randomImageId = ref<number | null>(null)
   const randomRoom = ref<string | null>(null)
   const loginTimeleft = ref(120)
+  const loginTimestamp = ref<number | null>(null)
+  const loginTimeout = ref<number | null>(null)
+  const loginInterval = ref<number | null>(null)
+  const cancelLoginUp = ref(false)
+  const attemptCanceled = ref(false)
 
   // Actions
   const setDoubleName = (name: string) => {
@@ -140,14 +145,67 @@ export const useAppStore = defineStore('app', () => {
     smsVerificationStatus.value = { checked: true, checking: false, valid: false }
   }
 
+  const SOCKET_cancelLogin = () => {
+    cancelLoginUp.value = true
+  }
+
+  const resetTimer = () => {
+    loginTimeleft.value = 120
+    loginTimestamp.value = Date.now()
+    randomImageId.value = Math.floor(Math.random() * 266)
+
+    if (loginTimeout.value) {
+      clearTimeout(loginTimeout.value)
+    }
+    if (loginInterval.value) {
+      clearInterval(loginInterval.value)
+    }
+
+    loginTimeout.value = window.setTimeout(() => {
+      loginTimeleft.value = 0
+      if (loginInterval.value) {
+        clearInterval(loginInterval.value)
+      }
+    }, 120000)
+
+    loginInterval.value = window.setInterval(() => {
+      if (loginTimestamp.value) {
+        const diff = Date.now() - loginTimestamp.value
+        loginTimeleft.value = Math.max(0, 120 - Math.floor(diff / 1000))
+      }
+    }, 1000)
+  }
+
+  const resendNotification = () => {
+    randomImageId.value = Math.floor(Math.random() * 266)
+    socketService.emit('resendlogin', { doubleName: doubleName.value })
+  }
+
+  const setAttemptCanceled = (canceled: boolean) => {
+    attemptCanceled.value = canceled
+    if (canceled) {
+      if (loginTimeout.value) clearTimeout(loginTimeout.value)
+      if (loginInterval.value) clearInterval(loginInterval.value)
+    }
+  }
+
+  const loginUserMobile = (data: { mobile: boolean; firstTime: boolean }) => {
+    signedAttempt.value = null
+    firstTime.value = data.firstTime
+    randomImageId.value = Math.floor(Math.random() * 266)
+    isMobile.value = data.mobile
+  }
+
   return {
     _state, redirectUrl, keys, doubleName, nameCheckStatus, emailVerificationStatus,
     smsVerificationStatus, signedAttempt, firstTime, isMobile, scope, appId, appPublicKey,
-    randomImageId, randomRoom, loginTimeleft, 
-    setDoubleName, checkName, clearCheckStatus, loginUser, setRandomRoom,
-    setState, setScope, setAppId, setAppPublicKey, setRedirectUrl,
+    randomImageId, randomRoom, loginTimeleft, loginTimestamp, loginTimeout, loginInterval,
+    cancelLoginUp, attemptCanceled,
+    setDoubleName, checkName, clearCheckStatus, loginUser, loginUserMobile, setRandomRoom,
+    setState, setScope, setAppId, setAppPublicKey, setRedirectUrl, resetTimer,
+    resendNotification, setAttemptCanceled,
     SOCKET_nameknown, SOCKET_namenotknown, SOCKET_signedAttempt,
     SOCKET_emailverified, SOCKET_emailverificationfailed,
-    SOCKET_smsverified, SOCKET_smsverificationfailed
+    SOCKET_smsverified, SOCKET_smsverificationfailed, SOCKET_cancelLogin
   }
 })

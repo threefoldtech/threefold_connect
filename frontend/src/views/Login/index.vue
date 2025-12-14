@@ -15,21 +15,35 @@
                   <p class="text-subtitle-1 pt-3">
                     Please open the ThreeFold Connect app on your mobile device, authenticate either with pin or Touch ID, and then match the following icon from the choices given.
                   </p>
-                  <v-progress-circular :size="100" :width="15" color="accent" indeterminate v-if="!loggedIn">
-                    <img v-if="!isMobile && !loggedIn" :src="`/icons/${store.randomImageId}.png`" height="37" />
-                  </v-progress-circular>
-                  <v-progress-circular v-else :size="100" :width="0">
-                    <v-icon color="accent" size="75">mdi-check</v-icon>
-                  </v-progress-circular>
-                  <p class="text-subtitle-1 pt-3">Please enter your pincode or use fingerprint and select this icon on your mobile phone.</p>
-                  <p>Your login attempt is valid for another {{store.loginTimeleft}} seconds.</p>
-                  <v-btn v-if="!store.firstTime && !isMobile" color="accent" class="mt-3" @click="triggerResendNotification">
-                    <v-icon start>mdi-refresh</v-icon>
-                    RESEND NOTIFICATION
-                  </v-btn>
-                  <v-btn v-if="isMobile" color="accent" class="mt-3" @click="openApp">
-                    Open ThreeFold Connect app
-                  </v-btn>
+                  <v-row v-if="store.loginTimeleft > 0 && !loggedIn" align="center" justify="center">
+                    <v-col cols="12" class="text-center">
+                      <v-progress-circular indeterminate color="accent" :size="100" :width="15">
+                        <img v-if="!isMobile" :src="`/icons/${store.randomImageId}.png`" height="37" />
+                      </v-progress-circular>
+                      <p class="text-subtitle-1 pt-3">Please open the ThreeFold Connect App and verify the login attempt.</p>
+                      <p class="text-body-2">Time remaining: {{ store.loginTimeleft }}s</p>
+                      <v-btn v-if="!store.firstTime && !isMobile" color="accent" class="mt-3" @click="triggerResendNotification">
+                        <v-icon start>mdi-refresh</v-icon>
+                        RESEND NOTIFICATION
+                      </v-btn>
+                      <v-btn v-if="isMobile" color="accent" class="mt-3" @click="openApp">
+                        Open ThreeFold Connect app
+                      </v-btn>
+                    </v-col>
+                  </v-row>
+                  <v-row v-else-if="loggedIn" align="center" justify="center">
+                    <v-col cols="12" class="text-center">
+                      <v-icon :size="100" color="accent">mdi-check-circle</v-icon>
+                      <p class="text-subtitle-1 pt-3">Login successful! Redirecting...</p>
+                    </v-col>
+                  </v-row>
+                  <v-row v-else align="center" justify="center">
+                    <v-col cols="12" class="text-center">
+                      <v-icon :size="100" color="error">mdi-close-circle</v-icon>
+                      <b v-if="referrer">This login attempt is no longer valid, please click <a :href="referrer">here</a> to return.</b>
+                      <b v-else>This login attempt is no longer valid, please go back to the previous page.</b>
+                    </v-col>
+                  </v-row>
                 </v-col>
               </v-row>
               <v-row v-else>
@@ -100,8 +114,7 @@ const openApp = () => {
 }
 
 const triggerResendNotification = () => {
-  // Resend notification logic would go here
-  console.log('Resending notification')
+  store.resendNotification()
 }
 
 watch(() => store.signedAttempt, (val) => {
@@ -116,7 +129,16 @@ watch(() => store.signedAttempt, (val) => {
 })
 
 onMounted(() => {
-  // Reset timer or other initialization
+  store.resetTimer()
+  store.setAttemptCanceled(false)
+})
+
+watch(() => store.cancelLoginUp, (val) => {
+  if (val && store.redirectUrl && store.appId) {
+    const safeRedirectUri = store.redirectUrl[0] === '/' ? store.redirectUrl : '/' + store.redirectUrl
+    const url = `//${store.appId}${safeRedirectUri}?error=CancelledByUser`
+    window.location.href = url
+  }
 })
 </script>
 

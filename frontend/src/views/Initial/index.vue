@@ -129,6 +129,7 @@ const login = () => {
     if (store.appId) url += `&appId=${encodeURIComponent(store.appId)}`
     if (store.appPublicKey) url += `&appPublicKey=${encodeURIComponent(store.appPublicKey)}`
     if (store.redirectUrl) url += `&redirecturl=${encodeURIComponent(store.redirectUrl)}`
+    
     window.open(url)
   }
   
@@ -137,6 +138,12 @@ const login = () => {
 
 const promptLoginToMobileUser = () => {
   const randomRoom = localStorage.getItem('randomRoom') || ''
+  store.loginUserMobile({
+    mobile: isMobile.value,
+    firstTime: false
+  })
+  store.setRandomRoom(randomRoom)
+  
   let url = `${config.deeplink}login?state=${encodeURIComponent(store._state || '')}&randomRoom=${randomRoom}`
   if (store.scope) url += `&scope=${encodeURIComponent(store.scope)}`
   if (store.appId) url += `&appId=${encodeURIComponent(store.appId)}`
@@ -150,12 +157,50 @@ const promptLoginToMobileUser = () => {
   }
 }
 
+const redirectOrError = () => {
+  const returnUrl = localStorage.getItem('returnUrl')
+  if (returnUrl) {
+    if (/iPhone|iPad|iPod/i.test(navigator.userAgent)) {
+      window.location.replace(returnUrl)
+    } else {
+      window.location.href = returnUrl
+    }
+  } else {
+    router.push({ name: 'error' })
+  }
+}
+
 onMounted(() => {
+  // Handle return URL
+  if (document.referrer) {
+    try {
+      if (new URL(document.referrer).host !== new URL(window.location.href).host) {
+        localStorage.setItem('returnUrl', document.referrer)
+      }
+    } catch (e) {
+      localStorage.setItem('returnUrl', '')
+    }
+  } else {
+    localStorage.setItem('returnUrl', '')
+  }
+  
+  // Setup mobile random room
+  if (isMobile.value) {
+    let randomRoom = localStorage.getItem('randomRoom')
+    if (!randomRoom) {
+      randomRoom = crypto.randomUUID()
+      localStorage.setItem('randomRoom', randomRoom)
+    }
+    store.setRandomRoom(randomRoom)
+  }
+  
   const appid = route.query.appid as string
   if (!appid) {
-    router.push({ name: 'error' })
+    redirectOrError()
     return
   }
+  
+  store.setAttemptCanceled(false)
   
   if (route.query.username) {
     doubleName.value = (route.query.username as string).split('.')[0]
@@ -173,6 +218,27 @@ onMounted(() => {
   if (route.query.appid) store.setAppId(route.query.appid as string)
   if (route.query.publickey) store.setAppPublicKey(route.query.publickey as string)
   if (route.query.scope) store.setScope(route.query.scope as string)
+})
+
+watch(() => store.signedAttempt, (val) => {
+  if (!isMobile.value) return
+  
+  if (val && store.redirectUrl && store.appId) {
+    localStorage.setItem('username', doubleName.value)
+    const data = encodeURIComponent(JSON.stringify(val))
+    const union = (store.redirectUrl.indexOf('?') ?? -1) >= 0 ? '&' : '?'
+    const safeRedirectUri = store.redirectUrl[0] === '/' ? store.redirectUrl : '/' + store.redirectUrl
+    const url = `//${store.appId}${safeRedirectUri}${union}signedAttempt=${data}`
+    window.location.href = url
+  }
+})
+
+watch(() => store.cancelLoginUp, (val) => {
+  if (val && store.redirectUrl && store.appId) {
+    const safeRedirectUri = store.redirectUrl[0] === '/' ? store.redirectUrl : '/' + store.redirectUrl
+    const url = `//${store.appId}${safeRedirectUri}?error=CancelledByUser`
+    window.location.href = url
+  }
 })
 </script>
 

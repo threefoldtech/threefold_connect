@@ -30,6 +30,7 @@ socket.on('emailverified', () => store.SOCKET_emailverified())
 socket.on('emailverificationfailed', () => store.SOCKET_emailverificationfailed())
 socket.on('smsverified', () => store.SOCKET_smsverified())
 socket.on('smsverificationfailed', () => store.SOCKET_smsverificationfailed())
+socket.on('cancelLogin', () => store.SOCKET_cancelLogin())
 
 router.beforeEach((to: RouteLocationNormalized, _from: RouteLocationNormalized, next: NavigationGuardNext) => {
   const publicRoutes = ['initial', 'error', 'verifyemail', 'verifysms', 'sign']
