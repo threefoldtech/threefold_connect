@@ -28,10 +28,7 @@
   },
   "devDependencies": {
     "@types/node": "^20.11.25",
-    "@types/bip39": "^3.0.0",
     "@types/libsodium-wrappers": "^0.7.14",
-    "@types/tweetnacl": "^1.0.3",
-    "@types/tweetnacl-util": "^0.15.1",
     "@vitejs/plugin-vue": "^5.0.4",
     "@vue/eslint-config-typescript": "^13.0.0",
     "@vue/tsconfig": "^0.5.1",
