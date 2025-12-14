@@ -1,5 +1,6 @@
 export interface AppConfig {
   apiurl: string
+  openkycurl: string
   deeplink: string
 }
 
