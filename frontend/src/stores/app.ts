@@ -104,12 +104,11 @@ export const useAppStore = defineStore('app', () => {
         JSON.stringify(loginData),
         publicKey
       )
-      console.log('Encrypted login attempt created')
+      console.log('State:', _state.value)
+      console.log('Encrypted login attempt:', encryptedLoginAttempt)
 
       socketService.emit('leave', { room: doubleName.value })
-      randomRoom.value = newRandomRoom
-      socketService.emit('join', { room: newRandomRoom })
-      console.log('Emitting login event to room:', newRandomRoom)
+      setRandomRoom(newRandomRoom)
       socketService.emit('login', { doubleName: doubleName.value, encryptedLoginAttempt })
     } catch (error) {
       console.error('Error in loginUser:', error)
@@ -123,6 +122,7 @@ export const useAppStore = defineStore('app', () => {
 
   const setRandomRoom = (room: string) => {
     randomRoom.value = room
+    console.log(`joining ${room}`)
     socketService.emit('join', { room })
   }
 
@@ -203,19 +203,23 @@ export const useAppStore = defineStore('app', () => {
     try {
       resetTimer() // This regenerates randomImageId
       
-      console.log('Resending notification with new randomImageId:', randomImageId.value)
-      
       const publicKey = (await userService.getUserData(doubleName.value!)).data.publicKey
+      console.log('Public key:', publicKey)
+      
       const newRandomRoom = generateUUID()
-      const locationId = localStorage.getItem('locationId') || generateUUID()
+      let locationId = localStorage.getItem('locationId')
+      if (locationId === null) {
+        locationId = generateUUID()
+        localStorage.setItem('locationId', locationId)
+      }
+      console.log('locationId UUID:', locationId)
       
       const loginData = {
         doubleName: doubleName.value,
+        randomRoom: newRandomRoom,
         state: _state.value,
-        firstTime: firstTime.value,
         scope: scope.value,
         appId: appId.value,
-        randomRoom: newRandomRoom,
         appPublicKey: appPublicKey.value,
         randomImageId: randomImageId.value?.toString(),
         locationId
@@ -227,9 +231,7 @@ export const useAppStore = defineStore('app', () => {
       )
       
       socketService.emit('leave', { room: randomRoom.value })
-      randomRoom.value = newRandomRoom
-      socketService.emit('join', { room: newRandomRoom })
-      console.log('Emitting new login event to room:', newRandomRoom)
+      setRandomRoom(newRandomRoom)
       socketService.emit('login', { 
         doubleName: doubleName.value, 
         encryptedLoginAttempt 
