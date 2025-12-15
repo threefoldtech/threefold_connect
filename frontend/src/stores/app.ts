@@ -71,7 +71,7 @@ export const useAppStore = defineStore('app', () => {
       setDoubleName(data.doubleName)
       signedAttempt.value = null
       firstTime.value = data.firstTime
-      randomImageId.value = Math.floor(Math.random() * 266)
+      randomImageId.value = Math.floor(Math.random() * 266) + 1
       isMobile.value = data.mobile
 
       console.log('Fetching user public key for:', doubleName.value)
@@ -170,7 +170,7 @@ export const useAppStore = defineStore('app', () => {
   const resetTimer = () => {
     loginTimeleft.value = 120
     loginTimestamp.value = Date.now()
-    randomImageId.value = Math.floor(Math.random() * 266)
+    randomImageId.value = Math.floor(Math.random() * 266) + 1
 
     if (loginTimeout.value) {
       clearTimeout(loginTimeout.value)
@@ -210,7 +210,7 @@ export const useAppStore = defineStore('app', () => {
   const loginUserMobile = (data: { mobile: boolean; firstTime: boolean }) => {
     signedAttempt.value = null
     firstTime.value = data.firstTime
-    randomImageId.value = Math.floor(Math.random() * 266)
+    randomImageId.value = Math.floor(Math.random() * 266) + 1
     isMobile.value = data.mobile
   }
 
