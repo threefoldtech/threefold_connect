@@ -12,11 +12,14 @@ export function useSocket() {
     nameknown: () => store.SOCKET_nameknown(),
     namenotknown: () => store.SOCKET_namenotknown(),
     signedAttempt: (data: SignedAttemptData) => store.SOCKET_signedAttempt(data),
+    signedSignDataAttempt: (data: any) => store.SOCKET_signedSignDataAttempt(data),
     emailverified: () => store.SOCKET_emailverified(),
     emailverificationfailed: () => store.SOCKET_emailverificationfailed(),
     smsverified: () => store.SOCKET_smsverified(),
     smsverificationfailed: () => store.SOCKET_smsverificationfailed(),
-    cancelLogin: () => store.SOCKET_cancelLogin()
+    phoneverified: () => store.SOCKET_phoneverified(),
+    cancelLogin: () => store.SOCKET_cancelLogin(),
+    cancelSign: () => store.SOCKET_cancelSign()
   }
   
   onMounted(() => {

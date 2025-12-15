@@ -3,6 +3,8 @@ import { ref } from 'vue'
 import socketService from '@/services/socketService'
 import cryptoService from '@/services/cryptoService'
 import userService from '@/services/userService'
+import axios from 'axios'
+import config from '@/config'
 import type { Keys, NameCheckStatus, VerificationStatus, SignedAttemptData } from '@/types'
 
 const generateUUID = (): string => {
@@ -44,6 +46,14 @@ export const useAppStore = defineStore('app', () => {
   const loginInterval = ref<number | null>(null)
   const cancelLoginUp = ref(false)
   const attemptCanceled = ref(false)
+  const scannedFlagUp = ref(false)
+  const cancelSignUp = ref(false)
+  const signAttemptOnGoing = ref(false)
+  const signedSignAttempt = ref<any>(null)
+  const isJson = ref(false)
+  const dataUrl = ref<string | null>(null)
+  const friendlyName = ref<string | null>(null)
+  const dataUrlHash = ref<string | null>(null)
 
   // Actions
   const setDoubleName = (name: string) => {
@@ -289,16 +299,289 @@ export const useAppStore = defineStore('app', () => {
     isMobile.value = data.mobile
   }
 
+  const signUserMobile = (data: any) => {
+    appId.value = data.appId
+    isJson.value = data.isJson
+    dataUrlHash.value = data.dataUrlHash
+    dataUrl.value = data.dataUrl
+    friendlyName.value = data.friendlyName
+    redirectUrl.value = data.redirectUrl
+    _state.value = data.state
+  }
+
+  const signDataUser = async (data: any) => {
+    setDoubleName(data.doubleName)
+    appId.value = data.appId
+    isJson.value = data.isJson
+    dataUrlHash.value = data.dataUrlHash
+    dataUrl.value = data.dataUrl
+    friendlyName.value = data.friendlyName
+    redirectUrl.value = data.redirectUrl
+    _state.value = data.state
+
+    console.log('THIS IS THE STATE')
+    console.log(data.state)
+
+    const publicKey = (await userService.getUserData(doubleName.value!)).data.publicKey
+    const newRandomRoom = generateUUID()
+    socketService.emit('leave', { room: doubleName.value })
+    setRandomRoom(newRandomRoom)
+    
+    const encryptedSignAttempt = await cryptoService.encrypt(
+      JSON.stringify({
+        state: _state.value,
+        doubleName: doubleName.value,
+        isJson: isJson.value,
+        dataUrlHash: dataUrlHash.value,
+        dataUrl: dataUrl.value,
+        friendlyName: friendlyName.value,
+        appId: appId.value,
+        randomRoom: newRandomRoom,
+        redirectUrl: redirectUrl.value
+      }),
+      publicKey
+    )
+
+    socketService.emit('sign', {
+      doubleName: doubleName.value,
+      encryptedSignAttempt
+    })
+
+    signAttemptOnGoing.value = true
+  }
+
+  const resendSignNotification = async () => {
+    const publicKey = (await userService.getUserData(doubleName.value!)).data.publicKey
+    const newRandomRoom = generateUUID()
+    socketService.emit('leave', { room: doubleName.value })
+    setRandomRoom(newRandomRoom)
+    
+    const encryptedSignAttempt = await cryptoService.encrypt(
+      JSON.stringify({
+        state: _state.value,
+        doubleName: doubleName.value,
+        isJson: isJson.value,
+        dataUrlHash: dataUrlHash.value,
+        friendlyName: friendlyName.value,
+        dataUrl: dataUrl.value,
+        appId: appId.value,
+        randomRoom: newRandomRoom,
+        redirectUrl: redirectUrl.value
+      }),
+      publicKey
+    )
+
+    socketService.emit('sign', {
+      doubleName: doubleName.value,
+      encryptedSignAttempt
+    })
+
+    signAttemptOnGoing.value = true
+  }
+
+  const SOCKET_signedSignDataAttempt = async (data: any) => {
+    console.log('signedSignDataAttempt', data.signedAttempt)
+    console.log('signedSignDataAttempt', data.doubleName)
+
+    const publicKey = (await userService.getUserData(data.doubleName)).data.publicKey
+    const signedAttemptDecoded = await cryptoService.validateSignedAttempt(
+      data.signedAttempt,
+      publicKey
+    )
+    console.log('decoded', signedAttemptDecoded)
+    const string = new TextDecoder().decode(signedAttemptDecoded)
+    console.log('in string', string)
+
+    signedSignAttempt.value = data
+    console.log(data)
+  }
+
+  const SOCKET_cancelSign = () => {
+    console.log('Cancel sign attempt')
+    cancelSignUp.value = true
+    signAttemptOnGoing.value = false
+  }
+
+  const setSignAttemptCanceled = (canceled: boolean) => {
+    cancelSignUp.value = canceled
+  }
+
+  const generateKeys = async () => {
+    keys.value = await cryptoService.generateKeys()
+  }
+
+  const saveState = (payload: { _state: string; redirectUrl: string }) => {
+    _state.value = payload._state
+    redirectUrl.value = payload.redirectUrl
+  }
+
+  const sendValidationEmail = (data: { email: string }) => {
+    let callbackUrl = `${window.location.protocol}//${window.location.host}/verifyemail`
+
+    callbackUrl += `?state=${_state.value}`
+    callbackUrl += `&redirecturl=${window.btoa(redirectUrl.value!)}`
+    callbackUrl += `&doublename=${doubleName.value}`
+
+    if (scope.value) {
+      callbackUrl += `&scope=${encodeURIComponent(scope.value)}`
+    }
+    if (appPublicKey.value) {
+      callbackUrl += `&publickey=${appPublicKey.value}`
+    }
+    callbackUrl += appId.value
+      ? `&appid=${appId.value}`
+      : `&appid=${window.location.hostname}`
+
+    axios
+      .post(`${config.openkycurl}verification/send-email`, {
+        user_id: doubleName.value,
+        email: data.email,
+        callback_url: callbackUrl,
+        public_key: keys.value.publicKey
+      })
+      .then(() => {
+        console.log('Mail has been sent')
+      })
+      .catch((e) => {
+        alert(e)
+      })
+  }
+
+  const sendValidationSms = (data: { phone: string }) => {
+    let callbackUrl = `${window.location.protocol}//${window.location.host}/verifysms`
+
+    callbackUrl += `?state=${_state.value}`
+    callbackUrl += `&redirecturl=${window.btoa(redirectUrl.value!)}`
+    callbackUrl += `&doublename=${doubleName.value}`
+
+    if (scope.value) {
+      callbackUrl += `&scope=${encodeURIComponent(scope.value)}`
+    }
+    if (appPublicKey.value) {
+      callbackUrl += `&publickey=${appPublicKey.value}`
+    }
+    callbackUrl += appId.value
+      ? `&appid=${appId.value}`
+      : `&appid=${window.location.hostname}`
+
+    axios
+      .post(`${config.openkycurl}verification/send-sms`, {
+        user_id: doubleName.value,
+        phone: data.phone,
+        callback_url: callbackUrl,
+        public_key: keys.value.publicKey
+      })
+      .then(() => {
+        console.log('sms has been sent')
+      })
+      .catch(() => {
+        alert('Failed to send SMS')
+      })
+  }
+
+  const validateEmail = (data: { userId: string; verificationCode: string }) => {
+    console.log('Validating email', data)
+    if (data && data.userId && data.verificationCode) {
+      emailVerificationStatus.value = {
+        checked: false,
+        checking: true,
+        valid: false
+      }
+      axios
+        .post(`${config.openkycurl}verification/verify-email`, {
+          user_id: data.userId,
+          verification_code: data.verificationCode
+        })
+        .then((message) => {
+          axios
+            .post(`${config.openkycurl}verification/verify-sei`, {
+              signedEmailIdentifier: message.data
+            })
+            .then((response) => {
+              if (response.data.identifier === data.userId) {
+                axios.post(
+                  `${config.apiurl}api/users/${data.userId}/emailverified`
+                )
+                emailVerificationStatus.value = {
+                  checked: true,
+                  checking: false,
+                  valid: true
+                }
+              }
+            })
+        })
+        .catch(() => {
+          emailVerificationStatus.value = {
+            checked: true,
+            checking: false,
+            valid: false
+          }
+        })
+    }
+  }
+
+  const validateSms = (data: { userId: string; verificationCode: string }) => {
+    if (data && data.userId && data.verificationCode) {
+      smsVerificationStatus.value = {
+        checked: false,
+        checking: true,
+        valid: false
+      }
+      axios
+        .post(`${config.openkycurl}verification/verify-sms`, {
+          user_id: data.userId,
+          verification_code: data.verificationCode
+        })
+        .then((message) => {
+          axios
+            .post(`${config.openkycurl}verification/verify-spi`, {
+              signedPhoneIdentifier: message.data
+            })
+            .then((response) => {
+              if (response.data.identifier === data.userId) {
+                axios.post(
+                  `${config.apiurl}api/users/${data.userId}/smsverified`
+                )
+                smsVerificationStatus.value = {
+                  checked: true,
+                  checking: false,
+                  valid: true
+                }
+              }
+            })
+        })
+        .catch(() => {
+          smsVerificationStatus.value = {
+            checked: true,
+            checking: false,
+            valid: false
+          }
+        })
+    }
+  }
+
+  const SOCKET_phoneverified = () => {
+    smsVerificationStatus.value = {
+      checked: true,
+      checking: false,
+      valid: true
+    }
+  }
+
   return {
     _state, redirectUrl, keys, doubleName, nameCheckStatus, emailVerificationStatus,
     smsVerificationStatus, signedAttempt, firstTime, isMobile, scope, appId, appPublicKey,
     randomImageId, randomRoom, loginTimeleft, loginTimestamp, loginTimeout, loginInterval,
-    cancelLoginUp, attemptCanceled,
+    cancelLoginUp, attemptCanceled, scannedFlagUp, cancelSignUp, signAttemptOnGoing,
+    signedSignAttempt, isJson, dataUrl, friendlyName, dataUrlHash,
     setDoubleName, checkName, clearCheckStatus, loginUser, loginUserMobile, setRandomRoom,
     setState, setScope, setAppId, setAppPublicKey, setRedirectUrl, resetTimer,
-    resendNotification, setAttemptCanceled,
+    resendNotification, setAttemptCanceled, signUserMobile, signDataUser, resendSignNotification,
+    setSignAttemptCanceled, generateKeys, saveState,
+    sendValidationEmail, sendValidationSms, validateEmail, validateSms,
     SOCKET_nameknown, SOCKET_namenotknown, SOCKET_signedAttempt,
     SOCKET_emailverified, SOCKET_emailverificationfailed,
-    SOCKET_smsverified, SOCKET_smsverificationfailed, SOCKET_cancelLogin
+    SOCKET_smsverified, SOCKET_smsverificationfailed, SOCKET_cancelLogin,
+    SOCKET_signedSignDataAttempt, SOCKET_cancelSign, SOCKET_phoneverified
   }
 })
