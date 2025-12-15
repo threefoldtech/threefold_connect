@@ -172,36 +172,25 @@ export const useAppStore = defineStore('app', () => {
   }
 
   const resetTimer = () => {
-    loginTimeleft.value = 120
-    loginTimestamp.value = Date.now()
-    randomImageId.value = Math.floor(Math.random() * 266)
-    console.log('🔄 Resend - New randomImageId:', randomImageId.value)
-
-    if (loginTimeout.value) {
-      clearTimeout(loginTimeout.value)
-    }
     if (loginInterval.value) {
       clearInterval(loginInterval.value)
     }
 
-    loginTimeout.value = window.setTimeout(() => {
-      loginTimeleft.value = 0
-      if (loginInterval.value) {
-        clearInterval(loginInterval.value)
-      }
-    }, 120000)
-
+    loginTimestamp.value = Date.now()
     loginInterval.value = window.setInterval(() => {
-      if (loginTimestamp.value) {
-        const diff = Date.now() - loginTimestamp.value
-        loginTimeleft.value = Math.max(0, 120 - Math.floor(diff / 1000))
+      loginTimeleft.value = Math.round(
+        120 - (Date.now() - loginTimestamp.value!) / 1000
+      )
+      if (loginTimeleft.value <= 0) {
+        clearInterval(loginInterval.value!)
       }
     }, 1000)
   }
 
   const resendNotification = async () => {
     try {
-      resetTimer() // This regenerates randomImageId
+      randomImageId.value = Math.floor(Math.random() * 266)
+      console.log('🔄 Resend - New randomImageId:', randomImageId.value)
       
       const publicKey = (await userService.getUserData(doubleName.value!)).data.publicKey
       console.log('Public key:', publicKey)
@@ -232,6 +221,7 @@ export const useAppStore = defineStore('app', () => {
       
       socketService.emit('leave', { room: randomRoom.value })
       setRandomRoom(newRandomRoom)
+      resetTimer()
       socketService.emit('login', { 
         doubleName: doubleName.value, 
         encryptedLoginAttempt 
