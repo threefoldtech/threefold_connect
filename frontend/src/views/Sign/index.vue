@@ -1,74 +1,162 @@
 <template>
-  <section class="login">
-    <v-row justify="center">
-      <v-col cols="12" md="8">
-        <v-card>
-          <v-toolbar color="primary">
-            <v-toolbar-title class="text-h5 text-white">Sign data</v-toolbar-title>
-            <v-spacer></v-spacer>
-            <v-btn icon="mdi-help" variant="outlined" color="white" @click="dialog = true"></v-btn>
-          </v-toolbar>
-          
-          <v-row v-if="isMobile" class="fill-height" align="center" justify="center">
-            <v-col cols="12" class="text-center py-5">
-              <v-avatar class="mb-4" size="200">
-                <v-img src="/logo.png"></v-img>
-              </v-avatar>
-              <v-btn color="accent" @click="promptToSignMobile">
-                Open ThreeFold Connect app
-              </v-btn>
-            </v-col>
-          </v-row>
-          
-          <v-form v-else class="pa-4" v-model="valid" @submit.prevent="onSignIn">
-            <v-card-text>
-              <v-text-field
-                @input="checkNameAvailability"
-                :disabled="store.nameCheckStatus.checking"
-                :rules="nameRules"
-                v-model="doubleName"
-                variant="outlined"
-                label="Type in your ThreeFold Connect ID"
-                :hint="doubleName ? `Your ThreeFold ID: ${doubleName}` : 'Whats your ThreeFold ID?'"
-                required
-                counter="50"
-              ></v-text-field>
+  <section class="sign fill-height">
+    <v-row justify="center" align="center" class="fill-height">
+      <v-col cols="12" sm="10" md="8" lg="6" xl="5">
+        <!-- Mobile View -->
+        <v-card v-if="isMobile" class="modern-card">
+          <div class="text-center pa-8">
+            <v-avatar size="120" class="mb-6">
+              <v-img src="/logo.png" alt="ThreeFold Connect"></v-img>
+            </v-avatar>
+            <h1 class="text-h5 font-weight-bold mb-3" style="color: #1E293B;">
+              Sign Data Request
+            </h1>
+            <p class="text-body-1 mb-6" style="color: #64748B;">
+              Open your ThreeFold Connect app to sign this data
+            </p>
+            <v-btn 
+              color="primary" 
+              size="x-large"
+              variant="elevated"
+              rounded="xl"
+              class="px-8"
+              @click="promptToSignMobile"
+            >
+              <v-icon start>mdi-open-in-app</v-icon>
+              Open ThreeFold Connect App
+            </v-btn>
+          </div>
+        </v-card>
+
+        <!-- Desktop View -->
+        <v-card v-else class="modern-card">
+          <div class="text-center pa-6 pb-4">
+            <v-avatar size="80" class="mb-4">
+              <v-img src="/logo.png" alt="ThreeFold Connect"></v-img>
+            </v-avatar>
+            <h1 class="text-h5 font-weight-bold mb-2" style="color: #1E293B;">
+              Sign Data
+            </h1>
+            <p class="text-body-2" style="color: #64748B;">
+              Authenticate to sign data with your ThreeFold identity
+            </p>
+          </div>
+
+          <v-form v-model="valid" @submit.prevent="onSignIn">
+            <v-card-text class="px-6 pb-6">
+              <v-alert
+                type="info"
+                variant="tonal"
+                rounded="lg"
+                class="mb-6"
+                border="start"
+                border-color="primary"
+              >
+                <div class="text-body-2">
+                  You're about to sign data with your ThreeFold identity. Please verify your 3Bot name below.
+                </div>
+              </v-alert>
+
+              <div class="mb-6">
+                <label class="text-subtitle-2 font-weight-medium mb-2 d-block" style="color: #1E293B;">
+                  3Bot Name
+                </label>
+                <v-text-field
+                  v-model="doubleName"
+                  @input="checkNameAvailability"
+                  :disabled="store.nameCheckStatus.checking"
+                  :rules="nameRules"
+                  variant="outlined"
+                  placeholder="Enter your 3Bot name"
+                  hint="Enter your 3Bot name without .3bot extension"
+                  persistent-hint
+                  density="comfortable"
+                  prepend-inner-icon="mdi-account-circle"
+                  :loading="store.nameCheckStatus.checking"
+                >
+                  <template v-slot:append-inner>
+                    <v-icon v-if="store.nameCheckStatus.checked && store.nameCheckStatus.available" color="error" size="small">
+                      mdi-close-circle
+                    </v-icon>
+                    <v-icon v-if="store.nameCheckStatus.checked && !store.nameCheckStatus.available" color="success" size="small">
+                      mdi-check-circle
+                    </v-icon>
+                  </template>
+                </v-text-field>
+              </div>
+
+              <v-alert 
+                v-if="store.nameCheckStatus.checked && store.nameCheckStatus.available" 
+                type="error"
+                variant="tonal"
+                rounded="lg"
+                class="mb-4"
+              >
+                <div class="d-flex align-center">
+                  <v-icon start>mdi-alert-circle</v-icon>
+                  <span>This 3Bot name is not registered. Please check your spelling.</span>
+                </div>
+              </v-alert>
+              
+              <v-alert 
+                v-if="store.nameCheckStatus.checked && !store.nameCheckStatus.available" 
+                type="success"
+                variant="tonal"
+                rounded="lg"
+                class="mb-4"
+              >
+                <div class="d-flex align-center">
+                  <v-icon start>mdi-check-circle</v-icon>
+                  <span>3Bot name verified! You can proceed.</span>
+                </div>
+              </v-alert>
             </v-card-text>
             
-            <v-card-actions>
-              <v-col cols="12" class="text-center">
-                <v-btn
-                  v-if="store.nameCheckStatus.checked && !isSignAttemptOnGoing"
-                  type="submit"
-                  class="sign-in mb-3"
-                  elevation="0"
-                  color="accent"
-                  :disabled="!store.nameCheckStatus.checking && store.nameCheckStatus.available"
-                >
-                  Sign in
-                </v-btn>
-                
-                <div v-if="isSignAttemptOnGoing" class="text-center mb-4">
-                  <v-progress-circular indeterminate color="accent" class="mb-3"></v-progress-circular>
-                  <v-btn v-if="!store.firstTime && !isMobile" color="accent" @click="triggerResendSignSocket">
-                    <v-icon start>mdi-refresh</v-icon>
-                    RESEND NOTIFICATION
-                  </v-btn>
-                </div>
-                
-                <div v-if="store.nameCheckStatus.checked && !store.nameCheckStatus.checking && valid && store.nameCheckStatus.available">
-                  This account doesn't exist yet. Please register using the mobile app!<br>
-                  If you don't have the app, you can download by clicking below.
-                </div>
-                <div v-else>
-                  If you do not have an ID, please download ThreeFold Connect<br>on the Google Play / Apple App store and create an account.
-                </div>
-              </v-col>
+            <v-card-actions class="px-6 pb-6 pt-2">
+              <v-btn
+                type="submit"
+                color="primary"
+                size="large"
+                variant="elevated"
+                rounded="lg"
+                block
+                :disabled="!valid || store.nameCheckStatus.available"
+                class="text-none font-weight-semibold"
+              >
+                <v-icon start>mdi-draw</v-icon>
+                Continue to Sign
+              </v-btn>
             </v-card-actions>
           </v-form>
         </v-card>
       </v-col>
     </v-row>
+
+    <!-- Help Dialog -->
+    <v-dialog v-model="dialog" max-width="600">
+      <v-card rounded="xl">
+        <v-card-title class="text-h5 font-weight-bold pa-6" style="color: #1E293B;">
+          About Data Signing
+        </v-card-title>
+        <v-card-text class="px-6 pb-6">
+          <p class="text-body-1" style="color: #475569;">
+            Data signing allows you to cryptographically prove that you authorized specific data or transactions using your ThreeFold identity.
+          </p>
+        </v-card-text>
+        <v-card-actions class="px-6 pb-6">
+          <v-spacer></v-spacer>
+          <v-btn 
+            color="primary" 
+            variant="elevated"
+            rounded="lg"
+            @click="dialog = false"
+            class="text-none font-weight-semibold"
+          >
+            Got It
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </section>
 </template>
 
@@ -86,7 +174,6 @@ const doubleName = ref('')
 const valid = ref(false)
 const dialog = ref(false)
 const isMobile = ref(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent))
-const isSignAttemptOnGoing = ref(false)
 const nameCheckerTimeOut = ref<number | null>(null)
 
 const nameRegex = /^(\w+)$/
@@ -151,10 +238,6 @@ const promptToSignMobile = () => {
   } else {
     window.location.href = url
   }
-}
-
-const triggerResendSignSocket = async () => {
-  await store.resendSignNotification()
 }
 
 onMounted(() => {

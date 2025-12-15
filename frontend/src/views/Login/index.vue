@@ -1,74 +1,204 @@
 <template>
-  <section class="login">
-    <v-row justify="center">
-      <v-col cols="12" md="8">
-        <v-card>
-          <v-toolbar color="primary">
-            <v-toolbar-title class="text-h5 text-white">Signing in...</v-toolbar-title>
-            <v-spacer></v-spacer>
-            <v-btn icon="mdi-help" variant="outlined" color="white" @click="dialog = true"></v-btn>
-          </v-toolbar>
-          <v-form class="pa-4">
-            <v-card-text>
-              <v-row v-if="store.loginTimeleft > 0 && !loggedIn" align="center" justify="center">
-                <v-col cols="12" class="text-center">
-                  <p class="text-subtitle-1 pt-3">
-                    Please open the ThreeFold Connect app on your mobile device, authenticate either with pin or Touch ID, and then match the following icon from the choices given.
-                  </p>
-                  <v-progress-circular indeterminate color="accent" :size="100" :width="15">
-                    <img v-if="!isMobile" :src="`/icons/${store.randomImageId}.png`" height="37" />
-                  </v-progress-circular>
-                  <p class="text-body-2 pt-3">Time remaining: {{ store.loginTimeleft }}s</p>
-                  <v-btn v-if="!store.firstTime && !isMobile" color="accent" class="mt-3" @click="triggerResendNotification">
-                    <v-icon start>mdi-refresh</v-icon>
-                    RESEND NOTIFICATION
-                  </v-btn>
-                  <v-btn v-if="isMobile" color="accent" class="mt-3" @click="openApp">
-                    Open ThreeFold Connect app
-                  </v-btn>
-                </v-col>
-              </v-row>
-              <v-row v-else-if="loggedIn" align="center" justify="center">
-                <v-col cols="12" class="text-center">
-                  <v-icon :size="100" color="accent">mdi-check-circle</v-icon>
-                  <p class="text-subtitle-1 pt-3">Login successful! Redirecting...</p>
-                </v-col>
-              </v-row>
-              <v-row v-else align="center" justify="center">
-                <v-col cols="12" class="text-center">
-                  <v-icon :size="100" color="error">mdi-close-circle</v-icon>
-                  <b v-if="referrer">This login attempt is no longer valid, please click <a :href="referrer">here</a> to return.</b>
-                  <b v-else>This login attempt is no longer valid, please go back to the previous page.</b>
-                </v-col>
-              </v-row>
-            </v-card-text>
-          </v-form>
+  <section class="login fill-height">
+    <v-row justify="center" align="center" class="fill-height">
+      <v-col cols="12" sm="10" md="8" lg="6" xl="5">
+        <!-- Active Login State -->
+        <v-card v-if="store.loginTimeleft > 0 && !loggedIn" class="modern-card">
+          <div class="text-center pa-6 pb-4">
+            <v-avatar size="80" class="mb-4">
+              <v-img src="/logo.png" alt="ThreeFold Connect"></v-img>
+            </v-avatar>
+            <h1 class="text-h5 font-weight-bold mb-2" style="color: #1E293B;">
+              Verify Your Identity
+            </h1>
+            <p class="text-body-2" style="color: #64748B;">
+              Select the matching emoji in your ThreeFold Connect app
+            </p>
+          </div>
+
+          <v-card-text class="text-center px-6 pb-6">
+            <v-alert
+              type="info"
+              variant="tonal"
+              rounded="lg"
+              class="mb-6"
+              border="start"
+              border-color="primary"
+            >
+              <div class="text-body-2">
+                Please open your ThreeFold Connect app, authenticate with PIN or biometrics, and select the matching emoji
+              </div>
+            </v-alert>
+
+            <!-- Emoji Display -->
+            <div class="emoji-container mb-6">
+              <div class="emoji-card">
+                <v-img 
+                  v-if="!isMobile"
+                  :src="`/icons/${store.randomImageId}.png`" 
+                  alt="Login emoji"
+                  width="180"
+                  height="180"
+                  class="emoji-image"
+                ></v-img>
+                <v-progress-circular 
+                  v-else
+                  indeterminate 
+                  color="primary" 
+                  :size="100" 
+                  :width="8"
+                  class="mb-4"
+                ></v-progress-circular>
+              </div>
+            </div>
+
+            <!-- Timer -->
+            <div class="timer-section mb-6">
+              <v-chip
+                size="large"
+                variant="tonal"
+                color="primary"
+                prepend-icon="mdi-clock-outline"
+                class="px-6 py-6"
+              >
+                <span class="text-h6 font-weight-bold">{{ store.loginTimeleft }}s</span>
+              </v-chip>
+              <p class="text-caption mt-2" style="color: #64748B;">
+                Time remaining to complete verification
+              </p>
+            </div>
+
+            <!-- Actions -->
+            <div class="d-flex flex-column gap-3">
+              <v-btn
+                v-if="!store.firstTime && !isMobile"
+                color="primary"
+                variant="elevated"
+                size="large"
+                rounded="lg"
+                @click="triggerResendNotification"
+                class="text-none font-weight-semibold"
+              >
+                <v-icon start>mdi-refresh</v-icon>
+                Resend Notification
+              </v-btn>
+              
+              <v-btn
+                v-if="isMobile"
+                color="primary"
+                variant="elevated"
+                size="large"
+                rounded="lg"
+                @click="openApp"
+                class="text-none font-weight-semibold"
+              >
+                <v-icon start>mdi-open-in-app</v-icon>
+                Open ThreeFold Connect App
+              </v-btn>
+              
+              <v-btn
+                variant="text"
+                color="secondary"
+                size="large"
+                rounded="lg"
+                @click="dialog = true"
+                class="text-none"
+              >
+                <v-icon start>mdi-help-circle</v-icon>
+                Need Help?
+              </v-btn>
+            </div>
+          </v-card-text>
+        </v-card>
+
+        <!-- Success State -->
+        <v-card v-else-if="loggedIn" class="modern-card">
+          <v-card-text class="text-center pa-8">
+            <v-icon :size="120" color="success" class="mb-4">mdi-check-circle</v-icon>
+            <h2 class="text-h5 font-weight-bold mb-2" style="color: #1E293B;">
+              Login Successful!
+            </h2>
+            <p class="text-body-1" style="color: #64748B;">
+              Redirecting you now...
+            </p>
+            <v-progress-linear indeterminate color="primary" class="mt-4"></v-progress-linear>
+          </v-card-text>
+        </v-card>
+
+        <!-- Expired State -->
+        <v-card v-else class="modern-card">
+          <v-card-text class="text-center pa-8">
+            <v-icon :size="120" color="error" class="mb-4">mdi-close-circle</v-icon>
+            <h2 class="text-h5 font-weight-bold mb-2" style="color: #1E293B;">
+              Login Expired
+            </h2>
+            <p class="text-body-1 mb-4" style="color: #64748B;">
+              <span v-if="referrer">
+                This login attempt is no longer valid. Please <a :href="referrer" class="text-primary">click here</a> to return.
+              </span>
+              <span v-else>
+                This login attempt is no longer valid. Please go back to the previous page.
+              </span>
+            </p>
+            <v-btn
+              color="primary"
+              variant="elevated"
+              size="large"
+              rounded="lg"
+              @click="$router.push({ name: 'initial' })"
+              class="text-none font-weight-semibold"
+            >
+              <v-icon start>mdi-arrow-left</v-icon>
+              Back to Login
+            </v-btn>
+          </v-card-text>
         </v-card>
       </v-col>
     </v-row>
 
-    <v-dialog v-model="dialog" max-width="500">
-      <v-card class="text-center">
-        <v-card-title class="text-h5"></v-card-title>
-        <v-card-text class="text-subtitle-1 pt-3">
-          If you do not yet have the ThreeFold Connect app on your device, you can download it on the Google Play / Apple App store.
-        </v-card-text>
-        <v-row justify="center">
-          <v-col cols="auto">
-            <a href="https://play.google.com/store/apps/details?id=org.jimber.threebotlogin" target="_blank" class="mx-2">
-              <img src="/googleplay.png" height="50" />
+    <!-- Help Dialog -->
+    <v-dialog v-model="dialog" max-width="600">
+      <v-card rounded="xl">
+        <v-card-title class="text-h5 font-weight-bold pa-6" style="color: #1E293B;">
+          Need Help?
+        </v-card-title>
+        <v-card-text class="px-6">
+          <p class="text-body-1 mb-4" style="color: #475569;">
+            If you don't have the ThreeFold Connect app yet, download it from your app store:
+          </p>
+          
+          <div class="d-flex justify-center gap-3 mb-6">
+            <a 
+              href="https://play.google.com/store/apps/details?id=org.jimber.threebotlogin" 
+              target="_blank"
+            >
+              <img src="/googleplay.png" height="56" alt="Get it on Google Play" style="border-radius: 8px;" />
             </a>
-            <a href="https://itunes.apple.com/be/app/3bot-login/id1459845885?l=nl&mt=8" target="_blank" class="mx-2">
-              <img src="/applestore.png" height="50" />
+            <a 
+              href="https://itunes.apple.com/be/app/3bot-login/id1459845885?l=nl&mt=8" 
+              target="_blank"
+            >
+              <img src="/applestore.png" height="56" alt="Download on the App Store" style="border-radius: 8px;" />
             </a>
-          </v-col>
-        </v-row>
-        <v-card-text class="text-subtitle-1 pt-3">
-          Have you already created an account but it is not active on your device? Click the 'recover account' button in the app and you will be instructed on how to regain access.
+          </div>
+
+          <v-divider class="my-4"></v-divider>
+
+          <p class="text-body-2" style="color: #64748B;">
+            <strong>Account Recovery:</strong> If you have an account but it's not active on your device, open the app and click the 'Recover Account' button for instructions.
+          </p>
         </v-card-text>
-        <v-card-actions>
+        <v-card-actions class="px-6 pb-6">
           <v-spacer></v-spacer>
-          <v-btn color="accent" class="ma-3" @click="dialog = false">Close Window</v-btn>
+          <v-btn 
+            color="primary" 
+            variant="elevated"
+            rounded="lg"
+            @click="dialog = false"
+            class="text-none font-weight-semibold"
+          >
+            Got It
+          </v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -123,7 +253,6 @@ onMounted(() => {
 })
 
 onUnmounted(() => {
-  // Clean up timers to prevent memory leaks
   if (store.loginTimeout) clearTimeout(store.loginTimeout)
   if (store.loginInterval) clearInterval(store.loginInterval)
 })

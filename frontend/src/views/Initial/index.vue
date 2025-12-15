@@ -1,82 +1,171 @@
 <template>
   <section class="initial fill-height">
-    <v-row v-if="isMobile" style="width: 100%;" class="fill-height" align="center" justify="center">
-      <v-col cols="12" class="text-center py-5">
-        <v-avatar class="mb-4" size="200">
-          <v-img src="/logo.png"></v-img>
+    <!-- Mobile View -->
+    <v-row v-if="isMobile" class="fill-height" align="center" justify="center">
+      <v-col cols="12" class="text-center px-6">
+        <v-avatar class="mb-8 logo-avatar" size="160">
+          <v-img src="/logo.png" alt="ThreeFold Connect Logo"></v-img>
         </v-avatar>
-        <v-btn color="accent" @click="promptLoginToMobileUser">
-          Open ThreeFold Connect app
+        <h1 class="text-h4 font-weight-bold mb-3" style="color: #1E293B;">
+          ThreeFold Connect
+        </h1>
+        <p class="text-body-1 mb-8" style="color: #64748B; max-width: 400px; margin: 0 auto;">
+          Secure authentication for ThreeFold Grid
+        </p>
+        <v-btn 
+          color="primary" 
+          size="x-large"
+          variant="elevated"
+          rounded="xl"
+          class="px-8 py-6"
+          @click="promptLoginToMobileUser"
+        >
+          <v-icon start>mdi-open-in-app</v-icon>
+          Open ThreeFold Connect App
         </v-btn>
       </v-col>
     </v-row>
     
-    <v-row v-else>
-      <v-progress-linear style="position:fixed; top:0; left: 0;" class="ma-0" indeterminate v-if="store.nameCheckStatus.checking"></v-progress-linear>
-      <v-col cols="12" md="8" offset-md="2">
-        <v-card>
-          <v-toolbar color="primary" class="pa-4">
-            <v-toolbar-title class="text-h5 text-white">
-              ThreeFold Connect Authenticator
-            </v-toolbar-title>
-          </v-toolbar>
-          <v-form class="pa-4" v-model="valid" @submit.prevent="login">
-            <v-card-text>
-              <p class="text-subtitle-1 pb-2">
-                Welcome to the ThreeFold Connect two-factor authenticator, enabling you access to ThreeFold Grid tools and solutions. Not a single person in the world will be able to log in to your account, not even us.
-                <br><br>
-                Make sure your ThreeFold Connect app is open before sending the login request.
-                <br><br>
-              </p>
-              <p class="text-subtitle-1 font-weight-bold">
-                What is your ThreeFold Connect ID?
-              </p>
-              <v-text-field
-                @input="checkNameAvailability"
-                :disabled="store.nameCheckStatus.checking"
-                :rules="nameRules"
-                v-model="doubleName"
-                variant="outlined"
-                label="Type in your ThreeFold Connect ID"
-                :hint="doubleName ? `Your ThreeFold ID: ${doubleName}` : 'Whats your ThreeFold ID?'"
-                required
-                counter="50"
-              ></v-text-field>
-            </v-card-text>
-            <v-card-actions>
-              <v-col cols="12" class="text-center">
-                <v-btn
-                  v-if="store.nameCheckStatus.checked"
-                  type="submit"
-                  class="sign-in mb-3"
-                  elevation="0"
-                  color="accent"
-                  :disabled="!store.nameCheckStatus.checking && store.nameCheckStatus.available"
+    <!-- Desktop View -->
+    <v-row v-else class="fill-height" align="center" justify="center">
+      <v-progress-linear 
+        v-if="store.nameCheckStatus.checking" 
+        color="primary"
+        indeterminate
+        style="position: fixed; top: 0; left: 0; right: 0; z-index: 9999;"
+      ></v-progress-linear>
+      
+      <v-col cols="12" sm="10" md="8" lg="6" xl="5">
+        <v-card class="modern-card pa-4">
+          <!-- Header -->
+          <div class="text-center mb-8 mt-4">
+            <v-avatar size="100" class="mb-4">
+              <v-img src="/logo.png" alt="ThreeFold Connect Logo"></v-img>
+            </v-avatar>
+            <h1 class="text-h4 font-weight-bold mb-2" style="color: #1E293B;">
+              ThreeFold Connect
+            </h1>
+            <p class="text-subtitle-1" style="color: #64748B;">
+              Secure Two-Factor Authentication
+            </p>
+          </div>
+
+          <v-form v-model="valid" @submit.prevent="login">
+            <v-card-text class="px-6">
+              <!-- Welcome Message -->
+              <v-alert
+                type="info"
+                variant="tonal"
+                rounded="lg"
+                class="mb-6"
+                border="start"
+                border-color="primary"
+              >
+                <div class="text-body-2" style="line-height: 1.6;">
+                  Welcome to the ThreeFold Connect authenticator. Your account is secured with military-grade encryption - not even we can access it.
+                  <br><br>
+                  <strong>Before continuing:</strong> Please ensure your ThreeFold Connect mobile app is open and ready.
+                </div>
+              </v-alert>
+              <!-- Username Input -->
+              <div class="mb-6">
+                <label class="text-subtitle-2 font-weight-medium mb-2 d-block" style="color: #1E293B;">
+                  3Bot Name
+                </label>
+                <v-text-field
+                  v-model="doubleName"
+                  @input="checkNameAvailability"
+                  :disabled="store.nameCheckStatus.checking"
+                  :rules="nameRules"
+                  variant="outlined"
+                  placeholder="Enter your 3Bot name"
+                  hint="Enter your 3Bot name without .3bot extension"
+                  persistent-hint
+                  density="comfortable"
+                  prepend-inner-icon="mdi-account-circle"
+                  :loading="store.nameCheckStatus.checking"
                 >
-                  Sign in
-                </v-btn>
-                <div v-if="store.nameCheckStatus.checked && !store.nameCheckStatus.checking && valid && store.nameCheckStatus.available">
-                  This account doesn't exist yet. Please register using the mobile app!<br>
-                  If you don't have the app, you can download by clicking below.
+                  <template v-slot:append-inner>
+                    <v-icon v-if="store.nameCheckStatus.checked && store.nameCheckStatus.available" color="error" size="small">
+                      mdi-close-circle
+                    </v-icon>
+                    <v-icon v-if="store.nameCheckStatus.checked && !store.nameCheckStatus.available" color="success" size="small">
+                      mdi-check-circle
+                    </v-icon>
+                  </template>
+                </v-text-field>
+              </div>
+              <!-- Status Messages -->
+              <v-alert 
+                v-if="store.nameCheckStatus.checked && store.nameCheckStatus.available" 
+                type="error"
+                variant="tonal"
+                rounded="lg"
+                class="mb-4"
+              >
+                <div class="d-flex align-center">
+                  <v-icon start>mdi-alert-circle</v-icon>
+                  <span>This 3Bot name is not registered yet. Please check your spelling or register a new account.</span>
                 </div>
-                <div v-else>
-                  If you do not have an ID, please download ThreeFold Connect<br>on the Google Play / Apple App store and create an account.
+              </v-alert>
+              
+              <v-alert 
+                v-if="store.nameCheckStatus.checked && !store.nameCheckStatus.available" 
+                type="success"
+                variant="tonal"
+                rounded="lg"
+                class="mb-4"
+              >
+                <div class="d-flex align-center">
+                  <v-icon start>mdi-check-circle</v-icon>
+                  <span>3Bot name verified! You can proceed with login.</span>
                 </div>
-              </v-col>
+              </v-alert>
+            </v-card-text>
+            
+            <!-- Actions -->
+            <v-card-actions class="px-6 pb-6 pt-2">
+              <v-btn
+                type="submit"
+                color="primary"
+                size="large"
+                variant="elevated"
+                rounded="lg"
+                block
+                :disabled="!valid || store.nameCheckStatus.available"
+                class="text-none font-weight-semibold"
+              >
+                <v-icon start>mdi-login</v-icon>
+                Continue to Login
+              </v-btn>
             </v-card-actions>
           </v-form>
         </v-card>
       </v-col>
     </v-row>
 
-    <v-row class="pt-5" justify="center">
-      <v-col cols="auto">
-        <a href="https://play.google.com/store/apps/details?id=org.jimber.threebotlogin" target="_blank" class="mx-2">
-          <img src="/googleplay.png" height="50" />
-        </a>
-        <a href="https://itunes.apple.com/be/app/3bot-login/id1459845885?l=nl&mt=8" target="_blank" class="mx-2">
-          <img src="/applestore.png" height="50" />
-        </a>
+    <!-- App Store Badges -->
+    <v-row class="mt-8" justify="center">
+      <v-col cols="12" class="text-center">
+        <p class="text-body-2 mb-4" style="color: #64748B;">
+          Don't have an account? Download the app to get started
+        </p>
+        <div class="d-flex justify-center align-center gap-3 flex-wrap">
+          <a 
+            href="https://play.google.com/store/apps/details?id=org.jimber.threebotlogin" 
+            target="_blank" 
+            class="app-badge"
+          >
+            <img src="/googleplay.png" height="48" alt="Get it on Google Play" style="border-radius: 8px; transition: transform 0.2s;" />
+          </a>
+          <a 
+            href="https://itunes.apple.com/be/app/3bot-login/id1459845885?l=nl&mt=8" 
+            target="_blank"
+            class="app-badge"
+          >
+            <img src="/applestore.png" height="48" alt="Download on the App Store" style="border-radius: 8px; transition: transform 0.2s;" />
+          </a>
+        </div>
       </v-col>
     </v-row>
   </section>
