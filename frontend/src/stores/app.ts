@@ -72,7 +72,7 @@ export const useAppStore = defineStore('app', () => {
       setDoubleName(data.doubleName)
       signedAttempt.value = null
       firstTime.value = data.firstTime
-      randomImageId.value = Math.floor(Math.random() * 266) + 1
+      randomImageId.value = Math.floor(Math.random() * 266)
       console.log('🎯 Generated randomImageId:', randomImageId.value)
       console.log('🎯 firstTime:', data.firstTime)
       isMobile.value = data.mobile
@@ -174,7 +174,7 @@ export const useAppStore = defineStore('app', () => {
   const resetTimer = () => {
     loginTimeleft.value = 120
     loginTimestamp.value = Date.now()
-    randomImageId.value = Math.floor(Math.random() * 266) + 1
+    randomImageId.value = Math.floor(Math.random() * 266)
     console.log('🔄 Resend - New randomImageId:', randomImageId.value)
 
     if (loginTimeout.value) {
@@ -253,7 +253,7 @@ export const useAppStore = defineStore('app', () => {
   const loginUserMobile = (data: { mobile: boolean; firstTime: boolean }) => {
     signedAttempt.value = null
     firstTime.value = data.firstTime
-    randomImageId.value = Math.floor(Math.random() * 266) + 1
+    randomImageId.value = Math.floor(Math.random() * 266)
     isMobile.value = data.mobile
   }
 
