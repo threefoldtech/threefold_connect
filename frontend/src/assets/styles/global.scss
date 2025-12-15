@@ -118,7 +118,7 @@ body {
   }
 }
 
-// Professional background pattern
+// ThreeFold-themed background
 #app {
   position: relative;
   min-height: 100vh;
@@ -131,11 +131,28 @@ body {
     right: 0;
     bottom: 0;
     background: 
-      radial-gradient(circle at 20% 50%, rgba(26, 161, 143, 0.03) 0%, transparent 50%),
-      radial-gradient(circle at 80% 80%, rgba(26, 161, 143, 0.04) 0%, transparent 50%),
-      linear-gradient(135deg, #F8FAFB 0%, #E8F4F2 100%);
+      radial-gradient(circle at 10% 20%, rgba(26, 161, 143, 0.08) 0%, transparent 40%),
+      radial-gradient(circle at 90% 80%, rgba(26, 161, 143, 0.06) 0%, transparent 40%),
+      radial-gradient(circle at 50% 50%, rgba(26, 161, 143, 0.02) 0%, transparent 60%),
+      linear-gradient(135deg, #F0F9F7 0%, #E3F4F1 50%, #F8FAFB 100%);
     z-index: -1;
     pointer-events: none;
+  }
+  
+  &::after {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: 
+      linear-gradient(90deg, rgba(26, 161, 143, 0.02) 1px, transparent 1px),
+      linear-gradient(rgba(26, 161, 143, 0.02) 1px, transparent 1px);
+    background-size: 50px 50px;
+    z-index: -1;
+    pointer-events: none;
+    opacity: 0.3;
   }
 }
 

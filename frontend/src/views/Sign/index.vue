@@ -59,7 +59,7 @@
 
               <div class="mb-6">
                 <label class="text-subtitle-2 font-weight-medium mb-2 d-block" style="color: #1E293B;">
-                  3Bot Name
+                  ThreeFold Connect ID
                 </label>
                 <v-text-field
                   v-model="doubleName"
@@ -67,13 +67,17 @@
                   :disabled="store.nameCheckStatus.checking"
                   :rules="nameRules"
                   variant="outlined"
-                  placeholder="Enter your 3Bot name"
-                  hint="Enter your 3Bot name without .3bot extension"
+                  placeholder="Enter your ThreeFold Connect ID"
+                  hint="Enter your ID without the .3bot extension"
                   persistent-hint
                   density="comfortable"
-                  prepend-inner-icon="mdi-account-circle"
                   :loading="store.nameCheckStatus.checking"
                 >
+                  <template v-slot:prepend-inner>
+                    <v-avatar size="24" class="mr-2">
+                      <v-img src="/logo.png" alt="ThreeFold"></v-img>
+                    </v-avatar>
+                  </template>
                   <template v-slot:append-inner>
                     <v-icon v-if="store.nameCheckStatus.checked && store.nameCheckStatus.available" color="error" size="small">
                       mdi-close-circle
@@ -94,7 +98,7 @@
               >
                 <div class="d-flex align-center">
                   <v-icon start>mdi-alert-circle</v-icon>
-                  <span>This 3Bot name is not registered. Please check your spelling.</span>
+                  <span>This ThreeFold Connect ID is not registered. Please check your spelling.</span>
                 </div>
               </v-alert>
               
@@ -107,7 +111,7 @@
               >
                 <div class="d-flex align-center">
                   <v-icon start>mdi-check-circle</v-icon>
-                  <span>3Bot name verified! You can proceed.</span>
+                  <span>ThreeFold Connect ID verified! You can proceed.</span>
                 </div>
               </v-alert>
             </v-card-text>
