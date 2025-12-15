@@ -146,9 +146,51 @@ export const useAppStore = defineStore('app', () => {
     redirectUrl.value = url
   }
 
-  const SOCKET_signedAttempt = (data: SignedAttemptData) => {
-    console.log('Received signedAttempt:', data)
-    signedAttempt.value = data
+  const SOCKET_signedAttempt = async (data: SignedAttemptData) => {
+    console.log('signedAttempt', data.signedAttempt)
+    console.log('signedAttempt', data.doubleName)
+    console.log('context.getters.firstTime', firstTime.value)
+    console.log('context.getters.isMobile', isMobile.value)
+    console.log('context.getters.randomImageId', randomImageId.value)
+
+    try {
+      const publicKey = (await userService.getUserData(data.doubleName)).data.publicKey
+
+      // Decode the signed attempt to get the actual data
+      const decodedAttempt = await cryptoService.validateSignedAttempt(
+        data.signedAttempt,
+        publicKey
+      )
+
+      if (!decodedAttempt) {
+        console.log('Something went wrong ... ')
+        return
+      }
+
+      // Convert Uint8Array to string and parse JSON
+      const utf8ArrayToStr = (array: Uint8Array): string => {
+        const decoder = new TextDecoder('utf-8')
+        return decoder.decode(array)
+      }
+
+      const signedAttemptData = JSON.parse(utf8ArrayToStr(decodedAttempt))
+
+      // Check if wrong emoji was selected (Vue 2 logic)
+      if (
+        signedAttemptData.selectedImageId &&
+        !firstTime.value &&
+        !isMobile.value &&
+        signedAttemptData.selectedImageId !== randomImageId.value
+      ) {
+        console.log('Resending notification!')
+        await resendNotification()
+      } else {
+        console.log('Setting signedAttempt!')
+        signedAttempt.value = data
+      }
+    } catch (error) {
+      console.error('Error processing signedAttempt:', error)
+    }
   }
 
   const SOCKET_emailverified = () => {
