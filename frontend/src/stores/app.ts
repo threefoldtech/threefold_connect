@@ -141,7 +141,8 @@ export const useAppStore = defineStore('app', () => {
   }
 
   const setScope = (newScope: string) => {
-    scope.value = newScope
+    const parsedScope = JSON.parse(newScope)
+    scope.value = JSON.stringify(parsedScope)
   }
 
   const setAppId = (id: string) => {
@@ -154,6 +155,74 @@ export const useAppStore = defineStore('app', () => {
 
   const setRedirectUrl = (url: string) => {
     redirectUrl.value = url
+  }
+
+  const setKeys = (newKeys: Keys) => {
+    keys.value = newKeys
+  }
+
+  const setNameCheckStatus = (status: NameCheckStatus) => {
+    nameCheckStatus.value = status
+  }
+
+  const setEmailVerificationStatus = (status: VerificationStatus) => {
+    emailVerificationStatus.value = status
+  }
+
+  const setSmsVerificationStatus = (status: VerificationStatus) => {
+    smsVerificationStatus.value = status
+  }
+
+  const setSignedAttempt = (attempt: SignedAttemptData | null) => {
+    signedAttempt.value = attempt
+  }
+
+  const setFirstTime = (value: boolean) => {
+    firstTime.value = value
+  }
+
+  const setIsMobile = (value: boolean) => {
+    isMobile.value = value
+  }
+
+  const setRandomImageId = () => {
+    randomImageId.value = Math.floor(Math.random() * 266)
+  }
+
+  const setScannedFlagUp = (value: boolean) => {
+    scannedFlagUp.value = value
+  }
+
+  const setCancelLoginUp = (value: boolean) => {
+    cancelLoginUp.value = value
+  }
+
+  const setCancelSignUp = (value: boolean) => {
+    cancelSignUp.value = value
+  }
+
+  const setSignedSignAttempt = (attempt: any) => {
+    signedSignAttempt.value = attempt
+  }
+
+  const setSignAttemptOnGoing = (value: boolean) => {
+    signAttemptOnGoing.value = value
+  }
+
+  const setDataUrl = (url: string) => {
+    dataUrl.value = url
+  }
+
+  const setFriendlyName = (name: string) => {
+    friendlyName.value = name
+  }
+
+  const setIsJson = (value: boolean) => {
+    isJson.value = value
+  }
+
+  const setHashedDataUrl = (hash: string) => {
+    dataUrlHash.value = hash
   }
 
   const SOCKET_signedAttempt = async (data: SignedAttemptData) => {
@@ -579,6 +648,10 @@ export const useAppStore = defineStore('app', () => {
     resendNotification, setAttemptCanceled, signUserMobile, signDataUser, resendSignNotification,
     setSignAttemptCanceled, generateKeys, saveState,
     sendValidationEmail, sendValidationSms, validateEmail, validateSms,
+    setKeys, setNameCheckStatus, setEmailVerificationStatus, setSmsVerificationStatus,
+    setSignedAttempt, setFirstTime, setIsMobile, setRandomImageId,
+    setScannedFlagUp, setCancelLoginUp, setCancelSignUp, setSignedSignAttempt,
+    setSignAttemptOnGoing, setDataUrl, setFriendlyName, setIsJson, setHashedDataUrl,
     SOCKET_nameknown, SOCKET_namenotknown, SOCKET_signedAttempt,
     SOCKET_emailverified, SOCKET_emailverificationfailed,
     SOCKET_smsverified, SOCKET_smsverificationfailed, SOCKET_cancelLogin,

@@ -109,21 +109,42 @@ const checkNameAvailability = () => {
 
 const onSignIn = async () => {
   const query = route.query
-  // Sign data user logic would be implemented in the store
-  console.log('Signing in with data:', query)
+  
+  await store.signDataUser({
+    doubleName: doubleName.value,
+    appId: query.appId as string,
+    isJson: query.isJson as string,
+    dataUrlHash: query.dataHash as string,
+    dataUrl: query.dataUrl as string,
+    friendlyName: query.friendlyName as string,
+    redirectUrl: query.redirectUrl as string,
+    state: query.state as string
+  })
 }
 
 const promptToSignMobile = () => {
   const query = route.query
   const randomRoom = localStorage.getItem('randomRoom') || ''
   
-  let url = `${config.deeplink}sign/?state=${encodeURIComponent(query.state as string || '')}&randomRoom=${randomRoom}`
-  if (query.appId) url += `&appId=${encodeURIComponent(query.appId as string)}`
-  if (query.dataHash) url += `&dataHash=${encodeURIComponent(query.dataHash as string)}`
-  if (query.dataUrl) url += `&dataUrl=${encodeURIComponent(query.dataUrl as string)}`
-  if (query.isJson) url += `&isJson=${encodeURIComponent(query.isJson as string)}`
-  if (query.redirectUrl) url += `&redirectUrl=${encodeURIComponent(query.redirectUrl as string)}`
-  if (query.friendlyName) url += `&friendlyName=${encodeURIComponent(query.friendlyName as string)}`
+  store.setRandomRoom(randomRoom)
+  
+  store.signUserMobile({
+    state: query.state as string,
+    appId: query.appId as string,
+    dataUrlHash: query.dataHash as string,
+    dataUrl: query.dataUrl as string,
+    isJson: query.isJson as string,
+    redirectUrl: query.redirectUrl as string,
+    friendlyName: query.friendlyName as string
+  })
+  
+  let url = `${config.deeplink}sign/?state=${encodeURIComponent(store._state || '')}&randomRoom=${randomRoom}`
+  if (store.appId) url += `&appId=${encodeURIComponent(store.appId)}`
+  if (store.dataUrlHash) url += `&dataHash=${encodeURIComponent(store.dataUrlHash)}`
+  if (store.dataUrl) url += `&dataUrl=${encodeURIComponent(store.dataUrl)}`
+  if (store.isJson) url += `&isJson=${encodeURIComponent(store.isJson.toString())}`
+  if (store.redirectUrl) url += `&redirectUrl=${encodeURIComponent(store.redirectUrl)}`
+  if (store.friendlyName) url += `&friendlyName=${encodeURIComponent(store.friendlyName)}`
   
   if (/iPhone|iPad|iPod/i.test(navigator.userAgent)) {
     window.location.replace(url)
@@ -132,8 +153,8 @@ const promptToSignMobile = () => {
   }
 }
 
-const triggerResendSignSocket = () => {
-  console.log('Resending sign notification')
+const triggerResendSignSocket = async () => {
+  await store.resendSignNotification()
 }
 
 onMounted(() => {

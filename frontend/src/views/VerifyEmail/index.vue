@@ -34,12 +34,21 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
+import { useRoute } from 'vue-router'
 import { useAppStore } from '@/stores/app'
 import config from '@/config'
 
+const route = useRoute()
 const store = useAppStore()
 const isMobile = ref(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent))
+
+onMounted(() => {
+  store.validateEmail({
+    userId: route.query.userId as string,
+    verificationCode: route.query.verificationCode as string
+  })
+})
 
 const openApp = () => {
   window.location.href = `${config.deeplink}`
