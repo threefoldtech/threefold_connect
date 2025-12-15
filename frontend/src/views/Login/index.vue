@@ -5,9 +5,6 @@
         <!-- Active Login State -->
         <v-card v-if="store.loginTimeleft > 0 && !loggedIn" class="modern-card">
           <div class="text-center pa-6 pb-4">
-            <v-avatar size="80" class="mb-4">
-              <v-img src="/logo.png" alt="ThreeFold Connect"></v-img>
-            </v-avatar>
             <h1 class="text-h5 font-weight-bold mb-2" style="color: #1E293B;">
               Verify Your Identity
             </h1>
@@ -37,8 +34,8 @@
                   v-if="!isMobile"
                   :src="`/icons/${store.randomImageId}.png`" 
                   alt="Login emoji"
-                  width="180"
-                  height="180"
+                  width="80"
+                  height="80"
                   class="emoji-image"
                 ></v-img>
                 <v-progress-circular 
