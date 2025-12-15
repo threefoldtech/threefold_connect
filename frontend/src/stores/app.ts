@@ -3,7 +3,7 @@ import { ref } from 'vue'
 import socketService from '@/services/socketService'
 import cryptoService from '@/services/cryptoService'
 import userService from '@/services/userService'
-import type { Keys, NameCheckStatus, VerificationStatus } from '@/types'
+import type { Keys, NameCheckStatus, VerificationStatus, SignedAttemptData } from '@/types'
 
 const generateUUID = (): string => {
   let d = new Date().getTime()
@@ -26,11 +26,11 @@ export const useAppStore = defineStore('app', () => {
   const _state = ref<string | null>(null)
   const redirectUrl = ref<string | null>(null)
   const keys = ref<Keys>({})
-  const doubleName = ref<string | null>(null)
+  const doubleName = ref<string | null>(localStorage.getItem('doubleName') || null)
   const nameCheckStatus = ref<NameCheckStatus>({ checked: false, checking: false, available: false })
   const emailVerificationStatus = ref<VerificationStatus>({ checked: false, checking: false, valid: false })
   const smsVerificationStatus = ref<VerificationStatus>({ checked: false, checking: false, valid: false })
-  const signedAttempt = ref<any>(null)
+  const signedAttempt = ref<SignedAttemptData | null>(null)
   const firstTime = ref<boolean | null>(null)
   const isMobile = ref(false)
   const scope = ref<string | null>(null)
@@ -48,6 +48,7 @@ export const useAppStore = defineStore('app', () => {
   // Actions
   const setDoubleName = (name: string) => {
     doubleName.value = name.includes('.3bot') ? name : `${name}.3bot`
+    localStorage.setItem('doubleName', doubleName.value)
     socketService.emit('join', { room: doubleName.value })
   }
 
@@ -72,6 +73,8 @@ export const useAppStore = defineStore('app', () => {
       signedAttempt.value = null
       firstTime.value = data.firstTime
       randomImageId.value = Math.floor(Math.random() * 266) + 1
+      console.log('🎯 Generated randomImageId:', randomImageId.value)
+      console.log('🎯 firstTime:', data.firstTime)
       isMobile.value = data.mobile
 
       console.log('Fetching user public key for:', doubleName.value)
@@ -94,6 +97,7 @@ export const useAppStore = defineStore('app', () => {
         randomImageId: !data.firstTime ? randomImageId.value?.toString() : null,
         locationId
       }
+      console.log('🎯 Sending randomImageId to mobile app:', loginData.randomImageId)
       console.log('Login data to encrypt:', loginData)
 
       const encryptedLoginAttempt = await cryptoService.encrypt(
@@ -142,7 +146,7 @@ export const useAppStore = defineStore('app', () => {
     redirectUrl.value = url
   }
 
-  const SOCKET_signedAttempt = (data: any) => {
+  const SOCKET_signedAttempt = (data: SignedAttemptData) => {
     console.log('Received signedAttempt:', data)
     signedAttempt.value = data
   }
@@ -171,6 +175,7 @@ export const useAppStore = defineStore('app', () => {
     loginTimeleft.value = 120
     loginTimestamp.value = Date.now()
     randomImageId.value = Math.floor(Math.random() * 266) + 1
+    console.log('🔄 Resend - New randomImageId:', randomImageId.value)
 
     if (loginTimeout.value) {
       clearTimeout(loginTimeout.value)
@@ -194,9 +199,45 @@ export const useAppStore = defineStore('app', () => {
     }, 1000)
   }
 
-  const resendNotification = () => {
-    resetTimer()
-    socketService.emit('resendlogin', { doubleName: doubleName.value })
+  const resendNotification = async () => {
+    try {
+      resetTimer() // This regenerates randomImageId
+      
+      console.log('Resending notification with new randomImageId:', randomImageId.value)
+      
+      const publicKey = (await userService.getUserData(doubleName.value!)).data.publicKey
+      const newRandomRoom = generateUUID()
+      const locationId = localStorage.getItem('locationId') || generateUUID()
+      
+      const loginData = {
+        doubleName: doubleName.value,
+        state: _state.value,
+        firstTime: firstTime.value,
+        scope: scope.value,
+        appId: appId.value,
+        randomRoom: newRandomRoom,
+        appPublicKey: appPublicKey.value,
+        randomImageId: randomImageId.value?.toString(),
+        locationId
+      }
+      
+      const encryptedLoginAttempt = await cryptoService.encrypt(
+        JSON.stringify(loginData),
+        publicKey
+      )
+      
+      socketService.emit('leave', { room: randomRoom.value })
+      randomRoom.value = newRandomRoom
+      socketService.emit('join', { room: newRandomRoom })
+      console.log('Emitting new login event to room:', newRandomRoom)
+      socketService.emit('login', { 
+        doubleName: doubleName.value, 
+        encryptedLoginAttempt 
+      })
+    } catch (error) {
+      console.error('Error in resendNotification:', error)
+      throw error
+    }
   }
 
   const setAttemptCanceled = (canceled: boolean) => {

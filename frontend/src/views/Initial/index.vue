@@ -229,25 +229,23 @@ onMounted(() => {
 })
 
 watch(() => store.signedAttempt, (val) => {
-  if (!isMobile.value) return
+  if (!isMobile.value || !val || !store.redirectUrl || !store.appId) return
   
-  if (val && store.redirectUrl && store.appId) {
-    localStorage.setItem('username', doubleName.value)
-    const data = encodeURIComponent(JSON.stringify(val))
-    const union = (store.redirectUrl.indexOf('?') ?? -1) >= 0 ? '&' : '?'
-    const safeRedirectUri = store.redirectUrl[0] === '/' ? store.redirectUrl : '/' + store.redirectUrl
-    const url = `//${store.appId}${safeRedirectUri}${union}signedAttempt=${data}`
-    window.location.href = url
-  }
-})
+  localStorage.setItem('username', doubleName.value)
+  const data = encodeURIComponent(JSON.stringify(val))
+  const union = (store.redirectUrl.indexOf('?') ?? -1) >= 0 ? '&' : '?'
+  const safeRedirectUri = store.redirectUrl[0] === '/' ? store.redirectUrl : '/' + store.redirectUrl
+  const url = `//${store.appId}${safeRedirectUri}${union}signedAttempt=${data}`
+  window.location.href = url
+}, { once: true })
 
 watch(() => store.cancelLoginUp, (val) => {
-  if (val && store.redirectUrl && store.appId) {
-    const safeRedirectUri = store.redirectUrl[0] === '/' ? store.redirectUrl : '/' + store.redirectUrl
-    const url = `//${store.appId}${safeRedirectUri}?error=CancelledByUser`
-    window.location.href = url
-  }
-})
+  if (!val || !store.redirectUrl || !store.appId) return
+  
+  const safeRedirectUri = store.redirectUrl[0] === '/' ? store.redirectUrl : '/' + store.redirectUrl
+  const url = `//${store.appId}${safeRedirectUri}?error=CancelledByUser`
+  window.location.href = url
+}, { once: true })
 </script>
 
 <style src="./Initial.scss" scoped lang="scss"></style>

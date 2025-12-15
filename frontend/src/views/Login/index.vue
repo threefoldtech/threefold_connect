@@ -76,7 +76,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, watch } from 'vue'
+import { ref, onMounted, onUnmounted, watch } from 'vue'
 import { useAppStore } from '@/stores/app'
 import config from '@/config'
 
@@ -107,28 +107,34 @@ const triggerResendNotification = () => {
 }
 
 watch(() => store.signedAttempt, (val) => {
-  if (val) {
-    loggedIn.value = true
-    const data = encodeURIComponent(JSON.stringify(val))
-    const union = (store.redirectUrl?.indexOf('?') ?? -1) >= 0 ? '&' : '?'
-    const safeRedirectUri = store.redirectUrl?.[0] === '/' ? store.redirectUrl : '/' + store.redirectUrl
-    const url = `//${store.appId}${safeRedirectUri}${union}signedAttempt=${data}`
-    window.location.href = url
-  }
-})
+  if (!val) return
+  
+  loggedIn.value = true
+  const data = encodeURIComponent(JSON.stringify(val))
+  const union = (store.redirectUrl?.indexOf('?') ?? -1) >= 0 ? '&' : '?'
+  const safeRedirectUri = store.redirectUrl?.[0] === '/' ? store.redirectUrl : '/' + store.redirectUrl
+  const url = `//${store.appId}${safeRedirectUri}${union}signedAttempt=${data}`
+  window.location.href = url
+}, { once: true })
 
 onMounted(() => {
   store.resetTimer()
   store.setAttemptCanceled(false)
 })
 
-watch(() => store.cancelLoginUp, (val) => {
-  if (val && store.redirectUrl && store.appId) {
-    const safeRedirectUri = store.redirectUrl[0] === '/' ? store.redirectUrl : '/' + store.redirectUrl
-    const url = `//${store.appId}${safeRedirectUri}?error=CancelledByUser`
-    window.location.href = url
-  }
+onUnmounted(() => {
+  // Clean up timers to prevent memory leaks
+  if (store.loginTimeout) clearTimeout(store.loginTimeout)
+  if (store.loginInterval) clearInterval(store.loginInterval)
 })
+
+watch(() => store.cancelLoginUp, (val) => {
+  if (!val || !store.redirectUrl || !store.appId) return
+  
+  const safeRedirectUri = store.redirectUrl[0] === '/' ? store.redirectUrl : '/' + store.redirectUrl
+  const url = `//${store.appId}${safeRedirectUri}?error=CancelledByUser`
+  window.location.href = url
+}, { once: true })
 </script>
 
 <style src="./Login.scss" scoped lang="scss"></style>

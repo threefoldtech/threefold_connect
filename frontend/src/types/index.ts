@@ -22,6 +22,16 @@ export interface VerificationStatus {
   valid: boolean
 }
 
+export interface SignedAttemptData {
+  signedAttempt: string
+  doubleName: string
+  selectedImageId?: number
+  state?: string
+  appId?: string
+  scope?: string
+  [key: string]: any
+}
+
 export interface SignedAttempt {
   signedAttempt: string
   data: {
