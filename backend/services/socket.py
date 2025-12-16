@@ -8,7 +8,7 @@ from services.logger import logger
 
 sio = SocketIO(
     cors_allowed_origins="*",
-    async_mode='gevent_uwsgi',
+    async_mode='gevent',
     logger=False,
     engineio_logger=False,
     ping_timeout=60,

@@ -23,7 +23,7 @@ app.register_blueprint(api_digitaltwin)
 app.register_blueprint(api_crypt)
 app.register_blueprint(api_payment)
 
-CORS(app, support_credentials=True, resources={r"*": {"origins": ["*"]}})
+CORS(app, supports_credentials=True, resources={r"*": {"origins": ["*"]}})
 
 logging.getLogger("werkzeug").setLevel(level=logging.ERROR)
 logging.getLogger("socketio").setLevel(level=logging.ERROR)
