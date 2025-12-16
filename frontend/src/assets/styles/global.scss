@@ -9,9 +9,13 @@ body {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background: #F8FAFB url('/map.png') no-repeat center center fixed;
-  background-size: cover;
   min-height: 100vh;
+}
+
+// Apply background to v-app so it shows on all pages
+.v-application {
+  background: #F8FAFB url('/map.png') no-repeat center center fixed !important;
+  background-size: cover !important;
 }
 
 // Modern card shadows
@@ -119,28 +123,22 @@ body {
   }
 }
 
-// Background with map image
-#app {
+// Background overlay for readability
+.v-application::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(248, 250, 251, 0.15);
+  z-index: 0;
+  pointer-events: none;
+}
+
+.v-main {
   position: relative;
-  min-height: 100vh;
-  background: inherit;
-  
-  &::before {
-    content: '';
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(248, 250, 251, 0.15);
-    z-index: 0;
-    pointer-events: none;
-  }
-  
-  > * {
-    position: relative;
-    z-index: 1;
-  }
+  z-index: 1;
 }
 
 // Modern spacing utilities
