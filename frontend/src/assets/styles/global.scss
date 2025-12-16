@@ -118,11 +118,11 @@ body {
   }
 }
 
-// Background with image
+// Background with map image
 #app {
   position: relative;
   min-height: 100vh;
-  background: url('/bg.png') no-repeat center center fixed;
+  background: #F8FAFB url('/map.png') no-repeat center center fixed;
   background-size: cover;
   
   &::before {
@@ -132,7 +132,7 @@ body {
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(255, 255, 255, 0.85);
+    background: rgba(248, 250, 251, 0.92);
     z-index: -1;
     pointer-events: none;
   }
