@@ -148,16 +148,21 @@ body {
 
 // Alert styling - reduce excessive padding
 .v-alert {
-  padding: 12px 12px 12px 16px !important;
+  padding: 12px 16px !important;
   
   .v-alert__content {
     padding: 0 !important;
-    margin-left: 0 !important;
   }
   
   .v-alert__prepend {
-    margin-inline-end: 8px !important;
+    margin-inline-end: 12px !important;
   }
+}
+
+// Fix button icon spacing
+.v-btn .v-icon--start {
+  margin-inline-start: 0 !important;
+  margin-inline-end: 8px !important;
 }
 
 // Accessibility improvements
