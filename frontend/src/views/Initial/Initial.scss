@@ -6,3 +6,20 @@
     width: 230px;
     height: 40px;
 }
+
+// Center alert icon vertically
+.centered-icon-alert {
+    :deep(.v-alert__prepend) {
+        align-self: center;
+    }
+}
+
+// App badge hover effect
+.app-badge {
+    display: inline-block;
+    transition: transform 0.2s ease;
+    
+    &:hover {
+        transform: scale(1.05);
+    }
+}

@@ -48,7 +48,7 @@
                 type="info"
                 variant="tonal"
                 rounded="lg"
-                class="mb-4"
+                class="mb-4 centered-icon-alert"
                 border="start"
                 border-color="primary"
                 density="compact"
@@ -96,7 +96,7 @@
                 type="error"
                 variant="tonal"
                 rounded="lg"
-                class="mb-4"
+                class="mb-4 centered-icon-alert"
                 density="compact"
               >
                 <div class="d-flex align-center">
@@ -110,7 +110,7 @@
                 type="success"
                 variant="tonal"
                 rounded="lg"
-                class="mb-4"
+                class="mb-4 centered-icon-alert"
                 density="compact"
               >
                 <div class="d-flex align-center">

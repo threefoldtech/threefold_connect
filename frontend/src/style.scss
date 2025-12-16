@@ -3,6 +3,7 @@
     height: 100%;
     position: fixed;
     opacity: 0.75;
+    pointer-events: none;
 }
 .fw {
     width: 100%;
@@ -20,20 +21,57 @@
 
 // Ensure icons are visible in both themes, but don't override semantic colors
 .v-theme--light {
-    .v-btn .v-icon,
+    // Theme toggle button icon
     .theme-toggle-btn .v-icon {
         color: #1AA18F !important;
+    }
+    
+    // Regular button icon colors - enabled state (not theme toggle)
+    .v-btn:not(.theme-toggle-btn):not([disabled]):not(.v-btn--disabled) .v-icon {
+        color: #FFFFFF !important;
+    }
+    
+    // Regular button icon colors - disabled state
+    .v-btn:not(.theme-toggle-btn)[disabled] .v-icon,
+    .v-btn:not(.theme-toggle-btn).v-btn--disabled .v-icon {
+        color: rgba(255, 255, 255, 0.5) !important;
+        opacity: 0.5;
     }
 }
 
 .v-theme--dark {
-    .v-btn .v-icon,
+    // Theme toggle button icon
     .theme-toggle-btn .v-icon {
         color: #14B8A6 !important;
+    }
+    
+    // Regular button icon colors - enabled state (not theme toggle)
+    .v-btn:not(.theme-toggle-btn):not([disabled]):not(.v-btn--disabled) .v-icon {
+        color: #FFFFFF !important;
+    }
+    
+    // Regular button icon colors - disabled state
+    .v-btn:not(.theme-toggle-btn)[disabled] .v-icon,
+    .v-btn:not(.theme-toggle-btn).v-btn--disabled .v-icon {
+        color: rgba(255, 255, 255, 0.4) !important;
+        opacity: 0.4;
     }
     
     // Invert logo colors in dark mode
     .v-avatar .v-img {
         filter: invert(1);
+    }
+}
+
+// Center alert icons vertically
+.centered-icon-alert {
+    :deep(.v-alert__prepend) {
+        align-self: center !important;
+        margin-top: 0 !important;
+    }
+    
+    :deep(.v-alert__content) {
+        display: flex;
+        align-items: center;
     }
 }

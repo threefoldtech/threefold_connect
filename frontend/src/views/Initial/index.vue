@@ -57,7 +57,7 @@
                 type="info"
                 variant="tonal"
                 rounded="lg"
-                class="mb-4"
+                class="mb-4 centered-icon-alert"
                 border="start"
                 border-color="primary"
                 density="compact"
@@ -87,11 +87,11 @@
                   :loading="store.nameCheckStatus.checking"
                 >
                   <template v-slot:append-inner>
-                    <v-icon v-if="store.nameCheckStatus.checked && store.nameCheckStatus.available" color="error" size="small">
-                      mdi-close-circle
-                    </v-icon>
                     <v-icon v-if="store.nameCheckStatus.checked && !store.nameCheckStatus.available" color="success" size="small">
                       mdi-check-circle
+                    </v-icon>
+                    <v-icon v-else-if="store.nameCheckStatus.checked && store.nameCheckStatus.available" color="error" size="small">
+                      mdi-close-circle
                     </v-icon>
                   </template>
                 </v-text-field>
@@ -102,11 +102,10 @@
                 type="error"
                 variant="tonal"
                 rounded="lg"
-                class="mb-4"
+                class="mb-4 centered-icon-alert"
                 density="compact"
               >
                 <div class="d-flex align-center">
-                  <v-icon start>mdi-alert-circle</v-icon>
                   <span>This ThreeFold Connect ID is not registered yet. Please check your spelling or register a new account.</span>
                 </div>
               </v-alert>
@@ -116,11 +115,10 @@
                 type="success"
                 variant="tonal"
                 rounded="lg"
-                class="mb-4"
+                class="mb-4 centered-icon-alert"
                 density="compact"
               >
                 <div class="d-flex align-center">
-                  <v-icon start>mdi-check-circle</v-icon>
                   <span>ThreeFold Connect ID verified! You can proceed with login.</span>
                 </div>
               </v-alert>

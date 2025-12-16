@@ -18,7 +18,7 @@
               type="info"
               variant="tonal"
               rounded="lg"
-              class="mb-4"
+              class="mb-4 centered-icon-alert"
               border="start"
               border-color="primary"
               density="compact"
