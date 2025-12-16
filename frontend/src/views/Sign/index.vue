@@ -68,7 +68,7 @@
                   :rules="nameRules"
                   variant="outlined"
                   placeholder="Enter your ThreeFold Connect ID"
-                  hint="Enter your ID without the .3bot extension"
+                  hint="Enter your ThreeFold Connect ID"
                   persistent-hint
                   density="comfortable"
                   :loading="store.nameCheckStatus.checking"
