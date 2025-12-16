@@ -44,14 +44,22 @@ RUN poetry install --only main
 FROM nginx:1.27-alpine AS runtime
 
 RUN apk add --no-cache \
-    python3 \
     libffi \
-    openssl
+    openssl \
+    libgcc \
+    libstdc++
 
 ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
     VIRTUAL_ENV=/app/.venv \
-    PATH="/app/.venv/bin:$PATH"
+    PATH="/usr/local/bin:/app/.venv/bin:$PATH" \
+    LD_LIBRARY_PATH="/usr/local/lib:$LD_LIBRARY_PATH"
+
+COPY --from=backend-builder /usr/local/bin/python3.11 /usr/local/bin/python3.11
+COPY --from=backend-builder /usr/local/bin/python3 /usr/local/bin/python3
+COPY --from=backend-builder /usr/local/lib/python3.11 /usr/local/lib/python3.11
+COPY --from=backend-builder /usr/local/lib/libpython3.11.so.1.0 /usr/local/lib/libpython3.11.so.1.0
+COPY --from=backend-builder /usr/local/lib/libpython3.so /usr/local/lib/libpython3.so
 
 COPY --from=backend-builder /app/.venv /app/.venv
 COPY --from=backend-builder /app /usr/share/nginx/backend
