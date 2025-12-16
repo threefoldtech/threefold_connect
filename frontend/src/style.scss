@@ -1,13 +1,3 @@
-#app:before {
-    content: '';
-    transform: scale(1.1);
-    width: 100%;
-    height: 100%;
-    position: fixed;
-    background: url(./assets/bg.png);
-    background-size: cover;
-    background-position: center top;
-}
 .overlay {
     width: 100%;
     height: 100%;
@@ -26,9 +16,4 @@
     img {
         width: 200px;
     }
-}
-
-// Vuetify extension
-.v-card {
-    border-radius: 10px;
 }

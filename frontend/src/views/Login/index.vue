@@ -57,7 +57,6 @@
                 color="primary"
                 class="px-6 py-6"
               >
-                <v-icon start size="small">mdi-clock-outline</v-icon>
                 <span class="text-h6 font-weight-bold">{{ store.loginTimeleft }}s</span>
               </v-chip>
               <p class="text-caption mt-2" style="color: #64748B;">
