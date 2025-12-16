@@ -15,13 +15,9 @@
 </template>
 
 <script setup lang="ts">
-import { onErrorCaptured, onMounted } from 'vue'
+import { onErrorCaptured } from 'vue'
 import { useSocket } from '@/composables/useSocket'
-import { useTheme } from '@/composables/useTheme'
 import ThemeToggle from '@/components/ThemeToggle.vue'
-
-// Initialize theme on app mount
-const { currentTheme } = useTheme()
 
 // Set up socket listeners with proper cleanup
 useSocket()
