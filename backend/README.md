@@ -1,18 +1,45 @@
-# 3botlogin_backend
+# ThreeFold Connect Backend
 
-The (temporary) backend for 3Bot login.
+Modern Python backend for ThreeFold Connect authentication and digital twin management.
 
-## Run service
+## Quick Start
 
-Go inside virtual environment:
+### Prerequisites
 
-`source ./venv/bin/activate`
+- Python 3.11+
+- Poetry (for dependency management)
+- Docker (optional, for containerized deployment)
 
-Start UWSGI backend:
+### Local Development
 
 ```bash
-uwsgi --http :5000 --gevent 1000 --http-websockets --master --wsgi-file __main__.py --callable app -s 0.0.0.0:3030
-: 1643024584:0;uwsgi --http :5000 --gevent 1000 --http-websockets --master --wsgi-file __main__.py --callable app -s 0.0.0.0:3030
+# Install dependencies
+poetry install
+
+# Run the backend
+poetry run python __main__.py
+```
+
+Or activate the virtual environment:
+
+```bash
+poetry shell
+python __main__.py
+```
+
+The backend will start on `http://localhost:5000`
+
+### Docker Development
+
+```bash
+# Build the image
+docker build -t threefold-connect .
+
+# Run the container
+docker run -d -p 5000:5000 \
+  -v $(pwd)/pythonsqlite.db:/usr/share/nginx/backend/pythonsqlite.db \
+  -v $(pwd)/config.ini:/usr/share/nginx/backend/config.ini \
+  threefold-connect
 ```
 
 ## Data to save
