@@ -61,6 +61,7 @@
                 border="start"
                 border-color="primary"
                 density="compact"
+                icon="mdi-information"
               >
                 <div class="text-body-2" style="line-height: 1.6;">
                   Welcome to the ThreeFold Connect authenticator. Your account is secured with military-grade encryption - not even we can access it.

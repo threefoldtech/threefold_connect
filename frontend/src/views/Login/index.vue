@@ -22,6 +22,7 @@
               border="start"
               border-color="primary"
               density="compact"
+              icon="mdi-information"
             >
               <div class="text-body-2">
                 Please open your ThreeFold Connect app, authenticate with PIN or biometrics, and select the matching emoji

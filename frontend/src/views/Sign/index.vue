@@ -52,6 +52,7 @@
                 border="start"
                 border-color="primary"
                 density="compact"
+                icon="mdi-information"
               >
                 <div class="text-body-2">
                   You're about to sign data with your ThreeFold identity. Please verify your 3Bot name below.
@@ -135,6 +136,27 @@
               </v-btn>
             </v-card-actions>
           </v-form>
+
+          <!-- App Store Badges -->
+          <div class="text-center pb-6">
+            <p class="text-body-2 mb-3" style="color: #64748B;">
+              Don't have the app yet?
+            </p>
+            <div class="d-flex justify-center gap-3">
+              <a 
+                href="https://play.google.com/store/apps/details?id=org.jimber.threebotlogin" 
+                target="_blank"
+              >
+                <img src="/googleplay.png" height="48" alt="Get it on Google Play" style="border-radius: 8px;" />
+              </a>
+              <a 
+                href="https://itunes.apple.com/be/app/3bot-login/id1459845885?l=nl&mt=8" 
+                target="_blank"
+              >
+                <img src="/applestore.png" height="48" alt="Download on the App Store" style="border-radius: 8px;" />
+              </a>
+            </div>
+          </div>
         </v-card>
       </v-col>
     </v-row>
