@@ -5,7 +5,7 @@ WORKDIR /frontend
 RUN yarn install --frozen-lockfile && yarn build
 
 
-FROM python:3.11-slim AS backend-builder
+FROM python:3.11-alpine AS backend-builder
 
 ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
@@ -17,13 +17,15 @@ ENV PYTHONUNBUFFERED=1 \
     POETRY_VIRTUALENVS_IN_PROJECT=true \
     POETRY_VIRTUALENVS_CREATE=true
 
-RUN apt-get update && apt-get install -y --no-install-recommends \
+RUN apk add --no-cache \
     gcc \
-    libssl-dev \
+    musl-dev \
     libffi-dev \
+    openssl-dev \
     python3-dev \
+    linux-headers \
     curl \
-    && rm -rf /var/lib/apt/lists/*
+    make
 
 RUN curl -sSL https://install.python-poetry.org | python3 -
 
@@ -43,10 +45,8 @@ FROM nginx:1.27-alpine AS runtime
 
 RUN apk add --no-cache \
     python3 \
-    py3-pip \
     libffi \
-    openssl \
-    && rm -rf /var/cache/apk/*
+    openssl
 
 ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
