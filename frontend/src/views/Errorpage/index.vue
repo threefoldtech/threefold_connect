@@ -20,7 +20,8 @@
               type="warning"
               variant="tonal"
               rounded="lg"
-              class="mb-6"
+              class="mb-4"
+              density="compact"
             >
               <div class="text-body-2">
                 <strong>Missing Parameters:</strong> We didn't receive the required information to complete this action.
@@ -54,7 +55,7 @@
             <v-divider class="my-6"></v-divider>
 
             <div class="text-center">
-              <p class="text-body-2 mb-4" style="color: #64748B;">
+              <p class="text-body-2" style="color: #64748B;">
                 Need help? Visit our support center
               </p>
               <v-btn

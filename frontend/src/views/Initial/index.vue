@@ -57,9 +57,10 @@
                 type="info"
                 variant="tonal"
                 rounded="lg"
-                class="mb-6"
+                class="mb-4"
                 border="start"
                 border-color="primary"
+                density="compact"
               >
                 <div class="text-body-2" style="line-height: 1.6;">
                   Welcome to the ThreeFold Connect authenticator. Your account is secured with military-grade encryption - not even we can access it.
@@ -101,6 +102,7 @@
                 variant="tonal"
                 rounded="lg"
                 class="mb-4"
+                density="compact"
               >
                 <div class="d-flex align-center">
                   <v-icon start>mdi-alert-circle</v-icon>
@@ -114,6 +116,7 @@
                 variant="tonal"
                 rounded="lg"
                 class="mb-4"
+                density="compact"
               >
                 <div class="d-flex align-center">
                   <v-icon start>mdi-check-circle</v-icon>

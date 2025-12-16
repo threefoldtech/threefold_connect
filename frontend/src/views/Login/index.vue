@@ -18,9 +18,10 @@
               type="info"
               variant="tonal"
               rounded="lg"
-              class="mb-6"
+              class="mb-4"
               border="start"
               border-color="primary"
+              density="compact"
             >
               <div class="text-body-2">
                 Please open your ThreeFold Connect app, authenticate with PIN or biometrics, and select the matching emoji

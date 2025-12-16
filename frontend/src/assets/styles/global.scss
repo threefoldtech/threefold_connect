@@ -132,7 +132,7 @@ body {
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(248, 250, 251, 0.88);
+    background: rgba(248, 250, 251, 0.15);
     z-index: 0;
     pointer-events: none;
   }
@@ -146,6 +146,15 @@ body {
 // Modern spacing utilities
 .section-spacing {
   padding: 3rem 1.5rem;
+}
+
+// Alert styling - reduce excessive padding
+.v-alert {
+  padding: 12px 16px !important;
+  
+  .v-alert__content {
+    padding: 0 !important;
+  }
 }
 
 // Accessibility improvements

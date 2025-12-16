@@ -67,6 +67,7 @@
                 variant="tonal"
                 rounded="lg"
                 class="mb-4"
+                density="compact"
               >
                 <div class="text-body-2">
                   If this problem persists, please contact support at<br>

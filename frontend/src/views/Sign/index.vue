@@ -48,9 +48,10 @@
                 type="info"
                 variant="tonal"
                 rounded="lg"
-                class="mb-6"
+                class="mb-4"
                 border="start"
                 border-color="primary"
+                density="compact"
               >
                 <div class="text-body-2">
                   You're about to sign data with your ThreeFold identity. Please verify your 3Bot name below.
@@ -95,6 +96,7 @@
                 variant="tonal"
                 rounded="lg"
                 class="mb-4"
+                density="compact"
               >
                 <div class="d-flex align-center">
                   <v-icon start>mdi-alert-circle</v-icon>
@@ -108,6 +110,7 @@
                 variant="tonal"
                 rounded="lg"
                 class="mb-4"
+                density="compact"
               >
                 <div class="d-flex align-center">
                   <v-icon start>mdi-check-circle</v-icon>
