@@ -84,11 +84,6 @@
                   density="comfortable"
                   :loading="store.nameCheckStatus.checking"
                 >
-                  <template v-slot:prepend-inner>
-                    <v-avatar size="24" class="mr-2">
-                      <v-img src="/logo.png" alt="ThreeFold"></v-img>
-                    </v-avatar>
-                  </template>
                   <template v-slot:append-inner>
                     <v-icon v-if="store.nameCheckStatus.checked && store.nameCheckStatus.available" color="error" size="small">
                       mdi-close-circle

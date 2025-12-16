@@ -29,7 +29,7 @@
 
             <!-- Emoji Display -->
             <div class="emoji-container mb-6">
-              <div class="emoji-card">
+              <div class="emoji-card" style="display: flex; justify-content: center; align-items: center;">
                 <v-img 
                   v-if="!isMobile"
                   :src="`/icons/${store.randomImageId}.png`" 
@@ -50,14 +50,14 @@
             </div>
 
             <!-- Timer -->
-            <div class="timer-section mb-6">
+            <div class="timer-section mb-6 text-center">
               <v-chip
                 size="large"
                 variant="tonal"
                 color="primary"
-                prepend-icon="mdi-clock-outline"
                 class="px-6 py-6"
               >
+                <v-icon start size="small">mdi-clock-outline</v-icon>
                 <span class="text-h6 font-weight-bold">{{ store.loginTimeleft }}s</span>
               </v-chip>
               <p class="text-caption mt-2" style="color: #64748B;">
