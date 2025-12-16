@@ -7,10 +7,10 @@
             <v-avatar size="80" class="mb-4">
               <v-img src="/logo.png" alt="ThreeFold Connect"></v-img>
             </v-avatar>
-            <h1 class="text-h5 font-weight-bold mb-2" style="color: #1E293B;">
+            <h1 class="text-h5 font-weight-bold mb-2">
               Oops! Something Went Wrong
             </h1>
-            <p class="text-body-2" style="color: #64748B;">
+            <p class="text-body-2">
               We couldn't process your request
             </p>
           </div>
@@ -29,10 +29,10 @@
             </v-alert>
 
             <div class="mb-6">
-              <p class="text-body-1 mb-3" style="color: #475569;">
+              <p class="text-body-1 mb-3">
                 This page requires specific parameters from a third-party application. You cannot access it directly.
               </p>
-              <p class="text-body-2" style="color: #64748B;">
+              <p class="text-body-2">
                 If you want to register a new account, please download the ThreeFold Connect app:
               </p>
             </div>
@@ -55,7 +55,7 @@
             <v-divider class="my-6"></v-divider>
 
             <div class="text-center">
-              <p class="text-body-2" style="color: #64748B;">
+              <p class="text-body-2">
                 Need help? Visit our support center
               </p>
               <v-btn

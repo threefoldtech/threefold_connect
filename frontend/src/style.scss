@@ -17,3 +17,23 @@
         width: 200px;
     }
 }
+
+// Ensure icons are visible in both themes, but don't override semantic colors
+.v-theme--light {
+    .v-btn .v-icon,
+    .theme-toggle-btn .v-icon {
+        color: #1AA18F !important;
+    }
+}
+
+.v-theme--dark {
+    .v-btn .v-icon,
+    .theme-toggle-btn .v-icon {
+        color: #14B8A6 !important;
+    }
+    
+    // Invert logo colors in dark mode
+    .v-avatar .v-img {
+        filter: invert(1);
+    }
+}

@@ -7,10 +7,10 @@
             <v-avatar size="80" class="mb-4">
               <v-img src="/logo.png" alt="ThreeFold Connect"></v-img>
             </v-avatar>
-            <h1 class="text-h5 font-weight-bold mb-2" style="color: #1E293B;">
+            <h1 class="text-h5 font-weight-bold mb-2">
               Phone Verification
             </h1>
-            <p class="text-body-2" style="color: #64748B;">
+            <p class="text-body-2">
               Verifying your phone number
             </p>
           </div>
@@ -25,7 +25,7 @@
                 indeterminate
                 class="mb-4"
               ></v-progress-circular>
-              <p class="text-body-1" style="color: #64748B;">
+              <p class="text-body-1">
                 Please wait while we validate your phone number...
               </p>
             </div>
@@ -33,10 +33,10 @@
             <!-- Success State -->
             <div v-if="store.smsVerificationStatus.checked && store.smsVerificationStatus.valid">
               <v-icon :size="120" color="success" class="mb-4">mdi-check-circle</v-icon>
-              <h2 class="text-h6 font-weight-bold mb-2" style="color: #1E293B;">
+              <h2 class="text-h6 font-weight-bold mb-2">
                 Phone Verified!
               </h2>
-              <p class="text-body-1 mb-6" style="color: #64748B;">
+              <p class="text-body-1 mb-6">
                 Your phone number has been successfully verified
               </p>
               <v-btn 
@@ -56,10 +56,10 @@
             <!-- Error State -->
             <div v-if="store.smsVerificationStatus.checked && !store.smsVerificationStatus.valid">
               <v-icon :size="120" color="error" class="mb-4">mdi-close-circle</v-icon>
-              <h2 class="text-h6 font-weight-bold mb-2" style="color: #1E293B;">
+              <h2 class="text-h6 font-weight-bold mb-2">
                 Verification Failed
               </h2>
-              <p class="text-body-1 mb-4" style="color: #64748B;">
+              <p class="text-body-1 mb-4">
                 There was a problem validating your phone number.
               </p>
               <v-alert
@@ -82,7 +82,7 @@
 
           <!-- App Store Badges -->
           <div class="text-center pb-6">
-            <p class="text-body-2 mb-3" style="color: #64748B;">
+            <p class="text-body-2 mb-3">
               Don't have the app yet?
             </p>
             <div class="d-flex justify-center gap-3">

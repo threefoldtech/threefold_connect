@@ -5,10 +5,10 @@
         <!-- Active Login State -->
         <v-card v-if="store.loginTimeleft > 0 && !loggedIn" class="modern-card">
           <div class="text-center pa-6 pb-4">
-            <h1 class="text-h5 font-weight-bold mb-2" style="color: #1E293B;">
+            <h1 class="text-h5 font-weight-bold mb-2">
               Verify Your Identity
             </h1>
-            <p class="text-body-2" style="color: #64748B;">
+            <p class="text-body-2">
               Select the matching emoji in your ThreeFold Connect app
             </p>
           </div>
@@ -61,7 +61,7 @@
               >
                 <span class="text-h6 font-weight-bold">{{ store.loginTimeleft }}s</span>
               </v-chip>
-              <p class="text-caption mt-2" style="color: #64748B;">
+              <p class="text-caption mt-2">
                 Time remaining to complete verification
               </p>
             </div>
@@ -113,10 +113,10 @@
         <v-card v-else-if="loggedIn" class="modern-card">
           <v-card-text class="text-center pa-8">
             <v-icon :size="120" color="success" class="mb-4">mdi-check-circle</v-icon>
-            <h2 class="text-h5 font-weight-bold mb-2" style="color: #1E293B;">
+            <h2 class="text-h5 font-weight-bold mb-2">
               Login Successful!
             </h2>
-            <p class="text-body-1" style="color: #64748B;">
+            <p class="text-body-1">
               Redirecting you now...
             </p>
             <v-progress-linear indeterminate color="primary" class="mt-4"></v-progress-linear>
@@ -127,10 +127,10 @@
         <v-card v-else class="modern-card">
           <v-card-text class="text-center pa-8">
             <v-icon :size="120" color="error" class="mb-4">mdi-close-circle</v-icon>
-            <h2 class="text-h5 font-weight-bold mb-2" style="color: #1E293B;">
+            <h2 class="text-h5 font-weight-bold mb-2">
               Login Expired
             </h2>
-            <p class="text-body-1 mb-4" style="color: #64748B;">
+            <p class="text-body-1 mb-4">
               <span v-if="referrer">
                 This login attempt is no longer valid. Please <a :href="referrer" class="text-primary">click here</a> to return.
               </span>
@@ -157,11 +157,11 @@
     <!-- Help Dialog -->
     <v-dialog v-model="dialog" max-width="600">
       <v-card rounded="xl">
-        <v-card-title class="text-h5 font-weight-bold pa-6" style="color: #1E293B;">
+        <v-card-title class="text-h5 font-weight-bold pa-6">
           Need Help?
         </v-card-title>
         <v-card-text class="px-6">
-          <p class="text-body-1 mb-4" style="color: #475569;">
+          <p class="text-body-1 mb-4">
             If you don't have the ThreeFold Connect app yet, download it from your app store:
           </p>
           
@@ -182,7 +182,7 @@
 
           <v-divider class="my-4"></v-divider>
 
-          <p class="text-body-2" style="color: #64748B;">
+          <p class="text-body-2">
             <strong>Account Recovery:</strong> If you have an account but it's not active on your device, open the app and click the 'Recover Account' button for instructions.
           </p>
         </v-card-text>

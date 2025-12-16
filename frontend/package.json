@@ -14,12 +14,13 @@
     "type-check": "vue-tsc --noEmit"
   },
   "dependencies": {
+    "@mdi/font": "^7.4.47",
     "axios": "^1.8.2",
-    "socket.io-client": "^4.7.5",
     "bip39": "^3.1.0",
     "libsodium-wrappers": "^0.7.13",
     "pinia": "^2.1.7",
     "qrcode.vue": "^3.4.1",
+    "socket.io-client": "^4.7.5",
     "tweetnacl": "^1.0.3",
     "tweetnacl-util": "^0.15.1",
     "vue": "^3.4.21",
@@ -27,8 +28,8 @@
     "vuetify": "^3.5.10"
   },
   "devDependencies": {
-    "@types/node": "^20.11.25",
     "@types/libsodium-wrappers": "^0.7.14",
+    "@types/node": "^20.11.25",
     "@vitejs/plugin-vue": "^5.0.4",
     "@vue/eslint-config-typescript": "^13.0.0",
     "@vue/tsconfig": "^0.5.1",

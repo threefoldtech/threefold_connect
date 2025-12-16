@@ -8,7 +8,6 @@ import socket from './services/socketClient'
 import { setSocketInstance } from './services/socketService'
 import { useAppStore } from './stores/app'
 import './style.scss'
-import './assets/styles/global.scss'
 
 const app = createApp(App)
 const pinia = createPinia()

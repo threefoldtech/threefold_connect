@@ -8,10 +8,10 @@
             <v-avatar size="120" class="mb-6">
               <v-img src="/logo.png" alt="ThreeFold Connect"></v-img>
             </v-avatar>
-            <h1 class="text-h5 font-weight-bold mb-3" style="color: #1E293B;">
+            <h1 class="text-h5 font-weight-bold mb-3">
               Sign Data Request
             </h1>
-            <p class="text-body-1 mb-6" style="color: #64748B;">
+            <p class="text-body-1 mb-6">
               Open your ThreeFold Connect app to sign this data
             </p>
             <v-btn 
@@ -34,10 +34,10 @@
             <v-avatar size="80" class="mb-4">
               <v-img src="/logo.png" alt="ThreeFold Connect"></v-img>
             </v-avatar>
-            <h1 class="text-h5 font-weight-bold mb-2" style="color: #1E293B;">
+            <h1 class="text-h5 font-weight-bold mb-2">
               Sign Data
             </h1>
-            <p class="text-body-2" style="color: #64748B;">
+            <p class="text-body-2">
               Authenticate to sign data with your ThreeFold identity
             </p>
           </div>
@@ -60,7 +60,7 @@
               </v-alert>
 
               <div class="mb-6">
-                <label class="text-subtitle-2 font-weight-medium mb-2 d-block" style="color: #1E293B;">
+                <label class="text-subtitle-2 font-weight-medium mb-2 d-block">
                   ThreeFold Connect ID
                 </label>
                 <v-text-field
@@ -139,7 +139,7 @@
 
           <!-- App Store Badges -->
           <div class="text-center pb-6">
-            <p class="text-body-2 mb-3" style="color: #64748B;">
+            <p class="text-body-2 mb-3">
               Don't have the app yet?
             </p>
             <div class="d-flex justify-center gap-3">
@@ -164,11 +164,11 @@
     <!-- Help Dialog -->
     <v-dialog v-model="dialog" max-width="600">
       <v-card rounded="xl">
-        <v-card-title class="text-h5 font-weight-bold pa-6" style="color: #1E293B;">
+        <v-card-title class="text-h5 font-weight-bold pa-6">
           About Data Signing
         </v-card-title>
         <v-card-text class="px-6 pb-6">
-          <p class="text-body-1" style="color: #475569;">
+          <p class="text-body-1">
             Data signing allows you to cryptographically prove that you authorized specific data or transactions using your ThreeFold identity.
           </p>
         </v-card-text>

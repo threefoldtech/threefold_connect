@@ -6,10 +6,10 @@
         <v-avatar class="mb-8 logo-avatar" size="160">
           <v-img src="/logo.png" alt="ThreeFold Connect Logo"></v-img>
         </v-avatar>
-        <h1 class="text-h4 font-weight-bold mb-3" style="color: #1E293B;">
+        <h1 class="text-h4 font-weight-bold mb-3">
           ThreeFold Connect
         </h1>
-        <p class="text-body-1 mb-8" style="color: #64748B; max-width: 400px; margin: 0 auto;">
+        <p class="text-body-1 mb-8">
           Secure authentication for ThreeFold Grid
         </p>
         <v-btn 
@@ -42,10 +42,10 @@
             <v-avatar size="100" class="mb-4">
               <v-img src="/logo.png" alt="ThreeFold Connect Logo"></v-img>
             </v-avatar>
-            <h1 class="text-h4 font-weight-bold mb-2" style="color: #1E293B;">
+            <h1 class="text-h4 font-weight-bold mb-2">
               ThreeFold Connect
             </h1>
-            <p class="text-subtitle-1" style="color: #64748B;">
+            <p class="text-subtitle-1">
               Secure Two-Factor Authentication
             </p>
           </div>
@@ -71,7 +71,7 @@
               </v-alert>
               <!-- Username Input -->
               <div class="mb-6">
-                <label class="text-subtitle-2 font-weight-medium mb-2 d-block" style="color: #1E293B;">
+                <label class="text-subtitle-2 font-weight-medium mb-2 d-block">
                   ThreeFold Connect ID
                 </label>
                 <v-text-field
@@ -150,7 +150,7 @@
     <!-- App Store Badges -->
     <v-row class="mt-8" justify="center">
       <v-col cols="12" class="text-center">
-        <p class="text-body-2 mb-4" style="color: #64748B;">
+        <p class="text-body-2 mb-4">
           Don't have an account? Download the app to get started
         </p>
         <div class="d-flex justify-center align-center gap-3 flex-wrap">
