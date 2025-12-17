@@ -1,9 +1,26 @@
 <template>
   <section class="sign fill-height">
-    <v-row justify="center" align="center" class="fill-height">
-      <v-col cols="12" sm="10" md="8" lg="6" xl="5">
-        <!-- Mobile View -->
-        <v-card v-if="isMobile" class="modern-card">
+    <v-container fluid class="fill-height pa-0">
+      <v-row class="fill-height ma-0" justify="center" align="center">
+        <v-col cols="12" sm="12" md="10" lg="8" xl="6">
+          <div class="content-wrapper">
+            <!-- Logo -->
+            <div class="text-center mb-6">
+              <v-img src="/logo.png" alt="ThreeFold" width="48" height="48" class="mx-auto mb-4"></v-img>
+            </div>
+            
+            <!-- Page Header -->
+            <div class="text-center mb-6">
+              <h1 class="page-title mb-2">
+                ThreeFold Connect
+              </h1>
+              <p class="page-subtitle">
+                Sign Data
+              </p>
+            </div>
+            
+            <!-- Mobile View -->
+            <v-card v-if="isMobile" class="sign-card">
           <div class="text-center pa-8">
             <v-avatar size="120" class="mb-6">
               <v-img src="/logo.png" alt="ThreeFold Connect"></v-img>
@@ -28,19 +45,8 @@
           </div>
         </v-card>
 
-        <!-- Desktop View -->
-        <v-card v-else class="modern-card">
-          <div class="text-center pa-6 pb-4">
-            <v-avatar size="80" class="mb-4">
-              <v-img src="/logo.png" alt="ThreeFold Connect"></v-img>
-            </v-avatar>
-            <h1 class="text-h5 font-weight-bold mb-2">
-              Sign Data
-            </h1>
-            <p class="text-body-2">
-              Authenticate to sign data with your ThreeFold identity
-            </p>
-          </div>
+            <!-- Desktop View -->
+            <v-card v-else class="sign-card">
 
           <v-form v-model="valid" @submit.prevent="onSignIn">
             <v-card-text class="px-6 pb-6">
@@ -137,29 +143,34 @@
             </v-card-actions>
           </v-form>
 
-          <!-- App Store Badges -->
-          <div class="text-center pb-6">
-            <p class="text-body-2 mb-3">
-              Don't have the app yet?
-            </p>
-            <div class="d-flex justify-center gap-3">
-              <a 
-                href="https://play.google.com/store/apps/details?id=org.jimber.threebotlogin" 
-                target="_blank"
-              >
-                <img src="/googleplay.png" height="48" alt="Get it on Google Play" style="border-radius: 8px;" />
-              </a>
-              <a 
-                href="https://itunes.apple.com/be/app/3bot-login/id1459845885?l=nl&mt=8" 
-                target="_blank"
-              >
-                <img src="/applestore.png" height="48" alt="Download on the App Store" style="border-radius: 8px;" />
-              </a>
+            </v-card>
+            
+            <!-- App Store Badges -->
+            <div class="mt-8 text-center">
+              <p class="app-badges-text mb-4">
+                Don't have an account? Download the app to get started
+              </p>
+              <div class="d-flex justify-center align-center gap-3 flex-wrap">
+                <a 
+                  href="https://play.google.com/store/apps/details?id=org.jimber.threebotlogin" 
+                  target="_blank"
+                  class="app-badge"
+                >
+                  <img src="/googleplay.png" height="40" alt="Get it on Google Play" class="badge-img" />
+                </a>
+                <a 
+                  href="https://itunes.apple.com/be/app/3bot-login/id1459845885?l=nl&mt=8" 
+                  target="_blank"
+                  class="app-badge"
+                >
+                  <img src="/applestore.png" height="40" alt="Download on the App Store" class="badge-img" />
+                </a>
+              </div>
             </div>
           </div>
-        </v-card>
-      </v-col>
-    </v-row>
+        </v-col>
+      </v-row>
+    </v-container>
 
     <!-- Help Dialog -->
     <v-dialog v-model="dialog" max-width="600">

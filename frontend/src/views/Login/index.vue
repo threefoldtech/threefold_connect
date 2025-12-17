@@ -14,116 +14,71 @@
       <h1 class="page-title mb-2">
         ThreeFold Connect
       </h1>
+      <p class="page-subtitle">
+        Secure Two-Factor Authentication
+      </p>
           </div>
           
-          <!-- Background Card (visible behind modal) -->
-          <v-card class="background-card">
-          <v-card-text class="pa-6">
-            <!-- Info Alerts -->
-            <v-alert class="info-alert mb-4" rounded="lg" density="comfortable">
-              <div class="d-flex align-start">
-                <v-icon class="alert-icon mr-3" size="20">mdi-information-outline</v-icon>
-                <div class="alert-text">
-                  Welcome to the ThreeFold Connect authenticator. Your account is secured with military-grade encryption - not even we can access it.
-                </div>
-              </div>
-            </v-alert>
+          <!-- Login In Progress Card -->
+        <v-card v-if="store.loginTimeleft > 0 && !loggedIn" class="login-card">
+          <v-card-text class="text-center pa-8">
+            <h2 class="login-title mb-6">
+              Signing in...
+            </h2>
             
-            <v-alert class="info-alert mb-6" rounded="lg" density="comfortable">
-              <div class="d-flex align-start">
-                <v-icon class="alert-icon mr-3" size="20">mdi-information-outline</v-icon>
-                <div class="alert-text">
-                  <strong>Before continuing:</strong><br>
-                  Please ensure your ThreeFold Connect mobile app is open and ready.
-                </div>
-              </div>
-            </v-alert>
+            <p class="login-instruction mb-6">
+              Please open the ThreeFold Connect app on your mobile device, authenticate either with pin or Touch ID, and then match the following icon from the choices given.
+            </p>
             
-            <!-- Input Field Placeholder -->
-            <div class="mb-4">
-              <label class="input-label mb-2 d-block">ThreeFold Connect ID</label>
-              <v-text-field
-                :model-value="store.doubleName"
-                variant="outlined"
-                density="comfortable"
-                class="custom-input"
-                disabled
-                hide-details
-              ></v-text-field>
+            <!-- Random Emoji Icon -->
+            <div class="biometric-container mb-6">
+              <div class="biometric-circle">
+                <img v-if="!loggedIn" :src="`/icons/${store.randomImageId}.png`" height="48" alt="Select this icon" />
+                <v-icon v-else size="48" color="#14B8A6">mdi-check</v-icon>
+              </div>
             </div>
+            
+            <p class="timer-text mb-4">
+              Please enter your pincode or use fingerprint and select this icon on your mobile phone.
+            </p>
+            
+            <p class="countdown-text mb-6">
+              Your login attempt is valid for another <strong>{{ store.loginTimeleft }} seconds.</strong>
+            </p>
+            
+            <!-- Resend Button -->
+            <v-btn
+              v-if="!store.firstTime && !isMobile"
+              color="primary"
+              variant="flat"
+              size="large"
+              rounded="lg"
+              block
+              @click="triggerResendNotification"
+              class="resend-btn text-none"
+            >
+              <v-icon start size="20">mdi-refresh</v-icon>
+              RESEND NOTIFICATION
+            </v-btn>
+            
+            <v-btn
+              v-if="isMobile"
+              color="primary"
+              variant="flat"
+              size="large"
+              rounded="lg"
+              block
+              @click="openApp"
+              class="resend-btn text-none"
+            >
+              <v-icon start>mdi-open-in-app</v-icon>
+              Open ThreeFold Connect App
+            </v-btn>
           </v-card-text>
         </v-card>
-        
-        <!-- Login Modal Dialog -->
-        <v-dialog 
-          v-if="store.loginTimeleft > 0 && !loggedIn"
-          :model-value="true" 
-          max-width="500"
-          persistent
-          class="login-dialog"
-        >
-          <v-card class="modal-card">
-            <v-card-title class="modal-header d-flex align-center justify-space-between pa-4">
-              <span class="modal-title">Signing in...</span>
-              <v-btn icon variant="text" size="small" class="close-btn">
-                <v-icon size="20" color="white">mdi-close</v-icon>
-              </v-btn>
-            </v-card-title>
-            
-            <v-card-text class="text-center pa-6">
-              <p class="modal-instruction mb-6">
-                Please open the ThreeFold Connect app on your mobile device, authenticate either with pin or Touch ID, and then match the following icon from the choices given.
-              </p>
-              
-              <!-- Biometric Icon -->
-              <div class="biometric-container mb-6">
-                <div class="biometric-circle">
-                  <v-icon size="48" color="white">mdi-fingerprint</v-icon>
-                </div>
-              </div>
-              
-              <p class="timer-text mb-4">
-                Please enter your pincode or use fingerprint and select this icon on your mobile phone.
-              </p>
-              
-              <p class="countdown-text mb-6">
-                Your login attempt is valid for another <strong>{{ store.loginTimeleft }} seconds.</strong>
-              </p>
-              
-              <!-- Resend Button -->
-              <v-btn
-                v-if="!store.firstTime && !isMobile"
-                color="primary"
-                variant="flat"
-                size="large"
-                rounded="lg"
-                block
-                @click="triggerResendNotification"
-                class="resend-btn text-none"
-              >
-                <v-icon start size="20">mdi-refresh</v-icon>
-                RESEND NOTIFICATION
-              </v-btn>
-              
-              <v-btn
-                v-if="isMobile"
-                color="primary"
-                variant="flat"
-                size="large"
-                rounded="lg"
-                block
-                @click="openApp"
-                class="resend-btn text-none"
-              >
-                <v-icon start>mdi-open-in-app</v-icon>
-                Open ThreeFold Connect App
-              </v-btn>
-            </v-card-text>
-          </v-card>
-        </v-dialog>
 
         <!-- Success State -->
-        <v-card v-else-if="loggedIn" class="background-card success-card">
+        <v-card v-else-if="loggedIn" class="success-card">
           <v-card-text class="text-center pa-8">
             <v-icon :size="100" color="#14B8A6" class="mb-4">mdi-check-circle</v-icon>
             <h2 class="success-title mb-2">
@@ -137,7 +92,7 @@
         </v-card>
 
         <!-- Expired State -->
-        <v-card v-else class="background-card expired-card">
+        <v-card v-else class="expired-card">
           <v-card-text class="text-center pa-8">
             <v-icon :size="100" color="#EF4444" class="mb-4">mdi-close-circle</v-icon>
             <h2 class="expired-title mb-2">

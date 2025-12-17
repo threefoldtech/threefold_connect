@@ -24,8 +24,8 @@ body {
 
 // Override Vuetify dialog backdrop
 :deep(.v-overlay__scrim) {
-    background: rgba(0, 0, 0, 0.7) !important;
-    backdrop-filter: blur(4px);
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(2px);
 }
 
 // Ensure proper scrollbar styling
