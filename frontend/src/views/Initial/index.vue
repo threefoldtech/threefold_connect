@@ -3,21 +3,18 @@
     <!-- Mobile View -->
     <v-row v-if="isMobile" class="fill-height" align="center" justify="center">
       <v-col cols="12" class="text-center px-6">
-        <v-avatar class="mb-8 logo-avatar" size="160">
-          <v-img src="/logo.png" alt="ThreeFold Connect Logo"></v-img>
-        </v-avatar>
-        <h1 class="text-h4 font-weight-bold mb-3">
+        <h1 class="page-title mb-2">
           ThreeFold Connect
         </h1>
-        <p class="text-body-1 mb-8">
-          Secure authentication for ThreeFold Grid
+        <p class="page-subtitle mb-8">
+          Secure Two-Factor Authentication
         </p>
         <v-btn 
           color="primary" 
           size="x-large"
           variant="elevated"
-          rounded="xl"
-          class="px-8 py-6"
+          rounded="lg"
+          class="px-8 py-6 text-none"
           @click="promptLoginToMobileUser"
         >
           <v-icon start>mdi-open-in-app</v-icon>
@@ -27,7 +24,8 @@
     </v-row>
     
     <!-- Desktop View -->
-    <v-row v-else class="fill-height" align="center" justify="center">
+    <v-container fluid class="fill-height pa-0">
+      <v-row class="fill-height ma-0" align="center" justify="center">
       <v-progress-linear 
         v-if="store.nameCheckStatus.checking" 
         color="primary"
@@ -35,43 +33,58 @@
         style="position: fixed; top: 0; left: 0; right: 0; z-index: 9999;"
       ></v-progress-linear>
       
-      <v-col cols="12" sm="10" md="8" lg="6" xl="5">
-        <v-card class="modern-card pa-4">
-          <!-- Header -->
-          <div class="text-center mb-8 mt-4">
-            <v-avatar size="100" class="mb-4">
-              <v-img src="/logo.png" alt="ThreeFold Connect Logo"></v-img>
-            </v-avatar>
-            <h1 class="text-h4 font-weight-bold mb-2">
+      <v-col cols="12" sm="12" md="10" lg="8" xl="6">
+        <div class="content-wrapper">
+          <!-- Logo -->
+          <div class="text-center mb-6">
+            <v-img src="/logo.png" alt="ThreeFold" width="48" height="48" class="mx-auto mb-4"></v-img>
+          </div>
+          
+          <!-- Page Header -->
+          <div class="text-center mb-6">
+            <h1 class="page-title mb-2">
               ThreeFold Connect
             </h1>
-            <p class="text-subtitle-1">
+            <p class="page-subtitle">
               Secure Two-Factor Authentication
             </p>
           </div>
+          
+          <v-card class="auth-card">
 
           <v-form v-model="valid" @submit.prevent="login">
-            <v-card-text class="px-6">
-              <!-- Welcome Message -->
+            <v-card-text class="pa-6">
+              <!-- Info Alert 1 -->
               <v-alert
-                type="info"
-                variant="tonal"
+                class="info-alert mb-4"
                 rounded="lg"
-                class="mb-4 centered-icon-alert"
-                border="start"
-                border-color="primary"
-                density="compact"
-                icon="mdi-information"
+                density="comfortable"
               >
-                <div class="text-body-2" style="line-height: 1.6;">
-                  Welcome to the ThreeFold Connect authenticator. Your account is secured with military-grade encryption - not even we can access it.
-                  <br><br>
-                  <strong>Before continuing:</strong> Please ensure your ThreeFold Connect mobile app is open and ready.
+                <div class="d-flex align-start">
+                  <v-icon class="alert-icon mr-3" size="20">mdi-information-outline</v-icon>
+                  <div class="alert-text">
+                    Welcome to the ThreeFold Connect authenticator. Your account is secured with military-grade encryption - not even we can access it.
+                  </div>
+                </div>
+              </v-alert>
+              
+              <!-- Info Alert 2 -->
+              <v-alert
+                class="info-alert mb-6"
+                rounded="lg"
+                density="comfortable"
+              >
+                <div class="d-flex align-start">
+                  <v-icon class="alert-icon mr-3" size="20">mdi-information-outline</v-icon>
+                  <div class="alert-text">
+                    <strong>Before continuing:</strong><br>
+                    Please ensure your ThreeFold Connect mobile app is open and ready.
+                  </div>
                 </div>
               </v-alert>
               <!-- Username Input -->
               <div class="mb-6">
-                <label class="text-subtitle-2 font-weight-medium mb-2 d-block">
+                <label class="input-label mb-2 d-block">
                   ThreeFold Connect ID
                 </label>
                 <v-text-field
@@ -81,10 +94,10 @@
                   :rules="nameRules"
                   variant="outlined"
                   placeholder="Enter your ThreeFold Connect ID"
-                  hint="Enter your Threefold Connect ID"
-                  persistent-hint
                   density="comfortable"
                   :loading="store.nameCheckStatus.checking"
+                  class="custom-input"
+                  hide-details="auto"
                 >
                   <template v-slot:append-inner>
                     <v-icon v-if="store.nameCheckStatus.checked && !store.nameCheckStatus.available" color="success" size="small">
@@ -102,11 +115,11 @@
                 type="error"
                 variant="tonal"
                 rounded="lg"
-                class="mb-4 centered-icon-alert"
-                density="compact"
+                class="mb-4"
+                density="comfortable"
               >
-                <div class="d-flex align-center">
-                  <span>This ThreeFold Connect ID is not registered yet. Please check your spelling or register a new account.</span>
+                <div class="alert-text">
+                  This ThreeFold Connect ID is not registered yet. Please check your spelling or register a new account.
                 </div>
               </v-alert>
               
@@ -115,60 +128,59 @@
                 type="success"
                 variant="tonal"
                 rounded="lg"
-                class="mb-4 centered-icon-alert"
-                density="compact"
+                class="mb-4"
+                density="comfortable"
               >
-                <div class="d-flex align-center">
-                  <span>ThreeFold Connect ID verified! You can proceed with login.</span>
+                <div class="alert-text">
+                  ThreeFold Connect ID verified! You can proceed with login.
                 </div>
               </v-alert>
             </v-card-text>
             
             <!-- Actions -->
-            <v-card-actions class="px-6 pb-6 pt-2">
+            <v-card-actions class="px-6 pb-6 pt-0">
               <v-btn
                 type="submit"
                 color="primary"
                 size="large"
-                variant="elevated"
+                variant="flat"
                 rounded="lg"
                 block
                 :disabled="!valid || store.nameCheckStatus.available"
-                class="text-none font-weight-semibold"
+                class="continue-btn text-none"
               >
-                <v-icon start>mdi-login</v-icon>
                 Continue to Login
               </v-btn>
             </v-card-actions>
           </v-form>
         </v-card>
-      </v-col>
-    </v-row>
-
-    <!-- App Store Badges -->
-    <v-row class="mt-8" justify="center">
-      <v-col cols="12" class="text-center">
-        <p class="text-body-2 mb-4">
-          Don't have an account? Download the app to get started
-        </p>
-        <div class="d-flex justify-center align-center gap-3 flex-wrap">
+        
+        <!-- App Store Badges -->
+        <div class="mt-8 text-center">
+          <p class="app-badges-text mb-4">
+            Don't have an account? Download the app to get started
+          </p>
+          <div class="d-flex justify-center align-center gap-3 flex-wrap">
           <a 
             href="https://play.google.com/store/apps/details?id=org.jimber.threebotlogin" 
             target="_blank" 
             class="app-badge"
           >
-            <img src="/googleplay.png" height="48" alt="Get it on Google Play" style="border-radius: 8px; transition: transform 0.2s;" />
+            <img src="/googleplay.png" height="40" alt="Get it on Google Play" class="badge-img" />
           </a>
           <a 
             href="https://itunes.apple.com/be/app/3bot-login/id1459845885?l=nl&mt=8" 
             target="_blank"
             class="app-badge"
           >
-            <img src="/applestore.png" height="48" alt="Download on the App Store" style="border-radius: 8px; transition: transform 0.2s;" />
+            <img src="/applestore.png" height="40" alt="Download on the App Store" class="badge-img" />
           </a>
+          </div>
+        </div>
         </div>
       </v-col>
-    </v-row>
+      </v-row>
+    </v-container>
   </section>
 </template>
 

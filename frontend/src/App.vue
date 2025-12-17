@@ -1,15 +1,9 @@
 <template>
   <v-app class="app-background">
-    <div class="overlay primary darken-2"></div>
-    
-    <div class="theme-toggle-wrapper">
-      <ThemeToggle />
-    </div>
+    <div class="background-overlay"></div>
     
     <v-main class="fill-height">
-      <v-container>
-        <router-view/>
-      </v-container>
+      <router-view/>
     </v-main>
   </v-app>
 </template>
@@ -17,7 +11,6 @@
 <script setup lang="ts">
 import { onErrorCaptured } from 'vue'
 import { useSocket } from '@/composables/useSocket'
-import ThemeToggle from '@/components/ThemeToggle.vue'
 
 // Set up socket listeners with proper cleanup
 useSocket()
@@ -35,17 +28,43 @@ onErrorCaptured((err, instance, info) => {
 
 <style scoped>
 .app-background {
-  background-image: url('/map.png');
+  background-image: url('/map2_blur.png');
   background-repeat: no-repeat;
   background-position: center center;
   background-size: cover;
   background-attachment: fixed;
+  position: relative;
 }
 
-.theme-toggle-wrapper {
+.background-overlay {
   position: fixed;
-  top: 1rem;
-  right: 1rem;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(2px);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.background-overlay::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.4) 0%, transparent 50%, rgba(0, 0, 0, 0.6) 100%);
+}
+
+.top-logo {
+  position: fixed;
+  top: 1.5rem;
+  left: 50%;
+  transform: translateX(-50%);
   z-index: 1000;
+}
+
+.v-main {
+  position: relative;
+  z-index: 1;
 }
 </style>

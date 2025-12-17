@@ -16,7 +16,7 @@ export default createVuetify({
     },
   },
   theme: {
-    defaultTheme: 'light',
+    defaultTheme: 'dark',
     themes: {
       light: {
         dark: false,
@@ -45,11 +45,11 @@ export default createVuetify({
           primary: '#14B8A6',
           secondary: '#64748B',
           accent: '#2DD4BF',
-          error: '#F87171',
-          warning: '#FBBF24',
-          info: '#60A5FA',
-          success: '#34D399',
-          background: '#0F172A',
+          error: '#EF4444',
+          warning: '#F59E0B',
+          info: '#14B8A6',
+          success: '#10B981',
+          background: '#0a0f1a',
           surface: '#1E293B',
           'surface-variant': '#334155',
           'surface-bright': '#475569',

@@ -1,27 +1,293 @@
 .login {
-    .relative{
-        position: relative;
+    .content-wrapper {
+        max-width: 768px;
+        width: 100%;
+        margin: 0 auto;
     }
-    .icon{
-        position:absolute;
-        top:50px;
+    
+    .page-header {
+        margin-bottom: 2rem;
     }
-    .animated {
-        -webkit-animation-duration: 1s;
-        animation-duration: 1s;
-        -webkit-animation-fill-mode: both;
-        animation-fill-mode: both;
-     }
-    @keyframes fadeIn {
-        0% {opacity: 0;}
-        100% {opacity: 1;}
+    
+    .page-title {
+        font-size: 1.75rem;
+        font-weight: 400;
+        color: #ffffff;
+        letter-spacing: 0.5px;
+        margin-top: 1rem;
     }
-    .fadeIn {
-        -webkit-animation-name: fadeIn;
-        animation-name: fadeIn;
+    
+    .background-card {
+        background: rgba(255, 255, 255, 0.1) !important;
+        backdrop-filter: blur(24px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    }
+    
+    .info-alert {
+        background: rgba(20, 184, 166, 0.15) !important;
+        border: 1px solid rgba(20, 184, 166, 0.3);
+        color: #ffffff;
+        
+        .alert-icon {
+            color: #14B8A6;
+            flex-shrink: 0;
+        }
+        
+        .alert-text {
+            font-size: 0.875rem;
+            line-height: 1.5;
+            color: rgba(255, 255, 255, 0.9);
+        }
+    }
+    
+    .input-label {
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: rgba(255, 255, 255, 0.9);
+    }
+    
+    .custom-input {
+        :deep(.v-field) {
+            background: rgba(15, 23, 42, 0.6);
+            border-color: rgba(255, 255, 255, 0.1);
+        }
+        
+        :deep(input) {
+            color: #ffffff;
+        }
+    }
+    
+    .modal-card {
+        background: rgba(30, 41, 59, 0.95) !important;
+        backdrop-filter: blur(24px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    }
+    
+    .modal-header {
+        background: rgba(30, 41, 59, 0.8);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .modal-title {
+        font-size: 1.125rem;
+        font-weight: 500;
+        color: #ffffff;
+    }
+    
+    .close-btn {
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 50%;
+        
+        &:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
+    }
+    
+    .modal-instruction {
+        font-size: 0.875rem;
+        line-height: 1.6;
+        color: rgba(255, 255, 255, 0.85);
+    }
+    
+    .biometric-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    
+    .biometric-circle {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        background: rgba(20, 184, 166, 0.2);
+        border: 3px solid #14B8A6;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        box-shadow: 0 0 30px rgba(20, 184, 166, 0.4);
+        animation: pulse 2s ease-in-out infinite;
+    }
+    
+    @keyframes pulse {
+        0%, 100% {
+            box-shadow: 0 0 30px rgba(20, 184, 166, 0.4);
+            transform: scale(1);
+        }
+        50% {
+            box-shadow: 0 0 40px rgba(20, 184, 166, 0.6);
+            transform: scale(1.02);
+        }
+    }
+    
+    .timer-text {
+        font-size: 0.875rem;
+        color: rgba(255, 255, 255, 0.8);
+        line-height: 1.5;
+    }
+    
+    .countdown-text {
+        font-size: 0.875rem;
+        color: rgba(255, 255, 255, 0.8);
+        
+        strong {
+            color: #ffffff;
+            font-weight: 600;
+        }
+    }
+    
+    .resend-btn {
+        background: #14B8A6 !important;
+        color: #ffffff !important;
+        font-weight: 600;
+        font-size: 0.875rem;
+        letter-spacing: 0.5px;
+        height: 48px;
+        
+        &:hover {
+            background: #0d9488 !important;
+        }
+    }
+    
+    .success-card,
+    .expired-card {
+        .success-title,
+        .expired-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #ffffff;
+        }
+        
+        .success-text,
+        .expired-text {
+            font-size: 1rem;
+            color: rgba(255, 255, 255, 0.8);
+        }
+        
+        .expired-link {
+            color: #14B8A6;
+            text-decoration: none;
+            
+            &:hover {
+                text-decoration: underline;
+            }
+        }
+    }
+    
+    .back-btn {
+        background: #14B8A6 !important;
+        color: #ffffff !important;
+        font-weight: 600;
+        
+        &:hover {
+            background: #0d9488 !important;
+        }
+    }
+    
+    .app-badges-row {
+        margin-top: 2rem;
+    }
+    
+    .app-badges-text {
+        font-size: 0.875rem;
+        color: rgba(255, 255, 255, 0.7);
+    }
+    
+    .app-badge {
+        display: inline-block;
+        transition: transform 0.2s ease, opacity 0.2s ease;
+        opacity: 0.9;
+        
+        &:hover {
+            transform: scale(1.05);
+            opacity: 1;
+        }
+        
+        .badge-img {
+            border-radius: 6px;
+            display: block;
+        }
     }
 }
 
-.v-btn{
-    border-radius: 80px;
+// Responsive styles
+@media (max-width: 600px) {
+    .login {
+        .content-wrapper {
+            max-width: 100%;
+            padding: 0 0.5rem;
+        }
+        
+        .page-header {
+            margin-bottom: 1.5rem;
+        }
+        
+        .page-title {
+            font-size: 1.5rem;
+            margin-top: 0.5rem;
+        }
+        
+        .background-card {
+            margin: 0;
+        }
+        
+        .modal-card {
+            margin: 0.5rem;
+            max-width: calc(100vw - 1rem);
+        }
+        
+        .modal-title {
+            font-size: 1rem;
+        }
+        
+        .modal-instruction {
+            font-size: 0.8rem;
+        }
+        
+        .biometric-circle {
+            width: 80px;
+            height: 80px;
+            
+            .v-icon {
+                font-size: 40px !important;
+            }
+        }
+        
+        .timer-text,
+        .countdown-text {
+            font-size: 0.8rem;
+        }
+        
+        .resend-btn {
+            height: 44px;
+            font-size: 0.8rem;
+        }
+        
+        .success-title,
+        .expired-title {
+            font-size: 1.25rem;
+        }
+        
+        .success-text,
+        .expired-text {
+            font-size: 0.9rem;
+        }
+        
+        .app-badges-text {
+            font-size: 0.8rem;
+        }
+    }
+}
+
+@media (min-width: 601px) and (max-width: 960px) {
+    .login {
+        .content-wrapper {
+            max-width: 90%;
+        }
+        
+        .modal-card {
+            max-width: 90%;
+        }
+    }
 }

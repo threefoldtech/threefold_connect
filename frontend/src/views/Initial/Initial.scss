@@ -1,25 +1,197 @@
 .initial {
-    a { text-decoration: none; font-weight: bold;}
-}
-.sign-in {
-    border-radius: 80px;
-    width: 230px;
-    height: 40px;
-}
-
-// Center alert icon vertically
-.centered-icon-alert {
-    :deep(.v-alert__prepend) {
-        align-self: center;
+    a { 
+        text-decoration: none; 
+        font-weight: bold;
+    }
+    
+    .content-wrapper {
+        max-width: 768px;
+        width: 100%;
+        margin: 0 auto;
+    }
+    
+    .page-title {
+        font-size: 2rem;
+        font-weight: 400;
+        color: #ffffff;
+        letter-spacing: 0.5px;
+    }
+    
+    .page-subtitle {
+        font-size: 0.95rem;
+        color: #14B8A6;
+        font-weight: 400;
+        letter-spacing: 0.3px;
+    }
+    
+    .auth-card {
+        background: rgba(255, 255, 255, 0.1) !important;
+        backdrop-filter: blur(24px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    }
+    
+    .info-alert {
+        background: rgba(6, 182, 212, 0.1) !important;
+        border: 1px solid rgba(34, 211, 238, 0.3);
+        backdrop-filter: blur(4px);
+        color: #ffffff;
+        
+        &:first-of-type {
+            background: rgba(6, 182, 212, 0.1) !important;
+            border-color: rgba(34, 211, 238, 0.3);
+            
+            .alert-icon {
+                color: #22d3ee;
+            }
+            
+            .alert-text {
+                color: #cffafe;
+            }
+        }
+        
+        &:nth-of-type(2) {
+            background: rgba(59, 130, 246, 0.1) !important;
+            border-color: rgba(96, 165, 250, 0.3);
+            
+            .alert-icon {
+                color: #60a5fa;
+            }
+            
+            .alert-text {
+                color: #dbeafe;
+            }
+        }
+        
+        .alert-icon {
+            flex-shrink: 0;
+        }
+        
+        .alert-text {
+            font-size: 0.875rem;
+            line-height: 1.5;
+        }
+    }
+    
+    .input-label {
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: rgba(255, 255, 255, 0.9);
+    }
+    
+    .custom-input {
+        :deep(.v-field) {
+            background: rgba(15, 23, 42, 0.6);
+            border-color: rgba(255, 255, 255, 0.1);
+            
+            &:hover {
+                border-color: rgba(20, 184, 166, 0.5);
+            }
+        }
+        
+        :deep(.v-field--focused) {
+            border-color: #14B8A6;
+        }
+        
+        :deep(input) {
+            color: #ffffff;
+            
+            &::placeholder {
+                color: rgba(255, 255, 255, 0.4);
+            }
+        }
+    }
+    
+    .continue-btn {
+        background: #14B8A6 !important;
+        color: #ffffff !important;
+        font-weight: 600;
+        font-size: 0.95rem;
+        letter-spacing: 0.3px;
+        height: 48px;
+        text-transform: none;
+        
+        &:hover {
+            background: #0d9488 !important;
+        }
+        
+        &:disabled {
+            background: rgba(20, 184, 166, 0.3) !important;
+            color: rgba(255, 255, 255, 0.4) !important;
+        }
+    }
+    
+    .app-badges-row {
+        margin-top: 2rem;
+    }
+    
+    .app-badges-text {
+        font-size: 0.875rem;
+        color: rgba(255, 255, 255, 0.7);
+    }
+    
+    .app-badge {
+        display: inline-block;
+        transition: transform 0.2s ease, opacity 0.2s ease;
+        opacity: 0.9;
+        
+        &:hover {
+            transform: scale(1.05);
+            opacity: 1;
+        }
+        
+        .badge-img {
+            border-radius: 6px;
+            display: block;
+        }
     }
 }
 
-// App badge hover effect
-.app-badge {
-    display: inline-block;
-    transition: transform 0.2s ease;
-    
-    &:hover {
-        transform: scale(1.05);
+// Responsive styles
+@media (max-width: 600px) {
+    .initial {
+        .content-wrapper {
+            max-width: 100%;
+            padding: 0 0.5rem;
+        }
+        
+        .page-title {
+            font-size: 1.5rem;
+        }
+        
+        .page-subtitle {
+            font-size: 0.85rem;
+        }
+        
+        .auth-card {
+            margin: 0;
+        }
+        
+        .info-alert {
+            .alert-text {
+                font-size: 0.8rem;
+            }
+        }
+        
+        .input-label {
+            font-size: 0.8rem;
+        }
+        
+        .continue-btn {
+            height: 44px;
+            font-size: 0.875rem;
+        }
+        
+        .app-badges-text {
+            font-size: 0.8rem;
+        }
+    }
+}
+
+@media (min-width: 601px) and (max-width: 960px) {
+    .initial {
+        .content-wrapper {
+            max-width: 90%;
+        }
     }
 }
