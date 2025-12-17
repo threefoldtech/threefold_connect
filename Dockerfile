@@ -47,7 +47,8 @@ RUN apk add --no-cache \
     libffi \
     openssl \
     libgcc \
-    libstdc++
+    libstdc++ \
+    sqlite-libs
 
 ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
