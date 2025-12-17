@@ -7,7 +7,7 @@ environment: staging
 images:
   login:
     name: threebotlogin-staging
-    repo: threefolddev/3botlogin
+    repo: ghcr.io/threefoldtech/threefold-connect
 
 
 ingress:

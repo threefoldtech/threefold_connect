@@ -7,7 +7,7 @@ replicaCount: 1
 #tags vary per environment (staging/testing/production) change in according value files.
 images:
   login:
-    repo: jimber/3botlogin
+    repo: ghcr.io/threefoldtech/threefold-connect
     containerPort: 80
 
 services:
