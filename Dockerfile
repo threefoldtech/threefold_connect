@@ -54,7 +54,7 @@ ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
     VIRTUAL_ENV=/app/.venv \
     PATH="/usr/local/bin:/app/.venv/bin:$PATH" \
-    LD_LIBRARY_PATH="/usr/local/lib:$LD_LIBRARY_PATH"
+    LD_LIBRARY_PATH="/usr/local/lib"
 
 COPY --from=backend-builder /usr/local/bin/python3.11 /usr/local/bin/python3.11
 COPY --from=backend-builder /usr/local/bin/python3 /usr/local/bin/python3
