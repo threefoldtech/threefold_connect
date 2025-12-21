@@ -41,6 +41,7 @@
         display: inline-block;
         transition: transform 0.2s ease, opacity 0.2s ease;
         opacity: 0.9;
+        margin: 0 8px;
         
         &:hover {
             transform: scale(1.05);
