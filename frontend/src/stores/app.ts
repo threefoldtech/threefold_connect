@@ -7,6 +7,14 @@ import axios from 'axios'
 import config from '@/config'
 import type { Keys, NameCheckStatus, VerificationStatus, SignedAttemptData } from '@/types'
 
+const toBoolean = (value: any): boolean => {
+  if (typeof value === 'boolean') return value
+  if (typeof value === 'string') {
+    return value.toLowerCase() === 'true'
+  }
+  return Boolean(value)
+}
+
 const generateUUID = (): string => {
   let d = new Date().getTime()
   let d2 = (performance?.now() * 1000) || 0
@@ -392,20 +400,20 @@ export const useAppStore = defineStore('app', () => {
     console.log(data.state)
 
     const publicKey = (await userService.getUserData(doubleName.value!)).data.publicKey
-    const newRandomRoom = generateUUID()
+    const randomRoom = generateUUID()
     socketService.emit('leave', { room: doubleName.value })
-    setRandomRoom(newRandomRoom)
+    await setRandomRoom(randomRoom)
     
     const encryptedSignAttempt = await cryptoService.encrypt(
       JSON.stringify({
         state: _state.value,
         doubleName: doubleName.value,
-        isJson: isJson.value,
+        isJson: toBoolean(isJson.value),
         dataUrlHash: dataUrlHash.value,
         dataUrl: dataUrl.value,
         friendlyName: friendlyName.value,
         appId: appId.value,
-        randomRoom: newRandomRoom,
+        randomRoom: randomRoom,
         redirectUrl: redirectUrl.value
       }),
       publicKey
@@ -413,7 +421,7 @@ export const useAppStore = defineStore('app', () => {
 
     socketService.emit('sign', {
       doubleName: doubleName.value,
-      encryptedSignAttempt
+      encryptedSignAttempt: encryptedSignAttempt
     })
 
     signAttemptOnGoing.value = true
@@ -421,20 +429,20 @@ export const useAppStore = defineStore('app', () => {
 
   const resendSignNotification = async () => {
     const publicKey = (await userService.getUserData(doubleName.value!)).data.publicKey
-    const newRandomRoom = generateUUID()
+    const randomRoom = generateUUID()
     socketService.emit('leave', { room: doubleName.value })
-    setRandomRoom(newRandomRoom)
+    await setRandomRoom(randomRoom)
     
     const encryptedSignAttempt = await cryptoService.encrypt(
       JSON.stringify({
         state: _state.value,
         doubleName: doubleName.value,
-        isJson: isJson.value,
+        isJson: toBoolean(isJson.value),
         dataUrlHash: dataUrlHash.value,
         friendlyName: friendlyName.value,
         dataUrl: dataUrl.value,
         appId: appId.value,
-        randomRoom: newRandomRoom,
+        randomRoom: randomRoom,
         redirectUrl: redirectUrl.value
       }),
       publicKey
@@ -442,7 +450,7 @@ export const useAppStore = defineStore('app', () => {
 
     socketService.emit('sign', {
       doubleName: doubleName.value,
-      encryptedSignAttempt
+      encryptedSignAttempt: encryptedSignAttempt
     })
 
     signAttemptOnGoing.value = true
