@@ -53,6 +53,15 @@
             display: block;
         }
     }
+    
+    .custom-input {
+        &:not(.v-input--error) {
+            :deep(.v-messages__message) {
+                color: #14B8A6;
+                font-weight: 500;
+            }
+        }
+    }
 }
 
 // Responsive styles

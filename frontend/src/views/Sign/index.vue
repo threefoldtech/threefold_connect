@@ -50,20 +50,9 @@
 
           <v-form v-model="valid" @submit.prevent="onSignIn">
             <v-card-text class="px-6 pb-6">
-              <v-alert
-                type="info"
-                variant="tonal"
-                rounded="lg"
-                class="mb-4 centered-icon-alert"
-                border="start"
-                border-color="primary"
-                density="compact"
-                icon="mdi-information"
-              >
-                <div class="text-body-2">
-                  You're about to sign data with your ThreeFold identity. Please verify your 3Bot name below.
-                </div>
-              </v-alert>
+              <div class="info-text mb-4 text-body-2 text-center" style="color: rgba(255, 255, 255, 0.7);">
+                You're about to sign data with your ThreeFold identity. Please verify your 3Bot name below.
+              </div>
 
               <div class="mb-6">
                 <label class="text-subtitle-2 font-weight-medium mb-2 d-block">
@@ -76,54 +65,25 @@
                   :rules="nameRules"
                   variant="outlined"
                   placeholder="Enter your ThreeFold Connect ID"
-                  hint="Enter your ThreeFold Connect ID"
-                  persistent-hint
                   density="comfortable"
                   :loading="store.nameCheckStatus.checking"
+                  class="custom-input"
+                  :error="store.nameCheckStatus.checked && store.nameCheckStatus.available"
+                  :error-messages="store.nameCheckStatus.checked && store.nameCheckStatus.available ? 'This ThreeFold Connect ID is not registered. Please check your spelling.' : ''"
+                  :success="store.nameCheckStatus.checked && !store.nameCheckStatus.available"
+                  :hint="store.nameCheckStatus.checked && !store.nameCheckStatus.available ? 'ThreeFold Connect ID verified! You can proceed with signing.' : ''"
+                  persistent-hint
                 >
-                  <template v-slot:prepend-inner>
-                    <v-avatar size="24" class="mr-2">
-                      <v-img src="/logo.png" alt="ThreeFold"></v-img>
-                    </v-avatar>
-                  </template>
                   <template v-slot:append-inner>
-                    <v-icon v-if="store.nameCheckStatus.checked && store.nameCheckStatus.available" color="error" size="small">
-                      mdi-close-circle
-                    </v-icon>
                     <v-icon v-if="store.nameCheckStatus.checked && !store.nameCheckStatus.available" color="success" size="small">
                       mdi-check-circle
+                    </v-icon>
+                    <v-icon v-else-if="store.nameCheckStatus.checked && store.nameCheckStatus.available" color="error" size="small">
+                      mdi-close-circle
                     </v-icon>
                   </template>
                 </v-text-field>
               </div>
-
-              <v-alert 
-                v-if="store.nameCheckStatus.checked && store.nameCheckStatus.available" 
-                type="error"
-                variant="tonal"
-                rounded="lg"
-                class="mb-4 centered-icon-alert"
-                density="compact"
-              >
-                <div class="d-flex align-center">
-                  <v-icon start>mdi-alert-circle</v-icon>
-                  <span>This ThreeFold Connect ID is not registered. Please check your spelling.</span>
-                </div>
-              </v-alert>
-              
-              <v-alert 
-                v-if="store.nameCheckStatus.checked && !store.nameCheckStatus.available" 
-                type="success"
-                variant="tonal"
-                rounded="lg"
-                class="mb-4 centered-icon-alert"
-                density="compact"
-              >
-                <div class="d-flex align-center">
-                  <v-icon start>mdi-check-circle</v-icon>
-                  <span>ThreeFold Connect ID verified! You can proceed.</span>
-                </div>
-              </v-alert>
             </v-card-text>
             
             <v-card-actions class="px-6 pb-6 pt-2">
@@ -134,7 +94,7 @@
                 variant="elevated"
                 rounded="lg"
                 block
-                :disabled="!valid || store.nameCheckStatus.available"
+                :disabled="!valid || !store.nameCheckStatus.checked || store.nameCheckStatus.available"
                 class="text-none font-weight-semibold"
               >
                 <v-icon start>mdi-draw</v-icon>
