@@ -5,7 +5,7 @@
         <v-col cols="12" sm="12" md="10" lg="8" xl="6">
           <div class="content-wrapper">
             <!-- Logo -->
-            <div class="text-center mb-6">
+            <div class="text-center mb-4">
               <v-img src="/logo.png" alt="ThreeFold" width="48" height="48" class="mx-auto mb-4"></v-img>
             </div>
             
@@ -22,7 +22,7 @@
             <!-- Mobile View -->
             <v-card v-if="isMobile" class="sign-card">
           <div class="text-center pa-8">
-            <v-avatar size="120" class="mb-6">
+            <v-avatar size="120" class="mb-4">
               <v-img src="/logo.png" alt="ThreeFold Connect"></v-img>
             </v-avatar>
             <h1 class="text-h5 font-weight-bold mb-3">

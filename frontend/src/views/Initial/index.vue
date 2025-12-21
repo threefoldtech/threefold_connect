@@ -12,7 +12,7 @@
       <v-col cols="12" sm="12" md="10" lg="8" xl="6">
         <div class="content-wrapper">
           <!-- Logo -->
-          <div class="text-center mb-6">
+          <div class="text-center mb-4">
             <v-img src="/logo.png" alt="ThreeFold" width="48" height="48" class="mx-auto mb-4"></v-img>
           </div>
           
