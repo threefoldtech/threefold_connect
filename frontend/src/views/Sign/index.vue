@@ -47,43 +47,8 @@
 
             <!-- Desktop View -->
             <v-card v-else class="sign-card">
-          <!-- Signing In Progress -->
-          <v-card-text v-if="signingInProgress && !signedSuccessfully" class="text-center pa-8">
-            <h2 class="sign-title mb-6">
-              Signing Data...
-            </h2>
-            
-            <p class="sign-instruction mb-6">
-              Please open the ThreeFold Connect app on your mobile device and approve the signing request.
-            </p>
-            
-            <v-progress-circular
-              indeterminate
-              color="#14B8A6"
-              :size="80"
-              :width="6"
-              class="mb-6"
-            ></v-progress-circular>
-            
-            <p class="timer-text">
-              Waiting for your approval...
-            </p>
-          </v-card-text>
-
-          <!-- Success State -->
-          <v-card-text v-else-if="signedSuccessfully" class="text-center pa-8">
-            <v-icon :size="100" color="#14B8A6" class="mb-4">mdi-check-circle</v-icon>
-            <h2 class="success-title mb-2">
-              Data Signed Successfully!
-            </h2>
-            <p class="success-text mb-4">
-              Redirecting you now...
-            </p>
-            <v-progress-linear indeterminate color="#14B8A6" class="mt-4"></v-progress-linear>
-          </v-card-text>
-
           <!-- Initial Form -->
-          <v-form v-else v-model="valid" @submit.prevent="onSignIn">
+          <v-form v-if="!store.signAttemptOnGoing" v-model="valid" @submit.prevent="onSignIn">
             <v-card-text class="px-6 pb-6">
               <div class="info-text mb-4 text-body-2 text-center" style="color: rgba(255, 255, 255, 0.7);">
                 You're about to sign data with your ThreeFold identity. Please verify your 3Bot name below.
@@ -137,6 +102,43 @@
               </v-btn>
             </v-card-actions>
           </v-form>
+
+          <!-- Signing In Progress -->
+          <v-card-text v-else class="text-center pa-8">
+            <h2 class="sign-title mb-6">
+              Signing Data...
+            </h2>
+            
+            <p class="sign-instruction mb-6">
+              Please open the ThreeFold Connect app on your mobile device and approve the signing request.
+            </p>
+            
+            <v-progress-circular
+              indeterminate
+              color="#14B8A6"
+              :size="80"
+              :width="6"
+              class="mb-6"
+            ></v-progress-circular>
+            
+            <p class="timer-text mb-4">
+              Waiting for your approval...
+            </p>
+            
+            <v-btn
+              v-if="!store.firstTime && !isMobile"
+              color="primary"
+              variant="flat"
+              size="large"
+              rounded="lg"
+              block
+              @click="triggerResendSignSocket"
+              class="resend-btn text-none"
+            >
+              <v-icon start size="20">mdi-refresh</v-icon>
+              RESEND NOTIFICATION
+            </v-btn>
+          </v-card-text>
 
             </v-card>
             
@@ -196,7 +198,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useAppStore } from '@/stores/app'
 import config from '@/config'
@@ -210,8 +212,8 @@ const valid = ref(false)
 const dialog = ref(false)
 const isMobile = ref(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent))
 const nameCheckerTimeOut = ref<number | null>(null)
-const signingInProgress = ref(false)
-const signedSuccessfully = ref(false)
+const isRedirecting = ref(false)
+const randomRoom = ref<string | null>(null)
 
 const nameRegex = /^(\w+)$/
 const nameRules = [
@@ -234,8 +236,6 @@ const checkNameAvailability = () => {
 const onSignIn = async () => {
   const query = route.query
   
-  signingInProgress.value = true
-  
   await store.signDataUser({
     doubleName: doubleName.value,
     appId: query.appId as string,
@@ -250,9 +250,8 @@ const onSignIn = async () => {
 
 const promptToSignMobile = () => {
   const query = route.query
-  const randomRoom = localStorage.getItem('randomRoom') || ''
   
-  store.setRandomRoom(randomRoom)
+  store.setRandomRoom(randomRoom.value!)
   
   store.signUserMobile({
     state: query.state as string,
@@ -264,50 +263,131 @@ const promptToSignMobile = () => {
     friendlyName: query.friendlyName as string
   })
   
-  let url = `${config.deeplink}sign/?state=${encodeURIComponent(store._state || '')}&randomRoom=${randomRoom}`
-  if (store.appId) url += `&appId=${encodeURIComponent(store.appId)}`
-  if (store.dataUrlHash) url += `&dataHash=${encodeURIComponent(store.dataUrlHash)}`
-  if (store.dataUrl) url += `&dataUrl=${encodeURIComponent(store.dataUrl)}`
-  if (store.isJson) url += `&isJson=${encodeURIComponent(store.isJson.toString())}`
-  if (store.redirectUrl) url += `&redirectUrl=${encodeURIComponent(store.redirectUrl)}`
-  if (store.friendlyName) url += `&friendlyName=${encodeURIComponent(store.friendlyName)}`
-  
-  if (/iPhone|iPad|iPod/i.test(navigator.userAgent)) {
-    window.location.replace(url)
-  } else {
+  if (isMobile.value) {
+    let url = `${config.deeplink}sign/?state=${encodeURIComponent(store._state || '')}&randomRoom=${randomRoom.value}`
+    if (store.appId) url += `&appId=${encodeURIComponent(store.appId)}`
+    if (query.dataHash) url += `&dataHash=${encodeURIComponent(store.dataUrlHash!)}`
+    if (query.dataUrl) url += `&dataUrl=${encodeURIComponent(store.dataUrl!)}`
+    if (query.isJson) url += `&isJson=${encodeURIComponent(store.isJson!.toString())}`
+    if (query.redirectUrl) url += `&redirectUrl=${encodeURIComponent(store.redirectUrl!)}`
+    if (query.friendlyName) url += `&friendlyName=${encodeURIComponent(store.friendlyName!)}`
+    
+    if (/iPhone|iPad|iPod/i.test(navigator.userAgent)) {
+      window.location.replace(url)
+    } else {
+      window.location.href = url
+    }
+  }
+}
+
+const triggerResendSignSocket = async () => {
+  await store.resendSignNotification()
+}
+
+const gotFocus = () => {
+  randomRoom.value = localStorage.getItem('randomRoom')
+  if (randomRoom.value) {
+    store.setRandomRoom(randomRoom.value)
+  }
+}
+
+// Watch for signed sign attempt
+watch(() => store.signedSignAttempt, (val) => {
+  if (!val) {
+    console.log('Missing data')
+    return
+  }
+
+  try {
+    console.log('signedAttemptObject: ', val)
+    console.log('signedAttemptObject: ', JSON.stringify(val))
+    localStorage.setItem('username', doubleName.value)
+
+    const data = encodeURIComponent(JSON.stringify(val))
+    console.log('data', data)
+
+    if (data) {
+      let union = '?'
+      console.log('redirect url: ', store.redirectUrl)
+      if (store.redirectUrl && store.redirectUrl.indexOf('?') >= 0) {
+        union = '&'
+      }
+
+      // Otherwise evil app could do appid+redirecturl = wallet.com + .evil.com = wallet.com.evil.com
+      // Now its wallet.com/.evil.com
+      let safeRedirectUri
+      if (store.redirectUrl && store.redirectUrl[0] === '/') {
+        safeRedirectUri = store.redirectUrl
+      } else {
+        safeRedirectUri = '/' + store.redirectUrl
+      }
+
+      console.log('!!!! doubleName: ', doubleName.value)
+      const url = `//${store.appId}${safeRedirectUri}${union}signedAttempt=${data}`
+      
+      if (!isRedirecting.value) {
+        isRedirecting.value = true
+        console.log('Changing href: ', url)
+        window.location.href = url
+      }
+    } else {
+      console.log('Val was null')
+    }
+  } catch (e) {
+    console.log('Something went wrong ... ', e)
+  }
+})
+
+// Watch for cancel sign
+watch(() => store.cancelSignUp, (val) => {
+  if (val) {
+    console.log('CANCELED', val)
+    let safeRedirectUri
+    if (store.redirectUrl && store.redirectUrl[0] === '/') {
+      safeRedirectUri = store.redirectUrl
+    } else {
+      safeRedirectUri = '/' + store.redirectUrl
+    }
+
+    const url = `//${store.appId}${safeRedirectUri}?error=CancelledByUser`
     window.location.href = url
   }
-}
-
-const handleSignedData = () => {
-  if (store.signedSignAttempt) {
-    signedSuccessfully.value = true
-    
-    setTimeout(() => {
-      const query = route.query
-      const redirectUrl = query.redirectUrl as string
-      const signedAttempt = encodeURIComponent(store.signedSignAttempt.signedAttempt)
-      const doubleName = encodeURIComponent(store.signedSignAttempt.doubleName)
-      
-      window.location.href = `${redirectUrl}?signedAttempt=${signedAttempt}&doubleName=${doubleName}`
-    }, 2000)
-  }
-}
+})
 
 onMounted(() => {
+  window.onfocus = gotFocus
+  
   const query = route.query
+  
+  if (isMobile.value) {
+    randomRoom.value = localStorage.getItem('randomRoom')
+    if (!randomRoom.value) {
+      randomRoom.value = generateUUID()
+      localStorage.setItem('randomRoom', randomRoom.value)
+    }
+    store.setRandomRoom(randomRoom.value)
+  }
+  
   if (!query.appId || !query.dataHash || !query.dataUrl || !query.isJson || !query.redirectUrl || !query.state || !query.friendlyName) {
     router.push({ name: 'error' })
   }
-  
-  // Watch for signed data
-  const checkInterval = setInterval(() => {
-    if (store.signedSignAttempt) {
-      handleSignedData()
-      clearInterval(checkInterval)
-    }
-  }, 500)
 })
+
+const generateUUID = (): string => {
+  let d = new Date().getTime()
+  let d2 = (performance?.now() * 1000) || 0
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
+    let r = Math.random() * 16
+    if (d > 0) {
+      r = (d + r) % 16 | 0
+      d = Math.floor(d / 16)
+    } else {
+      r = (d2 + r) % 16 | 0
+      d2 = Math.floor(d2 / 16)
+    }
+    return (c === 'x' ? r : (r & 0x3) | 0x8).toString(16)
+  })
+}
 </script>
 
 <style src="./sign.scss" scoped lang="scss"></style>
