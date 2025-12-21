@@ -100,6 +100,13 @@
                 color: rgba(255, 255, 255, 0.4);
             }
         }
+        
+        &:not(.v-input--error) {
+            :deep(.v-messages__message) {
+                color: #14B8A6;
+                font-weight: 500;
+            }
+        }
     }
     
     .continue-btn {

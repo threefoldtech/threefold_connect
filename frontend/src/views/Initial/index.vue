@@ -88,7 +88,11 @@
                   density="comfortable"
                   :loading="store.nameCheckStatus.checking"
                   class="custom-input"
-                  hide-details="auto"
+                  :error="(store.nameCheckStatus.checked && store.nameCheckStatus.available) || !!loginError"
+                  :error-messages="loginError || (store.nameCheckStatus.checked && store.nameCheckStatus.available ? 'This ThreeFold Connect ID is not registered yet. Please check your spelling or register a new account.' : '')"
+                  :success="store.nameCheckStatus.checked && !store.nameCheckStatus.available"
+                  :hint="store.nameCheckStatus.checked && !store.nameCheckStatus.available ? 'ThreeFold Connect ID verified! You can proceed with login.' : ''"
+                  persistent-hint
                 >
                   <template v-slot:append-inner>
                     <v-icon v-if="store.nameCheckStatus.checked && !store.nameCheckStatus.available" color="success" size="small">
@@ -100,32 +104,6 @@
                   </template>
                 </v-text-field>
               </div>
-              <!-- Status Messages -->
-              <v-alert 
-                v-if="store.nameCheckStatus.checked && store.nameCheckStatus.available" 
-                type="error"
-                variant="tonal"
-                rounded="lg"
-                class="mb-4"
-                density="comfortable"
-              >
-                <div class="alert-text">
-                  This ThreeFold Connect ID is not registered yet. Please check your spelling or register a new account.
-                </div>
-              </v-alert>
-              
-              <v-alert 
-                v-if="store.nameCheckStatus.checked && !store.nameCheckStatus.available" 
-                type="success"
-                variant="tonal"
-                rounded="lg"
-                class="mb-4"
-                density="comfortable"
-              >
-                <div class="alert-text">
-                  ThreeFold Connect ID verified! You can proceed with login.
-                </div>
-              </v-alert>
             </v-card-text>
             
             <!-- Actions -->
@@ -188,6 +166,7 @@ const store = useAppStore()
 const doubleName = ref('')
 const valid = ref(false)
 const isMobile = ref(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent))
+const loginError = ref('')
 const nameCheckerTimeOut = ref<number | null>(null)
 
 const nameRegex = /^(\w+)$/
@@ -198,6 +177,7 @@ const nameRules = [
 ]
 
 const checkNameAvailability = () => {
+  loginError.value = ''
   store.clearCheckStatus()
   if (doubleName.value) {
     if (nameCheckerTimeOut.value != null) {
@@ -210,6 +190,7 @@ const checkNameAvailability = () => {
 }
 
 const login = async () => {
+  loginError.value = ''
   try {
     console.log('Starting login for:', doubleName.value)
     await store.loginUser({
@@ -233,7 +214,7 @@ const login = async () => {
     router.push({ name: 'login' })
   } catch (error) {
     console.error('Login failed:', error)
-    alert('Login failed. Please check console for details.')
+    loginError.value = 'Login failed. Please try again or contact support if the issue persists.'
   }
 }
 
