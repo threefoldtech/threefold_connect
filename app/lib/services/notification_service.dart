@@ -240,4 +240,43 @@ class NotificationService {
     logger.i('Notification dismissed: ${receivedAction.title}');
     _decrementNotificationCount();
   }
+
+  void showNotificationDisabledReminder() async {
+    if (await AwesomeNotifications().isNotificationAllowed()) return;
+
+    final prefs = await SharedPreferences.getInstance();
+    if (prefs.getBool('notification_permission_requested') != true) return;
+
+    const cooldownDays = 7;
+    const cooldownMs = cooldownDays * 24 * 60 * 60 * 1000;
+    final lastShown = prefs.getInt('notification_reminder_last_shown') ?? 0;
+    final now = DateTime.now().millisecondsSinceEpoch;
+    if (now - lastShown < cooldownMs) return;
+
+    Future.delayed(const Duration(seconds: 1), () {
+      final context = navigatorKey.currentContext;
+      if (context == null || !context.mounted) return;
+
+      showDialog(
+        context: context,
+        barrierDismissible: true,
+        routeSettings: const RouteSettings(name: 'notification_disabled_reminder'),
+        builder: (BuildContext context) {
+          prefs.setInt('notification_reminder_last_shown', DateTime.now().millisecondsSinceEpoch);
+          return CustomDialog(
+            type: DialogType.Warning,
+            image: Icons.notifications_off,
+            title: 'Notifications Disabled',
+            description: 'Notifications are currently disabled. To enable them, please go to your device Settings > Notifications > ThreeFold Connect and enable notifications.',
+            actions: <Widget>[
+              TextButton(
+                child: const Text('Close'),
+                onPressed: () => Navigator.of(context).pop(),
+              ),
+            ],
+          );
+        },
+      );
+    });
+  }
 }
