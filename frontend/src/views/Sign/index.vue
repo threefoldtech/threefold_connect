@@ -22,9 +22,6 @@
             <!-- Mobile View -->
             <v-card v-if="isMobile" class="sign-card">
           <div class="text-center pa-8">
-            <v-avatar size="120" class="mb-4">
-              <v-img src="/logo.png" alt="ThreeFold Connect"></v-img>
-            </v-avatar>
             <h1 class="text-h5 font-weight-bold mb-3">
               Sign Data Request
             </h1>
