@@ -10,7 +10,7 @@
             </div>
             
             <!-- Page Header -->
-            <div class="text-center mb-6">
+            <div class="text-center mb-4">
               <h1 class="page-title mb-2">
                 ThreeFold Connect
               </h1>
@@ -20,15 +20,7 @@
             </div>
             
             <!-- Mobile View -->
-            <v-card v-if="isMobile" class="sign-card">
-          <div class="text-center pa-8">
-            <h1 class="text-h5 font-weight-bold mb-3">
-              Sign Data Request
-            </h1>
-            <p class="text-body-1 mb-6">
-              Open your ThreeFold Connect app to sign this data
-            </p>
-            <v-btn 
+            <v-btn v-if="isMobile"
               color="primary" 
               size="x-large"
               variant="elevated"
@@ -39,8 +31,6 @@
               <v-icon start>mdi-open-in-app</v-icon>
               Open ThreeFold Connect App
             </v-btn>
-          </div>
-        </v-card>
 
             <!-- Desktop View -->
             <v-card v-else class="sign-card">
@@ -140,7 +130,7 @@
             </v-card>
             
             <!-- App Store Badges -->
-            <div class="mt-8 text-center">
+            <div class="mt-6 text-center">
               <p class="app-badges-text mb-4">
                 Don't have an account? Download the app to get started
               </p>
