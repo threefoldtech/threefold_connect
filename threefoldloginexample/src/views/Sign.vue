@@ -79,13 +79,25 @@ export default defineComponent({
       const state = generateRandomString();
       window.localStorage.setItem("state", state);
 
+      // Hash the data to sign
+      const encoder = new TextEncoder();
+      const data = encoder.encode(dataToSign.value);
+      const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+      const hashArray = Array.from(new Uint8Array(hashBuffer));
+      const dataHash = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+      
+      // Create a data URL (you can use a real URL or base64 data URL)
+      const dataUrl = `data:text/plain;base64,${btoa(dataToSign.value)}`;
+      const friendlyName = 'Sign Example Data';
+
       // Create sign URL with data
       const signUrl = login.generateSignUrl(
         state,
-        dataToSign.value,
-        {
-          isJson: isJson.value.toString()
-        }
+        dataHash,
+        dataUrl,
+        isJson.value,
+        friendlyName,
+        sign_redirect_url
       );
 
       const popup = popupCenter(signUrl, 'ThreeFold Sign', 800, 550);

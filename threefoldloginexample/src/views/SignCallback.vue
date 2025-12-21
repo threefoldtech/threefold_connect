@@ -25,7 +25,7 @@ export default defineComponent({
     const redirectUrl = new URL(window.location.href);
 
     try {
-      const signedData = await login.parseAndValidateRedirectUrl(redirectUrl, state);
+      const signedData = await login.parseAndValidateRedirectUrlForSigning(redirectUrl, state);
       window.opener.postMessage({ message: 'threefoldSignRedirectSuccess', signedData: signedData });
       console.log('Signed data:', signedData);
     } catch (e) {
