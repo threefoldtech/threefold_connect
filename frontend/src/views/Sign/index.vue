@@ -47,8 +47,43 @@
 
             <!-- Desktop View -->
             <v-card v-else class="sign-card">
+          <!-- Signing In Progress -->
+          <v-card-text v-if="signingInProgress && !signedSuccessfully" class="text-center pa-8">
+            <h2 class="sign-title mb-6">
+              Signing Data...
+            </h2>
+            
+            <p class="sign-instruction mb-6">
+              Please open the ThreeFold Connect app on your mobile device and approve the signing request.
+            </p>
+            
+            <v-progress-circular
+              indeterminate
+              color="#14B8A6"
+              :size="80"
+              :width="6"
+              class="mb-6"
+            ></v-progress-circular>
+            
+            <p class="timer-text">
+              Waiting for your approval...
+            </p>
+          </v-card-text>
 
-          <v-form v-model="valid" @submit.prevent="onSignIn">
+          <!-- Success State -->
+          <v-card-text v-else-if="signedSuccessfully" class="text-center pa-8">
+            <v-icon :size="100" color="#14B8A6" class="mb-4">mdi-check-circle</v-icon>
+            <h2 class="success-title mb-2">
+              Data Signed Successfully!
+            </h2>
+            <p class="success-text mb-4">
+              Redirecting you now...
+            </p>
+            <v-progress-linear indeterminate color="#14B8A6" class="mt-4"></v-progress-linear>
+          </v-card-text>
+
+          <!-- Initial Form -->
+          <v-form v-else v-model="valid" @submit.prevent="onSignIn">
             <v-card-text class="px-6 pb-6">
               <div class="info-text mb-4 text-body-2 text-center" style="color: rgba(255, 255, 255, 0.7);">
                 You're about to sign data with your ThreeFold identity. Please verify your 3Bot name below.
@@ -175,6 +210,8 @@ const valid = ref(false)
 const dialog = ref(false)
 const isMobile = ref(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent))
 const nameCheckerTimeOut = ref<number | null>(null)
+const signingInProgress = ref(false)
+const signedSuccessfully = ref(false)
 
 const nameRegex = /^(\w+)$/
 const nameRules = [
@@ -196,6 +233,8 @@ const checkNameAvailability = () => {
 
 const onSignIn = async () => {
   const query = route.query
+  
+  signingInProgress.value = true
   
   await store.signDataUser({
     doubleName: doubleName.value,
@@ -240,11 +279,34 @@ const promptToSignMobile = () => {
   }
 }
 
+const handleSignedData = () => {
+  if (store.signedSignAttempt) {
+    signedSuccessfully.value = true
+    
+    setTimeout(() => {
+      const query = route.query
+      const redirectUrl = query.redirectUrl as string
+      const signedAttempt = encodeURIComponent(store.signedSignAttempt.signedAttempt)
+      const doubleName = encodeURIComponent(store.signedSignAttempt.doubleName)
+      
+      window.location.href = `${redirectUrl}?signedAttempt=${signedAttempt}&doubleName=${doubleName}`
+    }, 2000)
+  }
+}
+
 onMounted(() => {
   const query = route.query
   if (!query.appId || !query.dataHash || !query.dataUrl || !query.isJson || !query.redirectUrl || !query.state || !query.friendlyName) {
     router.push({ name: 'error' })
   }
+  
+  // Watch for signed data
+  const checkInterval = setInterval(() => {
+    if (store.signedSignAttempt) {
+      handleSignedData()
+      clearInterval(checkInterval)
+    }
+  }, 500)
 })
 </script>
 
