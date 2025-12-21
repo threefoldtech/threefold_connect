@@ -24,7 +24,7 @@
             <!-- Error Icon -->
             <div class="error-icon-container mb-6">
               <div class="error-circle">
-                <v-icon size="48" color="white">mdi-alert-outline</v-icon>
+                <v-icon size="48" color="error">mdi-alert-circle-outline</v-icon>
               </div>
             </div>
             
@@ -44,9 +44,6 @@
               If you want to register, you can do this from the ThreeFold Connect app.
             </p>
             
-            <a href="#" class="back-link" @click.prevent="$router.push({ name: 'initial' })">
-              Back to ThreeFold Connect Authenticator
-            </a>
           </v-card-text>
         </v-card>
         
