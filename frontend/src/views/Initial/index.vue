@@ -1,33 +1,9 @@
 <template>
   <section class="initial fill-height">
-    <!-- Mobile View -->
-    <v-row v-if="isMobile" class="fill-height" align="center" justify="center">
-      <v-col cols="12" class="text-center px-6">
-        <h1 class="page-title mb-2">
-          ThreeFold Connect
-        </h1>
-        <p class="page-subtitle mb-8">
-          Secure Two-Factor Authentication
-        </p>
-        <v-btn 
-          color="primary" 
-          size="x-large"
-          variant="elevated"
-          rounded="lg"
-          class="px-8 py-6 text-none"
-          @click="promptLoginToMobileUser"
-        >
-          <v-icon start>mdi-open-in-app</v-icon>
-          Open ThreeFold Connect App
-        </v-btn>
-      </v-col>
-    </v-row>
-    
-    <!-- Desktop View -->
     <v-container fluid class="fill-height pa-0">
       <v-row class="fill-height ma-0" align="center" justify="center">
       <v-progress-linear 
-        v-if="store.nameCheckStatus.checking" 
+        v-if="!isMobile && store.nameCheckStatus.checking" 
         color="primary"
         indeterminate
         style="position: fixed; top: 0; left: 0; right: 0; z-index: 9999;"
@@ -50,7 +26,22 @@
             </p>
           </div>
           
-          <v-card class="auth-card">
+          <!-- Mobile View: Simple Button -->
+              <v-btn v-if="isMobile"
+                color="primary" 
+                size="x-large"
+                variant="flat"
+                rounded="lg"
+                block
+                class="text-none mobile-open-btn"
+                @click="promptLoginToMobileUser"
+              >
+                <v-icon start>mdi-open-in-app</v-icon>
+                Open ThreeFold Connect App
+              </v-btn>
+          
+          <!-- Desktop View: Form -->
+          <v-card v-else class="auth-card">
 
           <v-form v-model="valid" @submit.prevent="login">
             <v-card-text class="pa-6">

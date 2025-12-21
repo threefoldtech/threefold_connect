@@ -121,6 +121,22 @@
         }
     }
     
+    .mobile-open-btn {
+        background: #14B8A6 !important;
+        color: #ffffff !important;
+        font-weight: 600;
+        font-size: 1rem;
+        letter-spacing: 0.3px;
+        height: 56px;
+        text-transform: none;
+        box-shadow: 0 4px 14px rgba(20, 184, 166, 0.4);
+        
+        &:hover {
+            background: #0d9488 !important;
+            box-shadow: 0 6px 20px rgba(20, 184, 166, 0.5);
+        }
+    }
+    
     .app-badges-row {
         margin-top: 2rem;
     }
