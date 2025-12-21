@@ -136,9 +136,9 @@ onMounted(() => {
 
 const openApp = () => {
   if (/iPhone|iPad|iPod/i.test(navigator.userAgent)) {
-    window.location.replace(`${config.deeplink}register/`)
+    window.location.replace(`${config.deeplink}login/`)
   } else {
-    window.location.href = `${config.deeplink}register/`
+    window.location.href = `${config.deeplink}login/`
   }
 }
 </script>
