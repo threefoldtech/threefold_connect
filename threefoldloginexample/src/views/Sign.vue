@@ -34,6 +34,7 @@
 import { ThreefoldLogin, generateRandomString } from '@threefoldjimber/threefold_login';
 import { threefoldBackend, sign_redirect_url, appId, seedPhrase, kycBackend } from '../config/config';
 import { defineComponent, ref } from 'vue';
+import sodium from 'libsodium-wrappers';
 
 const popupCenter = (url: string, title: string, w: number, h: number) => {
   const dualScreenLeft = window.screenLeft !== undefined ? window.screenLeft : window.screenX;
@@ -75,16 +76,16 @@ export default defineComponent({
       );
 
       await login.init();
+      await sodium.ready;
 
       const state = generateRandomString();
       window.localStorage.setItem("state", state);
 
-      // Hash the data to sign
+      // Hash the data to sign using BLAKE2b (same as mobile app)
       const encoder = new TextEncoder();
       const data = encoder.encode(dataToSign.value);
-      const hashBuffer = await crypto.subtle.digest('SHA-256', data);
-      const hashArray = Array.from(new Uint8Array(hashBuffer));
-      const dataHash = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+      const hashedData = sodium.crypto_generichash(32, data);
+      const dataHash = sodium.to_base64(hashedData);
       
       // Create a data URL (you can use a real URL or base64 data URL)
       const dataUrl = `data:text/plain;base64,${btoa(dataToSign.value)}`;
