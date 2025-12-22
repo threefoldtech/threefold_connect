@@ -290,21 +290,16 @@ const gotFocus = () => {
 // Watch for signed sign attempt
 watch(() => store.signedSignAttempt, (val) => {
   if (!val) {
-    console.log('Missing data')
     return
   }
 
   try {
-    console.log('signedAttemptObject: ', val)
-    console.log('signedAttemptObject: ', JSON.stringify(val))
     localStorage.setItem('username', doubleName.value)
 
     const data = encodeURIComponent(JSON.stringify(val))
-    console.log('data', data)
 
     if (data) {
       let union = '?'
-      console.log('redirect url: ', store.redirectUrl)
       if (store.redirectUrl && store.redirectUrl.indexOf('?') >= 0) {
         union = '&'
       }
@@ -318,26 +313,21 @@ watch(() => store.signedSignAttempt, (val) => {
         safeRedirectUri = '/' + store.redirectUrl
       }
 
-      console.log('!!!! doubleName: ', doubleName.value)
       const url = `//${store.appId}${safeRedirectUri}${union}signedAttempt=${data}`
       
       if (!isRedirecting.value) {
         isRedirecting.value = true
-        console.log('Changing href: ', url)
         window.location.href = url
       }
-    } else {
-      console.log('Val was null')
     }
   } catch (e) {
-    console.log('Something went wrong ... ', e)
+    console.error('Error processing signed attempt:', e)
   }
 })
 
 // Watch for cancel sign
 watch(() => store.cancelSignUp, (val) => {
   if (val) {
-    console.log('CANCELED', val)
     let safeRedirectUri
     if (store.redirectUrl && store.redirectUrl[0] === '/') {
       safeRedirectUri = store.redirectUrl

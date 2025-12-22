@@ -192,7 +192,6 @@ const checkNameAvailability = () => {
 const login = async () => {
   loginError.value = ''
   try {
-    console.log('Starting login for:', doubleName.value)
     await store.loginUser({
       doubleName: doubleName.value,
       mobile: isMobile.value,
@@ -206,11 +205,9 @@ const login = async () => {
       if (store.appPublicKey) url += `&appPublicKey=${encodeURIComponent(store.appPublicKey)}`
       if (store.redirectUrl) url += `&redirecturl=${encodeURIComponent(store.redirectUrl)}`
       
-      console.log('Opening mobile app with URL:', url)
       window.open(url)
     }
     
-    console.log('Navigating to login page')
     router.push({ name: 'login' })
   } catch (error) {
     console.error('Login failed:', error)

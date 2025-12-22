@@ -6,11 +6,4 @@ const config: AppConfig = {
   deeplink: import.meta.env.VITE_DEEPLINK || 'threebot://'
 }
 
-console.log('=== Config Loading ===')
-console.log('Using config:', config)
-console.log('API URL:', config.apiurl)
-console.log('OpenKYC URL:', config.openkycurl)
-console.log('Deep link:', config.deeplink)
-console.log('======================')
-
 export default config

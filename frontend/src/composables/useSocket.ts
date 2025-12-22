@@ -7,8 +7,8 @@ export function useSocket() {
   const store = useAppStore()
   
   const handlers = {
-    connect: () => console.log('Socket connected'),
-    disconnect: () => console.log('Socket disconnected'),
+    connect: () => {},
+    disconnect: () => {},
     nameknown: () => store.SOCKET_nameknown(),
     namenotknown: () => store.SOCKET_namenotknown(),
     signedAttempt: (data: SignedAttemptData) => store.SOCKET_signedAttempt(data),

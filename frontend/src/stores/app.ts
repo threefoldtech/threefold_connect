@@ -75,30 +75,23 @@ export const useAppStore = defineStore('app', () => {
   }
 
   const SOCKET_nameknown = () => {
-    console.log('Socket: name is known (user exists)')
     nameCheckStatus.value = { checked: true, checking: false, available: false }
   }
 
   const SOCKET_namenotknown = () => {
-    console.log('Socket: name is not known (user does not exist)')
     nameCheckStatus.value = { checked: true, checking: false, available: true }
   }
 
   const loginUser = async (data: { doubleName: string; mobile: boolean; firstTime: boolean }) => {
     try {
-      console.log('loginUser called with:', data)
       setDoubleName(data.doubleName)
       signedAttempt.value = null
       firstTime.value = data.firstTime
       randomImageId.value = Math.floor(Math.random() * 266)
-      console.log('🎯 Generated randomImageId:', randomImageId.value)
-      console.log('🎯 firstTime:', data.firstTime)
       isMobile.value = data.mobile
 
-      console.log('Fetching user public key for:', doubleName.value)
       const userData = await userService.getUserData(doubleName.value!)
       const publicKey = userData.data.publicKey
-      console.log('Got public key:', publicKey)
 
       const newRandomRoom = generateUUID()
       const locationId = localStorage.getItem('locationId') || generateUUID()
@@ -115,15 +108,11 @@ export const useAppStore = defineStore('app', () => {
         randomImageId: !data.firstTime ? randomImageId.value?.toString() : null,
         locationId
       }
-      console.log('🎯 Sending randomImageId to mobile app:', loginData.randomImageId)
-      console.log('Login data to encrypt:', loginData)
 
       const encryptedLoginAttempt = await cryptoService.encrypt(
         JSON.stringify(loginData),
         publicKey
       )
-      console.log('State:', _state.value)
-      console.log('Encrypted login attempt:', encryptedLoginAttempt)
 
       socketService.emit('leave', { room: doubleName.value })
       setRandomRoom(newRandomRoom)
@@ -140,7 +129,6 @@ export const useAppStore = defineStore('app', () => {
 
   const setRandomRoom = (room: string) => {
     randomRoom.value = room
-    console.log(`joining ${room}`)
     socketService.emit('join', { room })
   }
 
@@ -234,12 +222,6 @@ export const useAppStore = defineStore('app', () => {
   }
 
   const SOCKET_signedAttempt = async (data: SignedAttemptData) => {
-    console.log('signedAttempt', data.signedAttempt)
-    console.log('signedAttempt', data.doubleName)
-    console.log('context.getters.firstTime', firstTime.value)
-    console.log('context.getters.isMobile', isMobile.value)
-    console.log('context.getters.randomImageId', randomImageId.value)
-
     try {
       const publicKey = (await userService.getUserData(data.doubleName)).data.publicKey
 
@@ -250,7 +232,6 @@ export const useAppStore = defineStore('app', () => {
       )
 
       if (!decodedAttempt) {
-        console.log('Something went wrong ... ')
         return
       }
 
@@ -269,10 +250,8 @@ export const useAppStore = defineStore('app', () => {
         !isMobile.value &&
         signedAttemptData.selectedImageId !== randomImageId.value
       ) {
-        console.log('Resending notification!')
         await resendNotification()
       } else {
-        console.log('Setting signedAttempt!')
         signedAttempt.value = data
       }
     } catch (error) {
@@ -319,10 +298,8 @@ export const useAppStore = defineStore('app', () => {
   const resendNotification = async () => {
     try {
       randomImageId.value = Math.floor(Math.random() * 266)
-      console.log('🔄 Resend - New randomImageId:', randomImageId.value)
       
       const publicKey = (await userService.getUserData(doubleName.value!)).data.publicKey
-      console.log('Public key:', publicKey)
       
       const newRandomRoom = generateUUID()
       let locationId = localStorage.getItem('locationId')
@@ -330,7 +307,6 @@ export const useAppStore = defineStore('app', () => {
         locationId = generateUUID()
         localStorage.setItem('locationId', locationId)
       }
-      console.log('locationId UUID:', locationId)
       
       const loginData = {
         doubleName: doubleName.value,
@@ -396,9 +372,6 @@ export const useAppStore = defineStore('app', () => {
     redirectUrl.value = data.redirectUrl
     _state.value = data.state
 
-    console.log('THIS IS THE STATE')
-    console.log(data.state)
-
     const publicKey = (await userService.getUserData(doubleName.value!)).data.publicKey
     const randomRoom = generateUUID()
     socketService.emit('leave', { room: doubleName.value })
@@ -457,24 +430,16 @@ export const useAppStore = defineStore('app', () => {
   }
 
   const SOCKET_signedSignDataAttempt = async (data: any) => {
-    console.log('signedSignDataAttempt', data.signedAttempt)
-    console.log('signedSignDataAttempt', data.doubleName)
-
     const publicKey = (await userService.getUserData(data.doubleName)).data.publicKey
-    const signedAttemptDecoded = await cryptoService.validateSignedAttempt(
+    await cryptoService.validateSignedAttempt(
       data.signedAttempt,
       publicKey
     )
-    console.log('decoded', signedAttemptDecoded)
-    const string = new TextDecoder().decode(signedAttemptDecoded)
-    console.log('in string', string)
 
     signedSignAttempt.value = data
-    console.log(data)
   }
 
   const SOCKET_cancelSign = () => {
-    console.log('Cancel sign attempt')
     cancelSignUp.value = true
     signAttemptOnGoing.value = false
   }
@@ -517,7 +482,7 @@ export const useAppStore = defineStore('app', () => {
         public_key: keys.value.publicKey
       })
       .then(() => {
-        console.log('Mail has been sent')
+        // Email sent successfully
       })
       .catch((e) => {
         alert(e)
@@ -549,7 +514,7 @@ export const useAppStore = defineStore('app', () => {
         public_key: keys.value.publicKey
       })
       .then(() => {
-        console.log('sms has been sent')
+        // SMS sent successfully
       })
       .catch(() => {
         alert('Failed to send SMS')
@@ -557,7 +522,6 @@ export const useAppStore = defineStore('app', () => {
   }
 
   const validateEmail = (data: { userId: string; verificationCode: string }) => {
-    console.log('Validating email', data)
     if (data && data.userId && data.verificationCode) {
       emailVerificationStatus.value = {
         checked: false,
