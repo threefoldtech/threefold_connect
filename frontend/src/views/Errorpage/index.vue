@@ -20,11 +20,11 @@
           </div>
           
           <v-card class="error-card">
-          <v-card-text class="text-center pa-8">
+          <v-card-text class="text-center pa-6">
             <!-- Error Icon -->
-            <div class="error-icon-container mb-6">
+            <div class="error-icon-container mb-4">
               <div class="error-circle">
-                <v-icon size="48" color="error">mdi-alert-circle-outline</v-icon>
+                <v-icon size="55" color="error">mdi-alert-circle-outline</v-icon>
               </div>
             </div>
             

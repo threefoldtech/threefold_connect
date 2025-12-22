@@ -25,7 +25,7 @@
             <!-- Checking State -->
             <div v-if="store.smsVerificationStatus.checking">
               <v-progress-circular 
-                :size="100" 
+                :size="55" 
                 :width="8" 
                 color="primary" 
                 indeterminate
@@ -38,7 +38,7 @@
 
             <!-- Success State -->
             <div v-if="store.smsVerificationStatus.checked && store.smsVerificationStatus.valid">
-              <v-icon :size="120" color="success" class="mb-4">mdi-check-circle</v-icon>
+              <v-icon :size="55" color="success" class="mb-4">mdi-check-circle</v-icon>
               <h2 class="text-h6 font-weight-bold mb-2">
                 Phone Verified!
               </h2>
@@ -61,7 +61,7 @@
 
             <!-- Error State -->
             <div v-if="store.smsVerificationStatus.checked && !store.smsVerificationStatus.valid">
-              <v-icon :size="120" color="error" class="mb-4">mdi-close-circle</v-icon>
+              <v-icon :size="55" color="error" class="mb-4">mdi-close-circle</v-icon>
               <h2 class="text-h6 font-weight-bold mb-2">
                 Verification Failed
               </h2>
