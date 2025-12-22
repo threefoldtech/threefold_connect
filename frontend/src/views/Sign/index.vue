@@ -37,9 +37,18 @@
           <!-- Initial Form -->
           <v-form v-if="!store.signAttemptOnGoing" v-model="valid" @submit.prevent="onSignIn">
             <v-card-text class="px-6 pb-6">
-              <div class="info-text mb-4 text-body-2 text-center" style="color: rgba(255, 255, 255, 0.7);">
-                You're about to sign data with your ThreeFold identity. Please verify your 3Bot name below.
-              </div>
+              <v-alert
+                class="info-alert mb-4"
+                rounded="lg"
+                density="comfortable"
+              >
+                <div class="d-flex align-start">
+                  <v-icon class="alert-icon mr-3" size="20">mdi-information-outline</v-icon>
+                  <div class="alert-text">
+                    You're about to sign data with your ThreeFold identity. Please verify your Threefold Connect ID below.
+                  </div>
+                </div>
+              </v-alert>
 
               <div class="mb-6">
                 <label class="text-subtitle-2 font-weight-medium mb-2 d-block">

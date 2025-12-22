@@ -41,12 +41,10 @@
         width: 100px;
         height: 100px;
         border-radius: 50%;
-        background: rgba(239, 68, 68, 0.2);
-        border: 3px solid #EF4444;
         display: flex;
         justify-content: center;
         align-items: center;
-        box-shadow: 0 0 30px rgba(239, 68, 68, 0.3);
+        font-size: 55px;
     }
     
     .error-title {

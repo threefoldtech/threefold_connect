@@ -25,7 +25,8 @@
             <!-- Checking State -->
             <div v-if="store.emailVerificationStatus.checking">
               <v-progress-circular 
-                :size="100" 
+                :size="75"
+                :font-size="55"
                 :width="8" 
                 color="primary" 
                 indeterminate
@@ -38,7 +39,7 @@
 
             <!-- Success State -->
             <div v-if="store.emailVerificationStatus.checked && store.emailVerificationStatus.valid">
-              <v-icon :size="120" color="success" class="mb-4">mdi-check-circle</v-icon>
+              <v-icon :size="75" :font-size="55" color="success" class="mb-4">mdi-check-circle</v-icon>
               <h2 class="text-h6 font-weight-bold mb-2">
                 Email Verified!
               </h2>
@@ -61,7 +62,7 @@
 
             <!-- Error State -->
             <div v-if="store.emailVerificationStatus.checked && !store.emailVerificationStatus.valid">
-              <v-icon :size="120" color="error" class="mb-4">mdi-close-circle</v-icon>
+              <v-icon :size="75" :font-size="55" color="error" class="mb-4">mdi-close-circle</v-icon>
               <h2 class="text-h6 font-weight-bold mb-2">
                 Verification Failed
               </h2>
