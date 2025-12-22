@@ -386,4 +386,4 @@ const generateUUID = (): string => {
 }
 </script>
 
-<style src="./sign.scss" scoped lang="scss"></style>
+<style src="./Sign.scss" scoped lang="scss"></style>
