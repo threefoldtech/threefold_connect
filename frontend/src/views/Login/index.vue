@@ -80,7 +80,7 @@
         <!-- Success State -->
         <v-card v-else-if="loggedIn" class="success-card">
           <v-card-text class="text-center pa-8">
-            <v-icon :size="100" color="#14B8A6" class="mb-4">mdi-check-circle</v-icon>
+            <v-icon :size="55" color="#14B8A6" class="mb-4">mdi-check-circle</v-icon>
             <h2 class="success-title mb-2">
               Login Successful!
             </h2>
@@ -94,7 +94,7 @@
         <!-- Expired State -->
         <v-card v-else class="expired-card">
           <v-card-text class="text-center pa-8">
-            <v-icon :size="100" color="#EF4444" class="mb-4">mdi-close-circle</v-icon>
+            <v-icon :size="55" color="#EF4444" class="mb-4">mdi-close-circle</v-icon>
             <h2 class="expired-title mb-2">
               Login Expired
             </h2>
