@@ -15,7 +15,7 @@ const toBoolean = (value: any): boolean => {
   return Boolean(value)
 }
 
-const generateUUID = (): string => {
+export const generateUUID = (): string => {
   let d = new Date().getTime()
   let d2 = (performance?.now() * 1000) || 0
   return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {

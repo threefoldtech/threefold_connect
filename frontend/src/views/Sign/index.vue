@@ -196,7 +196,7 @@
 <script setup lang="ts">
 import { ref, onMounted, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
-import { useAppStore } from '@/stores/app'
+import { useAppStore, generateUUID } from '@/stores/app'
 import config from '@/config'
 
 const router = useRouter()
@@ -359,21 +359,6 @@ onMounted(() => {
   }
 })
 
-const generateUUID = (): string => {
-  let d = new Date().getTime()
-  let d2 = (performance?.now() * 1000) || 0
-  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
-    let r = Math.random() * 16
-    if (d > 0) {
-      r = (d + r) % 16 | 0
-      d = Math.floor(d / 16)
-    } else {
-      r = (d2 + r) % 16 | 0
-      d2 = Math.floor(d2 / 16)
-    }
-    return (c === 'x' ? r : (r & 0x3) | 0x8).toString(16)
-  })
-}
 </script>
 
 <style src="./Sign.scss" scoped lang="scss"></style>
