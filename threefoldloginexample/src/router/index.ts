@@ -10,12 +10,22 @@ const routes: Array<RouteRecordRaw> = [
   {
     path: '/callback',
     name: 'Callback',
-    component: () => import(/* webpackChunkName: "about" */ '../views/Callback.vue')
+    component: () => import('../views/Callback.vue')
+  },
+  {
+    path: '/sign',
+    name: 'Sign',
+    component: () => import('../views/Sign.vue')
+  },
+  {
+    path: '/sign-callback',
+    name: 'SignCallback',
+    component: () => import('../views/SignCallback.vue')
   }
 ]
 
 const router = createRouter({
-  history: createWebHistory(process.env.BASE_URL),
+  history: createWebHistory(import.meta.env.BASE_URL),
   routes
 })
 

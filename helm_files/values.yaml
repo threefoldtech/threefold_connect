@@ -7,10 +7,7 @@ replicaCount: 1
 #tags vary per environment (staging/testing/production) change in according value files.
 images:
   login:
-    repo: jimber/3botlogin
-    containerPort: 80
-  wizard:
-    repo: jimber/wizard
+    repo: ghcr.io/threefoldtech/threefold-connect
     containerPort: 80
 
 services:
@@ -22,10 +19,6 @@ services:
     name: uwgsi
     port: 5000
     targetPort: 5000
-  wizard:
-    name: wizard
-    port: 82
-    targetPort: 80
 
 storage:
   type: local

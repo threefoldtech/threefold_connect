@@ -1,48 +1,77 @@
-FROM node:16 AS builder
+FROM node:22 AS frontend-builder
 
 COPY frontend /frontend
 WORKDIR /frontend
 RUN yarn install --frozen-lockfile && yarn build
 
-# COPY example /example
-# WORKDIR /example
-# RUN yarn install --frozen-lockfile && yarn build
 
-COPY wizard /wizard
-WORKDIR /wizard
-RUN yarn install --frozen-lockfile && yarn build
+FROM python:3.11-alpine AS backend-builder
 
+ENV PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PIP_NO_CACHE_DIR=1 \
+    PIP_DISABLE_PIP_VERSION_CHECK=1 \
+    POETRY_VERSION=1.8.3 \
+    POETRY_HOME="/opt/poetry" \
+    POETRY_NO_INTERACTION=1 \
+    POETRY_VIRTUALENVS_IN_PROJECT=true \
+    POETRY_VIRTUALENVS_CREATE=true
 
-FROM nginx:1.25
-COPY backend/requirements.txt requirements.txt
-
-RUN apt-get update && apt-get install -y \
-    python3 \
-    python3-pip \
+RUN apk add --no-cache \
     gcc \
-    libssl-dev \
-    python3-dev \
+    musl-dev \
     libffi-dev \
-    && rm -rf /var/lib/apt/lists/*
-RUN pip3 install --break-system-packages uwsgi==2.0.26
-RUN pip3 install --break-system-packages --upgrade pip
-# Install stellar-sdk first to get compatible yarl version
-RUN pip3 install --break-system-packages stellar-sdk==9.1.0
-# Increase timeout and retries for slow network connections
-RUN pip3 install --break-system-packages \
-    --default-timeout=100 \
-    --retries=5 \
-    -r requirements.txt --ignore-installed
+    openssl-dev \
+    python3-dev \
+    linux-headers \
+    curl \
+    make
 
-COPY --from=builder /frontend/dist /var/www/html/frontend
-# COPY --from=builder /example/dist /var/www/html/example
-COPY --from=builder /wizard/dist /var/www/html/wizard
+RUN curl -sSL https://install.python-poetry.org | python3 -
 
-COPY backend/ /usr/share/nginx/backend
+ENV PATH="$POETRY_HOME/bin:$PATH"
+
+WORKDIR /app
+COPY backend/pyproject.toml backend/poetry.lock* ./
+
+RUN poetry install --only main --no-root --no-directory
+
+COPY backend/ ./
+
+RUN poetry install --only main
+
+
+FROM nginx:1.27-alpine AS runtime
+
+RUN apk add --no-cache \
+    libffi \
+    openssl \
+    libgcc \
+    libstdc++ \
+    sqlite-libs
+
+ENV PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    VIRTUAL_ENV=/app/.venv \
+    PATH="/usr/local/bin:/app/.venv/bin:$PATH" \
+    LD_LIBRARY_PATH="/usr/local/lib"
+
+COPY --from=backend-builder /usr/local/bin/python3.11 /usr/local/bin/python3.11
+COPY --from=backend-builder /usr/local/bin/python3 /usr/local/bin/python3
+COPY --from=backend-builder /usr/local/lib/python3.11 /usr/local/lib/python3.11
+COPY --from=backend-builder /usr/local/lib/libpython3.11.so.1.0 /usr/local/lib/libpython3.11.so.1.0
+COPY --from=backend-builder /usr/local/lib/libpython3.so /usr/local/lib/libpython3.so
+
+COPY --from=backend-builder /app/.venv /app/.venv
+COPY --from=backend-builder /app /usr/share/nginx/backend
+COPY --from=frontend-builder /frontend/dist /var/www/html/frontend
 
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 COPY services.sh /services.sh
 RUN chmod +x /services.sh
+
 WORKDIR /usr/share/nginx/backend/
+
+EXPOSE 5000
 
 CMD ["/services.sh"]

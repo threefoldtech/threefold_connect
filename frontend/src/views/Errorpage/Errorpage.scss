@@ -1,2 +1,162 @@
 .errorpage {
+    .content-wrapper {
+        max-width: 768px;
+        width: 100%;
+        margin: 0 auto;
+    }
+    
+    .page-header {
+        margin-bottom: 2rem;
+    }
+    
+    .page-title {
+        font-size: 2rem;
+        font-weight: 400;
+        color: #ffffff;
+        letter-spacing: 0.5px;
+        margin-bottom: 0.5rem;
+    }
+    
+    .page-subtitle {
+        font-size: 0.95rem;
+        color: #14B8A6;
+        font-weight: 400;
+        letter-spacing: 0.3px;
+    }
+    
+    .error-card {
+        background: rgba(255, 255, 255, 0.1) !important;
+        backdrop-filter: blur(24px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    }
+    
+    .error-icon-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    
+    .error-circle {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 55px;
+    }
+    
+    .error-title {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: #ffffff;
+        margin-bottom: 1.5rem;
+    }
+    
+    .error-text {
+        font-size: 0.95rem;
+        line-height: 1.6;
+        color: rgba(255, 255, 255, 0.9);
+    }
+    
+    .back-link {
+        color: #14B8A6;
+        text-decoration: none;
+        font-weight: 500;
+        font-size: 0.95rem;
+        transition: all 0.2s ease;
+        display: inline-block;
+        
+        &:hover {
+            color: #22d3ee;
+            text-decoration: none;
+            transform: translateX(2px);
+        }
+    }
+    
+    .app-badges-row {
+        margin-top: 2rem;
+    }
+    
+    .app-badges-text {
+        font-size: 0.875rem;
+        color: rgba(255, 255, 255, 0.7);
+    }
+    
+    .app-badge {
+        display: inline-block;
+        transition: transform 0.2s ease, opacity 0.2s ease;
+        opacity: 0.9;
+        margin: 0 8px;
+        
+        &:hover {
+            transform: scale(1.05);
+            opacity: 1;
+        }
+        
+        .badge-img {
+            border-radius: 6px;
+            display: block;
+        }
+    }
+}
+
+// Responsive styles
+@media (max-width: 600px) {
+    .errorpage {
+        .content-wrapper {
+            max-width: 100%;
+            padding: 0 0.5rem;
+        }
+        
+        .page-header {
+            margin-bottom: 1.5rem;
+        }
+        
+        .page-title {
+            font-size: 1.5rem;
+        }
+        
+        .page-subtitle {
+            font-size: 0.85rem;
+        }
+        
+        .error-card {
+            margin: 0;
+        }
+        
+        .error-circle {
+            width: 80px;
+            height: 80px;
+            
+            .v-icon {
+                font-size: 40px !important;
+            }
+        }
+        
+        .error-title {
+            font-size: 1.25rem;
+        }
+        
+        .error-text {
+            font-size: 0.85rem;
+        }
+        
+        .back-link {
+            font-size: 0.85rem;
+        }
+        
+        .app-badges-text {
+            font-size: 0.8rem;
+        }
+    }
+}
+
+@media (min-width: 601px) and (max-width: 960px) {
+    .errorpage {
+        .content-wrapper {
+            max-width: 90%;
+        }
+    }
 }

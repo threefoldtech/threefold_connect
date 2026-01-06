@@ -1,6 +1,6 @@
-# 3Botlogin frontend
+# ThreeFold Connect frontend
 
-The frontend for 3Bot login
+The frontend for threefold connect login
 
 ## Project setup
 
@@ -10,15 +10,13 @@ yarn install
 
 ### Configuration
 
-```bash
-# prod:
-cp public/config.prod.js public/config.js
+Update the .env file with the correct values.
 
-# staging:
-cp public/config.staging.js public/config.js
-
-# testing:
-cp public/config.testing.js public/config.js
+#### Example
+```
+VITE_API_URL=https://login.threefold.me/
+VITE_OPENKYC_URL=https://openkyc.threefold.me/
+VITE_DEEPLINK=threefold://
 ```
 
 ### Compiles and hot-reloads for development

@@ -7,10 +7,7 @@ environment: staging
 images:
   login:
     name: threebotlogin-staging
-    repo: threefolddev/3botlogin
-  wizard:
-    name: wizard-staging
-    repo: threefolddev/wizard
+    repo: ghcr.io/threefoldtech/threefold-connect
 
 
 ingress:
@@ -25,10 +22,6 @@ ingress:
       path: /socket.io/
       service: threebotlogin-staging
       port: 5000
-    - name: wizard.staging.threefold.me
-      path: /
-      service: wizard-staging
-      port: 82
 
 claims:
   data:
