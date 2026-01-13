@@ -5,11 +5,13 @@ import 'package:convert/convert.dart';
 import 'package:flutter_pkid/flutter_pkid.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:threebotlogin/helpers/globals.dart';
+import 'package:threebotlogin/helpers/logger.dart';
 import 'package:threebotlogin/models/wallet_data.dart';
 import 'package:threebotlogin/services/3bot_service.dart';
 import 'package:threebotlogin/services/crypto_service.dart';
 import 'package:threebotlogin/services/open_kyc_service.dart';
 import 'package:threebotlogin/services/pkid_service.dart';
+import 'package:threebotlogin/services/secure_storage_service.dart';
 import 'package:pinenacl/api.dart';
 import 'package:pinenacl/tweetnacl.dart' show TweetNaClExt;
 
@@ -69,37 +71,42 @@ Future<void> setPublicKeyFixed() async {
 }
 
 Future<Uint8List> getPrivateKey() async {
-  final SharedPreferences prefs = await SharedPreferences.getInstance();
+  final secureKey = await SecureStorageService.getPrivateKey();
+  if (secureKey != null) return secureKey;
 
-  String? privateKey = prefs.getString('privatekey');
-  Uint8List decodedPrivateKey = base64.decode(privateKey!);
+  final prefs = await SharedPreferences.getInstance();
+  final privateKey = prefs.getString('privatekey');
+  if (privateKey != null) {
+    final decoded = base64.decode(privateKey);
+    await SecureStorageService.savePrivateKey(decoded);
+    await prefs.remove('privatekey');
+    return decoded;
+  }
 
-  return decodedPrivateKey;
+  throw Exception('Private key not found');
 }
 
 Future<void> savePrivateKey(Uint8List privateKey) async {
-  final SharedPreferences prefs = await SharedPreferences.getInstance();
-  prefs.remove('privatekey');
-
-  String encodedPrivateKey = base64.encode(privateKey);
-  prefs.setString('privatekey', encodedPrivateKey);
+  await SecureStorageService.savePrivateKey(privateKey);
+  final prefs = await SharedPreferences.getInstance();
+  await prefs.remove('privatekey');
 }
 
 Future<Map<String, String>> getEdCurveKeys() async {
-  final SharedPreferences prefs = await SharedPreferences.getInstance();
+  final prefs = await SharedPreferences.getInstance();
+  final pkEd = prefs.getString('publickey');
+  if (pkEd == null) throw Exception('Public key not found');
 
-  final String? pkEd = prefs.getString('publickey');
-  final String? skEd = prefs.getString('privatekey');
+  final skEdBytes = await getPrivateKey();
+  final skEd = base64.encode(skEdBytes);
 
   final pkCurve = Uint8List(32);
-  TweetNaClExt.crypto_sign_ed25519_pk_to_x25519_pk(
-      pkCurve, base64.decode(pkEd!));
-  final String pkCurveEncoded = base64.encode(Uint8List.fromList(pkCurve));
+  TweetNaClExt.crypto_sign_ed25519_pk_to_x25519_pk(pkCurve, base64.decode(pkEd));
+  final pkCurveEncoded = base64.encode(Uint8List.fromList(pkCurve));
 
   final skCurve = Uint8List(32);
-  TweetNaClExt.crypto_sign_ed25519_sk_to_x25519_sk(
-      skCurve, base64.decode(skEd!));
-  final String skCurveEncoded = base64.encode(Uint8List.fromList(skCurve));
+  TweetNaClExt.crypto_sign_ed25519_sk_to_x25519_sk(skCurve, base64.decode(skEd));
+  final skCurveEncoded = base64.encode(Uint8List.fromList(skCurve));
 
   return {
     'signingPublicKey': hex.encode(base64.decode(pkEd)),
@@ -110,13 +117,24 @@ Future<Map<String, String>> getEdCurveKeys() async {
 }
 
 Future<void> savePhrase(String phrase) async {
-  final SharedPreferences prefs = await SharedPreferences.getInstance();
-  prefs.setString('phrase', phrase);
+  await SecureStorageService.savePhrase(phrase);
+  final prefs = await SharedPreferences.getInstance();
+  await prefs.remove('phrase');
 }
 
 Future<String?> getPhrase() async {
-  final SharedPreferences prefs = await SharedPreferences.getInstance();
-  return prefs.getString('phrase');
+  final securePhrase = await SecureStorageService.getPhrase();
+  if (securePhrase != null) return securePhrase;
+
+  final prefs = await SharedPreferences.getInstance();
+  final phrase = prefs.getString('phrase');
+  if (phrase != null) {
+    await SecureStorageService.savePhrase(phrase);
+    await prefs.remove('phrase');
+    return phrase;
+  }
+
+  return null;
 }
 
 Future<void> saveTwinId(int twinId) async {
@@ -246,14 +264,24 @@ Future<Uint8List> getDerivedSeed(String appId) async {
 ///
 
 Future<void> savePin(String pin) async {
-  final SharedPreferences prefs = await SharedPreferences.getInstance();
-  prefs.remove('pin');
-  prefs.setString('pin', pin);
+  await SecureStorageService.savePin(pin);
+  final prefs = await SharedPreferences.getInstance();
+  await prefs.remove('pin');
 }
 
 Future<String?> getPin() async {
-  final SharedPreferences prefs = await SharedPreferences.getInstance();
-  return prefs.getString('pin');
+  final securePin = await SecureStorageService.getPin();
+  if (securePin != null) return securePin;
+
+  final prefs = await SharedPreferences.getInstance();
+  final pin = prefs.getString('pin');
+  if (pin != null) {
+    await SecureStorageService.savePin(pin);
+    await prefs.remove('pin');
+    return pin;
+  }
+
+  return null;
 }
 
 Future<void> saveFingerprint(fingerprint) async {
@@ -380,8 +408,9 @@ Future<List<WalletData>> getWallets() async {
 ///
 
 Future<bool> clearData() async {
-  final SharedPreferences prefs = await SharedPreferences.getInstance();
-  bool cleared = await prefs.clear();
+  final prefs = await SharedPreferences.getInstance();
+  await SecureStorageService.clearAll();
+  final cleared = await prefs.clear();
   saveInitDone();
   return cleared;
 }
