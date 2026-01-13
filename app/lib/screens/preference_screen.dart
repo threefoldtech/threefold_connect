@@ -226,7 +226,7 @@ class _PreferenceScreenState extends ConsumerState<PreferenceScreen> {
           ),
           ListTile(
             leading: const Icon(Icons.help_outline),
-            title: const Text('View Documentation'),
+            title: const Text('Documentation'),
             onTap: () async => {await _showDocumentation()},
           ),
           ListTile(
