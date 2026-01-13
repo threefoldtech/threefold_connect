@@ -5,7 +5,6 @@ import 'package:convert/convert.dart';
 import 'package:flutter_pkid/flutter_pkid.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:threebotlogin/helpers/globals.dart';
-import 'package:threebotlogin/helpers/logger.dart';
 import 'package:threebotlogin/models/wallet_data.dart';
 import 'package:threebotlogin/services/3bot_service.dart';
 import 'package:threebotlogin/services/crypto_service.dart';
@@ -101,11 +100,13 @@ Future<Map<String, String>> getEdCurveKeys() async {
   final skEd = base64.encode(skEdBytes);
 
   final pkCurve = Uint8List(32);
-  TweetNaClExt.crypto_sign_ed25519_pk_to_x25519_pk(pkCurve, base64.decode(pkEd));
+  TweetNaClExt.crypto_sign_ed25519_pk_to_x25519_pk(
+      pkCurve, base64.decode(pkEd));
   final pkCurveEncoded = base64.encode(Uint8List.fromList(pkCurve));
 
   final skCurve = Uint8List(32);
-  TweetNaClExt.crypto_sign_ed25519_sk_to_x25519_sk(skCurve, base64.decode(skEd));
+  TweetNaClExt.crypto_sign_ed25519_sk_to_x25519_sk(
+      skCurve, base64.decode(skEd));
   final skCurveEncoded = base64.encode(Uint8List.fromList(skCurve));
 
   return {
@@ -245,7 +246,6 @@ Future<void> savePhone(String phone, String? signedPhoneIdentifier) async {
   Globals().phoneVerified.value = false;
   client.setPKidDoc('phone', json.encode({'phone': phone}));
 }
-
 
 ///
 ///
