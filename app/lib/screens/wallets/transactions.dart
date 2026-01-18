@@ -31,6 +31,8 @@ class _WalletTransactionsWidgetState extends State<WalletTransactionsWidget> {
 
       final txs = await txStream.take(_pageSize).toList();
 
+      if (!mounted) return;
+
       if (txs.isEmpty) {
         _pagingController.appendLastPage([]);
         return;
@@ -46,8 +48,10 @@ class _WalletTransactionsWidgetState extends State<WalletTransactionsWidget> {
         _pagingController.appendPage(txs, adjustedPagingToken);
       }
     } catch (e) {
+      if (!mounted) return;
+
       logger.e('Failed to load transactions: $e');
-      if (mounted) {
+      if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
