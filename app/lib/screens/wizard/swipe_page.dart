@@ -16,8 +16,9 @@ class SwipePage extends StatefulWidget {
 }
 
 class _SwipePagesState extends State<SwipePage> {
-  final PageController _pageController =
-      PageController(); // Controls the PageView
+  final PageController _pageController = PageController();
+  int _currentPage = 0;
+  final int _totalPages = 5;
 
   @override
   void dispose() {
@@ -25,60 +26,141 @@ class _SwipePagesState extends State<SwipePage> {
     super.dispose();
   }
 
+  void _nextPage() {
+    if (_currentPage < _totalPages - 1) {
+      _pageController.nextPage(
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
     return Scaffold(
       body: Column(
         children: [
+          // Skip button
           Padding(
-            padding:
-                EdgeInsets.only(top: MediaQuery.of(context).size.height * 0.01),
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.end,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
+                const SizedBox(width: 60), // Balance skip button
                 TextButton(
-                    onPressed: () {
-                      showDialog(
-                        context: context,
-                        builder: (BuildContext context) {
-                          return const TermsAndConditions();
-                        },
-                      );
-                    },
-                    child: Text(
-                      'SKIP',
-                      style: Theme.of(context).textTheme.bodyLarge!.copyWith(
-                          color: Theme.of(context).colorScheme.onSurface),
-                    ))
-              ],
-            ),
-          ),
-          Expanded(
-            child: PageView(
-              controller: _pageController,
-              onPageChanged: (int index) {
-                setState(() {});
-              },
-              children: const [Page1(), Page2(), Page3(), Page4(), Page5()],
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(top: 16, bottom: 16),
-            child: Column(
-              children: [
-                SmoothPageIndicator(
-                  controller: _pageController,
-                  count: 5,
-                  effect: ExpandingDotsEffect(
-                    dotWidth: 20,
-                    dotHeight: 20,
-                    activeDotColor: Theme.of(context).colorScheme.primary,
-                    dotColor: Theme.of(context).colorScheme.outline,
+                  onPressed: () {
+                    showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return const TermsAndConditions();
+                      },
+                    );
+                  },
+                  child: Text(
+                    'Skip',
+                    style: theme.textTheme.bodyLarge!.copyWith(
+                      color: colorScheme.onSurface.withOpacity(0.6),
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
                 ),
               ],
             ),
           ),
+
+          // Page View
+          Expanded(
+            child: PageView(
+              controller: _pageController,
+              onPageChanged: (int index) {
+                setState(() {
+                  _currentPage = index;
+                });
+              },
+              children: const [Page1(), Page2(), Page3(), Page4(), Page5()],
+            ),
+          ),
+
+          // Page Indicator
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 24),
+            child: SmoothPageIndicator(
+              controller: _pageController,
+              count: _totalPages,
+              effect: ExpandingDotsEffect(
+                dotWidth: 12,
+                dotHeight: 12,
+                spacing: 8,
+                activeDotColor: colorScheme.primary,
+                dotColor: colorScheme.outline.withOpacity(0.3),
+                expansionFactor: 3,
+              ),
+            ),
+          ),
+
+          // Navigation Buttons (only show if not on last page)
+          if (_currentPage < _totalPages - 1)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(24, 0, 24, 32),
+              child: Row(
+                children: [
+                  // Previous button
+                  if (_currentPage > 0)
+                    Expanded(
+                      child: OutlinedButton(
+                        onPressed: () {
+                          _pageController.previousPage(
+                            duration: const Duration(milliseconds: 300),
+                            curve: Curves.easeInOut,
+                          );
+                        },
+                        style: OutlinedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          side: BorderSide(
+                            color: colorScheme.outline.withOpacity(0.5),
+                          ),
+                        ),
+                        child: Text(
+                          'Previous',
+                          style: theme.textTheme.bodyLarge!.copyWith(
+                            color: colorScheme.onSurface,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ),
+                  if (_currentPage > 0) const SizedBox(width: 12),
+
+                  // Next button
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: _nextPage,
+                      style: ElevatedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        backgroundColor: colorScheme.primary,
+                        elevation: 0,
+                      ),
+                      child: Text(
+                        'Next',
+                        style: theme.textTheme.bodyLarge!.copyWith(
+                          color: colorScheme.onPrimary,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
         ],
       ),
     );
