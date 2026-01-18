@@ -7,6 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:threebotlogin/models/wallet.dart';
 import 'package:threebotlogin/helpers/logger.dart';
 import 'package:threebotlogin/providers/wallets_provider.dart';
+import 'package:threebotlogin/helpers/input_validator.dart';
 import 'package:threebotlogin/services/signing_service.dart';
 
 mixin SigningMixin<T extends ConsumerStatefulWidget> on ConsumerState<T> {
@@ -106,33 +107,15 @@ mixin SigningMixin<T extends ConsumerStatefulWidget> on ConsumerState<T> {
       return true;
     }
 
-    String url = destUrlController.text.trim();
-    try {
-      final uri = Uri.parse(url);
-      if (!uri.isScheme('http') && !uri.isScheme('https')) {
-        setState(() {
-          destUrlError = 'URL must start with http:// or https://';
-        });
-        return false;
-      }
-
-      if (!uri.hasAuthority) {
-        setState(() {
-          destUrlError = 'Invalid URL format';
-        });
-        return false;
-      }
-
-      setState(() {
-        destUrlError = null;
-      });
-      return true;
-    } catch (e) {
+    final uri = InputValidator.validateUrl(destUrlController.text);
+    if (uri == null) {
       setState(() {
         destUrlError = 'Invalid URL format';
       });
       return false;
     }
+
+    return true;
   }
 
   Future<void> checkWalletsListed() async {

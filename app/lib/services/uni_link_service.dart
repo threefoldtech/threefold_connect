@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -14,6 +13,7 @@ import 'package:threebotlogin/screens/login_screen.dart';
 import 'package:threebotlogin/screens/sign_screen.dart';
 import 'package:threebotlogin/services/shared_preference_service.dart';
 import 'package:threebotlogin/widgets/login_dialogs.dart';
+import 'package:threebotlogin/helpers/input_validator.dart';
 
 class UniLinkService {
   static void handleUniLink(UniLinkEvent e) async {
@@ -149,13 +149,21 @@ Future<void> handleSignUniLink(Uri link, BuildContext context) async {
 }
 
 Login queryParametersToLogin(Map<String, dynamic> map) {
+  Scope? scope;
+  if (map['scope'] != null && map['scope'] != 'null') {
+    final decodedScope = InputValidator.decodeJson(
+      map['scope'] as String,
+      maxLength: InputValidator.maxScopeLength,
+    );
+    if (decodedScope != null) {
+      scope = Scope.fromJson(decodedScope);
+    }
+  }
   return Login(
       state: map['state'],
       isMobile: true,
       randomRoom: map['randomRoom'],
-      scope: map['scope'] != null && map['scope'] != 'null'
-          ? Scope.fromJson(jsonDecode(map['scope'] as String))
-          : null,
+      scope: scope,
       appId: map['appId'],
       appPublicKey: map['appPublicKey'],
       redirectUrl: map['redirecturl']);
