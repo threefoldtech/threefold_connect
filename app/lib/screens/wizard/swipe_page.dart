@@ -62,7 +62,7 @@ class _SwipePagesState extends State<SwipePage> {
                   child: Text(
                     'Skip',
                     style: theme.textTheme.bodyLarge!.copyWith(
-                      color: colorScheme.onSurface.withOpacity(0.6),
+                      color: colorScheme.onSurface,
                       fontWeight: FontWeight.w500,
                     ),
                   ),
@@ -106,55 +106,52 @@ class _SwipePagesState extends State<SwipePage> {
             Padding(
               padding: const EdgeInsets.fromLTRB(24, 0, 24, 32),
               child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   // Previous button
                   if (_currentPage > 0)
-                    Expanded(
-                      child: OutlinedButton(
-                        onPressed: () {
-                          _pageController.previousPage(
-                            duration: const Duration(milliseconds: 300),
-                            curve: Curves.easeInOut,
-                          );
-                        },
-                        style: OutlinedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(vertical: 16),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          side: BorderSide(
-                            color: colorScheme.outline.withOpacity(0.5),
-                          ),
+                    OutlinedButton(
+                      onPressed: () {
+                        _pageController.previousPage(
+                          duration: const Duration(milliseconds: 300),
+                          curve: Curves.easeInOut,
+                        );
+                      },
+                      style: OutlinedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 12),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
                         ),
-                        child: Text(
-                          'Previous',
-                          style: theme.textTheme.bodyLarge!.copyWith(
-                            color: colorScheme.onSurface,
-                            fontWeight: FontWeight.w600,
-                          ),
+                        side: BorderSide(
+                          color: colorScheme.outline.withOpacity(0.5),
+                        ),
+                      ),
+                      child: Text(
+                        'Previous',
+                        style: theme.textTheme.bodyMedium!.copyWith(
+                          color: colorScheme.onSurface,
+                          fontWeight: FontWeight.w600,
                         ),
                       ),
                     ),
                   if (_currentPage > 0) const SizedBox(width: 12),
 
                   // Next button
-                  Expanded(
-                    child: ElevatedButton(
-                      onPressed: _nextPage,
-                      style: ElevatedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        backgroundColor: colorScheme.primary,
-                        elevation: 0,
+                  ElevatedButton(
+                    onPressed: _nextPage,
+                    style: ElevatedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 12),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
                       ),
-                      child: Text(
-                        'Next',
-                        style: theme.textTheme.bodyLarge!.copyWith(
-                          color: colorScheme.onPrimary,
-                          fontWeight: FontWeight.w600,
-                        ),
+                      backgroundColor: colorScheme.primary,
+                      elevation: 0,
+                    ),
+                    child: Text(
+                      'Next',
+                      style: theme.textTheme.bodyMedium!.copyWith(
+                        color: colorScheme.onPrimary,
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
                   ),

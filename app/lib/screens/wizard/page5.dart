@@ -187,8 +187,7 @@ class _Page5State extends State<Page5> with SingleTickerProviderStateMixin {
                 ],
               ),
               const SizedBox(height: 16),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
+              Center(
                 child: ElevatedButton(
                   onPressed: () async {
                     if (agreed) {
@@ -199,7 +198,7 @@ class _Page5State extends State<Page5> with SingleTickerProviderStateMixin {
                     setState(() {});
                   },
                   style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 12),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
