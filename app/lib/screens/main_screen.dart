@@ -52,6 +52,7 @@ class _AppState extends State<MainScreen> {
 
   @override
   void dispose() {
+    _sub?.cancel();
     super.dispose();
   }
 
@@ -174,11 +175,8 @@ class _AppState extends State<MainScreen> {
     _backendConnection = BackendConnection((await getDoubleName())!);
     _backendConnection.init();
 
+    _sub?.cancel();
     await initUniLinks();
-
-    if (_sub != null) {
-      _sub?.cancel();
-    }
 
     logger.i(mounted);
     Navigator.of(context).popUntil((route) => route.isFirst);
