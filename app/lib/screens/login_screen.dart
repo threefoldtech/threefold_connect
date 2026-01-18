@@ -77,6 +77,14 @@ class _LoginScreenState extends State<LoginScreen> with BlockAndRunMixin {
     });
   }
 
+  @override
+  void dispose() {
+    if (!isMobileCheck) {
+      timer.cancel();
+    }
+    super.dispose();
+  }
+
   timeoutTimer() async {
     if (!mounted) {
       timer.cancel();
