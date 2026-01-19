@@ -9,7 +9,6 @@ import 'package:threebotlogin/models/idenfy.dart';
 import 'package:threebotlogin/models/wallet.dart';
 import 'package:threebotlogin/providers/wallets_provider.dart';
 import 'package:threebotlogin/screens/wallets/wallet_details.dart';
-import 'package:threebotlogin/screens/wallets/wallet_info.dart';
 import 'package:threebotlogin/services/stellar_service.dart' as StellarService;
 import 'package:threebotlogin/services/tfchain_service.dart' as TFChainService;
 import 'package:threebotlogin/services/wallet_service.dart';
@@ -288,7 +287,7 @@ class _WalletCardWidgetState extends ConsumerState<WalletCardWidget> {
       if (mounted && context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Wallet deleted'),
+            content: const Text('Wallet deleted'),
             duration: const Duration(seconds: 2),
           ),
         );
