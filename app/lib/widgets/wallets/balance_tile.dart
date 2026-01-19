@@ -21,7 +21,7 @@ class WalletBalanceTileWidget extends StatelessWidget {
         side: BorderSide(
           color: Theme.of(context).colorScheme.primary,
         ),
-        borderRadius: BorderRadius.circular(5),
+        borderRadius: BorderRadius.circular(12),
       ),
       leading: SizedBox(
         width: 25,

@@ -208,7 +208,7 @@ class _SignWithLinkScreenState extends ConsumerState<SignWithLinkScreen>
                       hintText: 'Paste your link here...',
                       errorText: linkError,
                       border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
+                        borderRadius: BorderRadius.circular(12),
                       ),
                       suffixIcon: IconButton(
                         icon: const Icon(Icons.paste),
@@ -253,7 +253,7 @@ class _SignWithLinkScreenState extends ConsumerState<SignWithLinkScreen>
                       hintText: 'Processed data will appear here...',
                       errorText: dataError,
                       border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
+                        borderRadius: BorderRadius.circular(12),
                       ),
                       suffixIcon: _dataController.text.isNotEmpty
                           ? IconButton(
@@ -284,7 +284,7 @@ class _SignWithLinkScreenState extends ConsumerState<SignWithLinkScreen>
                     style: ElevatedButton.styleFrom(
                       padding: const EdgeInsets.all(16),
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
+                        borderRadius: BorderRadius.circular(12),
                       ),
                     ),
                     child: isLoading

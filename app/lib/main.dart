@@ -34,6 +34,10 @@ extension ColorSchemeExtension on ColorScheme {
       : const Color.fromARGB(255, 10, 10, 10);
 }
 
+Color _blendColors(Color base, Color tint, double ratio) {
+  return Color.lerp(base, tint, ratio) ?? base;
+}
+
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 final lastPausedProvider =
@@ -109,6 +113,15 @@ class MyApp extends ConsumerWidget {
       brightness: Brightness.light,
       seedColor: const Color.fromARGB(255, 26, 161, 143),
     );
+    
+    kColorScheme = kColorScheme.copyWith(
+      primaryContainer: _blendColors(
+        kColorScheme.surfaceContainer,
+        kColorScheme.primary,
+        0.08,
+      ),
+      onPrimaryContainer: kColorScheme.primary,
+    );
 
     var kDarkColorScheme = ColorScheme.fromSeed(
       brightness: Brightness.dark,
@@ -121,13 +134,17 @@ class MyApp extends ConsumerWidget {
     return AppLifecycleObserver(
       child: MaterialApp(
         navigatorKey: navigatorKey,
-        theme: ThemeData().copyWith(
+        theme: ThemeData(
+          useMaterial3: true,
+        ).copyWith(
           colorScheme: kColorScheme,
           brightness: Brightness.light,
+          scaffoldBackgroundColor: kColorScheme.surfaceContainerHighest,
           textTheme: textTheme,
           appBarTheme: const AppBarTheme().copyWith(
-            backgroundColor: kColorScheme.primary,
-            foregroundColor: kColorScheme.onPrimary,
+            backgroundColor: kColorScheme.surfaceContainerHighest,
+            foregroundColor: kColorScheme.onSurface,
+            elevation: 0,
           ),
           cardTheme: CardThemeData(
               color: kColorScheme.surfaceContainer,
@@ -135,26 +152,31 @@ class MyApp extends ConsumerWidget {
           elevatedButtonTheme: ElevatedButtonThemeData(
             style: ElevatedButton.styleFrom(
                 shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(5)),
-                backgroundColor: kColorScheme.primaryContainer),
+                    borderRadius: BorderRadius.circular(12)),
+                backgroundColor: kColorScheme.primaryContainer,
+                foregroundColor: kColorScheme.onPrimaryContainer),
           ),
           expansionTileTheme: const ExpansionTileThemeData().copyWith(
-              backgroundColor: kColorScheme.backgroundDarker,
-              collapsedBackgroundColor: ThemeData().colorScheme.surface),
+              backgroundColor: kColorScheme.surfaceContainerHighest,
+              collapsedBackgroundColor: kColorScheme.surfaceContainerHighest),
           bottomNavigationBarTheme:
               const BottomNavigationBarThemeData().copyWith(
+            backgroundColor: kColorScheme.surfaceContainerHighest,
             selectedItemColor: kColorScheme.primary,
             unselectedItemColor: kColorScheme.secondary,
+            elevation: 0,
           ),
         ),
         darkTheme: ThemeData(
           useMaterial3: true,
           colorScheme: kDarkColorScheme,
           brightness: Brightness.dark,
+          scaffoldBackgroundColor: kDarkColorScheme.surfaceContainerHighest,
           textTheme: textTheme,
           appBarTheme: const AppBarTheme().copyWith(
-            backgroundColor: kDarkColorScheme.primaryContainer,
-            foregroundColor: kDarkColorScheme.onPrimaryContainer,
+            backgroundColor: kDarkColorScheme.surfaceContainerHighest,
+            foregroundColor: kDarkColorScheme.onSurface,
+            elevation: 0,
           ),
           cardTheme: CardThemeData(
               color: kDarkColorScheme.surfaceContainer,
@@ -162,16 +184,19 @@ class MyApp extends ConsumerWidget {
           elevatedButtonTheme: ElevatedButtonThemeData(
             style: ElevatedButton.styleFrom(
                 shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(5)),
-                backgroundColor: kDarkColorScheme.primaryContainer),
+                    borderRadius: BorderRadius.circular(12)),
+                backgroundColor: kDarkColorScheme.primaryContainer,
+                foregroundColor: kDarkColorScheme.onPrimaryContainer),
           ),
           expansionTileTheme: const ExpansionTileThemeData().copyWith(
-              backgroundColor: kDarkColorScheme.backgroundDarker,
-              collapsedBackgroundColor: kDarkColorScheme.surface),
+              backgroundColor: kDarkColorScheme.surfaceContainerHighest,
+              collapsedBackgroundColor: kDarkColorScheme.surfaceContainerHighest),
           bottomNavigationBarTheme:
               const BottomNavigationBarThemeData().copyWith(
+            backgroundColor: kDarkColorScheme.surfaceContainerHighest,
             selectedItemColor: kDarkColorScheme.primary,
             unselectedItemColor: kDarkColorScheme.secondary,
+            elevation: 0,
           ),
         ),
         themeMode: themeMode,

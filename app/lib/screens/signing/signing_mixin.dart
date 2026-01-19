@@ -276,7 +276,7 @@ mixin SigningMixin<T extends ConsumerStatefulWidget> on ConsumerState<T> {
                   height: 56,
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(8),
+                    borderRadius: BorderRadius.circular(12),
                     border: Border.all(
                         color: Theme.of(context).colorScheme.outline),
                   ),
@@ -299,7 +299,7 @@ mixin SigningMixin<T extends ConsumerStatefulWidget> on ConsumerState<T> {
                       value: selectedWallet,
                       decoration: InputDecoration(
                         border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
+                          borderRadius: BorderRadius.circular(12),
                         ),
                         hintText: 'Select a wallet',
                         errorText: walletError,
@@ -351,7 +351,7 @@ mixin SigningMixin<T extends ConsumerStatefulWidget> on ConsumerState<T> {
               style: IconButton.styleFrom(
                 backgroundColor: Theme.of(context).colorScheme.surfaceVariant,
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(12),
                 ),
               ),
             ),
@@ -372,7 +372,7 @@ mixin SigningMixin<T extends ConsumerStatefulWidget> on ConsumerState<T> {
         errorText: destUrlError,
         hintText: 'https://example.com/api/signatures',
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(12),
         ),
       ),
       onChanged: (value) {
@@ -420,7 +420,7 @@ mixin SigningMixin<T extends ConsumerStatefulWidget> on ConsumerState<T> {
             border: Border.all(
               color: Theme.of(context).colorScheme.outline,
             ),
-            borderRadius: BorderRadius.circular(8),
+            borderRadius: BorderRadius.circular(12),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,

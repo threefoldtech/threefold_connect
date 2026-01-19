@@ -49,51 +49,112 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
     Widget mainWidget;
     if (loading) {
       mainWidget = Center(
-          child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          const CircularProgressIndicator(),
-          const SizedBox(height: 15),
-          Text(
-            'Loading Wallets...',
-            style: Theme.of(context).textTheme.bodyLarge!.copyWith(
-                color: Theme.of(context).colorScheme.onSurface,
-                fontWeight: FontWeight.bold),
-          ),
-        ],
-      ));
-    } else if (failed) {
-      mainWidget = Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const SizedBox(height: 15),
-            ElevatedButton.icon(
-              icon: const Icon(Icons.refresh),
-              label: const Text('Try Again'),
-              onPressed: () {
-                setState(() {
-                  walletRef.clear();
-                  failed = false;
-                  loading = true;
-                });
-                listMyWallets();
-              },
+            const CircularProgressIndicator(),
+            const SizedBox(height: 24),
+            Text(
+              'Loading Wallets...',
+              style: Theme.of(context).textTheme.bodyLarge!.copyWith(
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    fontWeight: FontWeight.w500,
+                  ),
             ),
           ],
         ),
       );
+    } else if (failed) {
+      mainWidget = Center(
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                Icons.error_outline,
+                size: 64,
+                color: Theme.of(context).colorScheme.error,
+              ),
+              const SizedBox(height: 16),
+              Text(
+                'Failed to load wallets',
+                style: Theme.of(context).textTheme.titleLarge!.copyWith(
+                      color: Theme.of(context).colorScheme.onSurface,
+                      fontWeight: FontWeight.w600,
+                    ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Please check your connection and try again',
+                textAlign: TextAlign.center,
+                style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    ),
+              ),
+              const SizedBox(height: 32),
+              ElevatedButton.icon(
+                icon: const Icon(Icons.refresh),
+                label: const Text('Try Again'),
+                onPressed: () {
+                  setState(() {
+                    walletRef.clear();
+                    failed = false;
+                    loading = true;
+                  });
+                  listMyWallets();
+                },
+              ),
+            ],
+          ),
+        ),
+      );
     } else {
-      mainWidget = RefreshIndicator(
-          onRefresh: handleRefresh,
-          child: ListView.builder(
-              itemCount: wallets.length,
-              itemBuilder: (context, i) {
-                final wallet = wallets[i];
-                return WalletCardWidget(
-                  wallet: wallet,
-                );
-              }));
+      mainWidget = wallets.isEmpty
+          ? Center(
+              child: Padding(
+                padding: const EdgeInsets.all(24),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.account_balance_wallet_outlined,
+                      size: 64,
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      'No wallets yet',
+                      style: Theme.of(context).textTheme.titleLarge!.copyWith(
+                            color: Theme.of(context).colorScheme.onSurface,
+                            fontWeight: FontWeight.w600,
+                          ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'Add your first wallet to get started',
+                      textAlign: TextAlign.center,
+                      style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                            color: Theme.of(context).colorScheme.onSurfaceVariant,
+                          ),
+                    ),
+                  ],
+                ),
+              ),
+            )
+          : RefreshIndicator(
+              onRefresh: handleRefresh,
+              child: ListView.builder(
+                padding: const EdgeInsets.symmetric(vertical: 8),
+                itemCount: wallets.length,
+                itemBuilder: (context, i) {
+                  final wallet = wallets[i];
+                  return WalletCardWidget(
+                    wallet: wallet,
+                  );
+                },
+              ),
+            );
     }
 
     return LayoutDrawer(

@@ -97,9 +97,18 @@ class _PreferenceScreenState extends ConsumerState<PreferenceScreen> {
     return LayoutDrawer(
       titleText: 'Settings',
       content: ListView(
+        padding: const EdgeInsets.symmetric(vertical: 8),
         children: <Widget>[
-          const ListTile(
-            title: Text('Global settings'),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 24, 16, 8),
+            child: Text(
+              'Global settings',
+              style: Theme.of(context).textTheme.titleSmall!.copyWith(
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    fontWeight: FontWeight.w600,
+                    letterSpacing: 0.5,
+                  ),
+            ),
           ),
           FutureBuilder(
               future: checkBiometrics(),
@@ -212,6 +221,18 @@ class _PreferenceScreenState extends ConsumerState<PreferenceScreen> {
               ),
             ),
           ),
+          const Divider(height: 1),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 24, 16, 8),
+            child: Text(
+              'About',
+              style: Theme.of(context).textTheme.titleSmall!.copyWith(
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    fontWeight: FontWeight.w600,
+                    letterSpacing: 0.5,
+                  ),
+            ),
+          ),
           ListTile(
             leading: const Icon(Icons.perm_device_information),
             title: Text('Version: $version - $buildNumber'),
@@ -223,6 +244,18 @@ class _PreferenceScreenState extends ConsumerState<PreferenceScreen> {
             leading: const Icon(Icons.info_outline),
             title: const Text('Terms and conditions'),
             onTap: () async => {await _showTermsAndConds()},
+          ),
+          const Divider(height: 1),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 24, 16, 8),
+            child: Text(
+              'Account',
+              style: Theme.of(context).textTheme.titleSmall!.copyWith(
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    fontWeight: FontWeight.w600,
+                    letterSpacing: 0.5,
+                  ),
+            ),
           ),
           ListTile(
             leading: const Icon(Icons.logout_outlined),

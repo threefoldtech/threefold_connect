@@ -18,14 +18,17 @@ class SelectChainWidget extends StatelessWidget {
       onPressed: onPressed,
       style: ElevatedButton.styleFrom(
           maximumSize: Size.fromWidth(width),
-          backgroundColor:
-              active ? colorScheme.primaryContainer : colorScheme.surface,
+          backgroundColor: active
+              ? colorScheme.primaryContainer
+              : colorScheme.surfaceContainerHighest,
+          elevation: 0,
           shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(5),
+              borderRadius: BorderRadius.circular(12),
               side: BorderSide(
                   color: active
-                      ? colorScheme.primaryContainer
-                      : colorScheme.secondaryContainer))),
+                      ? colorScheme.primary
+                      : colorScheme.outline.withOpacity(0.2),
+                  width: active ? 1.5 : 1))),
       child: Text(
         label,
         style: Theme.of(context).textTheme.titleMedium!.copyWith(

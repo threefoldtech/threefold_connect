@@ -91,9 +91,10 @@ class _PincodeWidgetState extends State<PincodeWidget> {
 
   @override
   Widget build(BuildContext context) {
-    final focusedBorderColor = Theme.of(context).colorScheme.primary;
-    final fillColor = Theme.of(context).colorScheme.secondaryContainer;
-    final borderColor = Theme.of(context).colorScheme.primaryContainer;
+    final colorScheme = Theme.of(context).colorScheme;
+    final focusedBorderColor = colorScheme.primary;
+    final fillColor = colorScheme.secondaryContainer;
+    final borderColor = colorScheme.outline.withOpacity(0.3);
 
     final defaultPinTheme = PinTheme(
       width: 56,
@@ -167,7 +168,7 @@ class _PincodeWidgetState extends State<PincodeWidget> {
                   ),
                   focusedPinTheme: defaultPinTheme.copyWith(
                     decoration: defaultPinTheme.decoration!.copyWith(
-                      borderRadius: BorderRadius.circular(8),
+                      borderRadius: BorderRadius.circular(12),
                       border: Border.all(color: focusedBorderColor),
                     ),
                   ),

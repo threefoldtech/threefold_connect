@@ -410,11 +410,15 @@ class _OverviewWidgetState extends ConsumerState<OverviewWidget> {
                       child: Column(
                         children: [
                           Card(
+                            margin: const EdgeInsets.symmetric(horizontal: 16),
                             shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(5),
+                              borderRadius: BorderRadius.circular(12),
                               side: BorderSide(
-                                  color: Theme.of(context).colorScheme.primary),
+                                color: Theme.of(context).colorScheme.outline.withOpacity(0.5),
+                                width: 1,
+                              ),
                             ),
+                            elevation: 0,
                             child: Padding(
                               padding: const EdgeInsets.all(16.0),
                               child: Column(
@@ -426,10 +430,10 @@ class _OverviewWidgetState extends ConsumerState<OverviewWidget> {
                                         .textTheme
                                         .titleLarge!
                                         .copyWith(
-                                            fontWeight: FontWeight.bold,
+                                            fontWeight: FontWeight.w600,
                                             color: Theme.of(context)
                                                 .colorScheme
-                                                .onSecondaryContainer),
+                                                .onSurface),
                                   ),
                                   Row(
                                     crossAxisAlignment:
@@ -471,13 +475,15 @@ class _OverviewWidgetState extends ConsumerState<OverviewWidget> {
                             SizedBox(
                               width: double.infinity,
                               child: Card(
+                                margin: const EdgeInsets.symmetric(horizontal: 16),
                                 shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(5),
+                                  borderRadius: BorderRadius.circular(12),
                                   side: BorderSide(
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .primary),
+                                    color: Theme.of(context).colorScheme.outline.withOpacity(0.5),
+                                    width: 1,
+                                  ),
                                 ),
+                                elevation: 0,
                                 child: Padding(
                                   padding: const EdgeInsets.all(16.0),
                                   child: Column(
@@ -490,10 +496,10 @@ class _OverviewWidgetState extends ConsumerState<OverviewWidget> {
                                             .textTheme
                                             .titleLarge!
                                             .copyWith(
-                                                fontWeight: FontWeight.bold,
+                                                fontWeight: FontWeight.w600,
                                                 color: Theme.of(context)
                                                     .colorScheme
-                                                    .onSecondaryContainer),
+                                                    .onSurface),
                                       ),
                                       Column(
                                         crossAxisAlignment:

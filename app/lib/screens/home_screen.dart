@@ -206,8 +206,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
   Widget build(BuildContext context) {
     ProviderScope.containerOf(context, listen: false)
         .read(walletsNotifier.notifier);
+    final colorScheme = Theme.of(context).colorScheme;
+    
     return Scaffold(
       resizeToAvoidBottomInset: false,
+      backgroundColor: colorScheme.surfaceContainerHighest,
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(0),
         child: AppBar(
