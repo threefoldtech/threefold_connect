@@ -91,6 +91,7 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
               itemBuilder: (context, i) {
                 final wallet = wallets[i];
                 return WalletCardWidget(
+                  key: ValueKey(wallet.name),
                   wallet: wallet,
                 );
               }));

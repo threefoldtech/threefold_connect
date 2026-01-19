@@ -7,8 +7,9 @@ import 'package:threebotlogin/screens/wallets/wallet_assets.dart';
 import 'package:threebotlogin/screens/wallets/wallet_info.dart';
 
 class WalletDetailsScreen extends ConsumerStatefulWidget {
-  const WalletDetailsScreen({super.key, required this.wallet});
+  const WalletDetailsScreen({super.key, required this.wallet, this.initialTabIndex = 0});
   final Wallet wallet;
+  final int initialTabIndex;
 
   @override
   ConsumerState<WalletDetailsScreen> createState() =>
@@ -16,7 +17,13 @@ class WalletDetailsScreen extends ConsumerStatefulWidget {
 }
 
 class _WalletDetailsScreenState extends ConsumerState<WalletDetailsScreen> {
-  int currentScreenIndex = 0;
+  late int currentScreenIndex;
+  
+  @override
+  void initState() {
+    super.initState();
+    currentScreenIndex = widget.initialTabIndex;
+  }
 
   void _selectScreen(int index) {
     setState(() {

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:threebotlogin/helpers/globals.dart';
 import 'package:threebotlogin/helpers/kyc_helpers.dart';
 import 'package:threebotlogin/helpers/logger.dart';
@@ -8,9 +9,11 @@ import 'package:threebotlogin/models/idenfy.dart';
 import 'package:threebotlogin/models/wallet.dart';
 import 'package:threebotlogin/providers/wallets_provider.dart';
 import 'package:threebotlogin/screens/wallets/wallet_details.dart';
+import 'package:threebotlogin/screens/wallets/wallet_info.dart';
 import 'package:threebotlogin/services/stellar_service.dart' as StellarService;
 import 'package:threebotlogin/services/tfchain_service.dart' as TFChainService;
 import 'package:threebotlogin/services/wallet_service.dart';
+import 'package:threebotlogin/widgets/wallets/warning_dialog.dart';
 
 class WalletCardWidget extends ConsumerStatefulWidget {
   const WalletCardWidget({super.key, required this.wallet});
@@ -164,7 +167,8 @@ class _WalletCardWidgetState extends ConsumerState<WalletCardWidget> {
           )
       ];
     }
-    return Card(
+
+    final card = Card(
       shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(5),
           side: BorderSide(color: Theme.of(context).colorScheme.primary)),
@@ -201,16 +205,16 @@ class _WalletCardWidgetState extends ConsumerState<WalletCardWidget> {
                         const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                     decoration: BoxDecoration(
                       border: Border.all(
-                        color: wallet!.verificationStatus ==
+                        color: (wallet?.verificationStatus ?? widget.wallet.verificationStatus) ==
                                 VerificationState.VERIFIED
                             ? Theme.of(context).colorScheme.primary
                             : Theme.of(context).colorScheme.error,
                       ),
                       borderRadius: BorderRadius.circular(20),
                     ),
-                    child: Text(capitalize(wallet.verificationStatus.name),
+                    child: Text(capitalize((wallet?.verificationStatus ?? widget.wallet.verificationStatus).name),
                         style: Theme.of(context).textTheme.bodySmall!.copyWith(
-                              color: wallet.verificationStatus ==
+                              color: (wallet?.verificationStatus ?? widget.wallet.verificationStatus) ==
                                       VerificationState.VERIFIED
                                   ? Theme.of(context).colorScheme.primary
                                   : Theme.of(context).colorScheme.error,
@@ -225,5 +229,96 @@ class _WalletCardWidgetState extends ConsumerState<WalletCardWidget> {
         ),
       ),
     );
+
+    final canDelete = widget.wallet.type == WalletType.IMPORTED;
+    final actions = <Widget>[];
+    
+    if (canDelete) {
+      actions.add(
+        SlidableAction(
+          onPressed: (_) => _showDeleteConfirmationDialog(),
+          backgroundColor: Theme.of(context).colorScheme.error,
+          foregroundColor: Theme.of(context).colorScheme.onError,
+          icon: Icons.delete,
+          label: 'Delete',
+        ),
+      );
+    }
+    
+    actions.add(
+      SlidableAction(
+        onPressed: (_) => _editWallet(),
+        backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+        foregroundColor: Theme.of(context).colorScheme.onPrimaryContainer,
+        icon: Icons.edit,
+        label: 'Edit',
+      ),
+    );
+
+    return Slidable(
+      key: ValueKey(widget.wallet.name),
+      endActionPane: ActionPane(
+        motion: const DrawerMotion(),
+        extentRatio: canDelete ? 0.3 : 0.2,
+        children: actions,
+      ),
+      child: card,
+    );
+  }
+
+  void _showDeleteConfirmationDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) => WarningDialogWidget(
+        title: 'Are you sure?',
+        description: 'If you confirm, your wallet will be removed from this device.',
+        onAgree: _deleteWallet,
+      ),
+    );
+  }
+
+  Future<bool> _deleteWallet() async {
+    if (context.mounted) {
+      Navigator.of(context).pop();
+    }
+    
+    try {
+      await deleteWallet(widget.wallet.name);
+      await ref.read(walletsNotifier.notifier).removeWallet(widget.wallet.name);
+      if (mounted && context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Wallet deleted'),
+            duration: const Duration(seconds: 2),
+          ),
+        );
+      }
+      return true;
+    } catch (e) {
+      logger.e('Failed to delete wallet due to $e');
+      if (mounted && context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              'Failed to delete',
+              style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                    color: Theme.of(context).colorScheme.errorContainer,
+                  ),
+            ),
+            duration: const Duration(seconds: 3),
+          ),
+        );
+      }
+      return false;
+    }
+  }
+
+  void _editWallet() {
+    Navigator.of(context).push(MaterialPageRoute(
+      builder: (context) => WalletDetailsScreen(
+        wallet: widget.wallet,
+        initialTabIndex: 2, // Navigate to Info tab
+      ),
+    ));
   }
 }
