@@ -23,7 +23,7 @@ jobs:
           cat > frontend/.env << EOF
           VITE_API_URL=https://login.threefold.me/
           VITE_OPENKYC_URL=https://openkyc.threefold.me/
-          VITE_DEEPLINK=threefold://
+          VITE_DEEPLINK=threebot://
           EOF
       - name: Build the Docker image
         run: docker build . --file Dockerfile --tag ghcr.io/${{ github.repository_owner }}/threefold-connect:production-${{ github.sha }}
