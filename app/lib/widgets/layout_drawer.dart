@@ -70,28 +70,40 @@ class _LayoutDrawerState extends State<LayoutDrawer> {
           actions: widget.appBarActions ?? [],
           title: Text(widget.titleText),
           toolbarHeight: 60,
+          elevation: 0,
         ),
         body: widget.content,
         drawer: Drawer(
-          elevation: 5,
+          elevation: 0,
           width: MediaQuery.of(context).size.width * 2 / 3,
+          shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.only(
+              topRight: Radius.circular(0),
+              bottomRight: Radius.circular(0),
+            ),
+          ),
           // space to fit everything.
           child: Column(
             children: [
-              SizedBox(
-                height: 70,
-                child: DrawerHeader(
-                  decoration: BoxDecoration(
-                    border: Border(
-                      bottom: BorderSide(
-                          color: Theme.of(context).colorScheme.primary),
-                    ),
+              DrawerHeader(
+                padding: EdgeInsets.zero,
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.surfaceContainerHighest,
+                  border: Border(
+                    bottom: BorderSide(
+                        color: Theme.of(context).colorScheme.outline.withOpacity(0.2),
+                        width: 1),
                   ),
-                  child: SvgPicture.asset(
-                    'assets/TF_log_horizontal.svg',
-                    colorFilter: ColorFilter.mode(
-                        Theme.of(context).colorScheme.onSurface,
-                        BlendMode.srcIn),
+                ),
+                child: Center(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: SvgPicture.asset(
+                      'assets/TF_log_horizontal.svg',
+                      colorFilter: ColorFilter.mode(
+                          Theme.of(context).colorScheme.onSurface,
+                          BlendMode.srcIn),
+                    ),
                   ),
                 ),
               ),
@@ -232,6 +244,8 @@ class _LayoutDrawerState extends State<LayoutDrawer> {
           unselectedFontSize: 12,
           currentIndex: currentScreenIndex,
           type: BottomNavigationBarType.fixed,
+          backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest,
+          elevation: 0,
           items: const [
             BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
             BottomNavigationBarItem(

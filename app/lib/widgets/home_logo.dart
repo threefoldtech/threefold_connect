@@ -7,65 +7,71 @@ class HomeLogoWidget extends StatelessWidget {
   const HomeLogoWidget({super.key, required this.animate});
 
   @override
-Widget build(BuildContext context) {
-  return Column(
-    mainAxisAlignment: MainAxisAlignment.center,
-    crossAxisAlignment: CrossAxisAlignment.center,
-    children: [
-      Center(
-        child: animate
-            ? Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  SizedBox(
-                    width: 45,
-                    height: 45,
-                    child: Lottie.asset(
-                      'assets/tfloading.json',
-                      repeat: true,
-                      animate: true,
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+    final screenWidth = MediaQuery.of(context).size.width;
+
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        Center(
+          child: animate
+              ? Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    SizedBox(
+                      width: 40,
+                      height: 40,
+                      child: Lottie.asset(
+                        'assets/tfloading.json',
+                        repeat: true,
+                        animate: true,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'THREEFOLD',
+                      style: textTheme.titleLarge!.copyWith(
+                        color: colorScheme.onSurface,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                )
+              : SizedBox(
+                  height: 50,
+                  child: SvgPicture.asset(
+                    'assets/TF_logo.svg',
+                    alignment: Alignment.center,
+                    colorFilter: ColorFilter.mode(
+                      colorScheme.onSurface,
+                      BlendMode.srcIn,
                     ),
                   ),
-                  const SizedBox(height: 10),
-                  Text(
-                    'THREEFOLD',
-                    style: Theme.of(context).textTheme.headlineLarge!.copyWith(
-                          color: Theme.of(context).colorScheme.onSurface,
-                          fontWeight: FontWeight.bold,
-                        ),
-                  ),
-                ],
-              )
-            : SizedBox(
-                height: 90,
-                child: SvgPicture.asset(
-                  'assets/TF_logo.svg',
-                  alignment: Alignment.center,
-                  colorFilter: ColorFilter.mode(
-                    Theme.of(context).colorScheme.onSurface,
-                    BlendMode.srcIn,
-                  ),
                 ),
-              ),
-      ),
-      SizedBox(
-        height: MediaQuery.of(context).size.height * 0.04,
-        width: MediaQuery.of(context).size.width * 0.6,
-        child: Divider(
-          thickness: 2,
-          color: Theme.of(context).colorScheme.primary,
         ),
-      ),
-      Text(
-        'CONNECT',
-        style: Theme.of(context).textTheme.titleLarge!.copyWith(
-              color: Theme.of(context).colorScheme.onSurface,
-              letterSpacing: 10,
-              fontWeight: FontWeight.bold,
-            ),
-      ),
-    ],
-  );
-}
-
+        const SizedBox(height: 6),
+        SizedBox(
+          height: 1.5,
+          width: screenWidth * 0.45,
+          child: Divider(
+            thickness: 1.5,
+            color: colorScheme.primary,
+          ),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          'CONNECT',
+          style: textTheme.bodyLarge!.copyWith(
+            color: colorScheme.onSurface,
+            letterSpacing: 4,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ],
+    );
+  }
 }

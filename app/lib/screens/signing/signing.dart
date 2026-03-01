@@ -23,7 +23,7 @@ class _SigningState extends State<Signing> {
         style: ElevatedButton.styleFrom(
           minimumSize: const Size.fromHeight(60),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8),
+            borderRadius: BorderRadius.circular(12),
           ),
           backgroundColor: Theme.of(context).colorScheme.primaryContainer,
         ),

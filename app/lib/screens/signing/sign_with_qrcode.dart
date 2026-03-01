@@ -197,7 +197,7 @@ class _SignWithQRCodeScreenState extends ConsumerState<SignWithQRCodeScreen>
                       hintText: 'Scan a QR code to see the data here...',
                       errorText: scannedDataError,
                       border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
+                        borderRadius: BorderRadius.circular(12),
                       ),
                       suffixIcon: textController.text.isNotEmpty
                           ? IconButton(
@@ -228,7 +228,7 @@ class _SignWithQRCodeScreenState extends ConsumerState<SignWithQRCodeScreen>
                     style: ElevatedButton.styleFrom(
                       padding: const EdgeInsets.all(16),
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
+                        borderRadius: BorderRadius.circular(12),
                       ),
                     ),
                     child: isLoading

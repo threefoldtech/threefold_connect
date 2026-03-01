@@ -73,7 +73,7 @@ class _SignWithTextScreenState extends ConsumerState<SignWithTextScreen>
                       errorText: textError,
                       enabled: !isLoadingWallets,
                       border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
+                        borderRadius: BorderRadius.circular(12),
                       ),
                     ),
                   ),
@@ -89,7 +89,7 @@ class _SignWithTextScreenState extends ConsumerState<SignWithTextScreen>
                     style: ElevatedButton.styleFrom(
                       padding: const EdgeInsets.all(16),
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
+                        borderRadius: BorderRadius.circular(12),
                       ),
                     ),
                     child: isLoading

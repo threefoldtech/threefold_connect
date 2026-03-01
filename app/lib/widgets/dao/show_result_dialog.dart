@@ -132,7 +132,7 @@ class _ShowResultDialogState extends State<ShowResultDialog>
                     color: Theme.of(context).colorScheme.primaryContainer,
                     backgroundColor:
                         Theme.of(context).colorScheme.surfaceContainerHigh,
-                    borderRadius: const BorderRadius.all(Radius.circular(5)),
+                    borderRadius: const BorderRadius.all(Radius.circular(12)),
                   );
                 },
               ),

@@ -165,9 +165,15 @@ class _WalletCardWidgetState extends ConsumerState<WalletCardWidget> {
       ];
     }
     return Card(
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(5),
-          side: BorderSide(color: Theme.of(context).colorScheme.primary)),
+        borderRadius: BorderRadius.circular(12),
+        side: BorderSide(
+          color: Theme.of(context).colorScheme.outline.withOpacity(0.5),
+          width: 1,
+        ),
+      ),
+      elevation: 0,
       child: InkWell(
         onTap: () {
           if (widget.wallet.type == WalletType.NATIVE &&
@@ -180,6 +186,7 @@ class _WalletCardWidgetState extends ConsumerState<WalletCardWidget> {
             ),
           ));
         },
+        borderRadius: BorderRadius.circular(12),
         child: Padding(
           padding: const EdgeInsets.all(16),
           child: Column(
@@ -187,38 +194,43 @@ class _WalletCardWidgetState extends ConsumerState<WalletCardWidget> {
             children: [
               Row(
                 children: [
-                  Text(
-                    widget.wallet.name,
-                    style: Theme.of(context).textTheme.titleLarge!.copyWith(
-                          color: Theme.of(context)
-                              .colorScheme
-                              .onSecondaryContainer,
-                        ),
+                  Expanded(
+                    child: Text(
+                      widget.wallet.name,
+                      style: Theme.of(context).textTheme.titleLarge!.copyWith(
+                            color: Theme.of(context).colorScheme.onSurface,
+                            fontWeight: FontWeight.w600,
+                          ),
+                    ),
                   ),
-                  const Spacer(),
                   Container(
                     padding:
                         const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                     decoration: BoxDecoration(
-                      border: Border.all(
-                        color: wallet!.verificationStatus ==
-                                VerificationState.VERIFIED
-                            ? Theme.of(context).colorScheme.primary
-                            : Theme.of(context).colorScheme.error,
-                      ),
-                      borderRadius: BorderRadius.circular(20),
+                      color: wallet!.verificationStatus ==
+                              VerificationState.VERIFIED
+                          ? Theme.of(context).colorScheme.primaryContainer
+                          : Theme.of(context).colorScheme.errorContainer,
+                      borderRadius: BorderRadius.circular(16),
                     ),
-                    child: Text(capitalize(wallet.verificationStatus.name),
-                        style: Theme.of(context).textTheme.bodySmall!.copyWith(
-                              color: wallet.verificationStatus ==
-                                      VerificationState.VERIFIED
-                                  ? Theme.of(context).colorScheme.primary
-                                  : Theme.of(context).colorScheme.error,
-                            )),
+                    child: Text(
+                      capitalize(wallet.verificationStatus.name),
+                      style: Theme.of(context).textTheme.bodySmall!.copyWith(
+                            color: wallet.verificationStatus ==
+                                    VerificationState.VERIFIED
+                                ? Theme.of(context)
+                                    .colorScheme
+                                    .onPrimaryContainer
+                                : Theme.of(context).colorScheme.onErrorContainer,
+                            fontWeight: FontWeight.w600,
+                          ),
+                    ),
                   ),
                 ],
               ),
-              const SizedBox(height: 10),
+              const SizedBox(height: 16),
+              const Divider(height: 1),
+              const SizedBox(height: 16),
               ...cardContent,
             ],
           ),

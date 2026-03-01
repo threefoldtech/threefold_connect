@@ -17,44 +17,46 @@ class HomeCardWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Globals globals = Globals();
-    final size = MediaQuery.of(context).size.width;
-    const double margin = 3;
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+    final screenWidth = MediaQuery.of(context).size.width;
+    final cardWidth = fullWidth ? double.infinity : (screenWidth - 32 - 8) / 2;
+
     return Card(
-      color: Theme.of(context).colorScheme.primaryContainer,
-      margin: const EdgeInsets.all(margin),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
-      clipBehavior: Clip.hardEdge,
-      elevation: 2,
+      margin: EdgeInsets.zero,
+      elevation: 0,
+      color: colorScheme.surface,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+        side: BorderSide(
+          color: colorScheme.outline.withOpacity(0.2),
+          width: 1,
+        ),
+      ),
       child: InkWell(
-        onTap: () {
-          globals.tabController.animateTo(pageNumber);
-        },
-        child: Column(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(10),
-              height: size / 7,
-              width: fullWidth ? size * 2 / 2.5 + 2 * margin : size / 2.5,
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    icon,
-                    color: Theme.of(context).colorScheme.onPrimaryContainer,
-                  ),
-                  const SizedBox(width: 7),
-                  Text(
-                    name,
-                    style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                        color: Theme.of(context).colorScheme.onPrimaryContainer,
-                        fontWeight: FontWeight.bold),
-                  )
-                ],
+        onTap: () => Globals().tabController.animateTo(pageNumber),
+        borderRadius: BorderRadius.circular(12),
+        child: Container(
+          width: cardWidth,
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(icon, size: 22, color: colorScheme.primary),
+              const SizedBox(height: 6),
+              Text(
+                name,
+                textAlign: TextAlign.center,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: textTheme.bodySmall!.copyWith(
+                  color: colorScheme.onSurface,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
-            )
-          ],
+            ],
+          ),
         ),
       ),
     );
