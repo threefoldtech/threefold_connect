@@ -110,7 +110,7 @@ class _RegisteredScreenState extends State<RegisteredScreen>
                     HomeCardWidget(
                         name: 'Sign', icon: Icons.draw_sharp, pageNumber: 9),
                     HomeCardWidget(
-                        name: 'News', icon: Icons.article, pageNumber: 1),
+                        name: 'Identity', icon: Icons.person, pageNumber: 5),
                   ],
                 ),
                 const Row(
@@ -118,13 +118,7 @@ class _RegisteredScreenState extends State<RegisteredScreen>
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     HomeCardWidget(
-                        name: 'Identity', icon: Icons.person, pageNumber: 5),
-                    HomeCardWidget(
                         name: 'Settings', icon: Icons.settings, pageNumber: 7),
-                    // HomeCardWidget(
-                    //     name: 'Notifications',
-                    //     icon: Icons.notifications,
-                    //     pageNumber: 9),
                   ],
                 ),
                 const SizedBox(height: 40),
