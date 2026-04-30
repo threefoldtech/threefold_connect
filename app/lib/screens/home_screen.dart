@@ -43,12 +43,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
   bool timeoutExpiredInBackground = true;
   bool pinCheckOpen = false;
   late AppLinks _appLinks;
+  TabController? _ownedTabController;
 
   @override
   void dispose() {
     _sub?.cancel();
-    globals.tabController.removeListener(_handleTabSelection);
-    globals.tabController.dispose();
+    _ownedTabController?.removeListener(_handleTabSelection);
+    if (identical(globals.tabController, _ownedTabController)) {
+      _ownedTabController?.dispose();
+    }
     super.dispose();
   }
 
@@ -118,8 +121,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     super.initState();
     initUniLinks();
 
-    globals.tabController = TabController(
+    _ownedTabController = TabController(
         initialIndex: 0, length: Globals().router.routes.length, vsync: this);
+    globals.tabController = _ownedTabController!;
     globals.tabController.addListener(_handleTabSelection);
 
     Events().onEvent(GoHomeEvent().runtimeType, close);
@@ -192,7 +196,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     if (initialLink != null) {
       Events().emit(UniLinkEvent(Uri.parse(initialLink!), context));
     }
-    
+
     _appLinks = AppLinks();
     _sub = _appLinks.uriLinkStream.listen((Uri? uri) {
       if (!mounted || uri == null) {
