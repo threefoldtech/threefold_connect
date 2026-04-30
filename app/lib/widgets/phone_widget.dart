@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl_mobile_field/countries.dart';
 import 'package:intl_mobile_field/intl_mobile_field.dart';
+import 'package:intl_mobile_field/mobile_number.dart';
 import 'package:threebotlogin/services/phone_service.dart';
 
 import 'custom_dialog.dart';
@@ -15,10 +16,11 @@ Future<void> addPhoneNumberDialog(context,
     context: context,
     barrierDismissible: false,
     builder: (BuildContext context) => PhoneAlertDialog(
-        defaultCountryCode: countryCode,
-        newPhone: newPhone,
-        oldPhone: oldPhone,
-        onVerify: onVerify,),
+      defaultCountryCode: countryCode,
+      newPhone: newPhone,
+      oldPhone: oldPhone,
+      onVerify: onVerify,
+    ),
   );
 }
 
@@ -62,13 +64,19 @@ class PhoneAlertDialog extends StatefulWidget {
 }
 
 class PhoneAlertDialogState extends State<PhoneAlertDialog> {
-  bool valid = false;
   String verificationPhoneNumber = '';
   Country _country = countries.firstWhere((element) => element.code == 'US');
 
+  bool get _isValid => verificationPhoneNumber.isNotEmpty;
+
+  bool _isValidPhone(MobileNumber? phone) =>
+      phone != null &&
+      phone.completeNumber != widget.oldPhone &&
+      phone.number.length >= _country.minLength &&
+      phone.number.length <= _country.maxLength;
+
   @override
   void initState() {
-    valid = false;
     verificationPhoneNumber = '';
     _country = countries
         .firstWhere((element) => element.code == widget.defaultCountryCode);
@@ -112,25 +120,24 @@ class PhoneAlertDialogState extends State<PhoneAlertDialog> {
                   .bodyMedium!
                   .copyWith(color: Theme.of(context).colorScheme.onSurface),
               validator: (phone) {
-                final isValid = phone != null &&
-                    phone.completeNumber != widget.oldPhone &&
-                    phone.number.length >= _country.minLength &&
-                    phone.number.length <= _country.maxLength;
-
-                setState(() => valid = isValid);
-                verificationPhoneNumber = isValid ? phone.completeNumber : '';
-
-                return isValid
-                    ? null
-                    : (phone!.completeNumber == widget.oldPhone
-                        ? 'Please enter a different number'
-                        : 'Invalid Mobile Number');
+                if (phone?.completeNumber == widget.oldPhone) {
+                  return 'Please enter a different number';
+                }
+                return _isValidPhone(phone) ? null : 'Invalid Mobile Number';
+              },
+              onChanged: (phone) {
+                final newNumber =
+                    _isValidPhone(phone) ? phone.completeNumber : '';
+                if (newNumber != verificationPhoneNumber) {
+                  setState(() => verificationPhoneNumber = newNumber);
+                }
               },
               disableLengthCheck: true,
               onCountryChanged: (country) {
-                if (_country != country) valid = false;
-                _country = country;
-                setState(() {});
+                setState(() {
+                  _country = country;
+                  verificationPhoneNumber = '';
+                });
               },
             ),
           ),
@@ -141,10 +148,10 @@ class PhoneAlertDialogState extends State<PhoneAlertDialog> {
           child: const Text('Cancel'),
           onPressed: () => Navigator.pop(context),
         ),
-        if (valid)
+        if (_isValid)
           TextButton(
-            onPressed: () async{
-              await widget.onVerify(valid, verificationPhoneNumber);
+            onPressed: () async {
+              await widget.onVerify(_isValid, verificationPhoneNumber);
               Navigator.pop(context);
             },
             child: Text(widget.newPhone ? 'Add' : 'Update'),
