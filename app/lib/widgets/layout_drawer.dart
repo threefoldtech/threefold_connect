@@ -168,17 +168,6 @@ class _LayoutDrawerState extends State<LayoutDrawer> {
                 minLeadingWidth: 10,
                 leading: const Padding(
                     padding: EdgeInsets.only(left: 10),
-                    child: Icon(Icons.article, size: 18)),
-                title: const Text('News'),
-                onTap: () {
-                  Navigator.pop(context);
-                  globals.tabController.animateTo(1);
-                },
-              ),
-              ListTile(
-                minLeadingWidth: 10,
-                leading: const Padding(
-                    padding: EdgeInsets.only(left: 10),
                     child: Icon(Icons.person, size: 18)),
                 title: const Text('Identity'),
                 onTap: () {
