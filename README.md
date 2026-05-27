@@ -12,3 +12,8 @@ Threefold Connect is a mobile app that serves as your main gateway to the Threef
 - check [backend/README.md](backend/README.md)
 - check [app/README.md](app/README.md)
 
+
+## License
+
+This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENSE) file for details.
+Copyright (c) TFTech NV.
