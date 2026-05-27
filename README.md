@@ -1,10 +1,10 @@
-# ThreeFold Connect
+# Grid Connect
 
-ThreeFold Connect is a mobile and web application providing user identity, digital wallet, and grid interaction capabilities.
+Grid Connect is a mobile and web application providing user identity, digital wallet, and grid interaction capabilities.
 
 ## What this is
 
-ThreeFold Connect serves as an end-user interface for identity verification, token management, and workload deployment. It integrates with authentication and billing systems to provide a unified experience for users interacting with decentralized infrastructure.
+Grid Connect serves as an end-user interface for identity verification, token management, and workload deployment. It integrates with authentication and billing systems to provide a unified experience for users interacting with decentralized infrastructure.
 
 The application includes:
 - **Identity management** — user registration, verification, and secure identity handling
@@ -17,14 +17,14 @@ The application includes:
 - `app/` — Flutter mobile application (iOS, Android, macOS)
 - `frontend/` — Web frontend components
 - `backend/` — Python backend services with database models, API endpoints, and key management
-- `threefoldloginexample/` — Example integration for ThreeFold login
+- `threefoldloginexample/` — Example integration for Grid Connect login
 - `nginx.conf` — Reverse proxy configuration
 - `helm_files/` — Kubernetes deployment manifests
 - `Dockerfile` — Container build definition
 
 ## Role in the stack
 
-ThreeFold Connect sits at the user-facing layer of the stack. It communicates with backend services for identity and wallet operations, and with grid orchestration services for workload management. It relies on authentication services for secure user sessions and on blockchain integrations for token operations.
+Grid Connect sits at the user-facing layer of the stack. It communicates with backend services for identity and wallet operations, and with grid orchestration services for workload management. It relies on authentication services for secure user sessions and on blockchain integrations for token operations.
 
 ## Relation to ThreeFold
 
