@@ -55,21 +55,46 @@ class _LockedTokensCardState extends State<LockedTokensCard> {
     final unlockable =
         _lockedTokens.where((t) => t.canBeUnlocked).toList();
     try {
-      final unlocked =
-          await LockedTokens.unlockTokens(unlockable, widget.wallet.stellarSecret);
+      final results = await LockedTokens.unlockTokens(
+          unlockable, widget.wallet.stellarSecret);
       if (!mounted) return;
-      if (unlocked.isEmpty) {
+
+      final unlockedCount = results
+          .where((r) => r.outcome == LockedTokens.UnlockOutcome.unlocked)
+          .length;
+      final transferFailed = results.any((r) =>
+          r.outcome == LockedTokens.UnlockOutcome.unlockedButTransferFailed);
+      final failed = results
+          .any((r) => r.outcome == LockedTokens.UnlockOutcome.failed);
+
+      if (transferFailed) {
+        // The escrow was unlocked on-chain but the funds were not transferred;
+        // a retry will claim them, so steer the user to try again rather than
+        // reporting an outright failure.
         _showDialog(
           DialogType.Warning,
-          'Nothing unlocked',
-          'The tokens could not be unlocked yet. Please try again later.',
+          'Almost there',
+          'Your tokens were unlocked but could not be transferred to your '
+              'wallet yet. Please try again to claim them.',
         );
-      } else {
+      } else if (unlockedCount > 0) {
         _showDialog(
           DialogType.Info,
           'Tokens unlocked',
           'Your tokens have been unlocked and transferred to your wallet. '
               'Your balance will update shortly.',
+        );
+      } else if (failed) {
+        _showDialog(
+          DialogType.Error,
+          'Failed to unlock',
+          'Something went wrong while unlocking your tokens. Please try again.',
+        );
+      } else {
+        _showDialog(
+          DialogType.Warning,
+          'Nothing unlocked',
+          'The tokens could not be unlocked yet. Please try again later.',
         );
       }
     } catch (e) {
@@ -109,8 +134,10 @@ class _LockedTokensCardState extends State<LockedTokensCard> {
 
   @override
   Widget build(BuildContext context) {
-    // Hide the section entirely when there is nothing locked.
-    if (!_loading && _lockedTokens.isEmpty) {
+    // Render nothing until tokens are loaded, and stay hidden for the common
+    // "no locked tokens" case. This avoids flashing the Divider + 'Locked'
+    // header + spinner on every wallet open before collapsing again.
+    if (_loading || _lockedTokens.isEmpty) {
       return const SizedBox.shrink();
     }
 
@@ -126,19 +153,7 @@ class _LockedTokensCardState extends State<LockedTokensCard> {
               fontWeight: FontWeight.bold),
         ),
         const SizedBox(height: 20),
-        if (_loading)
-          const Center(
-            child: Padding(
-              padding: EdgeInsets.all(20),
-              child: SizedBox(
-                width: 24,
-                height: 24,
-                child: CircularProgressIndicator(strokeWidth: 2),
-              ),
-            ),
-          )
-        else ...[
-          ListTile(
+        ListTile(
             shape: RoundedRectangleBorder(
               side: BorderSide(color: Theme.of(context).colorScheme.primary),
               borderRadius: BorderRadius.circular(5),
@@ -186,7 +201,6 @@ class _LockedTokensCardState extends State<LockedTokensCard> {
                     ),
             ),
           ),
-        ],
       ],
     );
   }
