@@ -45,15 +45,13 @@ class _LockedTokensCardState extends State<LockedTokensCard> {
     }
   }
 
-  double get _totalLocked =>
-      _lockedTokens.fold(0, (sum, t) => sum + t.amount);
+  double get _totalLocked => _lockedTokens.fold(0, (sum, t) => sum + t.amount);
 
   bool get _hasUnlockable => _lockedTokens.any((t) => t.canBeUnlocked);
 
   Future<void> _unlock() async {
     setState(() => _unlocking = true);
-    final unlockable =
-        _lockedTokens.where((t) => t.canBeUnlocked).toList();
+    final unlockable = _lockedTokens.where((t) => t.canBeUnlocked).toList();
     try {
       final results = await LockedTokens.unlockTokens(
           unlockable, widget.wallet.stellarSecret);
@@ -64,8 +62,8 @@ class _LockedTokensCardState extends State<LockedTokensCard> {
           .length;
       final transferFailed = results.any((r) =>
           r.outcome == LockedTokens.UnlockOutcome.unlockedButTransferFailed);
-      final failed = results
-          .any((r) => r.outcome == LockedTokens.UnlockOutcome.failed);
+      final failed =
+          results.any((r) => r.outcome == LockedTokens.UnlockOutcome.failed);
 
       if (transferFailed) {
         // The escrow was unlocked on-chain but the funds were not transferred;
@@ -134,10 +132,9 @@ class _LockedTokensCardState extends State<LockedTokensCard> {
 
   @override
   Widget build(BuildContext context) {
-    // Render nothing until tokens are loaded, and stay hidden for the common
-    // "no locked tokens" case. This avoids flashing the Divider + 'Locked'
-    // header + spinner on every wallet open before collapsing again.
-    if (_loading || _lockedTokens.isEmpty) {
+    // Hide entirely once we know there are no locked tokens. While the lookup
+    // is in flight, show the header with a spinner so it isn't silent.
+    if (!_loading && _lockedTokens.isEmpty) {
       return const SizedBox.shrink();
     }
 
@@ -153,7 +150,19 @@ class _LockedTokensCardState extends State<LockedTokensCard> {
               fontWeight: FontWeight.bold),
         ),
         const SizedBox(height: 20),
-        ListTile(
+        if (_loading)
+          const Center(
+            child: Padding(
+              padding: EdgeInsets.symmetric(vertical: 10),
+              child: SizedBox(
+                width: 24,
+                height: 24,
+                child: CircularProgressIndicator(strokeWidth: 2),
+              ),
+            ),
+          )
+        else ...[
+          ListTile(
             shape: RoundedRectangleBorder(
               side: BorderSide(color: Theme.of(context).colorScheme.primary),
               borderRadius: BorderRadius.circular(5),
@@ -201,6 +210,7 @@ class _LockedTokensCardState extends State<LockedTokensCard> {
                     ),
             ),
           ),
+        ],
       ],
     );
   }
