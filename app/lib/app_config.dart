@@ -228,4 +228,5 @@ void setFallbackConfigs() {
   Globals().newsUrl = '';
   Globals().idenfyServiceUrl = '';
   Globals().council = false;
+  Globals().showLockedTokens = false;
 }

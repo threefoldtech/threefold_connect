@@ -12,6 +12,7 @@ import 'package:threebotlogin/services/stellar_service.dart' as Stellar;
 import 'package:threebotlogin/widgets/wallets/activate_wallet.dart';
 import 'package:threebotlogin/widgets/wallets/arrow_inward.dart';
 import 'package:threebotlogin/widgets/wallets/balance_tile.dart';
+import 'package:threebotlogin/widgets/wallets/locked_tokens_card.dart';
 
 class WalletAssetsWidget extends StatefulWidget {
   const WalletAssetsWidget({super.key, required this.wallet});
@@ -231,7 +232,8 @@ class _WalletAssetsWidgetState extends State<WalletAssetsWidget> {
               loading: false,
               onActivate: _openActivateStellarOverlay,
             ),
-          ...vestWidgets
+          ...vestWidgets,
+          if (Globals().showLockedTokens) LockedTokensCard(wallet: widget.wallet),
         ],
       ),
     );

@@ -63,6 +63,7 @@ class Globals {
   String newsUrl = '';
   String idenfyServiceUrl = '';
   bool council = false;
+  bool showLockedTokens = false;
   String registrarURL = '';
   bool isCacheClearedWallet = false;
   bool isCacheClearedFarmer = false;

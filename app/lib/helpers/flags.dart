@@ -93,6 +93,8 @@ class Flags {
             .toString();
     Globals().council =
         await Flags().hasFlagValueByFeatureName('council-member');
+    Globals().showLockedTokens =
+        await Flags().hasFlagValueByFeatureName('locked-tokens');
     Globals().registrarURL =
         (await Flags().getFlagValueByFeatureName('registrar-url')).toString();
 
