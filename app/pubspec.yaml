@@ -18,17 +18,17 @@ dependencies:
       ref: master
   tfchain_client:
     git:
-      url: https://github.com/threefoldtech/tfgrid-sdk-dart
+      url: https://github.com/threefoldtech/zos_sdk_dart
       ref: development
       path: packages/tfchain_client
   stellar_client:
     git:
-      url: https://github.com/threefoldtech/tfgrid-sdk-dart
+      url: https://github.com/threefoldtech/zos_sdk_dart
       ref: development
       path: packages/stellar_client
   gridproxy_client:
     git:
-      url: https://github.com/threefoldtech/tfgrid-sdk-dart
+      url: https://github.com/threefoldtech/zos_sdk_dart
       ref: development
       path: packages/gridproxy_client
   registrar_client:
@@ -97,7 +97,7 @@ dependency_overrides:
   intl: ^0.19.0
   signer:
     git:
-      url: https://github.com/threefoldtech/tfgrid-sdk-dart.git
+      url: https://github.com/threefoldtech/zos_sdk_dart.git
       path: packages/signer
       ref: development
 
