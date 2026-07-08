@@ -1,10 +1,7 @@
 import 'dart:async';
-import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 import 'package:flutter_json_viewer/flutter_json_viewer.dart';
-import 'package:http/http.dart' as http;
-import 'package:http/http.dart';
 
 import 'package:threebotlogin/events/events.dart';
 import 'package:flutter/material.dart';
@@ -19,6 +16,7 @@ import 'package:threebotlogin/services/crypto_service.dart';
 import 'package:threebotlogin/services/shared_preference_service.dart';
 import 'package:threebotlogin/services/tools_service.dart';
 import 'package:threebotlogin/widgets/custom_dialog.dart';
+import 'package:threebotlogin/helpers/input_validator.dart';
 
 class SignScreen extends StatefulWidget {
   const SignScreen(this.signData, {super.key});
@@ -60,13 +58,30 @@ class _SignScreenState extends State<SignScreen> with BlockAndRunMixin {
     }
 
     try {
-      Uri url = Uri.parse(widget.signData.dataUrl!);
-      Response r = await http.get(url);
+      final dataUrl = widget.signData.dataUrl;
+      final uri = dataUrl != null && dataUrl.isNotEmpty
+          ? InputValidator.validateUrl(dataUrl)
+          : null;
 
-      urlData = json.decode(r.body.toString());
+      if (uri == null) {
+        throw FormatException('Invalid data URL');
+      }
+
+      final content = await InputValidator.fetchValidatedContent(uri);
+      if (content == null) {
+        throw FormatException('Failed to fetch data');
+      }
+
+      final decoded = InputValidator.decodeJson(content);
+      if (decoded == null) {
+        throw FormatException('Invalid JSON format');
+      }
+
+      urlData = decoded;
       isDataLoading = false;
       setState(() {});
     } catch (e) {
+      logger.e('Error fetching sign data: $e');
       errorMessage = 'Failed to load data';
       isDataLoading = false;
       setState(() {});

@@ -1,15 +1,12 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
-import 'package:threebotlogin/helpers/logger.dart';
 import 'package:threebotlogin/providers/wallets_provider.dart';
 import 'package:threebotlogin/screens/scan_screen.dart';
 import 'package:threebotlogin/screens/signing/signing_mixin.dart';
 import 'package:threebotlogin/widgets/custom_dialog.dart';
-import 'package:http/http.dart' as http;
+import 'package:threebotlogin/helpers/input_validator.dart';
 
 class SignWithQRCodeScreen extends ConsumerStatefulWidget {
   const SignWithQRCodeScreen({super.key});
@@ -82,51 +79,77 @@ class _SignWithQRCodeScreenState extends ConsumerState<SignWithQRCodeScreen>
       }
     }
     if (result.rawValue != null) {
-      final Map<String, dynamic> jsonData = json.decode(result.rawValue!);
-      setState(() {
-        destUrlController.text = jsonData['dest'];
-      });
-
-      if (jsonData.containsKey('content')) {
-        textController.text = jsonData['content'];
-      } else if (jsonData.containsKey('src')) {
-        setState(() {
-          isLoading = true;
-        });
-
-        try {
-          final response = await http.get(Uri.parse(jsonData['src']));
-          if (response.statusCode == 200) {
-            textController.text = response.body;
-          } else {
-            throw Exception('Failed to load content from source');
-          }
-        } catch (e) {
-          logger.e('Error fetching content from src: $e');
-          setState(() {
-            scannedDataError = 'Failed to fetch content from source';
-          });
-          _showInvalidQRCodeDialog();
-          return;
-        } finally {
-          setState(() {
-            isLoading = false;
-          });
-        }
-      } else {
-        setState(() {
-          scannedDataError = 'No content found in QR code';
-        });
+      final jsonData = InputValidator.decodeJson(result.rawValue!);
+      if (jsonData == null) {
+        setState(() => scannedDataError = 'Invalid QR code format');
         _showInvalidQRCodeDialog();
         return;
       }
-      setState(() {
-        scannedDataError = null;
-      });
+
+      bool hasValidData = false;
+
+      if (jsonData.containsKey('dest')) {
+        final dest = jsonData['dest'];
+        if (dest is String &&
+            InputValidator.isValidLength(dest, InputValidator.maxUrlLength)) {
+          setState(() => destUrlController.text = dest);
+          hasValidData = true;
+        }
+      }
+
+      if (jsonData.containsKey('content')) {
+        final content = jsonData['content'];
+        if (content is String &&
+            InputValidator.isValidLength(
+                content, InputValidator.maxContentLength)) {
+          textController.text = content;
+          hasValidData = true;
+        } else {
+          setState(() => scannedDataError = 'Content too large');
+          _showInvalidQRCodeDialog();
+          return;
+        }
+      }
+
+      if (jsonData.containsKey('src')) {
+        final src = jsonData['src'];
+        if (src is! String) {
+          setState(() => scannedDataError = 'Invalid source URL');
+          _showInvalidQRCodeDialog();
+          return;
+        }
+
+        final uri = InputValidator.validateUrl(src);
+        if (uri == null) {
+          setState(() => scannedDataError = 'Invalid source URL format');
+          _showInvalidQRCodeDialog();
+          return;
+        }
+
+        setState(() => isLoading = true);
+        final content = await InputValidator.fetchValidatedContent(uri);
+        setState(() => isLoading = false);
+
+        if (content != null) {
+          textController.text = content;
+          hasValidData = true;
+        } else if (!hasValidData) {
+          setState(
+              () => scannedDataError = 'Failed to fetch content from source');
+          _showInvalidQRCodeDialog();
+          return;
+        }
+      }
+
+      if (!hasValidData) {
+        setState(() => scannedDataError = 'No valid data found in QR code');
+        _showInvalidQRCodeDialog();
+        return;
+      }
+
+      setState(() => scannedDataError = null);
     } else {
-      setState(() {
-        scannedDataError = 'No QR code data detected nor src provided';
-      });
+      setState(() => scannedDataError = 'No QR code data detected');
       _showInvalidQRCodeDialog();
       return;
     }

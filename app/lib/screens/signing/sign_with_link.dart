@@ -5,7 +5,7 @@ import 'package:threebotlogin/helpers/logger.dart';
 import 'package:threebotlogin/providers/wallets_provider.dart';
 import 'package:threebotlogin/screens/signing/signing_mixin.dart';
 import 'package:threebotlogin/widgets/custom_dialog.dart';
-import 'package:http/http.dart' as http;
+import 'package:threebotlogin/helpers/input_validator.dart';
 
 class SignWithLinkScreen extends ConsumerStatefulWidget {
   const SignWithLinkScreen({super.key});
@@ -97,19 +97,18 @@ class _SignWithLinkScreenState extends ConsumerState<SignWithLinkScreen>
     });
 
     try {
-      String linkText = _linkController.text;
-
-      try {
-        final response = await http.get(Uri.parse(linkText));
-        if (response.statusCode == 200) {
-          _dataController.text = response.body;
-          textController.text = response.body;
+      final linkText = _linkController.text.trim();
+      final uri = InputValidator.validateUrl(linkText);
+      if (uri != null) {
+        final content = await InputValidator.fetchValidatedContent(uri);
+        if (content != null) {
+          _dataController.text = content;
+          textController.text = content;
           setState(() {
             linkError = null;
             dataError = null;
             isLoading = false;
           });
-
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text('Content fetched successfully',
@@ -118,55 +117,48 @@ class _SignWithLinkScreenState extends ConsumerState<SignWithLinkScreen>
             ),
           );
           return;
-        } else {
-          throw Exception('Failed to fetch content: ${response.statusCode}');
         }
-      } catch (e) {
-        final Uri link = Uri.parse(linkText);
-        Map<String, String> queryParams = link.queryParameters;
+      }
 
-        List<String> requiredParams = [
-          'dataHash',
-          'state',
-          'appId',
-          'dataUrl',
-          'isJson',
-          'friendlyName'
-        ];
+      final link = Uri.parse(linkText);
+      final queryParams = link.queryParameters;
+      final requiredParams = [
+        'dataHash',
+        'state',
+        'appId',
+        'dataUrl',
+        'isJson',
+        'friendlyName'
+      ];
+      final isValidSignAttempt = requiredParams.every(
+        (param) =>
+            queryParams[param] != null && queryParams[param] != 'undefined',
+      );
 
-        bool isValidSignAttempt = true;
-        for (var param in requiredParams) {
-          if (queryParams[param] == null || queryParams[param] == 'undefined') {
-            isValidSignAttempt = false;
-            break;
-          }
-        }
-
-        if (!isValidSignAttempt) {
-          setState(() {
-            linkError = 'Missing required parameters';
-            isLoading = false;
-          });
-          _showInvalidLinkDialog();
-          return;
-        }
-
-        _dataController.text = queryParams['dataHash'] ?? '';
-        textController.text = queryParams['dataHash'] ?? '';
+      if (!isValidSignAttempt) {
         setState(() {
-          linkError = null;
-          dataError = null;
+          linkError = 'Missing required parameters';
           isLoading = false;
         });
-
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Link processed successfully',
-                style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                    color: Theme.of(context).colorScheme.primaryContainer)),
-          ),
-        );
+        _showInvalidLinkDialog();
+        return;
       }
+
+      _dataController.text = queryParams['dataHash'] ?? '';
+      textController.text = queryParams['dataHash'] ?? '';
+      setState(() {
+        linkError = null;
+        dataError = null;
+        isLoading = false;
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Link processed successfully',
+              style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                  color: Theme.of(context).colorScheme.primaryContainer)),
+        ),
+      );
     } catch (e) {
       logger.e('Error processing link: $e');
       setState(() {

@@ -21,7 +21,8 @@ const horizonUrl = 'https://horizon.stellar.org';
 
 bool isValidStellarSecret(String seed) {
   try {
-    StrKey.decodeStellarSecretSeed(seed);
+    final trimmedSeed = seed.trim();
+    StrKey.decodeStellarSecretSeed(trimmedSeed);
     return true;
   } catch (e) {
     logger.e('Secret is invalid. $e');
