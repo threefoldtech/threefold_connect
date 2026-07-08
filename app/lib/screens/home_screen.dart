@@ -22,6 +22,7 @@ import 'package:threebotlogin/screens/authentication_screen.dart';
 import 'package:threebotlogin/services/socket_service.dart';
 import 'package:threebotlogin/services/uni_link_service.dart';
 import 'package:threebotlogin/services/shared_preference_service.dart';
+import 'package:threebotlogin/services/notification_service.dart';
 import 'package:threebotlogin/widgets/email_verification_needed.dart';
 import 'package:app_links/app_links.dart';
 
@@ -120,6 +121,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
   void initState() {
     super.initState();
     initUniLinks();
+    
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      NotificationService().showNotificationDisabledReminder();
+    });
 
     _ownedTabController = TabController(
         initialIndex: 0, length: Globals().router.routes.length, vsync: this);
