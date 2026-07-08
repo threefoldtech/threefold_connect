@@ -307,13 +307,13 @@ class _MobileRegistrationScreenState extends State<MobileRegistrationScreen> {
   Widget registrationStepper() {
     return Stepper(
       controlsBuilder: (BuildContext context, ControlsDetails details) {
-        return Column(
-          children: <Widget>[
-            Row(
-              mainAxisSize: MainAxisSize.max,
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: <Widget>[
-                ElevatedButton(
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+          child: Row(
+            mainAxisSize: MainAxisSize.max,
+            children: <Widget>[
+              Expanded(
+                child: ElevatedButton(
                   onPressed: () {
                     details.onStepCancel!();
                   },
@@ -321,7 +321,10 @@ class _MobileRegistrationScreenState extends State<MobileRegistrationScreen> {
                     state == _State.DoubleName ? 'CANCEL' : 'PREVIOUS',
                   ),
                 ),
-                ElevatedButton(
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: ElevatedButton(
                   onPressed: state == _State.SeedPhrase && didWriteSeed == false
                       ? null
                       : () {
@@ -330,10 +333,10 @@ class _MobileRegistrationScreenState extends State<MobileRegistrationScreen> {
                   child: Text(
                     state == _State.Finish ? 'FINISH' : 'NEXT',
                   ),
-                )
-              ],
-            ),
-          ],
+                ),
+              ),
+            ],
+          ),
         );
       },
       type: StepperType.vertical,
