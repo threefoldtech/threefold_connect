@@ -19,6 +19,16 @@ const String usdcAssetIssuer =
     'GA5ZSEJYB37JRC5AVCIA5MOP4RHTM335X2KGX3IHOJAPP5RE34K4KZVN';
 const horizonUrl = 'https://horizon.stellar.org';
 
+/// Formats decimal values to ensure they have a leading zero if they start with a decimal point
+/// This is required by the stellar client which doesn't accept values like ".5" but needs "0.5"
+String formatDecimalValue(String value) {
+  final trimmedValue = value.trim();
+  if (trimmedValue.startsWith('.')) {
+    return '0$trimmedValue';
+  }
+  return trimmedValue;
+}
+
 bool isValidStellarSecret(String seed) {
   try {
     StrKey.decodeStellarSecretSeed(seed);
@@ -293,8 +303,8 @@ Future<bool> createOrder(String secret, String sellingAssetCode,
   return await client.createOrder(
       sellingAssetCode: sellingAssetCode,
       buyingAssetCode: buyingAssetCode,
-      amount: amount,
-      price: price);
+      amount: formatDecimalValue(amount),
+      price: formatDecimalValue(price));
 }
 
 Future<bool> cancelOrder(String secret, String offerID) async {
@@ -306,7 +316,9 @@ Future<bool> updateOrder(
     String secret, String amount, String price, String offerID) async {
   final client = Client(NetworkType.PUBLIC, secret);
   return await client.updateOrder(
-      amount: amount, price: price, offerId: offerID);
+      amount: formatDecimalValue(amount),
+      price: formatDecimalValue(price),
+      offerId: offerID);
 }
 
 // The provided offer won't be counted from available balance
