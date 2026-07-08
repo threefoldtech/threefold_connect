@@ -93,6 +93,7 @@ class _FarmScreenState extends ConsumerState<FarmScreen>
   }
 
   void _setLoadingState() {
+    if (!mounted) return;
     setState(() {
       loading = true;
       failed = false;
@@ -103,6 +104,7 @@ class _FarmScreenState extends ConsumerState<FarmScreen>
   }
 
   void _handleSuccess() {
+    if (!mounted) return;
     setState(() {
       loading = false;
       failed = false;
@@ -111,20 +113,20 @@ class _FarmScreenState extends ConsumerState<FarmScreen>
   }
 
   void _handleFailure(String userMessage, {Object? error}) {
-    if (mounted) {
-      final errorSnackbar = SnackBar(
-        content: Text(
-          userMessage,
-          style: Theme.of(context)
-              .textTheme
-              .bodyMedium!
-              .copyWith(color: Theme.of(context).colorScheme.errorContainer),
-        ),
-        duration: const Duration(seconds: 3),
-      );
-      ScaffoldMessenger.of(context).clearSnackBars();
-      ScaffoldMessenger.of(context).showSnackBar(errorSnackbar);
-    }
+    if (!mounted) return;
+    
+    final errorSnackbar = SnackBar(
+      content: Text(
+        userMessage,
+        style: Theme.of(context)
+            .textTheme
+            .bodyMedium!
+            .copyWith(color: Theme.of(context).colorScheme.errorContainer),
+      ),
+      duration: const Duration(seconds: 3),
+    );
+    ScaffoldMessenger.of(context).clearSnackBars();
+    ScaffoldMessenger.of(context).showSnackBar(errorSnackbar);
 
     setState(() {
       loading = false;
@@ -366,6 +368,7 @@ class _FarmScreenState extends ConsumerState<FarmScreen>
   }
 
   _addFarm(Farm farm) {
+    if (!mounted) return;
     setState(() {
       _tabController.index == 0 ? v3Farms.add(farm) : v4Farms.add(farm);
     });
