@@ -64,6 +64,8 @@ class _NewsScreenState extends State<NewsScreen> {
           (startIndex + articlesPerPage).clamp(0, allEntries.length);
       final newArticles = allEntries.sublist(startIndex, endIndex);
 
+      if (!mounted) return;
+
       final isLastPage = newArticles.length < articlesPerPage;
       isLastPage
           ? _pagingController.appendLastPage(newArticles)
@@ -83,13 +85,15 @@ class _NewsScreenState extends State<NewsScreen> {
   }
 
   void _handleError(String message, Exception error) {
+    if (!mounted) return;
+
     logger.e('News feed error: $message', error: error);
 
     _isLoading = false;
 
     _pagingController.error = message;
 
-    if (mounted && context.mounted) {
+    if (context.mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
@@ -106,6 +110,7 @@ class _NewsScreenState extends State<NewsScreen> {
   }
 
   Future<void> _refreshNews() async {
+    if (!mounted) return;
     _pagingController.refresh();
     return Future.delayed(const Duration(milliseconds: 300));
   }
