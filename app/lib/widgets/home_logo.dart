@@ -8,63 +8,67 @@ class HomeLogoWidget extends StatelessWidget {
 
   @override
 Widget build(BuildContext context) {
-  return Column(
-    mainAxisAlignment: MainAxisAlignment.center,
-    crossAxisAlignment: CrossAxisAlignment.center,
-    children: [
-      Center(
-        child: animate
-            ? Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  SizedBox(
-                    width: 45,
-                    height: 45,
-                    child: Lottie.asset(
-                      'assets/tfloading.json',
-                      repeat: true,
-                      animate: true,
+  return FittedBox(
+    fit: BoxFit.scaleDown,
+    child: Column(
+      mainAxisSize: MainAxisSize.min,
+      mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        Center(
+          child: animate
+              ? Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    SizedBox(
+                      width: 45,
+                      height: 45,
+                      child: Lottie.asset(
+                        'assets/tfloading.json',
+                        repeat: true,
+                        animate: true,
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    Text(
+                      'THREEFOLD',
+                      style: Theme.of(context).textTheme.headlineLarge!.copyWith(
+                            color: Theme.of(context).colorScheme.onSurface,
+                            fontWeight: FontWeight.bold,
+                          ),
+                    ),
+                  ],
+                )
+              : SizedBox(
+                  height: 90,
+                  child: SvgPicture.asset(
+                    'assets/TF_logo.svg',
+                    alignment: Alignment.center,
+                    colorFilter: ColorFilter.mode(
+                      Theme.of(context).colorScheme.onSurface,
+                      BlendMode.srcIn,
                     ),
                   ),
-                  const SizedBox(height: 10),
-                  Text(
-                    'THREEFOLD',
-                    style: Theme.of(context).textTheme.headlineLarge!.copyWith(
-                          color: Theme.of(context).colorScheme.onSurface,
-                          fontWeight: FontWeight.bold,
-                        ),
-                  ),
-                ],
-              )
-            : SizedBox(
-                height: 90,
-                child: SvgPicture.asset(
-                  'assets/TF_logo.svg',
-                  alignment: Alignment.center,
-                  colorFilter: ColorFilter.mode(
-                    Theme.of(context).colorScheme.onSurface,
-                    BlendMode.srcIn,
-                  ),
                 ),
-              ),
-      ),
-      SizedBox(
-        height: MediaQuery.of(context).size.height * 0.04,
-        width: MediaQuery.of(context).size.width * 0.6,
-        child: Divider(
-          thickness: 2,
-          color: Theme.of(context).colorScheme.primary,
         ),
-      ),
-      Text(
-        'CONNECT',
-        style: Theme.of(context).textTheme.titleLarge!.copyWith(
-              color: Theme.of(context).colorScheme.onSurface,
-              letterSpacing: 10,
-              fontWeight: FontWeight.bold,
-            ),
-      ),
-    ],
+        SizedBox(
+          height: MediaQuery.of(context).size.height * 0.04,
+          width: MediaQuery.of(context).size.width * 0.6,
+          child: Divider(
+            thickness: 2,
+            color: Theme.of(context).colorScheme.primary,
+          ),
+        ),
+        Text(
+          'CONNECT',
+          style: Theme.of(context).textTheme.titleLarge!.copyWith(
+                color: Theme.of(context).colorScheme.onSurface,
+                letterSpacing: 10,
+                fontWeight: FontWeight.bold,
+              ),
+        ),
+      ],
+    ),
   );
 }
 
