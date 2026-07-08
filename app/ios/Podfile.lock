@@ -31,6 +31,8 @@ PODS:
     - Flutter
   - flutter_pkid (0.0.1):
     - Flutter
+  - flutter_secure_storage (6.0.0):
+    - Flutter
   - idenfy_sdk_flutter (2.6.5):
     - Flutter
     - iDenfySDK/iDenfyLiveness (= 8.6.8)
@@ -90,6 +92,7 @@ DEPENDENCIES:
   - flutter_inappwebview_ios (from `.symlinks/plugins/flutter_inappwebview_ios/ios`)
   - flutter_keyboard_visibility (from `.symlinks/plugins/flutter_keyboard_visibility/ios`)
   - flutter_pkid (from `.symlinks/plugins/flutter_pkid/ios`)
+  - flutter_secure_storage (from `.symlinks/plugins/flutter_secure_storage/ios`)
   - idenfy_sdk_flutter (from `.symlinks/plugins/idenfy_sdk_flutter/ios`)
   - just_audio (from `.symlinks/plugins/just_audio/darwin`)
   - local_auth_darwin (from `.symlinks/plugins/local_auth_darwin/darwin`)
@@ -138,6 +141,8 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/flutter_keyboard_visibility/ios"
   flutter_pkid:
     :path: ".symlinks/plugins/flutter_pkid/ios"
+  flutter_secure_storage:
+    :path: ".symlinks/plugins/flutter_secure_storage/ios"
   idenfy_sdk_flutter:
     :path: ".symlinks/plugins/idenfy_sdk_flutter/ios"
   just_audio:
@@ -182,6 +187,7 @@ SPEC CHECKSUMS:
   flutter_inappwebview_ios: b89ba3482b96fb25e00c967aae065701b66e9b99
   flutter_keyboard_visibility: 4625131e43015dbbe759d9b20daaf77e0e3f6619
   flutter_pkid: 816b9b6b9e0db3bd65fb88a23a6e70e6a3e9473e
+  flutter_secure_storage: 1ed9476fba7e7a782b22888f956cce43e2c62f13
   idenfy_sdk_flutter: 446c31efa9ec9be62654bb03304506e76bf3327a
   iDenfySDK: 8424b9e1b0887802d3b5ff8ec85f7f652e02d3df
   IosAwnCore: 653786a911089012092ce831f2945cd339855a89
