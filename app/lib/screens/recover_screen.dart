@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:core';
 
@@ -5,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_pkid/flutter_pkid.dart';
 import 'package:sodium_libs/sodium_libs.dart';
 import 'package:http/http.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:threebotlogin/helpers/kyc_helpers.dart';
 import 'package:threebotlogin/helpers/logger.dart';
 import 'package:threebotlogin/services/3bot_service.dart';
@@ -36,9 +38,25 @@ class _RecoverScreenState extends State<RecoverScreen> {
 
   validateNameSeed(doubleName, seedPhrase) async {
     try {
-      Response userInfoResult = await getUserInfo(doubleName);
+      // Check connectivity first
+      final connectivityResult = await (Connectivity().checkConnectivity());
+      if (connectivityResult.contains(ConnectivityResult.none)) {
+        throw ('No internet connection. Please check your network.');
+      }
+
+      // Get user info with timeout
+      Response userInfoResult = await getUserInfo(doubleName).timeout(
+        const Duration(minutes: 1),
+        onTimeout: () {
+          throw TimeoutException('Loading user information timed out');
+        },
+      );
+
       await validateName(doubleName, userInfoResult);
       await validateSeed(seedPhrase, userInfoResult);
+    } on TimeoutException catch (e) {
+      logger.e('Timeout during name/seed validation', error: e);
+      throw ('Login timed out. Please check your network connection.');
     } catch (e) {
       rethrow;
     }
@@ -75,6 +93,12 @@ class _RecoverScreenState extends State<RecoverScreen> {
 
   continueRecoverAccount() async {
     try {
+      // Check connectivity before PKid operations
+      final connectivityResult = await (Connectivity().checkConnectivity());
+      if (connectivityResult.contains(ConnectivityResult.none)) {
+        throw ('No internet connection. Please check your network.');
+      }
+
       KeyPair keyPair = await generateKeyPairFromSeedPhrase(seedPhrase);
       await savePrivateKey(keyPair.secretKey.extractBytes());
       await savePublicKey(keyPair.publicKey);
@@ -83,14 +107,24 @@ class _RecoverScreenState extends State<RecoverScreen> {
       List<String> keyWords = ['email', 'phone'];
 
       var futures = keyWords.map((keyword) async {
-        var pKidResult = await client.getPKidDoc(keyword);
+        var pKidResult = await client.getPKidDoc(keyword).timeout(
+          const Duration(minutes: 1),
+          onTimeout: () {
+            throw TimeoutException('Loading $keyword data timed out');
+          },
+        );
         return pKidResult.containsKey('data') &&
                 pKidResult.containsKey('success')
             ? jsonDecode(pKidResult['data'])
             : {};
       });
 
-      var pKidResult = await Future.wait(futures);
+      var pKidResult = await Future.wait(futures).timeout(
+        const Duration(minutes: 2),
+        onTimeout: () {
+          throw TimeoutException('Loading account data timed out');
+        },
+      );
       Map<int, dynamic> dataMap = pKidResult.asMap();
 
       await savePhrase(seedPhrase);
@@ -99,9 +133,15 @@ class _RecoverScreenState extends State<RecoverScreen> {
       await handleKYCData(dataMap[0], dataMap[1]);
 
       await fixPkidMigration();
+    } on TimeoutException catch (e) {
+      logger.e('Timeout during account recovery', error: e);
+      throw ('Account recovery timed out. Please check your network connection.');
     } catch (e) {
-      logger.e(e);
-      throw ('Something went wrong');
+      logger.e('Error during account recovery', error: e);
+      if (e.toString().contains('No internet connection')) {
+        rethrow;
+      }
+      throw ('Something went wrong during account recovery. Please try again.');
     }
   }
 
@@ -204,11 +244,14 @@ class _RecoverScreenState extends State<RecoverScreen> {
             const SizedBox(
               height: 10,
             ),
-            Text(
-              error,
-              style: Theme.of(context).textTheme.bodyLarge!.copyWith(
-                  color: Theme.of(context).colorScheme.error,
-                  fontWeight: FontWeight.bold),
+            Padding(
+              padding: const EdgeInsets.all(20),
+              child: Text(
+                error,
+                style: Theme.of(context).textTheme.bodyLarge!.copyWith(
+                    color: Theme.of(context).colorScheme.error,
+                    fontWeight: FontWeight.bold),
+              ),
             ),
             ElevatedButton(
               style: ElevatedButton.styleFrom(),
