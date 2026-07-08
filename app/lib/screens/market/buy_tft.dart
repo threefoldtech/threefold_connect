@@ -1,5 +1,6 @@
 import 'package:decimal/decimal.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:stellar_client/models/exceptions.dart';
 import 'package:threebotlogin/helpers/logger.dart';
@@ -10,6 +11,18 @@ import 'package:threebotlogin/providers/orders_notifier.dart';
 import 'package:threebotlogin/screens/market/order.dart';
 import 'package:threebotlogin/services/stellar_service.dart' as Stellar;
 import 'package:threebotlogin/widgets/custom_dialog.dart';
+
+/// TextInputFormatter that converts comma to dot for decimal separator
+class CommaToDotFormatter extends TextInputFormatter {
+  @override
+  TextEditingValue formatEditUpdate(
+      TextEditingValue oldValue, TextEditingValue newValue) {
+    return TextEditingValue(
+      text: newValue.text.replaceAll(',', '.'),
+      selection: newValue.selection,
+    );
+  }
+}
 
 class BuyTFTWidget extends StatefulWidget {
   final Wallet wallet;
@@ -171,14 +184,22 @@ class _BuyTFTWidgetState extends State<BuyTFTWidget> {
       });
       return false;
     }
-    if (Decimal.parse(price) <= Decimal.zero) {
+    
+    try {
+      final decimalPrice = Decimal.parse(price);
+      if (decimalPrice <= Decimal.zero) {
+        setState(() {
+          priceError = 'Price should be positive';
+        });
+        return false;
+      }
+      return true;
+    } catch (e) {
       setState(() {
-        priceError = 'Price should be positive';
+        priceError = 'Invalid price format';
       });
       return false;
     }
-
-    return true;
   }
 
   calculateAmount(int percentage) {
@@ -456,6 +477,9 @@ class _BuyTFTWidgetState extends State<BuyTFTWidget> {
                         },
                         keyboardType: const TextInputType.numberWithOptions(
                             decimal: true, signed: false),
+                        inputFormatters: [
+                          CommaToDotFormatter(),
+                        ],
                         controller: amountController,
                         textInputAction: TextInputAction.done,
                         decoration: InputDecoration(
@@ -562,6 +586,12 @@ class _BuyTFTWidgetState extends State<BuyTFTWidget> {
                             ),
                         keyboardType: const TextInputType.numberWithOptions(
                             decimal: true, signed: false),
+                        inputFormatters: [
+                          CommaToDotFormatter(),
+                        ],
+                        onChanged: (_) {
+                          _validatePrice();
+                        },
                         controller: priceController,
                         textInputAction: TextInputAction.done,
                         decoration: InputDecoration(
