@@ -4,6 +4,7 @@ import 'package:threebotlogin/models/wallet.dart';
 import 'package:threebotlogin/providers/wallets_provider.dart';
 import 'package:threebotlogin/screens/wallets/transactions.dart';
 import 'package:threebotlogin/screens/wallets/wallet_assets.dart';
+import 'package:threebotlogin/screens/wallets/contracts.dart';
 import 'package:threebotlogin/screens/wallets/wallet_info.dart';
 
 class WalletDetailsScreen extends ConsumerStatefulWidget {
@@ -33,6 +34,8 @@ class _WalletDetailsScreenState extends ConsumerState<WalletDetailsScreen> {
         wallet: widget.wallet,
       );
     } else if (currentScreenIndex == 2) {
+      content = WalletContractsWidget(wallet: widget.wallet);
+    } else if (currentScreenIndex == 3) {
       content = WalletDetailsWidget(wallet: widget.wallet);
     } else {
       content = WalletAssetsWidget(
@@ -40,15 +43,20 @@ class _WalletDetailsScreenState extends ConsumerState<WalletDetailsScreen> {
       );
     }
     return Scaffold(
-      appBar: AppBar(title: Text(widget.wallet.name)),
+      appBar: AppBar(
+        title: Text(widget.wallet.name),
+      ),
       bottomNavigationBar: BottomNavigationBar(
         onTap: _selectScreen,
         currentIndex: currentScreenIndex,
+        type: BottomNavigationBarType.fixed,
         items: const [
           BottomNavigationBarItem(
               icon: Icon(Icons.account_balance), label: 'Assets'),
           BottomNavigationBarItem(
               icon: Icon(Icons.swap_horiz), label: 'Transactions'),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.description), label: 'Contracts'),
           BottomNavigationBarItem(icon: Icon(Icons.info), label: 'Info'),
         ],
       ),
