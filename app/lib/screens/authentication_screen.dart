@@ -56,6 +56,14 @@ class AuthenticationScreenState extends State<AuthenticationScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) => checkFingerprint());
   }
 
+  @override
+  void dispose() {
+    if (widget.loginData != null && widget.loginData!.isMobile == false) {
+      timer.cancel();
+    }
+    super.dispose();
+  }
+
   timeoutTimer() async {
     if (!mounted) {
       timer.cancel();
