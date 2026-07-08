@@ -67,7 +67,7 @@ class TransactionWidget extends StatelessWidget {
                                       : Theme.of(context).colorScheme.error,
                                 )),
                       ),
-                      Text(transaction.date,
+                      Text(formatDateTime(transaction.date),
                           overflow: TextOverflow.ellipsis,
                           style: Theme.of(context)
                               .textTheme

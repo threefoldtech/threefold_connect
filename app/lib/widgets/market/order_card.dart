@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:threebotlogin/helpers/logger.dart';
+import 'package:threebotlogin/helpers/transaction_helpers.dart';
 import 'package:threebotlogin/models/offer.dart';
-import 'package:intl/intl.dart';
 import 'package:threebotlogin/models/wallet.dart' as Wallet;
 import 'package:threebotlogin/screens/market/order_details.dart';
 
@@ -21,16 +21,6 @@ class OrderCardWidget extends ConsumerStatefulWidget {
 }
 
 class _OrderCardWidgetState extends ConsumerState<OrderCardWidget> {
-  String formatDateTime(String isoString) {
-    try {
-      DateTime dateTime = DateTime.parse(isoString).toLocal();
-      return DateFormat('yyyy-MM-dd HH:mm:ss').format(dateTime);
-    } catch (e) {
-      logger.e('Error formatting date: $e');
-      return 'Unknown date';
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     try {
